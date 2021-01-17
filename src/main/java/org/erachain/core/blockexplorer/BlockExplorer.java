@@ -390,7 +390,7 @@ public class BlockExplorer {
                     }
                     if (param.equals("person")) {
                         if (!assetKey) {
-                            int side = Transaction.BALANCE_SIDE_LEFT;
+                            int side = Account.BALANCE_SIDE_LEFT;
                             try {
                                 side = new Integer(info.getQueryParameters().getFirst("side"));
                             } catch (Exception e) {
@@ -1460,9 +1460,9 @@ public class BlockExplorer {
         output.put("label_Balance_Pos", Lang.T(Account.balancePositionName(position), langObj));
         output.put("label_Balance_Side", Lang.T(Account.balanceSideName(side), langObj));
 
-        output.put("Label_TotalDebit", Lang.T(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_DEBIT), langObj));
-        output.put("Label_Left", Lang.T(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_LEFT), langObj));
-        output.put("Label_TotalCredit", Lang.T(Account.balanceSideName(TransactionAmount.BALANCE_SIDE_CREDIT), langObj));
+        output.put("Label_TotalDebit", Lang.T(Account.balanceSideName(Account.BALANCE_SIDE_DEBIT), langObj));
+        output.put("Label_Left", Lang.T(Account.balanceSideName(Account.BALANCE_SIDE_LEFT), langObj));
+        output.put("Label_TotalCredit", Lang.T(Account.balanceSideName(Account.BALANCE_SIDE_CREDIT), langObj));
 
         output.put("Side_Help", Lang.T("Side_Help", langObj));
 
@@ -1475,17 +1475,17 @@ public class BlockExplorer {
                 output.put("label_Balance_Pos", Lang.T(Account.balanceCOMPUPositionName(position), langObj));
                 output.put("label_Balance_Side", Lang.T(Account.balanceCOMPUSideName(side), langObj));
 
-                output.put("Label_TotalDebit", Lang.T(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_DEBIT), langObj));
-                output.put("Label_Left", Lang.T(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_LEFT), langObj));
-                output.put("Label_TotalCredit", Lang.T(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_CREDIT), langObj));
-                output.put("Label_TotalForged", Lang.T(Account.balanceCOMPUSideName(TransactionAmount.BALANCE_SIDE_FORGED), langObj));
+                output.put("Label_TotalDebit", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_DEBIT), langObj));
+                output.put("Label_Left", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_LEFT), langObj));
+                output.put("Label_TotalCredit", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_CREDIT), langObj));
+                output.put("Label_TotalForged", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_FORGED), langObj));
 
                 output.put("Side_Help", Lang.T("Side_Help_COMPU_BONUS", langObj));
 
-                if (side == TransactionAmount.BALANCE_SIDE_FORGED) {
+                if (side == Account.BALANCE_SIDE_FORGED) {
                     // Это запрос на баланса Нафоржили - он в 5-й позиции на стороне 2
                     position = TransactionAmount.ACTION_PLEDGE;
-                    side = TransactionAmount.BALANCE_SIDE_LEFT;
+                    side = Account.BALANCE_SIDE_LEFT;
                 }
 
             }
@@ -1925,7 +1925,7 @@ public class BlockExplorer {
         BigDecimal all = BigDecimal.ZERO;
         BigDecimal alloreders = BigDecimal.ZERO;
 
-        List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
+        List<Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> top100s = new ArrayList();
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
         //BigDecimal total = BigDecimal.ZERO;
@@ -1941,13 +1941,12 @@ public class BlockExplorer {
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                             balance = map.get(key);
 
-                    BigDecimal balanceUSE = balance.a.b.add(balance.b.b);
-
                     // пустые не берем
-                    if (balance.a.b.signum() == 0 && balance.b.b.signum() == 0 && balance.c.b.signum() == 0)
+                    if (balance.a.b.signum() == 0 && balance.b.b.signum() == 0 && balance.c.b.signum() == 0 && balance.d.b.signum() == 0)
                         continue;
 
-                    top100s.add(Fun.t3(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)), balanceUSE, balance.a.b));
+                    top100s.add(Fun.t5(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)),
+                            balance.a.b, balance.b.b, balance.c.b, balance.d.b));
                 } catch (java.lang.ArrayIndexOutOfBoundsException e) {
                     logger.error("Wrong key raw: ");
                 }
@@ -1962,12 +1961,12 @@ public class BlockExplorer {
             alloreders = alloreders.add(order.getAmountHaveLeft());
         }
 
-        Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_C()));
+        Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_top100()));
 
         int couter = 0;
         AssetCls asset = Controller.getInstance().getAsset(assetKey);
 
-        for (Tuple3<String, BigDecimal, BigDecimal> top100 : top100s) {
+        for (Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal> top100 : top100s) {
 
             couter++;
 
@@ -1975,8 +1974,10 @@ public class BlockExplorer {
 
             Map balance = new LinkedHashMap();
             balance.put("address", top100.a);
-            balance.put("balance", top100.b.toPlainString());
-            balance.put("in_OWN", top100.c.toPlainString());
+            balance.put("OWN", top100.b.toPlainString());
+            balance.put("DEBT", top100.c.toPlainString());
+            balance.put("HOLD", top100.d.toPlainString());
+            balance.put("SPEND", top100.e.toPlainString());
 
             Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
@@ -2022,8 +2023,10 @@ public class BlockExplorer {
                             .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
         }
         output.put("Label_Table_Account", Lang.T("Account", langObj));
-        output.put("Label_Table_Balance", Lang.T("Balance", langObj));
-        output.put("Label_Table_in_OWN", Lang.T("in OWN", langObj));
+        output.put("label_Balance_1", Lang.T("OWN (1)", langObj));
+        output.put("label_Balance_2", Lang.T("DEBT (2)", langObj));
+        output.put("label_Balance_3", Lang.T("HOLD (3)", langObj));
+        output.put("label_Balance_4", Lang.T("SPEND (4)", langObj));
         output.put("Label_Table_Prop", Lang.T("Prop.", langObj));
         output.put("Label_Table_person", Lang.T("Owner", langObj));
 
@@ -2101,7 +2104,7 @@ public class BlockExplorer {
                     bal.put("asset_name", asset.viewName());
 
 
-                    if (BlockChain.ERA_COMPU_ALL_UP && side == Transaction.BALANCE_SIDE_LEFT) {
+                    if (BlockChain.ERA_COMPU_ALL_UP && side == Account.BALANCE_SIDE_LEFT) {
                         bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)
                                 .add(account.addDEVAmount(assetKey)));
                     } else {
@@ -2819,7 +2822,7 @@ public class BlockExplorer {
         output.put("label_account", Lang.T("Account", langObj));
 
         // balance assets from
-        int side = Transaction.BALANCE_SIDE_LEFT;
+        int side = Account.BALANCE_SIDE_LEFT;
         try {
             side = new Integer(info.getQueryParameters().getFirst("side"));
         } catch (Exception e) {
@@ -3362,10 +3365,10 @@ public class BlockExplorer {
 
     }
 
-    public class BigDecimalComparator_C implements Comparator<Tuple3<String, BigDecimal, BigDecimal>> {
+    public class BigDecimalComparator_top100 implements Comparator<Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> {
 
         @Override
-        public int compare(Tuple3<String, BigDecimal, BigDecimal> a, Tuple3<String, BigDecimal, BigDecimal> b) {
+        public int compare(Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal> a, Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal> b) {
             try {
                 int result = a.c.compareTo(b.c);
                 if (result != 0)
@@ -3422,28 +3425,30 @@ public class BlockExplorer {
 
                     out.put("seqNo", transaction.getSeqNo());
 
-                    out.put("title", transaction.getTitle());
                     //out.put("confirmations", transaction.getConfirmations(height));
+                    out.put("title", transaction.getTitle(langObj));
 
                     if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+
                         RCalculated txCalculated = (RCalculated) transaction;
+
                         outcome = txCalculated.getAmount().signum() < 0;
 
                         //out.put("reference", "--");
                         out.put("signature", transaction.viewHeightSeq());
-                        // 645124 - calced seq-No 654868
+                        // 645124 - calculated seq-No 654868
                         try {
                             out.put("timestamp", dcSet.getBlocksHeadsMap().get(transaction.getBlockHeight()).getTimestamp());
                         } catch (Exception e) {
                             out.put("timestamp", transaction.viewHeightSeq());
                         }
 
-                        String message = txCalculated.getMessage();
+                        //String message = txCalculated.getMessage();
                         String typeName = Lang.T(transaction.viewFullTypeName(), langObj);
                         out.put("type", typeName);
 
                         if (typeName.equals("_protocol_")) {
-                            out.put("title", message);
+                            //out.put("title", message);
                         }
 
                         out.put("creator", txCalculated.getRecipient().getPersonAsString());
@@ -3456,6 +3461,7 @@ public class BlockExplorer {
                         out.put("fee", "--");
 
                     } else {
+
                         out.put("signature", Base58.encode(transaction.getSignature()));
                         out.put("timestamp", transaction.getTimestamp());
                         String typeName = Lang.T(transaction.viewFullTypeName(), langObj);
@@ -3485,7 +3491,7 @@ public class BlockExplorer {
                                             atSideAccount = rSend.getRecipient();
                                         }
                                         // возврат и взять на харенение обратный
-                                        outcome = outcome ^ !rSend.isBackward() ^ (rSend.getActionType() == TransactionAmount.ACTION_HOLD);
+                                        outcome = outcome ^ !rSend.isBackward() ^ (rSend.balancePosition() == TransactionAmount.ACTION_HOLD);
                                     }
                                 }
                             }

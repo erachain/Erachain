@@ -1,5 +1,6 @@
 package org.erachain.gui.items.statement;
 
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
@@ -8,6 +9,7 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -114,6 +116,18 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         });
 
         menu.add(vouch_Item);
+
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
+        linkMenu.addActionListener(e -> {
+            int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+            row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+            Transaction transaction = (Transaction) favotitesTable.getItem(row);
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+
+        });
+        menu.add(linkMenu);
 
         menu.addSeparator();
 

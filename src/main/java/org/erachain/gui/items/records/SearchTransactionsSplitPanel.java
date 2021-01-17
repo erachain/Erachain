@@ -1,10 +1,12 @@
 package org.erachain.gui.items.records;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.ASMakeHashMenuItem;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
@@ -12,6 +14,7 @@ import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MenuPopupUtil;
@@ -149,7 +152,20 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         mainMenu.add(item_Save);
 
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
+        linkMenu.addActionListener(e -> {
+            int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+            row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+            Transaction transaction = (Transaction) transactionsTableModel.getItem(row);
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+
+        });
+        mainMenu.add(linkMenu);
+
         mainMenu.addSeparator();
+
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {

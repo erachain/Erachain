@@ -8,7 +8,6 @@ import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Observable;
 
@@ -63,7 +62,8 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
                 case COLUMN_TRANSACTIONS:
                     return blockHead.transactionsCount;
                 case COLUMN_FEE:
-                    return BigDecimal.valueOf(blockHead.totalFee, BlockChain.FEE_SCALE);
+                    return blockHead.viewFeeAsBigDecimal();
+                //return BigDecimal.valueOf(blockHead.totalFee, BlockChain.FEE_SCALE);
             }
         } catch (Exception e) {
             logger.error(e.getMessage() + " row:" + row, e);

@@ -1,11 +1,13 @@
 package org.erachain.gui.items.mails;
 
 import org.erachain.core.account.Account;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui2.MainPanel;
@@ -127,6 +129,18 @@ public class IncomingMailsSplitPanel extends SplitPanel {
             }
         });
         menu.add(signMail_item_Menu);
+
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
+        linkMenu.addActionListener(e -> {
+            int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+            row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+            Transaction transaction = incoming_Mails_Model.getItem(row);
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+
+        });
+        menu.add(linkMenu);
 
         menu.addSeparator();
 

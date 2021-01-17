@@ -1,6 +1,7 @@
 package org.erachain.gui.items.records;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.wallet.WTransactionMap;
@@ -8,6 +9,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SetIntervalPanel;
@@ -15,6 +17,7 @@ import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -254,6 +257,15 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         });
 
         menu.add(item_Save);
+
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
+        linkMenu.addActionListener(e -> {
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + selectedTransaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, selectedTransaction.viewHeightSeq(), null));
+
+        });
+        menu.add(linkMenu);
 
         menu.addSeparator();
 

@@ -204,7 +204,7 @@ public abstract class PersonCls extends ItemCls {
 
     public boolean isAlive(long onThisTime) {
 
-        if(this.deathday == Long.MIN_VALUE
+        if (this.deathday == Long.MIN_VALUE
                 || this.deathday == Long.MAX_VALUE
                 || this.deathday < this.birthday)
             return true;
@@ -240,55 +240,55 @@ public abstract class PersonCls extends ItemCls {
                     switch (pos) {
                         case 1:
                             switch (side) {
-                                case Transaction.BALANCE_SIDE_DEBIT:
+                                case Account.BALANCE_SIDE_DEBIT:
                                     return balances.a.a;
-                                case Transaction.BALANCE_SIDE_LEFT:
+                                case Account.BALANCE_SIDE_LEFT:
                                     return balances.a.b;
-                                case Transaction.BALANCE_SIDE_CREDIT:
+                                case Account.BALANCE_SIDE_CREDIT:
                                     return balances.a.a.subtract(balances.a.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 2:
                             switch (side) {
-                                case Transaction.BALANCE_SIDE_DEBIT:
+                                case Account.BALANCE_SIDE_DEBIT:
                                     return balances.b.a;
-                                case Transaction.BALANCE_SIDE_LEFT:
+                                case Account.BALANCE_SIDE_LEFT:
                                     return balances.b.b;
-                                case Transaction.BALANCE_SIDE_CREDIT:
+                                case Account.BALANCE_SIDE_CREDIT:
                                     return balances.b.a.subtract(balances.b.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 3:
                             switch (side) {
-                                case Transaction.BALANCE_SIDE_DEBIT:
+                                case Account.BALANCE_SIDE_DEBIT:
                                     return balances.c.a;
-                                case Transaction.BALANCE_SIDE_LEFT:
+                                case Account.BALANCE_SIDE_LEFT:
                                     return balances.c.b;
-                                case Transaction.BALANCE_SIDE_CREDIT:
+                                case Account.BALANCE_SIDE_CREDIT:
                                     return balances.c.a.subtract(balances.c.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 4:
                             switch (side) {
-                                case Transaction.BALANCE_SIDE_DEBIT:
+                                case Account.BALANCE_SIDE_DEBIT:
                                     return balances.d.a;
-                                case Transaction.BALANCE_SIDE_LEFT:
+                                case Account.BALANCE_SIDE_LEFT:
                                     return balances.d.b;
-                                case Transaction.BALANCE_SIDE_CREDIT:
+                                case Account.BALANCE_SIDE_CREDIT:
                                     return balances.d.a.subtract(balances.d.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 5:
                             switch (side) {
-                                case Transaction.BALANCE_SIDE_DEBIT:
+                                case Account.BALANCE_SIDE_DEBIT:
                                     return balances.e.a;
-                                case Transaction.BALANCE_SIDE_LEFT:
+                                case Account.BALANCE_SIDE_LEFT:
                                     return balances.e.b;
-                                case Transaction.BALANCE_SIDE_CREDIT:
+                                case Account.BALANCE_SIDE_CREDIT:
                                     return balances.e.a.subtract(balances.e.b);
                                 default:
                                     return BigDecimal.ZERO;
@@ -445,4 +445,13 @@ public abstract class PersonCls extends ItemCls {
         return personJSON;
     }
 
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+        //DCSet dcSet = DCSet.getInstance();
+
+        JSONObject json = super.jsonForExplorerPage(langObj);
+        json.put("birthday", birthday);
+
+        return json;
+
+    }
 }

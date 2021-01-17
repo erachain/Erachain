@@ -2088,7 +2088,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     forgerEarn, false, false, true);
 
             // учтем что нафоржили
-            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Transaction.BALANCE_SIDE_FORGED);
+            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Account.BALANCE_SIDE_FORGED);
 
             // MAKE CALCULATED TRANSACTIONS
             if (this.txCalculated != null) {
@@ -2301,6 +2301,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                 index = i + indexStart;
                 txCalculated = this.txCalculated.get(i);
                 txCalculated.setHeightSeq(this.heightBlock, index);
+                // if here ERROR in DB SERIALIZER - chek transaction in block before!
                 finalMap.put(txCalculated);
 
             }
@@ -2348,12 +2349,12 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 holder.changeBalance(dcSet, asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, false, false);
                 // учтем что получили бонусы
-                holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
+                holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Account.BALANCE_SIDE_DEBIT);
 
                 // у эмитента снимем
                 BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.FEE_KEY, balanceHold,
                         false, false, false);
-                BlockChain.FEE_ASSET_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Transaction.BALANCE_SIDE_DEBIT);
+                BlockChain.FEE_ASSET_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Account.BALANCE_SIDE_DEBIT);
 
                 if (this.txCalculated != null) {
                     txCalculated.add(new RCalculated(holder, BlockChain.FEE_KEY, balanceHold,
@@ -2424,7 +2425,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             //DLSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = dcSet.getTransactionTab();
             TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
-            TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
+            TransactionFinalMapSigns transFinalMapSigns = dcSet.getTransactionFinalMapSigns();
 
             long timerProcess = 0;
             long timerRefsMap_set = 0;
@@ -2487,13 +2488,13 @@ public class Block implements Closeable, ExplorerJsonLine {
                 timerStart = System.currentTimeMillis();
                 finalMap.put(key, transaction);
                 timerFinalMap_set += System.currentTimeMillis() - timerStart;
-                //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
+                //logger.debug("[" + seqNo + "] try transFinalMapSigns.set" );
                 timerStart = System.currentTimeMillis();
-                transFinalMapSinds.put(transactionSignature, key);
+                transFinalMapSigns.put(transactionSignature, key);
                 List<byte[]> signatures = transaction.getOtherSignatures();
                 if (signatures != null) {
                     for (byte[] itemSignature : signatures) {
-                        transFinalMapSinds.put(itemSignature, key);
+                        transFinalMapSigns.put(itemSignature, key);
                     }
                 }
                 timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;

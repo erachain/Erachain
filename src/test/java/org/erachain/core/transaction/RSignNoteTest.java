@@ -2,6 +2,7 @@ package org.erachain.core.transaction;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
@@ -81,7 +82,7 @@ public class RSignNoteTest {
         BigDecimal amountMax = null;
         Long filterAssetKey = 2L;
         int filterBalancePos = TransactionAmount.ACTION_SEND;
-        int filterBalanceSide = TransactionAmount.BALANCE_SIDE_LEFT;
+        int filterBalanceSide = Account.BALANCE_SIDE_LEFT;
         BigDecimal filterBalanceMIN = null;
         BigDecimal filterBalanceMAX = BigDecimal.TEN;
         int filterTXType = 0;

@@ -273,6 +273,19 @@ public abstract class AssetCls extends ItemCls {
      */
     public static final int AS_SELF_ACCOUNTING_CASH_FUND = 127;
 
+    /**
+     * self-managed - direct OWN balances
+     * === Не может управляться ни кем кроме обладателя актива
+     * === доступны 4-ре баланса и у каждого работает Возврат - backward
+     */
+    public static final int AS_SELF_MANAGED_DIRECT_SEND = 128;
+    /**
+     * self-managed - direct OWN balances
+     * === Не может управляться ни кем кроме обладателя актива
+     * === доступны 4-ре баланса и у каждого работает Возврат - backward
+     */
+    public static final int AS_SELF_MANAGED_SHARE = 129;
+
     protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, owner, name, icon, image, description);
         this.assetType = assetType;
@@ -325,7 +338,9 @@ public abstract class AssetCls extends ItemCls {
                 AS_SELF_MANAGED_ACCOUNTING,
                 AS_SELF_ACCOUNTING_LOAN,
                 AS_SELF_ACCOUNTING_MUTUAL_AID_FUND,
-                AS_SELF_ACCOUNTING_CASH_FUND
+                AS_SELF_ACCOUNTING_CASH_FUND,
+                AS_SELF_MANAGED_DIRECT_SEND,
+                AS_SELF_MANAGED_SHARE
         };
 
         if (BlockChain.TEST_MODE) {
@@ -418,6 +433,8 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_ACCOUNTING_LOAN:
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
             case AS_SELF_ACCOUNTING_CASH_FUND:
+            case AS_SELF_MANAGED_DIRECT_SEND:
+            case AS_SELF_MANAGED_SHARE:
                 return "±";
             case AS_MY_DEBT:
                 return "◆";
@@ -794,6 +811,34 @@ public abstract class AssetCls extends ItemCls {
         return isReverseSend(this.assetType);
     }
 
+
+    /**
+     * в обычном сотоянии тут отрицательные балансы или нет?
+     *
+     * @param balPos
+     * @return
+     */
+    public static boolean isReverseBalancePos(int assetType, int balPos) {
+
+        switch (balPos) {
+            case Account.BALANCE_POS_OWN:
+                return isReverseSend(assetType);
+            case Account.BALANCE_POS_SPEND:
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * в обычном сотоянии тут отрицательные балансы или нет?
+     *
+     * @param balPos
+     * @return
+     */
+    public boolean isReverseBalancePos(int balPos) {
+        return isReverseBalancePos(this.assetType, balPos);
+    }
+
     public BigDecimal defaultAmountAssetType() {
         switch (assetType) {
             case AS_BANK_GUARANTEE:
@@ -873,6 +918,10 @@ public abstract class AssetCls extends ItemCls {
                 return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_N";
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 return "AS_SELF_ACCOUNTING_CASH_FUND_N";
+            case AS_SELF_MANAGED_DIRECT_SEND:
+                return "AS_SELF_MANAGED_DIRECT_SEND_N";
+            case AS_SELF_MANAGED_SHARE:
+                return "AS_SELF_MANAGED_SHARE_N";
 
         }
         return null;
@@ -940,6 +989,10 @@ public abstract class AssetCls extends ItemCls {
                 return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 return "AS_SELF_ACCOUNTING_CASH_FUND_NF";
+            case AS_SELF_MANAGED_DIRECT_SEND:
+                return "AS_SELF_MANAGED_DIRECT_SEND_NF";
+            case AS_SELF_MANAGED_SHARE:
+                return "AS_SELF_MANAGED_SHARE_NF";
 
         }
         return null;
@@ -1011,6 +1064,10 @@ public abstract class AssetCls extends ItemCls {
                 return "AccAF";
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 return "AccCF";
+            case AS_SELF_MANAGED_DIRECT_SEND:
+                return "AccDS";
+            case AS_SELF_MANAGED_SHARE:
+                return "AccSh";
         }
         return "?";
     }
@@ -1079,6 +1136,10 @@ public abstract class AssetCls extends ItemCls {
                 return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_D";
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 return "AS_SELF_ACCOUNTING_CASH_FUND_D";
+            case AS_SELF_MANAGED_DIRECT_SEND:
+                return "AS_SELF_MANAGED_DIRECT_SEND_D";
+            case AS_SELF_MANAGED_SHARE:
+                return "AS_SELF_MANAGED_SHARE_D";
 
         }
         return "";
@@ -1355,6 +1416,32 @@ public abstract class AssetCls extends ItemCls {
                     default:
                         return null;
                 }
+            case AS_SELF_MANAGED_DIRECT_SEND:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? "AS_SELF_MANAGED_DIRECT_SEND_1B" : "AS_SELF_MANAGED_DIRECT_SEND_1";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "AS_SELF_MANAGED_DIRECT_SEND_2B" : "AS_SELF_MANAGED_DIRECT_SEND_2";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "AS_SELF_MANAGED_DIRECT_SEND_3B" : "AS_SELF_MANAGED_DIRECT_SEND_3";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? "AS_SELF_MANAGED_DIRECT_SEND_4B" : "AS_SELF_MANAGED_DIRECT_SEND_4";
+                    default:
+                        return null;
+                }
+            case AS_SELF_MANAGED_SHARE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return backward ? "AS_SELF_MANAGED_SHARE_1B" : "AS_SELF_MANAGED_SHARE_1";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "AS_SELF_MANAGED_SHARE_2B" : "AS_SELF_MANAGED_SHARE_2";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "AS_SELF_MANAGED_SHARE_3B" : "AS_SELF_MANAGED_SHARE_3";
+                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? "AS_SELF_MANAGED_SHARE_4B" : "AS_SELF_MANAGED_SHARE_4";
+                    default:
+                        return null;
+                }
 
         }
 
@@ -1570,6 +1657,8 @@ public abstract class AssetCls extends ItemCls {
                         return "Spender";
                 }
             case AS_SELF_MANAGED_ACCOUNTING:
+            case AS_SELF_MANAGED_DIRECT_SEND:
+            case AS_SELF_MANAGED_SHARE:
                 return "Accountant";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Lender";
@@ -1661,6 +1750,8 @@ public abstract class AssetCls extends ItemCls {
                         return "Spender";
                 }
             case AS_SELF_MANAGED_ACCOUNTING:
+            case AS_SELF_MANAGED_DIRECT_SEND:
+            case AS_SELF_MANAGED_SHARE:
                 return "Ledger";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Debtor";

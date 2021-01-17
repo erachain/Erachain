@@ -97,11 +97,18 @@ public class ExPays {
     DCSet dcSet;
     private int height;
     AssetCls asset;
+    int payAction;
     AssetCls filterAsset;
+    /**
+     * recipient + balance + payout
+     */
     public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> filteredPayouts;
     private int filteredPayoutsCount;
     private BigDecimal totalPay;
     private long totalFeeBytes;
+    private int maxIndex;
+    private BigDecimal maxBal;
+
     public String errorValue;
 
 
@@ -740,12 +747,28 @@ public class ExPays {
                 scale + Order.powerTen(totalBalances) + 3, RoundingMode.HALF_DOWN);
         Fun.Tuple3 item;
         BigDecimal amount;
+        maxBal = BigDecimal.ZERO;
         for (int index = 0; index < filteredPayoutsCount; index++) {
             item = filteredPayouts.get(index);
             amount = (BigDecimal) item.b;
             amount = amount.multiply(coefficient).setScale(scale, RoundingMode.DOWN);
             totalPay = totalPay.add(amount);
             filteredPayouts.set(index, new Fun.Tuple3(item.a, item.b, amount));
+
+            if (maxBal.compareTo(amount.abs()) < 0) {
+                // запомним максимальное для скидывания остатка
+                maxBal = amount.abs();
+                maxIndex = index;
+            }
+        }
+
+        BigDecimal totalDiff = payMethodValue.subtract(totalPay);
+        if (totalDiff.signum() != 0) {
+            // есть нераспределенный остаток
+            Fun.Tuple3<Account, BigDecimal, BigDecimal> maxItem = filteredPayouts.get(maxIndex);
+            filteredPayouts.set(maxIndex, new Fun.Tuple3(maxItem.a, maxItem.b, maxItem.c.add(totalDiff)));
+
+            totalPay = payMethodValue;
         }
 
         return true;
@@ -758,10 +781,13 @@ public class ExPays {
                 errorValue = "Payouts: assetKey == null or ZERO";
                 return Transaction.INVALID_ITEM_KEY;
             } else if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
-                errorValue = "Payouts: balancePos";
+                errorValue = "Payouts: balancePos out off range";
                 return Transaction.INVALID_AMOUNT;
             } else if (this.payMethodValue == null || payMethodValue.signum() == 0) {
                 errorValue = "Payouts: payMethodValue == null";
+                return Transaction.INVALID_AMOUNT;
+            } else if (payMethodValue.signum() < 0) {
+                errorValue = "Payouts: payMethodValue < 0";
                 return Transaction.INVALID_AMOUNT;
             }
         }
@@ -773,7 +799,7 @@ public class ExPays {
             } else if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_SPEND) {
                 errorValue = "Payouts: filterBalancePos";
                 return Transaction.INVALID_BACKWARD_ACTION;
-            } else if (this.filterBalanceSide < TransactionAmount.BALANCE_SIDE_DEBIT || this.filterBalanceSide > TransactionAmount.BALANCE_SIDE_CREDIT) {
+            } else if (this.filterBalanceSide < Account.BALANCE_SIDE_DEBIT || this.filterBalanceSide > Account.BALANCE_SIDE_CREDIT) {
                 errorValue = "Payouts: filterBalanceSide";
                 return Transaction.INVALID_BACKWARD_ACTION;
             }
@@ -871,6 +897,31 @@ public class ExPays {
         ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
         TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
 
+        // определим - меняется ли позиция баланса если направление сменим
+        // это нужно чтобы отсекать смену знака у балансов для тек активов у кого меняется позиция от знака
+        // настроим данные платежа по знакам Актива ИКоличества, так как величина коэффициента способа всегда положительная
+        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+        int balancePosDirect = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), false, asset.isSelfManaged());
+        int balancePosBackward = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), true, asset.isSelfManaged());
+        int filterBySigNum;
+        if (balancePosDirect != balancePosBackward) {
+            if (balancePosDirect == TransactionAmount.ACTION_SPEND) {
+                // используем только отрицательные балансы
+                filterBySigNum = -1;
+            } else {
+                // используем только положительные балансы
+                filterBySigNum = 1;
+            }
+        } else {
+            filterBySigNum = 0;
+        }
+
+        boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
+        // сменим знак балансов для отрицательных
+        if (reversedBalancesInPosition) {
+            filterBySigNum *= -1;
+        }
+
         byte[] key;
         BigDecimal balance;
         BigDecimal payout;
@@ -901,6 +952,10 @@ public class ExPays {
                 key = iterator.next();
 
                 balance = Account.balanceInPositionAndSide(balancesMap.get(key), filterBalancePos, filterBalanceSide);
+                if (filterBySigNum != 0 && balance.signum() != 0 && filterBySigNum != balance.signum()) {
+                    // произошла смена направления для актива у котро меняется Позиция баланса - пропускаем такое
+                    continue;
+                }
 
                 if (hasAssetFilter && filterBalanceMIN != null && balance.compareTo(filterBalanceMIN) < 0
                         || filterBalanceMAX != null && balance.compareTo(filterBalanceMAX) > 0)
@@ -1018,11 +1073,15 @@ public class ExPays {
         if (hasAssetFilter()) {
             boolean isDirect = asset.isDirectBalances();
             long absKey = assetKey;
-            boolean incomeReverse = balancePos == TransactionAmount.ACTION_HOLD;
 
             // возьмем знаки (минус) для создания позиции баланса такой
             Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
-            Long key = signs.a * assetKey;
+            Long actionPayKey = signs.a * assetKey;
+            boolean isAmountNegate;
+            BigDecimal actionPayAmount;
+            boolean incomeReverse = balancePos == Account.BALANCE_POS_HOLD;
+            boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
+            boolean backwardAction;
 
             Account recipient;
             for (Fun.Tuple3 item : filteredPayouts) {
@@ -1030,14 +1089,25 @@ public class ExPays {
                 recipient = (Account) item.a;
                 if (recipient == null)
                     break;
-                BigDecimal amount = (BigDecimal) item.c;
+                actionPayAmount = (BigDecimal) item.c;
+
+                isAmountNegate = actionPayAmount.signum() < 0;
+                backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
+
+                if (!asOrphan && block != null) {
+                    rNote.addCalculated(block, recipient, absKey, actionPayAmount,
+                            asset.viewAssetTypeAction(backwardAction, balancePos, asset.getOwner().equals(creator)));
+                }
+
+                // сбросим направлени от фильтра
+                actionPayAmount = actionPayAmount.abs();
+                // зазадим направление от Действия нашего
+                actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
 
                 TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
-                        asset, key, signs.b > 0 ? amount : amount.negate(), backward,
+                        asset, actionPayKey, actionPayAmount, backwardAction,
                         incomeReverse);
 
-                if (!asOrphan && block != null)
-                    rNote.addCalculated(block, recipient, absKey, amount, "payout");
 
             }
         }

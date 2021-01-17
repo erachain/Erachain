@@ -16,7 +16,7 @@ import java.io.File;
 public class WalletsManagerSplitPanel extends SplitPanel {
 
     public static String NAME = "WalletsManagerSplitPanel";
-    public static String TITLE = "Wallets Manager";
+    public static String TITLE = "Wallets";
 
     public AccountsPanel accountPanel;
     public AccountsRightPanel rightPanel;

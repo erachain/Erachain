@@ -29,7 +29,7 @@ import java.util.Observer;
 public class OtherSplitPanel extends SplitPanel implements Observer {
 
     public static String NAME = "OtherSplitPanel";
-    public static String TITLE = "Other";
+    public static String TITLE = "Dashboard";
 
     private PeersTableModel peersTableModel = new PeersTableModel();
     private JPanel jPanel2 = new JPanel();

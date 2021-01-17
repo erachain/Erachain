@@ -202,7 +202,7 @@ public class AssetVenture extends AssetCls {
         position += ASSET_TYPE_LENGTH;
 
         //RETURN
-        AssetVenture venture = new AssetVenture(typeBytes, owner, name, icon, image, description, assetTypeBytes[0], scale, quantity);
+        AssetVenture venture = new AssetVenture(typeBytes, owner, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]), scale, quantity);
         if (includeReference) {
             venture.setReference(reference, dbRef);
         }

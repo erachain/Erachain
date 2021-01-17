@@ -174,7 +174,8 @@ public class IssueImprintRecord extends IssueItemRecord {
 
     @Override
     public boolean hasPublicText() {
-        return false;
+        String description = item.getDescription();
+        return description != null && description.length() < 300;
     }
 
 

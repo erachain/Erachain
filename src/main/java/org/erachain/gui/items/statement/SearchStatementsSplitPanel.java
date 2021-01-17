@@ -1,6 +1,7 @@
 package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.gui.MainFrame;
@@ -9,6 +10,7 @@ import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MenuPopupUtil;
@@ -196,6 +198,17 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         });
 
         menu.add(vouch_Item);
+
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
+        linkMenu.addActionListener(e -> {
+            Transaction transaction = search_Table_Model.getItem(jTableJScrollPanelLeftPanel
+                    .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+
+        });
+        menu.add(linkMenu);
 
         menu.addSeparator();
 

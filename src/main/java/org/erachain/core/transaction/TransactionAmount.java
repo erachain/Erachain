@@ -83,13 +83,13 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     // BALANCES types and ACTION with IT
     // 0 - not used
-    public static final int ACTION_SEND = 1;
-    public static final int ACTION_DEBT = 2;
-    public static final int ACTION_REPAY_DEBT = -2; // чисто для другого отображения а так = ACTION_DEBT
-    public static final int ACTION_HOLD = 3;
-    public static final int ACTION_SPEND = 4;
-    public static final int ACTION_PLEDGE = 5;
-    public static final int ACTION_RESERCED_6 = 6;
+    public static final int ACTION_SEND = Account.BALANCE_POS_OWN;
+    public static final int ACTION_DEBT = Account.BALANCE_POS_DEBT;
+    public static final int ACTION_REPAY_DEBT = -Account.BALANCE_POS_DEBT; // чисто для другого отображения а так = ACTION_DEBT
+    public static final int ACTION_HOLD = Account.BALANCE_POS_HOLD;
+    public static final int ACTION_SPEND = Account.BALANCE_POS_SPEND;
+    public static final int ACTION_PLEDGE = Account.BALANCE_POS_PLEDGE;
+    public static final int ACTION_RESERCED_6 = Account.BALANCE_POS_6;
 
     /*
      * public static final String NAME_ACTION_TYPE_BACKWARD_PROPERTY =
@@ -317,7 +317,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return 0L;
 
         // ПРОЦЕНТЫ в любом случае посчитаем - даже если халявная транзакция
-        if (hasAmount() && getActionType() == ACTION_SEND // только для передачи в собственность!
+        if (hasAmount() && balancePosition() == ACTION_SEND // только для передачи в собственность!
                 && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
                 && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)
                 && !isInvolved(asset.getOwner())) {
@@ -340,14 +340,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return amount != null && amount.signum() != 0;
     }
 
-    public static int getActionType(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
-        return Account.balancePosition(assetKey, amount, isBackward, isDirect);
-    }
-
-    public int getActionType() {
+    public int balancePosition() {
         if (!hasAmount())
             return 0;
-        return getActionType(this.key, this.amount, this.isBackward(), asset.isSelfManaged());
+        return Account.balancePosition(this.key, this.amount, this.isBackward(), asset.isSelfManaged());
     }
 
     // BACKWARD AMOUNT
@@ -442,7 +438,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return "Mail";
 
         //return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
-        return asset.viewAssetTypeAction(isBackward(), getActionType(), creator == null ? false : asset.getOwner().equals(creator));
+        return asset.viewAssetTypeAction(isBackward(), balancePosition(), creator == null ? false : asset.getOwner().equals(creator));
     }
 
     // PARSE/CONVERT
@@ -496,7 +492,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             transaction.put("asset", this.getAbsKey());
             transaction.put("assetKey", this.getAbsKey());
             transaction.put("amount", this.amount.toPlainString());
-            transaction.put("actionKey", this.getActionType());
+            transaction.put("balancePos", this.balancePosition());
             transaction.put("actionName", viewActionType());
             if (this.isBackward())
                 transaction.put("backward", this.isBackward());
@@ -563,7 +559,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                                AssetCls asset) {
         if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
                 && actionType != ACTION_DEBT && actionType != ACTION_HOLD && actionType != ACTION_SPEND
-                && (absKey < 1 || absKey > asset.getStartKey()) // GATE Assets
+                && (absKey <= AssetCls.ERA_KEY || absKey > asset.getStartKey()) // GATE Assets
                 && !asset.isAccounting()
                 && asset.getAssetType() != AssetCls.AS_INSIDE_BONUS
                 && asset.getAssetType() != AssetCls.AS_INSIDE_VOTE

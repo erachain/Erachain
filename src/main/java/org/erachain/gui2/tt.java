@@ -98,7 +98,8 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         ASMutableTreeNode hashes_Node = new ASMutableTreeNode("hashes_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Unique Hashes") + "</b></html>", getIcon(pathIcons + "hashes_Node.png"));
         ASMutableTreeNode linked_hashes_Node = new ASMutableTreeNode("linked_hashes_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Linked Hashes") + "</b></html>", getIcon(pathIcons + "linked_hashes_Node.png"));
         ASMutableTreeNode records_Node = new ASMutableTreeNode("records_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Transactions") + "</b></html>", getIcon(pathIcons + "records_Node.png"));
-        ASMutableTreeNode other_Node = new ASMutableTreeNode("other_Node", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Network DashBoard") + "</b></html>", getIcon(pathIcons + "other_Node.png"));
+        ASMutableTreeNode other_Node = new ASMutableTreeNode("other_Node", "<html><span style='font-size:1.1em;'><b>"
+                + Lang.T("Network DashBoard") + "</b></html>", getIcon(pathIcons + "other_Node.png"));
         ASMutableTreeNode bank_Tree = new ASMutableTreeNode("bank_Tree", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Bank") + "</b></html>", getIcon(pathIcons + "bank_Tree.png"));
         ASMutableTreeNode telegrams_Tree = new ASMutableTreeNode("telegrams_Tree", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Telegrams") + "</b></html>", getIcon(pathIcons + "telegrams_Tree.png"));
 

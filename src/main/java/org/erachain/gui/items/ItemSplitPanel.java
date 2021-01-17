@@ -2,15 +2,18 @@ package org.erachain.gui.items;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -194,6 +197,17 @@ public abstract class ItemSplitPanel extends SplitPanel {
         });
         menuTable.add(vouchMenu);
 
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
+        linkMenu.addActionListener(e -> {
+            DCSet db = DCSet.getInstance();
+            Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+
+        });
+        menuTable.add(linkMenu);
+
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -219,11 +233,24 @@ public abstract class ItemSplitPanel extends SplitPanel {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Bytecode of the '%1' has been copy to buffer")
                             .replace("%1", itemTableSelected.getName())
-                            + "!",
+                            + ".",
                     Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
         });
         menuTable.add(byteCode);
+
+        JMenuItem byteKey = new JMenuItem(Lang.T("Get Number"));
+        byteKey.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection("" + itemTableSelected.getKey());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Number of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuTable.add(byteKey);
 
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menuTable);
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);

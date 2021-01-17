@@ -1,15 +1,18 @@
 package org.erachain.gui.items.records;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -223,9 +226,21 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
                 Library.saveTransactionJSONtoFileSystem(getParent(), trans);
             }
 
-            
+
         });
         menu.add(item_Save);
+
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
+        linkMenu.addActionListener(e -> {
+            int row = record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow();
+            row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+            Transaction transaction = transactionsModel.getItem(row);
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+
+        });
+        menu.add(linkMenu);
 
         menu.addSeparator();
 

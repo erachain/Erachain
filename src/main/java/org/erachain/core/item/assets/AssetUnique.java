@@ -151,7 +151,7 @@ public class AssetUnique extends AssetCls {
 
 
         //RETURN
-        AssetUnique unique = new AssetUnique(typeBytes, owner, name, icon, image, description, assetTypeBytes[0]);
+        AssetUnique unique = new AssetUnique(typeBytes, owner, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
         if (includeReference) {
             unique.setReference(reference, dbRef);
         }

@@ -2,6 +2,7 @@ package org.erachain.gui.exdata;
 
 
 import com.toedter.calendar.JDateChooser;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.item.ItemCls;
@@ -53,7 +54,7 @@ public class ExPayoutsPanel extends IconPanel {
         jComboBoxFilterBalancePosition.setRenderer(new RenderComboBoxViewBalance());
         jComboBoxFilterSideBalance.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
                 Lang.T("Total Debit"), // Transaction.BALANCE_SIDE_DEBIT = 1
-                Lang.T("Left"), // BALANCE_SIDE_LEFT = 2
+                Lang.T("Left # Остаток"), // BALANCE_SIDE_LEFT = 2
                 Lang.T("Total Credit") // BALANCE_SIDE_CREDIT = 3
         }));
         jComboBoxFilterSideBalance.setSelectedIndex(1);
@@ -82,7 +83,7 @@ public class ExPayoutsPanel extends IconPanel {
         jLabelMethodPaymentDecscription.setHorizontalAlignment(SwingConstants.LEFT);
         jComboBoxPersonFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
                 Lang.T("All"),
-                Lang.T("Only for Persons"),
+                Lang.T("Only certified addresses"),
                 Lang.T("Only for Men"),
                 Lang.T("Only for Women")}));
 
@@ -149,14 +150,14 @@ public class ExPayoutsPanel extends IconPanel {
             case 0:
                 jLabelMethodPaymentDecscription.setText("<html>" +
                         Lang.T("PAY_METHOD_0_D"));
-                jLabelAmount.setText(Lang.T("Total"));
+                jLabelAmount.setText(Lang.T("Total Amount"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
             case 1:
                 jLabelMethodPaymentDecscription.setText("<html>" +
                         Lang.T("PAY_METHOD_1_D"));
-                jLabelAmount.setText(Lang.T("Percent"));
+                jLabelAmount.setText(Lang.T("Coefficient"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
                 return;
@@ -331,7 +332,7 @@ public class ExPayoutsPanel extends IconPanel {
         jPanelLayout.rowHeights = new int[]{0};
         jPanelMinMaxAmounts.setLayout(jPanelLayout);
 
-        jLabelPaymentMin.setText(Lang.T("Minimal Volume"));
+        jLabelPaymentMin.setText(Lang.T("Minimal Payout"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
@@ -345,7 +346,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelMinMaxAmounts.add(jTextFieldPaymentMin, gridBagConstraints);
 
-        jLabelPaymentMax.setText(Lang.T("Maximum Volume"));
+        jLabelPaymentMax.setText(Lang.T("Maximum Payout"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
@@ -370,7 +371,7 @@ public class ExPayoutsPanel extends IconPanel {
         //jCheckBoxUseFilterAsset.setSelected(true);
         jLabelFilterAsset.setFont(headFont); // NOI18N
         jLabelFilterAsset.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelFilterAsset.setText(Lang.T("Filter By Asset"));
+        jLabelFilterAsset.setText(Lang.T("Filter By Asset and Balance"));
         headBGC.gridy = ++gridy;
         jPanelMain.add(jLabelFilterAsset, headBGC);
 
@@ -411,7 +412,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelFilterBalance.add(jComboBoxFilterSideBalance, gridBagConstraints);
 
-        jLabel8.setText(Lang.T("More then"));
+        jLabel8.setText(Lang.T("More or Equal"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
@@ -428,7 +429,7 @@ public class ExPayoutsPanel extends IconPanel {
         gridBagConstraints.insets = fieldGBC.insets;
         jPanelFilterBalance.add(jTextFieldBQ, gridBagConstraints);
 
-        jLabel9.setText(Lang.T("Less then"));
+        jLabel9.setText(Lang.T("Less or Equal"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 1;
@@ -454,7 +455,7 @@ public class ExPayoutsPanel extends IconPanel {
 
         jLabel20.setFont(headFont); // NOI18N
         jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel20.setText(Lang.T("Filter by Actions"));
+        jLabel20.setText(Lang.T("Filter by Actions and Period"));
         headBGC.gridy = ++gridy;
         jPanelMain.add(jLabel20, headBGC);
 
@@ -546,7 +547,9 @@ public class ExPayoutsPanel extends IconPanel {
         jPanel3.add(jButtonViewResult, gridBagConstraints);
 
         fieldGBC.gridy = ++gridy;
-        jPanelMain.add(jPanel3, fieldGBC);
+        if (BlockChain.TEST_MODE) {
+            jPanelMain.add(jPanel3, fieldGBC);
+        }
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 1;
@@ -599,12 +602,12 @@ public class ExPayoutsPanel extends IconPanel {
     private javax.swing.JButton jButtonViewResult;
     private javax.swing.JLabel jLabelFilterAsset;
     private javax.swing.JCheckBox jCheckBoxUseFilterAsset;
-    private javax.swing.JCheckBox jCheckBoxPayoutsUse;
+    public javax.swing.JCheckBox jCheckBoxPayoutsUse;
     private javax.swing.JCheckBox jCheckBoxSelfPay;
     private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxPayoutAction;
     public javax.swing.JComboBox<ItemCls> jComboBoxPayoutAsset;
     private javax.swing.JComboBox<String> jComboBoxMethodPaymentType;
-    private javax.swing.JComboBox<ItemCls> jComboBoxFilterAsset;
+    public javax.swing.JComboBox<ItemCls> jComboBoxFilterAsset;
     private javax.swing.JComboBox<Integer> jComboBoxTXTypeFilter;
     private javax.swing.JComboBox<String> jComboBoxPersonFilter;
     private javax.swing.JComboBox<String> jComboBoxFilterSideBalance;
@@ -633,7 +636,7 @@ public class ExPayoutsPanel extends IconPanel {
     private javax.swing.JPanel jPanelMinMaxAmounts;
     private javax.swing.JPanel jPanelFilterBalance;
     private javax.swing.JPanel jPanelStartEndActions;
-    private javax.swing.JPanel jPanelMain;
+    public javax.swing.JPanel jPanelMain;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
