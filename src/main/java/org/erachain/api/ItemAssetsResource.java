@@ -262,7 +262,7 @@ public class ItemAssetsResource {
                 }
 
                 try {
-                    balance = Account.getBalanceInPosition(map.get(key), position);
+                    balance = Account.getBalanceForAction(map.get(key), position);
 
                     // пустые не берем
                     if (balance.a.signum() == 0 && balance.b.signum() == 0)

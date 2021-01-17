@@ -253,7 +253,7 @@ public abstract class PollCls extends ItemCls {
 
             BigDecimal votesVol;
             if (balancePosition > 0) {
-                votesVol = voter.getBalanceInPosition(dcSet, assetKey, balancePosition).b;
+                votesVol = voter.getBalanceForAction(dcSet, assetKey, balancePosition).b;
             } else {
                 votesVol = voter.getBalanceUSE(assetKey, dcSet);
             }

@@ -821,7 +821,7 @@ public class RSendResource {
 
                     try {
 
-                        balance = Account.getBalanceInPosition(balancesMap.get(key), position);
+                        balance = Account.getBalanceForAction(balancesMap.get(key), position);
 
                         // только тем у кого положительный баланс и больше чем задано
                         if (balance.b.compareTo(greatEqual) < 0)
