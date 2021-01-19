@@ -1004,10 +1004,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                 return BigDecimal.valueOf(60000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (this.heightBlock < inDay30 << 3) // 16 mounth - 72000
                 return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (this.heightBlock > BlockChain.VERS_30SEC)
+            else if (this.heightBlock > BlockChain.VERS_30SEC && this.heightBlock <= BlockChain.FREE_FEE_FROM_HEIGHT)
                 return BigDecimal.valueOf(2000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (this.heightBlock > BlockChain.FREE_FEE_FROM_HEIGHT)
-                return BigDecimal.valueOf(1000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+                return BigDecimal.valueOf(2125, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else
                 return BigDecimal.valueOf(20000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
         } else {
