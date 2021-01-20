@@ -136,7 +136,7 @@ public class UnconfirmedTransactionsTableModel extends TimerTableModelCls<Transa
         for (Transaction item : list) {
 
             item.setDC(dcSet, false);
-            item.calcFee();
+            item.calcFee(false);
         }
 
     }

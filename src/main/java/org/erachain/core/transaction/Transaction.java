@@ -666,7 +666,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         this.seqNo = seqNo;
         this.dbRef = Transaction.makeDBRef(height, seqNo);
         if (forDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
-            this.calcFee();
+            this.calcFee(true);
 
         if (andUpdateFromState && !isWiped())
             updateFromStateDB();
@@ -1106,9 +1106,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     // get fee
-    public long calcBaseFee() {
+    public long calcBaseFee(boolean withFreeProtocol) {
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
-        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+        if (withFreeProtocol && height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
                 && len < BlockChain.FREE_FEE_LENGTH) {
             // не учитываем комиссию если размер блока маленький
             return 0L;
@@ -1118,9 +1118,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     // calc FEE by recommended and feePOW
-    public void calcFee() {
+    public void calcFee(boolean withFreeProtocol) {
 
-        long fee_long = calcBaseFee();
+        long fee_long = calcBaseFee(withFreeProtocol);
         if (fee_long == 0) {
             this.fee = BigDecimal.ZERO;
             return;

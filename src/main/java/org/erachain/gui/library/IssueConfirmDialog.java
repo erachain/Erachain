@@ -72,6 +72,8 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jTitle_Label.setText(title_Text);
         jTextPane1.setText(text);
         if (transaction != null) {
+            // посчитаем без учета что она может быть бесплатной - для инфо нужно показать
+            transaction.calcFee(false);
             String feeText = "" + Lang.T("Size") + ":&nbsp;"
                     + transaction.viewSize(Transaction.FOR_NETWORK) + " Bytes";
             if (transaction.getFee().signum() != 0) {

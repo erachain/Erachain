@@ -380,16 +380,16 @@ public class IssuePersonRecord extends IssueItemRecord {
     }
 
     @Override
-    public long calcBaseFee() {
+    public long calcBaseFee(boolean withFreeProtocol) {
 
         PersonCls person = (PersonCls) this.item;
 
         if (person.isAlive(this.timestamp)) {
             // IF PERSON is LIVE
-            return super.calcBaseFee() >> 1;
+            return super.calcBaseFee(withFreeProtocol) >> 1;
         }
 
         // is DEAD
-        return super.calcBaseFee();
+        return super.calcBaseFee(withFreeProtocol);
     }
 }

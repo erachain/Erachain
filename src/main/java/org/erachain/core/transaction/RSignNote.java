@@ -836,10 +836,11 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     @Override
-    public long calcBaseFee() {
+    public long calcBaseFee(boolean withFreeProtocol) {
 
-        long long_fee = super.calcBaseFee();
-        if (long_fee == 0)
+        long long_fee = super.calcBaseFee(withFreeProtocol);
+        if (false && // дело втом что выше не считается общая комиссия и она как первая транзакция = 0 становится
+                long_fee == 0)
             return getRoyaltyFee();
 
         byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
@@ -853,7 +854,7 @@ public class RSignNote extends Transaction implements Itemable {
 
         ExPays exPays = extendedData.getExPays();
         if (exPays != null) {
-            long_fee += exPays.getTotalFeeBytes();
+            long_fee += exPays.getTotalFeeBytes() * BlockChain.FEE_PER_BYTE;
         }
 
         if (extendedData.hasAuthors()) {

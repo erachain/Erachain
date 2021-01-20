@@ -319,9 +319,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     @Override
-    public long calcBaseFee() {
+    public long calcBaseFee(boolean withFreeProtocol) {
 
-        long long_fee = super.calcBaseFee();
+        long long_fee = super.calcBaseFee(withFreeProtocol);
         if (long_fee == 0)
             // если бесплатно то и процентную комиссию (ниже) не считаем!
             return 0L;

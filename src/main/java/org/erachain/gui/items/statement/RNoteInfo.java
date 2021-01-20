@@ -1,6 +1,7 @@
 package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
@@ -75,6 +76,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         this.transaction = transaction;
         statement = (RSignNote) transaction;
         statement.parseDataFull();
+        statement.calcFee(false);
 
         initComponents();
 
@@ -351,9 +353,9 @@ public class RNoteInfo extends javax.swing.JPanel {
         if (exPays != null) {
             exPays.getFilteredPayouts(statement);
             resultStr += "<h3>" + Lang.T("Payouts") + "</h3>";
-            resultStr += Lang.T("Counter") + ": <b>" + exPays.getFilteredPayoutsCount() + "</b><br>"
-                    + Lang.T("Total Amount") + ": <b>" + exPays.getTotalPay().toPlainString() + "</b><br>"
-                    + Lang.T("Fee Bytes Total") + ": <b>" + exPays.getTotalFeeBytes() + "</b><br>";
+            resultStr += Lang.T("Count # кол-во") + ": <b>" + exPays.getFilteredPayoutsCount()
+                    + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(exPays.getTotalFeeBytes())
+                    + "</b>, " + Lang.T("Total") + ": <b>" + exPays.getTotalPay();
         }
 
         String title = exData.getTitle();
