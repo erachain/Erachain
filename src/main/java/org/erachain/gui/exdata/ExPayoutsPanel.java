@@ -67,8 +67,8 @@ public class ExPayoutsPanel extends IconPanel {
         }));
         jComboBoxFilterSideBalance.setSelectedIndex(1);
 
-        jComboBoxTXTypeFilter.setModel(new javax.swing.DefaultComboBoxModel<Integer>(Transaction.getTransactionTypes()));
-        jComboBoxTXTypeFilter.addItem(-1);
+        jComboBoxTXTypeFilter.setModel(new javax.swing.DefaultComboBoxModel<Integer>(Transaction.getTransactionTypes(true)));
+        ///jComboBoxTXTypeFilter.addItem(-1);
         jComboBoxTXTypeFilter.setRenderer(new RenderComboBoxActionFilter());
 
         jComboBoxPayoutAction.setRenderer(new RenderComboBoxAssetActions());

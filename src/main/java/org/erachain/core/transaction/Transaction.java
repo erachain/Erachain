@@ -694,15 +694,22 @@ public abstract class Transaction implements ExplorerJsonLine {
         return Byte.toUnsignedInt(this.typeBytes[0]);
     }
 
-    public static Integer[] getTransactionTypes() {
-        return new Integer[]{
+    public static Integer[] getTransactionTypes(boolean onlyUsed) {
+
+        // SEND ASSET
+        // OTHER
+        // confirm other transactions
+        // HASHES
+        // exchange of assets
+        // voting
+        Integer[] list = new Integer[]{
                 0,
                 ISSUE_ASSET_TRANSACTION,
                 ISSUE_IMPRINT_TRANSACTION,
                 ISSUE_TEMPLATE_TRANSACTION,
                 ISSUE_PERSON_TRANSACTION,
                 ISSUE_STATUS_TRANSACTION,
-                ISSUE_UNION_TRANSACTION,
+                onlyUsed ? -1 : ISSUE_UNION_TRANSACTION,
                 ISSUE_STATEMENT_TRANSACTION,
                 ISSUE_POLL_TRANSACTION,
 
@@ -713,8 +720,8 @@ public abstract class Transaction implements ExplorerJsonLine {
                 SIGN_NOTE_TRANSACTION,
                 CERTIFY_PUB_KEYS_TRANSACTION,
                 SET_STATUS_TO_ITEM_TRANSACTION,
-                SET_UNION_TO_ITEM_TRANSACTION,
-                SET_UNION_STATUS_TO_ITEM_TRANSACTION,
+                onlyUsed ? -1 : SET_UNION_TO_ITEM_TRANSACTION,
+                onlyUsed ? -1 : SET_UNION_STATUS_TO_ITEM_TRANSACTION,
 
                 // confirm other transactions
                 SIGN_TRANSACTION,
@@ -730,6 +737,18 @@ public abstract class Transaction implements ExplorerJsonLine {
                 VOTE_ON_ITEM_POLL_TRANSACTION
 
         };
+
+        if (onlyUsed) {
+            ArrayList<Integer> tmp = new ArrayList<>();
+            for (Integer type : list) {
+                if (type < 0)
+                    continue;
+                tmp.add(type);
+            }
+            return tmp.toArray(new Integer[tmp.size()]);
+
+        }
+        return list;
     }
 
     public static String viewTypeName(int type) {

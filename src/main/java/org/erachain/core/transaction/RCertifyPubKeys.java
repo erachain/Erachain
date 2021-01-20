@@ -34,7 +34,7 @@ import java.util.*;
 public class RCertifyPubKeys extends Transaction implements Itemable {
 
     public static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
-    public static final String TYPE_NAME = "Certify Person";
+    public static final String TYPE_NAME = "Certify Public Key";
 
     private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
     private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
