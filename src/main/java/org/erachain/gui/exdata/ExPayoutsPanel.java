@@ -37,7 +37,7 @@ import java.util.TimeZone;
 public class ExPayoutsPanel extends IconPanel {
 
     public static String NAME = "ExPayoutsPanel";
-    public static String TITLE = "Payouts";
+    public static String TITLE = "Accruals";
 
     private ExDataPanel parent;
     public ComboBoxAssetsModel accountsModel;
@@ -116,7 +116,7 @@ public class ExPayoutsPanel extends IconPanel {
 
                 ExPays pays = exPaysRes.a;
                 pays.setDC(DCSet.getInstance());
-                List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> payouts = pays.precalcFilteredPayouts(
+                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> payouts = pays.precalcFilteredPayouts(
                         Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
                 pays.calcTotalFeeBytes();
                 jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredPayoutsCount()
@@ -137,7 +137,7 @@ public class ExPayoutsPanel extends IconPanel {
 
                 ExPays pays = exPaysRes.a;
                 pays.setDC(DCSet.getInstance());
-                List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> payouts = pays.precalcFilteredPayouts(
+                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> payouts = pays.precalcFilteredPayouts(
                         Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
                 pays.calcTotalFeeBytes();
                 String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredPayoutsCount()
@@ -338,7 +338,7 @@ public class ExPayoutsPanel extends IconPanel {
 
         int gridy = 0;
 
-        jCheckBoxPayoutsUse.setText(Lang.T("Make Payouts"));
+        jCheckBoxPayoutsUse.setText(Lang.T("Make Accruals"));
         add(jCheckBoxPayoutsUse, fieldGBC);
 
         jPanelMain.setLayout(layout);

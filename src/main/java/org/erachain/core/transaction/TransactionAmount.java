@@ -565,9 +565,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     private static long pointLogg;
 
     public static boolean isValidPersonProtect(DCSet dcSet, int height, Account recipient,
-                                               boolean isPerson, long absKey, int actionType,
+                                               boolean creatorIsPerson, long absKey, int actionType,
                                                AssetCls asset) {
-        if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
+        if (BlockChain.PERSON_SEND_PROTECT && creatorIsPerson && absKey != FEE_KEY
                 && actionType != ACTION_DEBT && actionType != ACTION_HOLD && actionType != ACTION_SPEND
                 && (absKey <= AssetCls.ERA_KEY || absKey > asset.getStartKey()) // GATE Assets
                 && !asset.isAccounting()
@@ -591,10 +591,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return true;
     }
 
-    public static int isValidAction(DCSet dcSet, int height, PublicKeyAccount creator, byte[] signature,
+    public static int isValidAction(DCSet dcSet, int height, Account creator, byte[] signature,
                                     long key, AssetCls asset, BigDecimal amount, Account recipient,
                                     boolean backward, BigDecimal fee, BigDecimal assetFee,
-                                    boolean isPerson, long flags) {
+                                    boolean creatorIsPerson, long flags) {
 
         boolean wrong;
 
@@ -1068,7 +1068,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                         // IF send from PERSON to ANONYMOUS
                         if (!isValidPersonProtect(dcSet, height, recipient,
-                                isPerson, absKey, actionType,
+                                creatorIsPerson, absKey, actionType,
                                 asset))
                             return RECEIVER_NOT_PERSONALIZED;
                     }

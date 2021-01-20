@@ -381,7 +381,7 @@ public class ExDataPanel extends JPanel {
 
         JScrollPane multiPayScrollBar = new JScrollPane();
         multiPayScrollBar.setViewportView(exPayoutsPanel);
-        jTabbedPane_Type.addTab(Lang.T("Payouts"), multiPayScrollBar);
+        jTabbedPane_Type.addTab(Lang.T("Accruals"), multiPayScrollBar);
 
         jTabbedPane_Type.addTab(Lang.T("Recipients"), multipleRecipientsPanel);
         jTabbedPane_Type.addTab(Lang.T(authorsPanel.getName()), authorsPanel);

@@ -45,7 +45,7 @@ public class ExPays {
 
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
 
-    public static final int MAX_COUNT = Integer.MAX_VALUE >> 1;
+    public static final int MAX_COUNT = Integer.MAX_VALUE >> 4;
     private static final byte AMOUNT_FLAG_MASK = -128;
     private static final byte AMOUNT_MIN_FLAG_MASK = 64;
     private static final byte AMOUNT_MAX_FLAG_MASK = 32;
@@ -109,7 +109,7 @@ public class ExPays {
     /**
      * recipient + balance + payout
      */
-    public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> filteredPayouts;
+    public List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> filteredPayouts;
     private int filteredPayoutsCount;
     private BigDecimal totalPay;
     private long totalFeeBytes;
@@ -217,7 +217,7 @@ public class ExPays {
         this.totalFeeBytes = totalFeeBytes;
     }
 
-    public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> getFilteredPayouts(Transaction statement) {
+    public List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> getFilteredPayouts(Transaction statement) {
         if (filteredPayouts == null) {
             filteredPayoutsCount = makeFilterPayList(statement, false);
             if (payMethod == PAYMENT_METHOD_TOTAL) {
@@ -227,11 +227,8 @@ public class ExPays {
         return filteredPayouts;
     }
 
-    public List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> precalcFilteredPayouts(int height, Account creator) {
-        filteredPayoutsCount = makeFilterPayList(dcSet, height, asset, creator, false);
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
-            calcPayoutsForMethodTotal();
-        }
+    public List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> precalcFilteredPayouts(int height, Account creator) {
+        checkValidList(dcSet, height, asset, creator);
         return filteredPayouts;
     }
 
@@ -820,7 +817,7 @@ public class ExPays {
         totalPay = BigDecimal.ZERO;
         BigDecimal coefficient = payMethodValue.divide(totalBalances,
                 scale + Order.powerTen(totalBalances) + 3, RoundingMode.HALF_DOWN);
-        Fun.Tuple3 item;
+        Fun.Tuple4 item;
         BigDecimal amount;
         maxBal = BigDecimal.ZERO;
         for (int index = 0; index < filteredPayoutsCount; index++) {
@@ -828,7 +825,7 @@ public class ExPays {
             amount = (BigDecimal) item.b;
             amount = amount.multiply(coefficient).setScale(scale, RoundingMode.DOWN);
             totalPay = totalPay.add(amount);
-            filteredPayouts.set(index, new Fun.Tuple3(item.a, item.b, amount));
+            filteredPayouts.set(index, new Fun.Tuple4(item.a, item.b, amount, item.d));
 
             if (maxBal.compareTo(amount.abs()) < 0) {
                 // запомним максимальное для скидывания остатка
@@ -840,8 +837,8 @@ public class ExPays {
         BigDecimal totalDiff = payMethodValue.subtract(totalPay);
         if (totalDiff.signum() != 0) {
             // есть нераспределенный остаток
-            Fun.Tuple3<Account, BigDecimal, BigDecimal> maxItem = filteredPayouts.get(maxIndex);
-            filteredPayouts.set(maxIndex, new Fun.Tuple3(maxItem.a, maxItem.b, maxItem.c.add(totalDiff)));
+            Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> maxItem = filteredPayouts.get(maxIndex);
+            filteredPayouts.set(maxIndex, new Fun.Tuple4(maxItem.a, maxItem.b, maxItem.c.add(totalDiff), maxItem.d));
 
             totalPay = payMethodValue;
         }
@@ -853,35 +850,35 @@ public class ExPays {
 
         if (hasAmount()) {
             if (this.assetKey == null || this.assetKey == 0L) {
-                errorValue = "Payouts: assetKey == null or ZERO";
+                errorValue = "Charges: assetKey == null or ZERO";
                 return Transaction.INVALID_ITEM_KEY;
             } else if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
-                errorValue = "Payouts: balancePos out off range";
+                errorValue = "Charges: balancePos out off range";
                 return Transaction.INVALID_BALANCE_POS;
             } else if (this.payMethodValue == null || payMethodValue.signum() == 0) {
-                errorValue = "Payouts: payMethodValue == null";
+                errorValue = "Charges: payMethodValue == null";
                 return Transaction.INVALID_AMOUNT;
             } else if (payMethodValue.signum() < 0) {
-                errorValue = "Payouts: payMethodValue < 0";
+                errorValue = "Charges: payMethodValue < 0";
                 return Transaction.INVALID_AMOUNT;
             }
         }
 
         if (hasAssetFilter()) {
             if (this.filterAssetKey == null || this.filterAssetKey == 0L) {
-                errorValue = "Payouts: filterAssetKey == null or ZERO";
+                errorValue = "Charges: filterAssetKey == null or ZERO";
                 return Transaction.INVALID_ITEM_KEY;
             } else if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_SPEND) {
-                errorValue = "Payouts: filterBalancePos";
+                errorValue = "Charges: filterBalancePos";
                 return Transaction.INVALID_BALANCE_POS;
             } else if (this.filterBalanceSide < Account.BALANCE_SIDE_DEBIT || this.filterBalanceSide > Account.BALANCE_SIDE_CREDIT) {
-                errorValue = "Payouts: filterBalanceSide";
+                errorValue = "Charges: filterBalanceSide";
                 return Transaction.INVALID_BALANCE_SIDE;
             }
         }
 
         if (this.filterTXType != 0 && !Transaction.isValidTransactionType(this.filterTXType)) {
-            errorValue = "Payouts: filterTXType= " + filterTXType;
+            errorValue = "Charges: filterTXType= " + filterTXType;
             return Transaction.INVALID_TRANSACTION_TYPE;
         }
 
@@ -890,7 +887,7 @@ public class ExPays {
                 && balancePos == filterBalancePos
                 && payMethod != PAYMENT_METHOD_ABSOLUTE) {
             // при откате невозможно тогда будет правильно рассчитать - так как съехала общая сумма
-            errorValue = "Payouts: assetKey == filterAssetKey && balancePos == filterBalancePos for not ABSOLUTE method";
+            errorValue = "Charges: assetKey == filterAssetKey && balancePos == filterBalancePos for not ABSOLUTE method";
             return Transaction.INVALID_TRANSFER_TYPE;
         }
 
@@ -906,13 +903,14 @@ public class ExPays {
             if (filterTXType == PAYMENT_METHOD_TOTAL) {
                 // просчитаем значения для точного округления Общей Суммы
                 if (!calcPayoutsForMethodTotal())
-                    // не удалось просчитать значения
+                    // нет значений
                     return Transaction.VALIDATE_OK;
             }
 
             Account recipient = filteredPayouts.get(0).a;
             PublicKeyAccount creator = rNote.getCreator();
             byte[] signature = rNote.getSignature();
+            boolean creatorIsPerson = creator.isPerson(dcSet, height);
 
             // возьмем знаки (минус) для создания позиции баланса такой
             Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
@@ -926,9 +924,9 @@ public class ExPays {
             // проверим как будто всю сумму одному переводим - с учетом комиссии полной
             result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                     key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
-                    backward, totalFeeBG, null, false, actionFlags);
+                    backward, totalFeeBG, null, creatorIsPerson, actionFlags);
             if (result != Transaction.VALIDATE_OK) {
-                errorValue = "Payouts: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
+                errorValue = "Charges: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
                 return result;
             }
 
@@ -936,7 +934,7 @@ public class ExPays {
             boolean needCheckAllList = false;
             if (needCheckAllList) {
 
-                for (Fun.Tuple3 item : filteredPayouts) {
+                for (Fun.Tuple4 item : filteredPayouts) {
 
                     recipient = (Account) item.a;
                     if (recipient == null)
@@ -945,10 +943,10 @@ public class ExPays {
 
                     result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                             key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
-                            backward, BigDecimal.ZERO, null, false, actionFlags);
+                            backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
 
                     if (result != Transaction.VALIDATE_OK) {
-                        errorValue = "Payouts: " + amount.toPlainString() + " -> " + recipient.getAddress();
+                        errorValue = "Charges: " + amount.toPlainString() + " -> " + recipient.getAddress();
                         return result;
                     }
 
@@ -957,6 +955,56 @@ public class ExPays {
         }
 
         return Transaction.VALIDATE_OK;
+    }
+
+    public void checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {
+
+        if (!hasAmount()) {
+            filteredPayoutsCount = 0;
+            filteredPayouts = new ArrayList<>();
+            return;
+        }
+
+        filteredPayoutsCount = makeFilterPayList(dcSet, height, asset, creator, false);
+        if (filteredPayoutsCount == 0)
+            return;
+
+        if (filterTXType == PAYMENT_METHOD_TOTAL) {
+            // просчитаем значения для точного округления Общей Суммы
+            if (!calcPayoutsForMethodTotal())
+                // нет значений
+                return;
+        }
+
+        Account recipient;
+        //byte[] signature = rNote.getSignature();
+        boolean creatorIsPerson = creator.isPerson(dcSet, height);
+
+        // возьмем знаки (минус) для создания позиции баланса такой
+        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+        long key = signs.a * assetKey;
+
+        // комиссию не проверяем так как она не правильно считается внутри?
+        long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
+
+        int result;
+        Fun.Tuple4 item;
+        BigDecimal amount;
+        byte[] signature = new byte[0];
+        for (int index = 0; index < filteredPayoutsCount; index++) {
+
+            item = filteredPayouts.get(index);
+            recipient = (Account) item.a;
+            amount = (BigDecimal) item.c;
+
+            result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+                    key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
+                    backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
+
+            if (result != Transaction.VALIDATE_OK) {
+                filteredPayouts.set(index, new Fun.Tuple4(item.a, item.b, item.c, new Fun.Tuple2<>(result, "")));
+            }
+        }
     }
 
     public int makeFilterPayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
@@ -1024,12 +1072,13 @@ public class ExPays {
             myPersonKey = null;
         }
 
-        boolean isPerson = creator.isPerson(dcSet, height);
+        boolean creatorIsPerson = creator.isPerson(dcSet, height);
 
         HashSet<Long> usedPersons = new HashSet<>();
         PersonCls person;
         byte[] assetOwner = asset.getOwner().getShortAddressBytes();
 
+        boolean hasAmount = hasAmount();
         boolean hasAssetFilter = hasAssetFilter();
         try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(hasAssetFilter ? filterAssetKey : AssetCls.FEE_KEY)) {
             while (iterator.hasNext()) {
@@ -1093,14 +1142,14 @@ public class ExPays {
                 }
 
                 // IF send from PERSON to ANONYMOUS
-                if (hasAssetFilter && andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
-                        isPerson, assetKey, balancePos,
+                if (hasAmount && andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
+                        creatorIsPerson, assetKey, balancePos,
                         asset)) {
                     errorValue = recipient.getAddress();
                     return (filteredPayoutsCount = -Transaction.RECEIVER_NOT_PERSONALIZED);
                 }
 
-                if (!hasAssetFilter) {
+                if (!hasAmount) {
                     payout = null;
                 } else {
                     switch (payMethod) {
@@ -1119,7 +1168,7 @@ public class ExPays {
                 }
 
                 // не проверяем на 0 - так это может быть рассылка писем всем
-                filteredPayouts.add(new Fun.Tuple3(recipient, balance, payout));
+                filteredPayouts.add(new Fun.Tuple4(recipient, balance, payout, null));
 
                 count++;
                 if (andValidate && count > MAX_COUNT) {
@@ -1173,7 +1222,7 @@ public class ExPays {
             boolean backwardAction;
 
             Account recipient;
-            for (Fun.Tuple3 item : filteredPayouts) {
+            for (Fun.Tuple4 item : filteredPayouts) {
 
                 recipient = (Account) item.a;
                 if (recipient == null)
