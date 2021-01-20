@@ -1078,7 +1078,7 @@ public class ExPays {
 
         Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
         Long myPersonKey = null;
-        if (onlyPerson && !useSelfBalance) {
+        if (onlyPerson && (!useSelfBalance || payMethod != PAYMENT_METHOD_TOTAL)) {
             addressDuration = dcSet.getAddressPersonMap().getItem(accountFrom);
             if (addressDuration != null) {
                 myPersonKey = addressDuration.a;
@@ -1121,7 +1121,7 @@ public class ExPays {
                     if (usedPersons.contains(addressDuration.a))
                         continue;
 
-                    if (!useSelfBalance && myPersonKey != null && myPersonKey.equals(addressDuration.a)) {
+                    if ((!useSelfBalance || payMethod != PAYMENT_METHOD_TOTAL) && myPersonKey != null && myPersonKey.equals(addressDuration.a)) {
                         // сами себе не платим?
                         continue;
                     }
@@ -1134,8 +1134,8 @@ public class ExPays {
 
                 } else {
 
-                    if (!useSelfBalance && Arrays.equals(accountFrom, recipientShort)) {
-                        // сами себе не платим?
+                    if ((!useSelfBalance || payMethod != PAYMENT_METHOD_TOTAL) && Arrays.equals(accountFrom, recipientShort)) {
+                        // сами себе не платим
                         continue;
                     }
 
@@ -1144,8 +1144,6 @@ public class ExPays {
                 }
 
                 Account recipient = new Account(recipientShort);
-                if ((!useSelfBalance || payMethod != PAYMENT_METHOD_TOTAL) && creator.equals(recipient))
-                    continue;
 
                 /// если задано то проверим - входит ли в в диапазон
                 // - собранные блоки учитываем? да - иначе долго будет делать поиск
