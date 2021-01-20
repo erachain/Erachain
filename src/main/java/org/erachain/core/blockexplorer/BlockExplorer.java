@@ -3445,11 +3445,8 @@ public class BlockExplorer {
 
                         //String message = txCalculated.getMessage();
                         String typeName = Lang.T(transaction.viewFullTypeName(), langObj);
-                        out.put("type", typeName);
-
-                        if (typeName.equals("_protocol_")) {
-                            //out.put("title", message);
-                        }
+                        out.put("type", "");
+                        out.put("type_name", typeName);
 
                         out.put("creator", txCalculated.getRecipient().getPersonAsString());
                         out.put("creator_addr", txCalculated.getRecipient().getAddress());
@@ -3464,8 +3461,10 @@ public class BlockExplorer {
 
                         out.put("signature", Base58.encode(transaction.getSignature()));
                         out.put("timestamp", transaction.getTimestamp());
+
                         String typeName = Lang.T(transaction.viewFullTypeName(), langObj);
-                        out.put("type", typeName);
+                        out.put("type", "@TT" + transaction.getType() + ":");
+                        out.put("type_name", typeName);
 
                         if (transaction.getCreator() == null) {
                             out.put("creator", GenesisBlock.CREATOR.getAddress());

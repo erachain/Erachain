@@ -905,9 +905,9 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
     }
 
-    public static String[] tags(String type, String tags, String words, Object[][] itemsKeys) {
+    public static String[] tags(int typeID, String type, String tags, String words, Object[][] itemsKeys) {
 
-        String allTags = "";
+        String allTags = "@TT" + typeID;
 
         if (type != null)
             allTags += " " + type;
@@ -956,7 +956,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             makeItemsKeys();
 
         try {
-            return tags(viewTypeName(), getExTags(), getTitle(), itemsKeys);
+            return tags(getType(), viewTypeName(), getExTags(), getTitle(), itemsKeys);
         } catch (Exception e) {
             LOGGER.error(toString() + " - itemsKeys.len: " + itemsKeys.length);
             throw e;
@@ -1455,7 +1455,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         JSONObject transaction = new JSONObject();
 
-        transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
+        transaction.put("type", getType());
         transaction.put("record_type", this.viewTypeName());
         transaction.put("confirmations", this.getConfirmations(localDCSet));
         transaction.put("type_name", this.viewTypeName());

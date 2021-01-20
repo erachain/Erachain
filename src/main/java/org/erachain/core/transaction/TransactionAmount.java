@@ -89,7 +89,17 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static final int ACTION_HOLD = Account.BALANCE_POS_HOLD;
     public static final int ACTION_SPEND = Account.BALANCE_POS_SPEND;
     public static final int ACTION_PLEDGE = Account.BALANCE_POS_PLEDGE;
-    public static final int ACTION_RESERCED_6 = Account.BALANCE_POS_6;
+    public static final int ACTION_RESERVED_6 = Account.BALANCE_POS_6;
+
+    public static final int[] ACTIONS_LIST = new int[]{
+            ACTION_SEND,
+            ACTION_DEBT,
+            ACTION_REPAY_DEBT, // чисто для другого отображения а так = ACTION_DEBT
+            ACTION_HOLD,
+            ACTION_SPEND,
+            ACTION_PLEDGE
+            // ACTION_RESERVED_6
+    };
 
     /*
      * public static final String NAME_ACTION_TYPE_BACKWARD_PROPERTY =

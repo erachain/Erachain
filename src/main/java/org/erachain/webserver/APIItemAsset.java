@@ -56,7 +56,7 @@ public class APIItemAsset {
         help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
 
         help.put("GET apiasset/types", "Return array of asset types.");
-        help.put("GET apiasset/typesActions", "Return array of asset types and Actions.");
+        help.put("GET apiasset/types/actions", "Return array of asset types and Actions for localize.");
 
         help.put("GET apiasset/balances/[assetKey]?position=POS&offset=OFFSET&limit=LIMIT",
                 "Get balances for assetKey sorted by Own Amount. Balance positions: 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other. Default: POS=1. Balance A - total debit. Balance B - final amount.");
@@ -124,16 +124,22 @@ public class APIItemAsset {
 
     }
 
+    static String getAssetTypesCACHE = null;
     @GET
     @Path("types")
     public String getAssetTypes() {
-        return AssetCls.typesJson().toJSONString();
+        if (getAssetTypesCACHE != null)
+            return getAssetTypesCACHE;
+        return (getAssetTypesCACHE = AssetCls.typesJson().toJSONString());
     }
 
+    static String getAssetTypesLangCACHE = null;
     @GET
-    @Path("typesActions")
+    @Path("types/actions")
     public String getAssetTypesLang() {
-        return AssetCls.AssetTypesActionsJson().toJSONString();
+        if (getAssetTypesLangCACHE != null)
+            return getAssetTypesLangCACHE;
+        return (getAssetTypesLangCACHE = AssetCls.AssetTypesActionsJson().toJSONString());
     }
 
 

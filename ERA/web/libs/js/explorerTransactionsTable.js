@@ -381,7 +381,7 @@ function transactions_Table(data) {
             output += '<td>';
         }
 
-        output += item.type + '<td>';
+        output += item.type + item.type_name + '<td>';
 
         if (item.hasOwnProperty('amount')) {
             output += item.amount + ' ';
