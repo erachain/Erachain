@@ -98,7 +98,7 @@ public class ExPays {
     public Long filterTimeEnd; // 52 - in msec
 
     private final int filterByGender; // 53 = gender or all
-    public boolean selfPay; // 54
+    public boolean useSelfBalance; // 54
 
     /////////////////
     DCSet dcSet;
@@ -139,13 +139,13 @@ public class ExPays {
      * @param filterTimeStart
      * @param filterTimeEnd
      * @param filterByGender
-     * @param selfPay
+     * @param useSelfBalance
      */
     public ExPays(int flags, Long assetKey, int balancePos, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
                   Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
                   BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
                   int filterTXType, Long filterTimeStart, Long filterTimeEnd,
-                  int filterByGender, boolean selfPay) {
+                  int filterByGender, boolean useSelfBalance) {
         this.flags = flags;
 
         if (true || // запретить без действий по активу - так как это не письма явно - письма отдельно!
@@ -197,20 +197,20 @@ public class ExPays {
         }
 
         this.filterByGender = filterByGender;
-        this.selfPay = selfPay;
+        this.useSelfBalance = useSelfBalance;
     }
 
     public ExPays(int flags, Long assetKey, int balancePos, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
                   Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
                   BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
                   int filterTXType, Long filterTimeStart, Long filterTimeEnd,
-                  int filterByGender, boolean selfPay,
+                  int filterByGender, boolean useSelfBalance,
                   int filteredPayoutsCount, BigDecimal totalPay, long totalFeeBytes) {
         this(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMIN, filterBalanceMAX,
                 filterTXType, filterTimeStart, filterTimeEnd,
-                filterByGender, selfPay);
+                filterByGender, useSelfBalance);
 
         this.filteredPayoutsCount = filteredPayoutsCount;
         this.totalPay = totalPay;
@@ -436,7 +436,7 @@ public class ExPays {
             outStream.write(Longs.toByteArray(this.filterTimeEnd));
         }
 
-        outStream.write(new byte[]{(byte) filterTXType, (byte) filterByGender, (byte) (selfPay ? 1 : 0)});
+        outStream.write(new byte[]{(byte) filterTXType, (byte) filterByGender, (byte) (useSelfBalance ? 1 : 0)});
 
         return outStream.toByteArray();
 
@@ -789,7 +789,7 @@ public class ExPays {
             toJson.put("filterTimeEnd", filterTimeEnd);
 
         toJson.put("filterByGender", filterByGender);
-        toJson.put("selfPay", selfPay);
+        toJson.put("useSelfBalance", useSelfBalance);
 
         if (filteredPayoutsCount > 0) {
             toJson.put("filteredPayoutsCount", filteredPayoutsCount);
@@ -862,6 +862,11 @@ public class ExPays {
                 errorValue = "Charges: payMethodValue < 0";
                 return Transaction.INVALID_AMOUNT;
             }
+            if (payMethod != PAYMENT_METHOD_TOTAL && useSelfBalance) {
+                errorValue = "Charges: payMethodValue is not by TOTAL && useSelfBalance";
+                return Transaction.INVALID_AMOUNT;
+            }
+
         }
 
         if (hasAssetFilter()) {
@@ -939,6 +944,11 @@ public class ExPays {
                     recipient = (Account) item.a;
                     if (recipient == null)
                         break;
+
+                    if (creator.equals(recipient))
+                        // пропустим себя
+                        continue;
+
                     BigDecimal amount = (BigDecimal) item.c;
 
                     result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
@@ -995,6 +1005,11 @@ public class ExPays {
 
             item = filteredPayouts.get(index);
             recipient = (Account) item.a;
+
+            if (creator.equals(recipient))
+                // пропустим себя
+                continue;
+
             amount = (BigDecimal) item.c;
 
             result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
@@ -1063,13 +1078,11 @@ public class ExPays {
 
         Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
         Long myPersonKey = null;
-        if (onlyPerson && !selfPay) {
+        if (onlyPerson && !useSelfBalance) {
             addressDuration = dcSet.getAddressPersonMap().getItem(accountFrom);
             if (addressDuration != null) {
                 myPersonKey = addressDuration.a;
             }
-        } else {
-            myPersonKey = null;
         }
 
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
@@ -1108,7 +1121,7 @@ public class ExPays {
                     if (usedPersons.contains(addressDuration.a))
                         continue;
 
-                    if (!selfPay && myPersonKey != null && myPersonKey.equals(addressDuration.a)) {
+                    if (!useSelfBalance && myPersonKey != null && myPersonKey.equals(addressDuration.a)) {
                         // сами себе не платим?
                         continue;
                     }
@@ -1121,7 +1134,7 @@ public class ExPays {
 
                 } else {
 
-                    if (!selfPay && Arrays.equals(accountFrom, recipientShort)) {
+                    if (!useSelfBalance && Arrays.equals(accountFrom, recipientShort)) {
                         // сами себе не платим?
                         continue;
                     }
@@ -1131,6 +1144,8 @@ public class ExPays {
                 }
 
                 Account recipient = new Account(recipientShort);
+                if ((!useSelfBalance || payMethod != PAYMENT_METHOD_TOTAL) && creator.equals(recipient))
+                    continue;
 
                 /// если задано то проверим - входит ли в в диапазон
                 // - собранные блоки учитываем? да - иначе долго будет делать поиск
@@ -1227,6 +1242,7 @@ public class ExPays {
                 recipient = (Account) item.a;
                 if (recipient == null)
                     break;
+
                 actionPayAmount = (BigDecimal) item.c;
 
                 isAmountNegate = actionPayAmount.signum() < 0;
@@ -1236,6 +1252,10 @@ public class ExPays {
                     rNote.addCalculated(block, recipient, absKey, actionPayAmount,
                             asset.viewAssetTypeAction(backwardAction, balancePos, asset.getOwner().equals(creator)));
                 }
+
+                if (creator.equals(recipient))
+                    // пропустим себя в любом случае - хотя КАлькулейтед оставим для виду
+                    continue;
 
                 // сбросим направлени от фильтра
                 actionPayAmount = actionPayAmount.abs();

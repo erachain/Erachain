@@ -215,6 +215,8 @@ public class ExPayoutsPanel extends IconPanel {
                 jLabelAmount.setText(Lang.T("Total Amount"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
+
+                jCheckBoxSelfPay.setVisible(true);
                 return;
             case 1:
                 jLabelMethodPaymentDescription.setText("<html>" +
@@ -222,6 +224,10 @@ public class ExPayoutsPanel extends IconPanel {
                 jLabelAmount.setText(Lang.T("Coefficient"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
+
+                jCheckBoxSelfPay.setSelected(false);
+                jCheckBoxSelfPay.setVisible(false);
+
                 return;
             case 2:
                 jLabelMethodPaymentDescription.setText("<html>" +
@@ -229,6 +235,9 @@ public class ExPayoutsPanel extends IconPanel {
                 jLabelAmount.setText(Lang.T("Amount"));
                 jTextFieldPaymentMin.setEnabled(false);
                 jTextFieldPaymentMax.setEnabled(false);
+
+                jCheckBoxSelfPay.setSelected(false);
+                jCheckBoxSelfPay.setVisible(false);
                 return;
         }
     }
@@ -588,7 +597,7 @@ public class ExPayoutsPanel extends IconPanel {
         separateBGC.gridy = ++gridy;
         jPanelMain.add(jSeparator5, separateBGC);
 
-        jCheckBoxSelfPay.setText(Lang.T("Payout to Self too"));
+        jCheckBoxSelfPay.setText(Lang.T("Select Self Balance too"));
         jCheckBoxSelfPay.setSelected(true);
         fieldGBC.gridy = ++gridy;
         jPanelMain.add(jCheckBoxSelfPay, fieldGBC);
