@@ -377,6 +377,10 @@ public class OnDealClick {
                 mess = "Invalid item key";
                 break;
 
+            case Transaction.INVALID_FLAGS:
+                mess = "Invalid flags = -1";
+                break;
+
             case Transaction.INVALID_ITEM_VALUE:
                 mess = "Invalid item value";
                 break;
