@@ -28,10 +28,10 @@ public class AccrualsModel extends DefaultTableModel {
         return true;
     }
 
-    public void setRows(List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> payouts) {
+    public void setRows(List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals) {
         int count = 0;
         Vector vector = getDataVector();
-        for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : payouts) {
+        for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : accruals) {
 
             Vector<Object> rowVector = new Vector<Object>(4);
             rowVector.addElement(count + 1);

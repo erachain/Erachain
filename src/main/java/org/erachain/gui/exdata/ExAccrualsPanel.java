@@ -71,7 +71,7 @@ public class ExAccrualsPanel extends IconPanel {
         ///jComboBoxTXTypeFilter.addItem(-1);
         jComboBoxTXTypeFilter.setRenderer(new RenderComboBoxActionFilter());
 
-        jComboBoxPayoutAction.setRenderer(new RenderComboBoxAssetActions());
+        jComboBoxAccrualAction.setRenderer(new RenderComboBoxAssetActions());
         jComboBoxAccrualAsset.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -95,11 +95,11 @@ public class ExAccrualsPanel extends IconPanel {
                 Lang.T(ExPays.viewFilterPersMode(2)),
                 Lang.T(ExPays.viewFilterPersMode(3))}));
 
-        jCheckBoxPayoutsUse.setSelected(false);
-        jCheckBoxPayoutsUse.addActionListener(new ActionListener() {
+        jCheckBoxAccrualsUse.setSelected(false);
+        jCheckBoxAccrualsUse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                jPanelMain.setVisible(jCheckBoxPayoutsUse.isSelected());
+                jPanelMain.setVisible(jCheckBoxAccrualsUse.isSelected());
             }
         });
 
@@ -116,7 +116,7 @@ public class ExAccrualsPanel extends IconPanel {
 
                 ExPays pays = exPaysRes.a;
                 pays.setDC(DCSet.getInstance());
-                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> payouts = pays.precalcFilteredAccruals(
+                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.precalcFilteredAccruals(
                         Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
                 pays.calcTotalFeeBytes();
                 jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
@@ -137,7 +137,7 @@ public class ExAccrualsPanel extends IconPanel {
 
                 ExPays pays = exPaysRes.a;
                 pays.setDC(DCSet.getInstance());
-                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> payouts = pays.precalcFilteredAccruals(
+                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.precalcFilteredAccruals(
                         Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
                 pays.calcTotalFeeBytes();
                 String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
@@ -145,9 +145,9 @@ public class ExAccrualsPanel extends IconPanel {
                         + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
                 jLabel_FeesResult.setText(result);
 
-                AccrualsModel model = new AccrualsModel(payouts);
-                jTablePreviewPayouts.setModel(model);
-                TableColumnModel columnModel = jTablePreviewPayouts.getColumnModel();
+                AccrualsModel model = new AccrualsModel(accrual);
+                jTablePreviewAccruals.setModel(model);
+                TableColumnModel columnModel = jTablePreviewAccruals.getColumnModel();
 
                 TableColumn columnNo = columnModel.getColumn(0);
                 columnNo.setMinWidth(50);
@@ -170,7 +170,7 @@ public class ExAccrualsPanel extends IconPanel {
                 columnPay.setWidth(150);
                 columnPay.sizeWidthToFit();
 
-                jScrollPanePayouts.setVisible(true);
+                jScrollPaneAccruals.setVisible(true);
 
             }
         });
@@ -199,11 +199,11 @@ public class ExAccrualsPanel extends IconPanel {
         if (creator == null)
             return;
 
-        int selected = jComboBoxPayoutAction.getSelectedIndex();
-        jComboBoxPayoutAction.setModel(new javax.swing.DefaultComboBoxModel(
+        int selected = jComboBoxAccrualAction.getSelectedIndex();
+        jComboBoxAccrualAction.setModel(new javax.swing.DefaultComboBoxModel(
                 asset.viewAssetTypeActionsList(creator.equals(asset.getOwner()), false).toArray()));
         if (selected >= 0)
-            jComboBoxPayoutAction.setSelectedIndex(selected);
+            jComboBoxAccrualAction.setSelectedIndex(selected);
 
     }
 
@@ -251,7 +251,7 @@ public class ExAccrualsPanel extends IconPanel {
         jCheckBoxUseFilterAsset = new javax.swing.JCheckBox();
         jLabelFilterAsset = new javax.swing.JLabel();
         jComboBoxAccrualAsset = new javax.swing.JComboBox<>();
-        jComboBoxPayoutAction = new javax.swing.JComboBox<>();
+        jComboBoxAccrualAction = new javax.swing.JComboBox<>();
         jComboBoxFilterAsset = new javax.swing.JComboBox<>();
         jLabelBalancePosition = new javax.swing.JLabel();
         jComboBoxFilterBalancePosition = new javax.swing.JComboBox<>();
@@ -282,7 +282,7 @@ public class ExAccrualsPanel extends IconPanel {
         jButtonViewResult = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jCheckBoxSelfPay = new javax.swing.JCheckBox();
-        jCheckBoxPayoutsUse = new javax.swing.JCheckBox();
+        jCheckBoxAccrualsUse = new javax.swing.JCheckBox();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -347,8 +347,8 @@ public class ExAccrualsPanel extends IconPanel {
 
         int gridy = 0;
 
-        jCheckBoxPayoutsUse.setText(Lang.T("Make Accruals"));
-        add(jCheckBoxPayoutsUse, fieldGBC);
+        jCheckBoxAccrualsUse.setText(Lang.T("Make Accruals"));
+        add(jCheckBoxAccrualsUse, fieldGBC);
 
         jPanelMain.setLayout(layout);
         jPanelMain.setVisible(false);
@@ -370,7 +370,7 @@ public class ExAccrualsPanel extends IconPanel {
         jPanelMain.add(jLabelAction, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jPanelMain.add(jComboBoxPayoutAction, fieldGBC);
+        jPanelMain.add(jComboBoxAccrualAction, fieldGBC);
 
         ////////// PAYMENT METHOD
 
@@ -597,7 +597,7 @@ public class ExAccrualsPanel extends IconPanel {
         separateBGC.gridy = ++gridy;
         jPanelMain.add(jSeparator5, separateBGC);
 
-        jCheckBoxSelfPay.setText(Lang.T("Select Self Balance too"));
+        jCheckBoxSelfPay.setText(Lang.T("Accrual by creator account too"));
         jCheckBoxSelfPay.setSelected(true);
         fieldGBC.gridy = ++gridy;
         jPanelMain.add(jCheckBoxSelfPay, fieldGBC);
@@ -621,10 +621,10 @@ public class ExAccrualsPanel extends IconPanel {
         headBGC.gridy = ++gridy;
         jPanel3.add(jLabel_FeesResult, headBGC);
 
-        jTablePreviewPayouts = new MTable(new AccrualsModel(new ArrayList<>()));
+        jTablePreviewAccruals = new MTable(new AccrualsModel(new ArrayList<>()));
 
-        jTablePreviewPayouts.setAutoCreateRowSorter(true);
-        jScrollPanePayouts.setViewportView(jTablePreviewPayouts);
+        jTablePreviewAccruals.setAutoCreateRowSorter(true);
+        jScrollPaneAccruals.setViewportView(jTablePreviewAccruals);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -636,7 +636,7 @@ public class ExAccrualsPanel extends IconPanel {
         gridBagConstraints.weighty = 0.2;
 
         headBGC.gridy = ++gridy;
-        jPanel3.add(jScrollPanePayouts, gridBagConstraints);
+        jPanel3.add(jScrollPaneAccruals, gridBagConstraints);
 
         ///////// PANEL 3
         fieldGBC.gridy = ++gridy;
@@ -658,7 +658,7 @@ public class ExAccrualsPanel extends IconPanel {
             return new Fun.Tuple2<>(null, null);
 
         Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> balancePosition
-                = (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>) jComboBoxPayoutAction.getSelectedItem();
+                = (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>) jComboBoxAccrualAction.getSelectedItem();
 
         Integer txTypeFilter = (Integer) jComboBoxTXTypeFilter.getSelectedItem();
 
@@ -694,9 +694,9 @@ public class ExAccrualsPanel extends IconPanel {
     private javax.swing.JButton jButtonViewResult;
     private javax.swing.JLabel jLabelFilterAsset;
     private javax.swing.JCheckBox jCheckBoxUseFilterAsset;
-    public javax.swing.JCheckBox jCheckBoxPayoutsUse;
+    public javax.swing.JCheckBox jCheckBoxAccrualsUse;
     private javax.swing.JCheckBox jCheckBoxSelfPay;
-    private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxPayoutAction;
+    private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxAccrualAction;
     public javax.swing.JComboBox<ItemCls> jComboBoxAccrualAsset;
     private javax.swing.JComboBox<String> jComboBoxMethodPaymentType;
     public javax.swing.JComboBox<ItemCls> jComboBoxFilterAsset;
@@ -745,6 +745,6 @@ public class ExAccrualsPanel extends IconPanel {
     private javax.swing.JTextField jTextFieldPaymentMax;
     private javax.swing.JTextField jTextFieldPaymentMin;
 
-    private MTable jTablePreviewPayouts;
-    private JScrollPane jScrollPanePayouts = new JScrollPane();
+    private MTable jTablePreviewAccruals;
+    private JScrollPane jScrollPaneAccruals = new JScrollPane();
 }

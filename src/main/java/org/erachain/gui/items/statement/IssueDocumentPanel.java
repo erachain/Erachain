@@ -346,7 +346,7 @@ public class IssueDocumentPanel extends IconPanel {
 
     public void selectAccruals(AssetCls actionAsset, AssetCls filterAsset) {
         selectTabbedPane(1);
-        exData_Panel.exAccrualsPanel.jCheckBoxPayoutsUse.setSelected(true);
+        exData_Panel.exAccrualsPanel.jCheckBoxAccrualsUse.setSelected(true);
         exData_Panel.exAccrualsPanel.jPanelMain.setVisible(true);
         if (actionAsset != null)
             exData_Panel.exAccrualsPanel.jComboBoxAccrualAsset.setSelectedItem(actionAsset);

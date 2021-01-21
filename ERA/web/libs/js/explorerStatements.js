@@ -170,7 +170,7 @@ function statement(data) {
         output += '<h4>' + exPays.Label_Filter_by_Persons + '</h4>';
         if (exPays.filterByGender)
         output += exPays.Label_filterByGender + ': <b>' + exPays.filterByGenderName + '</b><br>';
-        output += exPays.Label_selfPay + ': <b>' + exPays.useSelfBalance + '</b><br>';
+        output += exPays.Label_selfUse + ': <b>' + exPays.useSelfBalance + '</b><br>';
 
     }
 

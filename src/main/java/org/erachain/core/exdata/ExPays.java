@@ -221,7 +221,7 @@ public class ExPays {
         if (filteredAccruals == null) {
             filteredAccrualsCount = makeFilterPayList(statement, false);
             if (payMethod == PAYMENT_METHOD_TOTAL) {
-                calcPayoutsForMethodTotal();
+                calcAccrualsForMethodTotal();
             }
         }
         return filteredAccruals;
@@ -737,8 +737,8 @@ public class ExPays {
 
         json.put("Label_payMethod", Lang.T("Method of calculation", langObj));
         json.put("Label_payMethodValue", Lang.T("Value", langObj));
-        json.put("Label_amountMin", Lang.T("Minimal Payout", langObj));
-        json.put("Label_amountMax", Lang.T("Maximum Payout", langObj));
+        json.put("Label_amountMin", Lang.T("Minimal Accrual", langObj));
+        json.put("Label_amountMax", Lang.T("Maximum Accrual", langObj));
 
         json.put("Label_Filter_By_Asset_and_Balance", Lang.T("Filter By Asset and Balance", langObj));
         json.put("Label_balanceSide", Lang.T("Balance Side", langObj));
@@ -751,7 +751,7 @@ public class ExPays {
 
         json.put("Label_Filter_by_Persons", Lang.T("Filter by Persons", langObj));
         json.put("Label_filterByGender", Lang.T("Gender", langObj));
-        json.put("Label_selfPay", Lang.T("Accruals to Self too", langObj));
+        json.put("Label_selfUse", Lang.T("Accrual by creator account too", langObj));
 
         json.put("Label_", Lang.T("", langObj));
         return json;
@@ -792,7 +792,7 @@ public class ExPays {
         toJson.put("useSelfBalance", useSelfBalance);
 
         if (filteredAccrualsCount > 0) {
-            toJson.put("filteredPayoutsCount", filteredAccrualsCount);
+            toJson.put("filteredAccrualsCount", filteredAccrualsCount);
             toJson.put("totalPay", totalPay.toPlainString());
             toJson.put("totalFeeBytes", totalFeeBytes);
             toJson.put("totalFee", BlockChain.feeBG(totalFeeBytes).toPlainString());
@@ -801,7 +801,7 @@ public class ExPays {
         return toJson;
     }
 
-    public boolean calcPayoutsForMethodTotal() {
+    public boolean calcAccrualsForMethodTotal() {
 
         if (filteredAccrualsCount == 0)
             return false;
@@ -907,7 +907,7 @@ public class ExPays {
 
             if (filterTXType == PAYMENT_METHOD_TOTAL) {
                 // просчитаем значения для точного округления Общей Суммы
-                if (!calcPayoutsForMethodTotal())
+                if (!calcAccrualsForMethodTotal())
                     // нет значений
                     return Transaction.VALIDATE_OK;
             }
@@ -981,7 +981,7 @@ public class ExPays {
 
         if (filterTXType == PAYMENT_METHOD_TOTAL) {
             // просчитаем значения для точного округления Общей Суммы
-            if (!calcPayoutsForMethodTotal())
+            if (!calcAccrualsForMethodTotal())
                 // нет значений
                 return;
         }
@@ -1071,7 +1071,7 @@ public class ExPays {
 
         byte[] key;
         BigDecimal balance;
-        BigDecimal payout;
+        BigDecimal accrual;
         BigDecimal totalBalances = BigDecimal.ZERO;
 
         int count = 0;
@@ -1163,25 +1163,25 @@ public class ExPays {
                 }
 
                 if (!hasAmount) {
-                    payout = null;
+                    accrual = null;
                 } else {
                     switch (payMethod) {
                         case PAYMENT_METHOD_COEFF:
                             // нужно вычислить сразу сколько шлем
-                            payout = balance.multiply(payMethodValue).setScale(scale, RoundingMode.HALF_DOWN);
-                            totalBalances = totalBalances.add(payout);
+                            accrual = balance.multiply(payMethodValue).setScale(scale, RoundingMode.HALF_DOWN);
+                            totalBalances = totalBalances.add(accrual);
                             break;
                         case PAYMENT_METHOD_ABSOLUTE:
-                            payout = payMethodValue.setScale(scale, RoundingMode.HALF_DOWN);
+                            accrual = payMethodValue.setScale(scale, RoundingMode.HALF_DOWN);
                             break;
                         default:
-                            payout = null;
+                            accrual = null;
                             totalBalances = totalBalances.add(balance);
                     }
                 }
 
                 // не проверяем на 0 - так это может быть рассылка писем всем
-                filteredAccruals.add(new Fun.Tuple4(recipient, balance, payout, null));
+                filteredAccruals.add(new Fun.Tuple4(recipient, balance, accrual, null));
 
                 count++;
                 if (andValidate && count > MAX_COUNT) {
@@ -1280,7 +1280,7 @@ public class ExPays {
             return;
 
         if (payMethod == PAYMENT_METHOD_TOTAL) {
-            if (!calcPayoutsForMethodTotal())
+            if (!calcAccrualsForMethodTotal())
                 // не удалось просчитать значения
                 return;
         }
@@ -1303,7 +1303,7 @@ public class ExPays {
 
         if (payMethod == PAYMENT_METHOD_TOTAL) {
             if (payMethod == PAYMENT_METHOD_TOTAL) {
-                if (!calcPayoutsForMethodTotal())
+                if (!calcAccrualsForMethodTotal())
                     // не удалось просчитать значения
                     return;
             }
