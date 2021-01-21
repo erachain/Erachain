@@ -1865,25 +1865,45 @@ public abstract class AssetCls extends ItemCls {
     //OTHER
     public static JSONObject AssetTypeJson(int assetType, JSONObject langObj) {
 
-        JSONObject type = new JSONObject();
-        type.put("id", assetType);
-        type.put("name", Lang.T(AssetCls.viewAssetTypeCls(assetType), langObj));
-        type.put("nameFull", Lang.T(AssetCls.viewAssetTypeFullCls(assetType), langObj));
+        JSONObject assetTypeJson = new JSONObject();
+        assetTypeJson.put("id", assetType);
+        assetTypeJson.put("name", Lang.T(AssetCls.viewAssetTypeCls(assetType), langObj));
+        assetTypeJson.put("nameFull", Lang.T(AssetCls.viewAssetTypeFullCls(assetType), langObj));
 
         List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
                 AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
                 assetType, null, true);
         StringJoiner joiner = new StringJoiner(", ");
         JSONArray actionsArray = new JSONArray();
-        for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> action : actions) {
-            joiner.add(Lang.T(action.b, langObj));
+        for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> actionItem : actions) {
+            int action = actionItem.a.a;
+            boolean backward = actionItem.a.b;
+
+            joiner.add(Lang.T(actionItem.b, langObj));
             JSONObject actionJson = new JSONObject();
-            actionJson.put("position", action.a.a);
-            actionJson.put("backward", action.a.b);
-            actionJson.put("name", Lang.T(action.b, langObj));
+            actionJson.put("position", action);
+            actionJson.put("backward", backward);
+            actionJson.put("name", Lang.T(actionItem.b, langObj));
+
+            String name;
+            //// CREATOR
+            name = viewAssetTypeCreator(assetType, backward, action, false);
+            if (name != null) actionJson.put("creator", Lang.T(name, langObj));
+
+            name = viewAssetTypeCreator(assetType, backward, action, true);
+            if (name != null) actionJson.put("creator_owner", Lang.T(name, langObj));
+
+            //////// TARGET
+            name = viewAssetTypeTarget(assetType, backward, action, false);
+            if (name != null) actionJson.put("target", Lang.T(name, langObj));
+
+            name = viewAssetTypeTarget(assetType, backward, action, true);
+            if (name != null) actionJson.put("target_owner", Lang.T(name, langObj));
+
             actionsArray.add(actionJson);
         }
-        type.put("actions", actionsArray);
+
+        assetTypeJson.put("actions", actionsArray);
 
         String description = Lang.T(AssetCls.viewAssetTypeDescriptionCls(assetType), langObj) + ".<br>";
         if (AssetCls.isReverseSend(assetType)) {
@@ -1891,9 +1911,9 @@ public abstract class AssetCls extends ItemCls {
         }
         description += "<b>" + Lang.T("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
 
-        type.put("description", description);
+        assetTypeJson.put("description", description);
 
-        return type;
+        return assetTypeJson;
     }
 
     public static JSONObject assetTypesJson;
@@ -1933,44 +1953,6 @@ public abstract class AssetCls extends ItemCls {
         typeJson.put("name", Lang.T(assetTypeName, langObj));
         typeJson.put("name_full", Lang.T(viewAssetTypeFullCls(type), langObj));
         typeJson.put("desc", Lang.T(viewAssetTypeDescriptionCls(type), langObj));
-
-        JSONObject creatorNames = new JSONObject();
-        JSONObject creatorOwnerNames = new JSONObject();
-        JSONObject targetNames = new JSONObject();
-        JSONObject targetOwnerNames = new JSONObject();
-        String name;
-        for (int action : TransactionAmount.ACTIONS_LIST) {
-            //// CREATOR
-            name = viewAssetTypeCreator(type, false, action, false);
-            if (name != null) creatorNames.put(action + "", Lang.T(name, langObj));
-
-            name = viewAssetTypeCreator(type, true, action, false);
-            if (name != null) creatorNames.put(action + "_B", Lang.T(name, langObj));
-
-            name = viewAssetTypeCreator(type, false, action, true);
-            if (name != null) creatorOwnerNames.put(action + "", Lang.T(name, langObj));
-
-            name = viewAssetTypeCreator(type, true, action, true);
-            if (name != null) creatorOwnerNames.put(action + "_B", Lang.T(name, langObj));
-
-            //////// TARGET
-            name = viewAssetTypeTarget(type, false, action, false);
-            if (name != null) targetNames.put(action + "", Lang.T(name, langObj));
-
-            name = viewAssetTypeTarget(type, true, action, false);
-            if (name != null) targetNames.put(action + "_B", Lang.T(name, langObj));
-
-            name = viewAssetTypeTarget(type, false, action, true);
-            if (name != null) targetOwnerNames.put(action + "", Lang.T(name, langObj));
-
-            name = viewAssetTypeTarget(type, true, action, true);
-            if (name != null) targetOwnerNames.put(action + "_B", Lang.T(name, langObj));
-
-        }
-        typeJson.put("creator", creatorNames);
-        typeJson.put("creator_owner", creatorOwnerNames);
-        typeJson.put("target", targetNames);
-        typeJson.put("target_owner", targetOwnerNames);
 
         return typeJson;
     }
