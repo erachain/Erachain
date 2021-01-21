@@ -1078,7 +1078,7 @@ public class ExPays {
 
         Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
         Long myPersonKey = null;
-        if (onlyPerson && (!useSelfBalance || payMethod != PAYMENT_METHOD_TOTAL)) {
+        if (onlyPerson && !useSelfBalance) {
             addressDuration = dcSet.getAddressPersonMap().getItem(accountFrom);
             if (addressDuration != null) {
                 myPersonKey = addressDuration.a;
@@ -1108,8 +1108,8 @@ public class ExPays {
                     continue;
 
                 byte[] recipientShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
-                if (Arrays.equals(assetOwner, recipientShort))
-                    // создателю актива не даем ничего никогда
+                if ((filterBySigNum == 0 || asset.getQuantity() <= 0) && Arrays.equals(assetOwner, recipientShort))
+                    // создателю актива не даем если это в обе стороны балансы обработка - иначе Общая величина будет всегда = 0
                     continue;
 
                 if (onlyPerson) {
@@ -1121,7 +1121,7 @@ public class ExPays {
                     if (usedPersons.contains(addressDuration.a))
                         continue;
 
-                    if ((!useSelfBalance || payMethod != PAYMENT_METHOD_TOTAL) && myPersonKey != null && myPersonKey.equals(addressDuration.a)) {
+                    if (!useSelfBalance && myPersonKey != null && myPersonKey.equals(addressDuration.a)) {
                         // сами себе не платим?
                         continue;
                     }
@@ -1134,7 +1134,7 @@ public class ExPays {
 
                 } else {
 
-                    if ((!useSelfBalance || payMethod != PAYMENT_METHOD_TOTAL) && Arrays.equals(accountFrom, recipientShort)) {
+                    if (!useSelfBalance && Arrays.equals(accountFrom, recipientShort)) {
                         // сами себе не платим
                         continue;
                     }
