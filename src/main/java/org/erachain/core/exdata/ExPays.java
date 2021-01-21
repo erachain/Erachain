@@ -850,20 +850,20 @@ public class ExPays {
 
         if (hasAmount()) {
             if (this.assetKey == null || this.assetKey == 0L) {
-                errorValue = "Charges: assetKey == null or ZERO";
+                errorValue = "Accruals: assetKey == null or ZERO";
                 return Transaction.INVALID_ITEM_KEY;
             } else if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
-                errorValue = "Charges: balancePos out off range";
+                errorValue = "Accruals: balancePos out off range";
                 return Transaction.INVALID_BALANCE_POS;
             } else if (this.payMethodValue == null || payMethodValue.signum() == 0) {
-                errorValue = "Charges: payMethodValue == null";
+                errorValue = "Accruals: payMethodValue == null";
                 return Transaction.INVALID_AMOUNT;
             } else if (payMethodValue.signum() < 0) {
-                errorValue = "Charges: payMethodValue < 0";
+                errorValue = "Accruals: payMethodValue < 0";
                 return Transaction.INVALID_AMOUNT;
             }
             if (payMethod != PAYMENT_METHOD_TOTAL && useSelfBalance) {
-                errorValue = "Charges: payMethodValue is not by TOTAL && useSelfBalance";
+                errorValue = "Accruals: payMethodValue is not by TOTAL && useSelfBalance";
                 return Transaction.INVALID_AMOUNT;
             }
 
@@ -871,19 +871,19 @@ public class ExPays {
 
         if (hasAssetFilter()) {
             if (this.filterAssetKey == null || this.filterAssetKey == 0L) {
-                errorValue = "Charges: filterAssetKey == null or ZERO";
+                errorValue = "Accruals: filterAssetKey == null or ZERO";
                 return Transaction.INVALID_ITEM_KEY;
             } else if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_SPEND) {
-                errorValue = "Charges: filterBalancePos";
+                errorValue = "Accruals: filterBalancePos";
                 return Transaction.INVALID_BALANCE_POS;
             } else if (this.filterBalanceSide < Account.BALANCE_SIDE_DEBIT || this.filterBalanceSide > Account.BALANCE_SIDE_CREDIT) {
-                errorValue = "Charges: filterBalanceSide";
+                errorValue = "Accruals: filterBalanceSide";
                 return Transaction.INVALID_BALANCE_SIDE;
             }
         }
 
         if (this.filterTXType != 0 && !Transaction.isValidTransactionType(this.filterTXType)) {
-            errorValue = "Charges: filterTXType= " + filterTXType;
+            errorValue = "Accruals: filterTXType= " + filterTXType;
             return Transaction.INVALID_TRANSACTION_TYPE;
         }
 
@@ -892,7 +892,7 @@ public class ExPays {
                 && balancePos == filterBalancePos
                 && payMethod != PAYMENT_METHOD_ABSOLUTE) {
             // при откате невозможно тогда будет правильно рассчитать - так как съехала общая сумма
-            errorValue = "Charges: assetKey == filterAssetKey && balancePos == filterBalancePos for not ABSOLUTE method";
+            errorValue = "Accruals: assetKey == filterAssetKey && balancePos == filterBalancePos for not ABSOLUTE method";
             return Transaction.INVALID_TRANSFER_TYPE;
         }
 
@@ -908,8 +908,9 @@ public class ExPays {
             if (filterTXType == PAYMENT_METHOD_TOTAL) {
                 // просчитаем значения для точного округления Общей Суммы
                 if (!calcAccrualsForMethodTotal())
-                    // нет значений
-                    return Transaction.VALIDATE_OK;
+                    // ошибка подсчета Общего значения - был взят в учет минус общий
+                    errorValue = "Accruals: PayTotal == 0 && payMethod == PAYMENT_METHOD_TOTAL";
+                return Transaction.INVALID_AMOUNT;
             }
 
             Account recipient = filteredAccruals.get(0).a;
@@ -931,7 +932,7 @@ public class ExPays {
                     key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
                     backward, totalFeeBG, null, creatorIsPerson, actionFlags);
             if (result != Transaction.VALIDATE_OK) {
-                errorValue = "Charges: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
+                errorValue = "Accruals: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
                 return result;
             }
 
@@ -956,7 +957,7 @@ public class ExPays {
                             backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
 
                     if (result != Transaction.VALIDATE_OK) {
-                        errorValue = "Charges: " + amount.toPlainString() + " -> " + recipient.getAddress();
+                        errorValue = "Accruals: " + amount.toPlainString() + " -> " + recipient.getAddress();
                         return result;
                     }
 
