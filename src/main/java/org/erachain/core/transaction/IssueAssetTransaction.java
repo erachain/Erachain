@@ -65,7 +65,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
     int minLenAccounting = minLen / 5;
 
     @Override
-    public long calcBaseFee() {
+    public long calcBaseFee(boolean withFreeProtocol) {
 
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
 

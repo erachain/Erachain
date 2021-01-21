@@ -93,7 +93,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     int minLen = 200 * 500;
 
     @Override
-    public long calcBaseFee() {
+    public long calcBaseFee(boolean withFreeProtocol) {
 
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
 

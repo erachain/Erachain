@@ -37,7 +37,7 @@ import java.util.TimeZone;
 public class ExPayoutsPanel extends IconPanel {
 
     public static String NAME = "ExPayoutsPanel";
-    public static String TITLE = "Payouts";
+    public static String TITLE = "Accruals";
 
     private ExDataPanel parent;
     public ComboBoxAssetsModel accountsModel;
@@ -67,8 +67,8 @@ public class ExPayoutsPanel extends IconPanel {
         }));
         jComboBoxFilterSideBalance.setSelectedIndex(1);
 
-        jComboBoxTXTypeFilter.setModel(new javax.swing.DefaultComboBoxModel<Integer>(Transaction.getTransactionTypes()));
-        jComboBoxTXTypeFilter.addItem(-1);
+        jComboBoxTXTypeFilter.setModel(new javax.swing.DefaultComboBoxModel<Integer>(Transaction.getTransactionTypes(true)));
+        ///jComboBoxTXTypeFilter.addItem(-1);
         jComboBoxTXTypeFilter.setRenderer(new RenderComboBoxActionFilter());
 
         jComboBoxPayoutAction.setRenderer(new RenderComboBoxAssetActions());
@@ -116,7 +116,7 @@ public class ExPayoutsPanel extends IconPanel {
 
                 ExPays pays = exPaysRes.a;
                 pays.setDC(DCSet.getInstance());
-                List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> payouts = pays.precalcFilteredPayouts(
+                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> payouts = pays.precalcFilteredPayouts(
                         Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
                 pays.calcTotalFeeBytes();
                 jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredPayoutsCount()
@@ -137,7 +137,7 @@ public class ExPayoutsPanel extends IconPanel {
 
                 ExPays pays = exPaysRes.a;
                 pays.setDC(DCSet.getInstance());
-                List<Fun.Tuple3<Account, BigDecimal, BigDecimal>> payouts = pays.precalcFilteredPayouts(
+                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> payouts = pays.precalcFilteredPayouts(
                         Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
                 pays.calcTotalFeeBytes();
                 String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredPayoutsCount()
@@ -215,6 +215,8 @@ public class ExPayoutsPanel extends IconPanel {
                 jLabelAmount.setText(Lang.T("Total Amount"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
+
+                jCheckBoxSelfPay.setVisible(true);
                 return;
             case 1:
                 jLabelMethodPaymentDescription.setText("<html>" +
@@ -222,6 +224,10 @@ public class ExPayoutsPanel extends IconPanel {
                 jLabelAmount.setText(Lang.T("Coefficient"));
                 jTextFieldPaymentMin.setEnabled(true);
                 jTextFieldPaymentMax.setEnabled(true);
+
+                jCheckBoxSelfPay.setSelected(false);
+                jCheckBoxSelfPay.setVisible(false);
+
                 return;
             case 2:
                 jLabelMethodPaymentDescription.setText("<html>" +
@@ -229,6 +235,9 @@ public class ExPayoutsPanel extends IconPanel {
                 jLabelAmount.setText(Lang.T("Amount"));
                 jTextFieldPaymentMin.setEnabled(false);
                 jTextFieldPaymentMax.setEnabled(false);
+
+                jCheckBoxSelfPay.setSelected(false);
+                jCheckBoxSelfPay.setVisible(false);
                 return;
         }
     }
@@ -338,7 +347,7 @@ public class ExPayoutsPanel extends IconPanel {
 
         int gridy = 0;
 
-        jCheckBoxPayoutsUse.setText(Lang.T("Make Payouts"));
+        jCheckBoxPayoutsUse.setText(Lang.T("Make Accruals"));
         add(jCheckBoxPayoutsUse, fieldGBC);
 
         jPanelMain.setLayout(layout);
@@ -588,7 +597,7 @@ public class ExPayoutsPanel extends IconPanel {
         separateBGC.gridy = ++gridy;
         jPanelMain.add(jSeparator5, separateBGC);
 
-        jCheckBoxSelfPay.setText(Lang.T("Payout to Self too"));
+        jCheckBoxSelfPay.setText(Lang.T("Select Self Balance too"));
         jCheckBoxSelfPay.setSelected(true);
         fieldGBC.gridy = ++gridy;
         jPanelMain.add(jCheckBoxSelfPay, fieldGBC);

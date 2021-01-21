@@ -166,9 +166,9 @@ public abstract class AddressItemRefs extends Transaction {
     }
 
     @Override
-    public long calcBaseFee() {
+    public long calcBaseFee(boolean withFreeProtocol) {
 
-        long long_fee = super.calcBaseFee();
+        long long_fee = super.calcBaseFee(withFreeProtocol);
         if (long_fee == 0)
             return 0L;
 
