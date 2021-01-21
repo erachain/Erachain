@@ -52,7 +52,7 @@ public class RSignNoteResource {
                         "test:true, " +
                         "recipients: { onlyRecipients:false, list:[Addresses] }, " +
 
-                        "payouts: { "
+                        "accruals: { "
                         + "assetKey:long - asset key for Action, "
                         + "position=1 - balance position (1 - OWN, 2 - DEBT, 3 - HOLD, 4 - SPEND, 5 - PLEDGE), "
                         + "backward:false, "
@@ -85,7 +85,7 @@ public class RSignNoteResource {
                         "filesUnique:false," +
 
                         "ai:, ",
-                "PAYOUTS - make 'muli-send' action from creator Address the asset [assetKey] by filter, If 'test' = false it will be make real sends."
+                "Accruals - make 'muli-send' action from creator Address the asset [assetKey] by filter, If 'test' = false it will be make real sends."
         );
 
         //
@@ -230,11 +230,11 @@ public class RSignNoteResource {
             }
         }
 
-        /////////// PAYOUTS
-        JSONObject payoutsJson = (JSONObject) jsonObject.get("payouts");
-        ExPays payouts;
-        if (payoutsJson == null) {
-            payouts = null;
+        /////////// Accruals
+        JSONObject accrualsJson = (JSONObject) jsonObject.get("accruals");
+        ExPays accruals;
+        if (accrualsJson == null) {
+            accruals = null;
         } else {
             long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
             int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
@@ -258,16 +258,16 @@ public class RSignNoteResource {
             int filterPerson = Integer.valueOf(jsonObject.getOrDefault("filterPerson", 0).toString());
             boolean selfPay = Boolean.valueOf((boolean) jsonObject.getOrDefault("selfPay", true));
 
-            Fun.Tuple2<ExPays, String> payoutsResult = ExPays.make(assetKey, position, backward, payMethod, value,
+            Fun.Tuple2<ExPays, String> accrualsResult = ExPays.make(assetKey, position, backward, payMethod, value,
                     amountMin, amountMax, filterAssetKey, filterPos, filterSide,
                     filterGreatEqual, filterLessEqual,
                     filterTXType, filterTimeStart, filterTimeEnd,
                     filterPerson, selfPay);
 
-            if (payoutsResult.a == null) {
-                payouts = null;
+            if (accrualsResult.a == null) {
+                accruals = null;
             } else {
-                payouts = payoutsResult.a;
+                accruals = accrualsResult.a;
             }
 
         }
@@ -365,7 +365,7 @@ public class RSignNoteResource {
 
             byte[] exDataBytes;
             try {
-                exDataBytes = ExData.make(exLink, payouts, privateKeyAccount, title,
+                exDataBytes = ExData.make(exLink, accruals, privateKeyAccount, title,
                         onlyRecipients, recipients, authors, sources, tags, isEncrypted,
                         templateKey, templateParams, templateUnique,
                         message, messageUnique,

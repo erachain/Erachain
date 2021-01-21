@@ -129,10 +129,10 @@ function statement(data) {
         exPays = data.exPays;
         output += '<h3>'
             //+ '<img src="img/parentTx.png" style="height:1.5em"> '
-            + data.Label_Payouts + '</h3>';
+            + data.Label_Accruals + '</h3>';
 
-        if (exPays.hasOwnProperty('filteredPayoutsCount')) {
-            output += exPays.Label_Counter + ': <b>' + exPays.filteredPayoutsCount + '</b><br>';
+        if (exPays.hasOwnProperty('filteredAccrualsCount')) {
+            output += exPays.Label_Counter + ': <b>' + exPays.filteredAccrualsCount + '</b><br>';
             output += exPays.Label_Total_Amount + ': <b>' + exPays.totalPay + '</b><br>';
             output += exPays.Label_Additional_Fee + ': <b>' + exPays.totalFee + '</b><br>';
 

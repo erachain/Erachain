@@ -1354,7 +1354,7 @@ public class ExData {
         }
 
         if (exPays != null) {
-            output.put("Label_Payouts", Lang.T("Payouts", langObj));
+            output.put("Label_Accruals", Lang.T("Accruals", langObj));
             output.put("exPays", exPays.makeJSONforHTML(langObj));
 
         }

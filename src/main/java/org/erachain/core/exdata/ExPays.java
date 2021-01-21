@@ -107,10 +107,10 @@ public class ExPays {
     int payAction;
     AssetCls filterAsset;
     /**
-     * recipient + balance + payout
+     * recipient + balance + accrual
      */
-    public List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> filteredPayouts;
-    private int filteredPayoutsCount;
+    public List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> filteredAccruals;
+    private int filteredAccrualsCount;
     private BigDecimal totalPay;
     private long totalFeeBytes;
     private long iteratorUses;
@@ -205,35 +205,35 @@ public class ExPays {
                   BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
                   int filterTXType, Long filterTimeStart, Long filterTimeEnd,
                   int filterByGender, boolean useSelfBalance,
-                  int filteredPayoutsCount, BigDecimal totalPay, long totalFeeBytes) {
+                  int filteredAccrualsCount, BigDecimal totalPay, long totalFeeBytes) {
         this(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMIN, filterBalanceMAX,
                 filterTXType, filterTimeStart, filterTimeEnd,
                 filterByGender, useSelfBalance);
 
-        this.filteredPayoutsCount = filteredPayoutsCount;
+        this.filteredAccrualsCount = filteredAccrualsCount;
         this.totalPay = totalPay;
         this.totalFeeBytes = totalFeeBytes;
     }
 
-    public List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> getFilteredPayouts(Transaction statement) {
-        if (filteredPayouts == null) {
-            filteredPayoutsCount = makeFilterPayList(statement, false);
+    public List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> getFilteredAccruals(Transaction statement) {
+        if (filteredAccruals == null) {
+            filteredAccrualsCount = makeFilterPayList(statement, false);
             if (payMethod == PAYMENT_METHOD_TOTAL) {
                 calcPayoutsForMethodTotal();
             }
         }
-        return filteredPayouts;
+        return filteredAccruals;
     }
 
-    public List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> precalcFilteredPayouts(int height, Account creator) {
+    public List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> precalcFilteredAccruals(int height, Account creator) {
         checkValidList(dcSet, height, asset, creator);
-        return filteredPayouts;
+        return filteredAccruals;
     }
 
-    public int getFilteredPayoutsCount() {
-        return filteredPayoutsCount;
+    public int getFilteredAccrualsCount() {
+        return filteredAccrualsCount;
     }
 
     public BigDecimal getTotalPay() {
@@ -263,7 +263,7 @@ public class ExPays {
     }
 
     public void calcTotalFeeBytes() {
-        totalFeeBytes = 10L * filteredPayoutsCount + 5L * iteratorUses;
+        totalFeeBytes = 10L * filteredAccrualsCount + 5L * iteratorUses;
     }
 
     public boolean hasAmount() {
@@ -318,7 +318,7 @@ public class ExPays {
     }
 
     public int parseDBData(byte[] dbData, int position) {
-        filteredPayoutsCount = Ints.fromByteArray(Arrays.copyOfRange(dbData, position, position + Integer.BYTES));
+        filteredAccrualsCount = Ints.fromByteArray(Arrays.copyOfRange(dbData, position, position + Integer.BYTES));
         position += Integer.BYTES;
 
         totalFeeBytes = Longs.fromByteArray(Arrays.copyOfRange(dbData, position, position + Long.BYTES));
@@ -357,7 +357,7 @@ public class ExPays {
         }
 
         int pos = 0;
-        System.arraycopy(Ints.toByteArray(filteredPayoutsCount), 0, dbData, pos, Integer.BYTES);
+        System.arraycopy(Ints.toByteArray(filteredAccrualsCount), 0, dbData, pos, Integer.BYTES);
         pos += Integer.BYTES;
         System.arraycopy(Longs.toByteArray(totalFeeBytes), 0, dbData, pos, Long.BYTES);
         pos += Long.BYTES;
@@ -716,7 +716,7 @@ public class ExPays {
             json.put("filterAsset", filterAsset.getName());
         }
 
-        if (filteredPayoutsCount > 0) {
+        if (filteredAccrualsCount > 0) {
             json.put("Label_Counter", Lang.T("Counter", langObj));
             json.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
             json.put("Label_Additional_Fee", Lang.T("Additional Fee", langObj));
@@ -751,7 +751,7 @@ public class ExPays {
 
         json.put("Label_Filter_by_Persons", Lang.T("Filter by Persons", langObj));
         json.put("Label_filterByGender", Lang.T("Gender", langObj));
-        json.put("Label_selfPay", Lang.T("Payout to Self too", langObj));
+        json.put("Label_selfPay", Lang.T("Accruals to Self too", langObj));
 
         json.put("Label_", Lang.T("", langObj));
         return json;
@@ -791,8 +791,8 @@ public class ExPays {
         toJson.put("filterByGender", filterByGender);
         toJson.put("useSelfBalance", useSelfBalance);
 
-        if (filteredPayoutsCount > 0) {
-            toJson.put("filteredPayoutsCount", filteredPayoutsCount);
+        if (filteredAccrualsCount > 0) {
+            toJson.put("filteredPayoutsCount", filteredAccrualsCount);
             toJson.put("totalPay", totalPay.toPlainString());
             toJson.put("totalFeeBytes", totalFeeBytes);
             toJson.put("totalFee", BlockChain.feeBG(totalFeeBytes).toPlainString());
@@ -803,7 +803,7 @@ public class ExPays {
 
     public boolean calcPayoutsForMethodTotal() {
 
-        if (filteredPayoutsCount == 0)
+        if (filteredAccrualsCount == 0)
             return false;
 
         // нужно подсчитать выплаты по общей сумме балансов
@@ -820,12 +820,12 @@ public class ExPays {
         Fun.Tuple4 item;
         BigDecimal amount;
         maxBal = BigDecimal.ZERO;
-        for (int index = 0; index < filteredPayoutsCount; index++) {
-            item = filteredPayouts.get(index);
+        for (int index = 0; index < filteredAccrualsCount; index++) {
+            item = filteredAccruals.get(index);
             amount = (BigDecimal) item.b;
             amount = amount.multiply(coefficient).setScale(scale, RoundingMode.DOWN);
             totalPay = totalPay.add(amount);
-            filteredPayouts.set(index, new Fun.Tuple4(item.a, item.b, amount, item.d));
+            filteredAccruals.set(index, new Fun.Tuple4(item.a, item.b, amount, item.d));
 
             if (maxBal.compareTo(amount.abs()) < 0) {
                 // запомним максимальное для скидывания остатка
@@ -837,8 +837,8 @@ public class ExPays {
         BigDecimal totalDiff = payMethodValue.subtract(totalPay);
         if (totalDiff.signum() != 0) {
             // есть нераспределенный остаток
-            Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> maxItem = filteredPayouts.get(maxIndex);
-            filteredPayouts.set(maxIndex, new Fun.Tuple4(maxItem.a, maxItem.b, maxItem.c.add(totalDiff), maxItem.d));
+            Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> maxItem = filteredAccruals.get(maxIndex);
+            filteredAccruals.set(maxIndex, new Fun.Tuple4(maxItem.a, maxItem.b, maxItem.c.add(totalDiff), maxItem.d));
 
             totalPay = payMethodValue;
         }
@@ -896,13 +896,13 @@ public class ExPays {
             return Transaction.INVALID_TRANSFER_TYPE;
         }
 
-        filteredPayoutsCount = makeFilterPayList(rNote, true);
+        filteredAccrualsCount = makeFilterPayList(rNote, true);
 
-        if (filteredPayoutsCount < 0) {
+        if (filteredAccrualsCount < 0) {
             // ERROR on make LIST
-            return -filteredPayoutsCount;
+            return -filteredAccrualsCount;
 
-        } else if (filteredPayoutsCount > 0) {
+        } else if (filteredAccrualsCount > 0) {
             height = rNote.getBlockHeight();
 
             if (filterTXType == PAYMENT_METHOD_TOTAL) {
@@ -912,7 +912,7 @@ public class ExPays {
                     return Transaction.VALIDATE_OK;
             }
 
-            Account recipient = filteredPayouts.get(0).a;
+            Account recipient = filteredAccruals.get(0).a;
             PublicKeyAccount creator = rNote.getCreator();
             byte[] signature = rNote.getSignature();
             boolean creatorIsPerson = creator.isPerson(dcSet, height);
@@ -939,7 +939,7 @@ public class ExPays {
             boolean needCheckAllList = false;
             if (needCheckAllList) {
 
-                for (Fun.Tuple4 item : filteredPayouts) {
+                for (Fun.Tuple4 item : filteredAccruals) {
 
                     recipient = (Account) item.a;
                     if (recipient == null)
@@ -970,13 +970,13 @@ public class ExPays {
     public void checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {
 
         if (!hasAmount()) {
-            filteredPayoutsCount = 0;
-            filteredPayouts = new ArrayList<>();
+            filteredAccrualsCount = 0;
+            filteredAccruals = new ArrayList<>();
             return;
         }
 
-        filteredPayoutsCount = makeFilterPayList(dcSet, height, asset, creator, false);
-        if (filteredPayoutsCount == 0)
+        filteredAccrualsCount = makeFilterPayList(dcSet, height, asset, creator, false);
+        if (filteredAccrualsCount == 0)
             return;
 
         if (filterTXType == PAYMENT_METHOD_TOTAL) {
@@ -1001,9 +1001,9 @@ public class ExPays {
         Fun.Tuple4 item;
         BigDecimal amount;
         byte[] signature = new byte[0];
-        for (int index = 0; index < filteredPayoutsCount; index++) {
+        for (int index = 0; index < filteredAccrualsCount; index++) {
 
-            item = filteredPayouts.get(index);
+            item = filteredAccruals.get(index);
             recipient = (Account) item.a;
 
             if (creator.equals(recipient))
@@ -1017,17 +1017,17 @@ public class ExPays {
                     backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
 
             if (result != Transaction.VALIDATE_OK) {
-                filteredPayouts.set(index, new Fun.Tuple4(item.a, item.b, item.c, new Fun.Tuple2<>(result, "")));
+                filteredAccruals.set(index, new Fun.Tuple4(item.a, item.b, item.c, new Fun.Tuple2<>(result, "")));
             }
         }
     }
 
     public int makeFilterPayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
 
-        filteredPayouts = new ArrayList<>();
+        filteredAccruals = new ArrayList<>();
 
         iteratorUses = 0L;
-        filteredPayoutsCount = 0;
+        filteredAccrualsCount = 0;
 
         int scale = asset.getScale();
 
@@ -1159,7 +1159,7 @@ public class ExPays {
                         creatorIsPerson, assetKey, balancePos,
                         asset)) {
                     errorValue = recipient.getAddress();
-                    return (filteredPayoutsCount = -Transaction.RECEIVER_NOT_PERSONALIZED);
+                    return (filteredAccrualsCount = -Transaction.RECEIVER_NOT_PERSONALIZED);
                 }
 
                 if (!hasAmount) {
@@ -1181,12 +1181,12 @@ public class ExPays {
                 }
 
                 // не проверяем на 0 - так это может быть рассылка писем всем
-                filteredPayouts.add(new Fun.Tuple4(recipient, balance, payout, null));
+                filteredAccruals.add(new Fun.Tuple4(recipient, balance, payout, null));
 
                 count++;
                 if (andValidate && count > MAX_COUNT) {
                     errorValue = "MAX count over: " + MAX_COUNT;
-                    return (filteredPayoutsCount = -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+                    return (filteredAccrualsCount = -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
                 }
 
                 if (onlyPerson) {
@@ -1208,7 +1208,7 @@ public class ExPays {
                 totalPay = totalBalances;
         }
 
-        filteredPayoutsCount = count;
+        filteredAccrualsCount = count;
         calcTotalFeeBytes();
         return count;
 
@@ -1235,7 +1235,7 @@ public class ExPays {
             boolean backwardAction;
 
             Account recipient;
-            for (Fun.Tuple4 item : filteredPayouts) {
+            for (Fun.Tuple4 item : filteredAccruals) {
 
                 recipient = (Account) item.a;
                 if (recipient == null)
@@ -1272,11 +1272,11 @@ public class ExPays {
 
     public void process(Transaction rNote, Block block) {
 
-        if (filteredPayouts == null) {
-            filteredPayoutsCount = makeFilterPayList(rNote, false);
+        if (filteredAccruals == null) {
+            filteredAccrualsCount = makeFilterPayList(rNote, false);
         }
 
-        if (filteredPayoutsCount == 0)
+        if (filteredAccrualsCount == 0)
             return;
 
         if (payMethod == PAYMENT_METHOD_TOTAL) {
@@ -1294,11 +1294,11 @@ public class ExPays {
 
     public void orphan(Transaction rNote) {
 
-        if (filteredPayouts == null) {
-            filteredPayoutsCount = makeFilterPayList(rNote, false);
+        if (filteredAccruals == null) {
+            filteredAccrualsCount = makeFilterPayList(rNote, false);
         }
 
-        if (filteredPayoutsCount == 0)
+        if (filteredAccrualsCount == 0)
             return;
 
         if (payMethod == PAYMENT_METHOD_TOTAL) {

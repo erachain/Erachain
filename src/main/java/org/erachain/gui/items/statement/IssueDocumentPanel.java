@@ -79,14 +79,14 @@ public class IssueDocumentPanel extends IconPanel {
         jComboBox_Account_Work.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 exData_Panel.updateRecipients();
-                exData_Panel.exPayoutsPanel.updateAction();
+                exData_Panel.exAccrualsPanel.updateAction();
             }
         });
         if (creator != null) {
             jComboBox_Account_Work.setSelectedItem(creator);
         }
         if (actionAsset != null) {
-            exData_Panel.exPayoutsPanel.jComboBoxPayoutAsset.setSelectedItem(actionAsset);
+            exData_Panel.exAccrualsPanel.jComboBoxAccrualAsset.setSelectedItem(actionAsset);
         }
         if (type > 0) {
             exData_Panel.docTypeAppendixPanel.typeDocymentCombox.setSelectedIndex(type);
@@ -344,14 +344,14 @@ public class IssueDocumentPanel extends IconPanel {
         this.jButton_Work_OK1.setEnabled(true);
     }
 
-    public void selectPayouts(AssetCls actionAsset, AssetCls filterAsset) {
+    public void selectAccruals(AssetCls actionAsset, AssetCls filterAsset) {
         selectTabbedPane(1);
-        exData_Panel.exPayoutsPanel.jCheckBoxPayoutsUse.setSelected(true);
-        exData_Panel.exPayoutsPanel.jPanelMain.setVisible(true);
+        exData_Panel.exAccrualsPanel.jCheckBoxPayoutsUse.setSelected(true);
+        exData_Panel.exAccrualsPanel.jPanelMain.setVisible(true);
         if (actionAsset != null)
-            exData_Panel.exPayoutsPanel.jComboBoxPayoutAsset.setSelectedItem(actionAsset);
+            exData_Panel.exAccrualsPanel.jComboBoxAccrualAsset.setSelectedItem(actionAsset);
         if (filterAsset != null)
-            exData_Panel.exPayoutsPanel.jComboBoxFilterAsset.setSelectedItem(filterAsset);
+            exData_Panel.exAccrualsPanel.jComboBoxFilterAsset.setSelectedItem(filterAsset);
     }
 
     public void setChecks() {
