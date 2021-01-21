@@ -1801,6 +1801,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (typeBytes[2] == -1 || typeBytes[3] == -1) {
             // не может быть чтобы все флаги были подняты - скорее всего это и JS ошибка
+            errorValue = (typeBytes[2] == -1 ? "[2]" : "[3]") + " = -1";
             return INVALID_FLAGS;
         }
 
