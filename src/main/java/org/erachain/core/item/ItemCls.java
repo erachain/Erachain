@@ -17,6 +17,7 @@ import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.Iconable;
+import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -622,6 +623,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("key", this.getKey());
         itemJSON.put("name", this.name);
 
+        //map.put("icon", Base64.encodeBase64String(item.getIcon()));
+        //map.put("image", Base64.encodeBase64String(item.getImage()));
+
         if (withIcon && this.getIcon() != null && this.getIcon().length > 0)
             itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
         else
@@ -636,7 +640,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             }
         }
 
-
         return itemJSON;
     }
 
@@ -644,6 +647,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     public JSONObject toJson() {
 
         JSONObject itemJSON = toJsonLite(false, false);
+
+        itemJSON.put("charKey", getItemTypeChar());
 
         // ADD DATA
         itemJSON.put("item_type", this.getItemTypeName());
@@ -757,6 +762,34 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         output.put("pageItems", array);
         output.put("lastKey", key);
 
+    }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = toJson();
+
+        if (getKey() > 0 && getKey() < getStartKey()) {
+            itemJson.put("description", Lang.T(viewDescription(), langObj));
+        }
+
+        itemJson.put("Label_key", Lang.T("Key", langObj));
+        itemJson.put("Label_TXIssue", Lang.T("Issued in", langObj));
+        itemJson.put("label_Actions", Lang.T("Actions", langObj));
+        itemJson.put("label_RAW", Lang.T("Bytecode", langObj));
+
+        itemJson.put("owner", this.getOwner().getAddress());
+        Fun.Tuple2<Integer, PersonCls> person = this.getOwner().getPerson();
+        if (person != null) {
+            itemJson.put("owner_person", person.b.getName());
+            itemJson.put("owner_person_key", person.b.getKey());
+        }
+
+        if (getIcon() != null && getIcon().length > 0)
+            itemJson.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+        else
+            itemJson.put("icon", "");
+
+        return itemJson;
     }
 
     public HashMap getNovaItems() {

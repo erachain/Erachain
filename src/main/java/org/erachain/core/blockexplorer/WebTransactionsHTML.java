@@ -35,36 +35,39 @@ import java.util.List;
 
 public class WebTransactionsHTML {
     private static WebTransactionsHTML instance;
+
+    BlockExplorer explorer;
     JSONObject langObj;
     DCSet dcSet;
+    JSONObject output;
 
-    WebTransactionsHTML() {
-        dcSet = DCSet.getInstance();
+    WebTransactionsHTML(BlockExplorer explorer) {
+        this.explorer = explorer;
+        dcSet = explorer.dcSet;
+        langObj = explorer.langObj;
+        output = explorer.getOutput();
+
     }
 
-    public static WebTransactionsHTML getInstance() {
+    public static WebTransactionsHTML getInstance(BlockExplorer explorer) {
         if (instance == null) {
-            instance = new WebTransactionsHTML();
+            instance = new WebTransactionsHTML(explorer);
         }
 
         return instance;
     }
 
-    public HashMap get_HTML(Transaction transaction, JSONObject langObj) {
+    public void get_HTML(Transaction transaction) {
         // TODO: надо переделать тут так чтобы на строне клиента HTML собиралось с его локальным временм из timestamp
 
         transaction.setDC(dcSet, true);
 
-        this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
         boolean wiped = transaction.isWiped();
         tt.add(transaction);
-        LinkedHashMap json = new LinkedHashMap();
-        BlockExplorer.getInstance().transactionsJSON(json, null, tt, 0, BlockExplorer.pageSize, "tx");
-        LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) ((LinkedHashMap) json.get("Transactions"))
+        explorer.transactionsJSON(null, tt, 0, BlockExplorer.pageSize, "tx");
+        JSONObject tras_json = (JSONObject) ((LinkedHashMap) ((LinkedHashMap) output.get("Transactions"))
                 .get("transactions")).get(0);
-
-        HashMap output = new HashMap();
 
         String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ": </b>" + tras_json.get("type");
         out += " (" + Lang.T("Block", langObj) + ": </b><a href=?block=" + tras_json.get("block") + get_Lang() + ">" + tras_json.get("block") + "</a>";
@@ -112,7 +115,7 @@ public class WebTransactionsHTML {
         output.put("timestamp", transaction.getTimestamp());
 
         if (wiped)
-            return output;
+            return;
 
         int type = transaction.getType();
         switch (type) {
@@ -196,7 +199,6 @@ public class WebTransactionsHTML {
 
         getApps(output, transaction, langObj);
 
-        return output;
     }
 
     private String get_Lang() {

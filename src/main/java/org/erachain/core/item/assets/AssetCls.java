@@ -11,6 +11,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
+import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -2007,6 +2008,57 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("quantity", this.getQuantity());
 
         return assetJSON;
+    }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("label_Asset", Lang.T("Asset", langObj));
+        itemJson.put("label_Actions", Lang.T("Actions", langObj));
+        itemJson.put("label_Scale", Lang.T("Accuracy", langObj));
+        itemJson.put("label_AssetType", Lang.T("Type # вид", langObj));
+        itemJson.put("label_AssetType_Desc", Lang.T("Type Description", langObj));
+        itemJson.put("label_Quantity", Lang.T("Quantity", langObj));
+        itemJson.put("label_Released", Lang.T("Released", langObj));
+        itemJson.put("label_View", Lang.T("View", langObj));
+
+        JSONObject assetJson = new JSONObject();
+
+        assetJson.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
+        assetJson.put("released", getReleased());
+
+        if (!forPrint) {
+            itemJson.put("label_Total", Lang.T("Total", langObj));
+            itemJson.put("label_Holders", Lang.T("Holders", langObj));
+            itemJson.put("label_Available_pairs", Lang.T("Available pairs", langObj));
+            itemJson.put("label_Pair", Lang.T("Pair", langObj));
+            itemJson.put("label_Orders_Count", Lang.T("Orders Count", langObj));
+            itemJson.put("label_Open_Orders_Volume", Lang.T("Open Orders Volume", langObj));
+            itemJson.put("label_Trades_Count", Lang.T("Trades Count", langObj));
+            itemJson.put("label_Trades_Volume", Lang.T("Trades Volume", langObj));
+
+            assetJson.put("orders", getOperations(DCSet.getInstance()));
+        }
+
+        assetJson.put("quantity", NumberAsString.formatAsString(getQuantity()));
+        assetJson.put("released", NumberAsString.formatAsString(getReleased(dcSet)));
+
+        assetJson.put("scale", getScale());
+
+        assetJson.put("assetType", Lang.T(viewAssetType(), langObj));
+        assetJson.put("assetTypeChar", charAssetType() + viewAssetTypeAbbrev());
+
+        assetJson.put("assetTypeFull", Lang.T(viewAssetTypeFull(), langObj));
+        StringJoiner joiner = new StringJoiner(", ");
+        for (Fun.Tuple2<?, String> item : viewAssetTypeActionsList(null, true)) {
+            joiner.add(Lang.T(item.b, langObj));
+        }
+        assetJson.put("assetTypeDesc", Lang.T(viewAssetTypeDescriptionCls(getAssetType()), langObj)
+                + ".\n" + Lang.T("Acceptable actions", langObj) + ":\n" + joiner.toString()
+        );
+
+        itemJson.put("asset", assetJson);
+        return itemJson;
     }
 
     public int getDataLength(boolean includeReference) {

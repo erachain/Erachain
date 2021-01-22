@@ -62,11 +62,12 @@ public class BlockExplorer {
     private static final String LANG_DEFAULT = "en";
     private static final Logger logger = LoggerFactory.getLogger(BlockExplorer.class);
     private volatile static BlockExplorer blockExplorer;
-    private JSONObject langObj;
+    JSONObject langObj;
     private Locale local = new Locale("ru", "RU"); // Date format
-//    private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for
-    private DCSet dcSet;
-    private LinkedHashMap output;
+    //    private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for
+    DCSet dcSet;
+    private JSONObject output;
+    private boolean forPrint;
 
     public static BlockExplorer getInstance() {
         if (blockExplorer == null) {
@@ -76,7 +77,7 @@ public class BlockExplorer {
         return blockExplorer;
     }
 
-    public Map getOutput() {
+    public JSONObject getOutput() {
         return output;
     }
 
@@ -271,7 +272,8 @@ public class BlockExplorer {
     @SuppressWarnings("static-access")
     public Map jsonQueryMain(UriInfo info) throws WrongSearchException, Exception {
 
-        output = new LinkedHashMap();
+        output = new JSONObject();
+        forPrint = info.getQueryParameters().getFirst("print") != null;
 
         Stopwatch stopwatchAll = new Stopwatch();
         long start = 0;
@@ -455,7 +457,7 @@ public class BlockExplorer {
         } else if (info.getQueryParameters().containsKey("asset")) {
             if (info.getQueryParameters().get("asset").size() == 1) {
                 try {
-                    output.put("asset", jsonQueryItemAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
+                    jsonQueryItemAsset(Long.valueOf((info.getQueryParameters().getFirst("asset"))));
                 } catch (Exception e) {
                     output.put("error", e.getMessage());
                     logger.error(e.getMessage(), e);
@@ -491,7 +493,7 @@ public class BlockExplorer {
             output.put("type", "blocks");
             output.putAll(jsonQueryPages(Block.BlockHead.class, (int) start, pageSize));
         } else if (info.getQueryParameters().containsKey("block")) {
-            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int) start));
+            jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int) start);
         }
 
         ///////////////////////////// TRANSACTIONS ///////////////
@@ -661,16 +663,12 @@ public class BlockExplorer {
         return output;
     }
 
-    private Tuple2<Map, Transaction> itemBase(ItemCls item) {
-        Map map = new LinkedHashMap();
-        map.put("key", item.getKey());
-        map.put("icon", Base64.encodeBase64String(item.getIcon()));
-        map.put("image", Base64.encodeBase64String(item.getImage()));
-        map.put("name", item.getName());
-        map.put("description", item.viewDescription());
-        map.put("owner", item.getOwner().getAddress());
+    private Tuple2<Map, Transaction> itemBase(ItemCls item, boolean forPrint) {
+        JSONObject map = item.jsonForExplorerInfo(dcSet, langObj, forPrint);
 
-        if (item.getReference() != null) {
+        if (item.getReference() == null) {
+            return new Tuple2<Map, Transaction>(map, null);
+        } else {
             map.put("Label_seqNo", Lang.T("seqNo", langObj));
             long txSeqNo = dcSet.getTransactionFinalMapSigns().get(item.getReference());
             map.put("seqNo", Transaction.viewDBRef(txSeqNo));
@@ -682,8 +680,6 @@ public class BlockExplorer {
             }
             return new Tuple2<Map, Transaction>(map, transaction);
         }
-
-        return new Tuple2<Map, Transaction>(map, null);
     }
 
     public Map jsonQueryItemPoll(Long pollKey, String assetStr) {
@@ -717,7 +713,7 @@ public class BlockExplorer {
         output.put("assetKey", assetKey);
         output.put("assetName", asset.viewName());
 
-        Map pollJSON = itemBase(poll).a;
+        Map pollJSON = itemBase(poll, forPrint).a;
 
         pollJSON.put("totalVotes", poll.getTotalVotes(DCSet.getInstance()).toPlainString());
 
@@ -901,57 +897,27 @@ public class BlockExplorer {
         return all;
     }
 
-    public Map jsonQueryItemAsset(long key) {
+    public void jsonQueryItemAsset(long key) {
 
         output.put("type", "asset");
         output.put("search", "assets");
 
         AssetCls asset = Controller.getInstance().getAsset(key);
         if (asset == null) {
-            return new HashMap(2);
+            return;
         }
 
-        output.put("charKey", asset.getItemTypeChar());
-        output.put("Label_key", Lang.T("Key", langObj));
-        output.put("Label_TXIssue", Lang.T("Issued in", langObj));
-        output.put("label_Actions", Lang.T("Actions", langObj));
-        output.put("label_RAW", Lang.T("Bytecode", langObj));
-
-        Map output = new LinkedHashMap();
+        Tuple2<Map, Transaction> itemBase = itemBase(asset, forPrint);
+        if (forPrint) {
+            return;
+        }
 
         List<Order> orders = dcSet.getOrderMap().getOrders(key);
 
         TradeMapImpl tradesMap = dcSet.getTradeMap();
         List<Trade> trades = tradesMap.getTrades(key);
 
-        Map assetJSON = itemBase(asset).a;
-
-        if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            /// redefine
-            assetJSON.put("description", Lang.T(asset.viewDescription(), langObj));
-        }
-
-        assetJSON.put("quantity", NumberAsString.formatAsString(asset.getQuantity()));
-        assetJSON.put("released", NumberAsString.formatAsString(asset.getReleased(dcSet)));
-
-        assetJSON.put("scale", asset.getScale());
-
-        assetJSON.put("operations", orders.size() + trades.size());
-
-        assetJSON.put("assetType", Lang.T(asset.viewAssetType(), langObj));
-        assetJSON.put("assetTypeChar", asset.charAssetType() + asset.viewAssetTypeAbbrev());
-
-        assetJSON.put("assetTypeFull", Lang.T(asset.viewAssetTypeFull(), langObj));
-        StringJoiner joiner = new StringJoiner(", ");
-        for (Tuple2<?, String> item : asset.viewAssetTypeActionsList(null, true)) {
-            joiner.add(Lang.T(item.b, langObj));
-        }
-        assetJSON.put("assetTypeDesc", Lang.T(asset.viewAssetTypeDescriptionCls(asset.getAssetType()), langObj)
-                + ".\n" + Lang.T("Acceptable actions", langObj) + ":\n" + joiner.toString()
-        );
-
-        output.put("this", assetJSON);
-
+        output.put("operations", orders.size() + trades.size());
         output.put("totalOpenOrdersCount", orders.size());
         output.put("totalTradesCount", trades.size());
 
@@ -972,7 +938,6 @@ public class BlockExplorer {
 
         Map pairsJSON = new LinkedHashMap();
 
-        pairsJSON = new LinkedHashMap();
         for (Map.Entry<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> pair : all
                 .entrySet()) {
             if (pair.getKey() == key) {
@@ -1015,28 +980,7 @@ public class BlockExplorer {
         }
 
         output.put("pairs", pairsJSON);
-        output.put("label_Asset", Lang.T("Asset", langObj));
-        output.put("label_Key", Lang.T("Key", langObj));
-        output.put("Label_seqNo", Lang.T("seqNo", langObj));
-        output.put("label_Creator", Lang.T("Creator", langObj));
-        output.put("label_Description", Lang.T("Description", langObj));
-        output.put("label_Scale", Lang.T("Accuracy", langObj));
-        output.put("label_AssetType", Lang.T("Type # вид", langObj));
-        output.put("label_AssetType_Desc", Lang.T("Type Description", langObj));
-        output.put("label_Quantity", Lang.T("Quantity", langObj));
-        output.put("label_Released", Lang.T("Released", langObj));
-        output.put("label_Holders", Lang.T("Holders", langObj));
-        output.put("label_Available_pairs", Lang.T("Available pairs", langObj));
-        output.put("label_Pair", Lang.T("Pair", langObj));
-        output.put("label_Orders_Count", Lang.T("Orders Count", langObj));
-        output.put("label_Open_Orders_Volume",
-                Lang.T("Open Orders Volume", langObj));
-        output.put("label_Trades_Count", Lang.T("Trades Count", langObj));
-        output.put("label_Trades_Volume", Lang.T("Trades Volume", langObj));
-        output.put("label_Total", Lang.T("Total", langObj));
-        output.put("label_View", Lang.T("View", langObj));
 
-        return output;
     }
 
     public Map jsonQueryOrder(String orderIdStr) {
@@ -1675,7 +1619,7 @@ public class BlockExplorer {
         output.put("label_Authorship", Lang.T("Authorship", langObj));
         output.put("label_RAW", Lang.T("Bytecode", langObj));
 
-        Tuple2<Map, Transaction> itemBase = itemBase(person);
+        Tuple2<Map, Transaction> itemBase = itemBase(person, forPrint);
         Map output = itemBase.a;
 
         output.put("Label_key", Lang.T("Key", langObj));
@@ -2744,7 +2688,7 @@ public class BlockExplorer {
         }
 
         // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
-        transactionsJSON(output, null, transactions, 0, pageSize,
+        transactionsJSON(null, transactions, 0, pageSize,
                 Lang.T("Last XX transactions", langObj).replace("XX", ""));
 
         output.put("useoffset", true);
@@ -2807,7 +2751,7 @@ public class BlockExplorer {
         Tuple2<Integer, PersonCls> person = account.getPerson();
 
         // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
-        transactionsJSON(output, account, transactions, 0, pageSize,
+        transactionsJSON(account, transactions, 0, pageSize,
                 Lang.T("Last XX transactions", langObj).replace("XX", ""));
 
         output.put("useoffset", true);
@@ -3014,7 +2958,7 @@ public class BlockExplorer {
 
         Map output = new LinkedHashMap();
 
-        Map templateJSON = itemBase(template).a;
+        Map templateJSON = itemBase(template, forPrint).a;
         output.put("template", templateJSON);
 
         output.put("label_Template", Lang.T("Template", langObj));
@@ -3041,7 +2985,7 @@ public class BlockExplorer {
 
         Map output = new LinkedHashMap();
 
-        Map statusJSON = itemBase(status).a;
+        Map statusJSON = itemBase(status, forPrint).a;
 
         statusJSON.put("unique", status.isUnique());
 
@@ -3129,7 +3073,7 @@ public class BlockExplorer {
 
             } else {
                 output.put("type", "tx");
-                output.put("body", WebTransactionsHTML.getInstance().get_HTML(transaction, langObj));
+                WebTransactionsHTML.getInstance(this).get_HTML(transaction);
                 output.put("Label_Transaction", Lang.T("Transaction", langObj));
                 output.put("heightSeqNo", transaction.viewHeightSeq());
             }
@@ -3138,12 +3082,11 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryBlock(String query, int start) throws WrongSearchException {
+    public void jsonQueryBlock(String query, int start) throws WrongSearchException {
 
         output.put("type", "block");
         output.put("search", "blocks");
 
-        LinkedHashMap output = new LinkedHashMap();
         List<Object> all = new ArrayList<Object>();
         int[] txsTypeCount = new int[256];
         int aTTxsCount = 0;
@@ -3186,7 +3129,7 @@ public class BlockExplorer {
         }
 
         // Transactions view
-        transactionsJSON(output, null, block.getTransactions(), start, pageSize,
+        transactionsJSON(null, block.getTransactions(), start, pageSize,
                 Lang.T("Transactions found", langObj));
 
         LinkedHashMap<Tuple2<Integer, Integer>, ATTransaction> atTxs = dcSet.getATTransactionMap()
@@ -3285,7 +3228,6 @@ public class BlockExplorer {
         output.put("label_Including", Lang.T("Including", langObj));
         output.put("label_Signature", Lang.T("Signature", langObj));
 
-        return output;
     }
 
     public Map jsonQueryUnconfirmedTXs() {
@@ -3389,7 +3331,7 @@ public class BlockExplorer {
 
     }
 
-    public void transactionsJSON(LinkedHashMap output, Account account, List<Transaction> transactions, int fromIndex, int pageSize,
+    public void transactionsJSON(Account account, List<Transaction> transactions, int fromIndex, int pageSize,
                                  String title) {
         LinkedHashMap outputTXs = new LinkedHashMap();
         int i = 0;
@@ -3425,7 +3367,7 @@ public class BlockExplorer {
 
                     outcome = true;
 
-                    LinkedHashMap out = new LinkedHashMap();
+                    JSONObject out = new JSONObject();
 
                     out.put("block", transaction.getBlockHeight());// .getSeqNo(dcSet));
 
