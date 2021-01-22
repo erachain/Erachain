@@ -297,6 +297,9 @@ public class BlockExplorer {
         }
 
         output.put("Lang", langList);
+
+        output.put("label_Print", Lang.T("Print", langObj));
+
         //Основное меню. заголовки и их перевод на выбранный язык
         output.put("id_home2", Lang.T("Blocks", langObj));
         output.put("id_menu_top_100", Lang.T("Top 100 Richest", langObj));
@@ -909,6 +912,8 @@ public class BlockExplorer {
         }
 
         output.put("charKey", asset.getItemTypeChar());
+        output.put("Label_key", Lang.T("Key", langObj));
+        output.put("Label_TXIssue", Lang.T("Issued in", langObj));
         output.put("label_Actions", Lang.T("Actions", langObj));
         output.put("label_RAW", Lang.T("Bytecode", langObj));
 
@@ -1674,6 +1679,7 @@ public class BlockExplorer {
         Map output = itemBase.a;
 
         output.put("Label_key", Lang.T("Key", langObj));
+        output.put("Label_TXIssue", Lang.T("Issued in", langObj));
         output.put("Label_name", Lang.T("Name", langObj));
         output.put("Label_creator", Lang.T("Creator", langObj));
         output.put("Label_registrar", Lang.T("Registrar", langObj));

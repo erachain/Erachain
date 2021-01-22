@@ -217,9 +217,11 @@ function person_status(data) {
     return output;
 }
 
-function person(data) {
+function person(data, print) {
 
-    var output = lastBlock(data.lastBlock);
+    var output = '';
+    if (!print)
+        output += lastBlock(data.lastBlock);
 
     if (!data.hasOwnProperty('key')) {
         output += '<h2>Not found</h2>';
@@ -241,17 +243,32 @@ function person(data) {
         output += '<br>';
     }
 
-    output += '<h3><a href="?person=' + data.key + get_lang() + '"><h3 style="display:inline;">';
-    if (false && data.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.icon + '" style="width:50px;" /> ';
-    output += data.name + '</a></h3>';
+    output += '<h3 style="display:inline;">';
+    if (!print)
+        output += '<a href="?person=' + data.key + get_lang() + '">';
 
-    output += '<h4> [ <input id="key1" name="person" size="8" type="text" value="' + data.key + '" class="" style="font-size: 1em;"'
+    output += data.name;
+
+    if (!print)
+        output += '</a>';
+
+    output += '</h3><h4>';
+
+    if (print)
+        output += data.Label_key + ':<b> ' + data.key + '</b><br>' + data.Label_TXIssue + ':<b> ' + data.seqNo + '</b>';
+    else {
+        output += '[ <input id="key1" name="person" size="8" type="text" value="' + data.key + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
-    output += '<a href=?tx=' + data.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.seqNo + '</b></a>';
-    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
-    output += ' ' +'<a href=?q=@PA' + data.key + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Authorship + '</b></a>';
-    output += ' ' +'<a href=../apiperson/raw/' + data.key + ' class="button ll-blue-bgc"><b>' + data.label_RAW + '</b></a></h4>';
-    output += '<br>';
+
+        output += '<a href=?tx=' + data.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.seqNo + '</b></a>';
+        output += ' ' + '<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
+        output += ' ' + '<a href=?q=@PA' + data.key + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Authorship + '</b></a>';
+        output += ' ' + '<a href=../apiperson/raw/' + data.key + ' class="button ll-blue-bgc"><b>' + data.label_RAW + '</b></a>';
+        output += ' ' + '<a href=?person=' + data.key + get_lang() + '&print class="button ll-blue-bgc"><b>' + data.label_Print + '</b></a>';
+    }
+
+    output += '</h4><br>';
+
 
     output += '<h4>' + data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
     if ('deathday' in data) {
@@ -274,13 +291,19 @@ function person(data) {
     }
 
     if (data.creator_name != "") {
-        output += '<h4>' + data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator_name + '</b></a></h4>';
+        if (print)
+            output += '<h4>' + data.Label_creator + ': &nbsp&nbsp<b> ' + data.creator_name + ' (' + data.creator + ')</b></h4>';
+        else
+            output += '<h4>' + data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator_name + '</b></a></h4>';
     } else {
         output += '<h4>' + data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator + '</b></a></h4>';
     }
 
     if (data.registrar_name != "") {
-        output += '<h4>' + data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar_name + '</b></a></h4>';
+        if (print)
+            output += '<h4>' + data.Label_registrar + ': &nbsp&nbsp<b> ' + data.registrar_name + ' (' + data.registrar + ')</b></a></h4>';
+        else
+            output += '<h4>' + data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar_name + '</b></a></h4>';
     } else {
         output += '<h4>' + data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar + '</b></a></h4>';
     }
@@ -313,6 +336,9 @@ function person(data) {
         }
         output += '</table>';
     }
+
+    if (print)
+        return output;
 
     // accounts
     if (data.Label_accounts) {

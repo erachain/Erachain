@@ -314,6 +314,8 @@ button.white-bgc[disabled]:focus,
                         if (Object.keys(data).length > 0) {
 
                             var type = data.type;
+                            var print = parseUrlQuery().print;
+
                             document.getElementById('Langs').innerHTML = langs(data);
 
                             if (data.hasOwnProperty('network')) {
@@ -375,7 +377,11 @@ button.white-bgc[disabled]:focus,
                                     document.getElementById('main').innerHTML = persons(data);
                                 } else
                                 if (type == 'person') {
-                                    document.getElementById('main').innerHTML = person(data);
+                                    if (print) {
+                                        document.getElementById('all').innerHTML = person(data, print);
+                                    } else {
+                                        document.getElementById('main').innerHTML = person(data, print);
+                                    }
                                 } else
                                 if (type == 'person_asset') {
                                     document.getElementById('main').innerHTML = person_asset(data);
@@ -396,7 +402,11 @@ button.white-bgc[disabled]:focus,
                                     document.getElementById('main').innerHTML = assets(data);
                                 } else
                                 if (type == 'asset') { // for one Asset
-                                    document.getElementById('main').innerHTML = asset(data);
+                                    if (print) {
+                                        document.getElementById('all').innerHTML = asset(data, print);
+                                    } else {
+                                        document.getElementById('main').innerHTML = asset(data, print);
+                                    }
                                 } else
                                 if (type == 'trades') {
                                     document.getElementById('main').innerHTML = trades(data)
@@ -943,9 +953,11 @@ button.white-bgc[disabled]:focus,
         }
 
 
-        function asset(data) {
+        function asset(data, print) {
 
-            var output = lastBlock(data.lastBlock);
+            var output = '';
+            if (!print)
+                output += lastBlock(data.lastBlock);
 
             if (!data.asset.hasOwnProperty('this')) {
                 output += '<h2>Not found</h2>';
@@ -963,30 +975,47 @@ button.white-bgc[disabled]:focus,
             output += '<table><tr style="vertical-align:top">';
 
 
-            if (data.asset.this.image.length > 0) {
+            if (data.asset.this.image && data.asset.this.image.length > 0) {
                 output += '<td><img src="data:image/gif;base64,' + data.asset.this.image + '" width = "350" /></td><td style ="padding-left:20px">';
                 output += '<br>';
             }
 
-            output += '<h3><a href="?asset=' + data.asset.this.key + get_lang() + '">';
-            if (data.asset.this.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.asset.this.icon + '" style="width:50px;" /> ';
-            output += data.asset.this.name + '</a></h3>';
+            output += '<h3 style="display:inline;">';
 
-            output += '<h4> [ <input id="key1" name="asset" size="8" type="text" value="' + data.asset.this.key + '" class="" style="font-size: 1em;"'
+            if (!print)
+                output += '<a href="?asset=' + data.asset.this.key + get_lang() + '">';
+
+            if (data.asset.this.icon && data.asset.this.icon.length > 0)
+                output += ' <img src="data:image/gif;base64,' + data.asset.this.icon + '" style="width:50px;" /> ';
+
+            output += data.asset.this.name;
+
+            if (!print)
+                output += '</a>';
+
+            output += '</h3><h4>';
+
+            output += '[ <input id="key1" name="asset" size="8" type="text" value="' + data.asset.this.key + '" class="" style="font-size: 1em;"'
                            + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
 
-            if (data.asset.this.hasOwnProperty('seqNo')) {
-                output += '<a href=?tx=' + data.asset.this.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.asset.this.seqNo + '</b></a>';
-                output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
-                output += ' ' +'<a href=../apiasset/raw/' + data.asset.this.key + ' class="button ll-blue-bgc"><b>' + data.label_RAW + '</b></a></h4>';
 
-                output += '<br>';
+            if (print)
+                output += data.Label_key + ':<b> ' + data.asset.this.key + '</b><br>' + data.Label_TXIssue + ':<b> ' + data.asset.this.seqNo + '</b>';
+            else {
+                if (data.asset.this.hasOwnProperty('seqNo')) {
+                    output += '<a href=?tx=' + data.asset.this.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.asset.this.seqNo + '</b></a>';
+                    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
+                    output += ' ' +'<a href=../apiasset/raw/' + data.asset.this.key + ' class="button ll-blue-bgc"><b>' + data.label_RAW + '</b></a>';
+                    output += ' ' + '<a href=?asset=' + data.asset.this.key + get_lang() + '&print class="button ll-blue-bgc"><b>' + data.label_Print + '</b></a></h4>';
 
-                output += '<b>' + data.asset.label_Creator + ':</b> <a href=?address=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
+                    output += '<br>';
 
-                output += '<br>';
-            } else {
-                output += '</h4>';
+                    output += '<b>' + data.asset.label_Creator + ':</b> <a href=?address=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
+
+                    output += '<br>';
+                } else {
+                    output += '</h4>';
+                }
             }
 
             output += data.asset.label_AssetType + ': <b>' + data.asset.this.assetTypeChar + '</b>: ' + data.asset.this.assetTypeFull + '<br>';
@@ -995,6 +1024,9 @@ button.white-bgc[disabled]:focus,
             output += data.asset.label_Quantity + ': <b>' + addCommas(data.asset.this.quantity) + '</b>';
             output += ', ' + data.asset.label_Scale + ': <b>' + data.asset.this.scale + '</b>';
             output += ', ' + data.asset.label_Released + ': <b>' + addCommas(data.asset.this.released) + '</b>';
+
+            if (print)
+                return output;
 
             if (data.asset.this.key != 0) {
                 assetUrl = '&asset=' + data.asset.this.key;
@@ -2008,7 +2040,11 @@ button.white-bgc[disabled]:focus,
                 var pair = (location.search.substr(1)).split('&');
                 for (var i = 0; i < pair.length; i++) {
                     var param = pair[i].split('=');
-                    data[param[0]] = param[1];
+                    if (param.length > 1) {
+                        data[param[0]] = param[1];
+                    } else {
+                        data[param[0]] = true;
+                    }
                 }
             }
             return data;
@@ -2280,7 +2316,7 @@ button.white-bgc[disabled]:focus,
 </head>
 <body onload='start()' topmargin="0" leftmargin="0" rightmargin="0" bottommargin="0" style='height:100%'>
 
-<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<table id="all" width="100%" cellspacing="0" cellpadding="0" border="0">
     <tr>
         <td valign="top" align="" colspan="3" height="1" nowrap>
             <!-- <nav class="navbar navbar-default navbar-fixed-top"> -->
