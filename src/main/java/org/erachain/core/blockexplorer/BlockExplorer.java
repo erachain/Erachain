@@ -66,7 +66,7 @@ public class BlockExplorer {
     private Locale local = new Locale("ru", "RU"); // Date format
     //    private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for
     DCSet dcSet;
-    private JSONObject output;
+    JSONObject output;
     private boolean forPrint;
 
     public static BlockExplorer getInstance() {
@@ -499,7 +499,7 @@ public class BlockExplorer {
         ///////////////////////////// TRANSACTIONS ///////////////
         /// TX = signature
         else if (info.getQueryParameters().containsKey("tx")) {
-            output.putAll(jsonQueryTX(info.getQueryParameters().getFirst("tx")));
+            jsonQueryTX(info.getQueryParameters().getFirst("tx"));
         }
 
 
@@ -3044,13 +3044,11 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryTX(String query) {
+    public void jsonQueryTX(String query) {
 
         output.put("type", "tx");
         output.put("search", "transactions");
         output.put("search_placeholder", Lang.T("Type searching words or signature or BlockNo-SeqNo", langObj));
-
-        Map output = new LinkedHashMap();
 
         String[] signatures = query.split(",");
 
@@ -3072,14 +3070,12 @@ public class BlockExplorer {
                 output.put("type", "statement");
 
             } else {
-                output.put("type", "tx");
-                WebTransactionsHTML.getInstance(this).get_HTML(transaction);
+                new WebTransactionsHTML().get_HTML(this, transaction);
                 output.put("Label_Transaction", Lang.T("Transaction", langObj));
                 output.put("heightSeqNo", transaction.viewHeightSeq());
             }
         }
 
-        return output;
     }
 
     public void jsonQueryBlock(String query, int start) throws WrongSearchException {
