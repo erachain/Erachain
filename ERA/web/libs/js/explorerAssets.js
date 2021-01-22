@@ -56,13 +56,14 @@ function assets(data) {
     return output;
 }
 
-function asset(data, print) {
+function asset(data, forPrint) {
 
     var output = '';
-    if (!print)
+
+    if (!forPrint)
         output += lastBlock(data.lastBlock);
 
-    if (!data.asset.hasOwnProperty('this')) {
+    if (!data.hasOwnProperty('item')) {
         output += '<h2>Not found</h2>';
         return output;
     }
@@ -77,113 +78,76 @@ function asset(data, print) {
     output += '<tr><td align=left>';
     output += '<table><tr style="vertical-align:top">';
 
+    var item = data.item;
+    ////// HEAD
+    output += itemHead(item, forPrint, 'asset');
 
-    if (data.asset.this.image && data.asset.this.image.length > 0) {
-        output += '<td><img src="data:image/gif;base64,' + data.asset.this.image + '" width = "350" /></td><td style ="padding-left:20px">';
-        output += '<br>';
-    }
+    //////// BODY
+    output += item.label_AssetType + ': <b>' + item.assetTypeChar + '</b>: ' + item.assetTypeFull + '<br>';
+    output += item.label_AssetType_Desc + ': ' + fformat(item.assetTypeDesc) + '<br>';
 
-    output += '<h3 style="display:inline;">';
+    output += item.label_Quantity + ': <b>' + addCommas(item.quantity) + '</b>';
+    output += ', ' + item.label_Scale + ': <b>' + item.scale + '</b>';
+    output += ', ' + item.label_Released + ': <b>' + addCommas(item.released) + '</b>';
 
-    if (!print)
-        output += '<a href="?asset=' + data.asset.this.key + get_lang() + '">';
+    output += itemFoot(item, forPrint, 'asset');
 
-    if (data.asset.this.icon && data.asset.this.icon.length > 0)
-        output += ' <img src="data:image/gif;base64,' + data.asset.this.icon + '" style="width:50px;" /> ';
-
-    output += data.asset.this.name;
-
-    if (!print)
-        output += '</a>';
-
-    output += '</h3><h4>';
-
-    output += '[ <input id="key1" name="asset" size="8" type="text" value="' + data.asset.this.key + '" class="" style="font-size: 1em;"'
-                   + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
-
-
-    if (print)
-        output += data.Label_key + ':<b> ' + data.asset.this.key + '</b><br>' + data.Label_TXIssue + ':<b> ' + data.asset.this.seqNo + '</b>';
-    else {
-        if (data.asset.this.hasOwnProperty('seqNo')) {
-            output += '<a href=?tx=' + data.asset.this.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.asset.this.seqNo + '</b></a>';
-            output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
-            output += ' ' +'<a href=../apiasset/raw/' + data.asset.this.key + ' class="button ll-blue-bgc"><b>' + data.label_RAW + '</b></a>';
-            output += ' ' + '<a href=?asset=' + data.asset.this.key + get_lang() + '&print class="button ll-blue-bgc"><b>' + data.label_Print + '</b></a></h4>';
-
-            output += '<br>';
-
-            output += '<b>' + data.asset.label_Creator + ':</b> <a href=?address=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
-
-            output += '<br>';
-        } else {
-            output += '</h4>';
-        }
-    }
-
-    output += data.asset.label_AssetType + ': <b>' + data.asset.this.assetTypeChar + '</b>: ' + data.asset.this.assetTypeFull + '<br>';
-    output += data.asset.label_AssetType_Desc + ': ' + fformat(data.asset.this.assetTypeDesc) + '<br>';
-
-    output += data.asset.label_Quantity + ': <b>' + addCommas(data.asset.this.quantity) + '</b>';
-    output += ', ' + data.asset.label_Scale + ': <b>' + data.asset.this.scale + '</b>';
-    output += ', ' + data.asset.label_Released + ': <b>' + addCommas(data.asset.this.released) + '</b>';
-
-    if (print)
+    if (forPrint)
         return output;
 
-    if (data.asset.this.key != 0) {
-        assetUrl = '&asset=' + data.asset.this.key;
+    if (item.key != 0) {
+        assetUrl = '&asset=' + item.key;
     } else {
         assetUrl = '';
     }
 
-    output += ' , <a href=?top=all' + assetUrl + get_lang() + ' class="button ll-blue-bgc"><b>' + data.asset.label_Holders + '</b></a>';
+    output += ' , <a href=?top=all' + assetUrl + get_lang() + ' class="button ll-blue-bgc"><b>' + item.label_Holders + '</b></a>';
     output += '<br>';
 
-    output += '<b>' + data.asset.label_Description + ':</b> ' + fformat(data.asset.this.description);
+    output += '<b>' + item.label_Description + ':</b> ' + fformat(item.description);
 
     output += '</td>';
     output += '</tr>';
     output += '</table>';
 
-    output += '<h3>' + data.asset.label_Available_pairs + '</h3>';
+    output += '<h3>' + item.label_Available_pairs + '</h3>';
 
     output += '<table border="0" cellspacing="10" class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
-    output += '<td><b>' + data.asset.label_Pair + '</b></td><td><b>' + data.asset.label_Orders_Count + '</b></td>';
-    output += '<td><b>' + data.asset.label_Open_Orders_Volume + '</b></td>';
-    output += '<td><b>' + data.asset.label_Trades_Count + '</b></td><td><b>' + data.asset.label_Trades_Volume + '</b></td>';
-    output += '<td><b>' + data.asset.label_Description + '</b></td></tr>';
+    output += '<td><b>' + data.label_Pair + '</b></td><td><b>' + item.label_Orders_Count + '</b></td>';
+    output += '<td><b>' + data.label_Open_Orders_Volume + '</b></td>';
+    output += '<td><b>' + data.label_Trades_Count + '</b></td><td><b>' + item.label_Trades_Volume + '</b></td>';
+    output += '<td><b>' + data.label_Description + '</b></td></tr>';
 
-    for (key in data.asset.pairs) {
+    for (key in item.pairs) {
         output += '<tr>';
 
         output += '<td><b>';
         output += '<a href="?asset=' + key + get_lang() + '">';
-        output += getAssetName2(key, data.asset.pairs[key].assetName);
+        output += getAssetName2(key, data.pairs[key].assetName);
 
-        output += '<td>' + data.asset.pairs[key].openOrdersCount;
-
-        output += '<td nowrap>';
-        output += '<a href="?asset=' + data.asset.this.key + '&asset=' + key + get_lang() + '"><b>'
-        output += addCommas(data.asset.pairs[key].last);
-        output += '</b></a> / <a href="?asset=' + key + '&asset=' + data.asset.this.key + get_lang() + '"><b>'
-        output += addCommas(data.asset.pairs[key].lastReverse) + '</b></a><br>';
-
-        output += addCommas(data.asset.pairs[key].ordersPriceVolume) + ' / ' + addCommas(data.asset.pairs[key].ordersAmountVolume);
-
-        output += '<td>' + data.asset.pairs[key].tradesCount;
+        output += '<td>' + data.pairs[key].openOrdersCount;
 
         output += '<td nowrap>';
-        output += addCommas(data.asset.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName);
-        output += '<br>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
+        output += '<a href="?asset=' + item.key + '&asset=' + key + get_lang() + '"><b>'
+        output += addCommas(data.pairs[key].last);
+        output += '</b></a> / <a href="?asset=' + key + '&asset=' + item.key + get_lang() + '"><b>'
+        output += addCommas(data.pairs[key].lastReverse) + '</b></a><br>';
 
-        output += '<td>' + escapeHtml(data.asset.pairs[key].description.substr(0, 100));
+        output += addCommas(data.pairs[key].ordersPriceVolume) + ' / ' + addCommas(data.pairs[key].ordersAmountVolume);
+
+        output += '<td>' + data.pairs[key].tradesCount;
+
+        output += '<td nowrap>';
+        output += addCommas(data.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMini(key, data.pairs[key].assetName);
+        output += '<br>' + addCommas(data.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMini(item.key, item.name);
+
+        output += '<td>' + escapeHtml(data.pairs[key].description.substr(0, 100));
     }
-    output += '<tr><td><b>' + data.asset.label_Total + ':';
-    output += '<td>' + data.asset.totalOpenOrdersCount;
-    output += '<td>' + addCommas(data.asset.totalOrdersVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
-    output += '<td>' + data.asset.totalTradesCount;
-    output += '<td>' + addCommas(data.asset.totalTradesVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
+    output += '<tr><td><b>' + data.label_Total + ':';
+    output += '<td>' + data.totalOpenOrdersCount;
+    output += '<td>' + addCommas(data.totalOrdersVolume) + ' ' + getAssetNameMini(item.key, item.name);
+    output += '<td>' + data.totalTradesCount;
+    output += '<td>' + addCommas(data.totalTradesVolume) + ' ' + getAssetNameMini(item.key, item.name);
     output += '<td></td></tr></table>';
 
 

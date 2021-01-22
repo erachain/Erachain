@@ -908,6 +908,8 @@ public class BlockExplorer {
         }
 
         Tuple2<Map, Transaction> itemBase = itemBase(asset, forPrint);
+        output.put("item", itemBase.a);
+
         if (forPrint) {
             return;
         }
