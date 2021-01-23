@@ -300,7 +300,7 @@ public class BlockExplorer {
 
         output.put("Lang", langList);
 
-        output.put("label_Print", Lang.T("Print", langObj));
+        output.put("Label_Print", Lang.T("Print", langObj));
 
         //Основное меню. заголовки и их перевод на выбранный язык
         output.put("id_home2", Lang.T("Blocks", langObj));
@@ -435,7 +435,7 @@ public class BlockExplorer {
                     }
                 }
             } else {
-                output.putAll(jsonQueryItemPerson(info.getQueryParameters().getFirst("person")));
+                jsonQueryItemPerson(info.getQueryParameters().getFirst("person"), forPrint);
             }
 
             ///////////////////// POLLS ////////////////////////
@@ -663,25 +663,6 @@ public class BlockExplorer {
         return output;
     }
 
-    private Tuple2<Map, Transaction> itemBase(ItemCls item, boolean forPrint) {
-        JSONObject map = item.jsonForExplorerInfo(dcSet, langObj, forPrint);
-
-        if (item.getReference() == null) {
-            return new Tuple2<Map, Transaction>(map, null);
-        } else {
-            map.put("Label_seqNo", Lang.T("seqNo", langObj));
-            long txSeqNo = dcSet.getTransactionFinalMapSigns().get(item.getReference());
-            map.put("seqNo", Transaction.viewDBRef(txSeqNo));
-            Transaction transaction = dcSet.getTransactionFinalMap().get(txSeqNo);
-            map.put("tx_timestamp", transaction.getTimestamp());
-            if (transaction.getCreator() == null) {
-                map.put("tx_creator", transaction.getCreator());
-                map.put("tx_creator_person", transaction.viewCreator());
-            }
-            return new Tuple2<Map, Transaction>(map, transaction);
-        }
-    }
-
     public Map jsonQueryItemPoll(Long pollKey, String assetStr) {
 
         output.put("type", "poll");
@@ -693,10 +674,9 @@ public class BlockExplorer {
         }
 
         output.put("charKey", poll.getItemTypeChar());
-        output.put("label_Actions", Lang.T("Actions", langObj));
-        output.put("label_RAW", Lang.T("Bytecode", langObj));
+        output.put("Label_Actions", Lang.T("Actions", langObj));
+        output.put("Label_RAW", Lang.T("Bytecode", langObj));
 
-        Map output = new LinkedHashMap();
         Long assetKey;
 
         try {
@@ -707,15 +687,15 @@ public class BlockExplorer {
 
         AssetCls asset = (AssetCls) dcSet.getItemAssetMap().get(assetKey);
         if (asset == null) {
-            assetKey = 2l;
+            assetKey = 2L;
             asset = (AssetCls) dcSet.getItemAssetMap().get(assetKey);
         }
         output.put("assetKey", assetKey);
         output.put("assetName", asset.viewName());
 
-        Map pollJSON = itemBase(poll, forPrint).a;
+        output.put("item", poll.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
-        pollJSON.put("totalVotes", poll.getTotalVotes(DCSet.getInstance()).toPlainString());
+        output.put("totalVotes", poll.getTotalVotes(DCSet.getInstance()).toPlainString());
 
         List<String> options = poll.getOptions();
         int optionsSize = options.size();
@@ -732,23 +712,21 @@ public class BlockExplorer {
             array.add(itemMap);
         }
 
-        pollJSON.put("votes", array);
-        pollJSON.put("personsTotal", votes.a);
-        pollJSON.put("votesTotal", votes.c);
+        output.put("votes", array);
+        output.put("personsTotal", votes.a);
+        output.put("votesTotal", votes.c);
 
-        output.put("poll", pollJSON);
+        output.put("Label_table_key", Lang.T("Number", langObj));
+        output.put("Label_table_option_name", Lang.T("Option", langObj));
+        output.put("Label_table_person_votes", Lang.T("Personal Voters", langObj));
+        output.put("Label_table_option_votes", Lang.T("Asset Votes", langObj));
+        output.put("Label_Total", Lang.T("Total", langObj));
 
-        output.put("label_table_key", Lang.T("Number", langObj));
-        output.put("label_table_option_name", Lang.T("Option", langObj));
-        output.put("label_table_person_votes", Lang.T("Personal Voters", langObj));
-        output.put("label_table_option_votes", Lang.T("Asset Votes", langObj));
-        output.put("label_Total", Lang.T("Total", langObj));
-
-        output.put("label_Poll", Lang.T("Poll", langObj));
-        output.put("label_Asset", Lang.T("Asset", langObj));
-        output.put("label_Key", Lang.T("Key", langObj));
-        output.put("label_Owner", Lang.T("Owner", langObj));
-        output.put("label_Description", Lang.T("Description", langObj));
+        output.put("Label_Poll", Lang.T("Poll", langObj));
+        output.put("Label_Asset", Lang.T("Asset", langObj));
+        output.put("Label_Key", Lang.T("Key", langObj));
+        output.put("Label_Owner", Lang.T("Owner", langObj));
+        output.put("Label_Description", Lang.T("Description", langObj));
 
         return output;
 
@@ -907,8 +885,7 @@ public class BlockExplorer {
             return;
         }
 
-        Tuple2<Map, Transaction> itemBase = itemBase(asset, forPrint);
-        output.put("item", itemBase.a);
+        output.put("item", asset.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
         if (forPrint) {
             return;
@@ -1055,34 +1032,34 @@ public class BlockExplorer {
 
         output.put("lastTrades", tradesJSON);
 
-        output.put("label_Head", Lang.T("Exchange Order", langObj));
+        output.put("Label_Head", Lang.T("Exchange Order", langObj));
 
-        output.put("label_Order", Lang.T("Order", langObj));
+        output.put("Label_Order", Lang.T("Order", langObj));
 
-        output.put("label_Active", Lang.T("Active", langObj));
-        output.put("label_Completed", Lang.T("Completed", langObj));
-        output.put("label_Canceled", Lang.T("Canceled", langObj));
+        output.put("Label_Active", Lang.T("Active", langObj));
+        output.put("Label_Completed", Lang.T("Completed", langObj));
+        output.put("Label_Canceled", Lang.T("Canceled", langObj));
 
-        output.put("label_Fulfilled", Lang.T("Fulfilled", langObj));
-        output.put("label_LeftHave", Lang.T("Left Have", langObj));
-        output.put("label_LeftPrice", Lang.T("Left Price", langObj));
-        output.put("label_table_LastTrades", Lang.T("Last Trades", langObj));
-        output.put("label_table_have", Lang.T("Base Asset", langObj));
-        output.put("label_table_want", Lang.T("Price Asset", langObj));
-        output.put("label_table_orders", Lang.T("Opened Orders", langObj));
-        output.put("label_table_last_price", Lang.T("Last Price", langObj));
-        output.put("label_table_volume24", Lang.T("Day Volume", langObj));
+        output.put("Label_Fulfilled", Lang.T("Fulfilled", langObj));
+        output.put("Label_LeftHave", Lang.T("Left Have", langObj));
+        output.put("Label_LeftPrice", Lang.T("Left Price", langObj));
+        output.put("Label_table_LastTrades", Lang.T("Last Trades", langObj));
+        output.put("Label_table_have", Lang.T("Base Asset", langObj));
+        output.put("Label_table_want", Lang.T("Price Asset", langObj));
+        output.put("Label_table_orders", Lang.T("Opened Orders", langObj));
+        output.put("Label_table_last_price", Lang.T("Last Price", langObj));
+        output.put("Label_table_volume24", Lang.T("Day Volume", langObj));
 
-        output.put("label_Trade_Initiator", Lang.T("Trade Initiator", langObj));
-        output.put("label_Position_Holder", Lang.T("Position Holder", langObj));
-        output.put("label_Date", Lang.T("Date", langObj));
-        output.put("label_Pair", Lang.T("Pair", langObj));
-        output.put("label_Creator", Lang.T("Creator", langObj));
-        output.put("label_Amount", Lang.T("Amount", langObj));
-        output.put("label_Volume", Lang.T("Volume", langObj));
-        output.put("label_Price", Lang.T("Price", langObj));
-        output.put("label_Reverse_Price", Lang.T("Reverse Price", langObj));
-        output.put("label_Total_Cost", Lang.T("Total Cost", langObj));
+        output.put("Label_Trade_Initiator", Lang.T("Trade Initiator", langObj));
+        output.put("Label_Position_Holder", Lang.T("Position Holder", langObj));
+        output.put("Label_Date", Lang.T("Date", langObj));
+        output.put("Label_Pair", Lang.T("Pair", langObj));
+        output.put("Label_Creator", Lang.T("Creator", langObj));
+        output.put("Label_Amount", Lang.T("Amount", langObj));
+        output.put("Label_Volume", Lang.T("Volume", langObj));
+        output.put("Label_Price", Lang.T("Price", langObj));
+        output.put("Label_Reverse_Price", Lang.T("Reverse Price", langObj));
+        output.put("Label_Total_Cost", Lang.T("Total Cost", langObj));
 
         return output;
     }
@@ -1333,25 +1310,25 @@ public class BlockExplorer {
         }
         output.put("trades", tradesJSON);
 
-        output.put("label_Trades", Lang.T("Trades", langObj));
-        output.put("label_Trade_Initiator", Lang.T("Trade Initiator", langObj));
-        output.put("label_Position_Holder", Lang.T("Position Holder", langObj));
-        output.put("label_Volume", Lang.T("Volume", langObj));
-        output.put("label_Price", Lang.T("Price", langObj));
-        output.put("label_Total_Cost", Lang.T("Total Cost", langObj));
-        output.put("label_Amount", Lang.T("Amount", langObj));
-        output.put("label_Orders", Lang.T("Orders", langObj));
-        output.put("label_Sell_Orders", Lang.T("Sell Orders", langObj));
-        output.put("label_Buy_Orders", Lang.T("Buy Orders", langObj));
-        output.put("label_Total", Lang.T("Total", langObj));
-        output.put("label_Total_For_Sell", Lang.T("Total for Sell", langObj));
-        output.put("label_Total_For_Buy", Lang.T("Total for Buy", langObj));
-        output.put("label_Trade_History", Lang.T("Trade History", langObj));
-        output.put("label_Date", Lang.T("Date", langObj));
-        output.put("label_Type", Lang.T("Type", langObj));
-        output.put("label_Trade_Volume", Lang.T("Trade Volume", langObj));
-        output.put("label_Go_To", Lang.T("Go To", langObj));
-        output.put("label_Creator", Lang.T("Creator", langObj));
+        output.put("Label_Trades", Lang.T("Trades", langObj));
+        output.put("Label_Trade_Initiator", Lang.T("Trade Initiator", langObj));
+        output.put("Label_Position_Holder", Lang.T("Position Holder", langObj));
+        output.put("Label_Volume", Lang.T("Volume", langObj));
+        output.put("Label_Price", Lang.T("Price", langObj));
+        output.put("Label_Total_Cost", Lang.T("Total Cost", langObj));
+        output.put("Label_Amount", Lang.T("Amount", langObj));
+        output.put("Label_Orders", Lang.T("Orders", langObj));
+        output.put("Label_Sell_Orders", Lang.T("Sell Orders", langObj));
+        output.put("Label_Buy_Orders", Lang.T("Buy Orders", langObj));
+        output.put("Label_Total", Lang.T("Total", langObj));
+        output.put("Label_Total_For_Sell", Lang.T("Total for Sell", langObj));
+        output.put("Label_Total_For_Buy", Lang.T("Total for Buy", langObj));
+        output.put("Label_Trade_History", Lang.T("Trade History", langObj));
+        output.put("Label_Date", Lang.T("Date", langObj));
+        output.put("Label_Type", Lang.T("Type", langObj));
+        output.put("Label_Trade_Volume", Lang.T("Trade Volume", langObj));
+        output.put("Label_Go_To", Lang.T("Go To", langObj));
+        output.put("Label_Creator", Lang.T("Creator", langObj));
 
         return output;
     }
@@ -1404,14 +1381,14 @@ public class BlockExplorer {
         output.put("Label_Positions", Lang.T("Balance Positions", langObj));
         output.put("Label_Sides", Lang.T("Balance Sides", langObj));
 
-        output.put("label_Balance_1", Lang.T(Account.balancePositionName(1), langObj));
-        output.put("label_Balance_2", Lang.T(Account.balancePositionName(2), langObj));
-        output.put("label_Balance_3", Lang.T(Account.balancePositionName(3), langObj));
-        output.put("label_Balance_4", Lang.T(Account.balancePositionName(4), langObj));
-        output.put("label_Balance_5", Lang.T(Account.balancePositionName(5), langObj));
+        output.put("Label_Balance_1", Lang.T(Account.balancePositionName(1), langObj));
+        output.put("Label_Balance_2", Lang.T(Account.balancePositionName(2), langObj));
+        output.put("Label_Balance_3", Lang.T(Account.balancePositionName(3), langObj));
+        output.put("Label_Balance_4", Lang.T(Account.balancePositionName(4), langObj));
+        output.put("Label_Balance_5", Lang.T(Account.balancePositionName(5), langObj));
 
-        output.put("label_Balance_Pos", Lang.T(Account.balancePositionName(position), langObj));
-        output.put("label_Balance_Side", Lang.T(Account.balanceSideName(side), langObj));
+        output.put("Label_Balance_Pos", Lang.T(Account.balancePositionName(position), langObj));
+        output.put("Label_Balance_Side", Lang.T(Account.balanceSideName(side), langObj));
 
         output.put("Label_TotalDebit", Lang.T(Account.balanceSideName(Account.BALANCE_SIDE_DEBIT), langObj));
         output.put("Label_Left", Lang.T(Account.balanceSideName(Account.BALANCE_SIDE_LEFT), langObj));
@@ -1420,13 +1397,13 @@ public class BlockExplorer {
         output.put("Side_Help", Lang.T("Side_Help", langObj));
 
         if (assetKey.equals(Transaction.FEE_KEY)) {
-            output.put("label_Balance_4", Lang.T(Account.balanceCOMPUPositionName(4), langObj));
-            output.put("label_Balance_5", Lang.T(Account.balanceCOMPUPositionName(5), langObj));
+            output.put("Label_Balance_4", Lang.T(Account.balanceCOMPUPositionName(4), langObj));
+            output.put("Label_Balance_5", Lang.T(Account.balanceCOMPUPositionName(5), langObj));
 
             if (position == TransactionAmount.ACTION_SPEND || position == TransactionAmount.ACTION_PLEDGE) {
 
-                output.put("label_Balance_Pos", Lang.T(Account.balanceCOMPUPositionName(position), langObj));
-                output.put("label_Balance_Side", Lang.T(Account.balanceCOMPUSideName(side), langObj));
+                output.put("Label_Balance_Pos", Lang.T(Account.balanceCOMPUPositionName(position), langObj));
+                output.put("Label_Balance_Side", Lang.T(Account.balanceCOMPUSideName(side), langObj));
 
                 output.put("Label_TotalDebit", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_DEBIT), langObj));
                 output.put("Label_Left", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_LEFT), langObj));
@@ -1609,70 +1586,19 @@ public class BlockExplorer {
         assetsJSON.put(asset.getKey(), assetJSON);
     }
 
-    private Map jsonQueryItemPerson(String first) {
+    private void jsonQueryItemPerson(String first, boolean forPrint) {
         output.put("type", "person");
         output.put("search", "persons");
 
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(first));
         if (person == null) {
-            return new HashMap(2);
+            return;
         }
 
-        output.put("charKey", person.getItemTypeChar());
-        output.put("label_Actions", Lang.T("Actions", langObj));
-        output.put("label_Authorship", Lang.T("Authorship", langObj));
-        output.put("label_RAW", Lang.T("Bytecode", langObj));
+        output.put("item", person.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
-        Tuple2<Map, Transaction> itemBase = itemBase(person, forPrint);
-        Map output = itemBase.a;
-
-        output.put("Label_key", Lang.T("Key", langObj));
-        output.put("Label_TXIssue", Lang.T("Issued in", langObj));
-        output.put("Label_name", Lang.T("Name", langObj));
-        output.put("Label_creator", Lang.T("Creator", langObj));
-        output.put("Label_registrar", Lang.T("Registrar", langObj));
-        output.put("Label_born", Lang.T("Birthday", langObj));
-        output.put("Label_gender", Lang.T("Gender", langObj));
-        output.put("Label_total_registered", Lang.T("Registered", langObj));
-        output.put("Label_total_certified", Lang.T("Certified", langObj));
-        output.put("Label_description", Lang.T("Description", langObj));
-
-        output.put("creator", person.getOwner().getAddress());
-        if (person.getOwner().getPerson() != null) {
-            output.put("creator_key", person.getOwner().getPerson().b.getKey());
-            output.put("creator_name", person.getOwner().getPerson().b.viewName());
-        } else {
-            output.put("creator_key", "");
-            output.put("creator_name", "");
-        }
-
-        // уже есть в карте это значение
-        Transaction transaction = itemBase.b;
-        output.put("registrar", transaction.getCreator().getAddress());
-        if (transaction.getCreator().getPerson() != null) {
-            output.put("registrar_key", transaction.getCreator().getPerson().b.getKey());
-            output.put("registrar_name", transaction.getCreator().getPerson().b.viewName());
-        } else {
-            output.put("registrar_key", "");
-            output.put("registrar_name", "");
-        }
-
-        output.put("birthday", person.getBirthdayStr());
-        if (!person.isAlive(0L)) {
-            output.put("deathday", person.getDeathdayStr());
-            output.put("Label_dead", Lang.T("Deathday", langObj));
-
-        }
-
-        String gender = Lang.T("Man", langObj);
-        if (person.getGender() == 0) {
-            gender = Lang.T("Man", langObj);
-        } else if (person.getGender() == 1) {
-            gender = Lang.T("Woman", langObj);
-        } else {
-            gender = Lang.T("-", langObj);
-        }
-        output.put("gender", gender);
+        if (forPrint)
+            return;
 
         // statuses
 
@@ -1842,7 +1768,6 @@ public class BlockExplorer {
 
         output.put("My_Persons", myPersonsJSON);
 
-        return output;
     }
 
 
@@ -1857,13 +1782,13 @@ public class BlockExplorer {
 
         //output.put("timezone", Settings.getInstance().getTimeZone());
         //output.put("timeformat", Settings.getInstance().getTimeFormat());
-        output.put("label_hour", Lang.T("hour", langObj));
-        output.put("label_hours", Lang.T("hours", langObj));
-        output.put("label_mins", Lang.T("mins", langObj));
-        output.put("label_min", Lang.T("min", langObj));
-        output.put("label_secs", Lang.T("secs", langObj));
-        output.put("label_ago", Lang.T("ago", langObj));
-        output.put("label_Last_processed_block",
+        output.put("Label_hour", Lang.T("hour", langObj));
+        output.put("Label_hours", Lang.T("hours", langObj));
+        output.put("Label_mins", Lang.T("mins", langObj));
+        output.put("Label_min", Lang.T("min", langObj));
+        output.put("Label_secs", Lang.T("secs", langObj));
+        output.put("Label_ago", Lang.T("ago", langObj));
+        output.put("Label_Last_processed_block",
                 Lang.T("Last processed block", langObj));
 
         return output;
@@ -1977,10 +1902,10 @@ public class BlockExplorer {
                             .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
         }
         output.put("Label_Table_Account", Lang.T("Account", langObj));
-        output.put("label_Balance_1", Lang.T("OWN (1)", langObj));
-        output.put("label_Balance_2", Lang.T("DEBT (2)", langObj));
-        output.put("label_Balance_3", Lang.T("HOLD (3)", langObj));
-        output.put("label_Balance_4", Lang.T("SPEND (4)", langObj));
+        output.put("Label_Balance_1", Lang.T("OWN (1)", langObj));
+        output.put("Label_Balance_2", Lang.T("DEBT (2)", langObj));
+        output.put("Label_Balance_3", Lang.T("HOLD (3)", langObj));
+        output.put("Label_Balance_4", Lang.T("SPEND (4)", langObj));
         output.put("Label_Table_Prop", Lang.T("Prop.", langObj));
         output.put("Label_Table_person", Lang.T("Owner", langObj));
 
@@ -2083,14 +2008,14 @@ public class BlockExplorer {
         output.put("Label_Left", Lang.T("Left # остаток", langObj));
         output.put("Label_TotalCredit", Lang.T("Total Credit", langObj));
 
-        output.put("label_Balance_table", Lang.T("Balance", langObj));
-        output.put("label_asset_key", Lang.T("Key", langObj));
-        output.put("label_asset_name", Lang.T("Name", langObj));
+        output.put("Label_Balance_table", Lang.T("Balance", langObj));
+        output.put("Label_asset_key", Lang.T("Key", langObj));
+        output.put("Label_asset_name", Lang.T("Name", langObj));
 
-        output.put("label_Balance_1", Lang.T("OWN (1)", langObj));
-        output.put("label_Balance_2", Lang.T("DEBT (2)", langObj));
-        output.put("label_Balance_3", Lang.T("HOLD (3)", langObj));
-        output.put("label_Balance_4", Lang.T("SPEND (4)", langObj));
+        output.put("Label_Balance_1", Lang.T("OWN (1)", langObj));
+        output.put("Label_Balance_2", Lang.T("DEBT (2)", langObj));
+        output.put("Label_Balance_3", Lang.T("HOLD (3)", langObj));
+        output.put("Label_Balance_4", Lang.T("SPEND (4)", langObj));
 
         return output;
 
@@ -2582,23 +2507,23 @@ public class BlockExplorer {
 
         output.put("lastTrades", tradesArray);
 
-        output.put("label_table_PopularPairs", Lang.T("Most Popular Pairs", langObj));
-        output.put("label_table_LastTrades", Lang.T("Last Trades", langObj));
-        output.put("label_table_have", Lang.T("Base Asset", langObj));
-        output.put("label_table_want", Lang.T("Price Asset", langObj));
-        output.put("label_table_orders", Lang.T("Opened Orders", langObj));
-        output.put("label_table_last_price", Lang.T("Last Price", langObj));
-        output.put("label_table_volume24", Lang.T("Day Volume", langObj));
+        output.put("Label_table_PopularPairs", Lang.T("Most Popular Pairs", langObj));
+        output.put("Label_table_LastTrades", Lang.T("Last Trades", langObj));
+        output.put("Label_table_have", Lang.T("Base Asset", langObj));
+        output.put("Label_table_want", Lang.T("Price Asset", langObj));
+        output.put("Label_table_orders", Lang.T("Opened Orders", langObj));
+        output.put("Label_table_last_price", Lang.T("Last Price", langObj));
+        output.put("Label_table_volume24", Lang.T("Day Volume", langObj));
 
-        output.put("label_Trade_Initiator", Lang.T("Trade Initiator", langObj));
-        output.put("label_Position_Holder", Lang.T("Position Holder", langObj));
-        output.put("label_Date", Lang.T("Date", langObj));
-        output.put("label_Pair", Lang.T("Pair", langObj));
-        output.put("label_Creator", Lang.T("Creator", langObj));
-        output.put("label_Amount", Lang.T("Amount", langObj));
-        output.put("label_Volume", Lang.T("Volume", langObj));
-        output.put("label_Price", Lang.T("Price", langObj));
-        output.put("label_Total_Cost", Lang.T("Total Cost", langObj));
+        output.put("Label_Trade_Initiator", Lang.T("Trade Initiator", langObj));
+        output.put("Label_Position_Holder", Lang.T("Position Holder", langObj));
+        output.put("Label_Date", Lang.T("Date", langObj));
+        output.put("Label_Pair", Lang.T("Pair", langObj));
+        output.put("Label_Creator", Lang.T("Creator", langObj));
+        output.put("Label_Amount", Lang.T("Amount", langObj));
+        output.put("Label_Volume", Lang.T("Volume", langObj));
+        output.put("Label_Price", Lang.T("Price", langObj));
+        output.put("Label_Total_Cost", Lang.T("Total Cost", langObj));
 
 
     }
@@ -2761,7 +2686,7 @@ public class BlockExplorer {
         output.put("useoffset", true);
 
         if (person != null) {
-            output.put("label_person_name", Lang.T("Name", langObj));
+            output.put("Label_person_name", Lang.T("Name", langObj));
             output.put("person_Img", Base64.encodeBase64String(person.b.getImage()));
             output.put("person", person.b.viewName());
             output.put("person_key", person.b.getKey());
@@ -2769,11 +2694,11 @@ public class BlockExplorer {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = account.getBalance(AssetCls.LIA_KEY);
             output.put("registered", balabce_LIA.a.b.toPlainString());
             output.put("certified", balabce_LIA.b.b.toPlainString());
-            output.put("label_registered", Lang.T("Registered", langObj));
-            output.put("label_certified", Lang.T("Certified", langObj));
+            output.put("Label_registered", Lang.T("Registered", langObj));
+            output.put("Label_certified", Lang.T("Certified", langObj));
         }
 
-        output.put("label_account", Lang.T("Account", langObj));
+        output.put("Label_account", Lang.T("Account", langObj));
 
         // balance assets from
         int side = Account.BALANCE_SIDE_LEFT;
@@ -2957,18 +2882,15 @@ public class BlockExplorer {
         }
 
         output.put("charKey", template.getItemTypeChar());
-        output.put("label_Actions", Lang.T("Actions", langObj));
-        output.put("label_RAW", Lang.T("Bytecode", langObj));
+        output.put("Label_Actions", Lang.T("Actions", langObj));
+        output.put("Label_RAW", Lang.T("Bytecode", langObj));
 
-        Map output = new LinkedHashMap();
+        output.put("item", template.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
-        Map templateJSON = itemBase(template, forPrint).a;
-        output.put("template", templateJSON);
-
-        output.put("label_Template", Lang.T("Template", langObj));
-        output.put("label_Key", Lang.T("Key", langObj));
-        output.put("label_Creator", Lang.T("Creator", langObj));
-        output.put("label_Description", Lang.T("Description", langObj));
+        output.put("Label_Template", Lang.T("Template", langObj));
+        output.put("Label_Key", Lang.T("Key", langObj));
+        output.put("Label_Creator", Lang.T("Creator", langObj));
+        output.put("Label_Description", Lang.T("Description", langObj));
 
         return output;
     }
@@ -2983,25 +2905,14 @@ public class BlockExplorer {
             return new HashMap(2);
         }
 
-        output.put("charKey", status.getItemTypeChar());
-        output.put("label_Actions", Lang.T("Actions", langObj));
-        output.put("label_RAW", Lang.T("Bytecode", langObj));
+        output.put("item", status.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
-        Map output = new LinkedHashMap();
+        output.put("unique", status.isUnique());
 
-        Map statusJSON = itemBase(status, forPrint).a;
+        output.put("Label_Status", Lang.T("Status", langObj));
 
-        statusJSON.put("unique", status.isUnique());
-
-        output.put("status", statusJSON);
-
-        output.put("label_Status", Lang.T("Status", langObj));
-        output.put("label_Key", Lang.T("Key", langObj));
-        output.put("label_Creator", Lang.T("Creator", langObj));
-        output.put("label_Description", Lang.T("Description", langObj));
-
-        output.put("label_unique_state", Lang.T("Unique State", langObj));
-        output.put("label_multi_states", Lang.T("Multi States", langObj));
+        output.put("Label_unique_state", Lang.T("Unique State", langObj));
+        output.put("Label_multi_states", Lang.T("Multi States", langObj));
 
         return output;
     }
@@ -3206,27 +3117,27 @@ public class BlockExplorer {
 
             output.put(counter + 1, transactionJSON);
         }
-        output.put("label_block", Lang.T("Block", langObj));
-        output.put("label_Block_version", Lang.T("Block version", langObj));
-        output.put("label_Forger", Lang.T("Forger", langObj));
-        output.put("label_Transactions_count",
+        output.put("Label_block", Lang.T("Block", langObj));
+        output.put("Label_Block_version", Lang.T("Block version", langObj));
+        output.put("Label_Forger", Lang.T("Forger", langObj));
+        output.put("Label_Transactions_count",
                 Lang.T("Transactions count", langObj));
-        output.put("label_Total_Amount", Lang.T("Total Amount", langObj));
-        output.put("label_Total_AT_Amount", Lang.T("Total AT Amount", langObj));
-        output.put("label_Total_Fee", Lang.T("Total Fee", langObj));
+        output.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
+        output.put("Label_Total_AT_Amount", Lang.T("Total AT Amount", langObj));
+        output.put("Label_Total_Fee", Lang.T("Total Fee", langObj));
 
-        output.put("label_Win_Value", Lang.T("Win Value", langObj));
-        output.put("label_Generating_Balance",
+        output.put("Label_Win_Value", Lang.T("Win Value", langObj));
+        output.put("Label_Generating_Balance",
                 Lang.T("Generating Balance", langObj));
-        output.put("label_Target", Lang.T("Target", langObj));
-        output.put("label_Targeted_Win_Value",
+        output.put("Label_Target", Lang.T("Target", langObj));
+        output.put("Label_Targeted_Win_Value",
                 Lang.T("Targeted Win Value", langObj));
 
-        output.put("label_Parent_block", Lang.T("Parent block", langObj));
-        output.put("label_Current_block", Lang.T("Current block", langObj));
-        output.put("label_Child_block", Lang.T("Child block", langObj));
-        output.put("label_Including", Lang.T("Including", langObj));
-        output.put("label_Signature", Lang.T("Signature", langObj));
+        output.put("Label_Parent_block", Lang.T("Parent block", langObj));
+        output.put("Label_Current_block", Lang.T("Current block", langObj));
+        output.put("Label_Child_block", Lang.T("Child block", langObj));
+        output.put("Label_Including", Lang.T("Including", langObj));
+        output.put("Label_Signature", Lang.T("Signature", langObj));
 
     }
 
@@ -3492,25 +3403,25 @@ public class BlockExplorer {
 
         outputTXs.put("transactions", transactionsJSON);
 
-        outputTXs.put("label_useForge", Lang.T("Forging", langObj));
+        outputTXs.put("Label_useForge", Lang.T("Forging", langObj));
 
-        outputTXs.put("label_seqNo", Lang.T("Number", langObj));
-        outputTXs.put("label_block", Lang.T("Block", langObj));
-        outputTXs.put("label_date", Lang.T("Date", langObj));
-        outputTXs.put("label_type_transaction", Lang.T("Type", langObj));
-        outputTXs.put("label_creator", Lang.T("Creator", langObj));
-        outputTXs.put("label_atside", Lang.T("Side", langObj));
-        outputTXs.put("label_asset", Lang.T("Asset", langObj));
-        outputTXs.put("label_amount", Lang.T("Amount", langObj));
-        //outputTXs.put("label_confirmations", Lang.TFromLangObj("Confirmations", langObj));
-        outputTXs.put("label_recipient", Lang.T("Recipient", langObj));
-        outputTXs.put("label_size", Lang.T("Size", langObj));
-        outputTXs.put("label_seqNo", Lang.T("SeqNo", langObj));
-        outputTXs.put("label_signature", Lang.T("Signature", langObj));
-        outputTXs.put("label_title", Lang.T("Title", langObj));
-        outputTXs.put("label_amount_key", Lang.T("Amount:Key", langObj));
-        outputTXs.put("label_fee", Lang.T("Fee", langObj));
-        outputTXs.put("label_transactions_table", title);
+        outputTXs.put("Label_seqNo", Lang.T("Number", langObj));
+        outputTXs.put("Label_block", Lang.T("Block", langObj));
+        outputTXs.put("Label_date", Lang.T("Date", langObj));
+        outputTXs.put("Label_type_transaction", Lang.T("Type", langObj));
+        outputTXs.put("Label_creator", Lang.T("Creator", langObj));
+        outputTXs.put("Label_atside", Lang.T("Side", langObj));
+        outputTXs.put("Label_asset", Lang.T("Asset", langObj));
+        outputTXs.put("Label_amount", Lang.T("Amount", langObj));
+        //outputTXs.put("Label_confirmations", Lang.TFromLangObj("Confirmations", langObj));
+        outputTXs.put("Label_recipient", Lang.T("Recipient", langObj));
+        outputTXs.put("Label_size", Lang.T("Size", langObj));
+        outputTXs.put("Label_seqNo", Lang.T("SeqNo", langObj));
+        outputTXs.put("Label_signature", Lang.T("Signature", langObj));
+        outputTXs.put("Label_title", Lang.T("Title", langObj));
+        outputTXs.put("Label_amount_key", Lang.T("Amount:Key", langObj));
+        outputTXs.put("Label_fee", Lang.T("Fee", langObj));
+        outputTXs.put("Label_transactions_table", title);
 
         output.put("Transactions", outputTXs);
 

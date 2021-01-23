@@ -2014,7 +2014,6 @@ public abstract class AssetCls extends ItemCls {
 
         JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
         itemJson.put("Label_Asset", Lang.T("Asset", langObj));
-        itemJson.put("Label_Actions", Lang.T("Actions", langObj));
         itemJson.put("Label_Scale", Lang.T("Accuracy", langObj));
         itemJson.put("Label_AssetType", Lang.T("Type # вид", langObj));
         itemJson.put("Label_AssetType_Desc", Lang.T("Type Description", langObj));

@@ -83,6 +83,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     protected byte[] icon;
     protected byte[] image;
 
+    public Transaction referenceTx = null;
+
     public ItemCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
         this.typeBytes = typeBytes;
         this.owner = owner;
@@ -651,6 +653,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("charKey", getItemTypeChar());
 
         // ADD DATA
+        itemJSON.put("itemCharKey", getItemTypeChar());
         itemJSON.put("item_type", this.getItemTypeName());
         //itemJSON.put("itemType", this.getItemTypeName());
         itemJSON.put("item_type_sub", this.getItemSubType());
@@ -666,10 +669,12 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("is_confirmed", this.isConfirmed());
         itemJSON.put("reference", Base58.encode(this.reference));
 
-        Transaction txIssue = Controller.getInstance().getTransaction(this.reference);
-        if (txIssue != null) {
-            itemJSON.put("timestamp", txIssue.getTimestamp());
-            itemJSON.put("blk_timestamp", Controller.getInstance().blockChain.getHeightOnTimestampMS(txIssue.getBlockHeight()));
+        long txSeqNo = DCSet.getInstance().getTransactionFinalMapSigns().get(getReference());
+        itemJSON.put("seqNo", Transaction.viewDBRef(txSeqNo));
+        referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
+        if (referenceTx != null) {
+            itemJSON.put("timestamp", referenceTx.getTimestamp());
+            itemJSON.put("blk_timestamp", Controller.getInstance().blockChain.getHeightOnTimestampMS(referenceTx.getBlockHeight()));
         }
 
         return itemJSON;
@@ -778,10 +783,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJson.put("Label_TXIssue", Lang.T("Issued in", langObj));
         itemJson.put("Label_DateIssue", Lang.T("Issued Date", langObj));
         itemJson.put("Label_IssueReference", Lang.T("Issued Reference", langObj));
-        itemJson.put("label_Actions", Lang.T("Actions", langObj));
-        itemJson.put("label_RAW", Lang.T("Bytecode", langObj));
+        itemJson.put("Label_Actions", Lang.T("Actions", langObj));
+        itemJson.put("Label_RAW", Lang.T("Bytecode", langObj));
         itemJson.put("Label_Print", Lang.T("Print", langObj));
         itemJson.put("Label_Description", Lang.T("Description", langObj));
+        itemJson.put("Label_seqNo", Lang.T("seqNo", langObj));
 
 
         itemJson.put("owner", this.getOwner().getAddress());
@@ -797,8 +803,16 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         if (getImage() != null && getImage().length > 0)
             itemJson.put("image", java.util.Base64.getEncoder().encodeToString(getImage()));
 
-        itemJson.put("item_type_name", Lang.T("Print", langObj));
-
+        if (reference != null) {
+            long txSeqNo = dcSet.getTransactionFinalMapSigns().get(reference);
+            itemJson.put("seqNo", Transaction.viewDBRef(txSeqNo));
+            Transaction transaction = dcSet.getTransactionFinalMap().get(txSeqNo);
+            itemJson.put("tx_timestamp", transaction.getTimestamp());
+            if (transaction.getCreator() == null) {
+                itemJson.put("tx_creator", transaction.getCreator());
+                itemJson.put("tx_creator_person", transaction.viewCreator());
+            }
+        }
 
         return itemJson;
     }
