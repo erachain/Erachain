@@ -18,11 +18,11 @@ function polls(data){
     }
     output += '<table width="1280" border=0><tr><td align=left><br>';
     output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;">';
-    output += '<thead><tr><td><b>'+ data.label_table_key  +': ' +
-        data.label_table_name + '</b></td><td><b>' + data.label_table_description +
-        '</b></td><td><b>' + data.label_table_total_votes +
-        '</b></td><td><b>' + data.label_table_options_count +
-        '</b></td><td><b>' + data.label_table_creator + '</b></td></tr></thead>';
+    output += '<thead><tr><td><b>'+ data.Label_table_key  +': ' +
+        data.Label_table_name + '</b></td><td><b>' + data.Label_table_description +
+        '</b></td><td><b>' + data.Label_table_total_votes +
+        '</b></td><td><b>' + data.Label_table_options_count +
+        '</b></td><td><b>' + data.Label_table_creator + '</b></td></tr></thead>';
 
     //Отображение таблицы элементов статусов
     for (var i in data.pageItems) {
@@ -51,11 +51,14 @@ function polls(data){
     return output;
 }
 
-function poll(data) {
+function poll(data, forPrint) {
 
-    var output = lastBlock(data.lastBlock);
+    var output = '';
 
-    if (!data.hasOwnProperty('poll')) {
+    if (!forPrint)
+        output += lastBlock(data.lastBlock);
+
+    if (!data.hasOwnProperty('item')) {
         output += '<h2>Not found</h2>';
         return output;
     }
@@ -66,47 +69,29 @@ function poll(data) {
         return output;
     }
 
-    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1300">';
     output += '<tr><td align=left>';
     output += '<table><tr style="vertical-align:top">';
 
-    if (data.poll.image.length > 0) {
-        output += '<td><img src="data:image/gif;base64,' + data.poll.image + '" width = "350" /></td><td style ="padding-left:20px">';
-        output += '<br>';
-    }
+    var item = data.item;
+    ////// HEAD
+    output += itemHead(item, forPrint, 'poll');
 
-    output += '<h3 style="display:inline;"><a href="?poll=' + data.poll.key + get_lang() + '">';
-    if (data.poll.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.poll.icon + '" style="width:50px;" />';
-    output += data.poll.name + '</a></h3>';
-
-    output += '<br>';
-
-    //output += '<b>' + data.poll.label_Key + ':</b> ' + data.poll.key;
-    //output += data.label_Key + ': ' +'<a href=?poll=' + data.poll.key + get_lang() + '><b>' + data.poll.key + '</b></a>, &nbsp&nbsp';
+    //////// BODY
+    output += '<p style="font-size:1.3em">';
 
 
-    output += '<h3 style="display:inline;"><b>' + data.label_Poll + ':</b>';
-
-    output += ' [ <input id="key1" name="poll" size="8" type="text" value="' + data.poll.key + '" class="" style="font-size: 1em;"'
-                   + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
-
-    output += '<a href=?tx=' + data.poll.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.poll.seqNo + '</b></a>';
-    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
-    output += ' ' +'<a href=../apipoll/raw/' + data.poll.key + ' class="button ll-blue-bgc"><b>' + data.label_RAW + '</b></a></h4>';
-
-    output += '<h4 style="display:inline;"><b>' + data.label_Asset + ':</b>';
+    output += '<h4 style="display:inline;"><b>' + data.Label_Asset + ':</b>';
     output += ' [ <input id="key2" name="asset" size="8" type="text" value="' + data.assetKey + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
-    output += '<a href ="?asset=' +  data.poll.assetKey + get_lang() + '">' + data.assetName + '</a></h4>';
+    output += '<a href ="?asset=' +  item.assetKey + get_lang() + '">' + data.assetName + '</a></h4>';
 
     output += '<br>';
 
-    output += '<b>' + data.label_Owner + ':</b> <a href=?address=' + data.poll.owner + get_lang() + '>' + data.poll.owner + '</a>';
+    output += '</p>';
 
-    output += '<br>';
-
-    output += '<b>' + data.label_Description + ':</b><br>';
-    output += fformat(data.poll.description);
+    //// FOOT
+    output += itemFoot(item, forPrint, 'poll');
 
     output += '<hl>';
 
@@ -116,29 +101,29 @@ function poll(data) {
 
     output += '<table width="1280" border=0><tr><td align=left><br>';
     output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;">';
-    output += '<thead><tr><td><b>'+ data.label_table_key  +' - ' +
-        data.label_table_option_name +
-        '</b></td><td><b>' + data.label_table_person_votes +
+    output += '<thead><tr><td><b>'+ data.Label_table_key  +' - ' +
+        data.Label_table_option_name +
+        '</b></td><td><b>' + data.Label_table_person_votes +
         '</b></td><td><b>%%' +
-        '</b></td><td><b>' + data.label_table_option_votes +
+        '</b></td><td><b>' + data.Label_table_option_votes +
         '</b></td><td><b>%%</b></td></tr></thead>';
 
     var number = 1;
-    for (var i in data.poll.votes) {
-        var item = data.poll.votes[i];
+    for (var i in item.votes) {
+        var item = item.votes[i];
         var voteNo = i * 1 + 1;
         output += '<tr><td><b>' + number++ + ' - ' + item.name + ':</b></td>';
         output += '<td>' + item.persons + '</td>';
-        output += '<td>' + (100.0 * item.persons / data.poll.personsTotal).toPrecision(6)  + '</td>';
+        output += '<td>' + (100.0 * item.persons / item.personsTotal).toPrecision(6)  + '</td>';
         output += '<td><a href=?q=' + data.charKey + '%20%23%23' + voteNo + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.votes + '</b></a></td>';
-        output += '<td>' + (100.0 * item.votes / data.poll.votesTotal).toPrecision(6) + '</td>';
+        output += '<td>' + (100.0 * item.votes / item.votesTotal).toPrecision(6) + '</td>';
 
         output += '</td></tr>';
     }
 
-    output += '<tr><td><b>' + data.label_Total + '</b></td>';
-    output += '<td>' + data.poll.personsTotal + '</td>';
-    output += '<td><td>' + data.poll.votesTotal + '</td><td>';
+    output += '<tr><td><b>' + data.Label_Total + '</b></td>';
+    output += '<td>' + item.personsTotal + '</td>';
+    output += '<td><td>' + item.votesTotal + '</td><td>';
 
     output += '</td></tr>';
 

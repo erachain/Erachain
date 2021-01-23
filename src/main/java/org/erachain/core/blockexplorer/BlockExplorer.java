@@ -444,8 +444,8 @@ public class BlockExplorer {
             output.put("type", "polls");
             output.putAll(jsonQueryPages(PollCls.class, start, pageSize));
         } else if (info.getQueryParameters().containsKey("poll")) {
-            output.putAll(jsonQueryItemPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
-                    info.getQueryParameters().getFirst("asset")));
+            jsonQueryItemPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
+                    info.getQueryParameters().getFirst("asset"));
 
             //////////////////////////// ASSETS //////////////////////////
             // top 100
@@ -663,14 +663,14 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryItemPoll(Long pollKey, String assetStr) {
+    public void jsonQueryItemPoll(Long pollKey, String assetStr) {
 
         output.put("type", "poll");
         output.put("search", "polls");
 
         PollCls poll = (PollCls) dcSet.getItemPollMap().get(pollKey);
         if (poll == null) {
-            return new HashMap(2);
+            return;
         }
 
         output.put("charKey", poll.getItemTypeChar());
@@ -682,7 +682,7 @@ public class BlockExplorer {
         try {
             assetKey = Long.valueOf(assetStr);
         } catch (Exception e) {
-            assetKey = 2l;
+            assetKey = 2L;
         }
 
         AssetCls asset = (AssetCls) dcSet.getItemAssetMap().get(assetKey);
@@ -699,7 +699,6 @@ public class BlockExplorer {
 
         List<String> options = poll.getOptions();
         int optionsSize = options.size();
-
 
         Tuple4<Integer, long[], BigDecimal, BigDecimal[]> votes = poll.votesWithPersons(dcSet, assetKey, 0);
 
@@ -727,8 +726,6 @@ public class BlockExplorer {
         output.put("Label_Key", Lang.T("Key", langObj));
         output.put("Label_Owner", Lang.T("Owner", langObj));
         output.put("Label_Description", Lang.T("Description", langObj));
-
-        return output;
 
     }
 

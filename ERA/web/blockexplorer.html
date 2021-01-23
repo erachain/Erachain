@@ -317,9 +317,9 @@ button.white-bgc[disabled]:focus,
                         if (Object.keys(data).length > 0) {
 
                             var type = data.type;
-                            var print = parseUrlQuery().print;
+                            var forPrint = parseUrlQuery().print;
                             var dest;
-                            if (print) {
+                            if (forPrint) {
                                 dest = 'all';
                             } else {
                                 dest = 'main';
@@ -347,86 +347,86 @@ button.white-bgc[disabled]:focus,
 
                             if (!data.noSearchedElements) {
                                 if (type == 'blocks') {
-                                    document.getElementById('main').innerHTML = blocks(data);
+                                    document.getElementById(dest).innerHTML = blocks(data);
                                 } else
                                 if (type == 'address') {
-                                    document.getElementById('main').innerHTML = address(data);
+                                    document.getElementById(dest).innerHTML = address(data);
                                 } else
                                 if (type == 'addresses') {
-                                    document.getElementById('main').innerHTML = addresses(data);
+                                    document.getElementById(dest).innerHTML = addresses(data);
                                 } else
                                 if (type == 'peers') {
-                                    document.getElementById('main').innerHTML = peers(data);
+                                    document.getElementById(dest).innerHTML = peers(data);
                                 } else
                                 if (type == 'exchange') {
-                                    document.getElementById('main').innerHTML = exchange(data);
+                                    document.getElementById(dest).innerHTML = exchange(data);
                                 } else
                                 if (type == 'order') {
-                                    document.getElementById('main').innerHTML = order(data);
+                                    document.getElementById(dest).innerHTML = order(data);
                                 } else
                                 if (type == 'transactions') {
-                                    document.getElementById('main').innerHTML = transactions(data);
+                                    document.getElementById(dest).innerHTML = transactions(data);
                                 } else
                                 if (type == 'tx') {
-                                    document.getElementById('main').innerHTML = tx(data);
+                                    document.getElementById(dest).innerHTML = tx(data);
                                 } else
                                 if (type == 'templates') {
-                                    document.getElementById('main').innerHTML = templates(data);
+                                    document.getElementById(dest).innerHTML = templates(data);
                                 } else
                                 if (type == 'template') {
-                                    document.getElementById('main').innerHTML = template(data);
+                                    document.getElementById(dest).innerHTML = template(data);
                                 } else
                                 if (type == 'statement') {
-                                    document.getElementById('main').innerHTML = statement(data);
+                                    document.getElementById(dest).innerHTML = statement(data);
                                 } else
                                 if (type == 'top') {
-                                    document.getElementById('main').innerHTML = top100(data);
+                                    document.getElementById(dest).innerHTML = top100(data);
                                 } else
                                 if (type == 'persons') {
-                                    document.getElementById('main').innerHTML = persons(data);
+                                    document.getElementById(dest).innerHTML = persons(data);
                                 } else
                                 if (type == 'person') {
-                                    document.getElementById(dest).innerHTML = person(data, print);
+                                    document.getElementById(dest).innerHTML = person(data, forPrint);
                                 } else
                                 if (type == 'person_asset') {
-                                    document.getElementById('main').innerHTML = person_asset(data);
+                                    document.getElementById(dest).innerHTML = person_asset(data);
                                 } else
                                 if (type == 'person_status') {
-                                    document.getElementById('main').innerHTML = person_status(data);
+                                    document.getElementById(dest).innerHTML = person_status(data);
                                 } else
                                 if (type == 'aTs') {
-                                    document.getElementById('main').innerHTML = aTs(data)
+                                    document.getElementById(dest).innerHTML = aTs(data)
                                 } else
                                 if (type == 'polls') {
-                                    document.getElementById('main').innerHTML = polls(data)
+                                    document.getElementById(dest).innerHTML = polls(data)
                                 } else
                                 if (type == 'poll') {
-                                    document.getElementById('main').innerHTML = poll(data)
+                                    document.getElementById(dest).innerHTML = poll(data, forPrint)
                                 } else
                                 if (type == 'assets') { // list and for search
-                                    document.getElementById('main').innerHTML = assets(data);
+                                    document.getElementById(dest).innerHTML = assets(data);
                                 } else
                                 if (type == 'asset') { // for one Asset
-                                    document.getElementById(dest).innerHTML = asset(data, print);
+                                    document.getElementById(dest).innerHTML = asset(data, forPrint);
                                 } else
                                 if (type == 'trades') {
-                                    document.getElementById('main').innerHTML = trades(data)
+                                    document.getElementById(dest).innerHTML = trades(data)
                                 } else
                                 if (type == 'search') {
-                                    document.getElementById('main').innerHTML = search(data);
+                                    document.getElementById(dest).innerHTML = search(data);
                                 } else
                                 if (type == 'statuses') {
-                                    document.getElementById('main').innerHTML = statuses(data);
+                                    document.getElementById(dest).innerHTML = statuses(data);
                                 } else
                                 if (type == 'status') {
-                                    document.getElementById('main').innerHTML = status(data);
+                                    document.getElementById(dest).innerHTML = status(data);
                                 } else
                                 if (type == 'block') {
-                                    document.getElementById('main').innerHTML = block(data);
+                                    document.getElementById(dest).innerHTML = block(data);
                                 } else
                                 ///if (type == 'mainQuery')
                                 {
-                                    document.getElementById('main').innerHTML = mainQuery(data);
+                                    document.getElementById(dest).innerHTML = mainQuery(data);
                                     genFilterUrlForAll();
                                     genFilterUrl();
                                     if (window.location.hash) {
