@@ -74,7 +74,7 @@ function asset(data, forPrint) {
         return output;
     }
 
-    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1300">';
     output += '<tr><td align=left>';
     output += '<table><tr style="vertical-align:top">';
 
@@ -83,12 +83,14 @@ function asset(data, forPrint) {
     output += itemHead(item, forPrint, 'asset');
 
     //////// BODY
-    output += item.Label_AssetType + ': <b>' + item.assetTypeNameFull + '<br>';
-    output += item.Label_AssetType_Desc + ': ' + fformat(item.assetTypeDesc) + '<br>';
+    if (!forPrint)
+        output += '<a href=?top=all&asset=' + item.key + get_lang() + ' class="button ll-blue-bgc"><b>' + item.Label_Holders + '</b></a><br>';
 
+    output += '<p style="font-size:1.3em">' + item.Label_AssetType + ': <b>' + item.assetTypeNameFull + '</b><br>';
+    output += item.Label_AssetType_Desc + ': <b>' + fformat(item.assetTypeDesc) + '</b><br>';
     output += item.Label_Quantity + ': <b>' + addCommas(item.quantity) + '</b>';
     output += ', ' + item.Label_Scale + ': <b>' + item.scale + '</b>';
-    output += ', ' + item.Label_Released + ': <b>' + addCommas(item.released) + '</b>';
+    output += ', ' + item.Label_Released + ': <b>' + addCommas(item.released) + '</b></p>';
 
     output += itemFoot(item, forPrint, 'asset');
 
@@ -104,35 +106,36 @@ function asset(data, forPrint) {
     output += '<h3>' + item.Label_Available_pairs + '</h3>';
 
     output += '<table border="0" cellspacing="10" class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
-    output += '<td><b>' + data.Label_Pair + '</b></td><td><b>' + item.Label_Orders_Count + '</b></td>';
-    output += '<td><b>' + data.Label_Open_Orders_Volume + '</b></td>';
-    output += '<td><b>' + data.Label_Trades_Count + '</b></td><td><b>' + item.Label_Trades_Volume + '</b></td>';
-    output += '<td><b>' + data.Label_Description + '</b></td></tr>';
+    output += '<td><b>' + item.Label_Pair + '</b></td><td><b>' + item.Label_Orders_Count + '</b></td>';
+    output += '<td><b>' + item.Label_Open_Orders_Volume + '</b></td>';
+    output += '<td><b>' + item.Label_Trades_Count + '</b></td><td><b>' + item.Label_Trades_Volume + '</b></td>';
+    output += '<td><b>' + item.Label_Description + '</b></td></tr>';
 
     for (key in item.pairs) {
+        var pair = data.pairs[key];
         output += '<tr>';
 
         output += '<td><b>';
         output += '<a href="?asset=' + key + get_lang() + '">';
         output += getAssetName2(key, data.pairs[key].assetName);
 
-        output += '<td>' + data.pairs[key].openOrdersCount;
+        output += '<td>' + pair.openOrdersCount;
 
         output += '<td nowrap>';
         output += '<a href="?asset=' + item.key + '&asset=' + key + get_lang() + '"><b>'
-        output += addCommas(data.pairs[key].last);
+        output += addCommas(pair.last);
         output += '</b></a> / <a href="?asset=' + key + '&asset=' + item.key + get_lang() + '"><b>'
-        output += addCommas(data.pairs[key].lastReverse) + '</b></a><br>';
+        output += addCommas(pair.lastReverse) + '</b></a><br>';
 
-        output += addCommas(data.pairs[key].ordersPriceVolume) + ' / ' + addCommas(data.pairs[key].ordersAmountVolume);
+        output += addCommas(pair.ordersPriceVolume) + ' / ' + addCommas(pair.ordersAmountVolume);
 
-        output += '<td>' + data.pairs[key].tradesCount;
+        output += '<td>' + pair.tradesCount;
 
         output += '<td nowrap>';
-        output += addCommas(data.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMini(key, data.pairs[key].assetName);
-        output += '<br>' + addCommas(data.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMini(item.key, item.name);
+        output += addCommas(pair.tradeAmountVolume) + ' ' + getAssetNameMini(key, pair.assetName);
+        output += '<br>' + addCommas(pair.tradesPriceVolume) + ' ' + getAssetNameMini(item.key, item.name);
 
-        output += '<td>' + escapeHtml(data.pairs[key].description.substr(0, 100));
+        output += '<td>' + escapeHtml(pair.description.substr(0, 100));
     }
     output += '<tr><td><b>' + data.Label_Total + ':';
     output += '<td>' + data.totalOpenOrdersCount;
