@@ -459,11 +459,10 @@ public abstract class PersonCls extends ItemCls {
     public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
 
         JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_TXCreator", Lang.T("Registrar", langObj));
         itemJson.put("Label_Authorship", Lang.T("Authorship", langObj));
-        itemJson.put("Label_Registrar", Lang.T("Registrar", langObj));
         itemJson.put("Label_Born", Lang.T("Birthday", langObj));
         itemJson.put("Label_Gender", Lang.T("Gender", langObj));
-        //itemJson.put("Label_View", Lang.T("View", langObj));
 
         itemJson.put("birthday", getBirthdayStr());
         if (!isAlive(0L)) {

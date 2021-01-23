@@ -60,11 +60,11 @@ function itemHead(item, forPrint, type) {
         if (forPrint) {
             output += ': <b> ' + item.seqNo + '</b></h4>';
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ':<b> ' + item.reference + '</b><br>';
-            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Creator + ':<b> ' + creator + '</b><br>';
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_TXCreator + ':<b> ' + creator + '</b><br>';
         } else {
             output += ': <a href=?tx=' + item.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + item.seqNo + '</b></a></h4>';
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ':<b> ' + item.reference + '</b><br>';
-            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Creator + ':<b> ' + creator + '</b><br>';
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_TXCreator + ':<b> ' + creator + '</b><br>';
 
             output += '<a href=?q=' + item.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.Label_Actions + '</b></a>';
         }

@@ -261,15 +261,6 @@ function person(data, forPrint) {
         output += '<h4>COMPU: &nbsp&nbsp <b>' + data.compu_balance + '</b></h4>';
     }
 
-    if (item.tx_creator) {
-        if (forPrint)
-            output += '<h4>' + item.Label_Registrar + ': &nbsp&nbsp<b> ' + item.tx_creator_person + ' (' + item.tx_creator + ')</b></a></h4>';
-        else
-            output += '<h4>' + item.Label_Registrar + ': &nbsp&nbsp<a href ="?address=' + item.tx_creator + get_lang() + '"><b> ' + item.tx_creator_person + '</b></a></h4>';
-    } else {
-        output += '<h4>' + item.Label_Registrar + ': &nbsp&nbsp<a href ="?address=' + item.tx_creator + get_lang() + '"><b> ' + item.tx_creator + '</b></a></h4>';
-    }
-
     if (data.lia_balance_a && !forPrint) {
         output += '<h4>' + data.Label_Total_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.Label_Total_certified + ': <b>' + data.lia_balance_b + '</b></h4>';
     }
