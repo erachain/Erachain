@@ -95,16 +95,7 @@ function asset(data, forPrint) {
     if (forPrint)
         return output;
 
-    if (item.key != 0) {
-        assetUrl = '&asset=' + item.key;
-    } else {
-        assetUrl = '';
-    }
-
-    output += ' , <a href=?top=all' + assetUrl + get_lang() + ' class="button ll-blue-bgc"><b>' + item.label_Holders + '</b></a>';
     output += '<br>';
-
-    output += '<b>' + item.label_Description + ':</b> ' + fformat(item.description);
 
     output += '</td>';
     output += '</tr>';

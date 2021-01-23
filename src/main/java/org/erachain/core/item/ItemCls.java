@@ -781,6 +781,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJson.put("label_Actions", Lang.T("Actions", langObj));
         itemJson.put("label_RAW", Lang.T("Bytecode", langObj));
         itemJson.put("Label_Print", Lang.T("Print", langObj));
+        itemJson.put("Label_Description", Lang.T("Description", langObj));
+
 
         itemJson.put("owner", this.getOwner().getAddress());
         Fun.Tuple2<Integer, PersonCls> person = this.getOwner().getPerson();

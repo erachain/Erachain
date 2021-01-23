@@ -35,12 +35,14 @@ function itemHead(item, forPrint, type) {
             output += ', ' + item.Label_DateIssue + ':<b> ' + convertTimestamp(item.blk_timestamp, true);
             output += '</h4>' + item.Label_IssueReference + ':<b> ' + item.reference + '</b>';
             output += '<h4><a href=?tx=' + item.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + item.seqNo + '</b></a>';
-            output += ' ' +'<a href=?q=' + item.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.label_Actions + '</b></a>';
-            output += ' ' +'<a href=../api'+ type + '/raw/' + item.key + ' class="button ll-blue-bgc"><b>' + item.label_RAW + '</b></a>';
-            output += ' ' + '<a href=?'+ type + '=' + item.key + get_lang() + '&print class="button ll-blue-bgc"><b>' + item.Label_Print + '</b></a></h4>';
+            output += ' <a href=?q=' + item.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.label_Actions + '</b></a>';
+            output += ' <a href=../api'+ type + '/raw/' + item.key + ' class="button ll-blue-bgc"><b>' + item.label_RAW + '</b></a>';
+            output += ' <a href=?top=all&'+ type + '=' + item.key + get_lang() + ' class="button ll-blue-bgc"><b>' + item.label_Holders + '</b></a>';
+            output += ' <a href=?'+ type + '=' + item.key + get_lang() + '&print class="button ll-blue-bgc"><b>' + item.Label_Print + '</b></a></h4>';
             output += '</h4><br>';
         }
     }
+
 
     output += '<h4>' + item.Label_Creator + ': &nbsp&nbsp<b> ';
     if (item.owner_person) {
@@ -60,6 +62,9 @@ function itemHead(item, forPrint, type) {
 }
 
 function itemFoot(item, forPrint, type) {
-    var output = '<b>' + item.label_Description + ':</b> ' + fformat(item.description);
+    var output = '';
+    if (item.description)
+        output += '<br><b>' + item.Label_Description + ':<br>' + fformat(item.description);
+
     return output;
 }
