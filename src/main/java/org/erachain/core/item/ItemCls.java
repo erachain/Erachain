@@ -669,12 +669,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("is_confirmed", this.isConfirmed());
         itemJSON.put("reference", Base58.encode(this.reference));
 
-        long txSeqNo = DCSet.getInstance().getTransactionFinalMapSigns().get(getReference());
-        itemJSON.put("seqNo", Transaction.viewDBRef(txSeqNo));
-        referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
-        if (referenceTx != null) {
-            itemJSON.put("timestamp", referenceTx.getTimestamp());
-            itemJSON.put("blk_timestamp", Controller.getInstance().blockChain.getHeightOnTimestampMS(referenceTx.getBlockHeight()));
+        Long txSeqNo = DCSet.getInstance().getTransactionFinalMapSigns().get(getReference());
+        if (txSeqNo != null) {
+            // если транзакция еще не подтверждена - чтобы ошибок не было при отображении в блокэксплорере
+            itemJSON.put("seqNo", Transaction.viewDBRef(txSeqNo));
+            referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
+            if (referenceTx != null) {
+                itemJSON.put("timestamp", referenceTx.getTimestamp());
+                itemJSON.put("blk_timestamp", Controller.getInstance().blockChain.getHeightOnTimestampMS(referenceTx.getBlockHeight()));
+            }
         }
 
         return itemJSON;
