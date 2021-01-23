@@ -22,28 +22,15 @@ function itemHead(item, forPrint, type) {
 
     output += '</h3><h4>';
 
-    if (!forPrint)
+    if (forPrint)
+        output += item.Label_Number + ':<b> ' + item.key + '</b>';
+    else
         output += '[ <input id="key1" name="' + type + '" size="8" type="text" value="' + item.key + '" class="" style="font-size: 1em;"'
                        + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ]';
 
-    if (item.hasOwnProperty('seqNo')) {
-        if (forPrint) {
-            output += item.Label_Number + ':<b> ' + item.key + '</b><br>' + item.Label_TXIssue + ':<b> '
-             + item.seqNo + '</b>, ' + item.Label_DateIssue + ':<b> ' + convertTimestamp(item.blk_timestamp, true) + '</b>';
-            output += '</h4>' + item.Label_IssueReference + ':<b> ' + item.reference + '</b>';
-        } else {
-            output += ', ' + item.Label_DateIssue + ':<b> ' + convertTimestamp(item.blk_timestamp, true) + '</b>';
-            output += '</h4>' + item.Label_IssueReference + ':<b> ' + item.reference + '</b>';
-            output += '<br><span><a href=?tx=' + item.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + item.seqNo + '</b></a>';
-            output += ' &nbsp&nbsp<a href=?q=' + item.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.Label_Actions + '</b></a>';
-            output += ' &nbsp&nbsp<a href=../api'+ type + '/raw/' + item.key + ' class="button ll-blue-bgc"><b>' + item.Label_RAW + '</b></a>';
-            output += ' &nbsp&nbsp<a href=?'+ type + '=' + item.key + get_lang() + '&print class="button ll-blue-bgc"><b>' + item.Label_Print + '</b></a></h4>';
-            output += '</span><br>';
-        }
-    }
+    output += ', &nbsp' + item.Label_DateIssue + ':<b> ' + convertTimestamp(item.blk_timestamp, true) + '</b></h4>';
 
-
-    output += '<h4>' + item.Label_Creator + ': &nbsp&nbsp ';
+    output += '<h4>' + item.Label_Owner + ': ';
     if (item.owner_person) {
         if (forPrint)
             output += '<b>' + item.owner_person + ' (' + item.creator + ')</b></h4>';
@@ -54,6 +41,37 @@ function itemHead(item, forPrint, type) {
             output += '<b>' + item.owner + '</b></h4>';
         else
             output += '<a href ="?address=' + item.owner + get_lang() + '"><b> ' + item.owner + '</b></a></h4>';
+    }
+
+    if (item.hasOwnProperty('seqNo')) {
+        output +=  '<h4>' + item.Label_TXIssue;
+        var creator;
+        if (item.owner_person) {
+            if (forPrint)
+                creator = '<b>' + item.owner_person + ' (' + item.creator + ')</b></h4>';
+            else
+                creator = '<a href ="?address=' + item.owner + get_lang() + '"><b> ' + item.owner_person + '</b></a></h4>';
+        } else {
+            if (forPrint)
+                creator = '<b>' + item.owner + '</b></h4>';
+            else
+                creator = '<a href ="?address=' + item.owner + get_lang() + '"><b> ' + item.owner + '</b></a></h4>';
+        }
+        if (forPrint) {
+            output += ': <b> ' + item.seqNo + '</b></h4>';
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ':<b> ' + item.reference + '</b><br>';
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Creator + ':<b> ' + creator + '</b><br>';
+        } else {
+            output += ': <a href=?tx=' + item.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + item.seqNo + '</b></a></h4>';
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ':<b> ' + item.reference + '</b><br>';
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Creator + ':<b> ' + creator + '</b><br>';
+
+            output += '<a href=?q=' + item.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.Label_Actions + '</b></a>';
+        }
+    }
+    if (!forPrint) {
+        output += ' &nbsp&nbsp<a href=../api'+ type + '/raw/' + item.key + ' class="button ll-blue-bgc"><b>' + item.Label_RAW + '</b></a>';
+        output += ' &nbsp&nbsp<a href=?'+ type + '=' + item.key + get_lang() + '&print class="button ll-blue-bgc"><b>' + item.Label_Print + '</b></a></h4>';
     }
 
     return output;

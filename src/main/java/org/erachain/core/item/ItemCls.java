@@ -778,16 +778,17 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             itemJson.put("description", Lang.T(viewDescription(), langObj));
         }
 
+        itemJson.put("Label_Owner", Lang.T("Owner", langObj));
         itemJson.put("Label_Creator", Lang.T("Creator", langObj));
         itemJson.put("Label_Number", Lang.T("Number", langObj));
-        itemJson.put("Label_TXIssue", Lang.T("Issued in", langObj));
+        itemJson.put("Label_TXIssue", Lang.T("Transaction of Issue", langObj));
         itemJson.put("Label_DateIssue", Lang.T("Issued Date", langObj));
-        itemJson.put("Label_IssueReference", Lang.T("Issued Reference", langObj));
+        itemJson.put("Label_Signature", Lang.T("Signature", langObj));
         itemJson.put("Label_Actions", Lang.T("Actions", langObj));
         itemJson.put("Label_RAW", Lang.T("Bytecode", langObj));
         itemJson.put("Label_Print", Lang.T("Print", langObj));
         itemJson.put("Label_Description", Lang.T("Description", langObj));
-        itemJson.put("Label_seqNo", Lang.T("seqNo", langObj));
+        itemJson.put("Label_seqNo", Lang.T("Номер", langObj));
 
 
         itemJson.put("owner", this.getOwner().getAddress());
