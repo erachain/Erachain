@@ -2881,16 +2881,9 @@ public class BlockExplorer {
             return new HashMap(2);
         }
 
-        output.put("charKey", template.getItemTypeChar());
-        output.put("Label_Actions", Lang.T("Actions", langObj));
-        output.put("Label_RAW", Lang.T("Bytecode", langObj));
-
         output.put("item", template.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
         output.put("Label_Template", Lang.T("Template", langObj));
-        output.put("Label_Key", Lang.T("Key", langObj));
-        output.put("Label_Creator", Lang.T("Creator", langObj));
-        output.put("Label_Description", Lang.T("Description", langObj));
 
         return output;
     }
@@ -2906,13 +2899,6 @@ public class BlockExplorer {
         }
 
         output.put("item", status.jsonForExplorerInfo(dcSet, langObj, forPrint));
-
-        output.put("unique", status.isUnique());
-
-        output.put("Label_Status", Lang.T("Status", langObj));
-
-        output.put("Label_unique_state", Lang.T("Unique State", langObj));
-        output.put("Label_multi_states", Lang.T("Multi States", langObj));
 
         return output;
     }

@@ -75,7 +75,7 @@ function poll(data, forPrint) {
 
     var item = data.item;
     ////// HEAD
-    output += itemHead(item, forPrint, 'poll');
+    output += itemHead(item, forPrint);
 
     //////// BODY
     output += '<p style="font-size:1.3em">';
@@ -91,7 +91,7 @@ function poll(data, forPrint) {
     output += '</p>';
 
     //// FOOT
-    output += itemFoot(item, forPrint, 'poll');
+    output += itemFoot(item, forPrint);
 
     output += '<hl>';
 

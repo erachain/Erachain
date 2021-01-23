@@ -241,7 +241,7 @@ function person(data, forPrint) {
 
     var item = data.item;
     ////// HEAD
-    output += itemHead(item, forPrint, 'person');
+    output += itemHead(item, forPrint);
 
     //////// BODY
 
@@ -265,7 +265,7 @@ function person(data, forPrint) {
         output += '<h4>' + data.Label_Total_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.Label_Total_certified + ': <b>' + data.lia_balance_b + '</b></h4>';
     }
 
-    output += itemFoot(item, forPrint, 'person');
+    output += itemFoot(item, forPrint);
 
     output += '</td>';
     output += '</tr>';

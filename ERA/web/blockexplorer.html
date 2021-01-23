@@ -374,7 +374,7 @@ button.white-bgc[disabled]:focus,
                                     document.getElementById(dest).innerHTML = templates(data);
                                 } else
                                 if (type == 'template') {
-                                    document.getElementById(dest).innerHTML = template(data);
+                                    document.getElementById(dest).innerHTML = template(data, forPrint);
                                 } else
                                 if (type == 'statement') {
                                     document.getElementById(dest).innerHTML = statement(data);
@@ -419,7 +419,7 @@ button.white-bgc[disabled]:focus,
                                     document.getElementById(dest).innerHTML = statuses(data);
                                 } else
                                 if (type == 'status') {
-                                    document.getElementById(dest).innerHTML = status(data);
+                                    document.getElementById(dest).innerHTML = status(data, forPrint);
                                 } else
                                 if (type == 'block') {
                                     document.getElementById(dest).innerHTML = block(data);

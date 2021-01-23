@@ -1,6 +1,7 @@
-function itemHead(item, forPrint, type) {
+function itemHead(item, forPrint) {
 
     var output = '';
+    var type = item.item_type;
 
     if (item.image) {
         output += '<td><img src="data:image/gif;base64,' + item.image + '" width = "350" /></td><td style ="width: 70%; padding-left:20px">';
@@ -78,7 +79,9 @@ function itemHead(item, forPrint, type) {
 
 }
 
-function itemFoot(item, forPrint, type) {
+function itemFoot(item, forPrint) {
+    var type = item.item_type;
+
     var output = '';
     if (item.description)
         output += '<h3>' + item.Label_Description + '</h3><br>' + fformat(item.description);

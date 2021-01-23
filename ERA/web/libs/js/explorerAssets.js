@@ -80,7 +80,7 @@ function asset(data, forPrint) {
 
     var item = data.item;
     ////// HEAD
-    output += itemHead(item, forPrint, 'asset');
+    output += itemHead(item, forPrint);
 
     //////// BODY
     output += '<p style="font-size:1.3em">';
@@ -96,7 +96,7 @@ function asset(data, forPrint) {
     output += item.Label_AssetType_Desc + ': <b>' + fformat(item.assetTypeDesc) + '</b><br>';
     output += '</p>';
 
-    output += itemFoot(item, forPrint, 'asset');
+    output += itemFoot(item, forPrint);
 
     if (forPrint)
         return output;
