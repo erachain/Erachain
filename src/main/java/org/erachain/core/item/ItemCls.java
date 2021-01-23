@@ -808,8 +808,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             itemJson.put("seqNo", Transaction.viewDBRef(txSeqNo));
             Transaction transaction = dcSet.getTransactionFinalMap().get(txSeqNo);
             itemJson.put("tx_timestamp", transaction.getTimestamp());
-            if (transaction.getCreator() == null) {
-                itemJson.put("tx_creator", transaction.getCreator());
+            if (transaction.getCreator() != null) {
+                itemJson.put("tx_creator", transaction.getCreator().getAddress());
                 itemJson.put("tx_creator_person", transaction.viewCreator());
             }
         }

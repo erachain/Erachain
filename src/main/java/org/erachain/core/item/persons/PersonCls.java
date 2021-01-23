@@ -463,8 +463,6 @@ public abstract class PersonCls extends ItemCls {
         itemJson.put("Label_Registrar", Lang.T("Registrar", langObj));
         itemJson.put("Label_Born", Lang.T("Birthday", langObj));
         itemJson.put("Label_Gender", Lang.T("Gender", langObj));
-        itemJson.put("Label_Total_registered", Lang.T("Registered", langObj));
-        itemJson.put("Label_Total_certified", Lang.T("Certified", langObj));
         //itemJson.put("Label_View", Lang.T("View", langObj));
 
         itemJson.put("birthday", getBirthdayStr());

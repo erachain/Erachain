@@ -35,8 +35,8 @@ function itemHead(item, forPrint, type) {
             output += ', ' + item.Label_DateIssue + ':<b> ' + convertTimestamp(item.blk_timestamp, true) + '</b>';
             output += '</h4>' + item.Label_IssueReference + ':<b> ' + item.reference + '</b>';
             output += '<br><span><a href=?tx=' + item.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + item.seqNo + '</b></a>';
-            output += ' &nbsp&nbsp<a href=?q=' + item.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.label_Actions + '</b></a>';
-            output += ' &nbsp&nbsp<a href=../api'+ type + '/raw/' + item.key + ' class="button ll-blue-bgc"><b>' + item.label_RAW + '</b></a>';
+            output += ' &nbsp&nbsp<a href=?q=' + item.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.Label_Actions + '</b></a>';
+            output += ' &nbsp&nbsp<a href=../api'+ type + '/raw/' + item.key + ' class="button ll-blue-bgc"><b>' + item.Label_RAW + '</b></a>';
             output += ' &nbsp&nbsp<a href=?'+ type + '=' + item.key + get_lang() + '&print class="button ll-blue-bgc"><b>' + item.Label_Print + '</b></a></h4>';
             output += '</span><br>';
         }

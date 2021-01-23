@@ -1677,6 +1677,9 @@ public class BlockExplorer {
             BigDecimal liaBalanceA = new BigDecimal(0);
             BigDecimal liaBalanceB = new BigDecimal(0);
 
+            output.put("Label_Total_registered", Lang.T("Registered", langObj));
+            output.put("Label_Total_certified", Lang.T("Certified", langObj));
+
             int i = 0;
             for (String address : addresses.keySet()) {
 
