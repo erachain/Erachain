@@ -666,9 +666,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("is_confirmed", this.isConfirmed());
         itemJSON.put("reference", Base58.encode(this.reference));
 
-        Transaction txReference = Controller.getInstance().getTransaction(this.reference);
-        if (txReference != null) {
-            itemJSON.put("timestamp", txReference.getTimestamp());
+        Transaction txIssue = Controller.getInstance().getTransaction(this.reference);
+        if (txIssue != null) {
+            itemJSON.put("timestamp", txIssue.getTimestamp());
+            itemJSON.put("blk_timestamp", Controller.getInstance().blockChain.getHeightOnTimestampMS(txIssue.getBlockHeight()));
         }
 
         return itemJSON;
@@ -772,10 +773,14 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             itemJson.put("description", Lang.T(viewDescription(), langObj));
         }
 
-        itemJson.put("Label_key", Lang.T("Key", langObj));
+        itemJson.put("Label_Creator", Lang.T("Creator", langObj));
+        itemJson.put("Label_Number", Lang.T("Number", langObj));
         itemJson.put("Label_TXIssue", Lang.T("Issued in", langObj));
+        itemJson.put("Label_DateIssue", Lang.T("Issued Date", langObj));
+        itemJson.put("Label_IssueReference", Lang.T("Issued Reference", langObj));
         itemJson.put("label_Actions", Lang.T("Actions", langObj));
         itemJson.put("label_RAW", Lang.T("Bytecode", langObj));
+        itemJson.put("Label_Print", Lang.T("Print", langObj));
 
         itemJson.put("owner", this.getOwner().getAddress());
         Fun.Tuple2<Integer, PersonCls> person = this.getOwner().getPerson();
@@ -785,9 +790,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         }
 
         if (getIcon() != null && getIcon().length > 0)
-            itemJson.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        else
-            itemJson.put("icon", "");
+            itemJson.put("icon", java.util.Base64.getEncoder().encodeToString(getIcon()));
+
+        if (getImage() != null && getImage().length > 0)
+            itemJson.put("image", java.util.Base64.getEncoder().encodeToString(getImage()));
+
+        itemJson.put("item_type_name", Lang.T("Print", langObj));
+
 
         return itemJson;
     }

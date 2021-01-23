@@ -318,6 +318,12 @@ button.white-bgc[disabled]:focus,
 
                             var type = data.type;
                             var print = parseUrlQuery().print;
+                            var dest;
+                            if (print) {
+                                dest = 'all';
+                            } else {
+                                dest = 'main';
+                            }
 
                             document.getElementById('Langs').innerHTML = langs(data);
 
@@ -380,11 +386,7 @@ button.white-bgc[disabled]:focus,
                                     document.getElementById('main').innerHTML = persons(data);
                                 } else
                                 if (type == 'person') {
-                                    if (print) {
-                                        document.getElementById('all').innerHTML = person(data, print);
-                                    } else {
-                                        document.getElementById('main').innerHTML = person(data, print);
-                                    }
+                                    document.getElementById(dest).innerHTML = person(data, print);
                                 } else
                                 if (type == 'person_asset') {
                                     document.getElementById('main').innerHTML = person_asset(data);
@@ -405,11 +407,7 @@ button.white-bgc[disabled]:focus,
                                     document.getElementById('main').innerHTML = assets(data);
                                 } else
                                 if (type == 'asset') { // for one Asset
-                                    if (print) {
-                                        document.getElementById('all').innerHTML = asset(data, print);
-                                    } else {
-                                        document.getElementById('main').innerHTML = asset(data, print);
-                                    }
+                                    document.getElementById(dest).innerHTML = asset(data, print);
                                 } else
                                 if (type == 'trades') {
                                     document.getElementById('main').innerHTML = trades(data)
