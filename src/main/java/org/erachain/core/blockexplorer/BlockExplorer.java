@@ -914,6 +914,8 @@ public class BlockExplorer {
             return;
         }
 
+        output.put("Label_Total", Lang.T("Total", langObj));
+
         List<Order> orders = dcSet.getOrderMap().getOrders(key);
 
         TradeMapImpl tradesMap = dcSet.getTradeMap();

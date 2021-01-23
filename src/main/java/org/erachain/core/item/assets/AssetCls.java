@@ -2026,7 +2026,6 @@ public abstract class AssetCls extends ItemCls {
         itemJson.put("released", getReleased());
 
         if (!forPrint) {
-            itemJson.put("Label_Total", Lang.T("Total", langObj));
             itemJson.put("Label_Holders", Lang.T("Holders", langObj));
             itemJson.put("Label_Available_pairs", Lang.T("Available pairs", langObj));
             itemJson.put("Label_Pair", Lang.T("Pair", langObj));

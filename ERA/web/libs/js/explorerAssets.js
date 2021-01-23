@@ -108,10 +108,9 @@ function asset(data, forPrint) {
     output += '<table border="0" cellspacing="10" class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
     output += '<td><b>' + item.Label_Pair + '</b></td><td><b>' + item.Label_Orders_Count + '</b></td>';
     output += '<td><b>' + item.Label_Open_Orders_Volume + '</b></td>';
-    output += '<td><b>' + item.Label_Trades_Count + '</b></td><td><b>' + item.Label_Trades_Volume + '</b></td>';
-    output += '<td><b>' + item.Label_Description + '</b></td></tr>';
+    output += '<td><b>' + item.Label_Trades_Count + '</b></td><td><b>' + item.Label_Trades_Volume + '</b></td></tr>';
 
-    for (key in item.pairs) {
+    for (key in data.pairs) {
         var pair = data.pairs[key];
         output += '<tr>';
 
@@ -135,7 +134,6 @@ function asset(data, forPrint) {
         output += addCommas(pair.tradeAmountVolume) + ' ' + getAssetNameMini(key, pair.assetName);
         output += '<br>' + addCommas(pair.tradesPriceVolume) + ' ' + getAssetNameMini(item.key, item.name);
 
-        output += '<td>' + escapeHtml(pair.description.substr(0, 100));
     }
     output += '<tr><td><b>' + data.Label_Total + ':';
     output += '<td>' + data.totalOpenOrdersCount;
