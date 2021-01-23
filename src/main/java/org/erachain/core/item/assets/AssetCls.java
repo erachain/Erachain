@@ -2013,51 +2013,48 @@ public abstract class AssetCls extends ItemCls {
     public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
 
         JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
-        itemJson.put("label_Asset", Lang.T("Asset", langObj));
-        itemJson.put("label_Actions", Lang.T("Actions", langObj));
-        itemJson.put("label_Scale", Lang.T("Accuracy", langObj));
-        itemJson.put("label_AssetType", Lang.T("Type # вид", langObj));
-        itemJson.put("label_AssetType_Desc", Lang.T("Type Description", langObj));
-        itemJson.put("label_Quantity", Lang.T("Quantity", langObj));
-        itemJson.put("label_Released", Lang.T("Released", langObj));
-        itemJson.put("label_View", Lang.T("View", langObj));
+        itemJson.put("Label_Asset", Lang.T("Asset", langObj));
+        itemJson.put("Label_Actions", Lang.T("Actions", langObj));
+        itemJson.put("Label_Scale", Lang.T("Accuracy", langObj));
+        itemJson.put("Label_AssetType", Lang.T("Type # вид", langObj));
+        itemJson.put("Label_AssetType_Desc", Lang.T("Type Description", langObj));
+        itemJson.put("Label_Quantity", Lang.T("Quantity", langObj));
+        itemJson.put("Label_Released", Lang.T("Released", langObj));
+        itemJson.put("Label_View", Lang.T("View", langObj));
 
-        JSONObject assetJson = new JSONObject();
-
-        assetJson.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
-        assetJson.put("released", getReleased());
+        itemJson.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
+        itemJson.put("released", getReleased());
 
         if (!forPrint) {
-            itemJson.put("label_Total", Lang.T("Total", langObj));
-            itemJson.put("label_Holders", Lang.T("Holders", langObj));
-            itemJson.put("label_Available_pairs", Lang.T("Available pairs", langObj));
-            itemJson.put("label_Pair", Lang.T("Pair", langObj));
-            itemJson.put("label_Orders_Count", Lang.T("Orders Count", langObj));
-            itemJson.put("label_Open_Orders_Volume", Lang.T("Open Orders Volume", langObj));
-            itemJson.put("label_Trades_Count", Lang.T("Trades Count", langObj));
-            itemJson.put("label_Trades_Volume", Lang.T("Trades Volume", langObj));
+            itemJson.put("Label_Total", Lang.T("Total", langObj));
+            itemJson.put("Label_Holders", Lang.T("Holders", langObj));
+            itemJson.put("Label_Available_pairs", Lang.T("Available pairs", langObj));
+            itemJson.put("Label_Pair", Lang.T("Pair", langObj));
+            itemJson.put("Label_Orders_Count", Lang.T("Orders Count", langObj));
+            itemJson.put("Label_Open_Orders_Volume", Lang.T("Open Orders Volume", langObj));
+            itemJson.put("Label_Trades_Count", Lang.T("Trades Count", langObj));
+            itemJson.put("Label_Trades_Volume", Lang.T("Trades Volume", langObj));
 
-            assetJson.put("orders", getOperations(DCSet.getInstance()));
+            itemJson.put("orders", getOperations(DCSet.getInstance()));
         }
 
-        assetJson.put("quantity", NumberAsString.formatAsString(getQuantity()));
-        assetJson.put("released", NumberAsString.formatAsString(getReleased(dcSet)));
+        itemJson.put("quantity", NumberAsString.formatAsString(getQuantity()));
+        itemJson.put("released", NumberAsString.formatAsString(getReleased(dcSet)));
 
-        assetJson.put("scale", getScale());
+        itemJson.put("scale", getScale());
 
-        assetJson.put("assetType", Lang.T(viewAssetType(), langObj));
-        assetJson.put("assetTypeChar", charAssetType() + viewAssetTypeAbbrev());
+        itemJson.put("assetType", Lang.T(viewAssetType(), langObj));
+        itemJson.put("assetTypeChar", charAssetType() + viewAssetTypeAbbrev());
 
-        assetJson.put("assetTypeFull", Lang.T(viewAssetTypeFull(), langObj));
+        itemJson.put("assetTypeFull", Lang.T(viewAssetTypeFull(), langObj));
         StringJoiner joiner = new StringJoiner(", ");
         for (Fun.Tuple2<?, String> item : viewAssetTypeActionsList(null, true)) {
             joiner.add(Lang.T(item.b, langObj));
         }
-        assetJson.put("assetTypeDesc", Lang.T(viewAssetTypeDescriptionCls(getAssetType()), langObj)
+        itemJson.put("assetTypeDesc", Lang.T(viewAssetTypeDescriptionCls(getAssetType()), langObj)
                 + ".\n" + Lang.T("Acceptable actions", langObj) + ":\n" + joiner.toString()
         );
 
-        itemJson.put("asset", assetJson);
         return itemJson;
     }
 

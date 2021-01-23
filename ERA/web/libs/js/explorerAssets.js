@@ -5,21 +5,21 @@ function assets(data) {
     output += lastBlock(data.lastBlock);
     var start = data.start;
     if (!notDisplayPages) {
-        //output += pagesComponentBeauty(start, data.label_Assets, data.lastNumber, data.pageSize, 'start');
+        //output += pagesComponentBeauty(start, data.Label_Assets, data.lastNumber, data.pageSize, 'start');
         output += pagesComponent2(data);
     }
 
 
     output += '<table width="1280" border=0><tr><td align=left><br>';
-    output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.label_Title + '</h3></a>';
+    output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.Label_Title + '</h3></a>';
     output += '<br><br>';
 
     output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
         'class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
-    output += '<td><b>' + data.label_table_asset_key + ': <b>' + data.label_table_asset_name +
-        '<td><b>' + data.label_table_asset_type + '<td><b>' + data.label_table_asset_owner;
-    output += '<td><b>' + data.label_table_asset_orders + '<td><b>' + data.label_table_asset_amount
-         + '<td><b>' + data.label_table_asset_scale;
+    output += '<td><b>' + data.Label_table_asset_key + ': <b>' + data.Label_table_asset_name +
+        '<td><b>' + data.Label_table_asset_type + '<td><b>' + data.Label_table_asset_owner;
+    output += '<td><b>' + data.Label_table_asset_orders + '<td><b>' + data.Label_table_asset_amount
+         + '<td><b>' + data.Label_table_asset_scale;
 
     //Отображение таблицы элементов активов
     //var length = Object.keys(data.pageItems).length;
@@ -83,12 +83,12 @@ function asset(data, forPrint) {
     output += itemHead(item, forPrint, 'asset');
 
     //////// BODY
-    output += item.label_AssetType + ': <b>' + item.assetTypeChar + '</b>: ' + item.assetTypeFull + '<br>';
-    output += item.label_AssetType_Desc + ': ' + fformat(item.assetTypeDesc) + '<br>';
+    output += item.Label_AssetType + ': <b>' + item.assetTypeNameFull + '<br>';
+    output += item.Label_AssetType_Desc + ': ' + fformat(item.assetTypeDesc) + '<br>';
 
-    output += item.label_Quantity + ': <b>' + addCommas(item.quantity) + '</b>';
-    output += ', ' + item.label_Scale + ': <b>' + item.scale + '</b>';
-    output += ', ' + item.label_Released + ': <b>' + addCommas(item.released) + '</b>';
+    output += item.Label_Quantity + ': <b>' + addCommas(item.quantity) + '</b>';
+    output += ', ' + item.Label_Scale + ': <b>' + item.scale + '</b>';
+    output += ', ' + item.Label_Released + ': <b>' + addCommas(item.released) + '</b>';
 
     output += itemFoot(item, forPrint, 'asset');
 
@@ -101,13 +101,13 @@ function asset(data, forPrint) {
     output += '</tr>';
     output += '</table>';
 
-    output += '<h3>' + item.label_Available_pairs + '</h3>';
+    output += '<h3>' + item.Label_Available_pairs + '</h3>';
 
     output += '<table border="0" cellspacing="10" class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
-    output += '<td><b>' + data.label_Pair + '</b></td><td><b>' + item.label_Orders_Count + '</b></td>';
-    output += '<td><b>' + data.label_Open_Orders_Volume + '</b></td>';
-    output += '<td><b>' + data.label_Trades_Count + '</b></td><td><b>' + item.label_Trades_Volume + '</b></td>';
-    output += '<td><b>' + data.label_Description + '</b></td></tr>';
+    output += '<td><b>' + data.Label_Pair + '</b></td><td><b>' + item.Label_Orders_Count + '</b></td>';
+    output += '<td><b>' + data.Label_Open_Orders_Volume + '</b></td>';
+    output += '<td><b>' + data.Label_Trades_Count + '</b></td><td><b>' + item.Label_Trades_Volume + '</b></td>';
+    output += '<td><b>' + data.Label_Description + '</b></td></tr>';
 
     for (key in item.pairs) {
         output += '<tr>';
@@ -134,7 +134,7 @@ function asset(data, forPrint) {
 
         output += '<td>' + escapeHtml(data.pairs[key].description.substr(0, 100));
     }
-    output += '<tr><td><b>' + data.label_Total + ':';
+    output += '<tr><td><b>' + data.Label_Total + ':';
     output += '<td>' + data.totalOpenOrdersCount;
     output += '<td>' + addCommas(data.totalOrdersVolume) + ' ' + getAssetNameMini(item.key, item.name);
     output += '<td>' + data.totalTradesCount;
@@ -154,7 +154,7 @@ function trades(data) {
 
     output += '<h3 style="display:inline;"><a href="?asset=' + data.assetWant + '&asset=' + data.assetHave + get_lang()
         + '"><img src="img/exchange.png" style="width:1em"></a> '
-        + data.label_Trades + '</h3> ';
+        + data.Label_Trades + '</h3> ';
 
     output += '<a href="?asset=' + data.assetHave + '&asset=' + data.assetWant + get_lang() + '"><h3 style="display:inline;">';
     output += getAssetName2(data.assetHave, data.assetHaveName) + ' / ';
@@ -163,7 +163,7 @@ function trades(data) {
     output += '<br>';
 
     output +='<div><div class="col-lg-5" style="padding-left:5em;">';
-    output += '<h4>' + data.label_Orders + '</h4>';
+    output += '<h4>' + data.Label_Orders + '</h4>';
 
     output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped"'
         + 'style="width:100%; border: 1px solid #ddd; margin-bottom: 0px;">';
@@ -196,18 +196,18 @@ function trades(data) {
     }
 
     output += '<tr bgcolor="#f9f9f9">';
-    output += '<td><td>' + data.label_Total_For_Sell;
+    output += '<td><td>' + data.Label_Total_For_Sell;
     ///output += '<td><b>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
     output += ':<td><b>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
     output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td width=40%><b>'
-        + data.label_Creator + ' / ' + data.label_Amount + '<td width=30% style="font-size:1.4em"><b>' + data.label_Price
-        + '</b></td><td width=40%><b>' + data.label_Amount + ' / ' + data.label_Creator + '</b></td></tr>';
+        + data.Label_Creator + ' / ' + data.Label_Amount + '<td width=30% style="font-size:1.4em"><b>' + data.Label_Price
+        + '</b></td><td width=40%><b>' + data.Label_Amount + ' / ' + data.Label_Creator + '</b></td></tr>';
 
     output += '<tr bgcolor="#f9f9f9">';
     ///output += '<td><b>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
     output += '<td><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-    output += '<td>- ' + data.label_Total_For_Buy + '<td>';
+    output += '<td>- ' + data.Label_Total_For_Buy + '<td>';
 
     width = 0;
     for (key in data.buys) {
@@ -236,15 +236,15 @@ function trades(data) {
 
     output += '</div><div class="col-lg-7" style="padding-right: 5em;">';
 
-    output += '<h4 style="text-align: center;">' + data.label_Trade_History + '</h4>';
+    output += '<h4 style="text-align: center;">' + data.Label_Trade_History + '</h4>';
 
     output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
-    output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_Date; // + '<td align=center><b>' + data.label_Type + '</b></td>';
-    output += '<td align=center><b>' + data.label_Trade_Initiator
-    output += '<td align=center><b>' + data.label_Amount;
-    output += '<td align=center><b>' + data.label_Price;
-    output += '<td align=center><b>' + data.label_Total_Cost;
-    output += '<td align=center><b>' + data.label_Position_Holder
+    output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.Label_Date; // + '<td align=center><b>' + data.Label_Type + '</b></td>';
+    output += '<td align=center><b>' + data.Label_Trade_Initiator
+    output += '<td align=center><b>' + data.Label_Amount;
+    output += '<td align=center><b>' + data.Label_Price;
+    output += '<td align=center><b>' + data.Label_Total_Cost;
+    output += '<td align=center><b>' + data.Label_Position_Holder
     output += '</tr>';
 
     for (key in data.trades) {
@@ -304,10 +304,10 @@ function trades(data) {
 
     output += '</div></div>';
 
-    //output += '<b>' + data.label_Trade_Volume + ':</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+    //output += '<b>' + data.Label_Trade_Volume + ':</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
     //output += '&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeWantAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
-    output += '<br><br><b>' + data.label_Go_To + ': <a href=?asset=' + data.assetHave + get_lang() + '>' + getAssetName2(data.assetHave, data.assetHaveName) + '</a>';
+    output += '<br><br><b>' + data.Label_Go_To + ': <a href=?asset=' + data.assetHave + get_lang() + '>' + getAssetName2(data.assetHave, data.assetHaveName) + '</a>';
     output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + get_lang() + '>' + getAssetName2(data.assetWant, data.assetWantName) + '</a>';
     output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + '&asset=' + data.assetHave + get_lang() + '>' + getAssetName2(data.assetWant, data.assetWantName) + '/' + getAssetName2(data.assetHave, data.assetHaveName);
     output += '</b>';
