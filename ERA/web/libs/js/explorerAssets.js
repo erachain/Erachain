@@ -84,16 +84,27 @@ function asset(data, forPrint) {
 
     //////// BODY
     output += '<p style="font-size:1.3em">';
-    output += item.Label_Quantity + ': <b>' + addCommas(item.quantity) + '</b>';
-    output += ', &nbsp&nbsp' + item.Label_Scale + ': <b>' + item.scale + '</b>';
+
+    if (item.isUnique) {
+        output += '<b>' + item.Label_Unique + '</b>';
+    } else {
+        if (item.isUnlimited) {
+            output += '<b>' + item.Label_Unlimited + '</b>';
+        } else {
+            output += item.Label_Quantity + ': <b>' + addCommas(item.quantity) + '</b>';
+        }
+        output += ', &nbsp&nbsp' + item.Label_Scale + ': <b>' + item.scale + '</b>';
+    }
     output += ', &nbsp&nbsp' + item.Label_Released + ': <b>' + addCommas(item.released) + '</b>';
 
     if (!forPrint)
         output += ', &nbsp&nbsp<a href=?top=all&asset=' + item.key + get_lang() + ' class="button ll-blue-bgc"><b>' + item.Label_Holders + '</b></a>';
 
-
     output += '<br>' + item.Label_AssetType + ': <b>' + item.assetTypeNameFull + '</b><br>';
-    output += item.Label_AssetType_Desc + ': <b>' + fformat(item.assetTypeDesc) + '</b><br>';
+    if (item.properties)
+        output += item.Label_Properties + ': ' + item.properties + '<br>';
+
+    output += item.Label_AssetType_Desc + ': ' + fformat(item.assetTypeDesc) + '<br>';
     output += '</p>';
 
     output += itemFoot(item, forPrint);

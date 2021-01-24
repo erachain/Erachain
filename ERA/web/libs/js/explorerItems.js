@@ -44,26 +44,28 @@ function itemHead(item, forPrint) {
             output += '<a href ="?address=' + item.owner + get_lang() + '"><b> ' + item.owner + '</b></a></h4>';
     }
 
-    if (item.hasOwnProperty('seqNo')) {
+    if (item.tx_seqNo) {
         output +=  '<h4>' + item.Label_TXIssue;
         var creator;
-        if (item.owner_person) {
+        if (item.tx_creator_person) {
             if (forPrint)
-                creator = '<b>' + item.owner_person + ' (' + item.creator + ')</b></h4>';
+                creator = '<b>' + item.tx_creator_person + ' (' + item.tx_creator + ')</b></h4>';
             else
-                creator = '<a href ="?address=' + item.owner + get_lang() + '"><b> ' + item.owner_person + '</b></a></h4>';
+                creator = '<a href ="?address=' + item.tx_creator + get_lang() + '"><b> ' + item.tx_creator_person + '</b></a></h4>';
         } else {
             if (forPrint)
-                creator = '<b>' + item.owner + '</b></h4>';
+                creator = '<b>' + item.tx_creator + '</b></h4>';
             else
-                creator = '<a href ="?address=' + item.owner + get_lang() + '"><b> ' + item.owner + '</b></a></h4>';
+                creator = '<a href ="?address=' + item.tx_creator + get_lang() + '"><b> ' + item.tx_creator + '</b></a></h4>';
         }
         if (forPrint) {
-            output += ': <b> ' + item.seqNo + '</b></h4>';
-            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ':<b> ' + item.reference + '</b><br>';
+            output += ': <b> ' + item.tx_seqNo + '</b></h4>';
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Pubkey + ':<b> ' + item.tx_creator_pubkey + '</b><br>';
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ':<b> ' + item.tx_signature + '</b><br>';
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_TXCreator + ':<b> ' + creator + '</b><br>';
         } else {
-            output += ': <a href=?tx=' + item.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + item.seqNo + '</b></a></h4>';
+            output += ': <a href=?tx=' + item.tx_seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + item.tx_seqNo + '</b></a></h4>';
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Pubkey + ':<b> ' + item.tx_creator_pubkey + '</b><br>';
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ':<b> ' + item.reference + '</b><br>';
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_TXCreator + ':<b> ' + creator + '</b><br>';
 

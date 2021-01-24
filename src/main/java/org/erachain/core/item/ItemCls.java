@@ -668,14 +668,17 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("isConfirmed", this.isConfirmed());
         itemJSON.put("is_confirmed", this.isConfirmed());
         itemJSON.put("reference", Base58.encode(this.reference));
+        itemJSON.put("tx_signature", Base58.encode(this.reference));
 
         Long txSeqNo = DCSet.getInstance().getTransactionFinalMapSigns().get(getReference());
         if (txSeqNo != null) {
             // если транзакция еще не подтверждена - чтобы ошибок не было при отображении в блокэксплорере
-            itemJSON.put("seqNo", Transaction.viewDBRef(txSeqNo));
+            itemJSON.put("tx_seqNo", Transaction.viewDBRef(txSeqNo));
             referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
             if (referenceTx != null) {
-                itemJSON.put("timestamp", referenceTx.getTimestamp());
+                itemJSON.put("tx_creator", referenceTx.getCreator().getAddress());
+                itemJSON.put("tx_creator_pubkey", referenceTx.getCreator().getBase58());
+                itemJSON.put("tx_timestamp", referenceTx.getTimestamp());
                 itemJSON.put("blk_timestamp", Controller.getInstance().blockChain.getHeightOnTimestampMS(referenceTx.getBlockHeight()));
             }
         }
@@ -782,6 +785,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         }
 
         itemJson.put("Label_Owner", Lang.T("Owner", langObj));
+        itemJson.put("Label_Pubkey", Lang.T("Public Key", langObj));
         itemJson.put("Label_TXCreator", Lang.T("Creator", langObj));
         itemJson.put("Label_Number", Lang.T("Number", langObj));
         itemJson.put("Label_TXIssue", Lang.T("Transaction of Issue", langObj));
@@ -807,14 +811,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         if (getImage() != null && getImage().length > 0)
             itemJson.put("image", java.util.Base64.getEncoder().encodeToString(getImage()));
 
-        if (reference != null) {
-            long txSeqNo = dcSet.getTransactionFinalMapSigns().get(reference);
-            itemJson.put("seqNo", Transaction.viewDBRef(txSeqNo));
-            Transaction transaction = dcSet.getTransactionFinalMap().get(txSeqNo);
-            itemJson.put("tx_timestamp", transaction.getTimestamp());
-            if (transaction.getCreator() != null) {
-                itemJson.put("tx_creator", transaction.getCreator().getAddress());
-                itemJson.put("tx_creator_person", transaction.viewCreator());
+        if (referenceTx != null) {
+            if (referenceTx.getCreator() != null) {
+                itemJson.put("tx_creator_person", referenceTx.viewCreator());
             }
         }
 

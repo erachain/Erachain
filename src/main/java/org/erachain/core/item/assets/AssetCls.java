@@ -684,7 +684,7 @@ public abstract class AssetCls extends ItemCls {
      *
      * @return
      */
-    public boolean isNotReDepted() {
+    public boolean isNotReDebted() {
         return isOutsideType();
     }
 
@@ -1972,6 +1972,40 @@ public abstract class AssetCls extends ItemCls {
         return types;
     }
 
+    public String viewProperties(JSONObject langObj) {
+
+        StringJoiner joiner = new StringJoiner(", ");
+
+        if (isImMovable())
+            joiner.add(Lang.T("ImMovable", langObj));
+        if (isUnlimited(owner, false))
+            joiner.add(Lang.T("Unlimited", langObj));
+        if (isAccounting())
+            joiner.add(Lang.T("Accounting", langObj));
+        if (isUnique())
+            joiner.add(Lang.T("Unique", langObj));
+        if (isUnHoldable())
+            joiner.add(Lang.T("Not holdable", langObj));
+        if (isOutsideType())
+            joiner.add(Lang.T("Outside Claim", langObj));
+        if (isSelfManaged())
+            joiner.add(Lang.T("Self Managed", langObj));
+        if (isChangeDebtBySendActions())
+            joiner.add(Lang.T("isChangeDebtBySendActions", langObj));
+        if (isChangeDebtBySpendActions())
+            joiner.add(Lang.T("isChangeDebtBySpendActions", langObj));
+        if (isDirectBalances())
+            joiner.add(Lang.T("isDirectBalances", langObj));
+        if (isNotReDebted())
+            joiner.add(Lang.T("isNotReDebted", langObj));
+        if (isOutsideOtherClaim())
+            joiner.add(Lang.T("isOutsideOtherClaim", langObj));
+        if (isReverseSend())
+            joiner.add(Lang.T("isReverseSend", langObj));
+
+        return joiner.toString();
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public JSONObject toJson() {
@@ -1992,6 +2026,27 @@ public abstract class AssetCls extends ItemCls {
 
         assetJSON.put("scale", this.getScale());
         assetJSON.put("quantity", this.getQuantity());
+
+        assetJSON.put("isImMovable", this.isImMovable());
+        assetJSON.put("isUnlimited", this.isUnlimited(owner, false));
+        assetJSON.put("isAccounting", this.isAccounting());
+        assetJSON.put("isUnique", this.isUnique());
+        assetJSON.put("isUnHoldable", this.isUnHoldable());
+        assetJSON.put("isOutsideType", this.isOutsideType());
+        assetJSON.put("isSelfManaged", this.isSelfManaged());
+        assetJSON.put("isChangeDebtBySendActions", this.isChangeDebtBySendActions());
+        assetJSON.put("isChangeDebtBySpendActions", this.isChangeDebtBySpendActions());
+        assetJSON.put("isDirectBalances", this.isDirectBalances());
+        assetJSON.put("isNotReDebted", this.isNotReDebted());
+        assetJSON.put("isOutsideOtherClaim", this.isOutsideOtherClaim());
+        assetJSON.put("isReverseSend", this.isReverseSend());
+
+        JSONObject revPos = new JSONObject();
+        for (int pos = Account.BALANCE_POS_OWN; pos <= Account.BALANCE_POS_6; pos++) {
+            revPos.put("" + pos, isReverseBalancePos(pos));
+        }
+        assetJSON.put("reversedBalPos", revPos);
+
 
         return assetJSON;
     }
@@ -2019,7 +2074,21 @@ public abstract class AssetCls extends ItemCls {
         itemJson.put("Label_AssetType_Desc", Lang.T("Type Description", langObj));
         itemJson.put("Label_Quantity", Lang.T("Quantity", langObj));
         itemJson.put("Label_Released", Lang.T("Released", langObj));
-        itemJson.put("Label_View", Lang.T("View", langObj));
+
+        itemJson.put("Label_ImMovable", Lang.T("ImMovable", langObj));
+        itemJson.put("Label_Unlimited", Lang.T("Unlimited", langObj));
+        itemJson.put("Label_Accounting", Lang.T("Accounting", langObj));
+        itemJson.put("Label_Unique", Lang.T("Unique", langObj));
+        itemJson.put("Label_UnHoldable", Lang.T("Un holdable", langObj));
+        itemJson.put("Label_OutsideType", Lang.T("Outside Type", langObj));
+        itemJson.put("Label_SelfManaged", Lang.T("Self Managed", langObj));
+        itemJson.put("Label_ChangeDebtBySendActions", Lang.T("isChangeDebtBySendActions", langObj));
+        itemJson.put("Label_ChangeDebtBySpendActions", Lang.T("isChangeDebtBySpendActions", langObj));
+        itemJson.put("Label_DirectBalances", Lang.T("isDirectBalances", langObj));
+        itemJson.put("Label_isNotReDebted", Lang.T("isNotReDebted", langObj));
+        itemJson.put("Label_isOutsideOtherClaim", Lang.T("isOutsideOtherClaim", langObj));
+        itemJson.put("Label_isReverseSend", Lang.T("isReverseSend", langObj));
+        itemJson.put("Label_Properties", Lang.T("Properties", langObj));
 
         itemJson.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
         itemJson.put("released", getReleased());
@@ -2052,6 +2121,8 @@ public abstract class AssetCls extends ItemCls {
         itemJson.put("assetTypeDesc", Lang.T(viewAssetTypeDescriptionCls(getAssetType()), langObj)
                 + ".\n" + Lang.T("Acceptable actions", langObj) + ":\n" + joiner.toString()
         );
+
+        itemJson.put("properties", viewProperties(langObj));
 
         return itemJson;
     }
