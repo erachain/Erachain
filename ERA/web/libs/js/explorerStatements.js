@@ -116,7 +116,7 @@ function statement(data) {
     output += '<br>' + data.Label_signature + ': <b>' + data.tx.signature + '</b>';
 
     if (data.hasOwnProperty('title')) {
-        output += '<h3>' + data.Label_title + ': <b>' + escapeHtml(data.title) + '</h3>';
+        output += '<h3>' + data.Label_title + ': ' + escapeHtml(data.title) + '</h3>';
     }
 
     if (data.hasOwnProperty('exLink')) {
