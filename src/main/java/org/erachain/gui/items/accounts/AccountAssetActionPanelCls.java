@@ -121,7 +121,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         initComponents(message);
 
-        this.jlabel_RecipientDetail.setText("");
+        this.jLabel_RecipientDetail.setText("");
         this.jTextFieldTXTitle.setText("");
 
         if (this.asset.defaultAmountAssetType() == null)
@@ -254,7 +254,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         // CONTEXT MENU
         MenuPopupUtil.installContextMenu(this.jTextField_Amount);
         MenuPopupUtil.installContextMenu(this.jTextArea_Message);
-        //MenuPopupUtil.installContextMenu(this.jlabel_RecipientDetail);
+        //MenuPopupUtil.installContextMenu(this.jLabel_RecipientDetail);
         jTextArea_Account_Description.setWrapStyleWord(true);
         jTextArea_Account_Description.setLineWrap(true);
 
@@ -358,7 +358,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             if (recipient.isPerson()) {
                 details += " - " + recipient.getPerson().b.getName();
             }
-            this.jlabel_RecipientDetail.setText("<html>" + details);
+            this.jLabel_RecipientDetail.setText("<html>" + details);
         }
 
         updateBalances();
@@ -400,7 +400,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         Fun.Tuple2<Account, String> resultMake = Account.tryMakeAccount(recipientAddress.getSelectedAddress());
         if (resultMake.b != null) {
             recipient = null;
-            this.jlabel_RecipientDetail.setText(Lang.T(resultMake.b));
+            this.jLabel_RecipientDetail.setText(Lang.T(resultMake.b));
             checkReadyToOK();
             return;
         }
@@ -638,7 +638,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jLabelRecipient = new javax.swing.JLabel(Lang.T("Recipient") + ":");
         jComboBoxCreator = new javax.swing.JComboBox<>();
         jLabelTXTitle = new javax.swing.JLabel();
-        jlabel_RecipientDetail = new javax.swing.JLabel();
+        jLabel_RecipientDetail = new javax.swing.JLabel();
         jLabel_Title = new javax.swing.JLabel();
         jTextFieldTXTitle = new javax.swing.JTextField();
         jLabel_Mess = new javax.swing.JLabel();
@@ -710,7 +710,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         labelGBC.gridy = ++gridy;
         add(jLabelRecipientDetail, labelGBC);
         fieldGBC.gridy = gridy;
-        add(jlabel_RecipientDetail, fieldGBC);
+        add(jLabel_RecipientDetail, fieldGBC);
 
         labelGBC.gridy = ++gridy;
         add(jLabelTXTitle, labelGBC);
@@ -855,7 +855,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     public javax.swing.JTextArea jTextArea_Message;
     public MDecimalFormatedTextField jTextField_Amount;
     public javax.swing.JTextField jTextFieldTXTitle;
-    private javax.swing.JLabel jlabel_RecipientDetail;
+    private javax.swing.JLabel jLabel_RecipientDetail;
     public RecipientAddress recipientAddress;
     public JTextField exLinkText;
     public JTextField exLinkDescription;

@@ -479,10 +479,10 @@ button.white-bgc[disabled]:focus,
             ret = "";
 
             if (hrs > 0)
-                ret += " " + hrs + " " + (hrs > 1 ? lastBlock.label_hours : lastBlock.label_hour);
+                ret += " " + hrs + " " + (hrs > 1 ? lastBlock.Label_hours : lastBlock.Label_hour);
 
-            ret += " " + mins + " " + (mins > 1 ? lastBlock.label_mins : lastBlock.label_min);
-            ret += " " + secs + " " + lastBlock.label_secs;
+            ret += " " + mins + " " + (mins > 1 ? lastBlock.Label_mins : lastBlock.Label_min);
+            ret += " " + secs + " " + lastBlock.Label_secs;
             return ret;
         }
 
@@ -681,13 +681,13 @@ button.white-bgc[disabled]:focus,
                     data.person_key +
                     '" width="100"/></td><td style ="padding-left:20px">';
                 output += '<td><font size="+1">' +
-                    data.label_account + ': <a href="?address=' +
+                    data.Label_account + ': <a href="?address=' +
                     data.address + get_lang() + '">' + data.address + '</a><br>';
-                output += data.label_person_name + ': <a href ="?person=' +
+                output += data.Label_person_name + ': <a href ="?person=' +
                     data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person + '</a>';
                 if ('registered' in data) {
-                    output += '<br>' + data.label_registered + ': <b>' +
-                        data.registered + '</b>, ' + data.label_certified +
+                    output += '<br>' + data.Label_registered + ': <b>' +
+                        data.registered + '</b>, ' + data.Label_certified +
                         ': <b>' + data.certified + '</b>';
                 }
                 output += '</font></tr>';
@@ -695,7 +695,7 @@ button.white-bgc[disabled]:focus,
             } else {
 
                 output += '<br><br>';
-                output += '<font size="+1">' + data.label_account +
+                output += '<font size="+1">' + data.Label_account +
                     ': <a href="?address=' + data.address + get_lang() +
                     '">' + data.address + '</a></font>';
             }
@@ -704,7 +704,7 @@ button.white-bgc[disabled]:focus,
             output += '<table width="1280" border=0><tr><td align=left>';
 
             output += '<span style="font-size:1.2em">';
-            output += data.Balance.label_Balance_table;
+            output += data.Balance.Label_Balance_table;
 
             if (false) {
                 // убреме пока переключение по сторонам
@@ -731,10 +731,10 @@ button.white-bgc[disabled]:focus,
 
             output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
                 ' class="tiny table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
-            output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.label_asset_key +
-                '<td><b>' + data.Balance.label_asset_name + '<td><b>' + data.Balance.label_Balance_1 +
-                '<td><b>' + data.Balance.label_Balance_2 + '<td><b>' + data.Balance.label_Balance_3 + '<td><b>'
-                 + data.Balance.label_Balance_4 + '</tr>';
+            output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.Label_asset_key +
+                '<td><b>' + data.Balance.Label_asset_name + '<td><b>' + data.Balance.Label_Balance_1 +
+                '<td><b>' + data.Balance.Label_Balance_2 + '<td><b>' + data.Balance.Label_Balance_3 + '<td><b>'
+                 + data.Balance.Label_Balance_4 + '</tr>';
             for (key in data.Balance.balances) {
                 output += '<tr><td><a href ="?asset=' + data.Balance.balances[key].asset_key +
                     get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
@@ -1405,7 +1405,7 @@ button.white-bgc[disabled]:focus,
             urlstart = url;
 
             output += '<table width="1280" border=0><tr><td align=left>';
-            output += '<font size="+2">' + data.label_block + ': ';
+            output += '<font size="+2">' + data.Label_block + ': ';
             if (data.hasOwnProperty('parentBlockSignature')) {
                 output += '<a class="button ll-blue-bgc" href="?block=' + (data.blockHeight - 1) + get_lang() + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a> ';
             }
@@ -1416,36 +1416,36 @@ button.white-bgc[disabled]:focus,
             output += '</font>';
             output += '<br><br>';
 
-            output += data.label_Block_version + ': <b>' + data.version + '</b><br>';
+            output += data.Label_Block_version + ': <b>' + data.version + '</b><br>';
 
-            output += data.label_Forger + ': <a href=?address=' + data.blockCreator + get_lang() + '><b>' + data.blockCreatorPerson + '</b></a><br>';
+            output += data.Label_Forger + ': <a href=?address=' + data.blockCreator + get_lang() + '><b>' + data.blockCreatorPerson + '</b></a><br>';
 
             if (data.countTx.hasOwnProperty('txsCount')) {
-                output += data.label_Transactions_count + ': <b>' + data.countTx.txsCount + '</b><br>';
+                output += data.Label_Transactions_count + ': <b>' + data.countTx.txsCount + '</b><br>';
             }
 
-            output += data.label_Total_Fee + ': <b>' + data.totalFee + '</b><br>';
+            output += data.Label_Total_Fee + ': <b>' + data.totalFee + '</b><br>';
             output += '<br>';
 
-            output += data.label_Generating_Balance + ': <b>' + addCommas(data.generatingBalance) + '</b><br>';
-            output += data.label_Win_Value + ': <b>' + addCommas(data.winValue) + '</b><br>';
-            output += data.label_Target + ': <b>' + addCommas(data.target) + '</b><br>';
-            output += data.label_Targeted_Win_Value + ': <b>' + addCommas(data.winValueTargeted) + '</b><br>';
+            output += data.Label_Generating_Balance + ': <b>' + addCommas(data.generatingBalance) + '</b><br>';
+            output += data.Label_Win_Value + ': <b>' + addCommas(data.winValue) + '</b><br>';
+            output += data.Label_Target + ': <b>' + addCommas(data.target) + '</b><br>';
+            output += data.Label_Targeted_Win_Value + ': <b>' + addCommas(data.winValueTargeted) + '</b><br>';
             output += '<br>';
 
             if (data.hasOwnProperty('parentBlockSignature')) {
 
-                output += data.label_Parent_block + ': ' + (data.blockHeight - 1) + ',   ' + data.label_Signature + ': ';
+                output += data.Label_Parent_block + ': ' + (data.blockHeight - 1) + ',   ' + data.Label_Signature + ': ';
                 output += '<a  href=?block=' + data.parentBlockSignature + get_lang() + '>' + data.parentBlockSignature + '</a>';
                 output += '<br><br>';
             }
 
-            output += '<b>' + data.label_Current_block + ': ' + (data.blockHeight) + ',    ' + data.label_Signature + ':</b> ';
+            output += '<b>' + data.Label_Current_block + ': ' + (data.blockHeight) + ',    ' + data.Label_Signature + ':</b> ';
             output += '<a  href=?block=' + data.blockSignature + get_lang() + '>' + data.blockSignature + '</a>';
             output += '<br><br>';
 
             if (data.hasOwnProperty('childBlockSignature')) {
-                output += data.label_Child_block + ': ' + (data.blockHeight + 1) + ',   ' + data.label_Signature + ': ';
+                output += data.Label_Child_block + ': ' + (data.blockHeight + 1) + ',   ' + data.Label_Signature + ': ';
                 output += '<a  href=?block=' + data.childBlockSignature + get_lang() + '>' + data.childBlockSignature + '</a>';
                 output += '<br><br>';
             }
@@ -1678,8 +1678,8 @@ button.white-bgc[disabled]:focus,
                 return "";
 
             var output = '';
-            output += lastBlock.label_Last_processed_block + ': <a href=?block=' + lastBlock.height + get_lang() + '>' + lastBlock.height + '</a>';
-            output += ' (' + convertTimestamp(lastBlock.timestamp, true) + ', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' + lastBlock.label_ago + ') ';
+            output += lastBlock.Label_Last_processed_block + ': <a href=?block=' + lastBlock.height + get_lang() + '>' + lastBlock.height + '</a>';
+            output += ' (' + convertTimestamp(lastBlock.timestamp, true) + ', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' + lastBlock.Label_ago + ') ';
             output += '<br>';
 
             return output;

@@ -39,8 +39,8 @@ public class AdderHeadInfo {
         } else if (type == PollCls.class
                 ) {
             addHeadInfoCapStatusesTemplates(output, langObj);
-            output.put("label_table_total_votes", Lang.T("Total Vote", langObj));
-            output.put("label_table_options_count", Lang.T("Options Count", langObj));
+            output.put("Label_table_total_votes", Lang.T("Total Vote", langObj));
+            output.put("Label_table_options_count", Lang.T("Options Count", langObj));
 
         }
 
@@ -103,16 +103,16 @@ public class AdderHeadInfo {
     public static void addHeadInfoCapAssets(Map output, JSONObject langObj) {
         output.put("search_placeholder", Lang.T("Type searching words or asset key", langObj));
 
-        output.put("label_Title", Lang.T("Assets", langObj));
-        output.put("label_table_asset_key", Lang.T("Key", langObj));
-        output.put("label_table_asset_name", Lang.T("Name", langObj));
-        output.put("label_table_asset_owner", Lang.T("Owner", langObj));
-        output.put("label_table_asset_type", Lang.T("Type", langObj));
-        output.put("label_table_asset_description", Lang.T("Description", langObj));
-        output.put("label_table_asset_scale", Lang.T("Scale", langObj));
-        output.put("label_table_asset_amount", Lang.T("Amount", langObj));
-        output.put("label_Assets", Lang.T("Assets", langObj));
-        output.put("label_table_asset_orders", Lang.T("Orders", langObj));
+        output.put("Label_Title", Lang.T("Assets", langObj));
+        output.put("Label_table_asset_key", Lang.T("Key", langObj));
+        output.put("Label_table_asset_name", Lang.T("Name", langObj));
+        output.put("Label_table_asset_owner", Lang.T("Owner", langObj));
+        output.put("Label_table_asset_type", Lang.T("Type", langObj));
+        output.put("Label_table_asset_description", Lang.T("Description", langObj));
+        output.put("Label_table_asset_scale", Lang.T("Scale", langObj));
+        output.put("Label_table_asset_amount", Lang.T("Amount", langObj));
+        output.put("Label_Assets", Lang.T("Assets", langObj));
+        output.put("Label_table_asset_orders", Lang.T("Orders", langObj));
         addLaterPrevious(output, langObj);
     }
 
@@ -124,10 +124,10 @@ public class AdderHeadInfo {
     public static void addHeadInfoCapStatusesTemplates(Map output, JSONObject langObj) {
         output.put("search_placeholder", Lang.T("Type searching words or item key", langObj));
 
-        output.put("label_table_key", Lang.T("Key", langObj));
-        output.put("label_table_name", Lang.T("Name", langObj));
-        output.put("label_table_creator", Lang.T("Creator", langObj));
-        output.put("label_table_description", Lang.T("Description", langObj));
+        output.put("Label_table_key", Lang.T("Key", langObj));
+        output.put("Label_table_name", Lang.T("Name", langObj));
+        output.put("Label_table_creator", Lang.T("Creator", langObj));
+        output.put("Label_table_description", Lang.T("Description", langObj));
         output.put("Label_Statuses", Lang.T("Statuses", langObj));
         output.put("Label_Templates", Lang.T("Templates", langObj));
         addLaterPrevious(output, langObj);

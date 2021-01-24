@@ -22,7 +22,7 @@ function top100(data) {
     }
 
 
-    var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="tiny table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.label_Balance_1 + '<td><b>' + data.label_Balance_2 + '<td><b>' + data.label_Balance_3 + '<td><b>' + data.label_Balance_4 + '<td><b>' + data.Label_Table_Prop;
+    var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="tiny table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.Label_Balance_1 + '<td><b>' + data.Label_Balance_2 + '<td><b>' + data.Label_Balance_3 + '<td><b>' + data.Label_Balance_4 + '<td><b>' + data.Label_Table_Prop;
 
     for (key in data.top) {
         var item = data.top[key];
