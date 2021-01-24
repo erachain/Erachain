@@ -938,7 +938,7 @@ public class ExData {
                     flags = Arrays.copyOfRange(data, position, Integer.BYTES);
                     position += Integer.BYTES;
 
-                    titleSize = Arrays.copyOfRange(data, position, position + 1)[0];
+                    titleSize = Byte.toUnsignedInt(data[position]);
                     position++;
 
                 }
