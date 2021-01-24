@@ -8,6 +8,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.lang.Lang;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,6 +110,17 @@ public abstract class TemplateCls extends ItemCls {
 
     public IssueItemMap getDBIssueMap(DCSet db) {
         return db.getIssueTemplateMap();
+    }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_Template", Lang.T("Template", langObj));
+
+        if (!forPrint) {
+        }
+
+        return itemJson;
     }
 
 }

@@ -282,23 +282,23 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(issueNote);
 
-        JMenuItem payouts = new JMenuItem(Lang.T("Make Payouts"));
-        payouts.addActionListener(new ActionListener() {
+        JMenuItem accruals = new JMenuItem(Lang.T("Make Accruals"));
+        accruals.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 IssueDocumentPanel panel = new IssueDocumentPanel(pubKey, asset);
-                panel.selectPayouts(null, null);
-                MainPanel.getInstance().insertNewTab(Lang.T("Make Payouts"), panel);
+                panel.selectAccruals(null, null);
+                MainPanel.getInstance().insertNewTab(Lang.T("Make Accruals"), panel);
             }
         });
-        add(payouts);
+        add(accruals);
 
         JMenuItem dividend = new JMenuItem(Lang.T("Pay Dividend"));
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), null);
-                panel.selectPayouts(null, asset);
+                panel.selectAccruals(null, asset);
                 MainPanel.getInstance().insertNewTab(Lang.T("Pay Dividend"), panel);
             }
         });

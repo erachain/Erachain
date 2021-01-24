@@ -29,7 +29,7 @@ public class SettingLangFrame extends JDialog {
     private JButton nextButton;
     //private SettingLangFrame th;
     private JLabel labelSelect;
-    private JLabel label_font_size;
+    private JLabel Label_font_size;
 
     public SettingLangFrame() {
         super();
@@ -75,8 +75,8 @@ public class SettingLangFrame extends JDialog {
         font_LabelGBC.gridy = 2;
         font_LabelGBC.gridx = 1;
 
-        label_font_size = new JLabel("Font Size:");
-        this.add(label_font_size, font_LabelGBC);
+        Label_font_size = new JLabel("Font Size:");
+        this.add(Label_font_size, font_LabelGBC);
         //LANGS GBC
         GridBagConstraints fontGBC = new GridBagConstraints();
         fontGBC.insets = new Insets(0, 0, 5, 0);
@@ -115,11 +115,11 @@ public class SettingLangFrame extends JDialog {
 
             switch (valueLang) {
                 case "[ru] Русский":
-                    label_font_size.setText("Размер шрифта:");
+                    Label_font_size.setText("Размер шрифта:");
                     labelSelect.setText("Язык");
                     break;
                 case "[en] English":
-                    label_font_size.setText("Font size:");
+                    Label_font_size.setText("Font size:");
                     labelSelect.setText("Language");
                     break;
             }
@@ -157,7 +157,7 @@ public class SettingLangFrame extends JDialog {
                     Font font = listLang.getFont();
                     listLang.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
                     labelSelect.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
-                    label_font_size.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
+                    Label_font_size.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
                     size_Font.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
                     nextButton.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
                     pack();

@@ -1273,6 +1273,42 @@ public class WebResource {
         }
     }
 
+    @Path("index/libs/js/explorer.js")
+    @GET
+    public Response explorer() {
+        File file = new File("web/libs/js/explorer.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/explorer").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
+    @Path("index/libs/js/explorerItems.js")
+    @GET
+    public Response explorerItems() {
+        File file = new File("web/libs/js/explorerItems.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/explorerItems").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
+    @Path("index/libs/js/explorerAssets.js")
+    @GET
+    public Response explorerAssets() {
+        File file = new File("web/libs/js/explorerAssets.js");
+
+        if (file.exists()) {
+            return Response.ok(file, "text/explorerAssets").build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
     @Path("index/libs/js/explorerPersons.js")
     @GET
     public Response explorerPersons() {

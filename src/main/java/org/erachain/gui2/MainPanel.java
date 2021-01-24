@@ -117,6 +117,7 @@ public class MainPanel extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jSplitPane1 = new MSplitPane();
+        jSplitPane1.buttonOrientation.setVisible(false);
         jSplitPane1.set_CloseOnOneTouch(jSplitPane1.ONE_TOUCH_CLOSE_LEFT_TOP); // set
         // one
         // touch

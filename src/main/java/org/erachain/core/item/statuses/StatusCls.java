@@ -8,6 +8,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.ItemStatusMap;
+import org.erachain.lang.Lang;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.sql.Date;
@@ -152,6 +154,22 @@ public abstract class StatusCls extends ItemCls {
 
         return statusesItems;
 
+    }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_Status", Lang.T("Status", langObj));
+
+        itemJson.put("unique", isUnique());
+
+        itemJson.put("Label_unique_state", Lang.T("Unique State", langObj));
+        itemJson.put("Label_multi_states", Lang.T("Multi States", langObj));
+
+        if (!forPrint) {
+        }
+
+        return itemJson;
     }
 
 }

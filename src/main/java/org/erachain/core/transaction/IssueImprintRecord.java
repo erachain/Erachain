@@ -61,7 +61,7 @@ public class IssueImprintRecord extends IssueItemRecord {
     int minLen = 200 * 25;
 
     @Override
-    public long calcBaseFee() {
+    public long calcBaseFee(boolean withFreeProtocol) {
 
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
 

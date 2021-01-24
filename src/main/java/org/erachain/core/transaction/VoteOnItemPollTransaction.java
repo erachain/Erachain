@@ -20,7 +20,7 @@ import java.util.HashSet;
 
 public class VoteOnItemPollTransaction extends Transaction implements Itemable {
     public static final byte TYPE_ID = (byte) VOTE_ON_ITEM_POLL_TRANSACTION;
-    public static final String TYPE_NAME = "Vote on Item Poll";
+    public static final String TYPE_NAME = "Vote on Poll";
 
     private static final int OPTION_SIZE_LENGTH = 4;
 

@@ -182,6 +182,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_MESSAGE_LENGTH = 196;
     public static final int UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT = 197;
 
+    public static final int INVALID_FLAGS = 199;
+
 
     // ITEMS
     public static final int INVALID_ITEM_KEY = 201;
@@ -666,7 +668,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         this.seqNo = seqNo;
         this.dbRef = Transaction.makeDBRef(height, seqNo);
         if (forDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
-            this.calcFee();
+            this.calcFee(true);
 
         if (andUpdateFromState && !isWiped())
             updateFromStateDB();
@@ -694,15 +696,22 @@ public abstract class Transaction implements ExplorerJsonLine {
         return Byte.toUnsignedInt(this.typeBytes[0]);
     }
 
-    public static Integer[] getTransactionTypes() {
-        return new Integer[]{
+    public static Integer[] getTransactionTypes(boolean onlyUsed) {
+
+        // SEND ASSET
+        // OTHER
+        // confirm other transactions
+        // HASHES
+        // exchange of assets
+        // voting
+        Integer[] list = new Integer[]{
                 0,
                 ISSUE_ASSET_TRANSACTION,
                 ISSUE_IMPRINT_TRANSACTION,
                 ISSUE_TEMPLATE_TRANSACTION,
                 ISSUE_PERSON_TRANSACTION,
                 ISSUE_STATUS_TRANSACTION,
-                ISSUE_UNION_TRANSACTION,
+                onlyUsed ? -1 : ISSUE_UNION_TRANSACTION,
                 ISSUE_STATEMENT_TRANSACTION,
                 ISSUE_POLL_TRANSACTION,
 
@@ -713,8 +722,8 @@ public abstract class Transaction implements ExplorerJsonLine {
                 SIGN_NOTE_TRANSACTION,
                 CERTIFY_PUB_KEYS_TRANSACTION,
                 SET_STATUS_TO_ITEM_TRANSACTION,
-                SET_UNION_TO_ITEM_TRANSACTION,
-                SET_UNION_STATUS_TO_ITEM_TRANSACTION,
+                onlyUsed ? -1 : SET_UNION_TO_ITEM_TRANSACTION,
+                onlyUsed ? -1 : SET_UNION_STATUS_TO_ITEM_TRANSACTION,
 
                 // confirm other transactions
                 SIGN_TRANSACTION,
@@ -730,6 +739,18 @@ public abstract class Transaction implements ExplorerJsonLine {
                 VOTE_ON_ITEM_POLL_TRANSACTION
 
         };
+
+        if (onlyUsed) {
+            ArrayList<Integer> tmp = new ArrayList<>();
+            for (Integer type : list) {
+                if (type < 0)
+                    continue;
+                tmp.add(type);
+            }
+            return tmp.toArray(new Integer[tmp.size()]);
+
+        }
+        return list;
     }
 
     public static String viewTypeName(int type) {
@@ -1106,9 +1127,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     // get fee
-    public long calcBaseFee() {
+    public long calcBaseFee(boolean withFreeProtocol) {
         int len = this.getDataLength(Transaction.FOR_NETWORK, true);
-        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+        if (withFreeProtocol && height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
                 && len < BlockChain.FREE_FEE_LENGTH) {
             // не учитываем комиссию если размер блока маленький
             return 0L;
@@ -1118,9 +1139,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     // calc FEE by recommended and feePOW
-    public void calcFee() {
+    public void calcFee(boolean withFreeProtocol) {
 
-        long fee_long = calcBaseFee();
+        long fee_long = calcBaseFee(withFreeProtocol);
         if (fee_long == 0) {
             this.fee = BigDecimal.ZERO;
             return;
@@ -1776,6 +1797,12 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
+        }
+
+        if (typeBytes[2] == -1 || typeBytes[3] == -1) {
+            // не может быть чтобы все флаги были подняты - скорее всего это и JS ошибка
+            errorValue = (typeBytes[2] == -1 ? "[2]" : "[3]") + " = -1";
+            return INVALID_FLAGS;
         }
 
         // CHECK IF REFERENCE IS OK

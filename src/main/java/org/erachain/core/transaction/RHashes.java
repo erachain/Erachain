@@ -35,7 +35,7 @@ import java.util.HashSet;
 public class RHashes extends Transaction {
 
     public static final byte TYPE_ID = (byte) HASHES_RECORD;
-    public static final String TYPE_NAME = "Hashes Record";
+    public static final String TYPE_NAME = "Hashes";
 
     private static final int URL_SIZE_LENGTH = 1;
     public static final int MAX_URL_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;

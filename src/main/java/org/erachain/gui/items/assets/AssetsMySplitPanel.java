@@ -88,17 +88,17 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
         });
         menuTable.add(details);
 
-        JMenuItem payouts = new JMenuItem(Lang.T("Make Payouts"));
-        payouts.addActionListener(new ActionListener() {
+        JMenuItem accruals = new JMenuItem(Lang.T("Make Accruals"));
+        accruals.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
                 IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), asset);
-                panel.selectPayouts(null, null);
-                MainPanel.getInstance().insertNewTab(Lang.T("Make Payouts"), panel);
+                panel.selectAccruals(null, null);
+                MainPanel.getInstance().insertNewTab(Lang.T("Make Accruals"), panel);
             }
         });
-        menuTable.add(payouts);
+        menuTable.add(accruals);
 
         JMenuItem dividend = new JMenuItem(Lang.T("Pay Dividend"));
         dividend.addActionListener(new ActionListener() {
@@ -106,7 +106,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
                 IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), null);
-                panel.selectPayouts(null, asset);
+                panel.selectAccruals(null, asset);
                 MainPanel.getInstance().insertNewTab(Lang.T("Pay Dividend"), panel);
             }
         });

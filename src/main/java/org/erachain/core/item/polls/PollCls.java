@@ -11,6 +11,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.VoteOnItemPollMap;
+import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -387,6 +388,18 @@ public abstract class PollCls extends ItemCls {
         json.put("totalVotes", getTotalVotes(DCSet.getInstance()).toPlainString());
 
         return json;
+    }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_Poll", Lang.T("Poll", langObj));
+
+
+        if (!forPrint) {
+        }
+
+        return itemJson;
     }
 
 }
