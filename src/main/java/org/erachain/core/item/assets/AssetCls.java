@@ -2119,7 +2119,7 @@ public abstract class AssetCls extends ItemCls {
             joiner.add(Lang.T(item.b, langObj));
         }
         itemJson.put("assetTypeDesc", Lang.T(viewAssetTypeDescriptionCls(getAssetType()), langObj)
-                + ".\n" + Lang.T("Acceptable actions", langObj) + ":\n" + joiner.toString()
+                + ".<br><b>" + Lang.T("Acceptable actions", langObj) + "</b>: " + joiner.toString()
         );
 
         itemJson.put("properties", viewProperties(langObj));

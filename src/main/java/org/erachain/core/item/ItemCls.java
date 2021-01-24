@@ -676,8 +676,14 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             itemJSON.put("tx_seqNo", Transaction.viewDBRef(txSeqNo));
             referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
             if (referenceTx != null) {
-                itemJSON.put("tx_creator", referenceTx.getCreator().getAddress());
-                itemJSON.put("tx_creator_pubkey", referenceTx.getCreator().getBase58());
+                PublicKeyAccount creator = referenceTx.getCreator();
+                if (creator == null) {
+                    itemJSON.put("tx_creator", "GENESIS");
+                    itemJSON.put("tx_creator_pubkey", "GENESIS");
+                } else {
+                    itemJSON.put("tx_creator", creator.getAddress());
+                    itemJSON.put("tx_creator_pubkey", creator.getBase58());
+                }
                 itemJSON.put("tx_timestamp", referenceTx.getTimestamp());
                 itemJSON.put("blk_timestamp", Controller.getInstance().blockChain.getHeightOnTimestampMS(referenceTx.getBlockHeight()));
             }

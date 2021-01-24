@@ -63,7 +63,7 @@ function asset(data, forPrint) {
     if (!forPrint)
         output += lastBlock(data.lastBlock);
 
-    if (!data.hasOwnProperty('item')) {
+    if (!data.item) {
         output += '<h2>Not found</h2>';
         return output;
     }
@@ -104,7 +104,7 @@ function asset(data, forPrint) {
     if (item.properties)
         output += item.Label_Properties + ': ' + item.properties + '<br>';
 
-    output += item.Label_AssetType_Desc + ': ' + fformat(item.assetTypeDesc) + '<br>';
+    output += item.Label_AssetType_Desc + ': ' + item.assetTypeDesc + '<br>';
     output += '</p>';
 
     output += itemFoot(item, forPrint);
