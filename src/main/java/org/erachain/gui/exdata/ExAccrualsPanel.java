@@ -42,6 +42,7 @@ public class ExAccrualsPanel extends IconPanel {
     private ExDataPanel parent;
     public ComboBoxAssetsModel assetsModel;
     public ComboBoxAssetsModel assetsModel1;
+    private Boolean lock = new Boolean(false);
 
     public ExAccrualsPanel(ExDataPanel parent) {
         super(NAME, TITLE);
@@ -106,26 +107,38 @@ public class ExAccrualsPanel extends IconPanel {
         jButtonCalcCompu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (lock)
+                    return;
+                synchronized (lock) {
+                    try {
+                        lock = new Boolean(true);
+                        jButtonCalcCompu.setEnabled(false);
+                        jButtonViewResult.setEnabled(false);
 
-                Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
-                synchronized (exPaysRes) {
-                    jButtonViewResult.setEnabled(false);
-                    if (exPaysRes.b != null) {
-                        jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
-                                Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                        jScrollPaneAccruals.setVisible(false);
+
+                        Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
+                        if (exPaysRes.b != null) {
+                            jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
+                                    Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                            return;
+                        }
+
+                        ExPays pays = exPaysRes.a;
+                        pays.setDC(DCSet.getInstance());
+                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.precalcFilteredAccruals(
+                                Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        pays.calcTotalFeeBytes();
+                        jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
+                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
+                                + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay());
+                    } finally {
+                        jButtonCalcCompu.setEnabled(true);
                         jButtonViewResult.setEnabled(true);
-                        return;
-                    }
 
-                    ExPays pays = exPaysRes.a;
-                    pays.setDC(DCSet.getInstance());
-                    List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.precalcFilteredAccruals(
-                            Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                    pays.calcTotalFeeBytes();
-                    jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
-                            + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
-                            + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay());
-                    jButtonViewResult.setEnabled(true);
+                        //jScrollPaneAccruals.setVisible(true);
+                        lock = new Boolean(false);
+                    }
                 }
             }
         });
@@ -133,55 +146,68 @@ public class ExAccrualsPanel extends IconPanel {
         jButtonViewResult.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
-                synchronized (exPaysRes) {
-                    jButtonViewResult.setEnabled(false);
-                    if (exPaysRes.b != null) {
-                        jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
-                                Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                if (lock)
+                    return;
+                synchronized (lock) {
+                    try {
+                        lock = new Boolean(true);
+                        jButtonCalcCompu.setEnabled(false);
+                        jButtonViewResult.setEnabled(false);
+
+                        jScrollPaneAccruals.setVisible(false);
+
+                        Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
+                        if (exPaysRes.b != null) {
+                            jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
+                                    Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                            jButtonViewResult.setEnabled(true);
+                            return;
+                        }
+
+                        ExPays pays = exPaysRes.a;
+                        pays.setDC(DCSet.getInstance());
+                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.precalcFilteredAccruals(
+                                Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        pays.calcTotalFeeBytes();
+                        String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
+                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
+                                + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
+                        jLabel_FeesResult.setText(result);
+
+                        AccrualsModel model = new AccrualsModel(accrual);
+                        jTablePreviewAccruals.setModel(model);
+                        TableColumnModel columnModel = jTablePreviewAccruals.getColumnModel();
+
+                        TableColumn columnNo = columnModel.getColumn(0);
+                        columnNo.setMinWidth(50);
+                        columnNo.setMaxWidth(100);
+                        columnNo.setPreferredWidth(70);
+                        columnNo.setWidth(70);
+                        columnNo.sizeWidthToFit();
+
+                        TableColumn columnBal = columnModel.getColumn(1);
+                        columnBal.setMinWidth(100);
+                        columnBal.setMaxWidth(200);
+                        columnBal.setPreferredWidth(150);
+                        columnBal.setWidth(150);
+                        columnBal.sizeWidthToFit();
+
+                        TableColumn columnPay = columnModel.getColumn(3);
+                        columnPay.setMinWidth(100);
+                        columnPay.setMaxWidth(200);
+                        columnPay.setPreferredWidth(150);
+                        columnPay.setWidth(150);
+                        columnPay.sizeWidthToFit();
+
+                    } finally {
+                        jButtonCalcCompu.setEnabled(true);
                         jButtonViewResult.setEnabled(true);
-                        return;
+
+                        jScrollPaneAccruals.setVisible(true);
+                        lock = new Boolean(false);
+
                     }
-
-                    ExPays pays = exPaysRes.a;
-                    pays.setDC(DCSet.getInstance());
-                    List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.precalcFilteredAccruals(
-                            Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                    pays.calcTotalFeeBytes();
-                    String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
-                            + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
-                            + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
-                    jLabel_FeesResult.setText(result);
-
-                    AccrualsModel model = new AccrualsModel(accrual);
-                    jTablePreviewAccruals.setModel(model);
-                    TableColumnModel columnModel = jTablePreviewAccruals.getColumnModel();
-
-                    TableColumn columnNo = columnModel.getColumn(0);
-                    columnNo.setMinWidth(50);
-                    columnNo.setMaxWidth(100);
-                    columnNo.setPreferredWidth(70);
-                    columnNo.setWidth(70);
-                    columnNo.sizeWidthToFit();
-
-                    TableColumn columnBal = columnModel.getColumn(1);
-                    columnBal.setMinWidth(100);
-                    columnBal.setMaxWidth(200);
-                    columnBal.setPreferredWidth(150);
-                    columnBal.setWidth(150);
-                    columnBal.sizeWidthToFit();
-
-                    TableColumn columnPay = columnModel.getColumn(3);
-                    columnPay.setMinWidth(100);
-                    columnPay.setMaxWidth(200);
-                    columnPay.setPreferredWidth(150);
-                    columnPay.setWidth(150);
-                    columnPay.sizeWidthToFit();
-
-                    jScrollPaneAccruals.setVisible(true);
-                    jButtonViewResult.setEnabled(true);
                 }
-
             }
         });
 
