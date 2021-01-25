@@ -1594,9 +1594,6 @@ public class BlockExplorer {
 
         output.put("item", person.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
-        if (forPrint)
-            return;
-
         // statuses
 
         JSONArray statusesJSON = new JSONArray();
@@ -1734,6 +1731,9 @@ public class BlockExplorer {
         }
 
         output.put("accounts", accountsJSON);
+
+        if (forPrint)
+            return;
 
         // my persons
 

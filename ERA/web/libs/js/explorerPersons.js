@@ -271,9 +271,6 @@ function person(data, forPrint) {
     output += '</tr>';
     output += '</table>';
 
-    if (forPrint)
-        return output;
-
     //statuses
     if (data.Label_statuses) {
         output += '<br>' + data.Label_statuses + ':';
@@ -297,9 +294,6 @@ function person(data, forPrint) {
         output += '</table>';
     }
 
-    if (print)
-        return output;
-
     // accounts
     if (data.Label_accounts) {
         output += '<br>' + data.Label_accounts + ':';
@@ -317,6 +311,9 @@ function person(data, forPrint) {
         }
         output += '</table>';
     }
+
+    if (forPrint)
+        return output;
 
     //my persons
     if (data.Label_My_Persons) {
