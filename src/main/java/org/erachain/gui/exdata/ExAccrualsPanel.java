@@ -245,16 +245,16 @@ public class ExAccrualsPanel extends IconPanel {
 
     private void updateLabelsByMethod() {
         switch (jComboBoxMethodPaymentType.getSelectedIndex()) {
-            case 0:
+            case ExPays.PAYMENT_METHOD_TOTAL:
                 jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_0_D"));
                 jLabelAmount.setText(Lang.T("Total Amount"));
-                jTextFieldPaymentMin.setEnabled(true);
-                jTextFieldPaymentMax.setEnabled(true);
+                jTextFieldPaymentMin.setEnabled(false);
+                jTextFieldPaymentMax.setEnabled(false);
 
                 jCheckBoxSelfPay.setVisible(true);
                 return;
-            case 1:
+            case ExPays.PAYMENT_METHOD_COEFF:
                 jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_1_D"));
                 jLabelAmount.setText(Lang.T("Coefficient"));
@@ -265,7 +265,7 @@ public class ExAccrualsPanel extends IconPanel {
                 jCheckBoxSelfPay.setVisible(false);
 
                 return;
-            case 2:
+            case ExPays.PAYMENT_METHOD_ABSOLUTE:
                 jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_2_D"));
                 jLabelAmount.setText(Lang.T("Amount"));
@@ -711,13 +711,14 @@ public class ExAccrualsPanel extends IconPanel {
             jTextFieldDateEndStr = null;
         }
 
+        boolean minMaxUse = jComboBoxMethodPaymentType.getSelectedIndex() == ExPays.PAYMENT_METHOD_COEFF;
         return ExPays.make(
                 ((AssetCls) jComboBoxAccrualAsset.getSelectedItem()).getKey(),
                 balancePosition.a.a, balancePosition.a.b,
                 jComboBoxMethodPaymentType.getSelectedIndex(),
                 jTextFieldAmount.getText(),
-                jTextFieldPaymentMin.getText(),
-                jTextFieldPaymentMax.getText(),
+                minMaxUse ? jTextFieldPaymentMin.getText() : null,
+                minMaxUse ? jTextFieldPaymentMax.getText() : null,
                 ((AssetCls) jComboBoxFilterAsset.getSelectedItem()).getKey(),
                 jComboBoxFilterBalancePosition.getSelectedIndex() + 1, jComboBoxFilterSideBalance.getSelectedIndex() + 1,
                 jTextFieldBQ.getText(), jTextFieldLQ.getText(),
