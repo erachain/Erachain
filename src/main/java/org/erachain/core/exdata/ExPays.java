@@ -1223,7 +1223,6 @@ public class ExPays {
         PublicKeyAccount creator = rNote.getCreator();
 
         if (hasAssetFilter()) {
-            boolean isDirect = asset.isDirectBalances();
             long absKey = assetKey;
 
             // возьмем знаки (минус) для создания позиции баланса такой
