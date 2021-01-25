@@ -905,7 +905,7 @@ public class ExPays {
         } else if (filteredAccrualsCount > 0) {
             height = rNote.getBlockHeight();
 
-            if (filterTXType == PAYMENT_METHOD_TOTAL) {
+            if (payMethod == PAYMENT_METHOD_TOTAL) {
                 // просчитаем значения для точного округления Общей Суммы
                 if (!calcAccrualsForMethodTotal())
                     // ошибка подсчета Общего значения - был взят в учет минус общий
@@ -980,7 +980,7 @@ public class ExPays {
         if (filteredAccrualsCount == 0)
             return;
 
-        if (filterTXType == PAYMENT_METHOD_TOTAL) {
+        if (payMethod == PAYMENT_METHOD_TOTAL) {
             // просчитаем значения для точного округления Общей Суммы
             if (!calcAccrualsForMethodTotal())
                 // нет значений
@@ -1303,11 +1303,9 @@ public class ExPays {
             return;
 
         if (payMethod == PAYMENT_METHOD_TOTAL) {
-            if (payMethod == PAYMENT_METHOD_TOTAL) {
-                if (!calcAccrualsForMethodTotal())
-                    // не удалось просчитать значения
-                    return;
-            }
+            if (!calcAccrualsForMethodTotal())
+                // не удалось просчитать значения
+                return;
         }
 
         height = rNote.getBlockHeight();

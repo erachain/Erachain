@@ -40,18 +40,18 @@ public class ExAccrualsPanel extends IconPanel {
     public static String TITLE = "Accruals";
 
     private ExDataPanel parent;
-    public ComboBoxAssetsModel accountsModel;
-    public ComboBoxAssetsModel accountsModel1;
+    public ComboBoxAssetsModel assetsModel;
+    public ComboBoxAssetsModel assetsModel1;
 
     public ExAccrualsPanel(ExDataPanel parent) {
         super(NAME, TITLE);
         this.parent = parent;
         initComponents();
 
-        accountsModel = new ComboBoxAssetsModel();
-        accountsModel1 = new ComboBoxAssetsModel();
-        this.jComboBoxAccrualAsset.setModel(accountsModel);
-        this.jComboBoxFilterAsset.setModel(accountsModel1);
+        assetsModel = new ComboBoxAssetsModel();
+        assetsModel1 = new ComboBoxAssetsModel();
+        this.jComboBoxAccrualAsset.setModel(assetsModel);
+        this.jComboBoxFilterAsset.setModel(assetsModel1);
         jComboBoxFilterBalancePosition.setModel(new javax.swing.DefaultComboBoxModel(new Integer[]{
                 TransactionAmount.ACTION_SEND,
                 TransactionAmount.ACTION_DEBT,
