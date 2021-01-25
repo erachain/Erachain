@@ -52,14 +52,14 @@ public class RSignNoteResource {
                         "test:true, " +
                         "recipients: { onlyRecipients:false, list:[Addresses] }, " +
 
-                        "payouts: { "
+                        "accruals: { "
                         + "assetKey:long - asset key for Action, "
                         + "position=1 - balance position (1 - OWN, 2 - DEBT, 3 - HOLD, 4 - SPEND, 5 - PLEDGE), "
                         + "backward:false, "
                         + "method:0..2 - by TOTAL (0), by coefficient (1), by same Value (2), "
                         + "methodValue:BigDecimal, "
-                        + "amountMin:BigDecimal or Null - minimum to Send, "
-                        + "amountMax:BigDecimal or Null - maximum to Send, "
+                        + "amountMin:BigDecimal or Null - minimum to accrual, "
+                        + "amountMax:BigDecimal or Null - maximum to accrual, "
                         + "filterAssetKey:long - file by this asset balances, "
                         + "filterBalPos:1 - check balance position (1 - OWN, 2 - DEBT, 3 - HOLD, 4 - SPEND, 5 - PLEDGE), "
                         + "filterBalSide:1 - check balance side (0 - Debit, 1 - Left, 2 - Credit), "
@@ -69,7 +69,7 @@ public class RSignNoteResource {
                         + "activeAfter=date - yyyy-MM-dd hh:mm:00 or Seq-No (3214-2) or timestamp[sec], "
                         + "activeBefore=date - yyyy-MM-dd hh:mm:00 or Seq-No (3214-2) or timestamp[sec], "
                         + "filterPerson:0..3 - 0 all, 1 - only for persons, 2 - only for man, 3 - only for woman, "
-                        + "selfPay:true - To pay to creator address too. Default = true, "
+                        + "selfUse:false - Use creator address too. Default = false, "
                         + "}, " +
                         "authors: { list: { ref:No, name:Name, share:Share }, " +
                         "sources: { list: { ref:SeqNo, name:Name, share:Share }, " +
@@ -85,7 +85,7 @@ public class RSignNoteResource {
                         "filesUnique:false," +
 
                         "ai:, ",
-                "PAYOUTS - make 'muli-send' action from creator Address the asset [assetKey] by filter, If 'test' = false it will be make real sends."
+                "accruals - make 'muli-send' action from creator Address the asset [assetKey] by filter, If 'test' = false it will be make real sends."
         );
 
         //
@@ -121,7 +121,7 @@ public class RSignNoteResource {
      */
     @POST
     @Path("make")
-    public String multiSend(String x) {
+    public String makeNote(String x) {
 
         JSONObject jsonObject;
         try {
@@ -230,11 +230,11 @@ public class RSignNoteResource {
             }
         }
 
-        /////////// PAYOUTS
-        JSONObject payoutsJson = (JSONObject) jsonObject.get("payouts");
-        ExPays payouts;
-        if (payoutsJson == null) {
-            payouts = null;
+        /////////// Accruals
+        JSONObject accrualsJson = (JSONObject) jsonObject.get("accruals");
+        ExPays accruals;
+        if (accrualsJson == null) {
+            accruals = null;
         } else {
             long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
             int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
@@ -256,18 +256,18 @@ public class RSignNoteResource {
             String filterTimeEnd = (String) jsonObject.get("activeBefore");
 
             int filterPerson = Integer.valueOf(jsonObject.getOrDefault("filterPerson", 0).toString());
-            boolean selfPay = Boolean.valueOf((boolean) jsonObject.getOrDefault("selfPay", true));
+            boolean selfUse = Boolean.valueOf((boolean) jsonObject.getOrDefault("selfUse", false));
 
-            Fun.Tuple2<ExPays, String> payoutsResult = ExPays.make(assetKey, position, backward, payMethod, value,
+            Fun.Tuple2<ExPays, String> accrualsResult = ExPays.make(assetKey, position, backward, payMethod, value,
                     amountMin, amountMax, filterAssetKey, filterPos, filterSide,
                     filterGreatEqual, filterLessEqual,
                     filterTXType, filterTimeStart, filterTimeEnd,
-                    filterPerson, selfPay);
+                    filterPerson, selfUse);
 
-            if (payoutsResult.a == null) {
-                payouts = null;
+            if (accrualsResult.a == null) {
+                accruals = null;
             } else {
-                payouts = payoutsResult.a;
+                accruals = accrualsResult.a;
             }
 
         }
@@ -365,7 +365,7 @@ public class RSignNoteResource {
 
             byte[] exDataBytes;
             try {
-                exDataBytes = ExData.make(exLink, payouts, privateKeyAccount, title,
+                exDataBytes = ExData.make(exLink, accruals, privateKeyAccount, title,
                         onlyRecipients, recipients, authors, sources, tags, isEncrypted,
                         templateKey, templateParams, templateUnique,
                         message, messageUnique,

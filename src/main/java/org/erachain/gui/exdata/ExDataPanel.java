@@ -87,9 +87,7 @@ public class ExDataPanel extends JPanel {
     public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
     public DocTypeAppendixPanel docTypeAppendixPanel;
-    public ExPayoutsPanel exPayoutsPanel;
-
-
+    public ExAccrualsPanel exAccrualsPanel;
 
     /**
      * Creates new form IssueDocumentPanel
@@ -328,7 +326,7 @@ public class ExDataPanel extends JPanel {
         params_Template_Model = new ParamsTemplateModel();
         jTable_Params_Message_Public = new MTable(params_Template_Model);
         docTypeAppendixPanel = new DocTypeAppendixPanel(this);
-        exPayoutsPanel = new ExPayoutsPanel(this);
+        exAccrualsPanel = new ExAccrualsPanel(this);
 
         params_Template_Model.addTableModelListener(new TableModelListener() {
 
@@ -380,7 +378,7 @@ public class ExDataPanel extends JPanel {
         jTabbedPane_Type.addTab(Lang.T("Type"), docTypeAppendixPanel);
 
         JScrollPane multiPayScrollBar = new JScrollPane();
-        multiPayScrollBar.setViewportView(exPayoutsPanel);
+        multiPayScrollBar.setViewportView(exAccrualsPanel);
         jTabbedPane_Type.addTab(Lang.T("Accruals"), multiPayScrollBar);
 
         jTabbedPane_Type.addTab(Lang.T("Recipients"), multipleRecipientsPanel);
@@ -849,16 +847,16 @@ public class ExDataPanel extends JPanel {
             }
         }
 
-        Fun.Tuple2<ExPays, String> exPayoutsResult = exPayoutsPanel.getPayouts();
-        if (exPayoutsResult.b != null) {
-            return new Fun.Tuple2(null, exPayoutsResult.b);
+        Fun.Tuple2<ExPays, String> exAccrualsResult = exAccrualsPanel.getAccruals();
+        if (exAccrualsResult.b != null) {
+            return new Fun.Tuple2(null, exAccrualsResult.b);
         }
 
         Long templateKey = fill_Template_Panel.sel_Template == null ? null : fill_Template_Panel.sel_Template.getKey();
 
         byte[] exData;
         try {
-            exData = ExData.make(exLink, exPayoutsResult.a, creator, jTextField_Title_Message.getText(),
+            exData = ExData.make(exLink, exAccrualsResult.a, creator, jTextField_Title_Message.getText(),
                     signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
                     templateKey, fill_Template_Panel.get_Params(),
                     fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),

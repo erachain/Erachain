@@ -11,6 +11,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
+import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -683,7 +684,7 @@ public abstract class AssetCls extends ItemCls {
      *
      * @return
      */
-    public boolean isNotReDepted() {
+    public boolean isNotReDebted() {
         return isOutsideType();
     }
 
@@ -1459,7 +1460,7 @@ public abstract class AssetCls extends ItemCls {
                 return backward ? null : "Spend";
             case Account.BALANCE_POS_PLEDGE:
                 return backward ? null //"Re-pledge"
-                        : "Pledge";
+                        : null; //"Pledge";
             case TransactionAmount.ACTION_RESERVED_6:
                 // for CALCULATED TX
                 return null; // backward ? "Reserved 6-" : "Reserved 6+";
@@ -1627,7 +1628,7 @@ public abstract class AssetCls extends ItemCls {
         return viewAssetTypeAction(backward, actionType, isCreatorOwner);
     }
 
-    public String viewAssetTypeCreator(boolean backward, int actionType, boolean isCreatorOwner) {
+    public static String viewAssetTypeCreator(int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_MY_DEBT:
                 switch (actionType) {
@@ -1716,7 +1717,11 @@ public abstract class AssetCls extends ItemCls {
         return null;
     }
 
-    public String viewAssetTypeTarget(boolean backward, int actionType, boolean isRecipientOwner) {
+    public String viewAssetTypeCreator(boolean backward, int actionType, boolean isCreatorOwner) {
+        return viewAssetTypeCreator(assetType, backward, actionType, isCreatorOwner);
+    }
+
+    public static String viewAssetTypeTarget(int assetType, boolean backward, int actionType, boolean isRecipientOwner) {
         switch (assetType) {
             case AS_MY_DEBT:
                 switch (actionType) {
@@ -1821,6 +1826,11 @@ public abstract class AssetCls extends ItemCls {
         return null;
     }
 
+    public String viewAssetTypeTarget(boolean backward, int actionType, boolean isRecipientOwner) {
+        return viewAssetTypeTarget(assetType, backward, actionType, isRecipientOwner);
+
+    }
+
     public String viewAssetTypeActionOK(boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
@@ -1856,25 +1866,45 @@ public abstract class AssetCls extends ItemCls {
     //OTHER
     public static JSONObject AssetTypeJson(int assetType, JSONObject langObj) {
 
-        JSONObject type = new JSONObject();
-        type.put("id", assetType);
-        type.put("name", Lang.T(AssetCls.viewAssetTypeCls(assetType), langObj));
-        type.put("nameFull", Lang.T(AssetCls.viewAssetTypeFullCls(assetType), langObj));
+        JSONObject assetTypeJson = new JSONObject();
+        assetTypeJson.put("id", assetType);
+        assetTypeJson.put("name", Lang.T(AssetCls.viewAssetTypeCls(assetType), langObj));
+        assetTypeJson.put("nameFull", Lang.T(AssetCls.viewAssetTypeFullCls(assetType), langObj));
 
         List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
                 AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
                 assetType, null, true);
         StringJoiner joiner = new StringJoiner(", ");
         JSONArray actionsArray = new JSONArray();
-        for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> action : actions) {
-            joiner.add(Lang.T(action.b, langObj));
+        for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> actionItem : actions) {
+            int action = actionItem.a.a;
+            boolean backward = actionItem.a.b;
+
+            joiner.add(Lang.T(actionItem.b, langObj));
             JSONObject actionJson = new JSONObject();
-            actionJson.put("position", action.a.a);
-            actionJson.put("backward", action.a.b);
-            actionJson.put("name", Lang.T(action.b, langObj));
+            actionJson.put("position", action);
+            actionJson.put("backward", backward);
+            actionJson.put("name", Lang.T(actionItem.b, langObj));
+
+            String name;
+            //// CREATOR
+            name = viewAssetTypeCreator(assetType, backward, action, false);
+            if (name != null) actionJson.put("creator", Lang.T(name, langObj));
+
+            name = viewAssetTypeCreator(assetType, backward, action, true);
+            if (name != null) actionJson.put("creator_owner", Lang.T(name, langObj));
+
+            //////// TARGET
+            name = viewAssetTypeTarget(assetType, backward, action, false);
+            if (name != null) actionJson.put("target", Lang.T(name, langObj));
+
+            name = viewAssetTypeTarget(assetType, backward, action, true);
+            if (name != null) actionJson.put("target_owner", Lang.T(name, langObj));
+
             actionsArray.add(actionJson);
         }
-        type.put("actions", actionsArray);
+
+        assetTypeJson.put("actions", actionsArray);
 
         String description = Lang.T(AssetCls.viewAssetTypeDescriptionCls(assetType), langObj) + ".<br>";
         if (AssetCls.isReverseSend(assetType)) {
@@ -1882,9 +1912,9 @@ public abstract class AssetCls extends ItemCls {
         }
         description += "<b>" + Lang.T("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
 
-        type.put("description", description);
+        assetTypeJson.put("description", description);
 
-        return type;
+        return assetTypeJson;
     }
 
     public static JSONObject assetTypesJson;
@@ -1942,6 +1972,40 @@ public abstract class AssetCls extends ItemCls {
         return types;
     }
 
+    public String viewProperties(JSONObject langObj) {
+
+        StringJoiner joiner = new StringJoiner(", ");
+
+        if (isImMovable())
+            joiner.add(Lang.T("ImMovable", langObj));
+        if (isUnlimited(owner, false))
+            joiner.add(Lang.T("Unlimited", langObj));
+        if (isAccounting())
+            joiner.add(Lang.T("Accounting", langObj));
+        if (isUnique())
+            joiner.add(Lang.T("Unique", langObj));
+        if (isUnHoldable())
+            joiner.add(Lang.T("Not holdable", langObj));
+        if (isOutsideType())
+            joiner.add(Lang.T("Outside Claim", langObj));
+        if (isSelfManaged())
+            joiner.add(Lang.T("Self Managed", langObj));
+        if (isChangeDebtBySendActions())
+            joiner.add(Lang.T("isChangeDebtBySendActions", langObj));
+        if (isChangeDebtBySpendActions())
+            joiner.add(Lang.T("isChangeDebtBySpendActions", langObj));
+        if (isDirectBalances())
+            joiner.add(Lang.T("isDirectBalances", langObj));
+        if (isNotReDebted())
+            joiner.add(Lang.T("isNotReDebted", langObj));
+        if (isOutsideOtherClaim())
+            joiner.add(Lang.T("isOutsideOtherClaim", langObj));
+        if (isReverseSend())
+            joiner.add(Lang.T("isReverseSend", langObj));
+
+        return joiner.toString();
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public JSONObject toJson() {
@@ -1963,6 +2027,27 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("scale", this.getScale());
         assetJSON.put("quantity", this.getQuantity());
 
+        assetJSON.put("isImMovable", this.isImMovable());
+        assetJSON.put("isUnlimited", this.isUnlimited(owner, false));
+        assetJSON.put("isAccounting", this.isAccounting());
+        assetJSON.put("isUnique", this.isUnique());
+        assetJSON.put("isUnHoldable", this.isUnHoldable());
+        assetJSON.put("isOutsideType", this.isOutsideType());
+        assetJSON.put("isSelfManaged", this.isSelfManaged());
+        assetJSON.put("isChangeDebtBySendActions", this.isChangeDebtBySendActions());
+        assetJSON.put("isChangeDebtBySpendActions", this.isChangeDebtBySpendActions());
+        assetJSON.put("isDirectBalances", this.isDirectBalances());
+        assetJSON.put("isNotReDebted", this.isNotReDebted());
+        assetJSON.put("isOutsideOtherClaim", this.isOutsideOtherClaim());
+        assetJSON.put("isReverseSend", this.isReverseSend());
+
+        JSONObject revPos = new JSONObject();
+        for (int pos = Account.BALANCE_POS_OWN; pos <= Account.BALANCE_POS_6; pos++) {
+            revPos.put("" + pos, isReverseBalancePos(pos));
+        }
+        assetJSON.put("reversedBalPos", revPos);
+
+
         return assetJSON;
     }
 
@@ -1978,6 +2063,68 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("quantity", this.getQuantity());
 
         return assetJSON;
+    }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_Asset", Lang.T("Asset", langObj));
+        itemJson.put("Label_Scale", Lang.T("Accuracy", langObj));
+        itemJson.put("Label_AssetType", Lang.T("Type # вид", langObj));
+        itemJson.put("Label_AssetType_Desc", Lang.T("Type Description", langObj));
+        itemJson.put("Label_Quantity", Lang.T("Quantity", langObj));
+        itemJson.put("Label_Released", Lang.T("Released", langObj));
+
+        itemJson.put("Label_ImMovable", Lang.T("ImMovable", langObj));
+        itemJson.put("Label_Unlimited", Lang.T("Unlimited", langObj));
+        itemJson.put("Label_Accounting", Lang.T("Accounting", langObj));
+        itemJson.put("Label_Unique", Lang.T("Unique", langObj));
+        itemJson.put("Label_UnHoldable", Lang.T("Un holdable", langObj));
+        itemJson.put("Label_OutsideType", Lang.T("Outside Type", langObj));
+        itemJson.put("Label_SelfManaged", Lang.T("Self Managed", langObj));
+        itemJson.put("Label_ChangeDebtBySendActions", Lang.T("isChangeDebtBySendActions", langObj));
+        itemJson.put("Label_ChangeDebtBySpendActions", Lang.T("isChangeDebtBySpendActions", langObj));
+        itemJson.put("Label_DirectBalances", Lang.T("isDirectBalances", langObj));
+        itemJson.put("Label_isNotReDebted", Lang.T("isNotReDebted", langObj));
+        itemJson.put("Label_isOutsideOtherClaim", Lang.T("isOutsideOtherClaim", langObj));
+        itemJson.put("Label_isReverseSend", Lang.T("isReverseSend", langObj));
+        itemJson.put("Label_Properties", Lang.T("Properties", langObj));
+
+        itemJson.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
+        itemJson.put("released", getReleased());
+
+        if (!forPrint) {
+            itemJson.put("Label_Holders", Lang.T("Holders", langObj));
+            itemJson.put("Label_Available_pairs", Lang.T("Available pairs", langObj));
+            itemJson.put("Label_Pair", Lang.T("Pair", langObj));
+            itemJson.put("Label_Orders_Count", Lang.T("Orders Count", langObj));
+            itemJson.put("Label_Open_Orders_Volume", Lang.T("Open Orders Volume", langObj));
+            itemJson.put("Label_Trades_Count", Lang.T("Trades Count", langObj));
+            itemJson.put("Label_Trades_Volume", Lang.T("Trades Volume", langObj));
+
+            itemJson.put("orders", getOperations(DCSet.getInstance()));
+        }
+
+        itemJson.put("quantity", NumberAsString.formatAsString(getQuantity()));
+        itemJson.put("released", NumberAsString.formatAsString(getReleased(dcSet)));
+
+        itemJson.put("scale", getScale());
+
+        itemJson.put("assetType", Lang.T(viewAssetType(), langObj));
+        itemJson.put("assetTypeChar", charAssetType() + viewAssetTypeAbbrev());
+
+        itemJson.put("assetTypeFull", Lang.T(viewAssetTypeFull(), langObj));
+        StringJoiner joiner = new StringJoiner(", ");
+        for (Fun.Tuple2<?, String> item : viewAssetTypeActionsList(null, true)) {
+            joiner.add(Lang.T(item.b, langObj));
+        }
+        itemJson.put("assetTypeDesc", Lang.T(viewAssetTypeDescriptionCls(getAssetType()), langObj)
+                + ".<br><b>" + Lang.T("Acceptable actions", langObj) + "</b>: " + joiner.toString()
+        );
+
+        itemJson.put("properties", viewProperties(langObj));
+
+        return itemJson;
     }
 
     public int getDataLength(boolean includeReference) {

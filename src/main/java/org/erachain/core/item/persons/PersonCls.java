@@ -8,6 +8,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.*;
+import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ByteArrayUtils;
 import org.erachain.utils.DateTimeFormat;
@@ -454,4 +455,37 @@ public abstract class PersonCls extends ItemCls {
         return json;
 
     }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_TXCreator", Lang.T("Registrar", langObj));
+        itemJson.put("Label_Authorship", Lang.T("Authorship", langObj));
+        itemJson.put("Label_Born", Lang.T("Birthday", langObj));
+        itemJson.put("Label_Gender", Lang.T("Gender", langObj));
+
+        itemJson.put("birthday", getBirthdayStr());
+        if (!isAlive(0L)) {
+            itemJson.put("deathday", getDeathdayStr());
+            itemJson.put("Label_dead", Lang.T("Deathday", langObj));
+
+        }
+
+        String gender = Lang.T("Man", langObj);
+        if (getGender() == 0) {
+            gender = Lang.T("Man", langObj);
+        } else if (getGender() == 1) {
+            gender = Lang.T("Woman", langObj);
+        } else {
+            gender = Lang.T("-", langObj);
+        }
+        itemJson.put("gender", gender);
+
+
+        if (!forPrint) {
+        }
+
+        return itemJson;
+    }
+
 }

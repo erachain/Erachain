@@ -351,9 +351,9 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         ExPays exPays = exData.getExPays();
         if (exPays != null) {
-            exPays.getFilteredPayouts(statement);
-            resultStr += "<h3>" + Lang.T("Payouts") + "</h3>";
-            resultStr += Lang.T("Count # кол-во") + ": <b>" + exPays.getFilteredPayoutsCount()
+            exPays.getFilteredAccruals(statement);
+            resultStr += "<h3>" + Lang.T("Accruals") + "</h3>";
+            resultStr += Lang.T("Count # кол-во") + ": <b>" + exPays.getFilteredAccrualsCount()
                     + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(exPays.getTotalFeeBytes())
                     + "</b>, " + Lang.T("Total") + ": <b>" + exPays.getTotalPay();
         }

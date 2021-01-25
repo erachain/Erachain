@@ -2,20 +2,21 @@ function tx(data) {
 
     var output = lastBlock(data.lastBlock);
 
-    if (!data.hasOwnProperty('body')) {
+    if (!data.hasOwnProperty('tx')) {
         output += '<h2>Not found</h2>';
         return output;
     }
+    var tx = data.tx;
 
     output += '<table width="1280" border=0><tr><td align=left>';
-    if (data.body.hasOwnProperty('head')) {
-        output += data.body.head + '<br>';
-        output += '<b>' + data.body.timestampLabel + '</b>: ' + convertTimestamp(data.body.timestamp, true) + ' / ' + data.body.timestamp + '<br>';
+    if (tx.hasOwnProperty('head')) {
+        output += tx.head + '<br>';
+        output += '<b>' + tx.timestampLabel + '</b>: ' + convertTimestamp(tx.timestamp, true) + ' / ' + tx.timestamp + '<br>';
         output += '<hr>';
     }
 
-    if (data.body.hasOwnProperty('body')) {
-        var body = data.body.body;
+    if (tx.hasOwnProperty('body')) {
+        var body = tx.body;
         if (body.hasOwnProperty("type_name")) {
             // тут просто JSON от calculated
             if (body.hasOwnProperty("message")) {
@@ -25,21 +26,21 @@ function tx(data) {
                 output += 'recipient: ' + body.recipient + '<br>';
             }
         } else {
-            output += data.body.body + '<br>';
+            output += tx.body + '<br>';
         }
     }
 
-    if (data.body.hasOwnProperty('message')) {
-        output += fformat(data.body.message) + '<br>';
+    if (tx.hasOwnProperty('message')) {
+        output += fformat(tx.message) + '<br>';
     }
-    if (data.body.hasOwnProperty('foot')) {
-        output += fformat(data.body.foot) + '<br>';
+    if (tx.hasOwnProperty('foot')) {
+        output += fformat(tx.foot) + '<br>';
     }
-    if (data.body.hasOwnProperty('signs')) {
-        output += data.body.signs + '<br>';
+    if (tx.hasOwnProperty('signs')) {
+        output += tx.signs + '<br>';
     }
-    if (data.body.hasOwnProperty('links')) {
-        output += data.body.links + '<br>';
+    if (tx.hasOwnProperty('links')) {
+        output += tx.links + '<br>';
     }
 
     output += '<br><a href ="/api/recordrawbynumber/' + data.heightSeqNo + '"> RAW </a>';

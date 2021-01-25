@@ -34,37 +34,26 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class WebTransactionsHTML {
-    private static WebTransactionsHTML instance;
+
     JSONObject langObj;
     DCSet dcSet;
 
     WebTransactionsHTML() {
-        dcSet = DCSet.getInstance();
     }
 
-    public static WebTransactionsHTML getInstance() {
-        if (instance == null) {
-            instance = new WebTransactionsHTML();
-        }
-
-        return instance;
-    }
-
-    public HashMap get_HTML(Transaction transaction, JSONObject langObj) {
+    public void get_HTML(BlockExplorer explorer, Transaction transaction) {
         // TODO: надо переделать тут так чтобы на строне клиента HTML собиралось с его локальным временм из timestamp
 
+        this.dcSet = explorer.dcSet;
+        this.langObj = explorer.langObj;
         transaction.setDC(dcSet, true);
 
-        this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
         boolean wiped = transaction.isWiped();
         tt.add(transaction);
-        LinkedHashMap json = new LinkedHashMap();
-        BlockExplorer.getInstance().transactionsJSON(json, null, tt, 0, BlockExplorer.pageSize, "tx");
-        LinkedHashMap tras_json = (LinkedHashMap) ((LinkedHashMap) ((LinkedHashMap) json.get("Transactions"))
+        explorer.transactionsJSON(null, tt, 0, BlockExplorer.pageSize, "tx");
+        JSONObject tras_json = (JSONObject) ((LinkedHashMap) ((LinkedHashMap) explorer.output.get("Transactions"))
                 .get("transactions")).get(0);
-
-        HashMap output = new HashMap();
 
         String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ": </b>" + tras_json.get("type");
         out += " (" + Lang.T("Block", langObj) + ": </b><a href=?block=" + tras_json.get("block") + get_Lang() + ">" + tras_json.get("block") + "</a>";
@@ -107,96 +96,100 @@ public class WebTransactionsHTML {
 
         }
 
-        output.put("head", out);
-        output.put("timestampLabel", Lang.T("Date", langObj));
-        output.put("timestamp", transaction.getTimestamp());
+        JSONObject outTX = new JSONObject();
+
+        outTX.put("head", out);
+        outTX.put("timestampLabel", Lang.T("Date", langObj));
+        outTX.put("timestamp", transaction.getTimestamp());
 
         if (wiped)
-            return output;
+            return;
 
         int type = transaction.getType();
         switch (type) {
             case Transaction.CALCULATED_TRANSACTION:
-                output.put("body", r_Calculated_HTML(transaction));
+                outTX.put("body", r_Calculated_HTML(transaction));
                 break;
             case Transaction.SEND_ASSET_TRANSACTION:
-                output.put("body", r_Send_HTML(transaction));
-                output.put("message", ((RSend) transaction).viewData());
+                outTX.put("body", r_Send_HTML(transaction));
+                outTX.put("message", ((RSend) transaction).viewData());
                 break;
             case Transaction.ISSUE_ASSET_TRANSACTION:
-                output.put("body", issue_Asset_HTML(transaction));
-                output.put("message", getItemDescription((Itemable) transaction));
+                outTX.put("body", issue_Asset_HTML(transaction));
+                outTX.put("message", getItemDescription((Itemable) transaction));
                 break;
             case Transaction.ISSUE_PERSON_TRANSACTION:
-                output.put("body", issue_Person_HTML(transaction));
-                output.put("message", getItemDescription((Itemable) transaction));
+                outTX.put("body", issue_Person_HTML(transaction));
+                outTX.put("message", getItemDescription((Itemable) transaction));
                 break;
             case Transaction.ISSUE_POLL_TRANSACTION:
-                output.put("body", issue_Poll_HTML(transaction));
-                output.put("message", getItemDescription((Itemable) transaction));
+                outTX.put("body", issue_Poll_HTML(transaction));
+                outTX.put("message", getItemDescription((Itemable) transaction));
                 break;
             case Transaction.ISSUE_IMPRINT_TRANSACTION:
-                output.put("body", issue_Imprint_HTML(transaction));
-                output.put("message", ((Itemable) transaction));
+                outTX.put("body", issue_Imprint_HTML(transaction));
+                outTX.put("message", ((Itemable) transaction));
                 break;
             case Transaction.ISSUE_TEMPLATE_TRANSACTION:
-                output.put("body", issue_Template_HTML(transaction));
-                output.put("message", getItemDescription((Itemable) transaction));
+                outTX.put("body", issue_Template_HTML(transaction));
+                outTX.put("message", getItemDescription((Itemable) transaction));
                 break;
             case Transaction.ISSUE_STATUS_TRANSACTION:
-                output.put("body", issue_Status_HTML(transaction));
-                output.put("message", getItemDescription((Itemable) transaction));
+                outTX.put("body", issue_Status_HTML(transaction));
+                outTX.put("message", getItemDescription((Itemable) transaction));
                 break;
             case Transaction.ISSUE_UNION_TRANSACTION:
-                output.put("body", issue_Union_HTML(transaction));
-                output.put("message", getItemDescription((Itemable) transaction));
+                outTX.put("body", issue_Union_HTML(transaction));
+                outTX.put("message", getItemDescription((Itemable) transaction));
                 break;
             case Transaction.SIGN_TRANSACTION:
-                output.put("body", sign_HTML(transaction));
+                outTX.put("body", sign_HTML(transaction));
                 break;
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-                output.put("body", certify_Pub_Key_HTML(transaction));
+                outTX.put("body", certify_Pub_Key_HTML(transaction));
                 break;
             case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
-                output.put("body", set_Status_HTML(transaction));
+                outTX.put("body", set_Status_HTML(transaction));
                 break;
             case Transaction.HASHES_RECORD:
-                output.put("body", hash_Record_HTML(transaction));
+                outTX.put("body", hash_Record_HTML(transaction));
                 break;
             case Transaction.CREATE_ORDER_TRANSACTION:
-                output.put("body", create_Order_HTML(transaction));
+                outTX.put("body", create_Order_HTML(transaction));
                 break;
             case Transaction.CANCEL_ORDER_TRANSACTION:
-                output.put("body", cancel_Order_HTML(transaction));
+                outTX.put("body", cancel_Order_HTML(transaction));
                 break;
             case Transaction.VOTE_ON_ITEM_POLL_TRANSACTION:
-                output.put("body", vote_On_Item_Poll_HTML(transaction));
+                outTX.put("body", vote_On_Item_Poll_HTML(transaction));
                 break;
             case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
-                output.put("body", genesis_Certify_Person_HTML(transaction));
+                outTX.put("body", genesis_Certify_Person_HTML(transaction));
                 break;
             case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
-                output.put("body", genesis_Issue_Asset_HTML(transaction));
-                output.put("message", getItemDescription((Itemable) transaction));
+                outTX.put("body", genesis_Issue_Asset_HTML(transaction));
+                outTX.put("message", getItemDescription((Itemable) transaction));
                 break;
             case Transaction.GENESIS_ISSUE_TEMPLATE_TRANSACTION:
-                output.put("body", genesis_Issue_Template_HTML(transaction));
-                output.put("message", getItemDescription((Itemable) transaction));
+                outTX.put("body", genesis_Issue_Template_HTML(transaction));
+                outTX.put("message", getItemDescription((Itemable) transaction));
                 break;
             case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
-                output.put("body", genesisIssue_Person_HTML(transaction));
-                output.put("message", getItemDescription((Itemable) transaction));
+                outTX.put("body", genesisIssue_Person_HTML(transaction));
+                outTX.put("message", getItemDescription((Itemable) transaction));
                 break;
             case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
-                output.put("body", genesis_Send_Asset_HTML(transaction));
+                outTX.put("body", genesis_Send_Asset_HTML(transaction));
                 break;
             default:
-                output.put("body", transaction.toJson());
+                outTX.put("body", transaction.toJson());
         }
 
-        getApps(output, transaction, langObj);
+        getApps(outTX, transaction, langObj);
 
-        return output;
+        explorer.output.put("tx", outTX);
+
+
     }
 
     private String get_Lang() {

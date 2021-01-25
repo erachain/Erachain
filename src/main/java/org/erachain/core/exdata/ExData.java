@@ -74,7 +74,7 @@ public class ExData {
     public static final byte LINK_SIMPLE_TYPE = 0; // для выбора типа в ГУИ
     public static final byte LINK_APPENDIX_TYPE = 1; // дополнение / приложение к другому документу или Сущности
     public static final byte LINK_REPLY_COMMENT_TYPE = 2; // ответ всем на предыдущий документ - Ссылка для отслеживания
-    public static final byte LINK_COMMENT_TYPE_FOR_VIEW = 3; // замечание без получетелей - используется только для ГУИ
+    public static final byte LINK_COMMENT_TYPE_FOR_VIEW = 3; // замечание без получателей - используется только для ГУИ
     public static final byte LINK_SURELY_TYPE = 5; // гарантия / поручительство на долю
 
     public static final byte LINK_SOURCE_TYPE = 6; // как Источник
@@ -938,7 +938,7 @@ public class ExData {
                     flags = Arrays.copyOfRange(data, position, Integer.BYTES);
                     position += Integer.BYTES;
 
-                    titleSize = Arrays.copyOfRange(data, position, position + 1)[0];
+                    titleSize = Byte.toUnsignedInt(data[position]);
                     position++;
 
                 }
@@ -1354,7 +1354,7 @@ public class ExData {
         }
 
         if (exPays != null) {
-            output.put("Label_Payouts", Lang.T("Payouts", langObj));
+            output.put("Label_Accruals", Lang.T("Accruals", langObj));
             output.put("exPays", exPays.makeJSONforHTML(langObj));
 
         }

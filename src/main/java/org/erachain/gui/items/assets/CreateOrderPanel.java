@@ -99,33 +99,33 @@ public class CreateOrderPanel extends JPanel {
 
         // label buy
         // DETAIL GBC
-        GridBagConstraints label_sell_buy = new GridBagConstraints();
-        label_sell_buy.insets = new Insets(0, 5, 5, 0);
-        label_sell_buy.fill = GridBagConstraints.HORIZONTAL;
-        label_sell_buy.anchor = GridBagConstraints.NORTHWEST;
-        label_sell_buy.gridx = 0;
-        label_sell_buy.gridwidth = 3;
+        GridBagConstraints Label_sell_buy = new GridBagConstraints();
+        Label_sell_buy.insets = new Insets(0, 5, 5, 0);
+        Label_sell_buy.fill = GridBagConstraints.HORIZONTAL;
+        Label_sell_buy.anchor = GridBagConstraints.NORTHWEST;
+        Label_sell_buy.gridx = 0;
+        Label_sell_buy.gridwidth = 3;
 
-        label_sell_buy.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        label_sell_buy.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        label_sell_buy.weightx = 1.0;
+        Label_sell_buy.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        Label_sell_buy.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        Label_sell_buy.weightx = 1.0;
 
-        label_sell_buy.gridy = ++labelGBC.gridy;
+        Label_sell_buy.gridy = ++labelGBC.gridy;
         detailGBC.gridy = ++detailGBC.gridy;
         JLabel lblWish = new JLabel(
                 "<html>" + (buying ? Lang.T("To buy") + ": " + "<b>" + this.want.toString()
                         : Lang.T("To sell") + ": " + "<b>" + this.have.toString()) + "</b></html>");
 
-        this.add(lblWish, label_sell_buy);
+        this.add(lblWish, Label_sell_buy);
 
         JLabel lblResult = new JLabel(
                 "<html>" + (buying ? Lang.T("For") + ": <b>" + this.have.toString()
                         : Lang.T("For") + ": <b>" + this.want.toString()) + "</b></html>");
 
         // Label sell
-        label_sell_buy.gridy = ++labelGBC.gridy;
+        Label_sell_buy.gridy = ++labelGBC.gridy;
         detailGBC.gridy = ++detailGBC.gridy;
-        this.add(lblResult, label_sell_buy);
+        this.add(lblResult, Label_sell_buy);
 
         // LABEL FROM
         labelGBC.gridy = ++labelGBC.gridy;

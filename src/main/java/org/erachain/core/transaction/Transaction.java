@@ -182,6 +182,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_MESSAGE_LENGTH = 196;
     public static final int UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT = 197;
 
+    public static final int INVALID_FLAGS = 199;
+
 
     // ITEMS
     public static final int INVALID_ITEM_KEY = 201;
@@ -1795,6 +1797,12 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
+        }
+
+        if (typeBytes[2] == -1 || typeBytes[3] == -1) {
+            // не может быть чтобы все флаги были подняты - скорее всего это и JS ошибка
+            errorValue = (typeBytes[2] == -1 ? "[2]" : "[3]") + " = -1";
+            return INVALID_FLAGS;
         }
 
         // CHECK IF REFERENCE IS OK

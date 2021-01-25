@@ -49,6 +49,7 @@ public class ApiClient {
                     {
                             "GET statuses",
                             "See statuses API",
+                            "See statuses API",
                     },
                     {
                             "GET templates",
