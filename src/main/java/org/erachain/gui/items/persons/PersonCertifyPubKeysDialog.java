@@ -234,7 +234,6 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         CertifyPubKeysDetailsFrame ww = new CertifyPubKeysDetailsFrame((RCertifyPubKeys) transaction);
         confirmDialog.jScrollPane1.setViewportView(ww);
         confirmDialog.setLocationRelativeTo(this);
-        confirmDialog.pack();
         confirmDialog.setVisible(true);
 
         // JOptionPane.OK_OPTION
@@ -517,7 +516,6 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         gridBagConstraints.insets = insetsField;
         getContentPane().add(jButton_Confirm, gridBagConstraints);
 
-        pack();
     }// <
 
     private void jFormattedTextField_ToDoActionPerformed(java.awt.event.ActionEvent evt) {
