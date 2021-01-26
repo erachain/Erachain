@@ -1168,10 +1168,11 @@ public class ExPays {
 
             if (payMethod == PAYMENT_METHOD_TOTAL) {
                 // просчитаем значения для точного округления Общей Суммы
-                if (!calcAccrualsForMethodTotal())
+                if (!calcAccrualsForMethodTotal()) {
                     // ошибка подсчета Общего значения - был взят в учет минус общий
                     errorValue = "Accruals: PayTotal == 0 && payMethod == PAYMENT_METHOD_TOTAL";
-                return Transaction.INVALID_AMOUNT;
+                    return Transaction.INVALID_AMOUNT;
+                }
             }
 
             Account recipient = filteredAccruals.get(0).a;
