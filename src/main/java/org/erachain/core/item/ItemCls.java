@@ -685,7 +685,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
                     itemJSON.put("tx_creator_pubkey", creator.getBase58());
                 }
                 itemJSON.put("tx_timestamp", referenceTx.getTimestamp());
-                itemJSON.put("blk_timestamp", Controller.getInstance().blockChain.getHeightOnTimestampMS(referenceTx.getBlockHeight()));
+                itemJSON.put("blk_timestamp", Controller.getInstance().blockChain.getTimestamp(referenceTx.getBlockHeight()));
             }
         }
 
