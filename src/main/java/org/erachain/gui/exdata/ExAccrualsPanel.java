@@ -40,18 +40,19 @@ public class ExAccrualsPanel extends IconPanel {
     public static String TITLE = "Accruals";
 
     private ExDataPanel parent;
-    public ComboBoxAssetsModel accountsModel;
-    public ComboBoxAssetsModel accountsModel1;
+    public ComboBoxAssetsModel assetsModel;
+    public ComboBoxAssetsModel assetsModel1;
+    private Boolean lock = new Boolean(false);
 
     public ExAccrualsPanel(ExDataPanel parent) {
         super(NAME, TITLE);
         this.parent = parent;
         initComponents();
 
-        accountsModel = new ComboBoxAssetsModel();
-        accountsModel1 = new ComboBoxAssetsModel();
-        this.jComboBoxAccrualAsset.setModel(accountsModel);
-        this.jComboBoxFilterAsset.setModel(accountsModel1);
+        assetsModel = new ComboBoxAssetsModel();
+        assetsModel1 = new ComboBoxAssetsModel();
+        this.jComboBoxAccrualAsset.setModel(assetsModel);
+        this.jComboBoxFilterAsset.setModel(assetsModel1);
         jComboBoxFilterBalancePosition.setModel(new javax.swing.DefaultComboBoxModel(new Integer[]{
                 TransactionAmount.ACTION_SEND,
                 TransactionAmount.ACTION_DEBT,
@@ -106,72 +107,107 @@ public class ExAccrualsPanel extends IconPanel {
         jButtonCalcCompu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
-                if (exPaysRes.b != null) {
-                    jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
-                            Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                if (lock)
                     return;
-                }
+                synchronized (lock) {
+                    try {
+                        lock = new Boolean(true);
+                        jButtonCalcCompu.setEnabled(false);
+                        jButtonViewResult.setEnabled(false);
 
-                ExPays pays = exPaysRes.a;
-                pays.setDC(DCSet.getInstance());
-                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.precalcFilteredAccruals(
-                        Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                pays.calcTotalFeeBytes();
-                jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
-                        + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
-                        + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay());
+                        jScrollPaneAccruals.setVisible(false);
+
+                        Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
+                        if (exPaysRes.b != null) {
+                            jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
+                                    Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                            return;
+                        }
+
+                        ExPays pays = exPaysRes.a;
+                        pays.setDC(DCSet.getInstance());
+                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.precalcFilteredAccruals(
+                                Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        pays.calcTotalFeeBytes();
+                        jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
+                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
+                                + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay());
+                    } finally {
+                        jButtonCalcCompu.setEnabled(true);
+                        jButtonViewResult.setEnabled(true);
+
+                        //jScrollPaneAccruals.setVisible(true);
+                        lock = new Boolean(false);
+                    }
+                }
             }
         });
 
         jButtonViewResult.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
-                if (exPaysRes.b != null) {
-                    jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
-                            Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                if (lock)
                     return;
+                synchronized (lock) {
+                    try {
+                        lock = new Boolean(true);
+                        jButtonCalcCompu.setEnabled(false);
+                        jButtonViewResult.setEnabled(false);
+
+                        jScrollPaneAccruals.setVisible(false);
+
+                        Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
+                        if (exPaysRes.b != null) {
+                            jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
+                                    Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                            jButtonViewResult.setEnabled(true);
+                            return;
+                        }
+
+                        ExPays pays = exPaysRes.a;
+                        pays.setDC(DCSet.getInstance());
+                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.precalcFilteredAccruals(
+                                Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        pays.calcTotalFeeBytes();
+                        String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
+                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
+                                + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
+                        jLabel_FeesResult.setText(result);
+
+                        AccrualsModel model = new AccrualsModel(accrual);
+                        jTablePreviewAccruals.setModel(model);
+                        TableColumnModel columnModel = jTablePreviewAccruals.getColumnModel();
+
+                        TableColumn columnNo = columnModel.getColumn(0);
+                        columnNo.setMinWidth(50);
+                        columnNo.setMaxWidth(100);
+                        columnNo.setPreferredWidth(70);
+                        columnNo.setWidth(70);
+                        columnNo.sizeWidthToFit();
+
+                        TableColumn columnBal = columnModel.getColumn(1);
+                        columnBal.setMinWidth(100);
+                        columnBal.setMaxWidth(200);
+                        columnBal.setPreferredWidth(150);
+                        columnBal.setWidth(150);
+                        columnBal.sizeWidthToFit();
+
+                        TableColumn columnPay = columnModel.getColumn(3);
+                        columnPay.setMinWidth(100);
+                        columnPay.setMaxWidth(200);
+                        columnPay.setPreferredWidth(150);
+                        columnPay.setWidth(150);
+                        columnPay.sizeWidthToFit();
+
+                    } finally {
+                        jButtonCalcCompu.setEnabled(true);
+                        jButtonViewResult.setEnabled(true);
+
+                        jScrollPaneAccruals.setVisible(true);
+                        lock = new Boolean(false);
+
+                    }
                 }
-
-                ExPays pays = exPaysRes.a;
-                pays.setDC(DCSet.getInstance());
-                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.precalcFilteredAccruals(
-                        Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                pays.calcTotalFeeBytes();
-                String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
-                        + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
-                        + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
-                jLabel_FeesResult.setText(result);
-
-                AccrualsModel model = new AccrualsModel(accrual);
-                jTablePreviewAccruals.setModel(model);
-                TableColumnModel columnModel = jTablePreviewAccruals.getColumnModel();
-
-                TableColumn columnNo = columnModel.getColumn(0);
-                columnNo.setMinWidth(50);
-                columnNo.setMaxWidth(100);
-                columnNo.setPreferredWidth(70);
-                columnNo.setWidth(70);
-                columnNo.sizeWidthToFit();
-
-                TableColumn columnBal = columnModel.getColumn(1);
-                columnBal.setMinWidth(100);
-                columnBal.setMaxWidth(200);
-                columnBal.setPreferredWidth(150);
-                columnBal.setWidth(150);
-                columnBal.sizeWidthToFit();
-
-                TableColumn columnPay = columnModel.getColumn(3);
-                columnPay.setMinWidth(100);
-                columnPay.setMaxWidth(200);
-                columnPay.setPreferredWidth(150);
-                columnPay.setWidth(150);
-                columnPay.sizeWidthToFit();
-
-                jScrollPaneAccruals.setVisible(true);
-
             }
         });
 
@@ -209,16 +245,16 @@ public class ExAccrualsPanel extends IconPanel {
 
     private void updateLabelsByMethod() {
         switch (jComboBoxMethodPaymentType.getSelectedIndex()) {
-            case 0:
+            case ExPays.PAYMENT_METHOD_TOTAL:
                 jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_0_D"));
                 jLabelAmount.setText(Lang.T("Total Amount"));
-                jTextFieldPaymentMin.setEnabled(true);
-                jTextFieldPaymentMax.setEnabled(true);
+                jTextFieldPaymentMin.setEnabled(false);
+                jTextFieldPaymentMax.setEnabled(false);
 
                 jCheckBoxSelfPay.setVisible(true);
                 return;
-            case 1:
+            case ExPays.PAYMENT_METHOD_COEFF:
                 jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_1_D"));
                 jLabelAmount.setText(Lang.T("Coefficient"));
@@ -229,7 +265,7 @@ public class ExAccrualsPanel extends IconPanel {
                 jCheckBoxSelfPay.setVisible(false);
 
                 return;
-            case 2:
+            case ExPays.PAYMENT_METHOD_ABSOLUTE:
                 jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_2_D"));
                 jLabelAmount.setText(Lang.T("Amount"));
@@ -675,13 +711,14 @@ public class ExAccrualsPanel extends IconPanel {
             jTextFieldDateEndStr = null;
         }
 
+        boolean minMaxUse = jComboBoxMethodPaymentType.getSelectedIndex() == ExPays.PAYMENT_METHOD_COEFF;
         return ExPays.make(
                 ((AssetCls) jComboBoxAccrualAsset.getSelectedItem()).getKey(),
                 balancePosition.a.a, balancePosition.a.b,
                 jComboBoxMethodPaymentType.getSelectedIndex(),
                 jTextFieldAmount.getText(),
-                jTextFieldPaymentMin.getText(),
-                jTextFieldPaymentMax.getText(),
+                minMaxUse ? jTextFieldPaymentMin.getText() : null,
+                minMaxUse ? jTextFieldPaymentMax.getText() : null,
                 ((AssetCls) jComboBoxFilterAsset.getSelectedItem()).getKey(),
                 jComboBoxFilterBalancePosition.getSelectedIndex() + 1, jComboBoxFilterSideBalance.getSelectedIndex() + 1,
                 jTextFieldBQ.getText(), jTextFieldLQ.getText(),

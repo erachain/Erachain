@@ -1799,9 +1799,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             return VALIDATE_OK;
         }
 
-        if (typeBytes[2] == -1 || typeBytes[3] == -1) {
+        if (typeBytes[0] == -1 || typeBytes[1] == -1 || typeBytes[2] == -1 || typeBytes[3] == -1) {
             // не может быть чтобы все флаги были подняты - скорее всего это и JS ошибка
-            errorValue = (typeBytes[2] == -1 ? "[2]" : "[3]") + " = -1";
+            errorValue = (typeBytes[0] == -1 ? "[0]" : typeBytes[1] == -1 ? "[1]" : typeBytes[2] == -1 ? "[2]" : "[3]") + " = -1";
             return INVALID_FLAGS;
         }
 
