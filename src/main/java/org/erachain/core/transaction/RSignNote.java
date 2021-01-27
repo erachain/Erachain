@@ -772,6 +772,7 @@ public class RSignNote extends Transaction implements Itemable {
         result = extendedData.isValid(this);
         if (result != Transaction.VALIDATE_OK) {
             // errorValue updated in extendedData
+            errorValue = extendedData.errorValue;
             return result;
         }
 

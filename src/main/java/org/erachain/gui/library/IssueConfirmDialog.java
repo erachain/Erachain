@@ -85,8 +85,9 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
 
         jStatus_Label.setText("<HTML>" + status_Text + "</HTML>");
         //  setMaximumSize(new Dimension(350,200));
-        setSize(w, h);
-
+        if (w > 0 && h > 0) {
+            setSize(w, h);
+        }
 
         if (!receive) {
             jButton0.setVisible(false);

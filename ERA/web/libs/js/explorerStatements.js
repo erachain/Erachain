@@ -210,7 +210,7 @@ function statement(data) {
 
         if (data.hasOwnProperty('templateKey')) {
             output += '<h4><a href="?template=' + data.templateKey + get_lang() + '">['
-             + data.templateKey + '] ' + data.templateName + '</a><h4>';
+             + data.templateKey + '] ' + data.templateName + '</a></h4>';
 
             output += '<br>' + data.Label_template_hash + ': ';
             if (data.hasOwnProperty('templateUnique')) {

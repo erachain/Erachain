@@ -98,8 +98,8 @@ public class API {
         help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");
 
         help.put("*** RECORD ***", "");
-        help.put("GET Record Parse from RAW", "recordparse/{raw}");
-        help.put("POST Record Parse from RAW", "recordparse?raw=...");
+        help.put("GET Record Parse from RAW", "recordparse/{RAW}");
+        help.put("POST Record Parse from RAW", "recordparse RAW");
         help.put("GET Record", "record/{signature}");
         help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
         help.put("GET Record RAW", "recordraw/{signature}");

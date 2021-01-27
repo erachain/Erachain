@@ -29,7 +29,7 @@ function itemHead(item, forPrint) {
         output += '[ <input id="key1" name="' + type + '" size="8" type="text" value="' + item.key + '" class="" style="font-size: 1em;"'
                        + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ]';
 
-    output += ', &nbsp' + item.Label_DateIssue + ':<b> ' + convertTimestamp(item.blk_timestamp, true) + '</b></h4>';
+    output += ', &nbsp' + item.Label_DateIssue + ':<b> ' + convertTimestamp(item.block_timestamp, true) + '</b></h4>';
 
     output += '<h4>' + item.Label_Owner + ': ';
     if (item.owner_person) {
