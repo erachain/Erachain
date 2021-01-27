@@ -795,7 +795,7 @@ public class WebTransactionsHTML {
         }
 
         ///out += "</table>";
-        output.put("vouches", out);
+        output.put("signs", out);
 
     }
 
