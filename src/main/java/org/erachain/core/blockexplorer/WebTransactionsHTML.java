@@ -742,7 +742,7 @@ public class WebTransactionsHTML {
     }
 
 
-    public static void getVouches(HashMap output, Transaction transaction, JSONObject langObj) {
+    public static void getVouchesAndSigns(HashMap output, Transaction transaction, JSONObject langObj) {
 
         DCSet dcSet = DCSet.getInstance();
 
@@ -958,7 +958,7 @@ public class WebTransactionsHTML {
     }
 
     public static void getApps(HashMap output, Transaction transaction, JSONObject langObj) {
-        getVouches(output, transaction, langObj);
+        getVouchesAndSigns(output, transaction, langObj);
         getLinks(output, transaction, langObj);
     }
 
