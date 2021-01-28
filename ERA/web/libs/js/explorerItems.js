@@ -29,6 +29,12 @@ function itemHead(item, forPrint) {
         output += '[ <input id="key1" name="' + type + '" size="8" type="text" value="' + item.key + '" class="" style="font-size: 1em;"'
                        + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ]';
 
+    if (item.hasOwnProperty('exLink')) {
+        output += '<h3>'
+            + '<img src="img/parentTx.png" style="height:1.5em"> ' + data.exLink_Name + ' '
+            + data.Label_Parent + ' <a href=?tx=' + data.exLink.ref + get_lang() + '><b>' + data.exLink.ref + '</b></a></h3>';
+    }
+
     output += ', &nbsp' + item.Label_DateIssue + ':<b> ' + convertTimestamp(item.block_timestamp, true) + '</b></h4>';
 
     output += '<h4>' + item.Label_Owner + ': ';
@@ -87,6 +93,14 @@ function itemFoot(item, forPrint) {
     var output = '';
     if (item.description)
         output += '<h3>' + item.Label_Description + '</h3><br>' + fformat(item.description);
+
+    if (item.hasOwnProperty('signs')) {
+        output += '<hr>' + data.signs;
+    }
+
+    if (item.hasOwnProperty('links')) {
+        output += '<hr>' + data.links;
+    }
 
     return output;
 }

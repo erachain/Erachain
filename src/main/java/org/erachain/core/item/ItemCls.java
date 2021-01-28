@@ -821,6 +821,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             if (referenceTx.getCreator() != null) {
                 itemJson.put("tx_creator_person", referenceTx.viewCreator());
             }
+
+            referenceTx.makeJSONforHTML(itemJson, langObj);
+
         }
 
         return itemJson;
