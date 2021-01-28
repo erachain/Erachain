@@ -489,6 +489,10 @@ public class ExData {
         return recipients != null && recipients.length > 0;
     }
 
+    public boolean hasExPays() {
+        return exPays != null;
+    }
+
     public boolean hasAuthors() {
         return authors != null && authors.length > 0;
     }

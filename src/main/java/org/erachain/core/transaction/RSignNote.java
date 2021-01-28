@@ -173,6 +173,13 @@ public class RSignNote extends Transaction implements Itemable {
             listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, creatorPersonDuration.a});
         }
 
+        if (extendedData.hasExPays()) {
+            ExPays pays = extendedData.getExPays();
+            if (pays.hasAmount()) {
+                listTags.add(new Object[]{ItemCls.ASSET_TYPE, pays.getAssetKey()});
+            }
+        }
+
         if (typeBytes[1] > 1 && extendedData != null && extendedData.getTemplateKey() != 0L) {
             // если новый порядок - ключ в Данных
             listTags.add(new Object[]{ItemCls.TEMPLATE_TYPE, extendedData.getTemplateKey()});
