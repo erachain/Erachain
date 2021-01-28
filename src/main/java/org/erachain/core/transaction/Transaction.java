@@ -1527,13 +1527,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             output.put("title", title);
         }
 
-        if (exLink != null) {
-            output.put("Label_LinkType", Lang.T("Link Type", langObj));
-            output.put("exLink_Name", Lang.T(exLink.viewTypeName(false), langObj));
-            output.put("exLink", exLink.makeJSONforHTML(false, langObj));
-            output.put("Label_Parent", Lang.T("for # для", langObj));
-        }
-
+        WebTransactionsHTML.getAppLink(output, this, langObj);
         WebTransactionsHTML.getApps(output, this, langObj);
 
     }

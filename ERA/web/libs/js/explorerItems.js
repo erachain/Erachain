@@ -95,8 +95,8 @@ function itemFoot(item, forPrint) {
     if (item.description)
         output += '<h3>' + item.Label_Description + '</h3><br>' + fformat(item.description);
 
-    if (item.hasOwnProperty('signs')) {
-        output += '<hr>' + item.signs;
+    if (item.hasOwnProperty('vouches')) {
+        output += '<hr>' + item.vouches;
     }
 
     if (item.hasOwnProperty('links')) {
