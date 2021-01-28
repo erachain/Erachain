@@ -120,7 +120,7 @@ public class MenuDeals extends JMenu {
         addSeparator();
 
         //vouch
-        JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.T("Vouch"));
+        JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.T("Sign / Vouch"));
         dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.T("Vouching record"));
         dealsMenuVouchRecord.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

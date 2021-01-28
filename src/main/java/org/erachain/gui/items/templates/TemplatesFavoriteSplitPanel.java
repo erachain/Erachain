@@ -24,7 +24,7 @@ public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
         super(new FavoriteTemplatesTableModel(), NAME, TITLE);
         iconName = "favorite.png";
 
-        JMenuItem vouch_menu = new JMenuItem(Lang.T("Vouch"));
+        JMenuItem vouch_menu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();

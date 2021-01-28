@@ -177,7 +177,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem vouch_Item = new JMenuItem(Lang.T("Vouch"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.T("Sign / Vouch"));
 
         vouch_Item.addActionListener(new ActionListener() {
 

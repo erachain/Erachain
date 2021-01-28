@@ -211,7 +211,7 @@ public class AccountsRightPanel extends JPanel {
         });
         mainMenu.add(viewInfo);
 
-        JMenuItem vouch_menu = new JMenuItem(Lang.T("Vouch"));
+        JMenuItem vouch_menu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 

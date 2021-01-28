@@ -10,6 +10,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -183,6 +184,19 @@ public class StatementsMySplitPanel extends SplitPanel {
         // jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 
         JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem vouch_menu = new JMenuItem(Lang.T("Sign / Vouch"));
+        vouch_menu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                Transaction transaction = my_Statements_Model.getItem(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;
+                new toSignRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
+
+            }
+        });
+
+        menu.add(vouch_menu);
 
         JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
         linkMenu.addActionListener(e -> {
