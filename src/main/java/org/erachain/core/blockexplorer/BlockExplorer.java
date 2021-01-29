@@ -304,7 +304,7 @@ public class BlockExplorer {
 
         //Основное меню. заголовки и их перевод на выбранный язык
         output.put("id_home2", Lang.T("Blocks", langObj));
-        output.put("id_menu_top_100", Lang.T("Top 100 Richest", langObj));
+        output.put("id_menu_top_100", Lang.T("Top 100", langObj));
         output.put("id_menu_percons", Lang.T("Persons", langObj));
         output.put("id_menu_pals_asset", Lang.T("Polls", langObj));
         output.put("id_menu_assets", Lang.T("Assets", langObj));
