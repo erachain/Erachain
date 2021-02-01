@@ -528,6 +528,9 @@ public class Wallet extends Observable implements Observer {
 	 */
 	public void updateAccountsFromSecretKeys() {
 
+		if (database == null)
+			return;
+
 		int number = 0;
 		/// deadlock org.erachain.database.wallet.AccountMap
 		AccountMap mapAccs = database.getAccountMap();
