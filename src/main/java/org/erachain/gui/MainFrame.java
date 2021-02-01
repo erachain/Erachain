@@ -40,7 +40,7 @@ public class MainFrame extends JFrame implements Observer {
     private MainFrame() {
 
         // CREATE FRAME
-        super(Controller.getInstance().getApplicationName(true));
+        super(Controller.getInstance().getApplicationName(true) + " " + Settings.getInstance().getWalletKeysPath());
         this.setVisible(false);
 
         //th = this;

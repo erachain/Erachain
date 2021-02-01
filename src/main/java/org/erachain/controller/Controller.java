@@ -641,7 +641,7 @@ public class Controller extends Observable {
         // OPENING DATABASES
         try {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Try Open DataChain")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open DataChain"));
             LOGGER.info("Try Open DataChain");
             if (Settings.simpleTestNet) {
                 // -testnet
@@ -650,8 +650,8 @@ public class Controller extends Observable {
                 this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
             }
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("DataChain OK")));
-            LOGGER.info("DataChain OK");
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "DataChain OK"));
+            LOGGER.info("DataChain OK - " + Settings.getInstance().getDataChainPath());
         } catch (Throwable e) {
             // Error open DB
             error = 1;
@@ -746,7 +746,7 @@ public class Controller extends Observable {
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Start API Service")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start API Service"));
             LOGGER.info(Lang.T("Start API Service"));
             this.rpcService = new ApiService();
             this.rpcServiceRestart();
@@ -755,7 +755,7 @@ public class Controller extends Observable {
         // START WEB SERVICE
         if (Settings.getInstance().isWebEnabled()) {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Start WEB Service")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start WEB Service"));
             LOGGER.info(Lang.T("Start WEB Service"));
             this.webService = WebService.getInstance();
             this.webService.start();
@@ -763,7 +763,7 @@ public class Controller extends Observable {
 
         // CREATE WALLET
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Open Wallet")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open Wallet"));
         this.wallet = new Wallet(this.dcSetWithObserver, this.dynamicGUI);
 
         boolean walletKeysRecovered = false;
@@ -818,12 +818,13 @@ public class Controller extends Observable {
                 this.wallet.initiateItemsFavorites();
             }
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Wallet OK")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wallet OK" + " " + Settings.getInstance().getDataWalletPath()));
+            LOGGER.info("Wallet OK" + " " + Settings.getInstance().getDataWalletPath());
 
             // create telegtam
 
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Open Telegram")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Open Telegram"));
             this.telegramStore = TelegramStore.getInstanse(this.dcSetWithObserver, this.dynamicGUI);
 
 
