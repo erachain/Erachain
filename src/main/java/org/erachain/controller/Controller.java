@@ -44,6 +44,7 @@ import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.GuiTimer;
+import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -874,7 +875,57 @@ public class Controller extends Observable {
     }
 
     public int loadWalletFromDir() {
-        return this.wallet.loadFromDir(this.dcSetWithObserver, this.dynamicGUI);
+        JFileChooser fileopen = new JFileChooser();
+        fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        String pathOld = Settings.getInstance().getWalletKeysPath();
+        File ff = new File(pathOld);
+        if (!ff.exists())
+            pathOld = "." + File.separator;
+        fileopen.setCurrentDirectory(new File(pathOld));
+        int ret = fileopen.showDialog(null, Lang.T("Open Wallet Dir"));
+        if (ret != JFileChooser.APPROVE_OPTION) {
+            //is abort
+            return 3;
+
+        }
+
+        String selectedDir = fileopen.getSelectedFile().toString();
+
+        // set wallet dir
+        Settings.getInstance().setWalletKeysPath(selectedDir);
+
+        // open wallet
+        Controller.getInstance().wallet = new Wallet(dcSetWithObserver, dynamicGUI);
+        // not wallet return 0;
+        if (!Controller.getInstance().wallet.walletKeysExists()) {
+            Settings.getInstance().setWalletKeysPath(pathOld);
+            return 2;
+        }
+
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            // ASK FOR PASSWORD
+            String password = PasswordPane.showUnlockWalletDialog(null);
+            if (!Controller.getInstance().unlockWallet(password)) {
+                // WRONG PASSWORD
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                        Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                return 5;
+            }
+        }
+
+        // LOAD accounts
+        Controller.getInstance().wallet.updateAccountsFromSecretKeys();
+
+        if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+            Controller.getInstance().wallet.initiateItemsFavorites();
+            // save path from setting json
+            Settings.getInstance().updateSettingsValue();
+            // is ok
+            return 1;
+        } else {
+            Settings.getInstance().setWalletKeysPath(pathOld);
+            return 3;
+        }
     }
 
     public void replaseFavoriteItems(int type) {

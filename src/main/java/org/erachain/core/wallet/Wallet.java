@@ -22,7 +22,6 @@ import org.erachain.database.wallet.SecureWalletDatabase;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -34,10 +33,7 @@ import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.io.File;
 import java.math.BigDecimal;
-import java.util.Timer;
 import java.util.*;
 
 /**
@@ -1824,7 +1820,7 @@ public class Wallet extends Observable implements Observer {
 
 	public long getLicenseKey() {
 		if (this.database == null || this.database.getLicenseKey() == null) {
-			return 2l;
+			return 2L;
 		}
 
 		return this.database.getLicenseKey();
@@ -1839,56 +1835,4 @@ public class Wallet extends Observable implements Observer {
 	 * @param dynamicGUI
 	 * @return 1 - OK, > 1- error
 	 */
-	public int loadFromDir(boolean withObserver, boolean dynamicGUI) {
-		JFileChooser fileopen = new JFileChooser();
-		fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		String pathOld = Settings.getInstance().getWalletKeysPath();
-		File ff = new File(pathOld);
-		if (!ff.exists())
-			pathOld = "." + File.separator;
-		fileopen.setCurrentDirectory(new File(pathOld));
-		int ret = fileopen.showDialog(null, Lang.T("Open Wallet Dir"));
-		if (ret != JFileChooser.APPROVE_OPTION) {
-			//is abort
-			return 3;
-
-		}
-
-		String selectedDir = fileopen.getSelectedFile().toString();
-
-		// set wallet dir
-		Settings.getInstance().setWalletKeysPath(selectedDir);
-		// open wallet
-		Controller.getInstance().wallet = new Wallet(withObserver, dynamicGUI);
-		// not wallet return 0;
-		if (!Controller.getInstance().wallet.walletKeysExists()) {
-			Settings.getInstance().setWalletKeysPath(pathOld);
-			return 2;
-		}
-
-		if (!Controller.getInstance().isWalletUnlocked()) {
-			// ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(null);
-			if (!Controller.getInstance().unlockWallet(password)) {
-				// WRONG PASSWORD
-				JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
-						Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-				return 5;
-			}
-		}
-
-		// LOAD accounts
-		updateAccountsFromSecretKeys();
-
-		if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
-			Controller.getInstance().wallet.initiateItemsFavorites();
-			// save path from setting json
-			Settings.getInstance().updateSettingsValue();
-			// is ok
-			return 1;
-		} else {
-			Settings.getInstance().setWalletKeysPath(pathOld);
-			return 3;
-		}
-	}
 }
