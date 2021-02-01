@@ -320,6 +320,19 @@ public class Settings {
         return this.dataWalletPath + DEFAULT_DATA_WALLET_DIR;
     }
 
+    public static String normalizePath(String path) {
+        String appPath = new File(".").getAbsolutePath();
+        if (appPath.endsWith(".")) {
+            appPath = appPath.substring(0, appPath.length() - 1);
+        }
+
+        if (path.startsWith(appPath)) {
+            path = path.substring(appPath.length());
+        }
+        return path;
+
+    }
+
     public void setDataWalletPath(String path) {
         if (path == null) {
             path = "";
