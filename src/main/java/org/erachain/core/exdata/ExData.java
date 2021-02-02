@@ -489,6 +489,10 @@ public class ExData {
         return recipients != null && recipients.length > 0;
     }
 
+    public boolean hasExPays() {
+        return exPays != null;
+    }
+
     public boolean hasAuthors() {
         return authors != null && authors.length > 0;
     }
@@ -1400,8 +1404,8 @@ public class ExData {
             return;
 
         } else {
-
-            output.put("Label_template_hash", Lang.T("Template hash", langObj));
+            output.put("Label_Used_Template", Lang.T("Used template", langObj));
+            output.put("Label_template_hash", Lang.T("Template text hash", langObj));
             output.put("Label_mess_hash", Lang.T("Text hash", langObj));
             output.put("Label_hashes", Lang.T("Hashes", langObj));
             output.put("Label_files", Lang.T("Files", langObj));

@@ -16,6 +16,7 @@ import org.erachain.gui.library.SetIntervalPanel;
 import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.models.WalletTransactionsTableModel;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -257,6 +258,13 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         });
 
         menu.add(item_Save);
+
+        JMenuItem vouchMenu = new JMenuItem(Lang.T("Sign / Vouch"));
+        vouchMenu.addActionListener(e -> {
+            new toSignRecordDialog(selectedTransaction.getBlockHeight(), selectedTransaction.getSeqNo());
+
+        });
+        menu.add(vouchMenu);
 
         JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
         linkMenu.addActionListener(e -> {

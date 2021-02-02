@@ -275,7 +275,7 @@ public class NoWalletFrame extends JFrame {
     public void goAfterLicence(int createWallet) {
         // StartPool
 
-        if (BlockChain.DEMO_MODE) {
+        if (false && BlockChain.DEMO_MODE) {
             StartQuestion ss = new StartQuestion();
             ss.setVisible(true);
         }

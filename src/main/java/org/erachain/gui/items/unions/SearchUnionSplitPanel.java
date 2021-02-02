@@ -22,7 +22,7 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
         super(new TableModelUnionsItemsTableModel(), NAME, TITLE);
         th = this;
 
-        JMenuItem vouch_Item = new JMenuItem(Lang.T("Vouch"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.T("Sign / Vouch"));
 
         // ADD MENU ITEMS
         JMenuItem confirm_Menu = new JMenuItem(Lang.T("Confirm"));

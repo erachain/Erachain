@@ -405,7 +405,8 @@ public class SettingsBasicPanel extends JPanel {
                 fileopen.setCurrentDirectory(new File(textDataFolder.getText()));
                 int ret = fileopen.showDialog(null, Lang.T("Set datachain dir"));
                 if (ret == FileChooser.APPROVE_OPTION) {
-                    textDataFolder.setText(fileopen.getSelectedFile().toString());
+                    String path = Settings.normalizePath(fileopen.getSelectedFile().toString());
+                    textDataFolder.setText(path);
                 }
             }
         });
@@ -460,7 +461,8 @@ public class SettingsBasicPanel extends JPanel {
                 fileopen.setCurrentDirectory(new File(textWallet.getText()));
                 int ret = fileopen.showDialog(null, Lang.T("Set walletKeys dir"));
                 if (ret == JFileChooser.APPROVE_OPTION) {
-                    textWallet.setText(fileopen.getSelectedFile().toString());
+                    String path = Settings.normalizePath(fileopen.getSelectedFile().toString());
+                    textWallet.setText(path);
                 }
             }
         });

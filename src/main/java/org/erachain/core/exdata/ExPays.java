@@ -232,6 +232,10 @@ public class ExPays {
         return filteredAccruals;
     }
 
+    public Long getAssetKey() {
+        return assetKey;
+    }
+
     public int getFilteredAccrualsCount() {
         return filteredAccrualsCount;
     }

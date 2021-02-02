@@ -8,6 +8,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
+import org.erachain.core.blockexplorer.WebTransactionsHTML;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSetStatusToItem;
@@ -821,6 +822,12 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             if (referenceTx.getCreator() != null) {
                 itemJson.put("tx_creator_person", referenceTx.viewCreator());
             }
+
+
+            WebTransactionsHTML.getAppLink(itemJson, referenceTx, langObj);
+            WebTransactionsHTML.getVouches(itemJson, referenceTx, langObj);
+            WebTransactionsHTML.getLinks(itemJson, referenceTx, langObj);
+
         }
 
         return itemJson;

@@ -209,10 +209,10 @@ function statement(data) {
     } else {
 
         if (data.hasOwnProperty('templateKey')) {
-            output += '<h4><a href="?template=' + data.templateKey + get_lang() + '">['
-             + data.templateKey + '] ' + data.templateName + '</a></h4>';
+            output += data.Label_Used_Template + ': <a href="?template=' + data.templateKey + get_lang() + '">['
+             + data.templateKey + '] ' + data.templateName + '</a></br>';
 
-            output += '<br>' + data.Label_template_hash + ': ';
+            output += data.Label_template_hash + ': ';
             if (data.hasOwnProperty('templateUnique')) {
                 output += '<a href="?search=transactions&q=' + data.templateHash + get_lang() + '"><b>'
                  + data.templateHash + '</b></a><br>';
@@ -221,6 +221,7 @@ function statement(data) {
             }
 
             if (data.hasOwnProperty('body')) {
+                output += '<hr>';
                 output += fformat(data.body);
             }
             output += '<hr>';

@@ -87,7 +87,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem vouchItem = new JMenuItem(Lang.T("Vouch"));
+        JMenuItem vouchItem = new JMenuItem(Lang.T("Sign / Vouch"));
 
         vouchItem.addActionListener(e -> {
 

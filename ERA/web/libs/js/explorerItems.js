@@ -21,7 +21,14 @@ function itemHead(item, forPrint) {
     if (!forPrint)
         output += '</a>';
 
-    output += '</h3><h4>';
+    output += '</h3>';
+    if (item.hasOwnProperty('exLink')) {
+        output += '<h3>'
+            + '<img src="img/parentTx.png" style="height:1.5em"> ' + item.exLink_Name + ' '
+            + item.Label_Parent + ' <a href=?tx=' + item.exLink.ref + get_lang() + '><b>' + item.exLink.ref + '</b></a></h3>';
+    }
+
+    output += '<h4>';
 
     if (forPrint)
         output += item.Label_Number + ':<b> ' + item.key + '</b>';
@@ -87,6 +94,14 @@ function itemFoot(item, forPrint) {
     var output = '';
     if (item.description)
         output += '<h3>' + item.Label_Description + '</h3><br>' + fformat(item.description);
+
+    if (item.hasOwnProperty('vouches')) {
+        output += '<hr>' + item.vouches;
+    }
+
+    if (item.hasOwnProperty('links')) {
+        output += '<hr>' + item.links;
+    }
 
     return output;
 }

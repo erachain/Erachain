@@ -118,6 +118,23 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         // MENU
         JPopupMenu mainMenu = new JPopupMenu();
 
+        // save jsot transactions
+        JMenuItem item_Save = new JMenuItem(Lang.T("Save"));
+        item_Save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                Transaction trans = transactionsTableModel.getItem(row);
+                if (trans == null) return;
+                // save
+                Library.saveTransactionJSONtoFileSystem(getParent(), trans);
+            }
+        });
+
+        mainMenu.add(item_Save);
+
         JMenuItem vouch_menu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -132,25 +149,6 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         });
 
         mainMenu.add(vouch_menu);
-
-        // save jsot transactions
-        JMenuItem item_Save = new JMenuItem(Lang.T("Save"));
-        item_Save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsTableModel.getItem(row);
-                if (trans == null) return;
-                // save
-                Library.saveTransactionJSONtoFileSystem(getParent(), trans);
-            }
-
-
-        });
-
-        mainMenu.add(item_Save);
 
         JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
         linkMenu.addActionListener(e -> {

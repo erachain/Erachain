@@ -12,6 +12,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
+import org.erachain.core.blockexplorer.WebTransactionsHTML;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
@@ -1513,6 +1514,22 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public JSONObject jsonForExplorerPage(JSONObject langObj) {
         return toJson();
+    }
+
+    /**
+     * Version 2 maker for BlockExplorer
+     */
+    public void makeJSONforHTML(JSONObject output, JSONObject langObj) {
+
+        String title = getTitle();
+        if (title != null && !title.isEmpty()) {
+            output.put("Label_title", Lang.T("Title", langObj));
+            output.put("title", title);
+        }
+
+        WebTransactionsHTML.getAppLink(output, this, langObj);
+        WebTransactionsHTML.getApps(output, this, langObj);
+
     }
 
     public abstract JSONObject toJson();
