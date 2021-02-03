@@ -6,6 +6,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.persons.InsertPersonPanel;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -362,7 +363,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
 
                 Transaction transaction = walletTelegramsFilterTableModel.getItem(row);
                 if (transaction instanceof RSend) {
-                    RSend rSend = (RSend) walletTelegramsFilterTableModel.getItem(row);
+                    RSend rSend = (RSend) transaction;
                     byte[] dataMess;
 
                     if (rSend.isEncrypted()) {
@@ -426,6 +427,78 @@ public class RightTelegramPanel extends javax.swing.JPanel {
             }
         });
         menu.add(tryIssuePersonText);
+
+        JMenu menuSaveCopy = new JMenu(Lang.T("Save / Copy"));
+        menu.add(menuSaveCopy);
+
+        JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
+        copyJson.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            StringSelection stringSelection = new StringSelection(selectedTransaction.toJson().toJSONString());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("JSON of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewSignature())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyJson);
+
+        JMenuItem copyRAW = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base58"));
+        copyRAW.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            StringSelection stringSelection = new StringSelection(Base58.encode(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewSignature())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW);
+
+        JMenuItem copyRAW64 = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base64"));
+        copyRAW64.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewSignature())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW64);
+
+        JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
+        saveJson.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            Library.saveJSONtoFileSystem(this, selectedTransaction, "tele-" + selectedTransaction.viewSignature());
+
+        });
+        menuSaveCopy.add(saveJson);
+
+        JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
+        saveRAW.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            Library.saveAsBase58FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tele-" + selectedTransaction.viewSignature());
+
+        });
+        menuSaveCopy.add(saveRAW);
+
+        JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
+        saveRAW64.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            Library.saveAsBase64FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tele-" + selectedTransaction.viewSignature());
+
+        });
+        menuSaveCopy.add(saveRAW64);
+
 
         menu.addSeparator();
 
