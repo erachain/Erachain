@@ -32,6 +32,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Base64;
 import java.util.Timer;
 import java.util.TimerTask;
 //import java.util.TimerTask;
@@ -240,8 +241,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         JMenuItem copyRAW = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base58"));
         copyRAW.addActionListener(e -> {
-            String base58str = Base58.encode(itemTableSelected.toBytes(false, false));
-            StringSelection stringSelection = new StringSelection(base58str);
+            StringSelection stringSelection = new StringSelection(Base58.encode(itemTableSelected.toBytes(false, false)));
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Bytecode of the '%1' has been copy to buffer")
@@ -251,6 +251,19 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         });
         menuSaveCopy.add(copyRAW);
+
+        JMenuItem copyRAW64 = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base64"));
+        copyRAW64.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(itemTableSelected.toBytes(false, false)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW64);
 
         JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
         saveJson.addActionListener(e -> {
@@ -267,6 +280,15 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         });
         menuSaveCopy.add(saveRAW);
+
+        JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
+        saveRAW64.addActionListener(e -> {
+            Library.saveToFile(this, Base64.getEncoder().encodeToString(itemTableSelected.toBytes(false, false)),
+                    itemTableSelected.viewName(), "b64");
+
+        });
+        menuSaveCopy.add(saveRAW64);
+
 
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
         setSeeInBlockexplorer.addActionListener(new ActionListener() {

@@ -2,16 +2,9 @@ package org.erachain.gui.items.statuses;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
-import org.erachain.gui.records.toSignRecordDialog;
-import org.erachain.lang.Lang;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
 
@@ -24,6 +17,7 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
         super(new FavoriteStatusesTableModel(), NAME, TITLE);
         iconName = "favorite.png";
 
+        /*
         JMenuItem vouch_menu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -34,6 +28,8 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
             }
         });
         menuTable.add(vouch_menu);
+
+         */
 
     }
 
