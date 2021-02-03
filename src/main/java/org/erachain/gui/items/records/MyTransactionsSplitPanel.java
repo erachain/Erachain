@@ -251,10 +251,8 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
                 if (selectedTransaction == null) return;
                 // save
-                Library.saveTransactionJSONtoFileSystem(getParent(), selectedTransaction);
+                Library.saveJSONtoFileSystem(getParent(), selectedTransaction, "TX" + selectedTransaction.viewHeightSeq());
             }
-
-
         });
 
         menu.add(item_Save);

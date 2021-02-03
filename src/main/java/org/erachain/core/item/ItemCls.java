@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.Jsonable;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
@@ -36,7 +37,7 @@ import java.util.Map;
 //import java.math.BigDecimal;
 //import com.google.common.primitives.Longs;
 
-public abstract class ItemCls implements Iconable, ExplorerJsonLine {
+public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public final static long START_KEY_OLD = 1L << 14;
     public static final long MIN_START_KEY_OLD = 1000L;

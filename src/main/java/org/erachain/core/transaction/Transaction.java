@@ -6,6 +6,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.Jsonable;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
@@ -50,7 +51,7 @@ import java.util.*;
 //import org.erachain.lang.Lang;
 //import org.erachain.settings.Settings;
 
-public abstract class Transaction implements ExplorerJsonLine {
+public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
 
     /*

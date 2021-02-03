@@ -3,8 +3,10 @@ package org.erachain.gui.library;
 import com.github.rjeschke.txtmark.Processor;
 import net.sf.tinylaf.Theme;
 import org.erachain.controller.Controller;
+import org.erachain.core.Jsonable;
 import org.erachain.core.account.Account;
-import org.erachain.core.transaction.*;
+import org.erachain.core.transaction.RSend;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -416,21 +418,23 @@ public class Library {
                 .replaceAll("\n", "<br>");
 
     }
-    
+
     /**
      * Save JSON String to era File
-     * @param parent - getParent()
+     *
+     * @param parent     - getParent()
      * @param JSONString - JSON STRING
+     * @param pref
+     * @param ext
      */
-    public static void saveJSONStringToEraFile(Container parent, String JSONString){
-        // String raw = Base58.encode(transaction.toBytes(false, null));
+    public static void saveToFile(Container parent, String JSONString, String pref, String ext) {
         FileChooser chooser = new FileChooser();
         chooser.setDialogTitle(Lang.T("Save File"));
         // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
         chooser.setMultiSelectionEnabled(false);
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("*.era","*.*");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("*." + ext, "*.*");
         chooser.setFileFilter(filter);
 
         chooser.setAcceptAllFileFilterUsed(false);
@@ -439,7 +443,7 @@ public class Library {
 
             String pp = chooser.getSelectedFile().getPath();
 
-            File ff = new File(pp + ".era");
+            File ff = new File(pp + "." + ext);
             // if file
             if (ff.exists() && ff.isFile()) {
                 int aaa = JOptionPane.showConfirmDialog(chooser,
@@ -461,142 +465,22 @@ public class Library {
                 System.out.println(e);
             }
 
-            
         }
 
-       
     }
-    
-    public static void saveTransactionJSONtoFileSystem(Container parent,Transaction trans){
-        String jsonString ="";
-        switch (trans.getType()) {
 
-        case Transaction.SIGN_NOTE_TRANSACTION:
-
-            jsonString = ((RSignNote) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.VOTE_ON_ITEM_POLL_TRANSACTION:
-
-            jsonString = ((VoteOnItemPollTransaction) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.ARBITRARY_TRANSACTION:
-
-            jsonString = ((ArbitraryTransaction) trans).toJson().toJSONString();
-
-            break;
-
-        case Transaction.ISSUE_ASSET_TRANSACTION:
-
-            jsonString = ((IssueAssetTransaction) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.ISSUE_PERSON_TRANSACTION:
-
-            jsonString = ((IssuePersonRecord) trans).toJson().toJSONString();
-
-            break;
-
-        case Transaction.ISSUE_POLL_TRANSACTION:
-
-            jsonString = ((IssuePollRecord) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
-
-            jsonString = ((RSetStatusToItem) trans).toJson().toJSONString();
-            break;
-           
-        case Transaction.CREATE_ORDER_TRANSACTION:
-
-            jsonString = ((CreateOrderTransaction) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.CANCEL_ORDER_TRANSACTION:
-
-            jsonString = ((CancelOrderTransaction) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.MULTI_PAYMENT_TRANSACTION:
-
-            jsonString = ((MultiPaymentTransaction) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.SEND_ASSET_TRANSACTION:
-            jsonString = ((RSend) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.SIGN_TRANSACTION:
-            jsonString = ((RVouch) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-            jsonString = ((RCertifyPubKeys) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.HASHES_RECORD:
-            jsonString = ((RHashes) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.ISSUE_IMPRINT_TRANSACTION:
-
-            jsonString = ((IssueImprintRecord) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.ISSUE_TEMPLATE_TRANSACTION:
-
-            jsonString = ((IssueTemplateRecord) trans).toJson().toJSONString();
-            break;
-            
-        case Transaction.ISSUE_UNION_TRANSACTION:
-
-            jsonString = ((IssueUnionRecord) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.ISSUE_STATUS_TRANSACTION:
-
-            jsonString = ((IssueStatusRecord) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
-
-            jsonString = ((GenesisTransferAssetTransaction) trans).toJson().toJSONString();
-
-            break;
-
-        case Transaction.GENESIS_ISSUE_TEMPLATE_TRANSACTION:
-
-            jsonString = ((GenesisIssueTemplateRecord) trans).toJson().toJSONString();
-            break;
-
-        case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
-
-            jsonString = ((GenesisIssueAssetTransaction) trans).toJson().toJSONString();
-
-            break;
-
-        case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
-
-            jsonString = ((GenesisCertifyPersonRecord) trans).toJson().toJSONString();
-
-            break;
-         default:
-             jsonString = (trans).toJson().toJSONString();
-        
-        }
-        if (jsonString.equals("")) return;
-        Library.saveJSONStringToEraFile(parent, jsonString);
+    public static void saveJSONtoFileSystem(Container parent, Jsonable jsonable, String pref) {
+        Library.saveToFile(parent, jsonable.toJson().toJSONString(), pref, "json");
     }
 
     //добавляем в конец стандартные меню копировать, вырезать
     //
-    public static void addStandartMenuItems(JPopupMenu menu, JTextField component){
+    public static void addStandartMenuItems(JPopupMenu menu, JTextField component) {
         JMenuItem item;
         item = new JMenuItem(new DefaultEditorKit.CopyAction());
         item.setText(Lang.T("Copy"));
         item.setEnabled(true);
- //       item.setEnabled(component.getSelectionStart() != component
+        //       item.setEnabled(component.getSelectionStart() != component
  //               .getSelectionEnd());
         menu.add(item);
         item = new JMenuItem(new DefaultEditorKit.CutAction());

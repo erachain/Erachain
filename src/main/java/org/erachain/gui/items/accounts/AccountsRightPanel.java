@@ -242,7 +242,7 @@ public class AccountsRightPanel extends JPanel {
 
                 AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
                 // save
-                Library.saveTransactionJSONtoFileSystem(getParent(), transaction.transaction);
+                Library.saveJSONtoFileSystem(getParent(), transaction.transaction, "TX" + transaction.transaction.viewHeightSeq());
             }
         });
 

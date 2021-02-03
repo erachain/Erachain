@@ -118,8 +118,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         // MENU
         JPopupMenu mainMenu = new JPopupMenu();
 
-        // save jsot transactions
-        JMenuItem item_Save = new JMenuItem(Lang.T("Save"));
+        // save JSON transactions
+        JMenuItem item_Save = new JMenuItem(Lang.T("Save as JSON"));
         item_Save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -129,7 +129,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                 Transaction trans = transactionsTableModel.getItem(row);
                 if (trans == null) return;
                 // save
-                Library.saveTransactionJSONtoFileSystem(getParent(), trans);
+                Library.saveJSONtoFileSystem(getParent(), trans, "json");
             }
         });
 
