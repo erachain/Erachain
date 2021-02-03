@@ -5,6 +5,7 @@ import net.sf.tinylaf.Theme;
 import org.erachain.controller.Controller;
 import org.erachain.core.Jsonable;
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -24,6 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Base64;
 
 //import net.sf.tinylaf.Theme;
 
@@ -425,19 +427,22 @@ public class Library {
      * @param parent     - getParent()
      * @param JSONString - JSON STRING
      * @param pref
+     * @param extDesc
      * @param ext
      */
-    public static void saveToFile(Container parent, String JSONString, String pref, String ext) {
+    public static void saveToFile(Container parent, String JSONString, String pref, String extDesc, String ext) {
         FileChooser chooser = new FileChooser();
         chooser.setDialogTitle(Lang.T("Save File"));
         // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
         chooser.setMultiSelectionEnabled(false);
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("*." + ext, "*.*");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(extDesc, ext);
+        chooser.setAcceptAllFileFilterUsed(false);// only filter
+        chooser.addChoosableFileFilter(filter);
         chooser.setFileFilter(filter);
-
-        chooser.setAcceptAllFileFilterUsed(false);
+        File file = new File(pref + "." + ext);
+        chooser.setSelectedFile(file);
 
         if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 
@@ -470,7 +475,15 @@ public class Library {
     }
 
     public static void saveJSONtoFileSystem(Container parent, Jsonable jsonable, String pref) {
-        Library.saveToFile(parent, jsonable.toJson().toJSONString(), pref, "json");
+        Library.saveToFile(parent, jsonable.toJson().toJSONString(), pref, "JSON", "json");
+    }
+
+    public static void saveAsBase58FileSystem(Container parent, byte[] data, String pref) {
+        Library.saveToFile(parent, Base58.encode(data), pref, "Base58", "b58");
+    }
+
+    public static void saveAsBase64FileSystem(Container parent, byte[] data, String pref) {
+        Library.saveToFile(parent, Base64.getEncoder().encodeToString(data), pref, "Base64", "b64");
     }
 
     //добавляем в конец стандартные меню копировать, вырезать
@@ -481,7 +494,7 @@ public class Library {
         item.setText(Lang.T("Copy"));
         item.setEnabled(true);
         //       item.setEnabled(component.getSelectionStart() != component
- //               .getSelectionEnd());
+        //               .getSelectionEnd());
         menu.add(item);
         item = new JMenuItem(new DefaultEditorKit.CutAction());
         item.setText(Lang.T("Cut"));

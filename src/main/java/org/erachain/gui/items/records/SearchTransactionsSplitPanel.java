@@ -237,8 +237,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
             Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (transaction == null) return;
-            Library.saveToFile(this, transaction.toJson().toJSONString(),
-                    transaction.viewHeightSeq(), "json");
+            Library.saveJSONtoFileSystem(this, transaction, "tx" + transaction.viewHeightSeq());
 
         });
         menuSaveCopy.add(saveJson);
@@ -248,8 +247,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
             Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (transaction == null) return;
-            Library.saveToFile(this, Base58.encode(transaction.toBytes(Transaction.FOR_NETWORK, true)),
-                    transaction.viewHeightSeq(), "b58");
+            Library.saveAsBase58FileSystem(this, transaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + transaction.viewHeightSeq());
 
         });
         menuSaveCopy.add(saveRAW);
@@ -259,8 +258,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
             Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (transaction == null) return;
-            Library.saveToFile(this, Base64.getEncoder().encodeToString(transaction.toBytes(Transaction.FOR_NETWORK, true)),
-                    transaction.viewHeightSeq(), "b64");
+            Library.saveAsBase64FileSystem(this, transaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + transaction.viewHeightSeq());
 
         });
         menuSaveCopy.add(saveRAW64);

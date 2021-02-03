@@ -267,24 +267,23 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
         saveJson.addActionListener(e -> {
-            Library.saveToFile(this, itemTableSelected.toJson().toJSONString(),
-                    itemTableSelected.viewName(), "json");
+            Library.saveJSONtoFileSystem(this, itemTableSelected, itemTableSelected.viewName());
 
         });
         menuSaveCopy.add(saveJson);
 
         JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
         saveRAW.addActionListener(e -> {
-            Library.saveToFile(this, Base58.encode(itemTableSelected.toBytes(false, false)),
-                    itemTableSelected.viewName(), "b58");
+            Library.saveAsBase58FileSystem(this, itemTableSelected.toBytes(false, false),
+                    itemTableSelected.viewName());
 
         });
         menuSaveCopy.add(saveRAW);
 
         JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
         saveRAW64.addActionListener(e -> {
-            Library.saveToFile(this, Base64.getEncoder().encodeToString(itemTableSelected.toBytes(false, false)),
-                    itemTableSelected.viewName(), "b64");
+            Library.saveAsBase64FileSystem(this, itemTableSelected.toBytes(false, false),
+                    itemTableSelected.viewName());
 
         });
         menuSaveCopy.add(saveRAW64);

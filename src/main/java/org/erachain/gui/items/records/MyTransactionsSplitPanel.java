@@ -334,24 +334,23 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
         saveJson.addActionListener(e -> {
-            Library.saveToFile(this, selectedTransaction.toJson().toJSONString(),
-                    selectedTransaction.viewHeightSeq(), "json");
+            Library.saveJSONtoFileSystem(this, selectedTransaction, "tx" + selectedTransaction.viewHeightSeq());
 
         });
         menuSaveCopy.add(saveJson);
 
         JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
         saveRAW.addActionListener(e -> {
-            Library.saveToFile(this, Base58.encode(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)),
-                    selectedTransaction.viewHeightSeq(), "b58");
+            Library.saveAsBase58FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + selectedTransaction.viewHeightSeq());
 
         });
         menuSaveCopy.add(saveRAW);
 
         JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
         saveRAW64.addActionListener(e -> {
-            Library.saveToFile(this, Base64.getEncoder().encodeToString(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)),
-                    selectedTransaction.viewHeightSeq(), "b64");
+            Library.saveAsBase64FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + selectedTransaction.viewHeightSeq());
 
         });
         menuSaveCopy.add(saveRAW64);
