@@ -204,10 +204,16 @@ public class MyTransactionsSplitPanel extends SplitPanel {
             public void ancestorRemoved(AncestorEvent event) {
                 // TODO Auto-generated method stub
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                if (row < 0) {
+                    selectedTransaction = null;
+                    return;
+                }
                 row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                if (row < 0) return;
+                if (row < 0) {
+                    selectedTransaction = null;
+                    return;
+                }
                 selectedTransaction = recordsModel.getItem(row).b;
-                //selectedTransactionKey = records_model.getPairItem(row).getA();
 
             }
 

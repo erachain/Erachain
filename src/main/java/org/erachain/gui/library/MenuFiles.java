@@ -1,20 +1,13 @@
 package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
-import org.erachain.core.account.Account;
-import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.*;
 import org.erachain.gui.create.LicenseDataJFrame;
 import org.erachain.gui.create.LicenseJFrame;
-import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.settings.SettingsFrame;
-import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.URLViewer;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,15 +15,12 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -139,121 +129,6 @@ public class MenuFiles extends JMenu {
             }
         });
         add(settingsItem);
-
-        // read transaction
-
-        JMenuItem readTransItem = new JMenuItem(Lang.T("Read Transaction"));
-        readTransItem.getAccessibleContext().setAccessibleDescription(Lang.T("Read Transaction"));
-        readTransItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
-        readTransItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-//        		String raw = Base58.encode(transaction.toBytes(false, null));
-                FileChooser chooser = new FileChooser();
-                chooser.setDialogTitle(Lang.T("Open File"));
-                //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
-                chooser.setMultiSelectionEnabled(false);
-                chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("*.era","*.*");
-                chooser.setFileFilter(filter);
-
-                //chooser.setAcceptAllFileFilterUsed(false);
-                String res = "";
-                if (chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
-
-                    String pp = chooser.getSelectedFile().getPath();
-
-                    File ff = new File(pp);
-
-                    // new ArrayList<String>();
-                    try {
-                        BufferedReader in = new BufferedReader(new FileReader(ff));
-                        String str;
-                        while ((str = in.readLine()) != null) {
-                            res += (str);
-                        }
-                        in.close();
-                    } catch (IOException e1) {
-                        logger.error(e1.getMessage(), e1);
-                        return;
-                    }
-  				
-  			/*	 try(FileOutputStream fos=new FileOutputStream(pp))
-  		        {
-  		            // перевод строки в байты
-  				//	String ssst = model.getValueAt(row, 2).toString();
-  		            byte[] buffer =transaction.toBytes(false, null);
-  		            // if ZIP
-  		           
-  		            fos.wri.write(buffer, 0, buffer.length);
-  		          		        
-  		        }
-  		        catch(IOException ex){
-  
-  		            System.out.println(ex.getMessage());
-  		        } 
-  	          */
-                }
-
-                try {
-                    JSONObject js = new JSONObject();
-                    js = (JSONObject) JSONValue.parse(res);
-                    String creator = "";
-                    if (!js.containsKey("type")) return;
-                    int type = ((Long) js.get("type")).intValue();
-                    if (type != 31) return;
-                    if (js.containsKey("creator")) creator = (String) js.get("creator");
-                    Controller ct = Controller.getInstance();
-                    if (!js.containsKey("asset")) return;
-                    long assetKey = ((Long) js.get("asset"));
-                    if (!js.containsKey("recipient")) return;
-                    Account recipient = Account.tryMakeAccount((String) js.get("recipient")).a;
-                    if (!js.containsKey("head")) return;
-                    String head = (String) js.get("head");
-                    if (!js.containsKey("amount")) return;
-                    String amount = (String) js.get("amount");
-                    Boolean backward = (Boolean) js.get("backward");
-                    AccountAssetSendPanel panel = new AccountAssetSendPanel(ct.getAsset(assetKey),
-                            ct.getWalletAccountByAddress(creator), recipient, null, null, backward);
-                    MainPanel.getInstance().insertNewTab(Lang.T("Read Transaction"),
-                            panel);
-
-                    AssetCls asset = ct.getAsset(assetKey);
-                    panel.recipientAddress.setSelectedAccount(recipient);
-                    panel.recipientAddress.setEditable(false);
-                    panel.jTextFieldTXTitle.setText(head);
-                    panel.jTextFieldTXTitle.setEditable(false);
-                    panel.jTextField_Amount.setText(amount);
-                    panel.jTextField_Amount.setEditable(false);
-                    panel.jComboBox_Asset.setSelectedItem(asset);
-                    panel.jComboBox_Asset.setEnabled(false);
-                } catch (Exception e1) {
-                    logger.error(e1.getMessage(), e1);
-                }
-               
-            }
-        });
-        add(readTransItem);
-
-        // write teransaction
-
-        JMenuItem writeTransItem = new JMenuItem(Lang.T("Write Transaction"));
-        writeTransItem.getAccessibleContext().setAccessibleDescription(Lang.T("Read Transaction"));
-        writeTransItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
-        writeTransItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //  new SettingsFrame();
-                // no receive
-                //AccountSendDialog dd = new AccountSendDialog(null, null, null, null, false);
-                MainPanel.getInstance().insertNewTab(Lang.T("Write Transaction"),
-                        new AccountAssetSendPanel(null,
-                                null, null, null, null, false));
-
-
-            }
-        });
-        if (BlockChain.TEST_MODE) add(writeTransItem);
 
         //WEB SERVER
         webServerItem = new JMenuItem(Lang.T("Decentralized Web server"));
