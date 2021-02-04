@@ -199,6 +199,42 @@ public class AccountsRightPanel extends JPanel {
 
             }
         });
+
+        JMenuItem itemCheckTX = new JMenuItem(Lang.T("Validate"));
+        itemCheckTX.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // code Rebroadcast
+
+                Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+
+                if (selectedTransaction == null) return;
+                // DLSet db = DLSet.getInstance();
+
+                if (!selectedTransaction.isSignatureValid(DCSet.getInstance())) {
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.T("Signature Invalid") + "!",
+                            Lang.T("Wrong"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (selectedTransaction.getConfirmations(DCSet.getInstance()) <= 0) {
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.T("Unconfirmed") + "!",
+                            Lang.T("Wrong"), JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+
+                selectedTransaction.setDC(DCSet.getInstance(), true);
+                Controller.getInstance().wallet.processTransaction(selectedTransaction);
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.T("Good") + "!",
+                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+            }
+        });
+        mainMenu.add(itemCheckTX);
+
         viewInfo = new JMenuItem(Lang.T("See Details"));
         viewInfo.addActionListener(new ActionListener() {
 
