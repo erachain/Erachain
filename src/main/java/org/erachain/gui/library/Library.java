@@ -479,11 +479,11 @@ public class Library {
     }
 
     public static void saveAsBase58FileSystem(Container parent, byte[] data, String pref) {
-        Library.saveToFile(parent, Base58.encode(data), pref, "Base58", "b58");
+        Library.saveToFile(parent, Base58.encode(data), pref, "RAW Base58", "raw58");
     }
 
     public static void saveAsBase64FileSystem(Container parent, byte[] data, String pref) {
-        Library.saveToFile(parent, Base64.getEncoder().encodeToString(data), pref, "Base64", "b64");
+        Library.saveToFile(parent, Base64.getEncoder().encodeToString(data), pref, "RAW Base64", "raw64");
     }
 
     //добавляем в конец стандартные меню копировать, вырезать

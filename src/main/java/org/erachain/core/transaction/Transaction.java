@@ -1533,6 +1533,26 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     }
 
+    public String makeHTMLView() {
+        return "";
+    }
+
+    public String makeHTMLHeadView() {
+
+        String text = "<h2>" + Lang.T(Lang.T(viewTypeName()) + "</h2>"
+                + Lang.T("Creator") + ":&nbsp;<b>" + getCreator().getPersonAsString() + "</b><br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>"));
+        return text;
+
+    }
+
+    public String makeHTMLFootView() {
+
+        String text = "";
+        return text;
+
+    }
+
     public abstract JSONObject toJson();
 
     @SuppressWarnings("unchecked")

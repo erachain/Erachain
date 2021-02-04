@@ -3,10 +3,12 @@ package org.erachain.gui;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.blockexplorer.WebTransactionsHTML;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.*;
 import org.erachain.gui.status.StatusPanel;
@@ -90,7 +92,7 @@ public class MainFrame extends JFrame implements Observer {
 
         JMenuItem readTransItemJSON = new JMenuItem(Lang.T("Read Transaction from JSON"));
         readTransItemJSON.getAccessibleContext().setAccessibleDescription(Lang.T("Read Transaction as JSON"));
-        readTransItemJSON.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
+        //readTransItemJSON.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
         readTransItemJSON.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -183,7 +185,7 @@ public class MainFrame extends JFrame implements Observer {
         if (BlockChain.DEMO_MODE)
             jMenuTX.add(readTransItemJSON);
 
-        JMenuItem readTransItemRAW = new JMenuItem(Lang.T("Read Transaction from RAW"));
+        JMenuItem readTransItemRAW = new JMenuItem(Lang.T("Read Transaction as RAW"));
         readTransItemRAW.getAccessibleContext().setAccessibleDescription(Lang.T("Read Transaction as RAW"));
         readTransItemRAW.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
         readTransItemRAW.addActionListener(new ActionListener() {
@@ -196,19 +198,23 @@ public class MainFrame extends JFrame implements Observer {
                 chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
                 chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("Erachain TX", "b58", "n64");
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Erachain TX in RAW", "raw58", "raw64");
                 chooser.setFileFilter(filter);
 
                 //chooser.setAcceptAllFileFilterUsed(false);
                 String res = "";
-                String fileExt;
+                String fileExt = "";
+
                 if (chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
 
-                    String pp = chooser.getSelectedFile().getPath();
+                    String fileName = chooser.getSelectedFile().getPath();
 
-                    File ff = new File(pp);
-                    String[] tmp = pp.split(".");
-                    fileExt = "b58";
+                    int i = fileName.lastIndexOf('.');
+                    if (i > 0) {
+                        fileExt = fileName.substring(i + 1);
+                    }
+
+                    File ff = new File(fileName);
 
                     // new ArrayList<String>();
                     try {
@@ -223,16 +229,24 @@ public class MainFrame extends JFrame implements Observer {
                         return;
                     }
 
-                    byte[] data = fileExt.equals("b58") ? Base58.decode(res)
+                    byte[] data = fileExt.equals("raw58") ? Base58.decode(res)
                             : Base64.getDecoder().decode(res);
                     Transaction transaction;
 
                     try {
                         transaction = TransactionFactory.getInstance().parse(data, Transaction.FOR_NETWORK);
                         if (transaction != null) {
+                            WebTransactionsHTML webHTML = new WebTransactionsHTML(DCSet.getInstance(), Lang.getInstance().getLangForNode());
+                            JSONObject outJson = webHTML.get_HTML_Body(transaction);
+                            String htmlDescr = (String) outJson.get("head");
+                            htmlDescr += (String) outJson.get("body");
+                            htmlDescr = transaction.toJson().toJSONString();
+                            htmlDescr = htmlDescr.replace(",", ",<br>");
+                            //IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+                            //        (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), "");
                             IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                                    transaction.viewFullTypeName(), (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), "",
-                                    Lang.T("CHECK"));
+                                    htmlDescr, (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), "",
+                                    Lang.T("CHECK") + " " + transaction.viewFullTypeName());
                             confirmDialog.setVisible(true);
 
                             if (confirmDialog.isConfirm > 0) {

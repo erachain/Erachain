@@ -218,7 +218,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
         saveJson.addActionListener(e -> {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            Transaction transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (transaction == null) return;
             Library.saveJSONtoFileSystem(this, transaction, "tx" + transaction.viewHeightSeq());
 
@@ -228,7 +228,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
         saveRAW.addActionListener(e -> {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            Transaction transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (transaction == null) return;
             Library.saveAsBase58FileSystem(this, transaction.toBytes(Transaction.FOR_NETWORK, true),
                     "tx" + transaction.viewHeightSeq());
@@ -239,7 +239,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
         saveRAW64.addActionListener(e -> {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            Transaction transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (transaction == null) return;
             Library.saveAsBase64FileSystem(this, transaction.toBytes(Transaction.FOR_NETWORK, true),
                     "tx" + transaction.viewHeightSeq());

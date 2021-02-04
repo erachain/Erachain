@@ -141,6 +141,10 @@ public class Lang {
         return langFileList;
     }
 
+    public JSONObject getLangForNode() {
+        return langObj;
+    }
+
     public void setLangForNode() {
         langObj = langList.get(Settings.getInstance().getLang()).getLangJson();
     }

@@ -30,51 +30,25 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 public class WebTransactionsHTML {
 
     JSONObject langObj;
     DCSet dcSet;
+    public JSONObject outTX;
 
     WebTransactionsHTML() {
     }
 
-    public void get_HTML(BlockExplorer explorer, Transaction transaction) {
-        // TODO: надо переделать тут так чтобы на строне клиента HTML собиралось с его локальным временм из timestamp
+    public WebTransactionsHTML(DCSet dcSet, JSONObject langObj) {
+        this.dcSet = dcSet;
+        this.langObj = langObj;
+    }
 
-        this.dcSet = explorer.dcSet;
-        this.langObj = explorer.langObj;
-        transaction.setDC(dcSet, true);
+    public JSONObject get_HTML_Body(Transaction transaction) {
 
-        List<Transaction> tt = new ArrayList<Transaction>();
-        boolean wiped = transaction.isWiped();
-        tt.add(transaction);
-        explorer.transactionsJSON(null, tt, 0, BlockExplorer.pageSize, "tx");
-        JSONObject tras_json = (JSONObject) ((LinkedHashMap) ((LinkedHashMap) explorer.output.get("Transactions"))
-                .get("transactions")).get(0);
-
-        String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ": </b>" + tras_json.get("type");
-        out += " (" + Lang.T("Block", langObj) + ": </b><a href=?block=" + tras_json.get("block") + get_Lang() + ">" + tras_json.get("block") + "</a>";
-        out += ", " + Lang.T("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("block") + "-" + tras_json.get("seqNo") + get_Lang() + ">" + tras_json.get("block") + "-" + tras_json.get("seqNo") + "</a> ) </font><br>";
-
-        // она и так в заголовке будет
-        //out += "<br><b>" + Lang.TFromLangObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
-        out += "<br><b>" + Lang.T("Confirmations", langObj) + ": </b>" + transaction.getConfirmations(dcSet);
-
-        if (!(transaction instanceof RCalculated)) {
-            out += "<br><b>" + Lang.T("Size", langObj) + ": </b>" + tras_json.get("size");
-            out += "<br><b>" + Lang.T("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
-            out += "<br><b>" + Lang.T("Signature", langObj) + ": </b>" + tras_json.get("signature");
-            out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + tras_json.get("fee");
-            if (wiped) {
-                out += "<BR><b>" + Lang.T("WIPED", langObj) + ": </b>" + "true";
-            }
-            out += "<br> ";
-            out += "<b>" + Lang.T("Creator", langObj)
-                    + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang() + ">" + tras_json.get("creator") + "</a>";
-        }
+        String out = "";
 
         ExLink exLink = transaction.getExLink();
         if (exLink != null) {
@@ -102,8 +76,8 @@ public class WebTransactionsHTML {
         outTX.put("timestampLabel", Lang.T("Date", langObj));
         outTX.put("timestamp", transaction.getTimestamp());
 
-        if (wiped)
-            return;
+        if (transaction.isWiped())
+            return outTX;
 
         int type = transaction.getType();
         switch (type) {
@@ -187,8 +161,56 @@ public class WebTransactionsHTML {
 
         getApps(outTX, transaction, langObj);
 
-        explorer.output.put("tx", outTX);
+        return outTX;
 
+    }
+
+    public void get_HTML(BlockExplorer explorer, Transaction transaction) {
+        // TODO: надо переделать тут так чтобы на строне клиента HTML собиралось с его локальным временм из timestamp
+
+        if (explorer != null) {
+            this.dcSet = explorer.dcSet;
+            this.langObj = explorer.langObj;
+        }
+
+        transaction.setDC(dcSet, true);
+
+        List<Transaction> tt = new ArrayList<Transaction>();
+        tt.add(transaction);
+        //explorer.transactionsJSON(null, tt, 0, BlockExplorer.pageSize, "tx");
+        //JSONObject tras_json = (JSONObject) ((LinkedHashMap) ((LinkedHashMap) explorer.output.get("Transactions"))
+        //        .get("transactions")).get(0);
+
+        JSONObject tras_json = transaction.toJson();
+
+        String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ": </b>" + tras_json.get("type");
+        out += " (" + Lang.T("Block", langObj) + ": </b><a href=?block=" + tras_json.get("block") + get_Lang() + ">" + tras_json.get("block") + "</a>";
+        out += ", " + Lang.T("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("block") + "-" + tras_json.get("seqNo") + get_Lang() + ">" + tras_json.get("block") + "-" + tras_json.get("seqNo") + "</a> ) </font><br>";
+
+        // она и так в заголовке будет
+        //out += "<br><b>" + Lang.TFromLangObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
+        out += "<br><b>" + Lang.T("Confirmations", langObj) + ": </b>" + transaction.getConfirmations(dcSet);
+
+        if (!(transaction instanceof RCalculated)) {
+            out += "<br><b>" + Lang.T("Size", langObj) + ": </b>" + tras_json.get("size");
+            out += "<br><b>" + Lang.T("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
+            out += "<br><b>" + Lang.T("Signature", langObj) + ": </b>" + tras_json.get("signature");
+            out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + tras_json.get("fee");
+            if (transaction.isWiped()) {
+                out += "<BR><b>" + Lang.T("WIPED", langObj) + ": </b>" + "true";
+            }
+            out += "<br> ";
+            out += "<b>" + Lang.T("Creator", langObj)
+                    + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang() + ">" + tras_json.get("creator") + "</a>";
+        }
+
+        JSONObject outTX = get_HTML_Body(transaction);
+
+        if (explorer == null) {
+            this.outTX = outTX;
+        } else {
+            explorer.output.put("tx", outTX);
+        }
 
     }
 

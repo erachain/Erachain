@@ -19,6 +19,7 @@ import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.Iconable;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
@@ -832,6 +833,30 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         }
 
         return itemJson;
+    }
+
+    public String makeHTMLView() {
+        return "";
+    }
+
+    public String makeHTMLHeadView() {
+
+        String text = "[" + getKey() + "]" + Lang.T("Name") + ":&nbsp;" + viewName() + "<br>";
+        return text;
+
+    }
+
+    public String makeHTMLFootView() {
+
+        String text = Lang.T("Description") + ":<br>";
+        if (getKey() > 0 && getKey() < START_KEY()) {
+            text += Library.to_HTML(Lang.T(viewDescription())) + "<br>";
+        } else {
+            text += Library.to_HTML(viewDescription()) + "<br>";
+        }
+
+        return text;
+
     }
 
     public HashMap getNovaItems() {
