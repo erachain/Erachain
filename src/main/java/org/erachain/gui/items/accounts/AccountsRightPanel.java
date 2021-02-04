@@ -1,6 +1,7 @@
 package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
@@ -28,11 +29,13 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 
@@ -234,19 +237,91 @@ public class AccountsRightPanel extends JPanel {
         });
         mainMenu.add(issueNote);
 
-        // save jsot transactions
-        JMenuItem item_Save = new JMenuItem(Lang.T("Save"));
-        item_Save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        JMenu menuSaveCopy = new JMenu(Lang.T("Save / Copy"));
+        mainMenu.add(menuSaveCopy);
 
-                AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
-                // save
-                Library.saveJSONtoFileSystem(getParent(), transaction.transaction, "TX" + transaction.transaction.viewHeightSeq());
-            }
+        JMenuItem copyNumber = new JMenuItem(Lang.T("Copy Number"));
+        copyNumber.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            StringSelection stringSelection = new StringSelection(selectedTransaction.viewHeightSeq());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Number of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
         });
+        menuSaveCopy.add(copyNumber);
 
-        mainMenu.add(item_Save);
+        JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
+        copyJson.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            StringSelection stringSelection = new StringSelection(selectedTransaction.toJson().toJSONString());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("JSON of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyJson);
+
+        JMenuItem copyRAW = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base58"));
+        copyRAW.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            StringSelection stringSelection = new StringSelection(Base58.encode(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW);
+
+        JMenuItem copyRAW64 = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base64"));
+        copyRAW64.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW64);
+
+        JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
+        saveJson.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            Library.saveJSONtoFileSystem(this, selectedTransaction, "tx" + selectedTransaction.viewHeightSeq());
+
+        });
+        menuSaveCopy.add(saveJson);
+
+        JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
+        saveRAW.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            Library.saveAsBase58FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + selectedTransaction.viewHeightSeq());
+
+        });
+        menuSaveCopy.add(saveRAW);
+
+        JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
+        saveRAW64.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            Library.saveAsBase64FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + selectedTransaction.viewHeightSeq());
+
+        });
+        menuSaveCopy.add(saveRAW64);
+
 
         mainMenu.addSeparator();
 

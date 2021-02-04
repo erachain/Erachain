@@ -253,19 +253,6 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         menu.add(item_Delete);
 
-        item_Save = new JMenuItem(Lang.T("Save"));
-        item_Save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                if (selectedTransaction == null) return;
-                // save
-                Library.saveJSONtoFileSystem(getParent(), selectedTransaction, "TX" + selectedTransaction.viewHeightSeq());
-            }
-        });
-
-        menu.add(item_Save);
-
         JMenuItem vouchMenu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouchMenu.addActionListener(e -> {
             new toSignRecordDialog(selectedTransaction.getBlockHeight(), selectedTransaction.getSeqNo());
@@ -300,7 +287,6 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
         copyJson.addActionListener(e -> {
-            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
             StringSelection stringSelection = new StringSelection(selectedTransaction.toJson().toJSONString());
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
