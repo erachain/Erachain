@@ -109,21 +109,22 @@ function poll(data, forPrint) {
         '</b></td><td><b>%%</b></td></tr></thead>';
 
     var number = 1;
-    for (var i in item.votes) {
-        var item = item.votes[i];
+    var votes = data.votes;
+    for (var i in votes) {
+        var item = votes[i];
         var voteNo = i * 1 + 1;
         output += '<tr><td><b>' + number++ + ' - ' + item.name + ':</b></td>';
         output += '<td>' + item.persons + '</td>';
-        output += '<td>' + (100.0 * item.persons / item.personsTotal).toPrecision(6)  + '</td>';
+        output += '<td>' + (data.personsTotal > 0? (100.0 * item.persons / data.personsTotal).toPrecision(6) : '--')  + '</td>';
         output += '<td><a href=?q=' + data.charKey + '%20%23%23' + voteNo + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.votes + '</b></a></td>';
-        output += '<td>' + (100.0 * item.votes / item.votesTotal).toPrecision(6) + '</td>';
+        output += '<td>' + (data.votesTotal? (100.0 * item.votes / data.votesTotal).toPrecision(6) : '--') + '</td>';
 
         output += '</td></tr>';
     }
 
     output += '<tr><td><b>' + data.Label_Total + '</b></td>';
-    output += '<td>' + item.personsTotal + '</td>';
-    output += '<td><td>' + item.votesTotal + '</td><td>';
+    output += '<td>' + data.personsTotal + '</td>';
+    output += '<td><td>' + data.votesTotal + '</td><td>';
 
     output += '</td></tr>';
 
