@@ -495,14 +495,16 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         if (true) {
+            // это правильно
+            return getBiDirectionAddressIterator(addressShort, null, descending);
+        } else if (false) {
             // тут уже все адреса есть вкупе
             return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), addressKey, descending, true);
-
         } else {
             Iterator senderKeys = map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), addressKey, descending, true);
             Iterator recipientKeys = map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), addressKey, descending, true);
 
-            // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
+            // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использовать ак как все перемешается
             Iterator<Long> mergedIterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
             // а тут уже оьбратный порядок дать
