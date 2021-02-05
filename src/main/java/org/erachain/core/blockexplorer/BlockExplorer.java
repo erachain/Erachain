@@ -2638,6 +2638,17 @@ public class BlockExplorer {
         output.put("search_placeholder", Lang.T("Insert searching address", langObj));
         output.put("search_message", address);
 
+        Tuple2<Account, String> accountResult = Account.tryMakeAccount(address);
+        Account account = accountResult.a;
+
+        LinkedHashMap output = new LinkedHashMap();
+        if (account == null) {
+            output.put("error", Lang.T("Address Wrong", langObj));
+            return output;
+        }
+
+        address = account.getAddress();
+
         Object forge = info == null ? false : info.getQueryParameters().getFirst("forge");
         boolean useForge = forge != null && (forge.toString().toLowerCase().equals("yes")
                 || forge.toString().toLowerCase().equals("1"));
@@ -2647,7 +2658,7 @@ public class BlockExplorer {
         if (offset == null) {
             intOffest = 0;
         } else {
-            intOffest = (int)(long) offset;
+            intOffest = (int) (long) offset;
         }
 
         String fromSeqNoStr = info.getQueryParameters().getFirst("seqNo");
@@ -2656,7 +2667,7 @@ public class BlockExplorer {
             // это значит нужно скакнуть в самый низ
         }
 
-        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(Account.makeShortBytes(address),
+        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(account.getShortAddressBytes(),
                 fromID, intOffest, pageSize, !useForge, true);
 
         if (transactions.isEmpty()) {
@@ -2673,10 +2684,8 @@ public class BlockExplorer {
             }
         }
 
-        LinkedHashMap output = new LinkedHashMap();
         output.put("address", address);
 
-        Account account = new Account(address);
         Tuple2<Integer, PersonCls> person = account.getPerson();
 
         // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
@@ -2707,7 +2716,7 @@ public class BlockExplorer {
         } catch (Exception e) {
         }
 
-        output.put("Balance", balanceJSON(new Account(address), side));
+        output.put("Balance", balanceJSON(account, side));
 
         return output;
     }

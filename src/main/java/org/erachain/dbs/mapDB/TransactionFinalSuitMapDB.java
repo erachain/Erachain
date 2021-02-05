@@ -469,6 +469,8 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         if (true) {
+            return getBiDirectionAddressIterator(addressShort, null, descending);
+        } else if (false) {
             Iterable keys = Fun.filter(descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey, new Tuple3<byte[], Integer, Boolean>(addressKey, 0, null));
             return IteratorCloseableImpl.make(keys.iterator());
         } else if (false) {
@@ -492,7 +494,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             }
         } else {
 
-            // ТУТ СОРТИООВКА не в ту тсорону получается
+            // ТУТ СОРТИООВКА не в ту сторону получается
 
             Iterable senderKeys = Fun.filter(this.creatorKey, addressKey);
             Iterator<Long> senderKeysIterator = senderKeys.iterator();
