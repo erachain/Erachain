@@ -1014,6 +1014,16 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return null;
     }
 
+    public static boolean checkIsFinal(DCSet dcSet, Transaction transaction) {
+        Long dbRefFinal = dcSet.getTransactionFinalMapSigns().get(transaction.getSignature());
+        if (dbRefFinal == null)
+            return false;
+        Tuple2<Integer, Integer> ref = parseDBRef(dbRefFinal);
+        transaction.setDC(dcSet, FOR_DB_RECORD, ref.a, ref.b, true);
+
+        return true;
+    }
+
     /**
      * Постраничный поиск по строке поиска
      *

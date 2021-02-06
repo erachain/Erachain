@@ -234,14 +234,13 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                     return;
                 }
 
-                if (selectedTransaction.getConfirmations(DCSet.getInstance()) <= 0) {
+                if (!Transaction.checkIsFinal(DCSet.getInstance(), selectedTransaction)) {
                     JOptionPane.showMessageDialog(new JFrame(),
                             Lang.T("Unconfirmed") + "!",
                             Lang.T("Wrong"), JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
 
-                selectedTransaction.setDC(DCSet.getInstance(), true);
                 Controller.getInstance().wallet.processTransaction(selectedTransaction);
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.T("Good") + "!",
