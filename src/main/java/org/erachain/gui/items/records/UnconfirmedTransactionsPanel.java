@@ -210,10 +210,10 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
         });
 
         menu.add(item_Delete);
-        
 
-        // save jsot transactions
-        JMenuItem item_Save = new JMenuItem(Lang.T("Save"));
+
+        // save JSON transactions
+        JMenuItem item_Save = new JMenuItem(Lang.T("Save as JSON"));
         item_Save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -223,7 +223,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
                 Transaction trans = transactionsModel.getItem(row);
                 if (trans == null) return;
                 // save
-                Library.saveTransactionJSONtoFileSystem(getParent(), trans);
+                Library.saveJSONtoFileSystem(getParent(), trans, "json");
             }
 
 

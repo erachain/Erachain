@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.Jsonable;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
@@ -18,6 +19,7 @@ import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.Iconable;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
@@ -36,7 +38,7 @@ import java.util.Map;
 //import java.math.BigDecimal;
 //import com.google.common.primitives.Longs;
 
-public abstract class ItemCls implements Iconable, ExplorerJsonLine {
+public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public final static long START_KEY_OLD = 1L << 14;
     public static final long MIN_START_KEY_OLD = 1000L;
@@ -831,6 +833,30 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         }
 
         return itemJson;
+    }
+
+    public String makeHTMLView() {
+        return "";
+    }
+
+    public String makeHTMLHeadView() {
+
+        String text = "[" + getKey() + "]" + Lang.T("Name") + ":&nbsp;" + viewName() + "<br>";
+        return text;
+
+    }
+
+    public String makeHTMLFootView() {
+
+        String text = Lang.T("Description") + ":<br>";
+        if (getKey() > 0 && getKey() < START_KEY()) {
+            text += Library.to_HTML(Lang.T(viewDescription())) + "<br>";
+        } else {
+            text += Library.to_HTML(viewDescription()) + "<br>";
+        }
+
+        return text;
+
     }
 
     public HashMap getNovaItems() {

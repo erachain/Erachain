@@ -29,7 +29,7 @@ public class SearchStatementsTableModel extends SearchTableModelCls<Transaction>
         super(DCSet.getInstance().getTransactionFinalMap(),
                 new String[]{"№", "Timestamp", "Type", "Creator", "Statement", "Favorite"},
                 new Boolean[]{false, true, true, true, true, false},
-                false);
+                true);
 
         logger = LoggerFactory.getLogger(this.getClass());
 

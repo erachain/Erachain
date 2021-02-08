@@ -171,5 +171,13 @@ public class AssetUnique extends AssetCls {
     }
 
     //OTHER
+    public String makeHTMLView() {
+
+        String text = super.makeHTMLHeadView();
+        text += super.makeHTMLFootView();
+
+        return text;
+
+    }
 
 }

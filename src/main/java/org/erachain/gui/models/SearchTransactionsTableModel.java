@@ -36,7 +36,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
         super(DCSet.getInstance().getTransactionFinalMap(),
                 new String[]{"№", "Timestamp", "Type", "Creator", "Title", "Key", "Amount", "Favorite"},
                 new Boolean[]{false, true, true, true, true, true, true, true},
-                false);
+                true);
 
     }
 
@@ -153,7 +153,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
                 case COLUMN_CREATOR:
 
-                    return transaction.getCreator().getPersonAsString();
+                    return transaction.viewCreator();
 
                 case COLUMN_KEY:
 

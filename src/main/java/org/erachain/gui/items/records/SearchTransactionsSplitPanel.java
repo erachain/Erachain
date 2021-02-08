@@ -1,6 +1,7 @@
 package org.erachain.gui.items.records;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -27,10 +28,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -118,23 +121,6 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         // MENU
         JPopupMenu mainMenu = new JPopupMenu();
 
-        // save jsot transactions
-        JMenuItem item_Save = new JMenuItem(Lang.T("Save"));
-        item_Save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsTableModel.getItem(row);
-                if (trans == null) return;
-                // save
-                Library.saveTransactionJSONtoFileSystem(getParent(), trans);
-            }
-        });
-
-        mainMenu.add(item_Save);
-
         JMenuItem vouch_menu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -161,6 +147,106 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         });
         mainMenu.add(linkMenu);
+
+        JMenu menuSaveCopy = new JMenu(Lang.T("Save / Copy"));
+        mainMenu.add(menuSaveCopy);
+
+        JMenuItem copyNumber = new JMenuItem(Lang.T("Copy Number"));
+        copyNumber.addActionListener(e -> {
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
+            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            if (transaction == null) return;
+            StringSelection stringSelection = new StringSelection(transaction.viewHeightSeq());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Number of the '%1' has been copy to buffer")
+                            .replace("%1", transaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyNumber);
+
+        JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
+        copyJson.addActionListener(e -> {
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
+            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            if (transaction == null) return;
+            StringSelection stringSelection = new StringSelection(transaction.toJson().toJSONString());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("JSON of the '%1' has been copy to buffer")
+                            .replace("%1", transaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyJson);
+
+        JMenuItem copyRAW = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base58"));
+        copyRAW.addActionListener(e -> {
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
+            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            if (transaction == null) return;
+            StringSelection stringSelection = new StringSelection(Base58.encode(transaction.toBytes(Transaction.FOR_NETWORK, true)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", transaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW);
+
+        JMenuItem copyRAW64 = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base64"));
+        copyRAW64.addActionListener(e -> {
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
+            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            if (transaction == null) return;
+            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(transaction.toBytes(Transaction.FOR_NETWORK, true)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", transaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW64);
+
+        JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
+        saveJson.addActionListener(e -> {
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
+            Transaction transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            if (transaction == null) return;
+            Library.saveJSONtoFileSystem(this, transaction, "tx" + transaction.viewHeightSeq());
+
+        });
+        menuSaveCopy.add(saveJson);
+
+        JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
+        saveRAW.addActionListener(e -> {
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
+            Transaction transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            if (transaction == null) return;
+            Library.saveAsBase58FileSystem(this, transaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + transaction.viewHeightSeq());
+
+        });
+        menuSaveCopy.add(saveRAW);
+
+        JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
+        saveRAW64.addActionListener(e -> {
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
+            Transaction transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            if (transaction == null) return;
+            Library.saveAsBase64FileSystem(this, transaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + transaction.viewHeightSeq());
+
+        });
+        menuSaveCopy.add(saveRAW64);
+
 
         mainMenu.addSeparator();
 

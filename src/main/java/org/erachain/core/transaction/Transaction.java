@@ -6,6 +6,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.Jsonable;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
@@ -50,7 +51,7 @@ import java.util.*;
 //import org.erachain.lang.Lang;
 //import org.erachain.settings.Settings;
 
-public abstract class Transaction implements ExplorerJsonLine {
+public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
 
     /*
@@ -1013,6 +1014,16 @@ public abstract class Transaction implements ExplorerJsonLine {
         return null;
     }
 
+    public static boolean checkIsFinal(DCSet dcSet, Transaction transaction) {
+        Long dbRefFinal = dcSet.getTransactionFinalMapSigns().get(transaction.getSignature());
+        if (dbRefFinal == null)
+            return false;
+        Tuple2<Integer, Integer> ref = parseDBRef(dbRefFinal);
+        transaction.setDC(dcSet, FOR_DB_RECORD, ref.a, ref.b, true);
+
+        return true;
+    }
+
     /**
      * Постраничный поиск по строке поиска
      *
@@ -1529,6 +1540,26 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         WebTransactionsHTML.getAppLink(output, this, langObj);
         WebTransactionsHTML.getApps(output, this, langObj);
+
+    }
+
+    public String makeHTMLView() {
+        return "";
+    }
+
+    public String makeHTMLHeadView() {
+
+        String text = "<h2>" + Lang.T(Lang.T(viewTypeName()) + "</h2>"
+                + Lang.T("Creator") + ":&nbsp;<b>" + getCreator().getPersonAsString() + "</b><br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>"));
+        return text;
+
+    }
+
+    public String makeHTMLFootView() {
+
+        String text = "";
+        return text;
 
     }
 
