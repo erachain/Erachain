@@ -23,7 +23,7 @@ public class IssueImprintPanel extends IssueItemPanel {
     private JTextField txtAmount;
 
     public IssueImprintPanel() {
-        super(NAME, TITLE, "Imprint issue has been sent!");
+        super(NAME, TITLE, "Imprint issue has been sent!", true);
 
         initComponents();
 
