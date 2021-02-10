@@ -36,7 +36,14 @@ public class PairsController {
         init();
     }
 
+    long updateInit;
     public void init() {
+
+        if (System.currentTimeMillis() - updateInit < 600000) {
+            return;
+        }
+        updateInit = System.currentTimeMillis();
+
         //OPEN FILE
         File file = new File(Settings.getInstance().getUserPath() + "market.json");
 
@@ -72,7 +79,14 @@ public class PairsController {
 
     }
 
+    long updateList;
     public void updateList() {
+
+        init();
+        if (System.currentTimeMillis() - updateList < 300000) {
+            return;
+        }
+        updateList = System.currentTimeMillis();
 
         spotPairsList = new JSONObject();
 

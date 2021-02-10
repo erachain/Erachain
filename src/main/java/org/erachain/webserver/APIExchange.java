@@ -15,6 +15,7 @@ import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,10 +46,9 @@ public class APIExchange {
         help.put("GET apiexchange/spot/list",
                 "Pairs list");
         help.put("GET apiexchange/spot/pairs",
-                "Pairs and values24");
-        help.put("GET apiexchange/spot/pair/{pair}",
-                "Pairs and values24");
-
+                "Pairs values24");
+        help.put("GET apiexchange/spot/pairs/{pairs_list}",
+                "Pairs values24. Pairs list separated by comma for example: BTC_USD,ERA_USD,GOLD_USD");
         help.put("GET apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
         help.put("GET apiexchange/pair/{have}/{want}",
@@ -360,15 +360,20 @@ public class APIExchange {
     }
 
     @GET
-    @Path("spot/pair/{pair}")
+    @Path("spot/pairs/{pairs}")
     // apiexchange/spot/pair/BTC_USD
-    public Response spotPair(@PathParam("pair") String pair) {
+    public Response spotPair(@PathParam("pairs") String pairs) {
 
         cntrl.pairsController.updateList();
 
+        JSONArray result = new JSONArray();
+        for (String pair : pairs.split(",")) {
+            result.add(cntrl.pairsController.spotPairsJson.get(pair));
+        }
+
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(((JSONObject) cntrl.pairsController.spotPairsJson.get(pair)).toJSONString())
+                .entity(result.toJSONString())
                 .build();
     }
 }
