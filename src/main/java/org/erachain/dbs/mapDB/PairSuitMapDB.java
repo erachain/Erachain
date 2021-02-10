@@ -2,6 +2,7 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.item.assets.Pair;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
@@ -23,7 +24,7 @@ import org.mapdb.Fun.Tuple3;
  * Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
-public class PairSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements PairSuit {
+public class PairSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Pair> implements PairSuit {
 
     private BTreeMap pairKeyMap;
     private BTreeMap wantKeyMap;

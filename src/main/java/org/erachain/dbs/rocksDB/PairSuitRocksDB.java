@@ -4,6 +4,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.item.assets.Pair;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
  */
 
 @Slf4j
-public class PairSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements PairSuit {
+public class PairSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Pair> implements PairSuit {
 
     private final String NAME_TABLE = "TRADES_TABLE";
     private final String tradesKeyPairIndexName = "tradesKeyPair";

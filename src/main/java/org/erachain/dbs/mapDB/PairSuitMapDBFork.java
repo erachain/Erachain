@@ -2,7 +2,7 @@ package org.erachain.dbs.mapDB;
 
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.core.item.assets.Trade;
+import org.erachain.core.item.assets.Pair;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.datachain.PairMap;
@@ -24,7 +24,7 @@ import java.util.Iterator;
  * Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
-public class PairSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade> implements PairSuit {
+public class PairSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Pair> implements PairSuit {
 
     public PairSuitMapDBFork(PairMap parent, DBASet databaseSet) {
         super(parent, databaseSet, logger);
@@ -52,7 +52,7 @@ public class PairSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade> 
         // берем из родителя
         IteratorCloseable<Tuple2<Long, Long>> parentIterator = ((TradeMapImpl) parent).getIteratorByInitiator(orderID);
         // берем свои
-        Iterator<Tuple2<Long, Long>> iteratorForked = ((BTreeMap<Tuple2<Long, Long>, Trade>) map).subMap(
+        Iterator<Tuple2<Long, Long>> iteratorForked = ((BTreeMap<Tuple2<Long, Long>, Pair>) map).subMap(
                 Fun.t2(orderID, null),
                 Fun.t2(orderID, Long.MAX_VALUE)).keySet().iterator();
 

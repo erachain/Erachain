@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.assets.Pair;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
@@ -33,7 +34,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
-public class PairMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implements PairMap {
+public class PairMapImpl extends DBTabImpl<Tuple2<Long, Long>, Pair> implements PairMap {
 
     public PairMapImpl(int dbs, DCSet databaseSet, DB database) {
         super(dbs, databaseSet, database);
