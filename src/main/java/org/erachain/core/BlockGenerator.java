@@ -419,10 +419,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     try {
 
-                        if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+                        if (transaction.isValid(Transaction.FOR_NETWORK, 0L) != Transaction.VALIDATE_OK) {
                             needRemoveInvalids.add(transaction.getSignature());
                             if (BlockChain.CHECK_BUGS > 1) {
-                                LOGGER.error(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0l));
+                                LOGGER.error(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0L));
                             }
                             continue;
                         }
@@ -1140,7 +1140,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                                 LOGGER.info("my BLOCK is weak ((...");
                                             }
                                         }
-
+                                    } catch (Exception e) {
+                                        LOGGER.error(e.getMessage(), e);
+                                        if (BlockChain.CHECK_BUGS > 7) {
+                                            ctrl.stopAll(106);
+                                            return;
+                                        }
                                     } catch (java.lang.OutOfMemoryError e) {
                                         LOGGER.error(e.getMessage(), e);
                                         ctrl.stopAll(105);
@@ -1479,10 +1484,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     public enum ForgingStatus {
 
-        FORGING_DISABLED(0, Lang.getInstance().translate("Forging disabled")),
-        FORGING_ENABLED(1, Lang.getInstance().translate("Forging enabled")),
-        FORGING(2, Lang.getInstance().translate("Forging")),
-        FORGING_WAIT(3, Lang.getInstance().translate("Forging awaiting another peer sync"));
+        FORGING_DISABLED(0, Lang.T("Forging disabled")),
+        FORGING_ENABLED(1, Lang.T("Forging enabled")),
+        FORGING(2, Lang.T("Forging")),
+        FORGING_WAIT(3, Lang.T("Forging awaiting another peer sync"));
 
         private final int statusCode;
         private String name;

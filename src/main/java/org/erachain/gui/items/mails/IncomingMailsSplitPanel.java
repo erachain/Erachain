@@ -1,13 +1,15 @@
 package org.erachain.gui.items.mails;
 
 import org.erachain.core.account.Account;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.records.toSignRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -41,7 +43,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
     public IncomingMailsSplitPanel() {
         super(NAME, TITLE);
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
@@ -66,7 +68,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         // MENU
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem copySender = new JMenuItem(Lang.getInstance().translate("Copy Sender Account"));
+        JMenuItem copySender = new JMenuItem(Lang.T("Copy Sender Account"));
         copySender.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -81,7 +83,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         });
         menu.add(copySender);
 
-        JMenuItem copyRecipient = new JMenuItem(Lang.getInstance().translate("Copy Recipient Account"));
+        JMenuItem copyRecipient = new JMenuItem(Lang.T("Copy Recipient Account"));
         copyRecipient.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -97,7 +99,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
         menu.add(copyRecipient);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("To Answer"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.T("To Answer"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -107,14 +109,14 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                 Account account = new Account(rSend.getCreator().getAddress());
                 Account recipient = rSend.getRecipient();
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(recipient, account, null));
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail"), new MailSendPanel(recipient, account, null));
 
             }
         });
         menu.add(Send_Mail_item_Menu);
 
-        JMenuItem vouch_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        vouch_Mail_item_Menu.addActionListener(new ActionListener() {
+        JMenuItem signMail_item_Menu = new JMenuItem(Lang.T("Sign / Vouch"));
+        signMail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
@@ -122,15 +124,27 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                 Transaction trans = incoming_Mails_Model.getItem(row);
                 int blockNo = trans.getBlockHeight();
                 int recNo = trans.getSeqNo();
-                new VouchRecordDialog(blockNo, recNo, ((RSend) trans).getRecipient());
+                new toSignRecordDialog(blockNo, recNo, ((RSend) trans).getRecipient());
 
             }
         });
-        menu.add(vouch_Mail_item_Menu);
+        menu.add(signMail_item_Menu);
+
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
+        linkMenu.addActionListener(e -> {
+            int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+            row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+            Transaction transaction = incoming_Mails_Model.getItem(row);
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+
+        });
+        menu.add(linkMenu);
 
         menu.addSeparator();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override

@@ -46,7 +46,7 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
                 return asset.getOwner().getPersonAsString();
 
             case COLUMN_ASSET_TYPE:
-                return Lang.getInstance().translate(asset.viewAssetType());
+                return Lang.T(asset.viewAssetType());
 
             case COLUMN_AMOUNT:
                 return asset.getQuantity();

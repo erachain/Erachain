@@ -6,7 +6,6 @@ import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.TransactionSuit;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.BlocksTableModel;
-import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -28,7 +27,6 @@ public class DebugTabPane extends JTabbedPane {
     private static final long serialVersionUID = 2717571093561259483L;
     static Logger LOGGER = Logger.getLogger(DebugTabPane.class.getName());
 
-    private PeersTableModel peersTableModel;
     private UnconfirmedTransactionsTableModel transactionsTableModel;
     private BlocksTableModel blocksTableModel;
     private LoggerTextArea loggerTextArea;
@@ -41,11 +39,8 @@ public class DebugTabPane extends JTabbedPane {
 
         //ADD TABS
         if (Settings.getInstance().isGuiConsoleEnabled()) {
-            this.addTab(Lang.getInstance().translate("Console"), new ConsolePanel());
+            this.addTab(Lang.T("Console"), new ConsolePanel());
         }
-
-        this.peersTableModel = new PeersTableModel();
-        //	this.addTab(Lang.getInstance().translate("Peers"), new JScrollPane(new MTable(this.peersTableModel)));
 
         //TRANSACTIONS TABLE MODEL
         this.transactionsTableModel = new UnconfirmedTransactionsTableModel();
@@ -54,8 +49,6 @@ public class DebugTabPane extends JTabbedPane {
         //TRANSACTIONS SORTER
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         indexes.put(SearchTransactionsTableModel.COLUMN_TIMESTAMP, TransactionSuit.TIMESTAMP_INDEX);
-        //CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
-        //transactionsTable.setRowSorter(sorter);
 
         //TRANSACTION DETAILS
         this.transactionsTable.addMouseListener(new MouseAdapter() {
@@ -74,9 +67,6 @@ public class DebugTabPane extends JTabbedPane {
             }
         });
 
-        //ADD TRANSACTIONS TABLE
-        //	this.addTab(Lang.getInstance().translate("Transactions"), new JScrollPane(this.transactionsTable));
-
         //BLOCKS TABLE MODEL
         this.blocksTableModel = new BlocksTableModel();
         JTable blocksTable = new MTable(this.blocksTableModel);
@@ -84,11 +74,9 @@ public class DebugTabPane extends JTabbedPane {
         //BLOCKS SORTER
         indexes = new TreeMap<Integer, Integer>();
         indexes.put(BlocksTableModel.COLUMN_HEIGHT, BlockMap.HEIGHT_INDEX);
-        //sorter = new CoreRowSorter(blocksTableModel, indexes);
-        //blocksTable.setRowSorter(sorter);
 
         //ADD BLOCK TABLE
-        this.addTab(Lang.getInstance().translate("Blocks"), new JScrollPane(blocksTable));
+        this.addTab(Lang.T("Blocks"), new JScrollPane(blocksTable));
         //
         if (true || BlockChain.TEST_MODE) {
             JPanel pppp = new JPanel();
@@ -105,19 +93,17 @@ public class DebugTabPane extends JTabbedPane {
             });
             pppp.add(bb);
 
-            //		this.addTab(Lang.getInstance().translate("OffRun"), new JScrollPane(pppp))
         }
 
         loggerTextArea = new LoggerTextArea(LOGGER);
         JScrollPane scrollPane = new JScrollPane(loggerTextArea);
         JScrollBar vertical = scrollPane.getVerticalScrollBar();
         vertical.setValue(vertical.getMaximum());
-        //      this.addTab("Logger", scrollPane);
+
     }
 
     public void close() {
         //REMOVE OBSERVERS/HANLDERS
-        this.peersTableModel.deleteObservers();
 
         this.transactionsTableModel.deleteObservers();
 

@@ -23,10 +23,10 @@ public class AuthorsModel extends DefaultTableModel {
 
 
     public AuthorsModel(int rows) {
-        super(new String[]{Lang.getInstance().translate("Number"),
-                        Lang.getInstance().translate("Share"),
-                        Lang.getInstance().translate("Name"),
-                        Lang.getInstance().translate("Mark")
+        super(new String[]{Lang.T("Number"),
+                        Lang.T("Share"),
+                        Lang.T("Name"),
+                        Lang.T("Mark")
                 },
                 rows);
         addEmpty();

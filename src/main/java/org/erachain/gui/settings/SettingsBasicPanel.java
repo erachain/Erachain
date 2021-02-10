@@ -1,7 +1,5 @@
 package org.erachain.gui.settings;
 
-import org.erachain.controller.Controller;
-import org.erachain.core.wallet.Wallet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.IssueConfirmDialog;
@@ -66,7 +64,7 @@ public class SettingsBasicPanel extends JPanel {
         gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         setLayout(gridBagLayout);
 
-        chckbxGuiEnabled = new JCheckBox(Lang.getInstance().translate("GUI enabled"));
+        chckbxGuiEnabled = new JCheckBox(Lang.T("GUI enabled"));
         chckbxGuiEnabled.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxGuiEnabled.setSelected(Settings.getInstance().isGuiEnabled());
         GridBagConstraints gbc_chckbxGuiEnabled = new GridBagConstraints();
@@ -78,7 +76,7 @@ public class SettingsBasicPanel extends JPanel {
         add(chckbxGuiEnabled, gbc_chckbxGuiEnabled);
 
 
-        chckbxGuiDynamic = new JCheckBox(Lang.getInstance().translate("GUI Dynamic"));
+        chckbxGuiDynamic = new JCheckBox(Lang.T("GUI Dynamic"));
         chckbxGuiDynamic.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxGuiDynamic.setSelected(Settings.getInstance().isGuiDynamic());
         GridBagConstraints gbc_chckbxGuiDynamic = new GridBagConstraints();
@@ -92,7 +90,7 @@ public class SettingsBasicPanel extends JPanel {
         add(chckbxGuiDynamic, gbc_chckbxGuiDynamic);
 
 
-        JLabel lblGUIExplanatoryText = new JLabel(Lang.getInstance().translate("Enable/Disable the Graphical User Interface."));
+        JLabel lblGUIExplanatoryText = new JLabel(Lang.T("Enable/Disable the Graphical User Interface."));
         lblGUIExplanatoryText.setVerticalAlignment(SwingConstants.TOP);
         lblGUIExplanatoryText.setHorizontalAlignment(SwingConstants.LEFT);
         GridBagConstraints gbc_lblExplanatoryText = new GridBagConstraints();
@@ -103,7 +101,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_lblExplanatoryText.gridy = ++panelRow;//1;
         add(lblGUIExplanatoryText, gbc_lblExplanatoryText);
 
-        chckbxRpcEnabled = new JCheckBox(Lang.getInstance().translate("RPC enabled"));
+        chckbxRpcEnabled = new JCheckBox(Lang.T("RPC enabled"));
         chckbxRpcEnabled.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxRpcEnabled.setSelected(Settings.getInstance().isRpcEnabled());
         GridBagConstraints gbc_chckbxRpcEnabled = new GridBagConstraints();
@@ -114,7 +112,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_chckbxRpcEnabled.gridy = ++panelRow;//2;
         add(chckbxRpcEnabled, gbc_chckbxRpcEnabled);
 
-        JLabel lblRpcPort = new JLabel(Lang.getInstance().translate("RPC port") + ":");
+        JLabel lblRpcPort = new JLabel(Lang.T("RPC port") + ":");
         GridBagConstraints gbc_lblRpcPort = new GridBagConstraints();
         gbc_lblRpcPort.anchor = GridBagConstraints.EAST;
         gbc_lblRpcPort.insets = new Insets(0, 0, 5, 5);
@@ -134,7 +132,7 @@ public class SettingsBasicPanel extends JPanel {
         add(txtRpcPort, gbc_txtRpcPort);
         txtRpcPort.setColumns(10);
 
-        JLabel lblRPCExplanatoryText = new JLabel(Lang.getInstance().translate("Enable/Disable API calls using the given port."));
+        JLabel lblRPCExplanatoryText = new JLabel(Lang.T("Enable/Disable API calls using the given port."));
         lblRPCExplanatoryText.setVerticalAlignment(SwingConstants.TOP);
         lblRPCExplanatoryText.setHorizontalAlignment(SwingConstants.LEFT);
         GridBagConstraints gbc_lblAnExplanatoryText_1 = new GridBagConstraints();
@@ -145,7 +143,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_lblAnExplanatoryText_1.gridy = ++panelRow;//3;
         add(lblRPCExplanatoryText, gbc_lblAnExplanatoryText_1);
 
-        chckbxWebEnabled = new JCheckBox(Lang.getInstance().translate("WEB enabled"));
+        chckbxWebEnabled = new JCheckBox(Lang.T("WEB enabled"));
         chckbxWebEnabled.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxWebEnabled.setSelected(Settings.getInstance().isWebEnabled());
         GridBagConstraints gbc_chckbxWebEnabled = new GridBagConstraints();
@@ -157,7 +155,7 @@ public class SettingsBasicPanel extends JPanel {
         add(chckbxWebEnabled, gbc_chckbxWebEnabled);
 
         //Use SSL checkBox
-        chckbxWebUseSSL = new JCheckBox(Lang.getInstance().translate("Use SSL"));
+        chckbxWebUseSSL = new JCheckBox(Lang.T("Use SSL"));
         chckbxWebUseSSL.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxWebUseSSL.setSelected(Settings.getInstance().isWebUseSSL());
         GridBagConstraints gbc_chckbxchckbxUseSSL = new GridBagConstraints();
@@ -179,7 +177,7 @@ public class SettingsBasicPanel extends JPanel {
        );
 
     // web settings
-        JLabel lblWebPort = new JLabel(Lang.getInstance().translate("WEB port") + ":");
+        JLabel lblWebPort = new JLabel(Lang.T("WEB port") + ":");
         GridBagConstraints gbc_lblWebPort = new GridBagConstraints();
         gbc_lblWebPort.anchor = GridBagConstraints.EAST;
         gbc_lblWebPort.insets = new Insets(0, 0, 5, 5);
@@ -201,7 +199,7 @@ public class SettingsBasicPanel extends JPanel {
 
         // { WEB SSL Settings
         // Keystore File
-        labelTextWebKeystoreFilePath = new JLabel(Lang.getInstance().translate("Keystore file path") + ":");
+        labelTextWebKeystoreFilePath = new JLabel(Lang.T("Keystore file path") + ":");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 0, 5, 5);
@@ -222,7 +220,7 @@ public class SettingsBasicPanel extends JPanel {
         gridBagConstraints.gridy = panelRow;//20;
         add(textWebKeyStoreFilePath, gridBagConstraints);
 
-        buttonBrowseWebKeystoreFilePath = new JButton(Lang.getInstance().translate("Browse..."));
+        buttonBrowseWebKeystoreFilePath = new JButton(Lang.T("Browse..."));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 0, 5, 5);
@@ -233,7 +231,7 @@ public class SettingsBasicPanel extends JPanel {
                 FileChooser fileopen = new FileChooser();
                 fileopen.setFileSelectionMode(FileChooser.FILES_ONLY);
                 fileopen.setCurrentDirectory(new File(textWebKeyStoreFilePath.getText()));
-                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set Keystore file path"));
+                int ret = fileopen.showDialog(null, Lang.T("Set Keystore file path"));
                 if (ret == FileChooser.APPROVE_OPTION) {
                     textWebKeyStoreFilePath.setText(fileopen.getSelectedFile().toString());
                 }
@@ -241,7 +239,7 @@ public class SettingsBasicPanel extends JPanel {
         });
         add(buttonBrowseWebKeystoreFilePath, gridBagConstraints);
         // Reset
-        buttonResetWebKeystoreFilePath = new JButton(Lang.getInstance().translate("Reset"));
+        buttonResetWebKeystoreFilePath = new JButton(Lang.T("Reset"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 0, 5, 5);
@@ -255,7 +253,7 @@ public class SettingsBasicPanel extends JPanel {
         add(buttonResetWebKeystoreFilePath, gridBagConstraints);
         //reset
         // Keystore password
-        labelTextWebKeystorePass = new JLabel(Lang.getInstance().translate("Keystore password") + ":");
+        labelTextWebKeystorePass = new JLabel(Lang.T("Keystore password") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 0, 5, 5);
@@ -276,7 +274,7 @@ public class SettingsBasicPanel extends JPanel {
         add(textWebKeystorePass, gridBagConstraints);
 
         // certificate password
-        labelTextwebCertificatePass = new JLabel(Lang.getInstance().translate("Certificate password") + ":");
+        labelTextwebCertificatePass = new JLabel(Lang.T("Certificate password") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(0, 0, 5, 5);
@@ -297,7 +295,7 @@ public class SettingsBasicPanel extends JPanel {
         add(textWebCertificatePass, gridBagConstraints);
 
         // verifi button
-        buttonVeryfytWebKeystoreFilePath = new JButton(Lang.getInstance().translate("Check") + " SSL");
+        buttonVeryfytWebKeystoreFilePath = new JButton(Lang.T("Check") + " SSL");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 0, 5, 5);
@@ -309,28 +307,29 @@ public class SettingsBasicPanel extends JPanel {
                     Fun.Tuple3<KeyStore, Certificate, String> result = SslUtils.getWebKeyStore(textWebKeyStoreFilePath.getText(),new String(textWebKeystorePass.getPassword()), new String(textWebCertificatePass.getPassword()));
                     if(result.a == null){
                         JOptionPane.showMessageDialog(
-                                new JFrame(), Lang.getInstance().translate(result.c),
-                                Lang.getInstance().translate("Error!"),
+                                new JFrame(), Lang.T(result.c),
+                                Lang.T("Error!"),
                                 JOptionPane.ERROR_MESSAGE);
                     }
                     else{
                         Certificate cetrtyficatemy = result.b;
 
                         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
-                                Lang.getInstance().translate("SSL is OK "), MainFrame.getInstance().getWidth()-100, MainFrame.getInstance().getHeight()-100, Lang.getInstance().translate(""));
+                                Lang.T("SSL is OK "), MainFrame.getInstance().getWidth()-100, MainFrame.getInstance().getHeight()-100, Lang.T(""));
 
-                        dd.setTitle(Lang.getInstance().translate("SSL is OK."));
+                        dd.setTitle(Lang.T("SSL is OK."));
                         dd.jTextPane1.setText("Certificate: \n " + cetrtyficatemy.toString());
+                        dd.jButton0.setVisible(false);
                         dd.jButton1.setVisible(false);
-                        dd.jButton2.setText(Lang.getInstance().translate("OK"));
+                        dd.jButton2.setText(Lang.T("OK"));
                         dd.setLocationRelativeTo(null);
                         dd.setVisible(true);
 
                     }
                 } catch (FileNotFoundException e1) {
                     JOptionPane.showMessageDialog(
-                            new JFrame(), Lang.getInstance().translate(e1.getLocalizedMessage()),
-                            Lang.getInstance().translate("Error!"),
+                            new JFrame(), Lang.T(e1.getLocalizedMessage()),
+                            Lang.T("Error!"),
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -339,7 +338,7 @@ public class SettingsBasicPanel extends JPanel {
 
         // WEB SSL Settings }
 
-        JLabel lblWEBExplanatoryText = new JLabel(Lang.getInstance().translate("Enable/Disable decentralized web server. Use \"Access permission\" tab for additional options."));
+        JLabel lblWEBExplanatoryText = new JLabel(Lang.T("Enable/Disable decentralized web server. Use \"Access permission\" tab for additional options."));
         lblWEBExplanatoryText.setVerticalAlignment(SwingConstants.TOP);
         lblWEBExplanatoryText.setHorizontalAlignment(SwingConstants.LEFT);
         GridBagConstraints gbc_lblAnExplanatoryText_2 = new GridBagConstraints();
@@ -350,7 +349,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_lblAnExplanatoryText_2.gridy = ++panelRow;//5;
         add(lblWEBExplanatoryText, gbc_lblAnExplanatoryText_2);
 
-        chckbxKeyCaching = new JCheckBox(Lang.getInstance().translate("Generator Key Caching"));
+        chckbxKeyCaching = new JCheckBox(Lang.T("Generator Key Caching"));
         chckbxKeyCaching.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxKeyCaching.setSelected(Settings.getInstance().isGeneratorKeyCachingEnabled());
         GridBagConstraints gbc_chckbxKeyCaching = new GridBagConstraints();
@@ -361,7 +360,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_chckbxKeyCaching.gridy = ++panelRow;//6;
         add(chckbxKeyCaching, gbc_chckbxKeyCaching);
 
-        JLabel lblKeyCachingExplanatoryText = new JLabel(Lang.getInstance().translate("Allows forging even when your wallet is locked. You need to unlock it once."));
+        JLabel lblKeyCachingExplanatoryText = new JLabel(Lang.T("Allows forging even when your wallet is locked. You need to unlock it once."));
         lblKeyCachingExplanatoryText.setVerticalAlignment(SwingConstants.TOP);
         lblKeyCachingExplanatoryText.setHorizontalAlignment(SwingConstants.LEFT);
         GridBagConstraints gbc_lblAnExplanatoryText_3 = new GridBagConstraints();
@@ -372,7 +371,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_lblAnExplanatoryText_3.gridy = ++panelRow;//7;
         add(lblKeyCachingExplanatoryText, gbc_lblAnExplanatoryText_3);
 
-        JLabel lblDataDir = new JLabel(Lang.getInstance().translate("DataChain dir") + ":");
+        JLabel lblDataDir = new JLabel(Lang.T("DataChain dir") + ":");
         GridBagConstraints gbc_lblDataDir = new GridBagConstraints();
         gbc_lblDataDir.anchor = GridBagConstraints.WEST;
         gbc_lblDataDir.insets = new Insets(0, 0, 5, 5);
@@ -393,7 +392,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_textDataFolder.gridy = panelRow;//8;
         add(textDataFolder, gbc_textDataFolder);
 
-        JButton btnBrowseDataFolder = new JButton(Lang.getInstance().translate("Browse..."));
+        JButton btnBrowseDataFolder = new JButton(Lang.T("Browse..."));
         GridBagConstraints gbc_btnBrowseDataFolder = new GridBagConstraints();
         gbc_btnBrowseDataFolder.anchor = GridBagConstraints.WEST;
         gbc_btnBrowseDataFolder.insets = new Insets(0, 0, 5, 5);
@@ -404,15 +403,16 @@ public class SettingsBasicPanel extends JPanel {
                 FileChooser fileopen = new FileChooser();
                 fileopen.setFileSelectionMode(FileChooser.DIRECTORIES_ONLY);
                 fileopen.setCurrentDirectory(new File(textDataFolder.getText()));
-                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set datachain dir"));
+                int ret = fileopen.showDialog(null, Lang.T("Set datachain dir"));
                 if (ret == FileChooser.APPROVE_OPTION) {
-                    textDataFolder.setText(fileopen.getSelectedFile().toString());
+                    String path = Settings.normalizePath(fileopen.getSelectedFile().toString());
+                    textDataFolder.setText(path);
                 }
             }
         });
         add(btnBrowseDataFolder, gbc_btnBrowseDataFolder);
         // AS
-        JButton resetDataDirButton = new JButton(Lang.getInstance().translate("Reset"));
+        JButton resetDataDirButton = new JButton(Lang.T("Reset"));
         GridBagConstraints gbc_resetDataDirButton = new GridBagConstraints();
         gbc_resetDataDirButton.anchor = GridBagConstraints.WEST;
         gbc_resetDataDirButton.insets = new Insets(0, 0, 5, 5);
@@ -426,7 +426,7 @@ public class SettingsBasicPanel extends JPanel {
         add(resetDataDirButton, gbc_resetDataDirButton);
 
         //AS
-        JLabel lblWelletDir = new JLabel(Lang.getInstance().translate("WalletKeys dir") + ":");
+        JLabel lblWelletDir = new JLabel(Lang.T("WalletKeys dir") + ":");
         GridBagConstraints gbc_lblWelletDir = new GridBagConstraints();
         gbc_lblWelletDir.anchor = GridBagConstraints.WEST;
         gbc_lblWelletDir.insets = new Insets(0, 0, 5, 5);
@@ -447,7 +447,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_textWallet.gridy = panelRow;//9;
         add(textWallet, gbc_textWallet);
 
-        JButton btnBrowseWallet = new JButton(Lang.getInstance().translate("Browse..."));
+        JButton btnBrowseWallet = new JButton(Lang.T("Browse..."));
         GridBagConstraints gbc_BrowseWalletbutton = new GridBagConstraints();
         gbc_BrowseWalletbutton.anchor = GridBagConstraints.WEST;
         gbc_BrowseWalletbutton.insets = new Insets(0, 0, 5, 5);
@@ -459,9 +459,10 @@ public class SettingsBasicPanel extends JPanel {
                 JFileChooser fileopen = new JFileChooser();
                 fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileopen.setCurrentDirectory(new File(textWallet.getText()));
-                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set walletKeys dir"));
+                int ret = fileopen.showDialog(null, Lang.T("Set walletKeys dir"));
                 if (ret == JFileChooser.APPROVE_OPTION) {
-                    textWallet.setText(fileopen.getSelectedFile().toString());
+                    String path = Settings.normalizePath(fileopen.getSelectedFile().toString());
+                    textWallet.setText(path);
                 }
             }
         });
@@ -469,7 +470,7 @@ public class SettingsBasicPanel extends JPanel {
         add(btnBrowseWallet, gbc_BrowseWalletbutton);
 
         // AS
-        JButton resetWaletDirButton = new JButton(Lang.getInstance().translate("Reset"));
+        JButton resetWaletDirButton = new JButton(Lang.T("Reset"));
         GridBagConstraints gbc_resetWaletDirButton = new GridBagConstraints();
         gbc_resetWaletDirButton.anchor = GridBagConstraints.WEST;
         gbc_resetWaletDirButton.insets = new Insets(0, 0, 5, 5);
@@ -485,7 +486,7 @@ public class SettingsBasicPanel extends JPanel {
         //AS
 
 
-        JLabel lblAnExplanatoryText_4 = new JLabel(Lang.getInstance().translate("The data folder contains blockchain data. The wallet dir contains user specific data."));
+        JLabel lblAnExplanatoryText_4 = new JLabel(Lang.T("The data folder contains blockchain data. The wallet dir contains user specific data."));
         lblAnExplanatoryText_4.setVerticalAlignment(SwingConstants.TOP);
         GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
         gbc_lblNewLabel_1.fill = GridBagConstraints.BOTH;
@@ -495,7 +496,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_lblNewLabel_1.gridy = ++panelRow;//10;
         add(lblAnExplanatoryText_4, gbc_lblNewLabel_1);
 
-        JLabel lblMinConnections = new JLabel(Lang.getInstance().translate("Min connections") + ":");
+        JLabel lblMinConnections = new JLabel(Lang.T("Min connections") + ":");
         GridBagConstraints gbc_lblMinConnections = new GridBagConstraints();
         gbc_lblMinConnections.anchor = GridBagConstraints.EAST;
         gbc_lblMinConnections.insets = new Insets(0, 0, 5, 5);
@@ -515,7 +516,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_textMinConnections.gridy = panelRow;//11;
         add(textMinConnections, gbc_textMinConnections);
 
-        JLabel lblMaxConnections = new JLabel(Lang.getInstance().translate("Max connections") + ":");
+        JLabel lblMaxConnections = new JLabel(Lang.T("Max connections") + ":");
         GridBagConstraints gbc_lblMaxConnections = new GridBagConstraints();
         gbc_lblMaxConnections.anchor = GridBagConstraints.EAST;
         gbc_lblMaxConnections.insets = new Insets(0, 0, 5, 5);
@@ -535,7 +536,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_textMaxConnections.gridy = panelRow;//11;
         add(textMaxConnections, gbc_textMaxConnections);
 
-        JLabel lbllimitConnections = new JLabel(Lang.getInstance().translate("Allows you to change the amount of simultaneous connections to the server."));
+        JLabel lbllimitConnections = new JLabel(Lang.T("Allows you to change the amount of simultaneous connections to the server."));
         lbllimitConnections.setVerticalAlignment(SwingConstants.TOP);
         GridBagConstraints gbc_lbllimitConnections = new GridBagConstraints();
         gbc_lbllimitConnections.fill = GridBagConstraints.BOTH;
@@ -545,7 +546,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_lbllimitConnections.gridy = ++panelRow;//12;
         add(lbllimitConnections, gbc_lbllimitConnections);
 
-        chckbxLocalPeersScannerEnabled = new JCheckBox(Lang.getInstance().translate("Local peer discovery"));
+        chckbxLocalPeersScannerEnabled = new JCheckBox(Lang.T("Local peer discovery"));
         chckbxLocalPeersScannerEnabled.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxLocalPeersScannerEnabled.setSelected(Settings.getInstance().isLocalPeersScannerEnabled());
         GridBagConstraints gbc_chckbxLocalPeersScannerEnabled = new GridBagConstraints();

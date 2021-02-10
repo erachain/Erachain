@@ -1,15 +1,18 @@
 package org.erachain.gui.items.records;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -59,7 +62,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
         // this.setSize(500, 500);
         // this.setLocation(20, 20);
         // this.setMaximizable(true);
-        // this.setTitle(Lang.getInstance().translate("Accounts"));
+        // this.setTitle(Lang.T("Accounts"));
         // this.setClosable(true);
         // this.setResizable(true);
         // this.setBorder(true);
@@ -176,7 +179,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem item_Rebroadcast = new JMenuItem(Lang.getInstance().translate("Rebroadcast"));
+        JMenuItem item_Rebroadcast = new JMenuItem(Lang.T("Rebroadcast"));
 
         item_Rebroadcast.addActionListener(new ActionListener() {
             @Override
@@ -192,7 +195,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
         });
 
         menu.add(item_Rebroadcast);
-        JMenuItem item_Delete = new JMenuItem(Lang.getInstance().translate("Delete"));
+        JMenuItem item_Delete = new JMenuItem(Lang.T("Delete"));
         item_Delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -207,10 +210,10 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
         });
 
         menu.add(item_Delete);
-        
 
-        // save jsot transactions
-        JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+
+        // save JSON transactions
+        JMenuItem item_Save = new JMenuItem(Lang.T("Save as JSON"));
         item_Save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -220,16 +223,28 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
                 Transaction trans = transactionsModel.getItem(row);
                 if (trans == null) return;
                 // save
-                Library.saveTransactionJSONtoFileSystem(getParent(), trans);
+                Library.saveJSONtoFileSystem(getParent(), trans, "json");
             }
 
-            
+
         });
         menu.add(item_Save);
 
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
+        linkMenu.addActionListener(e -> {
+            int row = record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow();
+            row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+            Transaction transaction = transactionsModel.getItem(row);
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+
+        });
+        menu.add(linkMenu);
+
         menu.addSeparator();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -259,7 +274,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
             @Override
             public void tableChanged(TableModelEvent arg0) {
                 // TODO Auto-generated method stub
-                setName(Lang.getInstance().translate("Unconfirmed Records:" + transactionsModel.getRowCount()));
+                setName(Lang.T("Unconfirmed Records:" + transactionsModel.getRowCount()));
             }
 
         });

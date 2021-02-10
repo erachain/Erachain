@@ -25,21 +25,21 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     protected ItemCls item;
     protected Long key = 0L;
 
-    public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, linkTo, feePow, timestamp, reference);
+    public IssueItemRecord(byte[] typeBytes, String TYPE_NAME, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, feePow, timestamp, reference);
         this.item = item;
         if (item.getKey() != 0)
             key = item.getKey();
     }
 
-    public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, NAME_ID, creator, linkTo, item, feePow, timestamp, reference);
+    public IssueItemRecord(byte[] typeBytes, String TYPE_NAME, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
+        this(typeBytes, TYPE_NAME, creator, linkTo, item, feePow, timestamp, reference);
         this.signature = signature;
         this.item.setReference(signature, dbRef);
     }
 
-    public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte[] signature) {
-        this(typeBytes, NAME_ID, creator, linkTo, item, (byte) 0, 0L, null);
+    public IssueItemRecord(byte[] typeBytes, String TYPE_NAME, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte[] signature) {
+        this(typeBytes, TYPE_NAME, creator, linkTo, item, (byte) 0, 0L, null);
         this.signature = signature;
         this.item.setReference(signature, dbRef);
     }
@@ -83,6 +83,26 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
                     new Object[]{item.getItemType(), key}
             };
         }
+    }
+
+    @Override
+    public boolean isFreeFee() {
+        return false;
+    }
+
+    int minLen = 200 * 500;
+
+    @Override
+    public long calcBaseFee(boolean withFreeProtocol) {
+
+        int len = this.getDataLength(Transaction.FOR_NETWORK, true);
+
+        if (this.height > BlockChain.USE_NEW_ISSUE_FEE) {
+            if (len < minLen)
+                len = minLen;
+        }
+
+        return len * BlockChain.FEE_PER_BYTE;
     }
 
     /**
@@ -226,18 +246,21 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
         // TEST ALL BYTES for database FIELD
         if (name.getBytes(StandardCharsets.UTF_8).length > ItemCls.MAX_NAME_LENGTH) {
-            errorValue = "" + nameLen;
+            errorValue = "" + nameLen + " > " + ItemCls.MAX_NAME_LENGTH;
             return INVALID_NAME_LENGTH_MAX;
         }
 
         //CHECK ICON LENGTH
-        int iconLength = this.item.getIcon().length;
-        if (iconLength < 0) {
-            return INVALID_ICON_LENGTH_MIN;
-        }
-        if (iconLength > ItemCls.MAX_ICON_LENGTH) {
-            errorValue = "" + iconLength;
-            return INVALID_ICON_LENGTH_MAX;
+        byte[] icon = this.item.getIcon();
+        if (icon != null) {
+            int iconLength = icon.length;
+            if (iconLength < 0) {
+                return INVALID_ICON_LENGTH_MIN;
+            }
+            if (iconLength > ItemCls.MAX_ICON_LENGTH) {
+                errorValue = "" + iconLength + " > " + ItemCls.MAX_ICON_LENGTH;
+                return INVALID_ICON_LENGTH_MAX;
+            }
         }
 
         //CHECK IMAGE LENGTH
@@ -246,14 +269,14 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
             return INVALID_IMAGE_LENGTH_MIN;
         }
         if (imageLength > ItemCls.MAX_IMAGE_LENGTH) {
-            errorValue = "" + imageLength;
+            errorValue = "" + imageLength + " > " + ItemCls.MAX_IMAGE_LENGTH;
             return INVALID_IMAGE_LENGTH_MAX;
         }
 
         //CHECK DESCRIPTION LENGTH
         int descriptionLength = this.item.getDescription().getBytes(StandardCharsets.UTF_8).length;
         if (descriptionLength > Transaction.MAX_DATA_BYTES_LENGTH) {
-            errorValue = "" + descriptionLength;
+            errorValue = "" + descriptionLength + " > " + Transaction.MAX_DATA_BYTES_LENGTH;
             return INVALID_DESCRIPTION_LENGTH_MAX;
         }
 

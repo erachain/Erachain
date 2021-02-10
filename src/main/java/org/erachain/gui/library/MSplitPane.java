@@ -1,8 +1,6 @@
 package org.erachain.gui.library;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,7 +16,7 @@ public class MSplitPane extends JSplitPane {
     private int wight_Div = 10;
     private JButton button;
     private JButton button1;
-    private JButton button_work;
+    public JButton buttonOrientation;
 
     public MSplitPane() {
         super(); //JSplitPane.VERTICAL_SPLIT, true);
@@ -55,13 +53,13 @@ public class MSplitPane extends JSplitPane {
         // set left-right
         set_CloseOnOneTouch = ONE_TOUCH_CLOSE_LEFT_RIGHT;
 
-        button_work = new JButton("!");
-        button_work.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        buttonOrientation = new JButton("!");
+        buttonOrientation.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 
 // set icon fron div location
         set_button_title();
-        button_work.setMargin(new Insets(0, 0, 0, 0));
+        buttonOrientation.setMargin(new Insets(0, 0, 0, 0));
         button1.setMargin(new Insets(0, 0, 0, 0));
         button.setMargin(new Insets(0, 0, 0, 0));
         // set divider position
@@ -102,7 +100,7 @@ public class MSplitPane extends JSplitPane {
             }
         });
 
-        button_work.addActionListener(new ActionListener() {
+        buttonOrientation.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 // 	System.out.print("lastposition = " + splitPane.getLastDividerLocation() + "\n");
                 if (getOrientation() == VERTICAL_SPLIT) {
@@ -115,12 +113,12 @@ public class MSplitPane extends JSplitPane {
                 // set title Deveder Buttons
                 set_button_title();
                 // repaint Devider Panel
-                setUI(new ButtonDividerUI(button, button1, wight_Div, button_work));
+                setUI(new ButtonDividerUI(button, button1, wight_Div, buttonOrientation));
             }
         });
 
 
-        setUI(new ButtonDividerUI(button, button1, wight_Div, button_work));
+        setUI(new ButtonDividerUI(button, button1, wight_Div, buttonOrientation));
 
 
         // view buttons divider
@@ -188,7 +186,7 @@ public class MSplitPane extends JSplitPane {
     public void M_setDividerSize(int div) {
         wight_Div = div;
         // splitPane.setDividerSize(div);
-        setUI(new ButtonDividerUI(button, button1, wight_Div, button_work));
+        setUI(new ButtonDividerUI(button, button1, wight_Div, buttonOrientation));
 
     }
 
@@ -197,11 +195,11 @@ public class MSplitPane extends JSplitPane {
             //char aa = (char)176;
             button1.setText((char) 0x02C4 + "");
             button.setText((char) 0x02C5 + "");
-            button_work.setText((char) 0x02C2 + "");
+            buttonOrientation.setText((char) 0x02C2 + "");
         } else {
             button1.setText((char) 0x02C2 + "");
             button.setText((char) 0x02C3 + "");
-            button_work.setText((char) 0x02C4 + "");
+            buttonOrientation.setText((char) 0x02C4 + "");
 
         }
 

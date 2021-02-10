@@ -55,26 +55,26 @@ public class WalletOrdersTableModel extends WalletTableModel<Order> implements O
 
             case COLUMN_HAVE:
                 AssetCls asset = DCSet.getInstance().getItemAssetMap().get(order.getHaveAssetKey());
-                return asset == null ? "[" + order.getHaveAssetKey() + "]" : asset.getShort();
+                return asset == null ? "--" : asset.toString();
 
             case COLUMN_PRICE:
                 return order.getPrice();
 
             case COLUMN_WANT:
                 asset = DCSet.getInstance().getItemAssetMap().get(order.getWantAssetKey());
-                return asset == null ? "[" + order.getWantAssetKey() + "]" : asset.getShort();
+                return asset == null ? "--" : asset.toString();
 
             case COLUMN_AMOUNT_WANT:
                 return order.getAmountWant().toPlainString();
 
             case COLUMN_LEFT:
-                return order.getFulfilledWant().toPlainString();
+                return order.getAmountWantLeft().toPlainString();
 
             case COLUMN_CREATOR:
                 return order.getCreator().getPersonAsString();
 
             case COLUMN_STATUS:
-                return Lang.getInstance().translate(order.state());
+                return Lang.T(order.state());
 
         }
 

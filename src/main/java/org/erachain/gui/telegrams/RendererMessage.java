@@ -98,8 +98,8 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
           }
                  
               value = value    + "&nbsp;<span style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>"
-                   + "&nbsp;&nbsp;" + Lang.getInstance().translate("Date") +": " + DateTimeFormat.timestamptoString(val.c.getTimestamp()) + "</span></p>"
-                   + "<p style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>&nbsp;&nbsp;"+Lang.getInstance().translate("Sender") +": " + val.a   + " &nbsp;&nbsp; "+Lang.getInstance().translate("Recipient") +": " + val.b + "</p>"
+                   + "&nbsp;&nbsp;" + Lang.T("Date") +": " + DateTimeFormat.timestamptoString(val.c.getTimestamp()) + "</span></p>"
+                   + "<p style='font-size:10px;font-family:" + UIManager.getFont("Label.font").getFamily() + ";color:"+ color   + "'>&nbsp;&nbsp;"+Lang.T("Sender") +": " + val.a   + " &nbsp;&nbsp; "+Lang.T("Recipient") +": " + val.b + "</p>"
                   + "&nbsp;&nbsp;<p>" + "<span style='font-size:" + UIManager.getFont("Label.font").getSize() + "px;font-family:"
                     + UIManager.getFont("Label.font").getFamily() + "'>" +text + "</p></HTML>";
             
@@ -148,7 +148,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
 
         if (!Controller.getInstance().isWalletUnlocked()) {
             isScriptImage = Settings.getInstance().getUserPath() + "images/messages/locked.png";
-            return "<span style='color:Navy'>" + Lang.getInstance().translate("Encrypted") + "</span>";
+            return "<span style='color:Navy'>" + Lang.T("Encrypted") + "</span>";
         }
 
         byte[] decryptedData = Controller.getInstance().decrypt(trans.getCreator(),
@@ -157,7 +157,7 @@ public class RendererMessage extends JLabel implements TableCellRenderer {
         if (decryptedData == null) {
             isScriptImage = Settings.getInstance().getUserPath() + "images/messages/locked.png";
 
-            return "<span style='color:Red'>" + Lang.getInstance().translate("Error") + "</span>";
+            return "<span style='color:Red'>" + Lang.T("Error") + "</span>";
         } else {
             isScriptImage = Settings.getInstance().getUserPath() + "images/messages/unlockedred.png";
 

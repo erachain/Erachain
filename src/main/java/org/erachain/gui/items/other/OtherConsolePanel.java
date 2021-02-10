@@ -27,7 +27,7 @@ public class OtherConsolePanel extends IconPanel {
             setLayout(new java.awt.GridBagLayout());
 
             JLabel jLabel1 = new javax.swing.JLabel();
-            jLabel1.setText(Lang.getInstance().translate("Console"));
+            jLabel1.setText(Lang.T("Console"));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
             add(jLabel1, gridBagConstraints);

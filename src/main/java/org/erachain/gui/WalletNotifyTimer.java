@@ -3,12 +3,14 @@ package org.erachain.gui;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.erachain.utils.PlaySound;
 import org.erachain.utils.SysTray;
 import org.mapdb.Fun;
@@ -22,7 +24,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletTimer<U> implements Observer {
+public class WalletNotifyTimer<U> implements Observer {
 
     public Object playEvent;
 
@@ -34,7 +36,7 @@ public class WalletTimer<U> implements Observer {
     Lang lang = Lang.getInstance();
     private List<Integer> transactionsAlreadyPlayed;
 
-    public WalletTimer() {
+    public WalletNotifyTimer() {
         transactionsAlreadyPlayed = new ArrayList<>();
 
         logger = LoggerFactory.getLogger(this.getClass());
@@ -87,7 +89,7 @@ public class WalletTimer<U> implements Observer {
                             if (settings.isSoundNewTransactionEnabled())
                                 sound = "send.wav";
 
-                            head = lang.translate("Payment send");
+                            head = Lang.T("Payment send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
                                     + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
                                     + rSend.getRecipient().getPersonAsString() + "\n"
@@ -97,7 +99,7 @@ public class WalletTimer<U> implements Observer {
                             if (settings.isSoundReceivePaymentEnabled())
                                 sound = "receivepayment.wav";
 
-                            head = lang.translate("Payment received");
+                            head = Lang.T("Payment received");
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
                                     + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
                                     + rSend.getCreator().getPersonAsString() + "\n"
@@ -109,7 +111,7 @@ public class WalletTimer<U> implements Observer {
                             if (settings.isSoundNewTransactionEnabled())
                                 sound = "send.wav";
 
-                            head = lang.translate("Mail send");
+                            head = Lang.T("Mail send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
                                     //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
                                     + rSend.getRecipient().getPersonAsString() + "\n"
@@ -118,7 +120,7 @@ public class WalletTimer<U> implements Observer {
                             if (settings.isSoundReceiveMessageEnabled())
                                 sound = "receivemail.wav";
 
-                            head = lang.translate("Mail received");
+                            head = Lang.T("Mail received");
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
                                     //+ rSend.getAmount().toPlainString() + "[" + rSend.getAbsKey() + "]\n "
                                     + rSend.getCreator().getPersonAsString() + "\n"
@@ -133,12 +135,12 @@ public class WalletTimer<U> implements Observer {
                         if (settings.isSoundNewTransactionEnabled())
                             sound = "outcometransaction.wav";
 
-                        head = lang.translate("Outcome transaction") + ": " + transaction.viewFullTypeName();
+                        head = Lang.T("Outcome transaction") + ": " + Lang.T(transaction.viewFullTypeName());
                         message = transaction.getTitle();
                     } else {
                         if (settings.isSoundNewTransactionEnabled())
                             sound = "incometransaction.wav";
-                        head = lang.translate("Income transaction") + ": " + transaction.viewFullTypeName();
+                        head = Lang.T("Income transaction") + ": " + Lang.T(transaction.viewFullTypeName());
                         message = transaction.getTitle();
                     }
                 }
@@ -156,8 +158,8 @@ public class WalletTimer<U> implements Observer {
                     sound = "blockforge.wav";
                 }
 
-                head = lang.translate("Forging Block %d").replace("%d", "" + blockHead.heightBlock);
-                message = lang.translate("Forging Fee") + ": " + blockHead.viewFeeAsBigDecimal();
+                head = Lang.T("Forging Block %d").replace("%d", "" + blockHead.heightBlock);
+                message = Lang.T("Forging Fee") + ": " + blockHead.viewFeeAsBigDecimal();
 
                 int diff = blockHead.heightBlock - forgingPoint.a;
                 if (diff < 300) {
@@ -166,9 +168,26 @@ public class WalletTimer<U> implements Observer {
                 } else if (diff < 1000) {
                     sound = null;
                 }
-
+            } else if (event instanceof Pair) {
+                Object value = ((Pair<?, ?>) event).getB();
+                if (value instanceof Order) {
+                    Order order = (Order) value;
+                    head = Lang.T("Order") + " - " + Lang.T(order.state());
+                    message = order.toString();
+                    int status = order.getStatus();
+                    if (status == Order.FULFILLED || status == Order.COMPLETED) {
+                        sound = "receivepayment.wav";
+                    } else {
+                        sound = "receivemail.wav";
+                    }
+                } else {
+                    head = Lang.T("EVENT");
+                    sound = "receivemail.wav";
+                    message = value.toString();
+                }
             } else {
-                head = lang.translate("EVENT");
+                head = Lang.T("EVENT");
+                sound = "receivemail.wav";
                 message = event.toString();
             }
 

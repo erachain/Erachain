@@ -8,6 +8,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.lang.Lang;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +19,6 @@ import java.util.regex.Pattern;
 public abstract class TemplateCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.TEMPLATE_TYPE;
-
-    public static final long MIN_START_KEY = 1000L;
 
     // PERS KEY
     public static final long EMPTY_KEY = 1L;
@@ -54,17 +54,17 @@ public abstract class TemplateCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     public String getItemTypeName() {
@@ -110,6 +110,17 @@ public abstract class TemplateCls extends ItemCls {
 
     public IssueItemMap getDBIssueMap(DCSet db) {
         return db.getIssueTemplateMap();
+    }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_Template", Lang.T("Template", langObj));
+
+        if (!forPrint) {
+        }
+
+        return itemJson;
     }
 
 }

@@ -3,12 +3,13 @@ package org.erachain.core.item;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.apache.commons.net.util.Base64;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.Jsonable;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
+import org.erachain.core.blockexplorer.WebTransactionsHTML;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSetStatusToItem;
@@ -18,6 +19,8 @@ import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.Iconable;
+import org.erachain.gui.library.Library;
+import org.erachain.lang.Lang;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -28,15 +31,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 //import java.math.BigDecimal;
 //import com.google.common.primitives.Longs;
 
-public abstract class ItemCls implements Iconable, ExplorerJsonLine {
+public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
-    protected final static long START_KEY = 1L << 14;
+    public final static long START_KEY_OLD = 1L << 14;
+    public static final long MIN_START_KEY_OLD = 1000L;
 
     public static final int ASSET_TYPE = 1;
     public static final int IMPRINT_TYPE = 2;
@@ -60,7 +65,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     protected static final int DESCRIPTION_SIZE_LENGTH = 4;
     protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
     protected static final int DBREF_LENGTH = Transaction.DBREF_LENGTH;
-    protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
+    protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH
+            + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
 
     protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
@@ -79,6 +85,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     protected long dbRef;
     protected byte[] icon;
     protected byte[] image;
+
+    public Transaction referenceTx = null;
 
     public ItemCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
         this.typeBytes = typeBytes;
@@ -268,7 +276,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     }
 
     /**
-     * При поиске будет в нижний регистр перевернуто. Поэтому тут нельзя использовать маленькие буквы
+     * При поиске будет в нижний регистр перевернуто. Поэтому тут нельзя использовать маленькие буквы/
+     * TT - тип трнзакции - используется в Transaction.tags
      *
      * @param itemType
      * @return
@@ -432,6 +441,18 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         return Controller.getInstance().isItemFavorite(this);
     }
 
+    @Override
+    public int hashCode() {
+        return Ints.fromByteArray(reference);
+    }
+
+    @Override
+    public boolean equals(Object item) {
+        if (item instanceof ItemCls)
+            return Arrays.equals(this.reference, ((ItemCls) item).reference);
+        return false;
+    }
+
     // forOwnerSign - use only DATA needed for making signature
     public byte[] toBytes(boolean includeReference, boolean forOwnerSign) {
 
@@ -531,10 +552,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
     public String toString(DCSet db) {
         long key = this.getKey(db);
-        //String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
-        return "[" + (key == 0 ? "?:" : key)
-                + "] " + this.viewName();
-        //+ (creator.length()==0?"": " (" +creator + ")");
+        return (key < getStartKey() ? "" : "[" + key + "] ") + this.viewName();
     }
 
     public String toString(DCSet db, byte[] data) {
@@ -595,10 +613,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
     }
 
     public String getShort(DCSet db) {
-        long key = this.getKey(db);
-        //String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(true);
-        return (key < 1 ? "? " : key + ": ") + this.viewName().substring(0, Math.min(this.viewName().length(), 30));
-        //+ (creator.length()==0?"": " (" +creator + ")");
+        return this.viewName().substring(0, Math.min(this.viewName().length(), 30));
     }
 
     public String getShort() {
@@ -613,8 +628,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("key", this.getKey());
         itemJSON.put("name", this.name);
 
-        if (withIcon && this.getIcon() != null)
+        //map.put("icon", Base64.encodeBase64String(item.getIcon()));
+        //map.put("image", Base64.encodeBase64String(item.getImage()));
+
+        if (withIcon && this.getIcon() != null && this.getIcon().length > 0)
             itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+        else
+            itemJSON.put("icon", "");
 
         itemJSON.put("owner", this.owner.getAddress());
         if (showPerson) {
@@ -625,7 +645,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             }
         }
 
-
         return itemJSON;
     }
 
@@ -634,7 +653,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
         JSONObject itemJSON = toJsonLite(false, false);
 
+        itemJSON.put("charKey", getItemTypeChar());
+
         // ADD DATA
+        itemJSON.put("itemCharKey", getItemTypeChar());
         itemJSON.put("item_type", this.getItemTypeName());
         //itemJSON.put("itemType", this.getItemTypeName());
         itemJSON.put("item_type_sub", this.getItemSubType());
@@ -649,10 +671,25 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         itemJSON.put("isConfirmed", this.isConfirmed());
         itemJSON.put("is_confirmed", this.isConfirmed());
         itemJSON.put("reference", Base58.encode(this.reference));
+        itemJSON.put("tx_signature", Base58.encode(this.reference));
 
-        Transaction txReference = Controller.getInstance().getTransaction(this.reference);
-        if (txReference != null) {
-            itemJSON.put("timestamp", txReference.getTimestamp());
+        Long txSeqNo = DCSet.getInstance().getTransactionFinalMapSigns().get(getReference());
+        if (txSeqNo != null) {
+            // если транзакция еще не подтверждена - чтобы ошибок не было при отображении в блокэксплорере
+            itemJSON.put("tx_seqNo", Transaction.viewDBRef(txSeqNo));
+            referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
+            if (referenceTx != null) {
+                PublicKeyAccount creator = referenceTx.getCreator();
+                if (creator == null) {
+                    itemJSON.put("tx_creator", "GENESIS");
+                    itemJSON.put("tx_creator_pubkey", "GENESIS");
+                } else {
+                    itemJSON.put("tx_creator", creator.getAddress());
+                    itemJSON.put("tx_creator_pubkey", creator.getBase58());
+                }
+                itemJSON.put("tx_timestamp", referenceTx.getTimestamp());
+                itemJSON.put("block_timestamp", Controller.getInstance().blockChain.getTimestamp(referenceTx.getBlockHeight()));
+            }
         }
 
         return itemJSON;
@@ -664,10 +701,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
         JSONObject itemJSON = new JSONObject();
 
         // ADD DATA
-        if (getIcon() != null)
+        if (getIcon() != null && getIcon().length > 0)
             itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        if (getImage() != null)
+        else
+            itemJSON.put("icon", "");
+
+        if (getImage() != null && getImage().length > 0)
             itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
+        else
+            itemJSON.put("image", "");
 
         return itemJSON;
     }
@@ -701,8 +743,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
             json.put("person_key", person.b.getKey());
         }
 
-        if (icon != null)
-            json.put("icon", Base64.encodeBase64String(getIcon()));
+        if (getIcon() != null && getIcon().length > 0)
+            json.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+        else
+            json.put("icon", "");
 
         return json;
     }
@@ -738,6 +782,80 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine {
 
         output.put("pageItems", array);
         output.put("lastKey", key);
+
+    }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = toJson();
+
+        if (getKey() > 0 && getKey() < getStartKey()) {
+            itemJson.put("description", Lang.T(viewDescription(), langObj));
+        }
+
+        itemJson.put("Label_Owner", Lang.T("Owner", langObj));
+        itemJson.put("Label_Pubkey", Lang.T("Public Key", langObj));
+        itemJson.put("Label_TXCreator", Lang.T("Creator", langObj));
+        itemJson.put("Label_Number", Lang.T("Number", langObj));
+        itemJson.put("Label_TXIssue", Lang.T("Transaction of Issue", langObj));
+        itemJson.put("Label_DateIssue", Lang.T("Issued Date", langObj));
+        itemJson.put("Label_Signature", Lang.T("Signature", langObj));
+        itemJson.put("Label_Actions", Lang.T("Actions", langObj));
+        itemJson.put("Label_RAW", Lang.T("Bytecode", langObj));
+        itemJson.put("Label_Print", Lang.T("Print", langObj));
+        itemJson.put("Label_Description", Lang.T("Description", langObj));
+        itemJson.put("Label_seqNo", Lang.T("Номер", langObj));
+
+
+        itemJson.put("owner", this.getOwner().getAddress());
+        Fun.Tuple2<Integer, PersonCls> person = this.getOwner().getPerson();
+        if (person != null) {
+            itemJson.put("owner_person", person.b.getName());
+            itemJson.put("owner_person_key", person.b.getKey());
+        }
+
+        if (getIcon() != null && getIcon().length > 0)
+            itemJson.put("icon", java.util.Base64.getEncoder().encodeToString(getIcon()));
+
+        if (getImage() != null && getImage().length > 0)
+            itemJson.put("image", java.util.Base64.getEncoder().encodeToString(getImage()));
+
+        if (referenceTx != null) {
+            if (referenceTx.getCreator() != null) {
+                itemJson.put("tx_creator_person", referenceTx.viewCreator());
+            }
+
+
+            WebTransactionsHTML.getAppLink(itemJson, referenceTx, langObj);
+            WebTransactionsHTML.getVouches(itemJson, referenceTx, langObj);
+            WebTransactionsHTML.getLinks(itemJson, referenceTx, langObj);
+
+        }
+
+        return itemJson;
+    }
+
+    public String makeHTMLView() {
+        return "";
+    }
+
+    public String makeHTMLHeadView() {
+
+        String text = "[" + getKey() + "]" + Lang.T("Name") + ":&nbsp;" + viewName() + "<br>";
+        return text;
+
+    }
+
+    public String makeHTMLFootView() {
+
+        String text = Lang.T("Description") + ":<br>";
+        if (getKey() > 0 && getKey() < START_KEY()) {
+            text += Library.to_HTML(Lang.T(viewDescription())) + "<br>";
+        } else {
+            text += Library.to_HTML(viewDescription()) + "<br>";
+        }
+
+        return text;
 
     }
 

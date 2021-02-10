@@ -14,27 +14,27 @@ import java.util.Arrays;
 // import org.slf4j.LoggerFactory;
 
 public class IssueUnionRecord extends IssueItemRecord {
-    private static final byte TYPE_ID = (byte) ISSUE_UNION_TRANSACTION;
-    private static final String NAME_ID = "Issue Union";
+    public static final byte TYPE_ID = (byte) ISSUE_UNION_TRANSACTION;
+    public static final String TYPE_NAME = "Issue Union";
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, union, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, union, feePow, timestamp, reference);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, union, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, reference, signature);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp,
                             Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, linkTo, union, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, reference, signature);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, union, (byte) 0, 0l, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, (byte) 0, 0l, null, signature);
     }
 
     public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) {

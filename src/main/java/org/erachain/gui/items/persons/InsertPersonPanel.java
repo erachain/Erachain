@@ -108,7 +108,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
         txtPublicKey.setEditable(false);
 
-        labelSign.setText(Lang.getInstance().translate("Signature") + ":");
+        labelSign.setText(Lang.T("Signature") + ":");
         labelGBC.gridy = ++gridy;
         jPanelAdd.add(labelSign, labelGBC);
 
@@ -116,7 +116,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtSign.setEditable(false);
         jPanelAdd.add(txtSign, fieldGBC);
 
-        labelPublicKey.setText(Lang.getInstance().translate("Public key") + ":");
+        labelPublicKey.setText(Lang.T("Public key") + ":");
         labelGBC.gridy = gridy;
         jPanelAdd.add(labelPublicKey, labelGBC);
 
@@ -124,14 +124,14 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtPublicKey.setEditable(false);
         jPanelAdd.add(txtPublicKey, fieldGBC);
 
-        pasteButton = new MButton(Lang.getInstance().translate("Paste Person from clipboard"), 2);
+        pasteButton = new MButton(Lang.T("Paste Person from clipboard"), 2);
         pasteButton.addActionListener(arg0 -> {
             String base58str = getClipboardContents();
             try {
                 byte[] dataPerson = Base58.decode(base58str);
                 setByteCode(dataPerson);
             } catch (Exception ee) {
-                JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.getInstance().translate("Error"),
+                JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.T("Error"),
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -145,7 +145,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         gridBagConstraints1.insets = new Insets(20, 0, 0, 0);
         jPanelAdd.add(pasteButton, gridBagConstraints1);
 
-        transformButton = new MButton(Lang.getInstance().translate("Check person and insert"), 2);
+        transformButton = new MButton(Lang.T("Check person and insert"), 2);
 
         transformButton.addActionListener(arg0 -> {
             if (person == null) {
@@ -164,8 +164,8 @@ public class InsertPersonPanel extends IssuePersonPanel {
                 feePow = Integer.parseInt((String) textFeePow.getSelectedItem());
             } catch (Exception e) {
                 String mess = "Invalid fee power 0..6";
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(mess),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T(mess),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -174,8 +174,8 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -190,27 +190,27 @@ public class InsertPersonPanel extends IssuePersonPanel {
             if (result.getB() == Transaction.VALIDATE_OK) {
                 String statusText = "";
 
-                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, result.getA(),
+                IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, result.getA(),
                         " ",
                         (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
-                        Lang.getInstance().translate("Confirmation transaction issue person"));
+                        Lang.T("Confirmation transaction issue person"));
 
                 IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame((IssuePersonRecord) result.getA());
-                dd.jScrollPane1.setViewportView(ww);
-                dd.setLocationRelativeTo(this);
-                dd.setVisible(true);
-                if (dd.isConfirm) {
+                confirmDialog.jScrollPane1.setViewportView(ww);
+                confirmDialog.setLocationRelativeTo(this);
+                confirmDialog.setVisible(true);
+                if (confirmDialog.isConfirm > 0) {
                     // VALIDATE AND PROCESS
                     Integer result1 = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(),
-                            Transaction.FOR_NETWORK);
+                            Transaction.FOR_NETWORK, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, false);
                     if (result1 != Transaction.VALIDATE_OK) {
                         JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.getInstance().translate(OnDealClick.resultMess(result1)),
-                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                                Lang.T(OnDealClick.resultMess(result1)),
+                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.getInstance().translate("Person issue has been sent!"),
-                                Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                                Lang.T("Person issue has been sent!"),
+                                Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
                         person = null;
                         eraseFields();
 
@@ -218,8 +218,8 @@ public class InsertPersonPanel extends IssuePersonPanel {
                 }
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result.getB())),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        Lang.T(OnDealClick.resultMess(result.getB())),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -239,7 +239,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         try {
             person = (PersonHuman) PersonFactory.getInstance().parse(dataPerson, false);
         } catch (Exception ee) {
-            JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.getInstance().translate("Error"),
+            JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.T("Error"),
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -279,7 +279,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
         txtSign.setText(
                 person.isSignatureValid(DCSet.getInstance()) ? Base58.encode(person.getOwnerSignature())
-                        : Lang.getInstance().translate("Wrong signature for data owner"));
+                        : Lang.T("Wrong signature for data owner"));
         txtPublicKey.setText(Base58.encode(person.getOwner().getPublicKey()));
 
     }

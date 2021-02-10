@@ -32,7 +32,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
         th = this;
         //LABEL RECIPIENT
         ++labelGBC.gridy;
-        JLabel recipientLabel = new JLabel(Lang.getInstance().translate("Recipient") + ":");
+        JLabel recipientLabel = new JLabel(Lang.T("Recipient") + ":");
         this.add(recipientLabel, labelGBC);
 
         //RECIPIENT
@@ -54,7 +54,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
         if (r_Send.getTitle() != null) {
             //LABEL MESSAGE
             ++labelGBC.gridy;
-            JLabel title_Label = new JLabel(Lang.getInstance().translate("Title") + ":");
+            JLabel title_Label = new JLabel(Lang.T("Title") + ":");
             this.add(title_Label, labelGBC);
 
             // ISTEXT
@@ -72,7 +72,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
 
             String sendType;
             if (asset != null) {
-                sendType = Lang.getInstance().translate(asset.viewAssetTypeAction(r_Send.isBackward(), r_Send.getActionType(),
+                sendType = Lang.T(asset.viewAssetTypeAction(r_Send.isBackward(), r_Send.balancePosition(),
                         r_Send.getCreator() != null && r_Send.getAsset().getOwner().equals(r_Send.getCreator())));
             } else {
                 sendType = "???";
@@ -111,7 +111,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
         if (r_data != null && r_data.length > 0) {
             //LABEL MESSAGE
             ++labelGBC.gridy;
-            JLabel serviceLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
+            JLabel serviceLabel = new JLabel(Lang.T("Message") + ":");
             this.add(serviceLabel, labelGBC);
 
             jScrollPane1 = new javax.swing.JScrollPane();
@@ -155,7 +155,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                 chcGBC.gridy = ++labelGBC.gridy;
                 chcGBC.gridx = 2;
                 chcGBC.gridwidth = 1;
-                final JCheckBox encrypted = new JCheckBox(Lang.getInstance().translate("Encrypted"));
+                final JCheckBox encrypted = new JCheckBox(Lang.T("Encrypted"));
 
                 encrypted.setSelected(r_Send.isEncrypted());
 
@@ -168,7 +168,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                             String password = PasswordPane.showUnlockWalletDialog(th);
                             if (!Controller.getInstance().unlockWallet(password)) {
                                 //WRONG PASSWORD
-                                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                                 encrypted.setSelected(!encrypted.isSelected());
 
@@ -183,7 +183,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                                     r_Send.getRecipient(), r_Send.getData());
 
                             if (decryptedData == null) {
-                                jTextArea_Messge.setText(Lang.getInstance().translate("Decrypt Error!"));
+                                jTextArea_Messge.setText(Lang.T("Decrypt Error!"));
                             } else {
                                 jTextArea_Messge.setText(r_Send.isText() ?
                                         new String(decryptedData, StandardCharsets.UTF_8)

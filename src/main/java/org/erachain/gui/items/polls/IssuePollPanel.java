@@ -21,16 +21,16 @@ public class IssuePollPanel extends IssueItemPanel {
     private final MTable table;
 
     public IssuePollPanel() {
-        super(NAME, TITLE, "Poll issue has been sent");
+        super(NAME, TITLE, "Poll issue has been sent", true);
 
         initComponents();
 
-        optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.getInstance().translate("Name")}, 0);
+        optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.T("Name")}, 0);
 
         // вывод верхней панели
         int gridy = initTopArea();
 
-        JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
+        JLabel optionsLabel = new JLabel(Lang.T("Options") + ":");
         labelGBC.gridy = gridy;
         jPanelAdd.add(optionsLabel, labelGBC);
 
@@ -41,13 +41,13 @@ public class IssuePollPanel extends IssueItemPanel {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(scrollPaneOptionalTable, fieldGBC);
 
-        JButton deleteButton = new JButton(Lang.getInstance().translate("Delete"));
+        JButton deleteButton = new JButton(Lang.T("Delete"));
         deleteButton.addActionListener(e -> deleteRow());
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(deleteButton, fieldGBC);
 
         JPopupMenu menu = new JPopupMenu();
-        JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Delete"));
+        JMenuItem copyAddress = new JMenuItem(Lang.T("Delete"));
         copyAddress.addActionListener(e -> deleteRow());
         menu.add(copyAddress);
         TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
@@ -61,14 +61,14 @@ public class IssuePollPanel extends IssueItemPanel {
     protected boolean checkValues() {
 
         if (optionsTableModel.getRowCount() < 1) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Null Options!"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Null Options!"),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
         if (optionsTableModel.getRowCount() == 1 && optionsTableModel.getValueAt(0, 0).equals("")) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Null Options!"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Null Options!"),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
@@ -87,14 +87,14 @@ public class IssuePollPanel extends IssueItemPanel {
     protected String makeTransactionView() {
 
         String text = "<HTML><body>";
-        text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
-                + Lang.getInstance().translate("Issue Voting") + "<br><br><br>";
-        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.getInstance().translate("Name") + ":&nbsp;" + this.textName.getText() + "<br>";
-        text += "<br>" + Lang.getInstance().translate("Description") + ":<br>"
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
+                + Lang.T("Issue Voting") + "<br><br><br>";
+        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
+        text += Lang.T("Name") + ":&nbsp;" + this.textName.getText() + "<br>";
+        text += "<br>" + Lang.T("Description") + ":<br>"
                 + Library.to_HTML(this.textAreaDescription.getText()) + "<br>";
-        text += "<br>" + Lang.getInstance().translate("Options") + ":<br>";
+        text += "<br>" + Lang.T("Options") + ":<br>";
 
         List<String> options = optionsTableModel.getOptions();
 

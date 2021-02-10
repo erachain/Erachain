@@ -35,7 +35,7 @@ public class MyBalanceTab extends SplitPanel {
     public MyBalanceTab() {
         super(NAME, TITLE);
 
-        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -185,7 +185,7 @@ public class MyBalanceTab extends SplitPanel {
 
         });
 
-        JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+        JMenuItem sell = new JMenuItem(Lang.T("To sell"));
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
@@ -197,7 +197,7 @@ public class MyBalanceTab extends SplitPanel {
             }
         });
 
-        JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
+        JMenuItem excahge = new JMenuItem(Lang.T("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
@@ -208,7 +208,7 @@ public class MyBalanceTab extends SplitPanel {
         });
         assetsMenu.add(excahge);
 
-        JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
+        JMenuItem buy = new JMenuItem(Lang.T("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = balancesModel.getAsset(row);
@@ -253,7 +253,7 @@ public class MyBalanceTab extends SplitPanel {
 
         );
 
-        JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
+        JMenuItem details = new JMenuItem(Lang.T("Details"));
         details.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -261,7 +261,7 @@ public class MyBalanceTab extends SplitPanel {
         });
 
         //	assetsMenu.add(details);
-        JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
+        JMenuItem dividend = new JMenuItem(Lang.T("Pay dividend"));
         dividend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -297,7 +297,7 @@ public class MyBalanceTab extends SplitPanel {
     }
 
     public void onIssueClick() {
-        MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Issue Asset"),
+        MainPanel.getInstance().insertNewTab(Lang.T("Issue Asset"),
                 new IssueAssetPanel());
     }
 

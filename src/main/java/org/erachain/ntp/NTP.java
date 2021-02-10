@@ -1,10 +1,10 @@
 package org.erachain.ntp;
 
-import org.erachain.lang.Lang;
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
-import org.slf4j.LoggerFactory;
+import org.erachain.lang.Lang;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 
@@ -35,7 +35,7 @@ public final class NTP {
 
             if (offset != 0l) {
                 //LOG OFFSET
-                LOGGER.info(Lang.getInstance().translate("Adjusting time with %offset% milliseconds.").replace("%offset%", String.valueOf(offset)));
+                LOGGER.info(Lang.T("Adjusting time with %offset% milliseconds.").replace("%offset%", String.valueOf(offset)));
             }
         }
 

@@ -27,12 +27,13 @@ public class CancelOrderTransaction extends Transaction {
 
     // TODO убрать в новой цепочке
     public static final byte[][] VALID_REC = new byte[][]{
-        //Base58.decode("2SEfiztfaj9wNE2k8h3Wiko3oVHtdjawosfua5PbjeAwPTFMHhFoJqVxpYvswZUdJFfQZ7i6xXep85UvCkZoxHqi"),
-        //Base58.decode("34BaZfvWJpyEKAL7i3txFcTqRcVJt2GgumJm2ANqNcvBHCxngfoXBUKhm24uhqmZx1qvShj1KwUK6WHwHX2FQpfy"),
+            //Base58.decode("2SEfiztfaj9wNE2k8h3Wiko3oVHtdjawosfua5PbjeAwPTFMHhFoJqVxpYvswZUdJFfQZ7i6xXep85UvCkZoxHqi"),
+            //Base58.decode("34BaZfvWJpyEKAL7i3txFcTqRcVJt2GgumJm2ANqNcvBHCxngfoXBUKhm24uhqmZx1qvShj1KwUK6WHwHX2FQpfy"),
     };
     // TODO - reference to ORDER - by recNor INT+INT - not 64xBYTE[] !!!
-    private static final byte TYPE_ID = (byte) CANCEL_ORDER_TRANSACTION;
-    private static final String NAME_ID = "Cancel Order";
+    public static final byte TYPE_ID = (byte) CANCEL_ORDER_TRANSACTION;
+    public static final String TYPE_NAME = "Cancel Order";
+
     private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
 
     private static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + ORDER_LENGTH;
@@ -45,7 +46,7 @@ public class CancelOrderTransaction extends Transaction {
 
 
     public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
         this.orderSignature = orderSignature;
     }
 

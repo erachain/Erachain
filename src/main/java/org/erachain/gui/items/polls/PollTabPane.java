@@ -27,7 +27,7 @@ public class PollTabPane extends JTabbedPane {
 
         //POLL DETAILS
         this.pollDetailPanel = new PollDetailPanel(poll, (AssetCls) asset);
-        this.addTab(Lang.getInstance().translate("Poll Details"), this.pollDetailPanel);
+        this.addTab(Lang.T("Poll Details"), this.pollDetailPanel);
 
         //ALL VOTES
         allVotesTableModel = new ItemPollsTableModel();
@@ -37,7 +37,7 @@ public class PollTabPane extends JTabbedPane {
         TableRowSorter<VotesTableModel> sorter = (TableRowSorter<VotesTableModel>) allVotesTable.getRowSorter();
         sorter.setComparator(VotesTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
 
-        this.addTab(Lang.getInstance().translate("All Votes"), new JScrollPane(allVotesTable));
+        this.addTab(Lang.T("All Votes"), new JScrollPane(allVotesTable));
 
         //MY VOTES
         myVotesTableModel = new ItemPollsTableModel();
@@ -47,7 +47,7 @@ public class PollTabPane extends JTabbedPane {
         sorter = (TableRowSorter<VotesTableModel>) myVotesTable.getRowSorter();
         sorter.setComparator(VotesTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
 
-        this.addTab(Lang.getInstance().translate("My Votes"), new JScrollPane(myVotesTable));
+        this.addTab(Lang.T("My Votes"), new JScrollPane(myVotesTable));
 
 
     }

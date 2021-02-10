@@ -59,9 +59,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @SuppressWarnings("rawtypes")
     private NavigableSet creatorKey;
     @SuppressWarnings("rawtypes")
-    private NavigableSet recipientKey;
-    @SuppressWarnings("rawtypes")
     private NavigableSet addressTypeKey;
+    @SuppressWarnings("rawtypes")
+    private NavigableSet recipientKey;
 
     @SuppressWarnings("rawtypes")
     private NavigableSet titleKey;
@@ -85,10 +85,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
         map = mapConstruct.makeOrGet();
 
-        if (Controller.getInstance().onlyProtocolIndexing)
-            // NOT USE SECONDARY INDEXES
-            return;
-
+        // теперь это протокольный для множественных выплат
         Fun.Tuple2Comparator<byte[], Long> comparatorAddressT2 = new Fun.Tuple2Comparator<byte[], Long>(
                 SignedBytes.lexicographicalComparator(),
                 Fun.COMPARATOR);
@@ -116,33 +113,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             }
         });
 
-        this.recipientKey = database.createTreeSet("recipient_txs")
-                .comparator(comparatorAddressT2) // - for Tuple2 String
-                //.comparator(SignedBytes.lexicographicalComparator())
-                .makeOrGet();
-
-        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.recipientKey,
-                new Function2<byte[][], Long, Transaction>() {
-                    @Override
-                    public byte[][] run(Long key, Transaction transaction) {
-                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                        if (transaction.noDCSet()) {
-                            transaction.setDC((DCSet) databaseSet, true);
-                        }
-
-                        HashSet<Account> recipients = transaction.getRecipientAccounts();
-                        int size = recipients.size();
-                        byte[][] keys = new byte[size][];
-                        int count = 0;
-                        for (Account recipient : recipients) {
-                            byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-                            System.arraycopy(recipient.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-                            keys[count++] = addressKey;
-                        }
-                        return keys;
-                    }
-                });
-
+        // теперь это протокольный для множественных выплат
         Fun.Tuple2Comparator<Fun.Tuple3Comparator<byte[], Integer, Boolean>, Long> comparatorAddressType
                 = new Fun.Tuple2Comparator<Fun.Tuple3Comparator<byte[], Integer, Boolean>, Long>(
                 new Fun.Tuple3Comparator(
@@ -150,7 +121,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         Fun.COMPARATOR,
                         Fun.COMPARATOR),
                 Fun.COMPARATOR);
-
         this.addressTypeKey = database.createTreeSet("address_type_txs")
                 .comparator(comparatorAddressType)
                 .makeOrGet();
@@ -175,6 +145,37 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                                 Array.newInstance(Tuple3.class, accounts.size());
                         result = accounts.toArray(result);
                         return result;
+                    }
+                });
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return;
+
+        this.recipientKey = database.createTreeSet("recipient_txs")
+                .comparator(comparatorAddressT2) // - for Tuple2 String
+                //.comparator(SignedBytes.lexicographicalComparator())
+                .makeOrGet();
+
+        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.recipientKey,
+                new Function2<byte[][], Long, Transaction>() {
+                    @Override
+                    public byte[][] run(Long key, Transaction transaction) {
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                        if (transaction.noDCSet()) {
+                            transaction.setDC((DCSet) databaseSet, true);
+                        }
+
+                        HashSet<Account> recipients = transaction.getRecipientAccounts();
+                        int size = recipients.size();
+                        byte[][] keys = new byte[size][];
+                        int count = 0;
+                        for (Account recipient : recipients) {
+                            byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                            System.arraycopy(recipient.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                            keys[count++] = addressKey;
+                        }
+                        return keys;
                     }
                 });
 
@@ -285,6 +286,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
+        if (fromSeqNo == null) {
+            fromSeqNo = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
+        }
+
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.creatorKey.descendingSet() : this.creatorKey)
                 .subSet(Fun.t2(addressKey, fromSeqNo),
                         Fun.t2(addressKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
@@ -295,6 +300,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        if (fromSeqNo == null) {
+            fromSeqNo = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
+        }
 
         if (toSeqNo == null) {
             toSeqNo = descending ? Long.MIN_VALUE : Long.MAX_VALUE;
@@ -343,7 +352,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
@@ -362,6 +370,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
+        if (fromID == null) {
+            fromID = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
+        }
+
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
                 Fun.t2(Fun.t3(addressKey, type, isCreator), fromID),
                 Fun.t2(Fun.t3(addressKey,
@@ -374,6 +386,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, Long toID, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        if (fromID == null) {
+            fromID = descending ? Long.MAX_VALUE : Long.MIN_VALUE;
+        }
 
         if (toID == null) {
             toID = descending ? Long.MIN_VALUE : Long.MAX_VALUE;
@@ -453,6 +469,8 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         if (true) {
+            return getBiDirectionAddressIterator(addressShort, null, descending);
+        } else if (false) {
             Iterable keys = Fun.filter(descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey, new Tuple3<byte[], Integer, Boolean>(addressKey, 0, null));
             return IteratorCloseableImpl.make(keys.iterator());
         } else if (false) {
@@ -476,7 +494,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             }
         } else {
 
-            // ТУТ СОРТИООВКА не в ту тсорону получается
+            // ТУТ СОРТИООВКА не в ту сторону получается
 
             Iterable senderKeys = Fun.filter(this.creatorKey, addressKey);
             Iterator<Long> senderKeysIterator = senderKeys.iterator();

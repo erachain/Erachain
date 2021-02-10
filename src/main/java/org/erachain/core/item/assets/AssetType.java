@@ -2,6 +2,7 @@ package org.erachain.core.item.assets;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.lang.Lang;
+import org.mapdb.Fun;
 
 import java.util.StringJoiner;
 
@@ -13,33 +14,34 @@ public class AssetType {
 
     public AssetType(Integer assetType) {
         this.id = assetType;
-        this.name = Lang.getInstance().translate(AssetCls.viewAssetTypeCls(assetType));
-        this.nameFull = Lang.getInstance().translate(AssetCls.viewAssetTypeFullCls(assetType));
+        this.name = Lang.T(AssetCls.viewAssetTypeCls(assetType));
+        this.nameFull = "<b>" + AssetCls.charAssetType(Long.MAX_VALUE, assetType)
+                + AssetCls.viewAssetTypeAbbrev(assetType) + "</b>:" + Lang.T(AssetCls.viewAssetTypeFullCls(assetType));
 
         StringJoiner joiner = new StringJoiner(", ");
-        for (String action : AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
-                AssetCls.ASSET_TYPE, AssetCls.START_KEY, AssetCls.MIN_START_KEY),
-                assetType)) {
-            joiner.add(Lang.getInstance().translate(action));
+        for (Fun.Tuple2<?, String> action : AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
+                AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
+                assetType, null, true)) {
+            joiner.add(Lang.T(action.b));
         }
 
-        this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(assetType)) + ".\n";
+        this.description = Lang.T(AssetCls.viewAssetTypeDescriptionCls(assetType)) + ".<br>";
         if (AssetCls.isReverseSend(assetType)) {
-            description += Lang.getInstance().translate("Actions for OWN balance is reversed") + ".\n";
+            description += Lang.T("Actions for OWN balance is reversed") + ".<br>";
         }
-        description += Lang.getInstance().translate("Acceptable actions") + ":\n" + joiner.toString();
+        description += "<b>" + Lang.T("Acceptable actions") + ":</b><br>" + joiner.toString();
 
     }
 
     @Override
     public String toString() {
 
-
-        return " {"
+        return "<HTML> {"
                 // + NumberAsString.formatAsString(this.getBalanceUSE(FEE_KEY))
                 + id
-                + "}" + " " + nameFull ;
+                + "}" + " " + nameFull;
     }
+
     public String getName(){
         return name;
     }

@@ -43,7 +43,7 @@ public class PollsDialog extends JDialog {
 
     public PollsDialog(PollCls poll, int option, AssetCls asset) {
         // super(Controller.getInstance().getApplicationName(false) + " - " +
-        // Lang.getInstance().translate("Vote"));
+        // Lang.T("Vote"));
 
         if (poll == null)
             return;
@@ -85,7 +85,7 @@ public class PollsDialog extends JDialog {
 
         // LABEL NAME
         labelGBC.gridy = 1;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Poll") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Poll") + ":");
         this.add(nameLabel, labelGBC);
 
         // NAME
@@ -96,7 +96,7 @@ public class PollsDialog extends JDialog {
 
         // LABEL DESCRIPTION
         labelGBC.gridy = 2;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         // DESCRIPTION
@@ -135,7 +135,7 @@ public class PollsDialog extends JDialog {
         assetsGBC.gridx = 1;
         assetsGBC.gridy = 3;
 
-        this.add(new JLabel(Lang.getInstance().translate("Check") + ":"), assetLabelGBC);
+        this.add(new JLabel(Lang.T("Check") + ":"), assetLabelGBC);
 
         cbxAssets = new JComboBox<ItemCls>(new ComboBoxModelItemsAll(ItemCls.ASSET_TYPE));
         cbxAssets.setSelectedItem(asset);
@@ -157,7 +157,7 @@ public class PollsDialog extends JDialog {
 
         // LABEL ACCOUNT
         labelGBC.gridy = 4;
-        JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
+        JLabel ownerLabel = new JLabel(Lang.T("Account") + ":");
         this.add(ownerLabel, labelGBC);
 
         // CBX ACCOUNT
@@ -169,7 +169,7 @@ public class PollsDialog extends JDialog {
 
         // LABEL OPTIONS
         labelGBC.gridy = 5;
-        JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Option") + ":");
+        JLabel optionsLabel = new JLabel(Lang.T("Option") + ":");
         this.add(optionsLabel, labelGBC);
 
         // CBX ACCOUNT
@@ -194,7 +194,7 @@ public class PollsDialog extends JDialog {
 
         // LABEL FEE
         labelGBC.gridy = 6;
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
+        JLabel feeLabel = new JLabel(Lang.T("Fee Power") + ":");
         feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         this.add(feeLabel, labelGBC);
 
@@ -207,7 +207,7 @@ public class PollsDialog extends JDialog {
 
         // ADD EXCHANGE BUTTON
         detailGBC.gridy = 7;
-        voteButton = new JButton(Lang.getInstance().translate("To Vote"));
+        voteButton = new JButton(Lang.T("To Vote"));
         voteButton.setPreferredSize(new Dimension(100, 25));
         voteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -243,8 +243,8 @@ public class PollsDialog extends JDialog {
             }
             if (!Controller.getInstance().unlockWallet(password)) {
                 // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                        Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 // ENABLE
                 this.voteButton.setEnabled(true);
@@ -261,16 +261,16 @@ public class PollsDialog extends JDialog {
             feePow = Integer.parseInt(txtFeePow.getText());
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee Power!"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee Power!"),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
         }
 
         // CREATE POLL
         PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (creator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -281,24 +281,24 @@ public class PollsDialog extends JDialog {
 
         // CHECK VALIDATE MESSAGE
         String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,
-                Lang.getInstance().translate("Vote on Poll"),
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(null, true, transaction,
+                Lang.T("Vote on Poll"),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
-                Lang.getInstance().translate("Confirmation Transaction"));
+                Lang.T("Confirmation Transaction"));
         VoteOnItemPollDetailsFrame ww = new VoteOnItemPollDetailsFrame((VoteOnItemPollTransaction) transaction);
-        dd.jScrollPane1.setViewportView(ww);
-        dd.pack();
-        dd.setLocationRelativeTo(this);
-        dd.setVisible(true);
+        confirmDialog.jScrollPane1.setViewportView(ww);
+        confirmDialog.pack();
+        confirmDialog.setLocationRelativeTo(this);
+        confirmDialog.setVisible(true);
 
-        dd.dispose();
+        confirmDialog.dispose();
 
         // ENABLE
         this.voteButton.setEnabled(true);
 
         // JOptionPane.OK_OPTION
-        if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, "Your vote has been sent");
+        if (confirmDialog.isConfirm > 0) {
+            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
 
     }

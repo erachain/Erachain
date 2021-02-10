@@ -19,7 +19,7 @@ public class RecGenesis_DetailsFrame extends JPanel //JFrame
     public GridBagConstraints detailGBC = new GridBagConstraints();
 
     public RecGenesis_DetailsFrame(final GenesisRecord record) {
-//		super(Lang.getInstance().translate(controller.Controller.APP_NAME) + " - " + Lang.getInstance().translate(record.viewTypeName()));
+//		super(Lang.T(controller.Controller.APP_NAME) + " - " + Lang.T(record.viewTypeName()));
 
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -61,7 +61,7 @@ public class RecGenesis_DetailsFrame extends JPanel //JFrame
 
         //LABEL SIGNATURE
         labelGBC.gridy = componentLevel;
-        JLabel signatureLabel = new JLabel(Lang.getInstance().translate("Signature") + ":");
+        JLabel signatureLabel = new JLabel(Lang.T("Signature") + ":");
         this.add(signatureLabel, labelGBC);
 
         //SIGNATURE
@@ -74,7 +74,7 @@ public class RecGenesis_DetailsFrame extends JPanel //JFrame
         //LABEL SIZE
         componentLevel++;
         labelGBC.gridy = componentLevel;
-        JLabel feePowLabel = new JLabel(Lang.getInstance().translate("Size") + ":");
+        JLabel feePowLabel = new JLabel(Lang.T("Size") + ":");
         this.add(feePowLabel, labelGBC);
 
         //SIZE

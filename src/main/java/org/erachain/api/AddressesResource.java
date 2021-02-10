@@ -508,10 +508,10 @@ public class AddressesResource {
     @SuppressWarnings("unchecked")
     @POST
     @Path("sign/{address}")
-    public String sign(String x, @PathParam("address") String address, @QueryParam("password") String password) {
+    public String sign(String x, @PathParam("address") String address) {
 
         //String password = null;
-        APIUtils.askAPICallAllowed(password, "POST addresses/sign/" + address, request, true);
+        APIUtils.askAPICallAllowed(null, "POST addresses/sign/" + address, request, true);
 
         // CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {

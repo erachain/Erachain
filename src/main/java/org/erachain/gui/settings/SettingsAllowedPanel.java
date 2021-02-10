@@ -58,7 +58,7 @@ public class SettingsAllowedPanel extends JPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem deleteaddressmenu = new JMenuItem(Lang.getInstance().translate("Delete address"));
+        JMenuItem deleteaddressmenu = new JMenuItem(Lang.T("Delete address"));
         deleteaddressmenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int row = webAllowedTable.getSelectedRow();
@@ -69,7 +69,7 @@ public class SettingsAllowedPanel extends JPanel {
 
         menu.add(deleteaddressmenu);
 
-        JLabel lblWebWhiteList = new JLabel(Lang.getInstance().translate("WEB server white list. The addresses are allowed to access the node."));
+        JLabel lblWebWhiteList = new JLabel(Lang.T("WEB server white list. The addresses are allowed to access the node."));
         lblWebWhiteList.setHorizontalAlignment(SwingConstants.LEFT);
         GridBagConstraints gbc_lblWebWhiteList = new GridBagConstraints();
         gbc_lblWebWhiteList.anchor = GridBagConstraints.WEST;
@@ -79,7 +79,7 @@ public class SettingsAllowedPanel extends JPanel {
         gbc_lblWebWhiteList.gridy = 0;
         add(lblWebWhiteList, gbc_lblWebWhiteList);
 
-        chckbxWebAllowForAll = new JCheckBox(Lang.getInstance().translate("Allow for all"));
+        chckbxWebAllowForAll = new JCheckBox(Lang.T("Allow for all"));
         GridBagConstraints gbc_chckbxWebAllowForAll = new GridBagConstraints();
         gbc_chckbxWebAllowForAll.gridwidth = 2;
         gbc_chckbxWebAllowForAll.insets = new Insets(0, 0, 5, 0);
@@ -103,7 +103,7 @@ public class SettingsAllowedPanel extends JPanel {
         webAllowedScrollPane.setPreferredSize(new Dimension(490, 180));
         this.add(webAllowedScrollPane, gbc_webAllowedScrollPane);
 
-        JLabel lblAddNewAddress = new JLabel(Lang.getInstance().translate("Add new address") + ":");
+        JLabel lblAddNewAddress = new JLabel(Lang.T("Add new address") + ":");
         GridBagConstraints gbc_lblAddNewAddress = new GridBagConstraints();
         gbc_lblAddNewAddress.anchor = GridBagConstraints.NORTHEAST;
         gbc_lblAddNewAddress.insets = new Insets(4, 0, 5, 5);
@@ -138,7 +138,7 @@ public class SettingsAllowedPanel extends JPanel {
 
         JPopupMenu menuRpc = new JPopupMenu();
 
-        JMenuItem deleteaddressmenu1 = new JMenuItem(Lang.getInstance().translate("Delete address"));
+        JMenuItem deleteaddressmenu1 = new JMenuItem(Lang.T("Delete address"));
         deleteaddressmenu1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int row = rpcAllowedTable.getSelectedRow();
@@ -150,7 +150,7 @@ public class SettingsAllowedPanel extends JPanel {
         menuRpc.add(deleteaddressmenu1);
 
 
-        btnAddAddressWeb = new JButton(Lang.getInstance().translate("Add"));
+        btnAddAddressWeb = new JButton(Lang.T("Add"));
         GridBagConstraints gbc_btnAddAddressWeb = new GridBagConstraints();
         gbc_btnAddAddressWeb.insets = new Insets(0, 0, 5, 0);
         gbc_btnAddAddressWeb.fill = GridBagConstraints.BOTH;
@@ -164,7 +164,7 @@ public class SettingsAllowedPanel extends JPanel {
         });
         add(btnAddAddressWeb, gbc_btnAddAddressWeb);
 
-        JLabel lblRpcWhiteList = new JLabel(Lang.getInstance().translate("RPC server white list. The addresses are allowed to access the node."));
+        JLabel lblRpcWhiteList = new JLabel(Lang.T("RPC server white list. The addresses are allowed to access the node."));
         GridBagConstraints gbc_lblRpcWhiteList = new GridBagConstraints();
         gbc_lblRpcWhiteList.anchor = GridBagConstraints.WEST;
         gbc_lblRpcWhiteList.gridwidth = 2;
@@ -173,7 +173,7 @@ public class SettingsAllowedPanel extends JPanel {
         gbc_lblRpcWhiteList.gridy = 4;
         add(lblRpcWhiteList, gbc_lblRpcWhiteList);
 
-        chckbxRpcAllowForAll = new JCheckBox(Lang.getInstance().translate("Allow for all"));
+        chckbxRpcAllowForAll = new JCheckBox(Lang.T("Allow for all"));
         GridBagConstraints gbc_RpcAllowForAll = new GridBagConstraints();
         gbc_RpcAllowForAll.insets = new Insets(0, 0, 5, 0);
         gbc_RpcAllowForAll.gridx = 2;
@@ -198,7 +198,7 @@ public class SettingsAllowedPanel extends JPanel {
         rpcScrollPane.setPreferredSize(new Dimension(520, 180));
         this.add(rpcScrollPane, gbc_rpcAllowedTable);
 
-        JLabel labelRpcAddNewAddress = new JLabel(Lang.getInstance().translate("Add new address") + ":");
+        JLabel labelRpcAddNewAddress = new JLabel(Lang.T("Add new address") + ":");
         GridBagConstraints gbc_labelRpcAddNewAddress = new GridBagConstraints();
         gbc_labelRpcAddNewAddress.anchor = GridBagConstraints.EAST;
         gbc_labelRpcAddNewAddress.insets = new Insets(4, 0, 0, 5);
@@ -215,7 +215,7 @@ public class SettingsAllowedPanel extends JPanel {
         gbc_textAddressRpc.gridy = 6;
         add(textAddressRpc, gbc_textAddressRpc);
 
-        btnAddAddressRpc = new JButton(Lang.getInstance().translate("Add"));
+        btnAddAddressRpc = new JButton(Lang.T("Add"));
         GridBagConstraints btn_AddAddressRpc = new GridBagConstraints();
         btn_AddAddressRpc.anchor = GridBagConstraints.SOUTHWEST;
         btn_AddAddressRpc.fill = GridBagConstraints.BOTH;
@@ -256,7 +256,7 @@ public class SettingsAllowedPanel extends JPanel {
     public void onAddClick(String addip, int type) {
         IPAddressFormatValidator iPAddressFormatValidator = new IPAddressFormatValidator();
         if (!iPAddressFormatValidator.validate(addip)) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("IP Address is not correct!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("IP Address is not correct!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
         } else if (type == 1) {
             webAllowedTableModel.addAddress(addip);
             webServiceRestart = true;

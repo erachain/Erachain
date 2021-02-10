@@ -65,7 +65,7 @@ public class LicenseJFrame extends JDialog {
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screens = kit.getScreenSize();
         initComponents();
-        setTitle(Lang.getInstance().translate("License"));
+        setTitle(Lang.T("License"));
         List<Image> icons = new ArrayList<Image>();
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
@@ -130,7 +130,7 @@ public class LicenseJFrame extends JDialog {
         mainPanel.setLayout(layout);
         
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText(Lang.getInstance().translate("Read carefully") + "!");
+        jLabel1.setText(Lang.T("Read carefully") + "!");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -161,7 +161,7 @@ public class LicenseJFrame extends JDialog {
         PagejPanelLayout.rowHeights = new int[] { 0, 8, 0 };
         PagejPanel.setLayout(PagejPanelLayout);
         
-        okCheckBox.setText(Lang.getInstance().translate("I accept"));
+        okCheckBox.setText(Lang.T("I accept"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -169,7 +169,7 @@ public class LicenseJFrame extends JDialog {
         if (needAccept)
             PagejPanel.add(okCheckBox, gridBagConstraints);
         
-        okButton.setText(Lang.getInstance().translate("Next"));
+        okButton.setText(Lang.T("Next"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 3;
@@ -201,7 +201,7 @@ public class LicenseJFrame extends JDialog {
             }
             
         });
-        cancelButton.setText(Lang.getInstance().translate(parent == null ? "Not Accept" : "Back"));
+        cancelButton.setText(Lang.T(parent == null ? "Not Accept" : "Back"));
         cancelButton.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;

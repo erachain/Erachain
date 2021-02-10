@@ -9,31 +9,31 @@ import org.erachain.utils.MenuPopupUtil;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class VouchingDetailsFrame extends RecDetailsFrame {
-    public VouchingDetailsFrame(RVouch vouchRecord) {
+public class SigningDetailsFrame extends RecDetailsFrame {
+    public SigningDetailsFrame(RVouch vouchRecord) {
         super(vouchRecord, true);
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Height-seq.") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Height-seq.") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
         ++detailGBC.gridy;
-        JTextField name = new JTextField(vouchRecord.getVouchHeight() + "-" + vouchRecord.getVouchSeqNo());
+        JTextField name = new JTextField(vouchRecord.getRefHeight() + "-" + vouchRecord.getRefSeqNo());
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
         this.add(name, detailGBC);
 
         Transaction record = DCSet.getInstance().getTransactionFinalMap().
-                get(vouchRecord.getVouchHeight(), vouchRecord.getVouchSeqNo());
+                get(vouchRecord.getRefHeight(), vouchRecord.getRefSeqNo());
 
         String message = "<div>";
         if (record == null) {
             message += "NULL</div>";
         } else {
             message += ", time: " + record.viewTimestamp() + "</div>";
-            message += "<div> type: <b>" + record.viewFullTypeName() + "</b>, size: " + record.viewSize(Transaction.FOR_NETWORK)
+            message += "<div> type: <b>" + Lang.T(record.viewFullTypeName()) + "</b>, size: " + record.viewSize(Transaction.FOR_NETWORK)
                     + ", fee: " + record.viewFeeAndFiat() + "</div>";
 
             //message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";
@@ -48,7 +48,7 @@ public class VouchingDetailsFrame extends RecDetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION

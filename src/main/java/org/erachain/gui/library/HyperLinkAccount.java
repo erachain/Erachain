@@ -37,7 +37,7 @@ public class HyperLinkAccount {
 
         // menu
         account_Menu = new JPopupMenu();
-        JMenuItem copy_Creator_Address1 = new JMenuItem(Lang.getInstance().translate("Copy Account"));
+        JMenuItem copy_Creator_Address1 = new JMenuItem(Lang.T("Copy Account"));
         copy_Creator_Address1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -58,10 +58,10 @@ public class HyperLinkAccount {
 
         JMenuItem copyPublicKey;
         if (public_Account == null) {
-            copyPublicKey = new JMenuItem(Lang.getInstance().translate("Public Key not Found"));
+            copyPublicKey = new JMenuItem(Lang.T("Public Key not Found"));
             copyPublicKey.setEnabled(false);
         } else {
-            copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+            copyPublicKey = new JMenuItem(Lang.T("Copy Public Key"));
             copyPublicKey.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -74,21 +74,21 @@ public class HyperLinkAccount {
         }
         account_Menu.add(copyPublicKey);
 
-        JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send asset"));
+        JMenuItem Send_Coins_Crator = new JMenuItem(Lang.T("Send asset"));
         Send_Coins_Crator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"), new AccountAssetSendPanel(null,
+                MainPanel.getInstance().insertNewTab(Lang.T("Send asset"), new AccountAssetSendPanel(null,
                         null, account, null, null, false));
 
             }
         });
         account_Menu.add(Send_Coins_Crator);
 
-        JMenuItem Send_Mail_Creator = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+        JMenuItem Send_Mail_Creator = new JMenuItem(Lang.T("Send Mail"));
         Send_Mail_Creator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"), new MailSendPanel(null, account, null));
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail"), new MailSendPanel(null, account, null));
                 //new MailSendDialog(null, null, account, null);
             }
         });

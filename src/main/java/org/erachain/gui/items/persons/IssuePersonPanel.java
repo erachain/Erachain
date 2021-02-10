@@ -8,7 +8,6 @@ import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
@@ -60,31 +59,31 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
     protected JTextField txtHairColor = new JTextField();
     protected JTextField txtHeight = new JTextField("170");
 
-    protected JLabel jLabelRegistrarAddress = new JLabel(Lang.getInstance().translate("Registrar") + ":");
-    private JLabel jLabelBirthLatitudeLongtitude = new JLabel(Lang.getInstance().translate("Coordinates of Birth") + ":");
-    private JLabel jLabelBirthday = new JLabel(Lang.getInstance().translate("Birthday") + ":");
-    protected JLabel jLabelDead = new JLabel(Lang.getInstance().translate("Deathday") + ":");
-    private JLabel jLabelEyeColor = new JLabel(Lang.getInstance().translate("Eye color") + ":");
-    private JLabel jLabelGender = new JLabel(Lang.getInstance().translate("Gender") + ":");
-    private JLabel jlabelhairColor = new JLabel(Lang.getInstance().translate("Hair color") + ":");
-    private JLabel jLabelHeight = new JLabel(Lang.getInstance().translate("Growth") + ":");
-    //private JLabel jLabelPersonNumber = new JLabel(Lang.getInstance().translate("Person number") + ":");
+    protected JLabel jLabelRegistrarAddress = new JLabel(Lang.T("Registrar") + ":");
+    private JLabel jLabelBirthLatitudeLongtitude = new JLabel(Lang.T("Coordinates of Birth") + ":");
+    private JLabel jLabelBirthday = new JLabel(Lang.T("Birthday") + ":");
+    protected JLabel jLabelDead = new JLabel(Lang.T("Deathday") + ":");
+    private JLabel jLabelEyeColor = new JLabel(Lang.T("Eye color") + ":");
+    private JLabel jLabelGender = new JLabel(Lang.T("Gender") + ":");
+    private JLabel jlabelhairColor = new JLabel(Lang.T("Hair color") + ":");
+    private JLabel jLabelHeight = new JLabel(Lang.T("Growth") + ":");
+    //private JLabel jLabelPersonNumber = new JLabel(Lang.T("Person number") + ":");
     protected JPanel jPanelHead = new JPanel();
-    protected JCheckBox aliveCheckBox = new JCheckBox(Lang.getInstance().translate("Alive"), true);
+    protected JCheckBox aliveCheckBox = new JCheckBox(Lang.T("Alive"), true);
 
     public IssuePersonPanel() {
         this(NAME, TITLE);
     }
 
     public IssuePersonPanel(String name, String title) {
-        super(name, title, "Person issue has been sent!");
+        super(name, title, "Person issue has been sent!", false);
         initComponents(true);
         initLabels();
 
     }
 
     public IssuePersonPanel(String name, String title, String issueMess) {
-        super(name, title, issueMess);
+        super(name, title, issueMess, false);
     }
 
     protected void initLabels() {
@@ -101,7 +100,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         });
 
         String[] items = PersonCls.GENDERS_LIST;
-        items = Lang.getInstance().translate(items);
+        items = Lang.T(items);
         comboBoxGender.setModel(new DefaultComboBoxModel<>(items));
         comboBoxGender.setSelectedIndex(2);
         setVisible(true);
@@ -127,7 +126,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         // вывод верхней панели
         int gridy = super.initTopArea();
 
-        issueJButton.setText(Lang.getInstance().translate("Create and copy to clipboard"));
+        issueJButton.setText(Lang.T("Create and copy to clipboard"));
         //issueJButton.addActionListener(e -> onIssueClick());
 
         // SET ONE TIME ZONE for Birthday
@@ -212,12 +211,12 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         txtBirthLatitude.add(popup);
         txtBirthLatitude.setComponentPopupMenu(popup);
 
-        JMenuItem jMenuItemCopy = new JMenuItem(Lang.getInstance().translate("Копировать"), KeyEvent.VK_C);
+        JMenuItem jMenuItemCopy = new JMenuItem(Lang.T("Копировать"), KeyEvent.VK_C);
         jMenuItemCopy.setMnemonic(KeyEvent.VK_C);
         jMenuItemCopy.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_C, InputEvent.CTRL_MASK));
 
-        JMenuItem jMenuItemPaste = new JMenuItem(Lang.getInstance().translate("Вставить"), KeyEvent.VK_V);
+        JMenuItem jMenuItemPaste = new JMenuItem(Lang.T("Вставить"), KeyEvent.VK_V);
         jMenuItemPaste.setMnemonic(KeyEvent.VK_V);
         jMenuItemPaste.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_V, InputEvent.CTRL_MASK));
@@ -333,8 +332,8 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     mess = "Invalid growth 10..255";
                     break;
             }
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(mess),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T(mess),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;
@@ -370,8 +369,8 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
             //READ FEE POW
             feePow = Integer.parseInt((String) this.textFeePow.getSelectedItem());
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee Power!"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee Power!"),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             issueJButton.setEnabled(true);
             return;
         }
@@ -381,8 +380,8 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
             creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creatorAccount.getAddress());
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                 issueJButton.setEnabled(true);
                 return;
             }
@@ -413,8 +412,8 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                         StringSelection stringSelection = new StringSelection(base58str);
                         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
                         JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.getInstance().translate("Person bytecode has been copy to buffer") + "!",
-                                Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                                Lang.T("Person bytecode has been copy to buffer") + "!",
+                                Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         // send telegram
                         byte[] encryptedBytes = AEScrypto.dataEncrypt(issueBytes, creator.getPrivateKey(), registrar.getPublicKey());
@@ -426,8 +425,8 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
                         Controller.getInstance().broadcastTelegram(transaction, true);
                         JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.getInstance().translate("Person bytecode has been send to Registrar") + "!",
-                                Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                                Lang.T("Person bytecode has been send to Registrar") + "!",
+                                Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
                     }
 
@@ -436,44 +435,35 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     return;
                 }
                 String statusText = "";
-                IssueConfirmDialog issueConfirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+                IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                         " ",
                         (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
-                        Lang.getInstance().translate("Confirmation transaction issue person"));
+                        Lang.T("Confirmation transaction issue person"));
 
                 IssuePersonDetailsFrame issuePersonDetailsFrame = new IssuePersonDetailsFrame((IssuePersonRecord) transaction);
-                issueConfirmDialog.jScrollPane1.setViewportView(issuePersonDetailsFrame);
-                issueConfirmDialog.setLocationRelativeTo(this);
-                issueConfirmDialog.setVisible(true);
-                if (issueConfirmDialog.isConfirm) {
+                confirmDialog.jScrollPane1.setViewportView(issuePersonDetailsFrame);
+                confirmDialog.setLocationRelativeTo(this);
+                confirmDialog.setVisible(true);
+                if (confirmDialog.isConfirm > 0) {
                     // VALIDATE AND PROCESS
-                    Integer afterCreateResult = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(), Transaction.FOR_NETWORK);
+                    Integer afterCreateResult = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(),
+                            Transaction.FOR_NETWORK, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, false);
                     if (afterCreateResult != Transaction.VALIDATE_OK) {
                         JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.getInstance().translate(OnDealClick.resultMess(afterCreateResult)),
-                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                                Lang.T(OnDealClick.resultMess(afterCreateResult)),
+                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.getInstance().translate("Person issue has been sent!"),
-                                Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+                                Lang.T("Person issue has been sent!"),
+                                Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
                     }
 
                 }
-            } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MIN) {
-                JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                        Lang.getInstance().translate("Name must be more then %val characters!")
-                                .replace("%val", "" + transaction.getItem().getMinNameLen()),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-            } else if (result.getB() == Transaction.INVALID_NAME_LENGTH_MAX) {
-                JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                        Lang.getInstance().translate("Name must be less then %val characters!")
-                                .replace("%val", "" + ItemCls.MAX_NAME_LENGTH),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(result.getB())
-                                + (transaction != null && transaction.getErrorValue() != null ? " " + transaction.getErrorValue() : "")),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        Lang.T(OnDealClick.resultMess(result.getB())
+                                + (transaction != null && transaction.getErrorValue() != null ? "\n" + transaction.getErrorValue() : "")),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             }
 
         }
@@ -487,8 +477,8 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
     private void refreshReceiverDetails(String registrarStr) {
 
         //Account
-        this.registrarAddressDesc.setText(Lang.getInstance().translate(
-                Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true)));
+        this.registrarAddressDesc.setText(Lang.T(
+                Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true, true)));
 
         registrar = null;
         if (registrarStr != null && !registrarStr.isEmpty()) {
@@ -507,9 +497,9 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         }
 
         if (registrar == null) {
-            issueJButton.setText(Lang.getInstance().translate("Create and copy to clipboard"));
+            issueJButton.setText(Lang.T("Create and copy to clipboard"));
         } else {
-            issueJButton.setText(Lang.getInstance().translate("Create and send to Registrar"));
+            issueJButton.setText(Lang.T("Create and send to Registrar"));
         }
     }
 

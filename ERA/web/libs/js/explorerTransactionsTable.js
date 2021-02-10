@@ -351,23 +351,23 @@ function transactions_Table(data) {
     var output = '';
     //console.log("data=")
     //console.log(data)
-    output += '<h4>' + data.Transactions.label_transactions_table + '</h4>';
+    output += '<h4>' + data.Transactions.Label_transactions_table + '</h4>';
 
     var useForgeChecked = getQueryParams('forge') == 'yes'? 'checked' : '';
 
-    output += '<input id="useForge" type="checkbox" name="option1" value="useForge" ' + useForgeChecked + ' onClick="filterTX()">' + data.Transactions.label_useForge + '<br>';
+    output += '<input id="useForge" type="checkbox" name="option1" value="useForge" ' + useForgeChecked + ' onClick="filterTX()">' + data.Transactions.Label_useForge + '<br>';
 
     output += pagesComponent2(data);
 
     output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
         ' class="tiny table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 
-    output += '<tr bgcolor="f1f1f1"><td><b>' + data.Transactions.label_seqNo + '<td><b>' +
-        data.Transactions.label_title + '<td><b>' + data.Transactions.label_type_transaction + '<td><b>' +
-        data.Transactions.label_amount_key + '<td><b>' + data.Transactions.label_date + '<td><b>' +
-        data.Transactions.label_atside + '<td><b>' + data.Transactions.label_size + '<td><b>' +
-        data.Transactions.label_fee + '</tr>';
-         //+ '<td><b>' + data.Transactions.label_confirmations + '</tr>';
+    output += '<tr bgcolor="f1f1f1"><td><b>' + data.Transactions.Label_seqNo + '<td><b>' +
+        data.Transactions.Label_title + '<td><b>' + data.Transactions.Label_type_transaction + '<td><b>' +
+        data.Transactions.Label_amount_key + '<td><b>' + data.Transactions.Label_date + '<td><b>' +
+        data.Transactions.Label_atside + '<td><b>' + data.Transactions.Label_size + '<td><b>' +
+        data.Transactions.Label_fee + '</tr>';
+         //+ '<td><b>' + data.Transactions.Label_confirmations + '</tr>';
 
     for (key in data.Transactions.transactions) {
         var item = data.Transactions.transactions[key];
@@ -381,7 +381,7 @@ function transactions_Table(data) {
             output += '<td>';
         }
 
-        output += item.type + '<td>';
+        output += item.type + item.type_name + '<td>';
 
         if (item.hasOwnProperty('amount')) {
             output += item.amount + ' ';

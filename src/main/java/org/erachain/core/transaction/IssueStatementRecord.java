@@ -23,8 +23,8 @@ import java.util.HashSet;
 public class IssueStatementRecord extends Transaction {
 
     protected static final byte HAS_TEMPLATE_MASK = (byte) (1 << 7);
-    private static final byte TYPE_ID = (byte) ISSUE_STATEMENT_TRANSACTION;
-    private static final String NAME_ID = "Issue Statement";
+    public static final byte TYPE_ID = (byte) ISSUE_STATEMENT_TRANSACTION;
+    public static final String TYPE_NAME = "Issue Statement";
     /*
     PROPERTIES:
     [0] - type
@@ -42,7 +42,7 @@ public class IssueStatementRecord extends Transaction {
 
     public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
         this.key = templateKey;
         this.data = data;

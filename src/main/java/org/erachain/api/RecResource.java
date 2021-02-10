@@ -198,7 +198,7 @@ public class RecResource {
                     //return RHashes.Parse(data, releaserReference);
                     break;
 
-                case Transaction.VOUCH_TRANSACTION:
+                case Transaction.SIGN_TRANSACTION:
 
                     //PARSE CERTIFY PERSON TRANSACTION
                     //return RVouch.Parse(data, releaserReference);

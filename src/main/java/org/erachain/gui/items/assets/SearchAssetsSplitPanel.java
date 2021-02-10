@@ -2,21 +2,15 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
-import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
@@ -30,23 +24,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
         // MENU
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try {
-                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
-                            + "/index/blockexplorer.html"
-                            + "?asset=" + itemTableSelected.getKey()));
-                } catch (MalformedURLException e1) {
-                    logger.error(e1.getMessage(), e1);
-                }
-            }
-        });
-
-        JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+        JMenuItem sell = new JMenuItem(Lang.T("To sell"));
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //new ExchangeFrame((AssetCls) th.itemMenu, null, "To sell", "");
@@ -55,7 +33,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             }
         });
 
-        JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
+        JMenuItem excahge = new JMenuItem(Lang.T("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "", ""));
@@ -63,21 +41,10 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             }
         });
 
-        JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
+        JMenuItem buy = new JMenuItem(Lang.T("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""));
-
-            }
-        });
-
-        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        vouch_menu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get(itemTableSelected.getReference());
-
-                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });
@@ -90,17 +57,11 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             this.menuTable.add(sell);
             this.menuTable.addSeparator();
 
-            this.menuTable.addSeparator();
-
-            this.menuTable.add(vouch_menu);
-
             menuTable.addSeparator();
-            menuTable.add(setSeeInBlockexplorer);
         } else {
             this.menuTable.remove(this.favoriteMenuItems);
 
             menuTable.addSeparator();
-            menuTable.add(setSeeInBlockexplorer);
         }
 
     }

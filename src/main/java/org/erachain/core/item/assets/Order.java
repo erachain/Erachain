@@ -400,10 +400,16 @@ public class Order implements Comparable<Order> {
                 return "Completed";
             case CANCELED:
                 return "Canceled";
+            case UNCONFIRMED:
+                return "Unconfirmed";
             case ORPHANED:
                 return "Orphaned";
         }
         return "UNKNOWN";
+    }
+
+    public String viewID() {
+        return Transaction.viewDBRef(id);
     }
 
     public String state() {

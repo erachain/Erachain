@@ -43,7 +43,7 @@ public class ExchangePanel extends IconPanel {
 
         install();
         // this.setTitle(Controller.getInstance().getApplicationName(false) + " - " +
-        // Lang.getInstance().translate("Check Exchange")+" - " +
+        // Lang.T("Check Exchange")+" - " +
         // this.have.toString() + " / " + this.want.toString());
         initComponents();
     }
@@ -56,7 +56,7 @@ public class ExchangePanel extends IconPanel {
             want = Settings.getInstance().getDefaultPairAsset();
         }
 
-        setName(Lang.getInstance().translate("Exchange"));
+        setName(Lang.T("Exchange"));
 
     }
 
@@ -86,15 +86,15 @@ public class ExchangePanel extends IconPanel {
                 have = want;
                 want = a;
 
-                if (!getName().equals(Lang.getInstance().translate("Exchange"))) {
+                if (!getName().equals(Lang.T("Exchange"))) {
                     MainPanel.getInstance().renameTab(getName(),
                             have.getTickerName() + "/" + want.getTickerName());
                 }
 
-                jTextField_Asset_1.setText(have.viewName());
+                jTextField_Asset_1.setText(have.toString());
                 jScrollPane_jPanel_RightPanel.setViewportView(new EchangeSellBuyPanel(have, want, action, account));
 
-                jTextField_Asset_2.setText(want.viewName());
+                jTextField_Asset_2.setText(want.toString());
                 jScrollPane_jPanel_RightPanel.setViewportView(new EchangeSellBuyPanel(have, want, action, account));
 
             }
@@ -109,7 +109,7 @@ public class ExchangePanel extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 0);
         jSelect_Trade.add(change_Button, gridBagConstraints);
 
-        jTextField_Asset_1.setText(have.viewName());
+        jTextField_Asset_1.setText(have.toString());
         jTextField_Asset_1.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -120,7 +120,7 @@ public class ExchangePanel extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         jSelect_Trade.add(jTextField_Asset_1, gridBagConstraints);
 
-        jButton_Change_Asset_1.setText(Lang.getInstance().translate("Search"));
+        jButton_Change_Asset_1.setText(Lang.T("Search"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -136,19 +136,19 @@ public class ExchangePanel extends IconPanel {
                 if (ss.pairAsset != null) {
                     have = ss.pairAsset;
 
-                    if (!getName().equals(Lang.getInstance().translate("Exchange"))) {
+                    if (!getName().equals(Lang.T("Exchange"))) {
                         MainPanel.getInstance().renameTab(getName(),
                                 have.getTickerName() + "/" + want.getTickerName());
                     }
 
-                    jTextField_Asset_1.setText(have.viewName());
+                    jTextField_Asset_1.setText(have.toString());
                     jScrollPane_jPanel_RightPanel
                             .setViewportView(new EchangeSellBuyPanel(have, want, action, account));
                 }
             }
         });
 
-        jTextField_Asset_2.setText(want.viewName());
+        jTextField_Asset_2.setText(want.toString());
         jTextField_Asset_2.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
@@ -159,7 +159,7 @@ public class ExchangePanel extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         jSelect_Trade.add(jTextField_Asset_2, gridBagConstraints);
 
-        jButton_Change_Asset_2.setText(Lang.getInstance().translate("Search"));
+        jButton_Change_Asset_2.setText(Lang.T("Search"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 1;
@@ -176,12 +176,12 @@ public class ExchangePanel extends IconPanel {
                 if (ss.pairAsset != null) {
                     want = ss.pairAsset;
 
-                    if (!getName().equals(Lang.getInstance().translate("Exchange"))) {
+                    if (!getName().equals(Lang.T("Exchange"))) {
                         MainPanel.getInstance().renameTab(getName(),
                                 have.getTickerName() + "/" + want.getTickerName());
                     }
 
-                    jTextField_Asset_2.setText(want.viewName());
+                    jTextField_Asset_2.setText(want.toString());
                     jScrollPane_jPanel_RightPanel
                             .setViewportView(new EchangeSellBuyPanel(have, want, action, account));
 

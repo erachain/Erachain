@@ -92,7 +92,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
                 return transaction.viewTimestamp();//.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 
             case COLUMN_TYPE:
-                return Lang.getInstance().translate(transaction.viewFullTypeName());
+                return Lang.T(transaction.viewFullTypeName());
 
             case COLUMN_CREATOR:
                 return transaction.viewCreator();
@@ -199,7 +199,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
             try {
                 item.b.setDC(dcSet, false);
                 // тут может выскочить ошибка если кошелек не с той цепочки и тут нет активов
-                item.b.calcFee();
+                item.b.calcFee(true);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }

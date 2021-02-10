@@ -75,10 +75,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         // USE counter index
         indexes = new ArrayList<>();
 
-        if (Controller.getInstance().onlyProtocolIndexing) {
-            return;
-        }
-
+        // теперь это протокольный для множественных выплат
         creatorTxs = new SimpleIndexDB<>(senderTransactionsIndexName,
                 (aLong, transaction) -> {
                     Account account = transaction.getCreator();
@@ -88,25 +85,9 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
                     return addressKey;
                 }, (result) -> result);
+        indexes.add(creatorTxs);
 
-        recipientTxs = new ListIndexDB<>(recipientTransactionsIndexName,
-                (Long aLong, Transaction transaction) -> {
-                    List<byte[]> recipients = new ArrayList<>();
-
-                    // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                    if (transaction.noDCSet()) {
-                        transaction.setDC((DCSet) databaseSet, true);
-                    }
-
-                    for (Account account : transaction.getRecipientAccounts()) {
-                        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-                        System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-
-                        recipients.add(addressKey);
-                    }
-                    return recipients;
-                }, (result) -> result);
-
+        // теперь это протокольный для множественных выплат
         addressTypeTxs = new ListIndexDB<>(addressTypeTransactionsIndexName,
                 (aLong, transaction) -> {
 
@@ -127,6 +108,29 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     return addressesTypes;
                 },
                 (result) -> result);
+        indexes.add(addressTypeTxs);
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return;
+        }
+
+        recipientTxs = new ListIndexDB<>(recipientTransactionsIndexName,
+                (Long aLong, Transaction transaction) -> {
+                    List<byte[]> recipients = new ArrayList<>();
+
+                    // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                    if (transaction.noDCSet()) {
+                        transaction.setDC((DCSet) databaseSet, true);
+                    }
+
+                    for (Account account : transaction.getRecipientAccounts()) {
+                        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                        System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+                        recipients.add(addressKey);
+                    }
+                    return recipients;
+                }, (result) -> result);
 
         titleIndex = new ArrayIndexDB<>(titleIndexName,
                 (aLong, transaction) -> {
@@ -184,9 +188,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                 (result) -> result
         );
 
-        indexes.add(creatorTxs);
         indexes.add(recipientTxs);
-        indexes.add(addressTypeTxs);
         indexes.add(titleIndex);
         indexes.add(addressBiDirectionTxs);
 
@@ -493,14 +495,16 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         if (true) {
+            // это правильно
+            return getBiDirectionAddressIterator(addressShort, null, descending);
+        } else if (false) {
             // тут уже все адреса есть вкупе
             return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), addressKey, descending, true);
-
         } else {
             Iterator senderKeys = map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), addressKey, descending, true);
             Iterator recipientKeys = map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), addressKey, descending, true);
 
-            // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
+            // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использовать ак как все перемешается
             Iterator<Long> mergedIterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
             // а тут уже оьбратный порядок дать

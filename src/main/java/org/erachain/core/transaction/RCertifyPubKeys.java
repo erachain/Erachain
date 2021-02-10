@@ -33,8 +33,9 @@ import java.util.*;
 // typeBytes[2] - size of personalized accounts
 public class RCertifyPubKeys extends Transaction implements Itemable {
 
-    private static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
-    private static final String NAME_ID = "Certify Person";
+    public static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
+    public static final String TYPE_NAME = "Certify Public Key";
+
     private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
     private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
 
@@ -53,7 +54,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
     public RCertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, long key,
                            List<PublicKeyAccount> certifiedPublicKeys,
                            int add_day, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, exLink, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, exLink, feePow, timestamp, reference);
 
         this.key = key;
         this.certifiedPublicKeys = certifiedPublicKeys;
@@ -515,6 +516,12 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             return VALIDATE_OK;
         }
 
+        for (String admin : BlockChain.GENESIS_ADMINS) {
+            if (creator.equals(admin)) {
+                flags = flags | NOT_VALIDATE_FLAG_FEE;
+                break;
+            }
+        }
         int result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
         // сюда без проверки Персоны приходит
@@ -679,7 +686,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             if (personBonus.signum() != 0) {
                 pkAccount.changeBalance(dcSet, false, false, FEE_KEY, personBonus,
                         false, false, false);
-                pkAccount.changeCOMPUBonusBalances(dcSet, false, personBonus, Transaction.BALANCE_SIDE_DEBIT);
+                pkAccount.changeCOMPUBonusBalances(dcSet, false, personBonus, Account.BALANCE_SIDE_DEBIT);
                 if (makeCalculates) {
                     block.txCalculated.add(new RCalculated(pkAccount, FEE_KEY, personBonus,
                             "enter bonus", this.dbRef, seqNo));
@@ -692,7 +699,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
                     false, false, false);
-            issuer.changeCOMPUBonusBalances(dcSet, false, issued_FEE_BD, Transaction.BALANCE_SIDE_DEBIT);
+            issuer.changeCOMPUBonusBalances(dcSet, false, issued_FEE_BD, Account.BALANCE_SIDE_DEBIT);
             if (makeCalculates) {
                 block.txCalculated.add(new RCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
                         "register reward @P:" + this.key, this.dbRef, seqNo));
@@ -811,7 +818,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             if (personBonus.signum() != 0) {
 
                 pkAccount.changeBalance(dcSet, true, false, FEE_KEY, personBonus, false, false, false);
-                pkAccount.changeCOMPUBonusBalances(dcSet, true, personBonus, Transaction.BALANCE_SIDE_DEBIT);
+                pkAccount.changeCOMPUBonusBalances(dcSet, true, personBonus, Account.BALANCE_SIDE_DEBIT);
                 issued_FEE_BD_total = personBonus;
             } else {
                 issued_FEE_BD_total = BigDecimal.ZERO;
@@ -820,7 +827,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(dcSet, true, false, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRAR_4_11,
                     false, false, false);
-            issuer.changeCOMPUBonusBalances(dcSet, true, issued_FEE_BD, Transaction.BALANCE_SIDE_DEBIT);
+            issuer.changeCOMPUBonusBalances(dcSet, true, issued_FEE_BD, Account.BALANCE_SIDE_DEBIT);
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // ADD to EMISSION (with minus)

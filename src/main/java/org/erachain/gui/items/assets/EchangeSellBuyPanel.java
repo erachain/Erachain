@@ -82,7 +82,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         tableGBC.gridy = 4;
 
         // CREATE TITLE LABEL
-        JLabel lblTitle = new JLabel(Lang.getInstance().translate("Buy %have%").replace("%have%", this.have.toString())
+        JLabel lblTitle = new JLabel(Lang.T("Buy %have%").replace("%have%", this.have.toString())
                 .replace("%want%", this.want.toString()));// this.have.toString()
         // + " / " +
         // this.want.toString());
@@ -94,7 +94,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         // CREATE BUY LABEL
         labelGBC.gridy = 1;
-        JLabel lblBuy = new JLabel(Lang.getInstance().translate("Sell %want%").replace("%have%", this.have.toString())
+        JLabel lblBuy = new JLabel(Lang.T("Sell %want%").replace("%have%", this.have.toString())
                 .replace("%want%", this.want.toString()));
         // lblBuy.setFont(new Font("Serif", Font.PLAIN, 18));
         // jPanel_Trade.add(lblBuy, labelGBC);
@@ -109,7 +109,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
             labelGBC.gridx = 0;
 
         // CREATE TITLE LABEL
-        JLabel lblTitle1 = new JLabel(Lang.getInstance().translate("Sell %have%")
+        JLabel lblTitle1 = new JLabel(Lang.T("Sell %have%")
                 .replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
 
         // lblTitle1.setFont(new Font("Serif", Font.PLAIN, 18));
@@ -119,7 +119,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         labelGBC.gridy = 1;
 
-        JLabel lblSell = new JLabel(Lang.getInstance().translate("Buy %want%").replace("%have%", this.have.toString())
+        JLabel lblSell = new JLabel(Lang.T("Buy %want%").replace("%have%", this.have.toString())
                 .replace("%want%", this.want.toString()));
 
         // lblSell.setFont(new Font("Serif", Font.PLAIN, 18));
@@ -164,7 +164,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         // CREATE SELL ORDERS LABEL
         labelGBC.gridx = 0;
         labelGBC.gridy = 3;
-        JLabel lblSellOrders = new JLabel(Lang.getInstance().translate("Sell Orders"));
+        JLabel lblSellOrders = new JLabel(Lang.T("Sell Orders"));
         // lblSellOrders.setFont(new Font("Serif", Font.PLAIN, 18));
         jPanel_Trade.add(lblSellOrders, labelGBC);
         if (action != null && action.equals("To sell"))
@@ -174,7 +174,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         labelGBC.gridx = 1;
         if (action != null && action.equals("To sell"))
             labelGBC.gridx = 0;
-        JLabel lblBuyOrders = new JLabel(Lang.getInstance().translate("Buy Orders"));
+        JLabel lblBuyOrders = new JLabel(Lang.T("Buy Orders"));
         // lblBuyOrders.setFont(new Font("Serif", Font.PLAIN, 18));
         jPanel_Trade.add(lblBuyOrders, labelGBC);
         if (action != null && action.equals("Buy"))
@@ -185,7 +185,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         final MTable sellOrdersTable = new MTable(this.sellOrdersTableModel);
 
         // ORDER INFO
-        JMenuItem orderInfo = new JMenuItem(Lang.getInstance().translate("Order info"));
+        JMenuItem orderInfo = new JMenuItem(Lang.T("Order info"));
         orderInfo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -216,7 +216,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         sellOrdersMenu.add(orderInfo);
 
         // MENU on MY ORDERS
-        JMenuItem trades = new JMenuItem(Lang.getInstance().translate("Trades"));
+        JMenuItem trades = new JMenuItem(Lang.T("Trades"));
         trades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -234,7 +234,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         });
         sellOrdersMenu.add(trades);
 
-        JMenuItem cancel = new JMenuItem(Lang.getInstance().translate("Cancel"));
+        JMenuItem cancel = new JMenuItem(Lang.T("Cancel"));
         cancel.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -351,7 +351,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         });
         
         // ORDER INFO
-        JMenuItem buyOrderInfo = new JMenuItem(Lang.getInstance().translate("Order info"));
+        JMenuItem buyOrderInfo = new JMenuItem(Lang.T("Order info"));
         buyOrderInfo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -382,7 +382,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         buyOrdersMenu.add(buyOrderInfo);
 
         // MENU on MY ORDERS
-        JMenuItem buyTrades = new JMenuItem(Lang.getInstance().translate("Trades"));
+        JMenuItem buyTrades = new JMenuItem(Lang.T("Trades"));
         buyTrades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -401,7 +401,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
             }
         });
         buyOrdersMenu.add(buyTrades);
-        JMenuItem buyCancel = new JMenuItem(Lang.getInstance().translate("Cancel"));
+        JMenuItem buyCancel = new JMenuItem(Lang.T("Cancel"));
         buyCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -429,14 +429,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         if (action != null && action.equals("Buy"))
             buyScrollPane.setVisible(false);
 
-        addTab(Lang.getInstance().translate("Trade"), jPanel_Trade);
+        addTab(Lang.T("Trade"), jPanel_Trade);
 
         jPanel_History.setLayout(new java.awt.GridBagLayout());
 
         // CREATE TRADE HISTORY LABEL
         labelGBC.gridx = 0;
         labelGBC.gridy = 0;
-        JLabel lblTradeHistory = new JLabel(Lang.getInstance().translate("Trade History"));
+        JLabel lblTradeHistory = new JLabel(Lang.T("Trade History"));
         // lblTradeHistory.setFont(new Font("Serif", Font.PLAIN, 18));
         jPanel_History.add(lblTradeHistory, labelGBC);
 
@@ -489,7 +489,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         ////
         jPanel_History.add(new JScrollPane(tradesTable), tableGBC);
-        addTab(Lang.getInstance().translate("Trade History"), jPanel_History);
+        addTab(Lang.T("Trade History"), jPanel_History);
 
     }
 

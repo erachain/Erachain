@@ -5,6 +5,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.FavoriteItemModelTable;
+import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
             case COLUMN_TIMESTAMP:
                 return transaction.viewTimestamp();
             case COLUMN_TYPE:
-                return transaction.viewFullTypeName();
+                return Lang.T(transaction.viewFullTypeName());
             case COLUMN_CREATOR:
                 if (transaction.getCreator() != null) {
                     return transaction.getCreator().getPersonAsString();

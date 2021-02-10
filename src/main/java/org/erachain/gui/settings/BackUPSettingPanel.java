@@ -28,11 +28,11 @@ public class BackUPSettingPanel extends JPanel {
     public BackUPSettingPanel() {
 
         initComponents();
-        jLabel_Title.setText(Lang.getInstance().translate("BackUP Panel"));
-        jCheckBox_Enable_BackUp.setText(Lang.getInstance().translate("Enable BackUP"));
-        jCheckBox_Ask_To_Start.setText(Lang.getInstance().translate("Ask from start"));
-        jLabel_Paht_DIR.setText(Lang.getInstance().translate("BackUP DIR"));
-        jButton_Paht_DIR.setText(Lang.getInstance().translate("Browse") + "...");
+        jLabel_Title.setText(Lang.T("BackUP Panel"));
+        jCheckBox_Enable_BackUp.setText(Lang.T("Enable BackUP"));
+        jCheckBox_Ask_To_Start.setText(Lang.T("Ask from start"));
+        jLabel_Paht_DIR.setText(Lang.T("BackUP DIR"));
+        jButton_Paht_DIR.setText(Lang.T("Browse") + "...");
 
         jCheckBox_Enable_BackUp.setSelected(Settings.getInstance().getbacUpEnabled());
         jCheckBox_Ask_To_Start.setSelected(Settings.getInstance().getbacUpAskToStart());
@@ -45,7 +45,7 @@ public class BackUPSettingPanel extends JPanel {
                 FileChooser fileopen = new FileChooser();
                 fileopen.setFileSelectionMode(FileChooser.DIRECTORIES_ONLY);
                 fileopen.setCurrentDirectory(new File(jTextField_BuckUp_Dir.getText()));
-                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set BackUp dir"));
+                int ret = fileopen.showDialog(null, Lang.T("Set BackUp dir"));
                 if (ret == FileChooser.APPROVE_OPTION) {
                     jTextField_BuckUp_Dir.setText(fileopen.getSelectedFile().toString());
                 }

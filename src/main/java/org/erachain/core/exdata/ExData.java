@@ -1,10 +1,14 @@
 package org.erachain.core.exdata;
 
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
@@ -30,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -64,11 +69,12 @@ public class ExData {
     private static final byte AUTHORS_FLAG_MASK = 16;
     private static final byte SOURCES_FLAG_MASK = 8;
     private static final byte TAGS_FLAG_MASK = 4;
+    private static final byte PAYS_FLAG_MASK = 2;
 
     public static final byte LINK_SIMPLE_TYPE = 0; // для выбора типа в ГУИ
     public static final byte LINK_APPENDIX_TYPE = 1; // дополнение / приложение к другому документу или Сущности
     public static final byte LINK_REPLY_COMMENT_TYPE = 2; // ответ всем на предыдущий документ - Ссылка для отслеживания
-    public static final byte LINK_COMMENT_TYPE_FOR_VIEW = 3; // замечание без получетелей - используется только для ГУИ
+    public static final byte LINK_COMMENT_TYPE_FOR_VIEW = 3; // замечание без получателей - используется только для ГУИ
     public static final byte LINK_SURELY_TYPE = 5; // гарантия / поручительство на долю
 
     public static final byte LINK_SOURCE_TYPE = 6; // как Источник
@@ -82,6 +88,8 @@ public class ExData {
     private final byte[] flags;
 
     private final ExLink exLink;
+
+    private final ExPays exPays;
 
     private final String title;
     private JSONObject json;
@@ -114,6 +122,8 @@ public class ExData {
     private byte[][] secrets;
     private byte[] encryptedData;
 
+
+    public DCSet dcSet;
     public String errorValue;
 
     /**
@@ -135,6 +145,8 @@ public class ExData {
             this.flags[1] |= HAS_PARENT_MASK;
         }
 
+        exPays = null;
+
         this.title = title;
         this.json = json;
         this.files = files;
@@ -146,6 +158,7 @@ public class ExData {
      *
      * @param flags
      * @param exLink
+     * @param exPays
      * @param title
      * @param recipients
      * @param authorsFlags
@@ -156,7 +169,7 @@ public class ExData {
      * @param json
      * @param files
      */
-    public ExData(byte[] flags, ExLink exLink, String title,
+    public ExData(byte[] flags, ExLink exLink, ExPays exPays, String title,
                   byte recipientsFlags, Account[] recipients,
                   byte authorsFlags, ExLinkAuthor[] authors, byte sourcesFlags, ExLinkSource[] sources,
                   byte[] tags, JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) {
@@ -166,6 +179,12 @@ public class ExData {
         if (exLink != null) {
             //this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
             this.flags[1] |= HAS_PARENT_MASK;
+        }
+
+        this.exPays = exPays;
+        if (exPays != null) {
+            //this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+            this.flags[1] |= PAYS_FLAG_MASK;
         }
 
         this.title = title;
@@ -187,8 +206,10 @@ public class ExData {
 
     /**
      * version 3 encrypted
+     *
      * @param flags
      * @param exLink
+     * @param exPays
      * @param title
      * @param recipients
      * @param authorsFlags
@@ -198,7 +219,7 @@ public class ExData {
      * @param tags
      * @param encryptedData
      */
-    public ExData(byte[] flags, ExLink exLink, String title,
+    public ExData(byte[] flags, ExLink exLink, ExPays exPays, String title,
                   byte recipientsFlags, Account[] recipients,
                   byte authorsFlags, ExLinkAuthor[] authors, byte sourcesFlags, ExLinkSource[] sources,
                   byte[] tags, byte secretsFlags, byte[][] secrets,
@@ -209,6 +230,12 @@ public class ExData {
         if (exLink != null) {
             //this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
             this.flags[1] |= HAS_PARENT_MASK;
+        }
+
+        this.exPays = exPays;
+        if (this.exPays != null) {
+            //this.flags[1] = (byte) (this.flags[1] | HAS_PARENT_MASK);
+            this.flags[1] |= PAYS_FLAG_MASK;
         }
 
         this.title = title;
@@ -230,10 +257,25 @@ public class ExData {
 
     }
 
+    public void setDC(DCSet dcSet) {
+
+        if (this.dcSet != null && this.dcSet.equals(dcSet)) {
+            // SAME DCSet
+            return;
+        }
+
+        this.dcSet = dcSet;
+        if (exPays != null) {
+            exPays.setDC(dcSet);
+        }
+        resolveValues();
+
+    }
+
     /**
      * for set up all values from JSON etc.
      */
-    public void resolveValues(DCSet dcSet) {
+    private void resolveValues() {
 
         String str = "";
         Set<String> kS;
@@ -320,12 +362,35 @@ public class ExData {
         }
     }
 
+    public void parseDBData(byte[] dbData) {
+
+        int position = 0;
+        if (exPays != null) {
+            position = exPays.parseDBData(dbData, position);
+        }
+
+    }
+
+    public byte[] makeDBData() {
+
+        byte[] dbData = new byte[0];
+        if (exPays != null) {
+            dbData = Bytes.concat(dbData, exPays.getDBdata());
+        }
+
+        return dbData;
+    }
+
     public boolean isParsedWithFiles() {
         return files != null;
     }
 
     public ExLink getExLink() {
         return exLink;
+    }
+
+    public ExPays getExPays() {
+        return exPays;
     }
 
     public byte getParentRefFlags() {
@@ -424,6 +489,10 @@ public class ExData {
         return recipients != null && recipients.length > 0;
     }
 
+    public boolean hasExPays() {
+        return exPays != null;
+    }
+
     public boolean hasAuthors() {
         return authors != null && authors.length > 0;
     }
@@ -494,10 +563,28 @@ public class ExData {
         return !isEncrypted() && json.containsKey("FU");
     }
 
+    static long templateRoyaltyFee = 200 * 10;
+
+    public long getRoyaltyFee() {
+        if (templateKey > 0)
+            return templateRoyaltyFee;
+
+        return 0L;
+    }
+
+    public BigDecimal getRoyaltyFeeBG() {
+        long royaltyFee = getRoyaltyFee();
+        if (royaltyFee == 0L)
+            return BigDecimal.ZERO;
+
+        return new BigDecimal(royaltyFee).multiply(BlockChain.FEE_RATE).setScale(BlockChain.FEE_SCALE, BigDecimal.ROUND_UP);
+    }
+
     // info to byte[]
     @SuppressWarnings("unchecked")
 
     static boolean newStyle = true;
+
     public static byte[] toByteJsonAndFiles(ByteArrayOutputStream outStream, JSONObject json,
                                             HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) throws Exception {
 
@@ -557,6 +644,14 @@ public class ExData {
 
     }
 
+    public int getLengthDBData() {
+        int len = 0;
+        if (exPays != null)
+            len += exPays.getLengthDBData();
+
+        return len;
+    }
+
     public byte[] toByte() throws Exception {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -587,6 +682,10 @@ public class ExData {
 
         if (exLink != null) {
             outStream.write(exLink.toBytes());
+        }
+
+        if (exPays != null) {
+            outStream.write(exPays.toBytes());
         }
 
         if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
@@ -815,6 +914,7 @@ public class ExData {
                 byte[] flags;
                 int titleSize;
                 ExLink exLink;
+                ExPays exPays;
                 byte recipientsFlags;
                 Account[] recipients;
                 byte authorsFlags;
@@ -842,7 +942,7 @@ public class ExData {
                     flags = Arrays.copyOfRange(data, position, Integer.BYTES);
                     position += Integer.BYTES;
 
-                    titleSize = Arrays.copyOfRange(data, position, position + 1)[0];
+                    titleSize = Byte.toUnsignedInt(data[position]);
                     position++;
 
                 }
@@ -864,6 +964,14 @@ public class ExData {
                         position += exLink.length();
                     } else {
                         exLink = null;
+                    }
+
+                    if ((flags[1] & PAYS_FLAG_MASK) > 0) {
+                        // ExLink READ
+                        exPays = ExPays.parse(data, position);
+                        position += exPays.length();
+                    } else {
+                        exPays = null;
                     }
 
                     int recipientsSize;
@@ -954,6 +1062,7 @@ public class ExData {
                     }
                 } else {
                     exLink = null;
+                    exPays = null;
                     isEncrypted = false;
                     flags = new byte[]{(byte) version, 0, 0, 0};
 
@@ -974,7 +1083,7 @@ public class ExData {
 
                 if (data.length == position) {
                     if (version > 2) {
-                        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, null, null);
+                        return new ExData(flags, exLink, exPays, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, null, null);
                     } else {
                         // version 2.0 - 2.1
                         return new ExData(version, exLink, title, null, null);
@@ -984,12 +1093,12 @@ public class ExData {
 
                     if (isEncrypted) {
                         // version 3 - with SECRETS
-                        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, secretsFlags, secrets,
+                        return new ExData(flags, exLink, exPays, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, secretsFlags, secrets,
                                 Arrays.copyOfRange(data, position, data.length));
                     } else {
 
                         Fun.Tuple2<JSONObject, HashMap> jsonAndFiles = parseJsonAndFiles(Arrays.copyOfRange(data, position, data.length), andFiles);
-                        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, jsonAndFiles.a,
+                        return new ExData(flags, exLink, exPays, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, jsonAndFiles.a,
                                 jsonAndFiles.b);
                     }
                 }
@@ -1061,9 +1170,9 @@ public class ExData {
         return allHashes;
     }
 
-    public static byte[] make(ExLink exLink, PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients,
+    public static byte[] make(ExLink exLink, ExPays exPays, PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients,
                               ExLinkAuthor[] authors, ExLinkSource[] sources, String tagsStr, boolean isEncrypted,
-                              TemplateCls template, HashMap<String, String> params_Template, boolean uniqueTemplate,
+                              Long templateKey, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,
                               HashMap<String, String> hashes_Map, boolean uniqueHashes,
                               Set<Tuple3<String, Boolean, byte[]>> files_Set, boolean uniqueFiles)
@@ -1074,8 +1183,8 @@ public class ExData {
         JSONObject hashes_JSON = new JSONObject();
 
         // add template AND params
-        if (template != null) {
-            out_Map.put("TM", template.getKey());
+        if (templateKey != null) {
+            out_Map.put("TM", templateKey);
 
             Iterator<Entry<String, String>> it_templ = params_Template.entrySet().iterator();
             while (it_templ.hasNext()) {
@@ -1198,9 +1307,9 @@ public class ExData {
                 }
 
                 if (publicKey == null) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(recipient.toString() + " : " +
-                                    "The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T(recipient.toString() + " : " +
+                                    ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                     return null;
                 }
@@ -1211,10 +1320,12 @@ public class ExData {
 
             secrets[recipients.length] = AEScrypto.dataEncrypt(password, privateKey, creator.getPublicKey());
 
-            return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, (byte) 0, secrets, encryptedData).toByte();
+            return new ExData(flags, exLink, exPays, title, recipientsFlags, recipients, authorsFlags, authors,
+                    sourcesFlags, sources, tags, (byte) 0, secrets, encryptedData).toByte();
         }
 
-        return new ExData(flags, exLink, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, new JSONObject(out_Map), filesMap).toByte();
+        return new ExData(flags, exLink, exPays, title, recipientsFlags, recipients, authorsFlags, authors,
+                sourcesFlags, sources, tags, new JSONObject(out_Map), filesMap).toByte();
 
     }
 
@@ -1234,24 +1345,30 @@ public class ExData {
                                 int blockNo, int seqNo, JSONObject langObj) {
 
         if (title != null && !title.isEmpty()) {
-            output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
+            output.put("Label_title", Lang.T("Title", langObj));
             output.put("title", title);
         }
 
         if (exLink != null) {
-            output.put("Label_LinkType", Lang.getInstance().translateFromLangObj("Link Type", langObj));
-            output.put("exLink_Name", Lang.getInstance().translateFromLangObj(exLink.viewTypeName(hasRecipients()), langObj));
+            output.put("Label_LinkType", Lang.T("Link Type", langObj));
+            output.put("exLink_Name", Lang.T(exLink.viewTypeName(hasRecipients()), langObj));
             output.put("exLink", exLink.makeJSONforHTML(hasRecipients(), langObj));
-            output.put("Label_Parent", Lang.getInstance().translateFromLangObj("for # для", langObj));
+            output.put("Label_Parent", Lang.T("for # для", langObj));
+
+        }
+
+        if (exPays != null) {
+            output.put("Label_Accruals", Lang.T("Accruals", langObj));
+            output.put("exPays", exPays.makeJSONforHTML(langObj));
 
         }
 
         if (isCanSignOnlyRecipients()) {
-            output.put("Label_CanSignOnlyRecipients", Lang.getInstance().translateFromLangObj("To sign can only Recipients", langObj));
+            output.put("Label_CanSignOnlyRecipients", Lang.T("To sign can only Recipients", langObj));
         }
 
         if (recipients != null && recipients.length > 0) {
-            output.put("Label_recipients", Lang.getInstance().translateFromLangObj("Recipients", langObj));
+            output.put("Label_recipients", Lang.T("Recipients", langObj));
             List<List<String>> recipientsOut = new ArrayList<>();
             for (Account recipient : recipients) {
                 recipientsOut.add(Arrays.asList(recipient.getAddress(), recipient.getPersonAsString()));
@@ -1260,7 +1377,7 @@ public class ExData {
         }
 
         if (authors != null && authors.length > 0) {
-            output.put("Label_Authors", Lang.getInstance().translateFromLangObj("Authors", langObj));
+            output.put("Label_Authors", Lang.T("Authors", langObj));
             JSONArray authorsOut = new JSONArray();
             for (ExLinkAuthor author : authors) {
                 authorsOut.add(author.makeJSONforHTML(langObj));
@@ -1269,7 +1386,7 @@ public class ExData {
         }
 
         if (sources != null && sources.length > 0) {
-            output.put("Label_Sources", Lang.getInstance().translateFromLangObj("Sources", langObj));
+            output.put("Label_Sources", Lang.T("Sources", langObj));
             JSONArray sourcesOut = new JSONArray();
             for (ExLinkSource source : sources) {
                 sourcesOut.add(source.makeJSONforHTML(langObj));
@@ -1278,20 +1395,20 @@ public class ExData {
         }
 
         if (tags != null && tags.length > 0) {
-            output.put("Label_Tags", Lang.getInstance().translateFromLangObj("Tags", langObj));
+            output.put("Label_Tags", Lang.T("Tags", langObj));
             output.put("tags", new String(tags, StandardCharsets.UTF_8));
         }
 
         if (isEncrypted()) {
-            output.put("encrypted", Lang.getInstance().translateFromLangObj("Encrypted", langObj));
+            output.put("encrypted", Lang.T("Encrypted", langObj));
             return;
 
         } else {
-
-            output.put("Label_template_hash", Lang.getInstance().translateFromLangObj("Template hash", langObj));
-            output.put("Label_mess_hash", Lang.getInstance().translateFromLangObj("Text hash", langObj));
-            output.put("Label_hashes", Lang.getInstance().translateFromLangObj("Hashes", langObj));
-            output.put("Label_files", Lang.getInstance().translateFromLangObj("Files", langObj));
+            output.put("Label_Used_Template", Lang.T("Used template", langObj));
+            output.put("Label_template_hash", Lang.T("Template text hash", langObj));
+            output.put("Label_mess_hash", Lang.T("Text hash", langObj));
+            output.put("Label_hashes", Lang.T("Hashes", langObj));
+            output.put("Label_files", Lang.T("Files", langObj));
 
         }
 
@@ -1365,7 +1482,7 @@ public class ExData {
                     }
                     filesStr += " - <a href ='../apidocuments/getFile?download=true&block="
                             + blockNo + "&seqNo=" + seqNo + "&name=" + fileName + "'><b>"
-                            + Lang.getInstance().translateFromLangObj("Download", langObj) + "</b></a><br>";
+                            + Lang.T("Download", langObj) + "</b></a><br>";
 
                     filesCount++;
 
@@ -1402,7 +1519,7 @@ public class ExData {
 
             // это уже не зашифрованный - сбросим
             byte[] decryptedFlags = setEncryptedFlag(flags, false);
-            return new Tuple3<>(pos, null, new ExData(decryptedFlags, exLink, title, recipientsFlags, recipients,
+            return new Tuple3<>(pos, null, new ExData(decryptedFlags, exLink, exPays, title, recipientsFlags, recipients,
                     authorsFlags, authors, sourcesFlags, sources, tags, jsonAndFiles.a,
                     jsonAndFiles.b));
         } catch (Exception e) {
@@ -1420,6 +1537,10 @@ public class ExData {
 
         if (exLink != null) {
             toJson.put("exLink", exLink.toJson(hasRecipients()));
+        }
+
+        if (exPays != null) {
+            toJson.put("exPays", exPays.toJson());
         }
 
         if (hasRecipients()) {
@@ -1469,7 +1590,7 @@ public class ExData {
         return toJson;
     }
 
-    public int isValid(DCSet dcSet, RSignNote rNote) {
+    public int isValid(RSignNote rNote) {
 
         int result;
 
@@ -1525,12 +1646,22 @@ public class ExData {
             }
         }
 
+        if (exPays != null) {
+            result = exPays.isValid(rNote);
+            if (result != Transaction.VALIDATE_OK)
+                rNote.errorValue = exPays.errorValue;
+            return result;
+        }
+
         return Transaction.VALIDATE_OK;
     }
 
-    public void process(Transaction transaction) {
+    public void process(Transaction transaction, Block block) {
         if (exLink != null)
             exLink.process(transaction);
+
+        if (exPays != null)
+            exPays.process(transaction, block);
 
         if (authors != null) {
             for (ExLinkAuthor author : authors) {
@@ -1544,11 +1675,30 @@ public class ExData {
             }
         }
 
+        if (template != null) {
+            DCSet dcSet = transaction.getDCSet();
+            Account templateOwner = template.getOwner();
+
+            BigDecimal royaltyFee = getRoyaltyFeeBG();
+            if (royaltyFee != null && royaltyFee.signum() != 0) {
+                templateOwner.changeBalance(dcSet, false, false, Transaction.FEE_KEY, royaltyFee, false, false, false);
+                // учтем что получили бонусы
+                templateOwner.changeCOMPUBonusBalances(dcSet, false, royaltyFee, Account.BALANCE_SIDE_DEBIT);
+
+                transaction.addCalculated(block, templateOwner, Transaction.FEE_KEY, royaltyFee,
+                        "template royalty for %1".replace("%1", "" + templateKey));
+            }
+
+        }
+
     }
 
     public void orphan(Transaction transaction) {
         if (exLink != null)
             exLink.orphan(transaction);
+
+        if (exPays != null)
+            exPays.orphan(transaction);
 
         if (authors != null) {
             for (ExLinkAuthor author : authors) {
@@ -1560,6 +1710,19 @@ public class ExData {
             for (ExLinkSource source : sources) {
                 source.orphan(transaction);
             }
+        }
+
+        if (template != null) {
+            DCSet dcSet = transaction.getDCSet();
+            Account templateOwner = template.getOwner();
+
+            BigDecimal royaltyFee = getRoyaltyFeeBG();
+            if (royaltyFee != null && royaltyFee.signum() != 0) {
+                templateOwner.changeBalance(dcSet, true, false, Transaction.FEE_KEY, royaltyFee, false, false, false);
+                // учтем что получили бонусы
+                templateOwner.changeCOMPUBonusBalances(dcSet, true, royaltyFee, Account.BALANCE_SIDE_DEBIT);
+            }
+
         }
     }
 

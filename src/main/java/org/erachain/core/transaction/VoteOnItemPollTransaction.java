@@ -19,8 +19,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 public class VoteOnItemPollTransaction extends Transaction implements Itemable {
-    private static final byte TYPE_ID = (byte) VOTE_ON_ITEM_POLL_TRANSACTION;
-    private static final String NAME_ID = "Vote on Item Poll";
+    public static final byte TYPE_ID = (byte) VOTE_ON_ITEM_POLL_TRANSACTION;
+    public static final String TYPE_NAME = "Vote on Poll";
+
     private static final int OPTION_SIZE_LENGTH = 4;
 
     private static final int LOAD_LENGTH = KEY_LENGTH + OPTION_SIZE_LENGTH;
@@ -33,7 +34,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
     private PollCls poll;
 
     public VoteOnItemPollTransaction(byte[] typeBytes, PublicKeyAccount creator, long pollKey, int option, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
         this.key = pollKey;
         this.option = option;

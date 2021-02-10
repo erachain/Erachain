@@ -28,8 +28,8 @@ public class DocTypeAppendixPanel extends JPanel {
         this.exPanel = exPanel;
 
         initComponents();
-        labelDocType.setText(Lang.getInstance().translate("Parent Document SeqNo or Signature"));
-        parentReference.setToolTipText(Lang.getInstance().translate("Example") + ": 1234-12 or r6fas657w12Y65da..");
+        labelDocType.setText(Lang.T("Parent Document SeqNo or Signature"));
+        parentReference.setToolTipText(Lang.T("Example") + ": 1234-12 or r6fas657w12Y65da..");
         estimationPanel.setVisible(false);
 
 
@@ -37,49 +37,51 @@ public class DocTypeAppendixPanel extends JPanel {
 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
-        typeDocumentLabel = new JLabel(Lang.getInstance().translate("Type"));
+        typeDocumentLabel = new JLabel(Lang.T("Type"));
         typeDocymentCombox = new DocTypeComboBox();
+
         typeDocymentCombox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
+
+                    int fontSize = typeDescription.getFontMetrics(typeDescription.getFont()).getHeight();
+                    String fontStyle = typeDescription.getFont().getFontName();
+                    fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
 
                     exPanel.updateRecipients();
                     estimationPanel.setVisible(false);
                     // возвращаем выбранный объект
                     int item = (int) e.getItem();
                     if (item == 0) {
-                        labelTitle.setVisible(false);
+                        typeDescription.setVisible(false);
                         labelDocType.setVisible(false);
                         parentReference.setVisible(false);
                         parentDetails.setVisible(false);
                         estimationPanel.setVisible(false);
                     } else {
-                        labelTitle.setVisible(true);
+                        typeDescription.setVisible(true);
                         labelDocType.setVisible(true);
                         parentReference.setVisible(true);
                         parentDetails.setVisible(true);
                         switch (item) {
                             case ExData.LINK_APPENDIX_TYPE:
-                                labelTitle.setText(Lang.getInstance().translate("Set parent Document for Appendix")
-                                        + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
-                                        + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
+                                typeDescription.setText(fontStyle + Lang.T("Set parent Transaction for Appendix below")
+                                        + ".<br?<br>" + Lang.T("LINK_APPENDIX_TYPE"));
                                 estimationPanel.setVisible(false);
                                 break;
                             case ExData.LINK_REPLY_COMMENT_TYPE:
-                                labelTitle.setText(Lang.getInstance().translate("Set parent Document for Reply")
-                                        + ".\n\n" + Lang.getInstance().translate("This will be reset Recipients list to involved accounts list by default")
-                                        + "\n" + Lang.getInstance().translate("But You may edit Recipients list"));
+                                typeDescription.setText(fontStyle + Lang.T("Set parent Transaction for Reply below")
+                                        + ".<br><br>" + Lang.T("LINK_REPLY_COMMENT_TYPE"));
                                 estimationPanel.setVisible(BlockChain.TEST_MODE);
-                                 break;
+                                break;
                             case ExData.LINK_COMMENT_TYPE_FOR_VIEW:
-                                labelTitle.setText(Lang.getInstance().translate("Set parent Document for Comment")
-                                        + ".\n\n" + Lang.getInstance().translate("This will erase Recipients list by default")
-                                        + ".\n" + Lang.getInstance().translate("But You may edit Recipients list"));
+                                typeDescription.setText(fontStyle + Lang.T("Set parent Transaction for Comment below")
+                                        + ".<br><br>" + Lang.T("LINK_COMMENT_TYPE_FOR_VIEW"));
                                 estimationPanel.setVisible(BlockChain.TEST_MODE);
                                 break;
                             default:
-                                labelTitle.setText(Lang.getInstance().translate("Set Parent Document"));
+                                typeDescription.setText(Lang.T(fontStyle + "Set Parent Document"));
 
                         }
                     }
@@ -90,10 +92,11 @@ public class DocTypeAppendixPanel extends JPanel {
         labelDocType = new JLabel();
         filler1 = new Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 32767));
-        labelTitle = new JTextArea();
-        labelTitle.setEditable(false);
-        labelTitle.setBackground(this.getBackground());
-        //labelTitle.setEnabled(false);
+
+        typeDescription = new JTextPane();
+        typeDescription.setEditable(false);
+        typeDescription.setBackground(this.getBackground());
+        typeDescription.setContentType("text/html");
 
         parentDetails = new JLabel();
 
@@ -120,7 +123,7 @@ public class DocTypeAppendixPanel extends JPanel {
             }
         });
 
-        tagsLabel = new JLabel(Lang.getInstance().translate("Tags"));
+        tagsLabel = new JLabel(Lang.T("Tags"));
         tagsField = new JTextField();
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
@@ -132,35 +135,35 @@ public class DocTypeAppendixPanel extends JPanel {
         java.awt.GridBagLayout panelLayout = new java.awt.GridBagLayout();
         panel.setLayout(panelLayout);
 
-        int dridY = 0;
+        int gridy = 0;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         add(tagsLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         add(tagsField, gridBagConstraints);
-        dridY++;
+        gridy++;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         panel.add(typeDocumentLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
@@ -169,7 +172,7 @@ public class DocTypeAppendixPanel extends JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -177,38 +180,39 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         add(panel, gridBagConstraints);
 
-        dridY++;
+        gridy++;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;//0;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridy = gridy;//0;
+        gridBagConstraints.gridwidth = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
-        add(labelTitle, gridBagConstraints);
-        dridY++;
+        add(typeDescription, gridBagConstraints);
+        gridy++;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;//2;
+        gridBagConstraints.gridy = gridy;//2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         add(labelDocType, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = dridY;//2;
+        gridBagConstraints.gridy = gridy;//2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 8);
         add(parentReference, gridBagConstraints);
-        dridY++;
+        gridy++;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = dridY;//3;
+        gridBagConstraints.gridy = gridy;//3;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
@@ -216,7 +220,7 @@ public class DocTypeAppendixPanel extends JPanel {
 
 //        gridBagConstraints = new java.awt.GridBagConstraints();
 //        gridBagConstraints.gridx = 0;
-//        gridBagConstraints.gridy = ++dridY;
+//        gridBagConstraints.gridy = ++gridy;
 //        gridBagConstraints.gridwidth = 3;
 //        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 //        gridBagConstraints.weightx = 0.3;
@@ -230,7 +234,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 5);
-        estimationPanel.add(new JLabel(Lang.getInstance().translate("Estimate") + " 1: "), gridBagConstraints);
+        estimationPanel.add(new JLabel(Lang.T("Estimate") + " 1: "), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -244,7 +248,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 5);
-        estimationPanel.add(new JLabel(Lang.getInstance().translate("Value") + " 1: "), gridBagConstraints);
+        estimationPanel.add(new JLabel(Lang.T("Value") + " 1: "), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
@@ -258,7 +262,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 5);
-        estimationPanel.add(new JLabel(Lang.getInstance().translate("Estimate") + " 2: "), gridBagConstraints);
+        estimationPanel.add(new JLabel(Lang.T("Estimate") + " 2: "), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -272,7 +276,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
-        estimationPanel.add(new JLabel(Lang.getInstance().translate("Value") + " 2: "), gridBagConstraints);
+        estimationPanel.add(new JLabel(Lang.T("Value") + " 2: "), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
@@ -283,7 +287,7 @@ public class DocTypeAppendixPanel extends JPanel {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++dridY;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -294,7 +298,7 @@ public class DocTypeAppendixPanel extends JPanel {
         // botoom
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++dridY;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
@@ -303,7 +307,7 @@ public class DocTypeAppendixPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         add(new JLabel(""), gridBagConstraints);
 
-        labelTitle.setVisible(false);
+        typeDescription.setVisible(false);
         labelDocType.setVisible(false);
         parentReference.setVisible(false);
         parentDetails.setVisible(false);
@@ -317,11 +321,11 @@ public class DocTypeAppendixPanel extends JPanel {
     // Variables declaration - do not modify
     private Box.Filler filler1;
     private JLabel labelDocType;
-    private JTextArea labelTitle;
+    private JTextPane typeDescription;
     public JTextField parentReference;
     private JLabel parentDetails;
     private JLabel typeDocumentLabel;
-    private DocTypeComboBox typeDocymentCombox;
+    public DocTypeComboBox typeDocymentCombox;
 
     private JLabel tagsLabel;
     public JTextField tagsField;
@@ -342,7 +346,7 @@ public class DocTypeAppendixPanel extends JPanel {
         Long parentDBref = Transaction.parseDBRef(docRef);
         if (parentDBref == null) {
             if (Base58.isExtraSymbols(docRef)) {
-                parentDetails.setText(Lang.getInstance().translate("Not Base58 signature"));
+                parentDetails.setText(Lang.T("Not Base58 signature"));
                 return;
             }
 
@@ -350,23 +354,23 @@ public class DocTypeAppendixPanel extends JPanel {
             if (DCSet.getInstance().getTransactionFinalMapSigns().contains(signature)) {
                 parentTx = DCSet.getInstance().getTransactionFinalMap().get(signature);
             } else {
-                parentDetails.setText(Lang.getInstance().translate("Not Found"));
+                parentDetails.setText(Lang.T("Not Found"));
                 return;
             }
         } else {
             if (DCSet.getInstance().getTransactionFinalMap().contains(parentDBref)) {
                 parentTx = DCSet.getInstance().getTransactionFinalMap().get(parentDBref);
                 if (parentTx.getCreator() == null) {
-                    parentDetails.setText(Lang.getInstance().translate("Empty Creator in parent transaction"));
+                    parentDetails.setText(Lang.T("Empty Creator in parent transaction"));
                     return;
                 }
             } else {
-                parentDetails.setText(Lang.getInstance().translate("Not Found"));
+                parentDetails.setText(Lang.T("Not Found"));
                 return;
             }
         }
 
-        parentDetails.setText(parentTx.toStringShortAsCreator());
+        parentDetails.setText(parentTx.toStringFullAndCreatorLang());
 
         exPanel.updateRecipients();
 

@@ -21,7 +21,7 @@ public class OnDealClick {
         //CHECK IF NETWORK OK
         if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
             //NETWORK NOT OK
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, Lang.T("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             //ENABLE
             button.setEnabled(true);
@@ -35,7 +35,7 @@ public class OnDealClick {
             String password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
             if (!Controller.getInstance().unlockWallet(password)) {
                 //WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 button.setEnabled(true);
@@ -68,7 +68,7 @@ public class OnDealClick {
                 mess = "Negative amount";
                 break;
             case Transaction.NOT_ENOUGH_FEE:
-                mess = "Not enought fee";
+                mess = "Not enough fee";
                 break;
             case Transaction.INVALID_FEE_POWER:
                 mess = "Invalid fee power";
@@ -174,11 +174,17 @@ public class OnDealClick {
                 mess = "Unknown public key for encrypt";
                 break;
 
-            case Transaction.HASH_ALREDY_EXIST:
-                mess = "Hash already exist";
+            case Transaction.HASH_ALREADY_EXIST:
+                mess = "HASH_ALREADY_EXIST";
                 break;
             case Transaction.WRONG_SIGNER:
                 mess = "Wrong Signer";
+                break;
+            case Transaction.INVALID_BALANCE_POS:
+                mess = "Invalid balance Position";
+                break;
+            case Transaction.INVALID_BALANCE_SIDE:
+                mess = "Invalid balance Side";
                 break;
 
             case Transaction.NAME_NOT_LOWER_CASE:
@@ -237,6 +243,13 @@ public class OnDealClick {
                 mess = "Invalid data format";
                 break;
 
+            case Transaction.INVALID_EX_LINK_TYPE:
+                mess = "Invalid Link Type";
+                break;
+            case Transaction.INVALID_EX_LINK_REF:
+                mess = "Empty or invalid 'linkTo' parameter";
+                break;
+
             case Transaction.INVALID_URL_LENGTH:
                 mess = "Invalid URL length";
                 break;
@@ -245,6 +258,9 @@ public class OnDealClick {
                 break;
             case Transaction.INVALID_SIGNATURE:
                 mess = "Invalid signature";
+                break;
+            case Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID:
+                mess = "Invalid Person Owner signature";
                 break;
             case Transaction.TRANSACTION_DOES_NOT_EXIST:
                 mess = "Transaction does not exist";
@@ -361,6 +377,10 @@ public class OnDealClick {
                 mess = "Invalid item key";
                 break;
 
+            case Transaction.INVALID_FLAGS:
+                mess = "Invalid flags = -1";
+                break;
+
             case Transaction.INVALID_ITEM_VALUE:
                 mess = "Invalid item value";
                 break;
@@ -391,7 +411,7 @@ public class OnDealClick {
                 mess = "Duplicate key";
                 break;
             case Transaction.ITEM_DUPLICATE:
-                mess = "Invalid duplicate item";
+                mess = "ITEM_DUPLICATE";
                 break;
             case Transaction.INVALID_TIMESTAMP_START:
                 mess = "Invalid start timestamp item";
@@ -399,6 +419,10 @@ public class OnDealClick {
             case Transaction.INVALID_TIMESTAMP_END:
                 mess = "Invalid end timestamp";
                 break;
+            case Transaction.INVALID_ASSET_TYPE:
+                mess = "Invalid asset type (not unique?)";
+                break;
+
             case Transaction.INVALID_CREATOR:
                 mess = "Invalid creator";
                 break;
@@ -480,6 +504,10 @@ public class OnDealClick {
                 break;
             case Transaction.TELEGRAM_DOES_NOT_EXIST:
                 mess = "Telegram does not exist";
+                break;
+
+            case Transaction.INVALID_TRANSACTION_TYPE:
+                mess = "Invalid transaction type";
                 break;
 
         }

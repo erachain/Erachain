@@ -2,10 +2,10 @@ package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,7 +23,7 @@ public class BalanceRenderer implements ListCellRenderer<Pair<Tuple2<String, Lon
 
         if (value != null) {
             AssetCls asset = Controller.getInstance().getAsset(value.getA().b);
-            renderer.setText("(" + asset.getKey() + ") " + asset.viewName() + " - " + NumberAsString.formatAsString(value.getB().a.b, asset.getScale()));
+            renderer.setText(asset.toString() + " - " + NumberAsString.formatAsString(value.getB().a.b, asset.getScale()));
         }
 
         return renderer;

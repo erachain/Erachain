@@ -8,8 +8,8 @@ import javax.validation.constraints.Null;
 class Attache_Files_Model extends DefaultTableModel {
 
     public Attache_Files_Model() {
-        super(new Object[]{Lang.getInstance().translate("Name"), Lang.getInstance().translate("Path"),
-                "Zip?", Lang.getInstance().translate("Size/Zip size")}, 0);
+        super(new Object[]{Lang.T("Name"), Lang.T("Path"),
+                "Zip?", Lang.T("Size/Zip size")}, 0);
 
     }
 

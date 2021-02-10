@@ -2,10 +2,10 @@ package org.erachain.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.statuses.StatusFactory;
@@ -42,6 +42,7 @@ public class ItemStatusesResource {
         help.put("statuses/images/{key}", "get item Images by key");
         help.put("statuses/listfrom/{start}", "get list from KEY");
         help.put("POST statuses/issueraw/{creator}?linkTo=<SeqNo>&feePow=<int>&password=<String> ", "Issue Status by Base58 RAW in POST body");
+        help.put("POST statuses/issueraw/{creator} {\"linkTo\":<SeqNo>, \"feePow\":<int>, \"password\":<String>, \"linkTo\":<SeqNo>, \"raw\":RAW-Base58", "Issue Statuse by Base58 RAW in POST body");
 
         //help.put("POST statuses/issue", "issue");
 
@@ -134,36 +135,34 @@ public class ItemStatusesResource {
 
     @POST
     @Path("issueraw/{creator}")
-    public String issueRAW(String x, @PathParam("creator") String creator,
-                           @QueryParam("linkTo") String linkToRefStr,
-                           @DefaultValue("0") @QueryParam("feePow") String feePowStr,
-                           @QueryParam("password") String password) {
+    public String issueRAW(String x, @PathParam("creator") String creatorStr) {
 
         Controller cntr = Controller.getInstance();
-        Fun.Tuple3<PrivateKeyAccount, Integer, byte[]> result = APIUtils.postIssueRawItem(request, x, creator, feePowStr, password);
+        Object result = Transaction.decodeJson(creatorStr, x);
+        if (result instanceof JSONObject) {
+            return result.toString();
+        }
+
+        Fun.Tuple5<Account, Integer, ExLink, String, JSONObject> resultHead = (Fun.Tuple5<Account, Integer, ExLink, String, JSONObject>) result;
+        Account creator = resultHead.a;
+        int feePow = resultHead.b;
+        ExLink linkTo = resultHead.c;
+        String password = resultHead.d;
+        JSONObject jsonObject = resultHead.e;
+
+        Fun.Tuple2<PrivateKeyAccount, byte[]> resultRaw = APIUtils.postIssueRawItem(request, jsonObject.get("raw").toString(),
+                creator, password, "issue Status");
+
         StatusCls item;
         try {
-            item = StatusFactory.getInstance().parse(result.c, false);
+            item = StatusFactory.getInstance().parse(resultRaw.b, false);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     e.getMessage());
         }
 
-        ExLink linkTo;
-        if (linkToRefStr == null)
-            linkTo = null;
-        else {
-            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-            if (linkToRef == null) {
-                throw ApiErrorFactory.getInstance().createError(
-                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-            } else {
-                linkTo = new ExLinkSource(linkToRef, null);
-            }
-        }
-
-        Transaction transaction = cntr.issueStatus(result.a, linkTo, result.b, item);
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+        Transaction transaction = cntr.issueStatus(resultRaw.a, linkTo, feePow, item);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();

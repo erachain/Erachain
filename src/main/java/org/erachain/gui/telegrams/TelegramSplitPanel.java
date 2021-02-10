@@ -1,5 +1,6 @@
 package org.erachain.gui.telegrams;
 
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -65,7 +66,7 @@ public class TelegramSplitPanel extends SplitPanel {
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
         this.toolBarLeftPanel.setVisible(false);
-        this.setName(Lang.getInstance().translate("My Accounts"));
+        this.setName(Lang.T("My Accounts"));
         this.jToolBarRightPanel.setVisible(false);
 
         GridBagConstraints PanelGBC = new GridBagConstraints();
@@ -199,7 +200,7 @@ public class TelegramSplitPanel extends SplitPanel {
         ) {
             this.leftTelegram.jCxbAllmessages.setSelected(true);
             tableFavoriteAccounts.setVisible(false);
-            rightTelegramPanel.jLabelRecipient.setText(Lang.getInstance().translate("All"));
+            rightTelegramPanel.jLabelRecipient.setText(Lang.T("All"));
             rightTelegramPanel.walletTelegramsFilterTableModel.setReceiver(null);
             rightTelegramPanel.jPanelBottom.setVisible(false);
             leftTelegram.jButtonAddAccount.setVisible(false);
@@ -225,7 +226,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 // TODO Auto-generated method stub
                 tableFavoriteAccounts.setVisible(false);
                 Settings.getInstance().setTelegramRatioReciever("all");
-                rightTelegramPanel.jLabelRecipient.setText(Lang.getInstance().translate("All"));
+                rightTelegramPanel.jLabelRecipient.setText(Lang.T("All"));
                 rightTelegramPanel.walletTelegramsFilterTableModel.setReceiver(null);
                 rightTelegramPanel.jPanelBottom.setVisible(false);
                 leftTelegram.jButtonAddAccount.setVisible(false);
@@ -256,7 +257,7 @@ public class TelegramSplitPanel extends SplitPanel {
         });
 
         rightTelegramPanel.jLabelCenter.setText(" <->");
-        rightTelegramPanel.jButtonSendTelegram.setText(Lang.getInstance().translate("Send"));
+        rightTelegramPanel.jButtonSendTelegram.setText(Lang.T("Send"));
         rightTelegramPanel.jButtonSendTelegram.addActionListener(new ActionListener() {
 
             @Override
@@ -298,7 +299,7 @@ public class TelegramSplitPanel extends SplitPanel {
             }
         });
 
-        JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Account"));
+        JMenuItem copyAddress = new JMenuItem(Lang.T("Copy Account"));
         copyAddress.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -311,7 +312,7 @@ public class TelegramSplitPanel extends SplitPanel {
         });
         menu.add(copyAddress);
 
-        JMenuItem menu_copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+        JMenuItem menu_copyPublicKey = new JMenuItem(Lang.T("Copy Public Key"));
         menu_copyPublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -335,12 +336,12 @@ public class TelegramSplitPanel extends SplitPanel {
         });
         menu.add(menu_copyPublicKey);
 
-        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
+        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.T("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Tuple2<String, Tuple3<String, String, String>> item = accountModel.getItem(row);
                 Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send asset"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Send asset"),
                         new AccountAssetSendPanel(null,
                                 null, accountTo, null, null, false));
 
@@ -349,19 +350,19 @@ public class TelegramSplitPanel extends SplitPanel {
         });
         menu.add(Send_Coins_item_Menu);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.T("Send mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Tuple2<String, Tuple3<String, String, String>> item = accountModel.getItem(row);
                 Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Mail"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail"),
                         new MailSendPanel(null, accountTo, null));
 
             }
         });
         menu.add(Send_Mail_item_Menu);
 
-        JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
+        JMenuItem setName = new JMenuItem(Lang.T("Edit name"));
         setName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Tuple2<String, Tuple3<String, String, String>> item = accountModel.getItem(row);
@@ -372,7 +373,7 @@ public class TelegramSplitPanel extends SplitPanel {
         });
         menu.add(setName);
 
-        JMenuItem menuItemDelete = new JMenuItem(Lang.getInstance().translate("Remove Favorite"));
+        JMenuItem menuItemDelete = new JMenuItem(Lang.T("Remove Favorite"));
         menuItemDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (false && !Controller.getInstance().isWalletUnlocked()) {
@@ -384,8 +385,8 @@ public class TelegramSplitPanel extends SplitPanel {
                     }
                     if (!Controller.getInstance().unlockWallet(password)) {
                         // WRONG PASSWORD
-                        JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                                Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                                Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                         // ENABLE
 
@@ -431,7 +432,7 @@ public class TelegramSplitPanel extends SplitPanel {
             }
             if (!Controller.getInstance().unlockWallet(password)) {
                 //WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.rightTelegramPanel.jButtonSendTelegram.setEnabled(true);
@@ -450,7 +451,7 @@ public class TelegramSplitPanel extends SplitPanel {
         if (result.b == null) {
             this.recipient = result.a;
         } else {
-            JOptionPane.showMessageDialog(null, Lang.getInstance().translate(result.b), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, Lang.T(result.b), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             //ENABLE
             this.rightTelegramPanel.jButtonSendTelegram.setEnabled(true);
@@ -474,8 +475,8 @@ public class TelegramSplitPanel extends SplitPanel {
                     try {
                         messageBytes = Base58.decode(message);
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex") + "!",
-                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(new JFrame(), Lang.T("Message format is not base58 or hex") + "!",
+                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                         //ENABLE
                         this.rightTelegramPanel.jButtonSendTelegram.setEnabled(true);
@@ -499,7 +500,7 @@ public class TelegramSplitPanel extends SplitPanel {
 
         if (messageBytes != null) {
             if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded") + " <= MAX", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Message size exceeded") + " <= MAX", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
                 this.rightTelegramPanel.jButtonSendTelegram.setEnabled(true);
@@ -514,7 +515,9 @@ public class TelegramSplitPanel extends SplitPanel {
                 //recipient
                 byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
                 if (publicKey == null) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T(
+                            ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)
+                    ), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                     //ENABLE
                     this.rightTelegramPanel.jButtonSendTelegram.setEnabled(true);
@@ -530,16 +533,16 @@ public class TelegramSplitPanel extends SplitPanel {
         if (head == null) head = "";
         if (head.getBytes(StandardCharsets.UTF_8).length > 256) {
 
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded") + " <= 256",
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Title size exceeded") + " <= 256",
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
 
         }
 
         PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
         if (creator == null) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Wallet is busy, try later") + "!",
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Wallet is busy, try later") + "!",
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
         } else {
             // CREATE TX MESSAGE
             Transaction transaction = Controller.getInstance().r_Send(

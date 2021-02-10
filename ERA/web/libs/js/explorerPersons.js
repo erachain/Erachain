@@ -31,7 +31,7 @@ function person_asset(data) {
     }
 
     output += '<h2><center style="font-si-ze:2em; color:' + color;
-    output += '"> &nbsp&nbsp ' + data.label_Balance_Pos + ' [' + data.label_Balance_Side + ']</center></h2>';
+    output += '"> &nbsp&nbsp ' + data.Label_Balance_Pos + ' [' + data.Label_Balance_Side + ']</center></h2>';
     output += '<h2><img src="img/' + img + '" style="height:2em">'
     output += '<span style="font-siz-e:3em; color:'+ color + '"> &nbsp&nbsp ' + data.sum + '</span></h2>';
     output += '<br>';
@@ -40,28 +40,28 @@ function person_asset(data) {
     output += '<h4>' + data.Label_Positions + ': ';
 
     if (data.position == 1)
-        output +=  '&nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c">' + data.label_Balance_1 + '</span></b>';
+        output +=  '&nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c">' + data.Label_Balance_1 + '</span></b>';
     else
         output +=  '&nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=1&side=' + data.side + get_lang()
-                                 + '">' + data.label_Balance_1 + '</a>';
+                                 + '">' + data.Label_Balance_1 + '</a>';
 
     if (data.position == 2)
-        output +=  ' &nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.label_Balance_2 + '</span></b>';
+        output +=  ' &nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_Balance_2 + '</span></b>';
     else
         output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=2&side=' + data.side + get_lang()
-                                        + '">' + data.label_Balance_2 + '</a>';
+                                        + '">' + data.Label_Balance_2 + '</a>';
 
     if (data.position == 3)
-        output +=  ' &nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.label_Balance_3 + '</span></b>';
+        output +=  ' &nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_Balance_3 + '</span></b>';
     else
         output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=3&side=' + data.side + get_lang()
-                                        + '">' + data.label_Balance_3 + '</a>';
+                                        + '">' + data.Label_Balance_3 + '</a>';
 
     if (data.position == 4)
-        output +=  ' &nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.label_Balance_4 + '</span></b>';
+        output +=  ' &nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_Balance_4 + '</span></b>';
     else
         output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=4&side=' + data.side + get_lang()
-                                        + '">' + data.label_Balance_4 + '</a>';
+                                        + '">' + data.Label_Balance_4 + '</a>';
 
     output += '</h4>';
 
@@ -217,11 +217,14 @@ function person_status(data) {
     return output;
 }
 
-function person(data) {
+function person(data, forPrint) {
 
-    var output = lastBlock(data.lastBlock);
+    var output = '';
 
-    if (!data.hasOwnProperty('key')) {
+    if (!forPrint)
+        output += lastBlock(data.lastBlock);
+
+    if (!data.hasOwnProperty('item')) {
         output += '<h2>Not found</h2>';
         return output;
     }
@@ -232,60 +235,37 @@ function person(data) {
         return output;
     }
 
-    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1300">';
     output += '<tr><td align=left>';
     output += '<table><tr style="vertical-align:top">';
 
-    if (data.image.length > 0) {
-        output += '<td><img src="data:image/gif;base64,' + data.image + '" width = "350" /></td><td style ="width: 70%; padding-left:20px">';
-        output += '<br>';
-    }
+    var item = data.item;
+    ////// HEAD
+    output += itemHead(item, forPrint);
 
-    output += '<h3><a href="?person=' + data.key + get_lang() + '"><h3 style="display:inline;">';
-    if (false && data.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.icon + '" style="width:50px;" /> ';
-    output += data.name + '</a></h3>';
+    //////// BODY
 
-    output += '<h4> [ <input id="key1" name="person" size="4" type="text" value="' + data.key + '" class="" style="font-size: 1em;"'
-                   + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
-    output += '<a href=?tx=' + data.seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + data.seqNo + '</b></a>';
-    output += ' ' +'<a href=?q=' + data.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Actions + '</b></a>';
-    output += ' ' +'<a href=?q=@PA' + data.key + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + data.label_Authorship + '</b></a></h4>';
-
-    output += '<br>';
-
-    output += '<h5>' + data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
+    output += '<h4>' + item.Label_Born + ': &nbsp&nbsp<b> ' + item.birthday + '</b>';
     if ('deathday' in data) {
-        output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b>'
-    } else {
-        output += '</h5>';
+        output += ', &nbsp&nbsp ' + item.Label_Dead + ': &nbsp&nbsp<b> ' + item.deathday + '</b>'
     }
-    output += '<h6>' + data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b></h6>';
+    output += '</h4>';
+
+    output += '<h4>' + item.Label_Gender + ': &nbsp&nbsp<b> ' + item.gender + '</b></h4>';
 
     if (data.era_balance_a) {
-        output += '<h5>ERA: &nbsp&nbsp<u>A</u>:<b>' + data.era_balance_a + '</b>&nbsp&nbsp<u>B</u>:<b>'
-            + data.era_balance_b + '</b>&nbsp&nbsp<u>C</u>:<b>' + data.era_balance_c + '</b></h5>';
+        output += '<h4>ERA: &nbsp&nbsp<u>A</u>:<b>' + data.era_balance_a + '</b>&nbsp&nbsp<u>B</u>:<b>'
+            + data.era_balance_b + '</b>&nbsp&nbsp<u>C</u>:<b>' + data.era_balance_c + '</b></h4>';
     }
     if (data.compu_balance) {
-        output += '<h5>COMPU: &nbsp&nbsp <b>' + data.compu_balance + '</b></h5>';
+        output += '<h4>COMPU: &nbsp&nbsp <b>' + data.compu_balance + '</b></h4>';
     }
 
-    if (data.lia_balance_a) {
-        output += '<h5>' + data.Label_total_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.Label_total_certified + ': <b>' + data.lia_balance_b + '</b></h5>';
+    if (data.lia_balance_a && !forPrint) {
+        output += '<h4>' + data.Label_Total_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.Label_Total_certified + ': <b>' + data.lia_balance_b + '</b></h4>';
     }
 
-    if (data.creator_name != "") {
-        output += data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator_name + '</b></a><br>';
-    } else {
-        output += data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator + '</b></a><br>';
-    }
-
-    if (data.registrar_name != "") {
-        output += data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar_name + '</b></a><br>';
-    } else {
-        output += data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar + '</b></a><br>';
-    }
-
-    output += '<h5>' + data.Label_description + ':</h5>' + fformat(data.description) + '<br>';
+    output += itemFoot(item, forPrint);
 
     output += '</td>';
     output += '</tr>';
@@ -332,6 +312,9 @@ function person(data) {
         output += '</table>';
     }
 
+    if (forPrint)
+        return output;
+
     //my persons
     if (data.Label_My_Persons) {
         output += '<br>' + data.Label_My_Persons + ':';
@@ -374,7 +357,7 @@ function persons(data) {
     output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
         'class="table table-striped" style="border: 1px solid #ddd;">';
     output += '<tr><td><td><b>' + data.Label_key + ' <td><b>' +
-        data.Label_name + '<td><b>'+ data.Label_description + ' <td><b>' + data.Label_creator;
+        data.Label_name + '<td><b>'+ data.Label_age + ' <td><b>' + data.Label_creator;
     //Отображение таблицы элементов персон
     for (var i in data.pageItems) {
     //var length = Object.keys(data.pageItems).length;
@@ -383,10 +366,14 @@ function persons(data) {
 
 
         output += '<tr>';
-        output += ' <td><img src="personimage?key=' + item.key + '" width="100"/></td>';
+        output += ' <td><img src="personimage?key=' + item.key + '" width="100"/>';
         output += '<td>' + item.key + '<td><a href=?person=' +
             item.key + get_lang() + '>' + escapeHtml(item.name) + '</a>';
-        output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
+        var dateDiff = new Date(item.birthday);
+        //dateDiff = Date.now() - dateDiff;
+        //output += '<td>' + convertTimestamp(item.birthday, true) + ' - '
+        output += '<td>' + (new Date().getFullYear() - dateDiff.getFullYear());
+        //output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
         output += '<td><a href=?address=' + item.owner + get_lang() + '>';
         if (item.hasOwnProperty('person'))
             output += '[' + item.person_key + ']' + escapeHtml(item.person);

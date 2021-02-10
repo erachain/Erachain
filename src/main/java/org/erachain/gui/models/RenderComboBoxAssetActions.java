@@ -1,6 +1,7 @@
 package org.erachain.gui.models;
 
-import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.lang.Lang;
+import org.mapdb.Fun;
 import sun.swing.DefaultLookup;
 
 import javax.swing.*;
@@ -8,7 +9,9 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-public class RenderComboBoxVidBalance extends DefaultListCellRenderer {
+
+public class RenderComboBoxAssetActions extends DefaultListCellRenderer {
+
     private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
     private static final Border DEFAULT_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
     protected static Border noFocusBorder = DEFAULT_NO_FOCUS_BORDER;
@@ -46,10 +49,10 @@ public class RenderComboBoxVidBalance extends DefaultListCellRenderer {
 
         if (value instanceof Icon) {
             setIcon((Icon) value);
-            setText("");
+            //setText("");
         } else {
             setIcon(null);
-            setText((value == null) ? "" : getDiscriptionValue((Integer) value));
+            setText((value == null) ? "" : getDescriptionValue((Fun.Tuple2) value));
         }
 
         setEnabled(list.isEnabled());
@@ -71,25 +74,8 @@ public class RenderComboBoxVidBalance extends DefaultListCellRenderer {
         return this;
     }
 
-    private String getDiscriptionValue(int value){
-      switch (value) {
-          case TransactionAmount.ACTION_DEBT:
-              return "Debt";
-          case       TransactionAmount.ACTION_SEND:
-              return "Send";
-          case  TransactionAmount.ACTION_HOLD:
-              return "Hold";
-          case  TransactionAmount.ACTION_REPAY_DEBT:
-              return "Repay debt";
-          case  TransactionAmount.ACTION_SPEND:
-              return "Spend";
-          case  TransactionAmount.ACTION_PLEDGE:
-              return "Pledge";
-          case   TransactionAmount.ACTION_RESERCED_6:
-              return "Reserced_6";
-      }
-
-        return "";
+    private String getDescriptionValue(Fun.Tuple2<?, String> value) {
+        return Lang.T(value.b);
     }
 
     private Border getNoFocusBorder() {
@@ -108,3 +94,8 @@ public class RenderComboBoxVidBalance extends DefaultListCellRenderer {
     }
 
 }
+
+
+
+
+

@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 public class UnionInfo extends MTextPane {
 
     private static final long serialVersionUID = 1L;
-    private String message = "<HTML>" + Lang.getInstance().translate("Select union");
+    private String message = "<HTML>" + Lang.T("Select union");
 
     public UnionInfo() {
     }
@@ -33,7 +33,7 @@ public class UnionInfo extends MTextPane {
                     "</div>";
 
         } else {
-            message = "<html><p>" + Lang.getInstance().translate("Not found!") + "</p>";
+            message = "<html><p>" + Lang.T("Not found!") + "</p>";
         }
         message = message + "</html>";
 

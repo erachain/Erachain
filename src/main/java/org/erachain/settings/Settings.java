@@ -29,7 +29,7 @@ import java.util.List;
 public class Settings {
 
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L; // MAIN Net
-    public static final long DEFAULT_DEMO_NET_STAMP = 1607511600000L; // DEMO Net
+    public static final long DEFAULT_DEMO_NET_STAMP = 1609491286000L; // DEMO Net
 
     public static String APP_NAME = "";
     public static String APP_FULL_NAME = "";
@@ -86,7 +86,7 @@ public class Settings {
     //GUI CONSOLE
     private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
     //WEB
-    private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
+    public static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
     private static final boolean DEFAULT_WEB_ENABLED = true;
     private static final String DEFAULT_WEB_KEYSTORE_FILE_PATH = "SSL" + File.separator +"WEBkeystore";
     private String webKeyStorePassword ="";
@@ -320,6 +320,19 @@ public class Settings {
         return this.dataWalletPath + DEFAULT_DATA_WALLET_DIR;
     }
 
+    public static String normalizePath(String path) {
+        String appPath = new File(".").getAbsolutePath();
+        if (appPath.endsWith(".")) {
+            appPath = appPath.substring(0, appPath.length() - 1);
+        }
+
+        if (path.startsWith(appPath)) {
+            path = path.substring(appPath.length());
+        }
+        return path;
+
+    }
+
     public void setDataWalletPath(String path) {
         if (path == null) {
             path = "";
@@ -497,6 +510,10 @@ public class Settings {
 
     }
 
+    public void updateJson(String key, Object value) {
+        settingsJSON.put(key, value);
+    }
+
     @SuppressWarnings("unchecked")
     /**
      * полностью доверныые пиры от которых данные не проверяются - ни блоки ни транзакции
@@ -609,7 +626,7 @@ public class Settings {
                 }
             }
 
-            //logger.info(Lang.getInstance().translate("Peers loaded from Internet : ") + this.cacheInternetPeers.size());
+            //logger.info(Lang.T("Peers loaded from Internet : ") + this.cacheInternetPeers.size());
 
             return this.cacheInternetPeers;
 
@@ -617,7 +634,7 @@ public class Settings {
             //RETURN EMPTY LIST
 
             //logger.debug(e.getMessage(), e);
-            LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet with errors : ") + this.cacheInternetPeers.size());
+            LOGGER.info(Lang.T("Peers loaded from Internet with errors : ") + this.cacheInternetPeers.size());
 
             return this.cacheInternetPeers;
         }

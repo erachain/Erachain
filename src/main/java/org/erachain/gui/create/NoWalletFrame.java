@@ -21,7 +21,7 @@ public class NoWalletFrame extends JFrame {
     private NoWalletFrame th;
 
     public NoWalletFrame(Gui parent) throws Exception {
-        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("No Wallet"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("No Wallet"));
 
         th = this;
         //ICON
@@ -70,20 +70,20 @@ public class NoWalletFrame extends JFrame {
 
         //LABEL
         labelGBC.gridy = 0;
-        JLabel label1 = new JLabel(Lang.getInstance().translate("No existing wallet was found."));
+        JLabel label1 = new JLabel(Lang.T("No existing wallet was found."));
         this.add(label1, labelGBC);
 
         //LABEL
         labelGBC.gridy = 1;
-        JLabel label2 = new JLabel(Lang.getInstance().translate("What would you like to do?"));
+        JLabel label2 = new JLabel(Lang.T("What would you like to do?"));
         this.add(label2, labelGBC);
 
         //ADD OPTIONS
-        //	this.createButton = new JRadioButton(Lang.getInstance().translate("Create a new wallet."));
+        //	this.createButton = new JRadioButton(Lang.T("Create a new wallet."));
         //	this.createButton.setSelected(true);
         //	this.add(this.createButton, optionsGBC);
         // CREATE WALLET LABEL
-        JLabel create_Label = new JLabel("<HTML><a href =''>" + Lang.getInstance().translate("Create a new wallet.") + " </a>");
+        JLabel create_Label = new JLabel("<HTML><a href =''>" + Lang.T("Create a new wallet.") + " </a>");
         create_Label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         this.add(create_Label, optionsGBC);
         create_Label.addMouseListener(new MouseListener() {
@@ -127,7 +127,7 @@ public class NoWalletFrame extends JFrame {
 
 
         optionsGBC.gridy = 3;
-        //	this.recoverButton = new JRadioButton(Lang.getInstance().translate("Recover a wallet using an existing seed"));
+        //	this.recoverButton = new JRadioButton(Lang.T("Recover a wallet using an existing seed"));
         // 	this.add(this.recoverButton, optionsGBC);
         //
         // 	ButtonGroup group = new ButtonGroup();
@@ -135,7 +135,7 @@ public class NoWalletFrame extends JFrame {
         // 	group.add(this.recoverButton);
 
         // CREATE WALLET LABEL
-        JLabel recover_Label = new JLabel("<HTML><a href =''>" + Lang.getInstance().translate("Recover a wallet using an existing seed") + " </a>");
+        JLabel recover_Label = new JLabel("<HTML><a href =''>" + Lang.T("Recover a wallet using an existing seed") + " </a>");
         recover_Label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         this.add(recover_Label, optionsGBC);
         recover_Label.addMouseListener(new MouseListener() {
@@ -180,7 +180,7 @@ public class NoWalletFrame extends JFrame {
 
 
         optionsGBC.gridy = 4;
-        //	this.recoverButton = new JRadioButton(Lang.getInstance().translate("Recover a wallet using an existing seed"));
+        //	this.recoverButton = new JRadioButton(Lang.T("Recover a wallet using an existing seed"));
         // 	this.add(this.recoverButton, optionsGBC);
         //
         // 	ButtonGroup group = new ButtonGroup();
@@ -188,7 +188,7 @@ public class NoWalletFrame extends JFrame {
         // 	group.add(this.recoverButton);
 
         // CREATE WALLET LABEL
-        JLabel dir_Label = new JLabel("<HTML><a href =''>" + Lang.getInstance().translate("Open Wallet") + " </a>");
+        JLabel dir_Label = new JLabel("<HTML><a href =''>" + Lang.T("Open Wallet") + " </a>");
         dir_Label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         this.add(dir_Label, optionsGBC);
         dir_Label.addMouseListener(new MouseListener() {
@@ -234,7 +234,7 @@ public class NoWalletFrame extends JFrame {
         //BUTTON NEXT
         buttonGBC.gridy = 5;
         buttonGBC.gridx = 1;
-        JButton nextButton = new JButton(Lang.getInstance().translate("Next"));
+        JButton nextButton = new JButton(Lang.T("Next"));
         nextButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onNextClick();
@@ -246,7 +246,7 @@ public class NoWalletFrame extends JFrame {
         //BUTTON CANCEL
         buttonGBC.gridx = 0;
         buttonGBC.gridy = 5;
-        JButton cancelButton = new JButton(Lang.getInstance().translate("Cancel"));
+        JButton cancelButton = new JButton(Lang.T("Cancel"));
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancelClick();
@@ -275,7 +275,7 @@ public class NoWalletFrame extends JFrame {
     public void goAfterLicence(int createWallet) {
         // StartPool
 
-        if (BlockChain.DEMO_MODE) {
+        if (false && BlockChain.DEMO_MODE) {
             StartQuestion ss = new StartQuestion();
             ss.setVisible(true);
         }
@@ -290,7 +290,7 @@ public class NoWalletFrame extends JFrame {
             int res = Controller.getInstance().loadWalletFromDir();
             if (res > 1) {
                 JOptionPane.showMessageDialog(
-                        new JFrame(), Lang.getInstance().translate("wallet does not exist") + "!",
+                        new JFrame(), Lang.T("wallet does not exist") + "!",
                         "Error!",
                         JOptionPane.ERROR_MESSAGE);
                 this.setVisible(true);

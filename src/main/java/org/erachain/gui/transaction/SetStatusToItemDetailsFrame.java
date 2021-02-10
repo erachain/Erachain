@@ -21,7 +21,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
         //LABEL RESULT
         ++labelGBC.gridy;
-        JLabel resutLabel = new JLabel(Lang.getInstance().translate("Result") + ":");
+        JLabel resutLabel = new JLabel(Lang.T("Result") + ":");
         this.add(resutLabel, labelGBC);
 
         //RESULT
@@ -34,7 +34,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         // STATUS
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Status Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Status Name") + ":");
         this.add(nameLabel, labelGBC);
 
         ////// STATUS
@@ -46,7 +46,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Status Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Status Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
@@ -60,7 +60,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
         // FROM - TO DATE
         ++labelGBC.gridy;
-        this.add(new JLabel(Lang.getInstance().translate("From - To") + ":"), labelGBC);
+        this.add(new JLabel(Lang.T("From - To") + ":"), labelGBC);
         ++detailGBC.gridy;
         long beginDate = setStatusToItem.getBeginDate();
         long endDate = setStatusToItem.getEndDate();
@@ -74,7 +74,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         if (setStatusToItem.getValue1() != 0) {
             //LABEL VALUE 1
             ++labelGBC.gridy;
-            this.add(new JLabel(Lang.getInstance().translate("Value") + " 1:"), labelGBC);
+            this.add(new JLabel(Lang.T("Value") + " 1:"), labelGBC);
             //VALUE 1
             ++detailGBC.gridy;
             JTextField statusValue1 = new JTextField("" + setStatusToItem.getValue1());
@@ -86,7 +86,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         if (setStatusToItem.getValue2() != 0) {
             //LABEL VALUE 2
             ++labelGBC.gridy;
-            this.add(new JLabel(Lang.getInstance().translate("Value") + " 2:"), labelGBC);
+            this.add(new JLabel(Lang.T("Value") + " 2:"), labelGBC);
             //VALUE 2
             ++detailGBC.gridy;
             JTextField statusValue2 = new JTextField("" + setStatusToItem.getValue2());
@@ -99,7 +99,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
             //LABEL ADDITION DATA
             ++labelGBC.gridy;
-            this.add(new JLabel(Lang.getInstance().translate("DATA") + " 1:"), labelGBC);
+            this.add(new JLabel(Lang.T("DATA") + " 1:"), labelGBC);
             //DATA
             ++detailGBC.gridy;
             JTextField statusAData = new JTextField(new String(setStatusToItem.getData1(), StandardCharsets.UTF_8));
@@ -111,7 +111,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
             //LABEL ADDITION DATA
             ++labelGBC.gridy;
-            this.add(new JLabel(Lang.getInstance().translate("DATA") + " 2:"), labelGBC);
+            this.add(new JLabel(Lang.T("DATA") + " 2:"), labelGBC);
             //DATA
             ++detailGBC.gridy;
             JTextField statusAData = new JTextField(new String(setStatusToItem.getData2(), StandardCharsets.UTF_8));
@@ -124,7 +124,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
             //LABEL PARENT
             ++labelGBC.gridy;
-            this.add(new JLabel(Lang.getInstance().translate("Parent") + ":"), labelGBC);
+            this.add(new JLabel(Lang.T("Parent") + ":"), labelGBC);
             //DATA
             ++detailGBC.gridy;
             JTextField statusRefParent = new JTextField("" + setStatusToItem.viewRefParent());
@@ -137,7 +137,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
             //LABEL ADDITION DATA
             ++labelGBC.gridy;
-            this.add(new JLabel(Lang.getInstance().translate("Description") + ":"), labelGBC);
+            this.add(new JLabel(Lang.T("Description") + ":"), labelGBC);
             //DATA
             ++detailGBC.gridy;
             JTextArea descrData = new JTextArea(new String(setStatusToItem.getDescription(), StandardCharsets.UTF_8));
@@ -152,7 +152,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         // //// ITEM
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel itemNameLabel = new JLabel(Lang.getInstance().translate("Item Name") + ":");
+        JLabel itemNameLabel = new JLabel(Lang.T("Item Name") + ":");
         this.add(itemNameLabel, labelGBC);
 
         //NAME
@@ -165,7 +165,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel itemDescriptionLabel = new JLabel(Lang.getInstance().translate("Item Description") + ":");
+        JLabel itemDescriptionLabel = new JLabel(Lang.T("Item Description") + ":");
         this.add(itemDescriptionLabel, labelGBC);
 
         //DESCRIPTION

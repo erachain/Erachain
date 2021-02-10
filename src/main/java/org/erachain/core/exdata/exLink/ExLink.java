@@ -4,6 +4,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
 public class ExLink {
@@ -148,7 +149,7 @@ public class ExLink {
     public JSONObject makeJSONforHTML(boolean hasRecipients, JSONObject langObj) {
         JSONObject json = new JSONObject();
         json.put("type", type);
-        json.put("typeName", viewTypeName(type, hasRecipients));
+        json.put("typeName", Lang.T(viewTypeName(type, hasRecipients), langObj));
         json.put("flags", flags);
         json.put("value1", value1);
         json.put("value2", value2);

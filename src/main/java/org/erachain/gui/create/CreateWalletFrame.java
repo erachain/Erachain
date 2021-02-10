@@ -27,7 +27,7 @@ public class CreateWalletFrame extends JFrame {
     private NoWalletFrame parent;
 
     public CreateWalletFrame(NoWalletFrame parent) {
-        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Create Wallet"));
+        super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Create Wallet"));
 
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -65,7 +65,7 @@ public class CreateWalletFrame extends JFrame {
 
         //LABEL
         labelGBC.gridy = 0;
-        JLabel label1 = new JLabel(Lang.getInstance().translate("Your wallet generation seed") + ":");
+        JLabel label1 = new JLabel(Lang.T("Your wallet generation seed") + ":");
         this.add(label1, labelGBC);
 
         //ADD TEXTBOX
@@ -79,7 +79,7 @@ public class CreateWalletFrame extends JFrame {
 
         // MENU
         JPopupMenu menu = new JPopupMenu();
-        JMenuItem copySeed = new JMenuItem(Lang.getInstance().translate("Copy Seed"));
+        JMenuItem copySeed = new JMenuItem(Lang.T("Copy Seed"));
         copySeed.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -93,27 +93,27 @@ public class CreateWalletFrame extends JFrame {
 
         //LABEL
         labelGBC.gridy = 2;
-        JLabel label2 = new JLabel(Lang.getInstance().translate("This seed is the result of a Base58 encoded 256bit random key."));
+        JLabel label2 = new JLabel(Lang.T("This seed is the result of a Base58 encoded 256bit random key."));
         this.add(label2, labelGBC);
 
         //LABEL
         labelGBC.gridy = 3;
-        JLabel label3 = new JLabel(Lang.getInstance().translate("This seed will allow you to recover your wallet if you would accidently delete the wallet file."));
+        JLabel label3 = new JLabel(Lang.T("This seed will allow you to recover your wallet if you would accidently delete the wallet file."));
         this.add(label3, labelGBC);
 
         //LABEL
         labelGBC.gridy = 4;
-        JLabel label4 = new JLabel("<html><b>" + Lang.getInstance().translate("KEEP THIS SEED PRIVATE AND SECURE!") + "</b></html>");
+        JLabel label4 = new JLabel("<html><b>" + Lang.T("KEEP THIS SEED PRIVATE AND SECURE!") + "</b></html>");
         this.add(label4, labelGBC);
 
         //LABEL
         labelGBC.gridy = 5;
-        JLabel label5 = new JLabel(Lang.getInstance().translate("Anyone who has access to your seed will have access to your wallet."));
+        JLabel label5 = new JLabel(Lang.T("Anyone who has access to your seed will have access to your wallet."));
         this.add(label5, labelGBC);
 
         //BUTTON NEXT
         buttonGBC.gridy = 6;
-        JButton nextButton = new JButton(Lang.getInstance().translate("Next"));
+        JButton nextButton = new JButton(Lang.T("Next"));
         nextButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onNextClick();
@@ -126,7 +126,7 @@ public class CreateWalletFrame extends JFrame {
 
         //BUTTON BACK
         buttonGBC.gridx = 1;
-        JButton backButton = new JButton(Lang.getInstance().translate("Back"));
+        JButton backButton = new JButton(Lang.T("Back"));
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onBackClick();
@@ -183,7 +183,7 @@ public class CreateWalletFrame extends JFrame {
             this.dispose();
         } else {
             JOptionPane.showMessageDialog(
-                    new JFrame(), Lang.getInstance().translate("Wallet already exists") + "!",
+                    new JFrame(), Lang.T("Wallet already exists") + "!",
                     "Error!",
                     JOptionPane.ERROR_MESSAGE);
         }

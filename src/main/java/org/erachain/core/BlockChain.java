@@ -221,7 +221,7 @@ public class BlockChain {
      * Если задан то это режим синхронизации со стрым протоколом - значит нам нельза генерить блоки и трнзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 1537000; // see in sidePROTOCOL.json as 'allValidBefore'
+    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? (DEMO_MODE ? 37700 : 0) : 1537000; // see in sidePROTOCOL.json as 'allValidBefore'
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
@@ -252,6 +252,14 @@ public class BlockChain {
     public static final int VERS_4_23_01 = TEST_DB > 0 || !MAIN_MODE ? 0 : 800000;
 
     public static final int VERS_5_01_01 = TEST_DB > 0 || !MAIN_MODE ? 0 : 990000;
+
+    /**
+     * Новый уровень начальных номеров для всех сущностей
+     */
+    public static int START_KEY_UP = MAIN_MODE ? 1670000 : DEMO_MODE ? 0 : Integer.MAX_VALUE;
+    public static int START_KEY_UP_ITEMS = 1 << 20;
+
+    public static final int USE_NEW_ISSUE_FEE = MAIN_MODE ? Integer.MAX_VALUE : 0;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
@@ -374,9 +382,9 @@ public class BlockChain {
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
-    public static final int FREE_FEE_LENGTH = 1 << 13;
-    public static final int FREE_FEE_TO_SEQNO = DEMO_MODE ? 1 : -1;
-    public static final int FREE_FEE_FROM_HEIGHT = DEMO_MODE ? 1 : Integer.MAX_VALUE;
+    public static final int FREE_FEE_LENGTH = 1 << 10;
+    public static final int FREE_FEE_TO_SEQNO = DEMO_MODE ? 1 : MAIN_MODE ? 1 : -1;
+    public static final int FREE_FEE_FROM_HEIGHT = DEMO_MODE ? 1 : MAIN_MODE ? 1610000 : Integer.MAX_VALUE;
 
     /**
      * FEE_KEY used here
@@ -468,11 +476,6 @@ public class BlockChain {
     private Block waitWinBuffer;
 
     public static long[] startKeys = new long[10];
-    /**
-     * Новый уровень начальных номеров для всех сущностей
-     */
-    public static int START_KEY_UP = MAIN_MODE ? 1700000 : DEMO_MODE ? 12500 : Integer.MAX_VALUE;
-    public static int START_KEY_UO_ITEMS = 1 << 15;
 
     //private int target = 0;
     //private byte[] lastBlockSignature;
@@ -486,7 +489,7 @@ public class BlockChain {
 
     /**
      * Учитывает время очистки очереди неподтвержденных трнзакций и сброса на жесткий диск их памяти
-     * И поэтому это число хуже чем в Логе по подстчету обработки транзакций в блоке
+     * И поэтому это число хуже чем в Логе по подсчету обработки транзакций в блоке
      */
     public long transactionProcessTimingAverage;
     public long transactionProcessTimingCounter;
@@ -686,6 +689,10 @@ public class BlockChain {
             NOVA_ASSETS.put("ETH",
                     new Tuple3<Long, Long, byte[]>(14L, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
 
+            ///
+            NOVA_ASSETS.put("EI",
+                    new Tuple3<Long, Long, byte[]>(24L, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+
             NOVA_ASSETS.put("USD",
                     new Tuple3<Long, Long, byte[]>(95L, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("EUR",
@@ -715,7 +722,7 @@ public class BlockChain {
                     new Tuple3<Long, Long, byte[]>(22L, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("GAS",
                     new Tuple3<Long, Long, byte[]>(23L, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
-            NOVA_ASSETS.put("BREND",
+            NOVA_ASSETS.put("BRENT",
                     new Tuple3<Long, Long, byte[]>(24L, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
 
 
@@ -995,12 +1002,16 @@ public class BlockChain {
 
     }
 
+    public static BigDecimal feeBG(long feeLong) {
+        return BigDecimal.valueOf(feeLong * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+    }
+
     public static BigDecimal BONUS_FOR_PERSON(int height) {
 
         if (!MAIN_MODE || START_ISSUE_RIGHTS == 0 || height > START_ISSUE_RIGHTS) {
-            return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+            return feeBG(5000);
         } else {
-            return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+            return feeBG(2000);
         }
     }
 
@@ -1326,7 +1337,7 @@ public class BlockChain {
         return getTimestamp(height);
     }
 
-    public int getHeightOnTimestamp(long timestamp) {
+    public int getHeightOnTimestampMS(long timestamp) {
         long diff = timestamp - genesisTimestamp;
         int height = (int) (diff / (long) GENERATING_MIN_BLOCK_TIME_MS(1));
         if (height <= VERS_30SEC)

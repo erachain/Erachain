@@ -99,37 +99,37 @@ public class CreateOrderPanel extends JPanel {
 
         // label buy
         // DETAIL GBC
-        GridBagConstraints label_sell_buy = new GridBagConstraints();
-        label_sell_buy.insets = new Insets(0, 5, 5, 0);
-        label_sell_buy.fill = GridBagConstraints.HORIZONTAL;
-        label_sell_buy.anchor = GridBagConstraints.NORTHWEST;
-        label_sell_buy.gridx = 0;
-        label_sell_buy.gridwidth = 3;
+        GridBagConstraints Label_sell_buy = new GridBagConstraints();
+        Label_sell_buy.insets = new Insets(0, 5, 5, 0);
+        Label_sell_buy.fill = GridBagConstraints.HORIZONTAL;
+        Label_sell_buy.anchor = GridBagConstraints.NORTHWEST;
+        Label_sell_buy.gridx = 0;
+        Label_sell_buy.gridwidth = 3;
 
-        label_sell_buy.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        label_sell_buy.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        label_sell_buy.weightx = 1.0;
+        Label_sell_buy.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        Label_sell_buy.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        Label_sell_buy.weightx = 1.0;
 
-        label_sell_buy.gridy = ++labelGBC.gridy;
+        Label_sell_buy.gridy = ++labelGBC.gridy;
         detailGBC.gridy = ++detailGBC.gridy;
         JLabel lblWish = new JLabel(
-                "<html>" + (buying ? Lang.getInstance().translate("To buy") + ": " + "<b>" + this.want.toString()
-                        : Lang.getInstance().translate("To sell") + ": " + "<b>" + this.have.toString()) + "</b></html>");
+                "<html>" + (buying ? Lang.T("To buy") + ": " + "<b>" + this.want.toString()
+                        : Lang.T("To sell") + ": " + "<b>" + this.have.toString()) + "</b></html>");
 
-        this.add(lblWish, label_sell_buy);
+        this.add(lblWish, Label_sell_buy);
 
         JLabel lblResult = new JLabel(
-                "<html>" + (buying ? Lang.getInstance().translate("For") + ": <b>" + this.have.toString()
-                        : Lang.getInstance().translate("For") + ": <b>" + this.want.toString()) + "</b></html>");
+                "<html>" + (buying ? Lang.T("For") + ": <b>" + this.have.toString()
+                        : Lang.T("For") + ": <b>" + this.want.toString()) + "</b></html>");
 
         // Label sell
-        label_sell_buy.gridy = ++labelGBC.gridy;
+        Label_sell_buy.gridy = ++labelGBC.gridy;
         detailGBC.gridy = ++detailGBC.gridy;
-        this.add(lblResult, label_sell_buy);
+        this.add(lblResult, Label_sell_buy);
 
         // LABEL FROM
         labelGBC.gridy = ++labelGBC.gridy;
-        // JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account")
+        // JLabel fromLabel = new JLabel(Lang.T("Account")
         // + ":");
         // this.add(fromLabel, labelGBC);
 
@@ -167,8 +167,8 @@ public class CreateOrderPanel extends JPanel {
         // LABEL AMOUNT
         labelGBC.gridy++;
 
-        String mes = buying ? Lang.getInstance().translate("Quantity to buy")
-                : Lang.getInstance().translate("Quantity to sell");
+        String mes = buying ? Lang.T("Quantity to buy")
+                : Lang.T("Quantity to sell");
 
         JLabel amountLabel = new JLabel(mes + ":");
         this.add(amountLabel, labelGBC);
@@ -190,7 +190,7 @@ public class CreateOrderPanel extends JPanel {
         // LABEL PRICE
         labelGBC.gridy++;
         JLabel priceLabel = new JLabel(
-                "<html><b>" + Lang.getInstance().translate("Price per unit") + " " + ":</b></html>");
+                "<html><b>" + Lang.T("Price per unit") + " " + ":</b></html>");
         this.add(priceLabel, labelGBC);
         // PRICE
         detailGBC.gridy++;
@@ -233,9 +233,9 @@ public class CreateOrderPanel extends JPanel {
         // LABEL AMOUNT
         labelGBC.gridy++;
 
-        // mes = buying ? Lang.getInstance().translate("Result") :
-        // Lang.getInstance().translate("Total Buy (want)");
-        mes = Lang.getInstance().translate("Total");
+        // mes = buying ? Lang.T("Result") :
+        // Lang.T("Total Buy (want)");
+        mes = Lang.T("Total");
 
         JLabel buyingAmountLabel = new JLabel(mes + ":");
         this.add(buyingAmountLabel, labelGBC);
@@ -306,7 +306,7 @@ public class CreateOrderPanel extends JPanel {
 
         // LABEL FEE
         labelGBC.gridy++;
-        JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ": ");
+        JLabel feeLabel = new JLabel(Lang.T("Fee Power") + ": ");
         feeLabel.setVisible(Gui.SHOW_FEE_POWER);
         this.add(feeLabel, labelGBC);
 
@@ -330,10 +330,10 @@ public class CreateOrderPanel extends JPanel {
         labelGBC.gridy++;
 
         if (buying) {
-            this.sellButton = new JButton(Lang.getInstance().translate("Buy"));
+            this.sellButton = new JButton(Lang.T("Buy"));
             this.sellButton.setBackground(new Color(204, 255, 204));
         } else {
-            this.sellButton = new JButton(Lang.getInstance().translate("Sell"));
+            this.sellButton = new JButton(Lang.T("Sell"));
             this.sellButton.setBackground(new Color(255, 153, 153));
         }
 
@@ -532,16 +532,16 @@ public class CreateOrderPanel extends JPanel {
                 LOGGER.error(e.getMessage(), e);
 
                 if (parse == 0) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee") + "!",
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee") + "!",
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                 }
                 if (parse == 1) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount") + "!",
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid amount") + "!",
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                 }
                 if (parse == 2) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid price") + "!",
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid price") + "!",
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                 }
                 return;
             }
@@ -562,7 +562,7 @@ public class CreateOrderPanel extends JPanel {
             if (false) {
                 // for develop
                 JOptionPane.showMessageDialog(new JFrame(), amountHave.toPlainString() + " - " + amountWant.toPlainString(),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -572,8 +572,8 @@ public class CreateOrderPanel extends JPanel {
                 String password = PasswordPane.showUnlockWalletDialog(this);
                 if (!Controller.getInstance().unlockWallet(password)) {
                     // WRONG PASSWORD
-                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                            Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                            Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
 
                     return;
@@ -583,8 +583,8 @@ public class CreateOrderPanel extends JPanel {
             PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -593,21 +593,21 @@ public class CreateOrderPanel extends JPanel {
                     amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
 
             String Status_text = "";
-            IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                    Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
+            IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+                    Lang.T("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
                     (int) (MainFrame.getInstance().getHeight() / 1.2), Status_text,
-                    Lang.getInstance().translate("Confirmation Transaction") + ": "
-                            + Lang.getInstance().translate("order creation"));
+                    Lang.T("Confirmation Transaction") + ": "
+                            + Lang.T("order creation"));
 
             CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) transaction);
-            dd.jScrollPane1.setViewportView(ww);
-            dd.pack();
-            dd.setLocationRelativeTo(null);
-            dd.setVisible(true);
+            confirmDialog.jScrollPane1.setViewportView(ww);
+            confirmDialog.pack();
+            confirmDialog.setLocationRelativeTo(null);
+            confirmDialog.setVisible(true);
 
             // JOptionPane.OK_OPTION
-            if (dd.isConfirm) {
-                ResultDialog.make(this, transaction, "Order has been sent");
+            if (confirmDialog.isConfirm > 0) {
+                ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
             }
 
         } finally {

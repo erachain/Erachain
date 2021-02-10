@@ -106,7 +106,7 @@ public class ConsolePanel extends JPanel {
 
         buttonGBC.fill = GridBagConstraints.HORIZONTAL;
         buttonGBC.anchor = GridBagConstraints.CENTER;
-        JButton sendButton = new JButton(Lang.getInstance().translate("Run"));
+        JButton sendButton = new JButton(Lang.T("Run"));
 
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

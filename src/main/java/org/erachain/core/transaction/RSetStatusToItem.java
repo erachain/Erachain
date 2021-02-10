@@ -25,8 +25,9 @@ import java.util.HashSet;
 
 public class RSetStatusToItem extends Transaction {
 
-    private static final byte TYPE_ID = (byte) Transaction.SET_STATUS_TO_ITEM_TRANSACTION;
-    private static final String NAME_ID = "Set Status";
+    public static final byte TYPE_ID = (byte) Transaction.SET_STATUS_TO_ITEM_TRANSACTION;
+    public static final String TYPE_NAME = "Set Status";
+
     private static final int DATE_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
     private static final int VALUE_LENGTH = 8; // one year + 256 days max
     private static final int REF_LENGTH = 8;
@@ -58,7 +59,7 @@ public class RSetStatusToItem extends Transaction {
                             Long beg_date, Long end_date,
                             long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
                             long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
         this.key = key;
         this.itemType = itemType;

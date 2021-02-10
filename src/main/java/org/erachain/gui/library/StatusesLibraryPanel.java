@@ -37,7 +37,7 @@ public class StatusesLibraryPanel extends JPanel {
     public StatusesLibraryPanel(PersonCls person) {
 
 
-        this.setName(Lang.getInstance().translate("Statuses"));
+        this.setName(Lang.T("Statuses"));
         this.setLayout(new java.awt.GridBagLayout());
 
 
@@ -99,7 +99,7 @@ public class StatusesLibraryPanel extends JPanel {
         });
 
 
-        JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy creator name"));
+        JMenuItem menu_copyName = new JMenuItem(Lang.T("Copy creator name"));
         menu_copyName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -112,7 +112,7 @@ public class StatusesLibraryPanel extends JPanel {
         menu.add(menu_copyName);
 
 
-        JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy creator account"));
+        JMenuItem copy_Creator_Address = new JMenuItem(Lang.T("Copy creator account"));
         copy_Creator_Address.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -122,7 +122,7 @@ public class StatusesLibraryPanel extends JPanel {
         });
         menu.add(copy_Creator_Address);
 
-        JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy creator public key"));
+        JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.T("Copy creator public key"));
         menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -136,7 +136,7 @@ public class StatusesLibraryPanel extends JPanel {
         menu.add(menu_copy_Creator_PublicKey);
 
 
-        JMenuItem menu_copy_Block_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy no. transaction"));
+        JMenuItem menu_copy_Block_PublicKey = new JMenuItem(Lang.T("Copy no. transaction"));
         menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -147,12 +147,12 @@ public class StatusesLibraryPanel extends JPanel {
         menu.add(menu_copy_Block_PublicKey);
 
 
-        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Creator"));
+        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.T("Send Asset to Creator"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = statusModel.getCreator(row);
                 //new AccountSendDialog(null, null, account, null);
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send Asset to Creator"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Asset to Creator"),
                         new AccountAssetSendPanel(null,
                                 null, null, person, null, false));
 
@@ -161,11 +161,11 @@ public class StatusesLibraryPanel extends JPanel {
         });
         menu.add(Send_Coins_item_Menu);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail to creator"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.T("Send mail to creator"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = statusModel.getCreator(row);
-                MainPanel.getInstance().insertNewTab(Lang.getInstance().translate("Send mail to creator"),
+                MainPanel.getInstance().insertNewTab(Lang.T("Send mail to creator"),
                         new MailSendPanel(null, account, null));
                 //new MailSendDialog(null, null, account, null);
 

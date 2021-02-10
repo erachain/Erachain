@@ -102,9 +102,9 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     @Override
-    //     private String[] columnNames = Lang.getInstance().translate();
+    //     private String[] columnNames = Lang.T();
     public String getColumnName(int index) {
-        return Lang.getInstance().translate(columnNames[index]);
+        return Lang.T(columnNames[index]);
     }
 
     public String getColumnNameOrigin(int index) {

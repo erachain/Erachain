@@ -20,7 +20,7 @@ public class PollsDetailPanel extends JPanel {
     public PollsDetailPanel(PollCls poll, AssetCls asset) {
         // CREATE FRAME
         // super(Controller.getInstance().getApplicationName(false) + " - " +
-        // Lang.getInstance().translate("Poll Details"));
+        // Lang.T("Poll Details"));
 
         // ICON
         // List<Image> icons = new ArrayList<Image>();
@@ -67,7 +67,7 @@ public class PollsDetailPanel extends JPanel {
         pollTabPaneGBC.gridy = 2;
         pollTabPaneGBC.weightx = 0.1;
 
-        this.add(new JLabel(Lang.getInstance().translate("Check") + ":"), assetLabelGBC);
+        this.add(new JLabel(Lang.T("Check") + ":"), assetLabelGBC);
 
         cbxAssets = new JComboBox<ItemCls>(new ComboBoxModelItemsAll(ItemCls.ASSET_TYPE));
         cbxAssets.setSelectedItem(asset);

@@ -152,7 +152,7 @@ public class MessageFactory {
 
             //CHECK IF CHECKSUM MATCHES
             if (!Arrays.equals(checksum, digest)) {
-                throw new Exception(Lang.getInstance().translate("Invalid data checksum length=") + length);
+                throw new Exception(Lang.T("Invalid data checksum length=") + length);
             }
         }
 
@@ -287,7 +287,7 @@ public class MessageFactory {
             default:
 
                 //UNKNOWN MESSAGE
-                LOGGER.info(Lang.getInstance().translate("Received unknown type message!"));
+                LOGGER.info(Lang.T("Received unknown type message!"));
                 return null; //new Message(type);
 
         }

@@ -1,6 +1,8 @@
 package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
@@ -8,12 +10,14 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.WalletTableRenderer;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererBigDecimals;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.gui.records.VouchRecordDialog;
+import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -25,11 +29,13 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 
@@ -193,14 +199,50 @@ public class AccountsRightPanel extends JPanel {
 
             }
         });
-        viewInfo = new JMenuItem(Lang.getInstance().translate("View Transaction"));
+
+        JMenuItem itemCheckTX = new JMenuItem(Lang.T("Validate"));
+        itemCheckTX.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // code Rebroadcast
+
+                Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+
+                if (selectedTransaction == null) return;
+                // DLSet db = DLSet.getInstance();
+
+                if (!selectedTransaction.isSignatureValid(DCSet.getInstance())) {
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.T("Signature Invalid") + "!",
+                            Lang.T("Wrong"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (selectedTransaction.getConfirmations(DCSet.getInstance()) <= 0) {
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.T("Unconfirmed") + "!",
+                            Lang.T("Wrong"), JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+
+                selectedTransaction.setDC(DCSet.getInstance(), true);
+                Controller.getInstance().wallet.processTransaction(selectedTransaction);
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.T("Good") + "!",
+                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+            }
+        });
+        mainMenu.add(itemCheckTX);
+
+        viewInfo = new JMenuItem(Lang.T("See Details"));
         viewInfo.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
-                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction.transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
+                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction.transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.T("Transaction"));
                 dd.setLocationRelativeTo(th);
                 dd.setVisible(true);
             }
@@ -208,37 +250,118 @@ public class AccountsRightPanel extends JPanel {
         });
         mainMenu.add(viewInfo);
 
-        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouch_menu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
-                new VouchRecordDialog(transaction.transaction.getBlockHeight(), transaction.transaction.getSeqNo());
+                new toSignRecordDialog(transaction.transaction.getBlockHeight(), transaction.transaction.getSeqNo());
 
             }
         });
-
         mainMenu.add(vouch_menu);
 
-        // save jsot transactions
-        JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
-        item_Save.addActionListener(new ActionListener() {
+        JMenuItem issueNote = new JMenuItem(Lang.T("Append Document"));
+        issueNote.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
-                // save
-                Library.saveTransactionJSONtoFileSystem(getParent(), transaction.transaction);
+                MainPanel.getInstance().insertNewTab(
+                        Lang.T("For # для") + " " + transaction.transaction.viewHeightSeq(),
+                        new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.transaction.viewHeightSeq(), null));
             }
+        });
+        mainMenu.add(issueNote);
 
+        JMenu menuSaveCopy = new JMenu(Lang.T("Save / Copy"));
+        mainMenu.add(menuSaveCopy);
+
+        JMenuItem copyNumber = new JMenuItem(Lang.T("Copy Number"));
+        copyNumber.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            StringSelection stringSelection = new StringSelection(selectedTransaction.viewHeightSeq());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Number of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
         });
+        menuSaveCopy.add(copyNumber);
 
-        mainMenu.add(item_Save);
+        JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
+        copyJson.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            StringSelection stringSelection = new StringSelection(selectedTransaction.toJson().toJSONString());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("JSON of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyJson);
+
+        JMenuItem copyRAW = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base58"));
+        copyRAW.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            StringSelection stringSelection = new StringSelection(Base58.encode(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW);
+
+        JMenuItem copyRAW64 = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base64"));
+        copyRAW64.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW64);
+
+        JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
+        saveJson.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            Library.saveJSONtoFileSystem(this, selectedTransaction, "tx" + selectedTransaction.viewHeightSeq());
+
+        });
+        menuSaveCopy.add(saveJson);
+
+        JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
+        saveRAW.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            Library.saveAsBase58FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + selectedTransaction.viewHeightSeq());
+
+        });
+        menuSaveCopy.add(saveRAW);
+
+        JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
+        saveRAW64.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            Library.saveAsBase64FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + selectedTransaction.viewHeightSeq());
+
+        });
+        menuSaveCopy.add(saveRAW64);
+
 
         mainMenu.addSeparator();
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -257,7 +380,6 @@ public class AccountsRightPanel extends JPanel {
 
         //   jTable1.setComponentPopupMenu(mainMenu);
         TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
-
 
         // SELECT
         jTable1.addMouseListener(new MouseAdapter() {
@@ -314,7 +436,7 @@ public class AccountsRightPanel extends JPanel {
     private void favoriteSet(Transaction transaction) {
         // CHECK IF FAVORITES
         if (wallet.isTransactionFavorite(transaction)) {
-            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
                 wallet.removeTransactionFavorite(transaction);
             }

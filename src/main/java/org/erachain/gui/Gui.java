@@ -26,7 +26,7 @@ public class Gui extends JFrame {
 
     private volatile static Gui maingui;
     private MainFrame mainframe;
-    public final WalletTimer walletTimer;
+    public final WalletNotifyTimer walletNotifyTimer;
 
     public static boolean SHOW_FEE_POWER = false;
 
@@ -54,7 +54,7 @@ public class Gui extends JFrame {
             mainframe.setVisible(true);
         }
 
-        walletTimer = new WalletTimer();
+        walletNotifyTimer = new WalletNotifyTimer();
 
     }
 
@@ -110,8 +110,8 @@ public class Gui extends JFrame {
 
     public void onWalletCreated() {
 
-        SysTray.getInstance().sendMessage(Lang.getInstance().translate("Wallet Initialized"),
-                Lang.getInstance().translate("Your wallet is initialized"), MessageType.INFO);
+        SysTray.getInstance().sendMessage(Lang.T("Wallet Initialized"),
+                Lang.T("Your wallet is initialized"), MessageType.INFO);
         if (Settings.getInstance().isGuiEnabled())
             mainframe = MainFrame.getInstance();
     }

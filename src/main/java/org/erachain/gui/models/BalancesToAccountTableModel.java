@@ -21,7 +21,7 @@ public class BalancesToAccountTableModel extends AbstractTableModel implements O
     public static final int COLUMN_BALANCE = 1;
     private static final int COLUMN_ADDRESS = 0;
     private long key;
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Balance"});
+    private String[] columnNames = Lang.T(new String[]{"Account", "Balance"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false};
     private List<Tuple2<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,

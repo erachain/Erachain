@@ -35,7 +35,7 @@ public class AssetPairSelect extends JDialog {
 
     public AssetPairSelect(long key, String action, String account) {
 
-        this.setTitle(Controller.getInstance().getApplicationName(false) + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
+        this.setTitle(Controller.getInstance().getApplicationName(false) + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.T("Select pair"));
         //ICON
         List<Image> icons = new ArrayList<Image>();
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -88,7 +88,7 @@ public class AssetPairSelect extends JDialog {
         pair_Panel.button1ToolBarLeftPanel.setVisible(false);
         pair_Panel.button1ToolBarLeftPanel.setEnabled(false);
         pair_Panel.button1ToolBarLeftPanel.setFocusable(true);
-        pair_Panel.button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Next"));
+        pair_Panel.button1ToolBarLeftPanel.setText(Lang.T("Next"));
         pair_Panel.button1ToolBarLeftPanel.addActionListener(new ActionListener() {
 
             @Override
@@ -108,10 +108,10 @@ public class AssetPairSelect extends JDialog {
         pair_Panel.jButton1_jToolBar_RightPanel.setVisible(false);
         pair_Panel.jButton2_jToolBar_RightPanel.setVisible(false);
 
-        pair_Panel.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        pair_Panel.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
 
         pair_Panel.searchToolBar_LeftPanel.setVisible(true);
-        pair_Panel.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
+        pair_Panel.toolBarLeftPanel.add(new JLabel(Lang.T("Find Key") + ":"));
         key_Item = new MDecimalFormatedTextField();
         key_Item.setMaskType(key_Item.maskLong);     
         key_Item.setToolTipText("");
@@ -132,14 +132,14 @@ public class AssetPairSelect extends JDialog {
 
                 pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.setText("");
 
-                pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+                pair_Panel.Label_search_Info_Panel.setText(Lang.T("Waiting..."));
 
                 new Thread() {
                     @Override
                     public void run() {
                         assetPairSelectTableModel.findByKey(key_Item.getText());
                         if (assetPairSelectTableModel.getRowCount() < 1) {
-                            pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Assets"));
+                            pair_Panel.Label_search_Info_Panel.setText(Lang.T("Not Found Assets"));
                             pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.search_Info_Panel);
                             return;
                         }
@@ -165,12 +165,12 @@ public class AssetPairSelect extends JDialog {
                 if (search.equals("")) {
                     pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(null);
                     assetPairSelectTableModel.clear();
-                    pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+                    pair_Panel.Label_search_Info_Panel.setText(Lang.T("Enter more  2 characters"));
                     pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.search_Info_Panel);
                     return;
                 }
                 if (search.length() < 3) {
-                    pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+                    pair_Panel.Label_search_Info_Panel.setText(Lang.T("Enter more  2 characters"));
                     pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.search_Info_Panel);
 
 
@@ -178,7 +178,7 @@ public class AssetPairSelect extends JDialog {
                 }
                 key_Item.setText("");
 
-                pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+                pair_Panel.Label_search_Info_Panel.setText(Lang.T("Waiting..."));
                 pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.search_Info_Panel);
 
 
@@ -189,7 +189,7 @@ public class AssetPairSelect extends JDialog {
                     public void run() {
                         assetPairSelectTableModel.set_Filter_By_Name(search);
                         if (assetPairSelectTableModel.getRowCount() < 1) {
-                            pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Assets"));
+                            pair_Panel.Label_search_Info_Panel.setText(Lang.T("Not Found Assets"));
                             pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.search_Info_Panel);
                             return;
                         }
@@ -310,7 +310,7 @@ public class AssetPairSelect extends JDialog {
         //this.add(label, labelGBC);
 
         pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.jTableJScrollPanelLeftPanel);
-        pair_Panel.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        pair_Panel.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
 
         // UPDATE FILTER ON TEXT CHANGE
         pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {

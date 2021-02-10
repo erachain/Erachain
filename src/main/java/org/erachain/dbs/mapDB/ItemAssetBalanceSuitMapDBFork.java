@@ -1,17 +1,15 @@
 package org.erachain.dbs.mapDB;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.ItemAssetBalanceSuit;
-import org.erachain.dbs.DBTab;
-import org.erachain.dbs.IteratorCloseable;
-import org.erachain.dbs.IteratorCloseableImpl;
+import org.erachain.dbs.*;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -68,8 +66,11 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
             map = treeMap;
         }
 
-        if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0 || !Controller.getInstance().onlyProtocolIndexing) {
+        if (BlockChain.TEST_DB == 0) {
             // TODO сделать потом отдельную таблицу только для заданного Актива - для ускорения
+
+            // теперь с множественными выплатами это НУЖНО!
+
             // если включены выплаты - то нужно этот индекс тоже делать - хотя можно отдельно по одному Активу только - нужному
 
             //BIND ASSET KEY
@@ -110,17 +111,32 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
 
     }
 
+    // тут родительские ключи еще нужны поидее - но это не используется в форке никак
     @Override
     public Collection<byte[]> assetKeys(long assetKey) {
         //FILTER ALL KEYS
-        return this.assetKeyMap == null ? null : this.assetKeyMap.subMap(
-                Fun.t2(Fun.t2(assetKey, null), null),
-                Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI())).values();
+        return null;
     }
 
+    /**
+     * Соберем Ключи с Родителем
+     *
+     * @param assetKey
+     * @return
+     */
     @Override
-    public IteratorCloseable<byte[]> assetIterator(long assetKey) {
-        return this.assetKeyMap == null ? null : new IteratorCloseableImpl(assetKeys(assetKey).iterator());
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
+
+        IteratorCloseable<byte[]> parentIterator = ((ItemAssetBalanceMap) parent).getIteratorByAsset(assetKey);
+        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted),
+                IteratorCloseableImpl.make(this.assetKeyMap.subMap(
+                        Fun.t2(Fun.t2(assetKey, null), null),
+                        Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI()))
+                        .values().iterator())),
+                // for BYTES primary key
+                Fun.BYTE_ARRAY_COMPARATOR);
+
     }
 
     @Override

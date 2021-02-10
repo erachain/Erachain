@@ -19,14 +19,14 @@ public class IssueStatusPanel extends IssueItemPanel {
 
 
     public IssueStatusPanel() {
-        super(NAME, TITLE, "Status issue has been sent");
+        super(NAME, TITLE, "Status issue has been sent", true);
 
         initComponents();
 
         // вывод верхней панели
         int gridy = initTopArea();
 
-        JLabel singleLabel = new JLabel(Lang.getInstance().translate("Single") + ":");
+        JLabel singleLabel = new JLabel(Lang.T("Single") + ":");
         labelGBC.gridy = gridy;
         jPanelAdd.add(singleLabel, labelGBC);
 
@@ -65,14 +65,14 @@ public class IssueStatusPanel extends IssueItemPanel {
     protected String makeTransactionView() {
 
         String text = "<HTML><body>";
-        text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
-                + Lang.getInstance().translate("Create Status") + "<br><br><br>";
-        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.getInstance().translate("Name") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
-        text += Lang.getInstance().translate("Description") + ":<br>"
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
+                + Lang.T("Create Status") + "<br><br><br>";
+        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
+        text += Lang.T("Name") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
+        text += Lang.T("Description") + ":<br>"
                 + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
-        text += Lang.getInstance().translate("Unique") + ": " + ((StatusCls) transaction.getItem()).isUnique()
+        text += Lang.T("Unique") + ": " + ((StatusCls) transaction.getItem()).isUnique()
                 + "<br>";
         return text;
 

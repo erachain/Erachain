@@ -28,14 +28,14 @@ public class IssueUnionPanel extends IssueItemPanel {
 
     private JTextField txtBirthday = new JTextField();
     private JTextField txtParent = new JTextField();
-    //		super(Controller.getInstance().getApplicationName(false) + " - " + Lang.getInstance().translate("Issue Union"));
+    //		super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Issue Union"));
 
     // Variables declaration - do not modify
     private JLabel birthdayJLabel = new JLabel();
     private JLabel parentJLabel = new JLabel();
 
     public IssueUnionPanel() {
-        super(NAME, TITLE, "Union issue has been sent!");
+        super(NAME, TITLE, "Union issue has been sent!", true);
 
         initComponents();
 
@@ -89,13 +89,13 @@ public class IssueUnionPanel extends IssueItemPanel {
     protected String makeTransactionView() {
 
         String text = "<HTML><body>";
-        text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Union") + "<br><br><br>";
-        text += Lang.getInstance().translate("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.getInstance().translate("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.getInstance().translate("Name") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
-        text += Lang.getInstance().translate("Description") + ":<br>" + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
-        text += Lang.getInstance().translate("Date") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getBirthday() + "<br>";
-        text += Lang.getInstance().translate("Parent") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getParent() + "<br>";
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Union") + "<br><br><br>";
+        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
+        text += Lang.T("Name") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
+        text += Lang.T("Description") + ":<br>" + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
+        text += Lang.T("Date") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getBirthday() + "<br>";
+        text += Lang.T("Parent") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getParent() + "<br>";
 
         return text;
     }
@@ -109,7 +109,7 @@ public class IssueUnionPanel extends IssueItemPanel {
 
         int gridwidth = fieldGBC.gridwidth;
 
-        birthdayJLabel.setText(Lang.getInstance().translate("Birthday") + ":");
+        birthdayJLabel.setText(Lang.T("Birthday") + ":");
         labelGBC.gridy = gridy;
         jPanelAdd.add(birthdayJLabel, labelGBC);
 
@@ -126,7 +126,7 @@ public class IssueUnionPanel extends IssueItemPanel {
         fieldGBC.gridwidth = 1;
         jPanelAdd.add(txtBirthday, fieldGBC);
 
-        parentJLabel.setText(Lang.getInstance().translate("Parent") + ":");
+        parentJLabel.setText(Lang.T("Parent") + ":");
         labelGBC.gridy = gridy;
         jPanelAdd.add(parentJLabel, labelGBC);
         fieldGBC.gridwidth = 2;

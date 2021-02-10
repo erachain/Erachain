@@ -2,22 +2,17 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ItemSplitPanel;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
-import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 public class AssetsMySplitPanel extends ItemSplitPanel {
@@ -31,7 +26,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
         super(new WalletItemAssetsTableModel(), NAME, TITLE);
 
         //      add items in menu
-        JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+        JMenuItem sell = new JMenuItem(Lang.T("To sell"));
         sell.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -42,7 +37,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             }
         });
 
-        JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
+        JMenuItem excahge = new JMenuItem(Lang.T("Exchange"));
         excahge.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -52,7 +47,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             }
         });
 
-        JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
+        JMenuItem buy = new JMenuItem(Lang.T("Buy"));
         buy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -70,7 +65,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
 
         this.menuTable.addSeparator();
 
-        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Asset"));
+        JMenuItem set_Status_Item = new JMenuItem(Lang.T("Set Status to Asset"));
 
         set_Status_Item.addActionListener(new ActionListener() {
             @Override
@@ -83,25 +78,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
         });
         this.menuTable.add(set_Status_Item);
 
-        JMenuItem vouchAsset_Item = new JMenuItem(Lang.getInstance().translate("Vouch the Asset Info"));
-        vouchAsset_Item.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                AssetCls asset = (AssetCls) itemTableSelected;
-                byte[] ref = asset.getReference();
-                Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
-                int blockNo = transaction.getBlockHeight();
-                int recNo = transaction.getSeqNo();
-                new VouchRecordDialog(blockNo, recNo);
-
-            }
-        });
-        this.menuTable.add(vouchAsset_Item);
-
-        menuTable.addSeparator();
-
-        JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
+        JMenuItem details = new JMenuItem(Lang.T("Details"));
         details.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,37 +86,31 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
                 //			new AssetFrame(asset);
             }
         });
-        //	assetsMenu.add(details);
+        menuTable.add(details);
 
-        JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
+        JMenuItem accruals = new JMenuItem(Lang.T("Make Accruals"));
+        accruals.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AssetCls asset = (AssetCls) itemTableSelected;
+                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), asset);
+                panel.selectAccruals(null, null);
+                MainPanel.getInstance().insertNewTab(Lang.T("Make Accruals"), panel);
+            }
+        });
+        menuTable.add(accruals);
+
+        JMenuItem dividend = new JMenuItem(Lang.T("Pay Dividend"));
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
-                new PayDividendFrame(asset);
+                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), null);
+                panel.selectAccruals(null, asset);
+                MainPanel.getInstance().insertNewTab(Lang.T("Pay Dividend"), panel);
             }
         });
         menuTable.add(dividend);
-
-        menuTable.addSeparator();
-
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try {
-                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
-                            + "/index/blockexplorer.html"
-                            + "?asset=" + itemTableSelected.getKey()));
-                } catch (MalformedURLException e1) {
-                    logger.error(e1.getMessage(), e1);
-                }
-            }
-        });
-
-        menuTable.add(setSeeInBlockexplorer);
 
     }
 

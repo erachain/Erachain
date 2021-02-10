@@ -17,7 +17,7 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -29,7 +29,7 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
@@ -43,7 +43,7 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
 
         //LABEL OPTIONS
         ++labelGBC.gridy;
-        JLabel optionLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
+        JLabel optionLabel = new JLabel(Lang.T("Options") + ":");
         this.add(optionLabel, labelGBC);
 
         // OPTIONs
@@ -64,7 +64,7 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
 
         //LABEL owner Public key
         ++labelGBC.gridy;
-        JLabel owner_Public_keyLabel = new JLabel(Lang.getInstance().translate("Public key") + ":");
+        JLabel owner_Public_keyLabel = new JLabel(Lang.T("Public key") + ":");
         this.add(owner_Public_keyLabel, labelGBC);
 
         //owner public key

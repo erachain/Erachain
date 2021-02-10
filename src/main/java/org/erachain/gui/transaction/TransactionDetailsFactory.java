@@ -171,13 +171,13 @@ public class TransactionDetailsFactory {
 
                 return multiPaymentDetailsFrame;
 
-            case Transaction.VOUCH_TRANSACTION:
+            case Transaction.SIGN_TRANSACTION:
                 RVouch r_Vouch = (RVouch) transaction;
-                VouchingDetailsFrame vouchingDetailsFrame = new VouchingDetailsFrame(r_Vouch);
-                gridBagConstraints.gridy = vouchingDetailsFrame.labelGBC.gridy + 1;
-                vouchingDetailsFrame.add(jLabel9, gridBagConstraints);
+                SigningDetailsFrame signingDetailsFrame = new SigningDetailsFrame(r_Vouch);
+                gridBagConstraints.gridy = signingDetailsFrame.labelGBC.gridy + 1;
+                signingDetailsFrame.add(jLabel9, gridBagConstraints);
 
-                return vouchingDetailsFrame;
+                return signingDetailsFrame;
 
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
                 RCertifyPubKeys certifyPubKeysRecord = (RCertifyPubKeys) transaction;

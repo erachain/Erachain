@@ -69,7 +69,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
             map = treeMap;
         }
 
-        if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0 || !Controller.getInstance().onlyProtocolIndexing) {
+        if (BlockChain.TEST_DB == 0) {
             // TODO сделать потом отдельную таблицу только для заданного Актива - для ускорения
             // если включены выплаты - то нужно этот индекс тоже делать - хотя можно отдельно по одному Активу только - нужному
 
@@ -155,7 +155,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     }
 
     @Override
-    public IteratorCloseable<byte[]> assetIterator(long assetKey) {
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
         return new IteratorCloseableImpl(assetKeys(assetKey).iterator());
     }
 

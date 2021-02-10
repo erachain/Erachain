@@ -78,21 +78,25 @@ public class PersonCertifyPubKeysDialog extends JDialog {
 
         initComponents(person, publicKey);
 
-        this.setTitle(Lang.getInstance().translate("Certification of Account"));
-        this.setResizable(true);
+        this.setTitle(Lang.T("Certification of Account"));
         this.setModal(true);
 
-         setPreferredSize(MainFrame.getInstance().getPreferredSize());
-        // PACK
-        this.pack();
+        setPreferredSize(new Dimension(1200, 600));
         this.setResizable(true);
         this.setLocationRelativeTo(null);
+        // PACK
+        this.pack();
         this.setVisible(true);
         // MainFrame.this.add(comp, constraints).setFocusable(false);
     }
 
     private void refreshReceiverDetails(JTextField pubKeyTxt, JLabel pubKeyDetails) {
         String toValue = pubKeyTxt.getText();
+        if (toValue == null) {
+            pubKeyDetails.setText("");
+            return;
+        }
+        toValue = toValue.trim();
 
         // CHECK IF RECIPIENT IS VALID ADDRESS
         boolean isValid = false;
@@ -112,7 +116,7 @@ public class PersonCertifyPubKeysDialog extends JDialog {
 
         if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
             pubKeyDetails.setText("<html>" + personDetails
-                    + Lang.getInstance().translate("Status must be OK to show public key details.") + "</html>");
+                    + Lang.T("Status must be OK to show public key details.") + "</html>");
             return;
         }
 
@@ -120,7 +124,7 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         Tuple4<Long, Integer, Integer, Integer> addressDuration = account.getPersonDuration(DCSet.getInstance());
 
         if (addressDuration == null) {
-            personDetails += "<b>" + Lang.getInstance().translate("Account is valid for certification") + "</b>";
+            personDetails += "<b>" + Lang.T("Account is valid for certification") + "</b>";
         } else {
             // TEST TIME and EXPIRE TIME
             long current_time = NTP.getTime();
@@ -128,13 +132,13 @@ public class PersonCertifyPubKeysDialog extends JDialog {
             // TEST TIME and EXPIRE TIME
             int daysLeft = addressDuration.b - (int) (current_time / (long) 86400000);
             if (daysLeft < 0)
-                personDetails += Lang.getInstance().translate("Personalize ended %days% ago").replace("%days%",
+                personDetails += Lang.T("Personalize ended %days% ago").replace("%days%",
                         "" + daysLeft);
             else
-                personDetails += Lang.getInstance().translate("Personalize is valid for %days% days").replace("%days%",
+                personDetails += Lang.T("Personalize is valid for %days% days").replace("%days%",
                         "" + daysLeft);
 
-            personDetails += "<br>" + Lang.getInstance().translate("Person is still alive");
+            personDetails += "<br>" + Lang.T("Person is still alive");
 
         }
         pubKeyDetails.setText("<html>" + personDetails + "<br>" + account.toString(Transaction.FEE_KEY) + "</html>");
@@ -160,8 +164,8 @@ public class PersonCertifyPubKeysDialog extends JDialog {
             feePow = Integer.parseInt(feePowTxt.getText());
         } catch (Exception e) {
             if (parse == 0) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee"),
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee"),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             } else {
             }
 
@@ -173,8 +177,8 @@ public class PersonCertifyPubKeysDialog extends JDialog {
 
         Pair<Integer, Integer> toDateResult = ItemCls.resolveEndDayFromStr(toDateStr, BlockChain.DEFAULT_DURATION);
         if (toDateResult.getA() < 0) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid to Date"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid to Date"),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             Button_Confirm.setEnabled(true);
             return;
@@ -201,8 +205,8 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         }
 
         if (certifiedPublicKeys.isEmpty()) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Nothing to personalize"),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Nothing to personalize"),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
             Button_Confirm.setEnabled(true);
             return;
@@ -213,8 +217,8 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         PrivateKeyAccount authenticator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress());
         if (authenticator == null) {
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -224,18 +228,19 @@ public class PersonCertifyPubKeysDialog extends JDialog {
                 person.getKey(), certifiedPublicKeys, toDate);
 
         String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                Lang.getInstance().translate("Certification of Account"), (int) (this.getWidth() / 1.2),
-                (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+                Lang.T("Certification of Account"), 0,
+                0, Status_text, Lang.T("Confirmation Transaction"));
         CertifyPubKeysDetailsFrame ww = new CertifyPubKeysDetailsFrame((RCertifyPubKeys) transaction);
-        dd.jScrollPane1.setViewportView(ww);
-        dd.setLocationRelativeTo(this);
-        dd.pack();
-        dd.setVisible(true);
+        confirmDialog.jScrollPane1.setViewportView(ww);
+        confirmDialog.setLocationRelativeTo(this);
+        confirmDialog.setVisible(true);
 
         // JOptionPane.OK_OPTION
-        if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, "Public Key was Certified");
+        if (confirmDialog.isConfirm > 0) {
+            if (ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE)) {
+                dispose();
+            }
         }
         // ENABLE
         Button_Confirm.setEnabled(true);
@@ -289,32 +294,18 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         info.show_001(person);
         info.setFocusable(false);
         jLabel_PersonInfo.setViewportView(info);
-        pack();
 
-        // jLabel_PersonInfo.set
-        // jLabel_PersonInfo.setText(Lang.getInstance().translate("Public Keys
-        // of") + " " + person.viewName() +":");
-        // jLabel_PersonInfo.setText(new
-        // PersonInfo().Get_HTML_Person_Info_001(person) );
+        Insets insets = new Insets(3, 27, 3, 0);
+        Insets insetsField = new Insets(3, 0, 3, 27);
+
+        int gridy = 0;
+
+        jLabel_YourAddress.setText(Lang.T("Your account") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        // gridBagConstraints.insets = new java.awt.Insets(12, 9, 0, 9);
-        gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
-        getContentPane().add(jLabel_PersonInfo, gridBagConstraints);
-
-        jLabel_YourAddress.setText(Lang.getInstance().translate("Your account") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        // gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-        gridBagConstraints.insets = new java.awt.Insets(21, 27, 0, 0);
+        gridBagConstraints.insets = insets;
         getContentPane().add(jLabel_YourAddress, gridBagConstraints);
 
         jComboBox_YourAddress = new JComboBox<Account>(new AccountsComboBoxModel());
@@ -324,20 +315,47 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         // 22));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridwidth = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        // gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 13);
-        gridBagConstraints.insets = new java.awt.Insets(21, 0, 0, 13);
+        gridBagConstraints.insets = insetsField;
         getContentPane().add(jComboBox_YourAddress, gridBagConstraints);
 
-        jLabel_Address1.setText(Lang.getInstance().translate("Public key") + ":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = insets;
+        jLabel_Title.setText(Lang.T("Information about the person"));
+        getContentPane().add(jLabel_Title, gridBagConstraints);
+
+        // jLabel_PersonInfo.set
+        // jLabel_PersonInfo.setText(Lang.T("Public Keys
+        // of") + " " + person.viewName() +":");
+        // jLabel_PersonInfo.setText(new
+        // PersonInfo().Get_HTML_Person_Info_001(person) );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = insets;
+        gridBagConstraints.insets = insetsField;
+        getContentPane().add(jLabel_PersonInfo, gridBagConstraints);
+
+        jLabel_Address1.setText(Lang.T("Public key") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
+        gridBagConstraints.insets = insets;
         getContentPane().add(jLabel_Address1, gridBagConstraints);
 
         // jTextField_Address1.setMinimumSize(new java.awt.Dimension(300, 20));
@@ -364,7 +382,7 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         });
 
         if (publicKey == null || publicKey.isPerson()) {
-            jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert Public Key"));
+            jLabel_Adress1_Check.setText(Lang.T("Insert Public Key"));
         } else {
             jTextField_Address1.setText(publicKey.getBase58());
             // refreshReceiverDetails(jTextField_Address1,
@@ -372,108 +390,30 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         }
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.weightx = 0.1;
-        // gridBagConstraints.gridheight =7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = insetsField;
+        getContentPane().add(jTextField_Address1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.insets = insetsField;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         getContentPane().add(jLabel_Adress1_Check, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        getContentPane().add(jTextField_Address1, gridBagConstraints);
-
-        jLabel_Address2.setText(Lang.getInstance().translate("Public Key") + ":");
+        jLabel_addDays.setText(Lang.T("Add active days") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-        // getContentPane().add(jLabel_Address2, gridBagConstraints);
-
-        jTextField_Address2.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails(jTextField_Address2, jLabel_Address2_Check);
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails(jTextField_Address2, jLabel_Address2_Check);
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails(jTextField_Address2, jLabel_Address2_Check);
-            }
-        });
-
-        jLabel_Address2_Check.setText(Lang.getInstance().translate("insert second Public Key"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        // getContentPane().add(jLabel_Address2_Check, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        // getContentPane().add(jTextField_Address2, gridBagConstraints);
-
-        jLabel_Address3.setText(Lang.getInstance().translate("Public Key") + ":");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-        // getContentPane().add(jLabel_Address3, gridBagConstraints);
-
-        jTextField_Address3.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails(jTextField_Address2, jLabel_Address2_Check);
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails(jTextField_Address3, jLabel_Address3_Check);
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent arg0) {
-                refreshReceiverDetails(jTextField_Address3, jLabel_Address3_Check);
-            }
-        });
-
-        jLabel_Address3_Check.setText(Lang.getInstance().translate("insert next Public Key"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        // getContentPane().add(jLabel_Address3_Check, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        // getContentPane().add(jTextField_Address3, gridBagConstraints);
-
-        jLabel_addDays.setText(Lang.getInstance().translate("Add Days") + ":");
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
-
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
+        gridBagConstraints.insets = insets;
         //getContentPane().add(jLabel_addDays, gridBagConstraints);
 
         /*
@@ -494,19 +434,33 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = insets;
         //getContentPane().add(jTextField_addDays, gridBagConstraints);
 
-        jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
+        jLabel_addDays_Check.setText("<html>'.' =2 " + Lang.T("year") + ",<br> '+' ="
+                + Lang.T("MAX days") + ",<br> '-' =" + Lang.T("Unconfirmed")
+                + "</HTML>");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = insets;
+        //getContentPane().add(jLabel_addDays_Check, gridBagConstraints);
+
+        jLabel_Fee.setText(Lang.T("Fee Power") + ":");
         jLabel_Fee.setVisible(Gui.SHOW_FEE_POWER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
+        gridBagConstraints.insets = insets;
         getContentPane().add(jLabel_Fee, gridBagConstraints);
 
         // jFormattedTextField_Fee.setFormatterFactory(new
@@ -526,15 +480,13 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 16;
-
-        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+        gridBagConstraints.insets = insetsField;
         getContentPane().add(jFormattedTextField_Fee, gridBagConstraints);
 
-        jButton_Cansel = new MButton(Lang.getInstance().translate("Cancel"), 2);
+        jButton_Cansel = new MButton(Lang.T("Cancel"), 2);
         jButton_Cansel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dispose();
@@ -543,12 +495,12 @@ public class PersonCertifyPubKeysDialog extends JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
-        gridBagConstraints.insets = new java.awt.Insets(1, 0, 29, 0);
+        gridBagConstraints.insets = insetsField;
         getContentPane().add(jButton_Cansel, gridBagConstraints);
 
-        jButton_Confirm = new MButton(Lang.getInstance().translate("Confirm"), 2);
+        jButton_Confirm = new MButton(Lang.T("Confirm"), 2);
         jButton_Confirm.setToolTipText("");
         jButton_Confirm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -558,45 +510,12 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         });
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = insetsField;
         getContentPane().add(jButton_Confirm, gridBagConstraints);
 
-        jLabel_addDays_Check.setText("<html>'.' =2 " + Lang.getInstance().translate("year") + ",<br> '+' ="
-                + Lang.getInstance().translate("MAX days") + ",<br> '-' =" + Lang.getInstance().translate("Unconfirmed")
-                + "</HTML>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        getContentPane().add(jLabel_addDays_Check, gridBagConstraints);
-
-        jLabel_Fee_Check.setText("0..6");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 16;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        // getContentPane().add(jLabel_Fee_Check, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        // gridBagConstraints.insets = new java.awt.Insets(12, 9, 11, 9);
-        gridBagConstraints.insets = new java.awt.Insets(12, 23, 0, 9);
-        getContentPane().add(jLabel_Title, gridBagConstraints);
-        jLabel_Title.setText(Lang.getInstance().translate("Information about the person"));
-        getContentPane().add(jLabel_Title, gridBagConstraints);
-
-        pack();
     }// <
 
     private void jFormattedTextField_ToDoActionPerformed(java.awt.event.ActionEvent evt) {

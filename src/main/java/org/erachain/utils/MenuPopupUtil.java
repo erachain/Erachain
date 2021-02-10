@@ -36,18 +36,18 @@ public class MenuPopupUtil {
                     final JPopupMenu menu = new JPopupMenu();
                     JMenuItem item;
                     item = new JMenuItem(new DefaultEditorKit.CopyAction());
-                    item.setText(Lang.getInstance().translate("Copy"));
+                    item.setText(Lang.T("Copy"));
                     item.setEnabled(component.getSelectionStart() != component
                             .getSelectionEnd());
                     menu.add(item);
                     item = new JMenuItem(new DefaultEditorKit.CutAction());
-                    item.setText(Lang.getInstance().translate("Cut"));
+                    item.setText(Lang.T("Cut"));
                     item.setEnabled(component.isEditable()
                             && component.getSelectionStart() != component
                             .getSelectionEnd());
                     menu.add(item);
                     item = new JMenuItem(new DefaultEditorKit.PasteAction());
-                    item.setText(Lang.getInstance().translate("Paste"));
+                    item.setText(Lang.T("Paste"));
                     item.setEnabled(component.isEditable());
                     menu.add(item);
                     menu.show(e.getComponent(), e.getX(), e.getY());
@@ -79,18 +79,18 @@ public class MenuPopupUtil {
                     final JPopupMenu menu = new JPopupMenu();
                     JMenuItem item;
                     item = new JMenuItem(new DefaultEditorKit.CopyAction());
-                    item.setText(Lang.getInstance().translate("Copy"));
+                    item.setText(Lang.T("Copy"));
                     item.setEnabled(component.getSelectionStart() != component
                             .getSelectionEnd());
                     menu.add(item);
                     item = new JMenuItem(new DefaultEditorKit.CutAction());
-                    item.setText(Lang.getInstance().translate("Cut"));
+                    item.setText(Lang.T("Cut"));
                     item.setEnabled(component.isEditable()
                             && component.getSelectionStart() != component
                             .getSelectionEnd());
                     menu.add(item);
                     item = new JMenuItem(new DefaultEditorKit.PasteAction());
-                    item.setText(Lang.getInstance().translate("Paste"));
+                    item.setText(Lang.T("Paste"));
                     item.setEnabled(component.isEditable());
                     menu.add(item);
                     menu.show(e.getComponent(), e.getX(), e.getY());
@@ -123,18 +123,18 @@ public class MenuPopupUtil {
                     final JPopupMenu menu = new JPopupMenu();
                     JMenuItem item;
                     item = new JMenuItem(new DefaultEditorKit.CopyAction());
-                    item.setText(Lang.getInstance().translate("Copy"));
+                    item.setText(Lang.T("Copy"));
                     item.setEnabled(component.getSelectionStart() != component
                             .getSelectionEnd());
                     menu.add(item);
                     item = new JMenuItem(new DefaultEditorKit.CutAction());
-                    item.setText(Lang.getInstance().translate("Cut"));
+                    item.setText(Lang.T("Cut"));
                     item.setEnabled(component.isEditable()
                             && component.getSelectionStart() != component
                             .getSelectionEnd());
                     menu.add(item);
                     item = new JMenuItem(new DefaultEditorKit.PasteAction());
-                    item.setText(Lang.getInstance().translate("Paste"));
+                    item.setText(Lang.T("Paste"));
                     item.setEnabled(component.isEditable());
                     menu.add(item);
                     menu.show(e.getComponent(), e.getX(), e.getY());
@@ -163,15 +163,15 @@ public class MenuPopupUtil {
                     final JPopupMenu menu = new JPopupMenu();
                     JMenuItem item;
                     item = new JMenuItem(new DefaultEditorKit.CopyAction());
-                    item.setText(Lang.getInstance().translate("Copy"));
+                    item.setText(Lang.T("Copy"));
                     item.setEnabled(false);
                     menu.add(item);
                     item = new JMenuItem(new DefaultEditorKit.CutAction());
-                    item.setText(Lang.getInstance().translate("Cut"));
+                    item.setText(Lang.T("Cut"));
                     item.setEnabled(false);
                     menu.add(item);
                     item = new JMenuItem(new DefaultEditorKit.PasteAction());
-                    item.setText(Lang.getInstance().translate("Paste"));
+                    item.setText(Lang.T("Paste"));
                     item.setEnabled(false);
                     menu.add(item);
                     menu.show(e.getComponent(), e.getX(), e.getY());

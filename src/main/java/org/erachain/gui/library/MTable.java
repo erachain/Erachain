@@ -114,17 +114,17 @@ public class MTable<U, T> extends JTable {
                 if (filters.get(col).a != null)
                     sss = filters.get(col).a.a.toString();
             }
-            str = JOptionPane.showInputDialog(mouseEventSource, Lang.getInstance().translate("Filter column") + ": " + column.getHeaderValue().toString(), sss);
+            str = JOptionPane.showInputDialog(mouseEventSource, Lang.T("Filter column") + ": " + column.getHeaderValue().toString(), sss);
             processFilters(col, column, str);
         }
 // date
         if (model.getColumnClass(col) == Date.class) {
-            str = JOptionPane.showInputDialog(mouseEventSource, Lang.getInstance().translate("Filter column") + ": " + column.getHeaderValue().toString(), "data");
+            str = JOptionPane.showInputDialog(mouseEventSource, Lang.T("Filter column") + ": " + column.getHeaderValue().toString(), "data");
             processFilters(col, column, str);
         }
 
         if (model.getColumnClass(col) == Boolean.class) {
-            JCheckBox rememberChk = new JCheckBox(Lang.getInstance().translate("Filter"));
+            JCheckBox rememberChk = new JCheckBox(Lang.T("Filter"));
             if (filters.get(col) != null) {
                 if (filters.get(col).a != null) {
                     if (filters.get(col).a.a != null) {
@@ -133,11 +133,11 @@ public class MTable<U, T> extends JTable {
                     }
                 }
             }
-            String msg = Lang.getInstance().translate("Filter column") + ": " + column.getHeaderValue().toString();
+            String msg = Lang.T("Filter column") + ": " + column.getHeaderValue().toString();
 
             Object[] msgContent = {msg, rememberChk};
 
-            int n = JOptionPane.showConfirmDialog(mouseEventSource, msgContent, Lang.getInstance().translate("Filter"), JOptionPane.OK_CANCEL_OPTION);
+            int n = JOptionPane.showConfirmDialog(mouseEventSource, msgContent, Lang.T("Filter"), JOptionPane.OK_CANCEL_OPTION);
             if (n == 2) {
                 column.setHeaderRenderer(null);
                 filters.remove(col);

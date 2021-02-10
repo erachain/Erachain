@@ -82,14 +82,13 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
+                case DBS_ROCK_DB:
                     map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceMap) parent, databaseSet, this);
                     break;
-                case DBS_ROCK_DB:
-                    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, this);
-                    break;
                 default: {
-                    if (BlockChain.HOLD_ROYALTY_PERIOD_DAYS > 0)
+                    if (BlockChain.TEST_DB == 0)
                         // тут нужна обработка по списку держателей Актива
+                        // ДЛЯ обработки множественных выплат нужна эта таблица а не в МЕМОКН - там нет нужных индексов
                         map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceMap) parent, databaseSet, this);
                     else
                         map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
@@ -151,7 +150,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> getBalancesList(long assetKey) {
 
-        if (Controller.getInstance().onlyProtocolIndexing)
+        if (Controller.getInstance().onlyProtocolIndexing || parent != null)
             return null;
 
         if (assetKey < 0)
@@ -161,7 +160,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (map instanceof ItemAssetBalanceSuitRocksDB) {
             //FILTER ALL KEYS
             keys = new ArrayList<>();
-            try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).assetIterator(assetKey)) {
+            try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey)) {
                 while (iterator.hasNext()) {
                     keys.add(iterator.next());
                 }
@@ -191,7 +190,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> getBalancesList(Account account) {
 
-        if (Controller.getInstance().onlyProtocolIndexing)
+        if (Controller.getInstance().onlyProtocolIndexing || parent != null)
             return null;
 
         Collection<byte[]> keys;
@@ -222,7 +221,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     public IteratorCloseable<byte[]> getIteratorByAccount(Account account) {
 
-        if (Controller.getInstance().onlyProtocolIndexing)
+        if (Controller.getInstance().onlyProtocolIndexing || parent != null)
             return null;
 
         return ((ItemAssetBalanceSuit) map).accountIterator(account);
@@ -231,13 +230,10 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
 
-        if (Controller.getInstance().onlyProtocolIndexing)
-            return null;
-
         if (assetKey < 0)
             assetKey = -assetKey;
 
-        return ((ItemAssetBalanceSuit) map).assetIterator(assetKey);
+        return ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey);
 
     }
 

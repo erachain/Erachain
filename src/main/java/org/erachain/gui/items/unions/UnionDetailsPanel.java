@@ -2,7 +2,6 @@ package org.erachain.gui.items.unions;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 
@@ -48,7 +47,7 @@ public class UnionDetailsPanel extends JPanel {
 
         //LABEL KEY
         ++labelGBC.gridy;
-        JLabel keyLabel = new JLabel(Lang.getInstance().translate("Key") + ":");
+        JLabel keyLabel = new JLabel(Lang.T("Key") + ":");
         this.add(keyLabel, labelGBC);
 
         //KEY
@@ -59,7 +58,7 @@ public class UnionDetailsPanel extends JPanel {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -70,7 +69,7 @@ public class UnionDetailsPanel extends JPanel {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
@@ -83,7 +82,7 @@ public class UnionDetailsPanel extends JPanel {
 
         //LABEL CREAtoR
         ++labelGBC.gridy;
-        JLabel ownerLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
+        JLabel ownerLabel = new JLabel(Lang.T("Creator") + ":");
         this.add(ownerLabel, labelGBC);
 
         //OWNER
@@ -105,7 +104,7 @@ public class UnionDetailsPanel extends JPanel {
             //ADD ERM PAIR BUTTON
             ++labelGBC.gridy;
             labelGBC.gridwidth = 2;
-            JButton openPairButton = new JButton(Lang.getInstance().translate("Open pair"));
+            JButton openPairButton = new JButton(Lang.T("Open pair"));
             openPairButton.setPreferredSize(new Dimension(200, 25));
             openPairButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -124,9 +123,9 @@ public class UnionDetailsPanel extends JPanel {
 
             //CHECK IF FAVORITES
             if (Controller.getInstance().isItemFavorite(union)) {
-                this.favoritesButton.setText(Lang.getInstance().translate("Remove Favorite"));
+                this.favoritesButton.setText(Lang.T("Remove Favorite"));
             } else {
-                this.favoritesButton.setText(Lang.getInstance().translate("Add Favorite"));
+                this.favoritesButton.setText(Lang.T("Add Favorite"));
             }
 
             this.favoritesButton.setPreferredSize(new Dimension(200, 25));
@@ -152,10 +151,10 @@ public class UnionDetailsPanel extends JPanel {
     public void onFavoriteClick() {
         //CHECK IF FAVORITES
         if (Controller.getInstance().isItemFavorite(union)) {
-            this.favoritesButton.setText(Lang.getInstance().translate("Add Favorite"));
+            this.favoritesButton.setText(Lang.T("Add Favorite"));
             Controller.getInstance().removeItemFavorite(this.union);
         } else {
-            this.favoritesButton.setText(Lang.getInstance().translate("Remove Favorite"));
+            this.favoritesButton.setText(Lang.T("Remove Favorite"));
             Controller.getInstance().addItemFavorite(this.union);
         }
 

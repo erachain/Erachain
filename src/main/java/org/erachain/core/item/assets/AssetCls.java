@@ -10,15 +10,17 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.gui.library.Library;
+import org.erachain.lang.Lang;
+import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
@@ -26,8 +28,10 @@ public abstract class AssetCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
 
-    public final static long START_KEY = ItemCls.START_KEY;
-    public static final long MIN_START_KEY = 1000L;
+    protected static final int ASSET_TYPE_LENGTH = 1;
+    //
+    protected int assetType;
+
 
     // CORE KEY
     public static final long ERA_KEY = 1L;
@@ -78,8 +82,6 @@ public abstract class AssetCls extends ItemCls {
     public static final int VENTURE = 2;
     public static final int NAME = 3;
     public static final int INITIAL_FAVORITES = 100;
-    protected static final int SCALE_LENGTH = 1;
-    protected static final int ASSET_TYPE_LENGTH = 1;
 
     ///////////////////////////////////////////////////
     /**
@@ -273,26 +275,83 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_SELF_ACCOUNTING_CASH_FUND = 127;
 
     /**
-     * +8 ... -23 = 32 диапазон. положительные - округляют целые числа
+     * self-managed - direct OWN balances
+     * === Не может управляться ни кем кроме обладателя актива
+     * === доступны 4-ре баланса и у каждого работает Возврат - backward
      */
-    protected int scale;
-    //
-    protected int assetType;
+    public static final int AS_SELF_MANAGED_DIRECT_SEND = 128;
+    /**
+     * self-managed - direct OWN balances
+     * === Не может управляться ни кем кроме обладателя актива
+     * === доступны 4-ре баланса и у каждого работает Возврат - backward
+     */
+    public static final int AS_SELF_MANAGED_SHARE = 129;
 
-    protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType, int scale) {
+    protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, owner, name, icon, image, description);
         this.assetType = assetType;
-        this.scale = (byte) scale;
 
     }
 
-    public AssetCls(int type, byte pars, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType, int scale) {
-        this(new byte[TYPE_LENGTH], owner, name, icon, image, description, assetType, scale);
+    public AssetCls(int type, byte pars, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[TYPE_LENGTH], owner, name, icon, image, description, assetType);
         this.typeBytes[0] = (byte) type;
         this.typeBytes[1] = pars;
     }
 
     //GETTERS/SETTERS
+
+    public static int[] assetTypes;
+
+    public static int[] AssetTypes() {
+
+        if (assetTypes != null)
+            return assetTypes;
+
+        int[] array = new int[]{
+
+                AS_OUTSIDE_GOODS,
+                AS_OUTSIDE_IMMOVABLE,
+                AS_OUTSIDE_CURRENCY,
+                AS_OUTSIDE_SERVICE,
+                AS_OUTSIDE_BILL,
+                AS_OUTSIDE_WORK_TIME_HOURS,
+                AS_OUTSIDE_WORK_TIME_MINUTES,
+                AS_OUTSIDE_SHARE,
+
+                AS_MY_DEBT,
+
+                AS_OUTSIDE_OTHER_CLAIM,
+
+                AS_INSIDE_ASSETS,
+                AS_INSIDE_CURRENCY,
+                AS_INSIDE_UTILITY,
+                AS_INSIDE_SHARE,
+                AS_INSIDE_BONUS,
+                AS_INSIDE_ACCESS,
+                AS_INSIDE_VOTE,
+                AS_BANK_GUARANTEE,
+                AS_BANK_GUARANTEE_TOTAL,
+                AS_INDEX,
+                AS_INSIDE_OTHER_CLAIM,
+
+                AS_ACCOUNTING,
+                AS_SELF_MANAGED_ACCOUNTING,
+                AS_SELF_ACCOUNTING_LOAN,
+                AS_SELF_ACCOUNTING_MUTUAL_AID_FUND,
+                AS_SELF_ACCOUNTING_CASH_FUND,
+                AS_SELF_MANAGED_DIRECT_SEND,
+                AS_SELF_MANAGED_SHARE
+        };
+
+        if (BlockChain.TEST_MODE) {
+            // AS_SELF_ACCOUNTING_CASH_FUND,
+        }
+
+        Arrays.sort(array);
+
+        return array;
+    }
 
     @Override
     public int getItemType() {
@@ -302,17 +361,17 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     @Override
@@ -331,25 +390,10 @@ public abstract class AssetCls extends ItemCls {
         return db.getIssueAssetMap();
     }
 
-    public abstract long getQuantity();
+    //public abstract long getQuantity();
 
     public abstract BigDecimal getReleased();
     public abstract BigDecimal getReleased(DCSet dc);
-
-
-    public int getScale() {
-        // TODO убрать это если будет новая цепочка с регулируемой точностью
-        if (BlockChain.MAIN_MODE && this.key > 0 && this.key < 5 ||
-                this.key > 1000 &&
-                        this.key < BlockChain.AMOUNT_SCALE_FROM
-        ) {
-            //return this.assetType == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
-            // IN ANY CASE
-            return BlockChain.AMOUNT_DEDAULT_SCALE;
-        }
-
-        return this.scale;
-    }
 
     public int getAssetType() {
         return this.assetType;
@@ -390,6 +434,8 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_ACCOUNTING_LOAN:
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
             case AS_SELF_ACCOUNTING_CASH_FUND:
+            case AS_SELF_MANAGED_DIRECT_SEND:
+            case AS_SELF_MANAGED_SHARE:
                 return "±";
             case AS_MY_DEBT:
                 return "◆";
@@ -573,6 +619,10 @@ public abstract class AssetCls extends ItemCls {
         return image;
     }
 
+    public abstract long getQuantity();
+
+    public abstract int getScale();
+
     @Override
     public HashMap getNovaItems() {
         return BlockChain.NOVA_ASSETS;
@@ -635,14 +685,18 @@ public abstract class AssetCls extends ItemCls {
      *
      * @return
      */
-    public boolean isNotReDepted() {
+    public boolean isNotReDebted() {
         return isOutsideType();
     }
 
     public boolean isOutsideType() {
+        return isOutsideType(this.assetType);
+    }
+
+    public static boolean isOutsideType(int assetType) {
         return // ?? this.assetType == AS_OUTSIDE_GOODS ||
-                this.assetType >= AS_OUTSIDE_CURRENCY
-                        && this.assetType <= AS_OUTSIDE_OTHER_CLAIM;
+                assetType >= AS_OUTSIDE_CURRENCY
+                        && assetType <= AS_OUTSIDE_OTHER_CLAIM;
     }
 
     public boolean isOutsideCurrency() {
@@ -670,7 +724,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static boolean isUnHoldable(long key, int assetType) {
-        if (key < getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY, AssetCls.MIN_START_KEY)
+        if (key < getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD)
                 || assetType == AS_INSIDE_ASSETS
                 || assetType > AS_OUTSIDE_OTHER_CLAIM
                 && assetType <= AS_INSIDE_OTHER_CLAIM
@@ -683,6 +737,22 @@ public abstract class AssetCls extends ItemCls {
     public boolean isUnHoldable() {
         return isUnHoldable(key, assetType);
     }
+
+    public static boolean isUnique(int assetType) {
+        if (assetType == AS_OUTSIDE_BILL
+                || assetType == AS_OUTSIDE_BILL_EX
+                || assetType == AS_BANK_GUARANTEE
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isUnique() {
+        return isUnique(assetType);
+    }
+
+    public abstract boolean isUnlimited(Account address, boolean notAccounting);
 
     /**
      * Управлять может только сам обладатель
@@ -719,6 +789,14 @@ public abstract class AssetCls extends ItemCls {
         return this.assetType == AS_SELF_ACCOUNTING_CASH_FUND;
     }
 
+    public static boolean isChangeDebtBySpendActions(int assetType) {
+        return isOutsideType(assetType);
+    }
+
+    public boolean isChangeDebtBySpendActions() {
+        return isChangeDebtBySpendActions(this.assetType);
+    }
+
     /**
      * Если обратный Послать то в меню местами меняем
      *
@@ -734,15 +812,32 @@ public abstract class AssetCls extends ItemCls {
         return isReverseSend(this.assetType);
     }
 
+
     /**
-     * Без ограничений - только если это счетная единица или сам владелец без огрничений
+     * в обычном сотоянии тут отрицательные балансы или нет?
      *
-     * @param address
-     * @param notAccounting
+     * @param balPos
      * @return
      */
-    public boolean isUnlimited(Account address, boolean notAccounting) {
-        return !notAccounting && isAccounting() || getQuantity() == 0L && owner.equals(address);
+    public static boolean isReverseBalancePos(int assetType, int balPos) {
+
+        switch (balPos) {
+            case Account.BALANCE_POS_OWN:
+                return isReverseSend(assetType);
+            case Account.BALANCE_POS_SPEND:
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * в обычном сотоянии тут отрицательные балансы или нет?
+     *
+     * @param balPos
+     * @return
+     */
+    public boolean isReverseBalancePos(int balPos) {
+        return isReverseBalancePos(this.assetType, balPos);
     }
 
     public BigDecimal defaultAmountAssetType() {
@@ -756,8 +851,8 @@ public abstract class AssetCls extends ItemCls {
     public PublicKeyAccount defaultRecipient(int actionType, boolean backward) {
 
         if (isOutsideType()) {
-            if (actionType == TransactionAmount.ACTION_SPEND
-                    || actionType == TransactionAmount.ACTION_DEBT) {
+            if (actionType == Account.BALANCE_POS_SPEND
+                    || actionType == Account.BALANCE_POS_DEBT) {
                 return getOwner();
             }
         }
@@ -783,7 +878,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "Outside Share";
             case AS_OUTSIDE_BILL:
-                return "Promissory Note";
+                return "AS_OUTSIDE_BILL_N";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of exchange";
             case AS_MY_DEBT:
@@ -819,11 +914,15 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_MANAGED_ACCOUNTING:
                 return "Self Managed";
             case AS_SELF_ACCOUNTING_LOAN:
-                return "Accounting Loan";
+                return "AS_SELF_ACCOUNTING_LOAN_N";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
-                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
+                return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_N";
             case AS_SELF_ACCOUNTING_CASH_FUND:
-                return "AS_SELF_ACCOUNTING_CASH_FUND_NF";
+                return "AS_SELF_ACCOUNTING_CASH_FUND_N";
+            case AS_SELF_MANAGED_DIRECT_SEND:
+                return "AS_SELF_MANAGED_DIRECT_SEND_N";
+            case AS_SELF_MANAGED_SHARE:
+                return "AS_SELF_MANAGED_SHARE_N";
 
         }
         return null;
@@ -850,7 +949,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "Outside Share Rights";
             case AS_OUTSIDE_BILL:
-                return "Promissory Note";
+                return "AS_OUTSIDE_BILL_NF";
             case AS_OUTSIDE_BILL_EX:
                 return "Bill of Exchange";
             case AS_MY_DEBT:
@@ -886,14 +985,26 @@ public abstract class AssetCls extends ItemCls {
             case AS_SELF_MANAGED_ACCOUNTING:
                 return "Self Managed for Accounting";
             case AS_SELF_ACCOUNTING_LOAN:
-                return "Accounting Loan for Debtor";
+                return "AS_SELF_ACCOUNTING_LOAN_NF";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
                 return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_NF";
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 return "AS_SELF_ACCOUNTING_CASH_FUND_NF";
+            case AS_SELF_MANAGED_DIRECT_SEND:
+                return "AS_SELF_MANAGED_DIRECT_SEND_NF";
+            case AS_SELF_MANAGED_SHARE:
+                return "AS_SELF_MANAGED_SHARE_NF";
 
         }
         return null;
+    }
+
+    public static String viewAssetTypeFullClsAndChars(int assetType) {
+        return charAssetType(Long.MAX_VALUE, assetType) + viewAssetTypeAbbrev(assetType) + ":" + viewAssetTypeFullCls(assetType);
+    }
+
+    public String viewAssetTypeFullClsAndChars() {
+        return charAssetType(Long.MAX_VALUE, assetType) + viewAssetTypeAbbrev(assetType) + ":" + viewAssetTypeFullCls(assetType);
     }
 
     public static String viewAssetTypeAbbrev(int asset_type) {
@@ -954,6 +1065,10 @@ public abstract class AssetCls extends ItemCls {
                 return "AccAF";
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 return "AccCF";
+            case AS_SELF_MANAGED_DIRECT_SEND:
+                return "AccDS";
+            case AS_SELF_MANAGED_SHARE:
+                return "AccSh";
         }
         return "?";
     }
@@ -983,7 +1098,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_SHARE:
                 return "External shares which have to be transferred to an external depository. The depositary can be notified by presenting the claim and then confirm the shares transfer";
             case AS_OUTSIDE_BILL:
-                return "A digital promissory note can be called for redemption by external money. You can take it into your hands";
+                return "AS_OUTSIDE_BILL_D";
             case AS_OUTSIDE_BILL_EX:
                 return "A digital bill of exchange can be called for redemption by external money. You can take it into your hands";
             case AS_MY_DEBT:
@@ -1022,6 +1137,10 @@ public abstract class AssetCls extends ItemCls {
                 return "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_D";
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 return "AS_SELF_ACCOUNTING_CASH_FUND_D";
+            case AS_SELF_MANAGED_DIRECT_SEND:
+                return "AS_SELF_MANAGED_DIRECT_SEND_D";
+            case AS_SELF_MANAGED_SHARE:
+                return "AS_SELF_MANAGED_SHARE_D";
 
         }
         return "";
@@ -1031,27 +1150,27 @@ public abstract class AssetCls extends ItemCls {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : "Transfer to the ownership ";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "Confiscate from rent" : "Transfer to rent";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Return from rent";
-                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? null : "Return from rent";
+                    case Account.BALANCE_POS_HOLD:
                         return backward ? "The employment security/received from security" : null;
                     default:
                         return null;
                 }
             case AS_OUTSIDE_CURRENCY:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null // для формирования списка действия надо выдать НУЛЬ
                                 : isCreatorOwner ? "AS_OUTSIDE_CURRENCY_Issue" : "AS_OUTSIDE_CURRENCY_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return isCreatorOwner ? null
                                 : backward ? "AS_OUTSIDE_CURRENCY_2B" // Отозвать требование об исполнении денежного требования
                                 : "AS_OUTSIDE_CURRENCY_2"; // Потребовать исполнения денежного требования
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? null
                                 : isCreatorOwner ? null
                                 : "AS_OUTSIDE_CURRENCY_4"; // Подтвердить исполнение денежного требования
@@ -1060,50 +1179,50 @@ public abstract class AssetCls extends ItemCls {
                 }
             case AS_OUTSIDE_WORK_TIME_HOURS:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : "AS_OUTSIDE_WORK_TIME_HOURS_1"; // Передать в собственность рабочие часы
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_OUTSIDE_WORK_TIME_HOURS_2B" // Отозвать требование траты рабочих часов
                                 : "AS_OUTSIDE_WORK_TIME_HOURS_2"; // Потребовать потратить рабочие часы
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? null : "AS_OUTSIDE_WORK_TIME_HOURS_4"; // Подтвердить затраты рабочих часов
                     default:
                         return null;
                 }
             case AS_OUTSIDE_WORK_TIME_MINUTES:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : "AS_OUTSIDE_WORK_TIME_MINUTES_1"; // Передать в собственность рабочие минуты
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_OUTSIDE_WORK_TIME_MINUTES_2B" // Отозвать требование траты рабочих минут
                                 : "AS_OUTSIDE_WORK_TIME_MINUTES_2"; // Потребовать потратить рабочие минуты
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? null : "AS_OUTSIDE_WORK_TIME_MINUTES_4"; // Подтвердить затраты рабочих минут
                     default:
                         return null;
                 }
             case AS_OUTSIDE_SERVICE:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : "Transfer Service Requirement";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "To reduce the provision of services" // Отозвать требование в предоставлении услуг
                                 : "To require the provision of services";
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? null : "Confirm the provision of services";
                     default:
                         return null;
                 }
             case AS_OUTSIDE_SHARE:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : "To transfer shares in the property";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "To reduce the transfer of shares"
                                 : "To require the transfer of shares";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "Return debt";
-                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? null : "Return debt";
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? null : "Confirm receipt of shares";
                     default:
                         return null;
@@ -1111,26 +1230,26 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL:
             case AS_OUTSIDE_BILL_EX:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : "AS_OUTSIDE_BILL_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_OUTSIDE_BILL_2B"
                                 : "AS_OUTSIDE_BILL_2";
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? null : "AS_OUTSIDE_BILL_4";
                     default:
                         return null;
                 }
             case AS_MY_DEBT:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null
                                 : isCreatorOwner ? "AS_MY_DEBT_Issue" : "AS_MY_DEBT_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return isCreatorOwner ? null // эмитент долга не может делать требования
                                 : backward ? "AS_MY_DEBT_2B"
                                 : "AS_MY_DEBT_2";
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return isCreatorOwner ? null // эмитент долга не может делать погашения
                                 : backward ? null : "AS_MY_DEBT_4";
                     default:
@@ -1138,20 +1257,20 @@ public abstract class AssetCls extends ItemCls {
                 }
             case AS_OUTSIDE_OTHER_CLAIM:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : isCreatorOwner ? "AS_OUTSIDE_OTHER_CLAIM_Issue"
                                 : "AS_OUTSIDE_OTHER_CLAIM_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_OUTSIDE_OTHER_CLAIM_2B"
                                 : "AS_OUTSIDE_OTHER_CLAIM_2";
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? null : "AS_OUTSIDE_OTHER_CLAIM_4";
                     default:
                         return null;
                 }
             case AS_INSIDE_CURRENCY:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : isCreatorOwner ? "AS_INSIDE_CURRENCY_Issue"
                                 : "AS_INSIDE_CURRENCY_1";
                     default:
@@ -1159,7 +1278,7 @@ public abstract class AssetCls extends ItemCls {
                 }
             case AS_INSIDE_UTILITY:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : isCreatorOwner ? "AS_INSIDE_UTILITY_Issue"
                                 : "AS_INSIDE_UTILITY_1";
                     default:
@@ -1167,7 +1286,7 @@ public abstract class AssetCls extends ItemCls {
                 }
             case AS_INSIDE_SHARE:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : isCreatorOwner ? "AS_INSIDE_SHARE_Issue"
                                 : "AS_INSIDE_SHARE_1";
                     default:
@@ -1175,7 +1294,7 @@ public abstract class AssetCls extends ItemCls {
                 }
             case AS_INSIDE_BONUS:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : isCreatorOwner ? "AS_INSIDE_BONUS_Issue"
                                 : "AS_INSIDE_BONUS_1";
                     default:
@@ -1183,56 +1302,56 @@ public abstract class AssetCls extends ItemCls {
                 }
             case AS_INSIDE_ACCESS:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : isCreatorOwner ? "AS_INSIDE_ACCESS_Issue" : "AS_INSIDE_ACCESS_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_INSIDE_ACCESS_2B"
                                 : "AS_INSIDE_ACCESS_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "AS_INSIDE_ACCESS_2R";
-                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? null : "AS_INSIDE_ACCESS_2R";
+                    case Account.BALANCE_POS_SPEND:
                         return "AS_INSIDE_ACCESS_4";
                     default:
                         return null;
                 }
             case AS_INSIDE_VOTE:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : isCreatorOwner ? "AS_INSIDE_VOTE_Issue" : "AS_INSIDE_VOTE_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_INSIDE_VOTE_2B"
                                 : "AS_INSIDE_VOTE_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "AS_INSIDE_VOTE_2R";
-                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? null : "AS_INSIDE_VOTE_2R";
+                    case Account.BALANCE_POS_SPEND:
                         return "AS_INSIDE_VOTE_4";
                     default:
                         return null;
                 }
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : isCreatorOwner ? "AS_BANK_GUARANTEE_Issue" : "AS_BANK_GUARANTEE_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_BANK_GUARANTEE_2B" : "AS_BANK_GUARANTEE_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "AS_BANK_GUARANTEE_2R";
-                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? null : "AS_BANK_GUARANTEE_2R";
+                    case Account.BALANCE_POS_HOLD:
                         return backward ? "AS_BANK_GUARANTEE_3" : null;
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? null : "AS_BANK_GUARANTEE_4";
                     default:
                         return null;
                 }
             case AS_BANK_GUARANTEE_TOTAL:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : isCreatorOwner ? "AS_BANK_GUARANTEE_TOTAL_Issue" : "AS_BANK_GUARANTEE_TOTAL_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_BANK_GUARANTEE_TOTAL_2B" : "AS_BANK_GUARANTEE_TOTAL_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
-                        return "AS_BANK_GUARANTEE_TOTAL_2R";
-                    case TransactionAmount.ACTION_SPEND:
+                        return backward ? null : "AS_BANK_GUARANTEE_TOTAL_2R";
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? null : "AS_BANK_GUARANTEE_TOTAL_4";
                     default:
                         return null;
@@ -1241,12 +1360,12 @@ public abstract class AssetCls extends ItemCls {
                 break;
             case AS_INSIDE_OTHER_CLAIM:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? null : isCreatorOwner ? "AS_INSIDE_OTHER_CLAIM_Issue" : "AS_INSIDE_OTHER_CLAIM_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_INSIDE_OTHER_CLAIM_2B"
                                 : "AS_INSIDE_OTHER_CLAIM_2";
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? null : "AS_INSIDE_OTHER_CLAIM_4";
                     default:
                         return null;
@@ -1255,24 +1374,24 @@ public abstract class AssetCls extends ItemCls {
                 break;
             case AS_SELF_MANAGED_ACCOUNTING:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? "AS_SELF_MANAGED_ACCOUNTING_1B" : "AS_SELF_MANAGED_ACCOUNTING_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_SELF_MANAGED_ACCOUNTING_2B" : "AS_SELF_MANAGED_ACCOUNTING_2";
-                    case TransactionAmount.ACTION_HOLD:
+                    case Account.BALANCE_POS_HOLD:
                         return backward ? "AS_SELF_MANAGED_ACCOUNTING_3B" : "AS_SELF_MANAGED_ACCOUNTING_3";
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? "AS_SELF_MANAGED_ACCOUNTING_4B" : "AS_SELF_MANAGED_ACCOUNTING_4";
                     default:
                         return null;
                 }
             case AS_SELF_ACCOUNTING_LOAN:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? "AS_SELF_ACCOUNTING_LOAN_1B" : "AS_SELF_ACCOUNTING_LOAN_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_SELF_ACCOUNTING_LOAN_2B" : "AS_SELF_ACCOUNTING_LOAN_2";
-                    case TransactionAmount.ACTION_HOLD:
+                    case Account.BALANCE_POS_HOLD:
                         // SPEND нельзя брать так как он Баланс Мой изменит у меня
                         return backward ? "AS_SELF_ACCOUNTING_LOAN_3B" : "AS_SELF_ACCOUNTING_LOAN_3";
                     default:
@@ -1280,21 +1399,47 @@ public abstract class AssetCls extends ItemCls {
                 }
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_1B" : "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_1";
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_4B" : "AS_SELF_ACCOUNTING_MUTUAL_AID_FUND_4";
                     default:
                         return null;
                 }
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return backward ? "AS_SELF_ACCOUNTING_CASH_FUND_1B" : "AS_SELF_ACCOUNTING_CASH_FUND_1";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_SELF_ACCOUNTING_CASH_FUND_2B" : "AS_SELF_ACCOUNTING_CASH_FUND_2";
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return backward ? "AS_SELF_ACCOUNTING_CASH_FUND_4B" : "AS_SELF_ACCOUNTING_CASH_FUND_4";
+                    default:
+                        return null;
+                }
+            case AS_SELF_MANAGED_DIRECT_SEND:
+                switch (actionType) {
+                    case Account.BALANCE_POS_OWN:
+                        return backward ? "AS_SELF_MANAGED_DIRECT_SEND_1B" : "AS_SELF_MANAGED_DIRECT_SEND_1";
+                    case Account.BALANCE_POS_DEBT:
+                        return backward ? "AS_SELF_MANAGED_DIRECT_SEND_2B" : "AS_SELF_MANAGED_DIRECT_SEND_2";
+                    case Account.BALANCE_POS_HOLD:
+                        return backward ? "AS_SELF_MANAGED_DIRECT_SEND_3B" : "AS_SELF_MANAGED_DIRECT_SEND_3";
+                    case Account.BALANCE_POS_SPEND:
+                        return backward ? "AS_SELF_MANAGED_DIRECT_SEND_4B" : "AS_SELF_MANAGED_DIRECT_SEND_4";
+                    default:
+                        return null;
+                }
+            case AS_SELF_MANAGED_SHARE:
+                switch (actionType) {
+                    case Account.BALANCE_POS_OWN:
+                        return backward ? "AS_SELF_MANAGED_SHARE_1B" : "AS_SELF_MANAGED_SHARE_1";
+                    case Account.BALANCE_POS_DEBT:
+                        return backward ? "AS_SELF_MANAGED_SHARE_2B" : "AS_SELF_MANAGED_SHARE_2";
+                    case Account.BALANCE_POS_HOLD:
+                        return backward ? "AS_SELF_MANAGED_SHARE_3B" : "AS_SELF_MANAGED_SHARE_3";
+                    case Account.BALANCE_POS_SPEND:
+                        return backward ? "AS_SELF_MANAGED_SHARE_4B" : "AS_SELF_MANAGED_SHARE_4";
                     default:
                         return null;
                 }
@@ -1302,21 +1447,24 @@ public abstract class AssetCls extends ItemCls {
         }
 
         switch (actionType) {
-            case TransactionAmount.ACTION_SEND:
+            case Account.BALANCE_POS_OWN:
                 return backward ? null : "Transfer to the ownership";
-            case TransactionAmount.ACTION_DEBT:
+            case Account.BALANCE_POS_DEBT:
                 return backward ? "To confiscate a debt"
                         : "Transfer to debt";
             case TransactionAmount.ACTION_REPAY_DEBT:
-                return "Return debt";
-            case TransactionAmount.ACTION_HOLD:
+                return backward ? null : "Return debt";
+            case Account.BALANCE_POS_HOLD:
                 return isUnHoldable(assetKey, assetType) ? null
                         : backward ? "Confirm acceptance \"in hand\"" : null;
-            case TransactionAmount.ACTION_SPEND:
+            case Account.BALANCE_POS_SPEND:
                 return backward ? null : "Spend";
-            case TransactionAmount.ACTION_PLEDGE:
-                return backward ? "Re-pledge"
-                        : "Pledge";
+            case Account.BALANCE_POS_PLEDGE:
+                return backward ? null //"Re-pledge"
+                        : null; //"Pledge";
+            case TransactionAmount.ACTION_RESERVED_6:
+                // for CALCULATED TX
+                return null; // backward ? "Reserved 6-" : "Reserved 6+";
         }
 
         return null;
@@ -1330,10 +1478,15 @@ public abstract class AssetCls extends ItemCls {
         switch (assetType) {
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return "AS_SELF_SEND_ADDITIONAL_ACT_DEBT";
                 }
         }
+
+        if (actionType == Account.BALANCE_POS_SPEND && isChangeDebtBySpendActions(assetType)) {
+            return "AdditionAction_on_isChangeDebtBySpendActions";
+        }
+
         return null;
     }
 
@@ -1349,48 +1502,96 @@ public abstract class AssetCls extends ItemCls {
         return viewAssetTypeAdditionAction(key, assetType, backward, actionType, isCreatorOwner);
     }
 
-    public static List<String> viewAssetTypeActionsList(long assetKey, int assetType) {
-        List<String> list = new ArrayList<>();
+    /**
+     * Balance Position + Backward + Action Name
+     *
+     * @param assetKey
+     * @param assetType
+     * @param isCreatorOwner
+     * @param useAddedActions
+     * @return
+     */
+    public static List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> viewAssetTypeActionsList(long assetKey,
+                                                                                                  int assetType, Boolean isCreatorOwner, boolean useAddedActions) {
+
+        List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> list = new ArrayList<>();
 
         String actionStr;
         String addActionStr;
-        for (int action = TransactionAmount.ACTION_SEND; action < TransactionAmount.ACTION_PLEDGE; action++) {
+        Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> item;
+        for (int balPos : TransactionAmount.ACTIONS_LIST) {
 
-            boolean backward = !AssetCls.isReverseSend(assetType) || action != TransactionAmount.ACTION_SEND;
+            boolean backward = !AssetCls.isReverseSend(assetType) || balPos != Account.BALANCE_POS_OWN;
 
-            actionStr = viewAssetTypeAction(assetKey, assetType, !backward, action, true);
-            if (actionStr != null && !list.contains(actionStr)) {
-                list.add(actionStr);
-                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, action, true);
-                if (addActionStr != null) {
-                    list.add(addActionStr);
+            actionStr = viewAssetTypeAction(assetKey, assetType, !backward, balPos,
+                    isCreatorOwner != null ? isCreatorOwner : true);
+            if (actionStr != null) {
+                item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, !backward), actionStr);
+                if (!list.contains(item)) {
+                    list.add(item);
+                    if (useAddedActions) {
+                        addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, balPos,
+                                isCreatorOwner != null ? isCreatorOwner : true);
+                        if (addActionStr != null) {
+                            item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, !backward), addActionStr);
+                            list.add(item);
+                        }
+                    }
                 }
             }
 
-            actionStr = viewAssetTypeAction(assetKey, assetType, !backward, action, false);
-            if (actionStr != null && !list.contains(actionStr)) {
-                list.add(actionStr);
-                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, action, false);
-                if (addActionStr != null) {
-                    list.add(addActionStr);
+            if (isCreatorOwner == null) {
+                actionStr = viewAssetTypeAction(assetKey, assetType, !backward, balPos,
+                        false);
+                if (actionStr != null) {
+                    item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, !backward), actionStr);
+                    if (!list.contains(item)) {
+                        list.add(item);
+                        if (useAddedActions) {
+                            addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, balPos,
+                                    false);
+                            if (addActionStr != null) {
+                                item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, !backward), addActionStr);
+                                list.add(item);
+                            }
+                        }
+                    }
                 }
             }
 
-            actionStr = viewAssetTypeAction(assetKey, assetType, backward, action, true);
-            if (actionStr != null && !list.contains(actionStr)) {
-                list.add(actionStr);
-                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, action, true);
-                if (addActionStr != null) {
-                    list.add(addActionStr);
+            actionStr = viewAssetTypeAction(assetKey, assetType, backward, balPos,
+                    isCreatorOwner != null ? isCreatorOwner : true);
+            if (actionStr != null) {
+                item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, backward), actionStr);
+                if (!list.contains(item)) {
+                    list.add(item);
+                    if (useAddedActions) {
+                        addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, balPos,
+                                isCreatorOwner != null ? isCreatorOwner : true);
+                        if (addActionStr != null) {
+                            item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, backward), addActionStr);
+                            list.add(item);
+                        }
+                    }
                 }
             }
 
-            actionStr = viewAssetTypeAction(assetKey, assetType, backward, action, false);
-            if (actionStr != null && !list.contains(actionStr)) {
-                list.add(actionStr);
-                addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, action, false);
-                if (addActionStr != null) {
-                    list.add(addActionStr);
+            if (isCreatorOwner == null) {
+                actionStr = viewAssetTypeAction(assetKey, assetType, backward, balPos,
+                        false);
+                if (actionStr != null) {
+                    item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, backward), actionStr);
+                    if (!list.contains(item)) {
+                        list.add(item);
+                        if (useAddedActions) {
+                            addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, balPos,
+                                    false);
+                            if (addActionStr != null) {
+                                item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, backward), addActionStr);
+                                list.add(item);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1398,8 +1599,8 @@ public abstract class AssetCls extends ItemCls {
         return list;
     }
 
-    public List<String> viewAssetTypeActionsList() {
-        return viewAssetTypeActionsList(key, assetType);
+    public List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> viewAssetTypeActionsList(Boolean isCreatorOwner, boolean useAddedActions) {
+        return viewAssetTypeActionsList(key, assetType, isCreatorOwner, useAddedActions);
     }
 
     public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorOwner) {
@@ -1428,14 +1629,14 @@ public abstract class AssetCls extends ItemCls {
         return viewAssetTypeAction(backward, actionType, isCreatorOwner);
     }
 
-    public String viewAssetTypeCreator(boolean backward, int actionType, boolean isCreatorOwner) {
+    public static String viewAssetTypeCreator(int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
         switch (assetType) {
             case AS_MY_DEBT:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return isCreatorOwner ? "Debtor" : "Lender";
-                    case TransactionAmount.ACTION_DEBT:
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_DEBT:
+                    case Account.BALANCE_POS_SPEND:
                         return isCreatorOwner ? null // эмитент долга не может делать требования
                                 : "Debtor";
                     default:
@@ -1443,28 +1644,30 @@ public abstract class AssetCls extends ItemCls {
                 }
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                    case TransactionAmount.ACTION_DEBT:
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_OWN:
+                    case Account.BALANCE_POS_DEBT:
+                    case Account.BALANCE_POS_SPEND:
                         return "Guarantee";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Beneficiary";
-                    case TransactionAmount.ACTION_HOLD:
+                    case Account.BALANCE_POS_HOLD:
                         return backward ? "Beneficiary" : null;
                 }
             case AS_BANK_GUARANTEE_TOTAL:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_OWN:
+                    case Account.BALANCE_POS_DEBT:
                         return "Guarantee";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Beneficiary";
-                    case TransactionAmount.ACTION_HOLD:
+                    case Account.BALANCE_POS_HOLD:
                         return backward ? "Beneficiary" : null;
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return "Spender";
                 }
             case AS_SELF_MANAGED_ACCOUNTING:
+            case AS_SELF_MANAGED_DIRECT_SEND:
+            case AS_SELF_MANAGED_SHARE:
                 return "Accountant";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Lender";
@@ -1479,10 +1682,10 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
             case AS_OUTSIDE_OTHER_CLAIM:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return isCreatorOwner ? "Issuer" : "Sender";
-                    case TransactionAmount.ACTION_DEBT:
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_DEBT:
+                    case Account.BALANCE_POS_SPEND:
                         return isCreatorOwner ? null : "Issuer";
                     default:
                         return null;
@@ -1500,29 +1703,33 @@ public abstract class AssetCls extends ItemCls {
         }
 
         switch (actionType) {
-            case TransactionAmount.ACTION_SEND:
+            case Account.BALANCE_POS_OWN:
                 return backward ? null : "Sender";
-            case TransactionAmount.ACTION_DEBT:
+            case Account.BALANCE_POS_DEBT:
                 return "Creditor";
             case TransactionAmount.ACTION_REPAY_DEBT:
                 return "Debtor";
-            case TransactionAmount.ACTION_HOLD:
+            case Account.BALANCE_POS_HOLD:
                 return backward ? "Taker" : null;
-            case TransactionAmount.ACTION_SPEND:
+            case Account.BALANCE_POS_SPEND:
                 return backward ? null : "Spender";
         }
 
         return null;
     }
 
-    public String viewAssetTypeTarget(boolean backward, int actionType, boolean isRecipientOwner) {
+    public String viewAssetTypeCreator(boolean backward, int actionType, boolean isCreatorOwner) {
+        return viewAssetTypeCreator(assetType, backward, actionType, isCreatorOwner);
+    }
+
+    public static String viewAssetTypeTarget(int assetType, boolean backward, int actionType, boolean isRecipientOwner) {
         switch (assetType) {
             case AS_MY_DEBT:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return isRecipientOwner ? null : "Lender"; // Тут может быть начальная эмиссия к Кредитору и переуступка - тоже кредитору по сути
-                    case TransactionAmount.ACTION_DEBT:
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_DEBT:
+                    case Account.BALANCE_POS_SPEND:
                         return isRecipientOwner ?
                                 "Debtor"
                                 : null; // реципиент только эмитент долга;
@@ -1531,47 +1738,49 @@ public abstract class AssetCls extends ItemCls {
                 }
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return "Recipient";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return "Beneficiary";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Guarantee";
-                    case TransactionAmount.ACTION_HOLD:
+                    case Account.BALANCE_POS_HOLD:
                         return backward ? "Guarantee" : null;
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return "Spender";
                 }
             case AS_BANK_GUARANTEE_TOTAL:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return "Recipient";
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_DEBT:
                         return "Principal";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Guarantee";
-                    case TransactionAmount.ACTION_HOLD:
+                    case Account.BALANCE_POS_HOLD:
                         return backward ? "Guarantee" : null;
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return "Spender";
                 }
             case AS_SELF_MANAGED_ACCOUNTING:
+            case AS_SELF_MANAGED_DIRECT_SEND:
+            case AS_SELF_MANAGED_SHARE:
                 return "Ledger";
             case AS_SELF_ACCOUNTING_LOAN:
                 return "Debtor";
             case AS_SELF_ACCOUNTING_MUTUAL_AID_FUND:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return "Benefactor";
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return "Recipient";
                 }
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                    case TransactionAmount.ACTION_DEBT:
+                    case Account.BALANCE_POS_OWN:
+                    case Account.BALANCE_POS_DEBT:
                         return "Participant";
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_SPEND:
                         return "Recipient";
                 }
             case AS_OUTSIDE_IMMOVABLE:
@@ -1582,10 +1791,10 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_BILL_EX:
             case AS_OUTSIDE_OTHER_CLAIM:
                 switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
+                    case Account.BALANCE_POS_OWN:
                         return isRecipientOwner ? "Issuer" : "Recipient";
-                    case TransactionAmount.ACTION_DEBT:
-                    case TransactionAmount.ACTION_SPEND:
+                    case Account.BALANCE_POS_DEBT:
+                    case Account.BALANCE_POS_SPEND:
                         return isRecipientOwner ? "Issuer" : null;
                     default:
                         return null;
@@ -1603,19 +1812,24 @@ public abstract class AssetCls extends ItemCls {
         }
 
         switch (actionType) {
-            case TransactionAmount.ACTION_SEND:
+            case Account.BALANCE_POS_OWN:
                 return "Recipient";
-            case TransactionAmount.ACTION_DEBT:
+            case Account.BALANCE_POS_DEBT:
                 return "Debtor";
             case TransactionAmount.ACTION_REPAY_DEBT:
                 return "Creditor";
-            case TransactionAmount.ACTION_HOLD:
+            case Account.BALANCE_POS_HOLD:
                 return "Supplier";
-            case TransactionAmount.ACTION_SPEND:
+            case Account.BALANCE_POS_SPEND:
                 return "Spender";
         }
 
-        return "unknown";
+        return null;
+    }
+
+    public String viewAssetTypeTarget(boolean backward, int actionType, boolean isRecipientOwner) {
+        return viewAssetTypeTarget(assetType, backward, actionType, isRecipientOwner);
+
     }
 
     public String viewAssetTypeActionOK(boolean backward, int actionType, boolean isCreatorOwner) {
@@ -1651,28 +1865,146 @@ public abstract class AssetCls extends ItemCls {
     }
 
     //OTHER
+    public static JSONObject AssetTypeJson(int assetType, JSONObject langObj) {
+
+        JSONObject assetTypeJson = new JSONObject();
+        assetTypeJson.put("id", assetType);
+        assetTypeJson.put("name", Lang.T(AssetCls.viewAssetTypeCls(assetType), langObj));
+        assetTypeJson.put("nameFull", Lang.T(AssetCls.viewAssetTypeFullCls(assetType), langObj));
+
+        List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
+                AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
+                assetType, null, true);
+        StringJoiner joiner = new StringJoiner(", ");
+        JSONArray actionsArray = new JSONArray();
+        for (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> actionItem : actions) {
+            int action = actionItem.a.a;
+            boolean backward = actionItem.a.b;
+
+            joiner.add(Lang.T(actionItem.b, langObj));
+            JSONObject actionJson = new JSONObject();
+            actionJson.put("position", action);
+            actionJson.put("backward", backward);
+            actionJson.put("name", Lang.T(actionItem.b, langObj));
+
+            String name;
+            //// CREATOR
+            name = viewAssetTypeCreator(assetType, backward, action, false);
+            if (name != null) actionJson.put("creator", Lang.T(name, langObj));
+
+            name = viewAssetTypeCreator(assetType, backward, action, true);
+            if (name != null) actionJson.put("creator_owner", Lang.T(name, langObj));
+
+            //////// TARGET
+            name = viewAssetTypeTarget(assetType, backward, action, false);
+            if (name != null) actionJson.put("target", Lang.T(name, langObj));
+
+            name = viewAssetTypeTarget(assetType, backward, action, true);
+            if (name != null) actionJson.put("target_owner", Lang.T(name, langObj));
+
+            actionsArray.add(actionJson);
+        }
+
+        assetTypeJson.put("actions", actionsArray);
+
+        String description = Lang.T(AssetCls.viewAssetTypeDescriptionCls(assetType), langObj) + ".<br>";
+        if (AssetCls.isReverseSend(assetType)) {
+            description += Lang.T("Actions for OWN balance is reversed", langObj) + ".<br>";
+        }
+        description += "<b>" + Lang.T("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
+
+        assetTypeJson.put("description", description);
+
+        return assetTypeJson;
+    }
+
+    public static JSONObject assetTypesJson;
+
+    public static JSONObject AssetTypesActionsJson() {
+
+        if (assetTypesJson != null)
+            return assetTypesJson;
+
+        assetTypesJson = new JSONObject();
+        for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+            JSONObject langObj = Lang.getInstance().getLangJson(iso);
+            JSONObject langJson = new JSONObject();
+            for (int type : AssetTypes()) {
+                langJson.put(type, AssetTypeJson(type, langObj));
+            }
+            assetTypesJson.put(iso, langJson);
+        }
+        return assetTypesJson;
+    }
+
+    public static JSONObject typeJson(int type) {
+
+        String assetTypeName;
+
+        assetTypeName = viewAssetTypeCls(type);
+        if (assetTypeName == null)
+            return null;
+
+        JSONObject typeJson = new JSONObject();
+
+        JSONObject langObj = Lang.getInstance().getLangJson("en");
+
+        typeJson.put("key", type);
+        typeJson.put("char", charAssetType(getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD), type));
+        typeJson.put("abbrev", viewAssetTypeAbbrev(type));
+        typeJson.put("name", Lang.T(assetTypeName, langObj));
+        typeJson.put("name_full", Lang.T(viewAssetTypeFullCls(type), langObj));
+        typeJson.put("desc", Lang.T(viewAssetTypeDescriptionCls(type), langObj));
+
+        return typeJson;
+    }
 
     public static JSONArray typesJson() {
 
         JSONArray types = new JSONArray();
 
-        String assetTypeName;
         for (int i = 0; i < 256; i++) {
-            assetTypeName = viewAssetTypeCls(i);
-            if (assetTypeName == null)
+            JSONObject json = typeJson(i);
+            if (json == null)
                 continue;
 
-            JSONObject type = new JSONObject();
-            type.put("key", i);
-            type.put("char", charAssetType(1000, i));
-            type.put("abbrev", viewAssetTypeAbbrev(i));
-            type.put("name", assetTypeName);
-            type.put("name_full", viewAssetTypeFullCls(i));
-            type.put("desc", viewAssetTypeDescriptionCls(i));
-            types.add(type);
-
+            types.add(json);
         }
         return types;
+    }
+
+    public String viewProperties(JSONObject langObj) {
+
+        StringJoiner joiner = new StringJoiner(", ");
+
+        if (isImMovable())
+            joiner.add(Lang.T("ImMovable", langObj));
+        if (isUnlimited(owner, false))
+            joiner.add(Lang.T("Unlimited", langObj));
+        if (isAccounting())
+            joiner.add(Lang.T("Accounting", langObj));
+        if (isUnique())
+            joiner.add(Lang.T("Unique", langObj));
+        if (isUnHoldable())
+            joiner.add(Lang.T("Not holdable", langObj));
+        if (isOutsideType())
+            joiner.add(Lang.T("Outside Claim", langObj));
+        if (isSelfManaged())
+            joiner.add(Lang.T("Self Managed", langObj));
+        if (isChangeDebtBySendActions())
+            joiner.add(Lang.T("isChangeDebtBySendActions", langObj));
+        if (isChangeDebtBySpendActions())
+            joiner.add(Lang.T("isChangeDebtBySpendActions", langObj));
+        if (isDirectBalances())
+            joiner.add(Lang.T("isDirectBalances", langObj));
+        if (isNotReDebted())
+            joiner.add(Lang.T("isNotReDebted", langObj));
+        if (isOutsideOtherClaim())
+            joiner.add(Lang.T("isOutsideOtherClaim", langObj));
+        if (isReverseSend())
+            joiner.add(Lang.T("isReverseSend", langObj));
+
+        return joiner.toString();
     }
 
     @Override
@@ -1682,10 +2014,10 @@ public abstract class AssetCls extends ItemCls {
         JSONObject assetJSON = super.toJson();
 
         // ADD DATA
-        assetJSON.put("scale", this.getScale());
         assetJSON.put("assetTypeKey", this.assetType);
         assetJSON.put("assetTypeName", viewAssetType());
         assetJSON.put("assetTypeDesc", viewAssetTypeDescriptionCls(assetType));
+        assetJSON.put("released", this.getReleased());
         assetJSON.put("type_key", this.assetType);
         assetJSON.put("type_char", charAssetType());
         assetJSON.put("type_abbrev", viewAssetTypeAbbrev());
@@ -1693,21 +2025,132 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("type_name_full", viewAssetTypeFull());
         assetJSON.put("type_desc", viewAssetTypeDescriptionCls(assetType));
 
+        assetJSON.put("scale", this.getScale());
+        assetJSON.put("quantity", this.getQuantity());
+
+        assetJSON.put("isImMovable", this.isImMovable());
+        assetJSON.put("isUnlimited", this.isUnlimited(owner, false));
+        assetJSON.put("isAccounting", this.isAccounting());
+        assetJSON.put("isUnique", this.isUnique());
+        assetJSON.put("isUnHoldable", this.isUnHoldable());
+        assetJSON.put("isOutsideType", this.isOutsideType());
+        assetJSON.put("isSelfManaged", this.isSelfManaged());
+        assetJSON.put("isChangeDebtBySendActions", this.isChangeDebtBySendActions());
+        assetJSON.put("isChangeDebtBySpendActions", this.isChangeDebtBySpendActions());
+        assetJSON.put("isDirectBalances", this.isDirectBalances());
+        assetJSON.put("isNotReDebted", this.isNotReDebted());
+        assetJSON.put("isOutsideOtherClaim", this.isOutsideOtherClaim());
+        assetJSON.put("isReverseSend", this.isReverseSend());
+
+        JSONObject revPos = new JSONObject();
+        for (int pos = Account.BALANCE_POS_OWN; pos <= Account.BALANCE_POS_6; pos++) {
+            revPos.put("" + pos, isReverseBalancePos(pos));
+        }
+        assetJSON.put("reversedBalPos", revPos);
+
+
         return assetJSON;
     }
 
     public JSONObject jsonForExplorerPage(JSONObject langObj) {
-        //DCSet dcSet = DCSet.getInstance();
 
-        JSONObject json =super.jsonForExplorerPage(langObj);
-        json.put("assetTypeKey", this.assetType);
-        json.put("assetTypeNameFull", viewAssetTypeFull());
-        json.put("quantity", getQuantity());
-        json.put("released", getReleased());
-        json.put("scale", scale);
-        json.put("orders", getOperations(DCSet.getInstance()));
+        JSONObject assetJSON = super.jsonForExplorerPage(langObj);
+        assetJSON.put("assetTypeKey", this.assetType);
+        assetJSON.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
+        assetJSON.put("released", getReleased());
+        assetJSON.put("orders", getOperations(DCSet.getInstance()));
 
-        return json;
+        assetJSON.put("scale", this.getScale());
+        assetJSON.put("quantity", this.getQuantity());
+
+        return assetJSON;
     }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_Asset", Lang.T("Asset", langObj));
+        itemJson.put("Label_Scale", Lang.T("Accuracy", langObj));
+        itemJson.put("Label_AssetType", Lang.T("Type # вид", langObj));
+        itemJson.put("Label_AssetType_Desc", Lang.T("Type Description", langObj));
+        itemJson.put("Label_Quantity", Lang.T("Quantity", langObj));
+        itemJson.put("Label_Released", Lang.T("Released", langObj));
+
+        itemJson.put("Label_ImMovable", Lang.T("ImMovable", langObj));
+        itemJson.put("Label_Unlimited", Lang.T("Unlimited", langObj));
+        itemJson.put("Label_Accounting", Lang.T("Accounting", langObj));
+        itemJson.put("Label_Unique", Lang.T("Unique", langObj));
+        itemJson.put("Label_UnHoldable", Lang.T("Un holdable", langObj));
+        itemJson.put("Label_OutsideType", Lang.T("Outside Type", langObj));
+        itemJson.put("Label_SelfManaged", Lang.T("Self Managed", langObj));
+        itemJson.put("Label_ChangeDebtBySendActions", Lang.T("isChangeDebtBySendActions", langObj));
+        itemJson.put("Label_ChangeDebtBySpendActions", Lang.T("isChangeDebtBySpendActions", langObj));
+        itemJson.put("Label_DirectBalances", Lang.T("isDirectBalances", langObj));
+        itemJson.put("Label_isNotReDebted", Lang.T("isNotReDebted", langObj));
+        itemJson.put("Label_isOutsideOtherClaim", Lang.T("isOutsideOtherClaim", langObj));
+        itemJson.put("Label_isReverseSend", Lang.T("isReverseSend", langObj));
+        itemJson.put("Label_Properties", Lang.T("Properties", langObj));
+
+        itemJson.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
+        itemJson.put("released", getReleased());
+
+        if (!forPrint) {
+            itemJson.put("Label_Holders", Lang.T("Holders", langObj));
+            itemJson.put("Label_Available_pairs", Lang.T("Available pairs", langObj));
+            itemJson.put("Label_Pair", Lang.T("Pair", langObj));
+            itemJson.put("Label_Orders_Count", Lang.T("Orders Count", langObj));
+            itemJson.put("Label_Open_Orders_Volume", Lang.T("Open Orders Volume", langObj));
+            itemJson.put("Label_Trades_Count", Lang.T("Trades Count", langObj));
+            itemJson.put("Label_Trades_Volume", Lang.T("Trades Volume", langObj));
+
+            itemJson.put("orders", getOperations(DCSet.getInstance()));
+        }
+
+        itemJson.put("quantity", NumberAsString.formatAsString(getQuantity()));
+        itemJson.put("released", NumberAsString.formatAsString(getReleased(dcSet)));
+
+        itemJson.put("scale", getScale());
+
+        itemJson.put("assetType", Lang.T(viewAssetType(), langObj));
+        itemJson.put("assetTypeChar", charAssetType() + viewAssetTypeAbbrev());
+
+        itemJson.put("assetTypeFull", Lang.T(viewAssetTypeFull(), langObj));
+        StringJoiner joiner = new StringJoiner(", ");
+        for (Fun.Tuple2<?, String> item : viewAssetTypeActionsList(null, true)) {
+            joiner.add(Lang.T(item.b, langObj));
+        }
+        itemJson.put("assetTypeDesc", Lang.T(viewAssetTypeDescriptionCls(getAssetType()), langObj)
+                + ".<br><b>" + Lang.T("Acceptable actions", langObj) + "</b>: " + joiner.toString()
+        );
+
+        itemJson.put("properties", viewProperties(langObj));
+
+        return itemJson;
+    }
+
+    public String makeHTMLHeadView() {
+
+        String text = super.makeHTMLHeadView();
+        text += Lang.T("Asset Class") + ":&nbsp;"
+                + Lang.T(getItemSubType() + "") + "<br>"
+                + Lang.T("Asset Type") + ":&nbsp;"
+                + "<b>" + charAssetType() + viewAssetTypeAbbrev() + "</b>:" + Lang.T(viewAssetTypeFull() + "") + "<br>"
+                + Lang.T("Quantity") + ":&nbsp;" + getQuantity() + ", "
+                + Lang.T("Scale") + ":&nbsp;" + getScale() + "<br>"
+                + Lang.T("Description") + ":<br>";
+        if (getKey() > 0 && getKey() < START_KEY()) {
+            text += Library.to_HTML(Lang.T(viewDescription())) + "<br>";
+        } else {
+            text += Library.to_HTML(viewDescription()) + "<br>";
+        }
+
+        return text;
+
+    }
+
+    public int getDataLength(boolean includeReference) {
+        return super.getDataLength(includeReference) + ASSET_TYPE_LENGTH;
+    }
+
 
 }

@@ -1,24 +1,14 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
@@ -93,7 +83,8 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                 case COLUMN_TRANSACTIONS:
                     return block.transactionsCount;
                 case COLUMN_FEE:
-                    return BigDecimal.valueOf(block.totalFee, BlockChain.FEE_SCALE);
+                    return block.viewFeeAsBigDecimal();
+                //return BigDecimal.valueOf(block.totalFee, BlockChain.FEE_SCALE);
             }
 
             return null;

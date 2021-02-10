@@ -26,7 +26,7 @@ public class MyDateJFormatedTextField extends JFormattedTextField {
 
         text_Color = this.getForeground();
         th.setForeground(Color.RED);
-        th.setToolTipText(Lang.getInstance().translate("Must be Date (dd-mm-yyyy)"));
+        th.setToolTipText(Lang.T("Must be Date (dd-mm-yyyy)"));
         MenuPopupUtil.installContextMenu(this);
         addCaretListener(new CaretListener() {
 

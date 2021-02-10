@@ -1,6 +1,7 @@
 package org.erachain.dbs;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.utils.ByteArrayUtils;
 
 import java.util.*;
 
@@ -34,6 +35,14 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
                 new Comparator<PeekingIteratorCloseable<T>>() {
                     @Override
                     public int compare(PeekingIteratorCloseable<T> o1, PeekingIteratorCloseable<T> o2) {
+                        // for BYTES use Fun.BYTE_ARRAY_COMPARATOR
+                        if (false) {
+                            T peek1 = o1.peek();
+                            T peek2 = o2.peek();
+                            if (peek1 instanceof byte[]) {
+                                return ByteArrayUtils.compareUnsignedAsMask((byte[]) peek1, (byte[]) peek2);
+                            }
+                        }
                         return itemComparator.compare(o1.peek(), o2.peek());
                     }
                 };

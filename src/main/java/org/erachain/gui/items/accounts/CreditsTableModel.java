@@ -97,7 +97,7 @@ public class CreditsTableModel extends TimerTableModelCls<Transaction> implement
             case COLUMN_AMOUNT:
                 return transactions_Asset.get(row).getAmount().toPlainString();
             case COLUMN_TRANSACTION:
-                return Lang.getInstance().translate(transactions_Asset.get(row).viewTypeName());
+                return Lang.T(transactions_Asset.get(row).viewFullTypeName());
 			/*
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";

@@ -17,7 +17,6 @@ public abstract class ImprintCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.IMPRINT_TYPE;
 
-    public static final long MIN_START_KEY = 1000L;
     protected static final int IMPRINT = 1;
     protected static final int CUTTED_REFERENCE_LENGTH = 20;
 
@@ -41,17 +40,17 @@ public abstract class ImprintCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     public String getItemTypeName() {

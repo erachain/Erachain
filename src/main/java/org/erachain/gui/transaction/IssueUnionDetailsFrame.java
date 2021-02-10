@@ -15,7 +15,7 @@ public class IssueUnionDetailsFrame extends RecDetailsFrame {
 
         //LABEL NAME
         ++labelGBC.gridy;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(nameLabel, labelGBC);
 
         //NAME
@@ -29,7 +29,7 @@ public class IssueUnionDetailsFrame extends RecDetailsFrame {
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
-        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
@@ -43,7 +43,7 @@ public class IssueUnionDetailsFrame extends RecDetailsFrame {
 
         //LABEL Birthday
         ++labelGBC.gridy;
-        JLabel birthdayLabel = new JLabel(Lang.getInstance().translate("Birthday") + ":");
+        JLabel birthdayLabel = new JLabel(Lang.T("Birthday") + ":");
         this.add(birthdayLabel, labelGBC);
 
         //Birthday
@@ -55,7 +55,7 @@ public class IssueUnionDetailsFrame extends RecDetailsFrame {
 
         //LABEL PARENT
         ++labelGBC.gridy;
-        JLabel parentLabel = new JLabel(Lang.getInstance().translate("Parent") + ":");
+        JLabel parentLabel = new JLabel(Lang.T("Parent") + ":");
         this.add(parentLabel, labelGBC);
 
         //PARENT

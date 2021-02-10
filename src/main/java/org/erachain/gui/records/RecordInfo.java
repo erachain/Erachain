@@ -33,13 +33,13 @@ public class RecordInfo extends JTextPane {
         if (record == null) return message += "Empty Record";
 
         if (!record.isConfirmed(db)) {
-            message = Lang.getInstance().translate("Not confirmed");
+            message = Lang.T("Not confirmed");
         } else {
             message = "Block Height - SeqNo.: " + record.viewHeightSeq() + ", Confs.: " + record.getConfirmations(DCSet.getInstance());
         }
         message = "<div><b>" + message + "</b>"
                 + ", time: " + record.viewTimestamp() + "</div>";
-        message += "<div> type: <b>" + record.viewFullTypeName() + "</b>, size: " + record.viewSize(Transaction.FOR_NETWORK)
+        message += "<div> type: <b>" + Lang.T(record.viewFullTypeName()) + "</b>, size: " + record.viewSize(Transaction.FOR_NETWORK)
                 + ", fee: " + record.viewFeeAndFiat() + "</div>";
 
         //message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";

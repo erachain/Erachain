@@ -6,7 +6,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.MTextPane;
-import org.erachain.gui.library.VouchLibraryPanel;
+import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
@@ -33,7 +33,7 @@ import java.nio.charset.StandardCharsets;
 public class MailInfo extends javax.swing.JPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailInfo.class);
-    public VouchLibraryPanel voush_Library_Panel;
+    public SignLibraryPanel voush_Library_Panel;
     public JTabbedPane jTabbedPane1;
     RSend trans;
     boolean encrypted;
@@ -92,7 +92,7 @@ public class MailInfo extends javax.swing.JPanel {
 
         setLayout(new java.awt.GridBagLayout());
 
-        jLabel_Block.setText(Lang.getInstance().translate("Block") + ":");
+        jLabel_Block.setText(Lang.T("Block") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 4);
@@ -109,7 +109,7 @@ public class MailInfo extends javax.swing.JPanel {
         add(jTextField_Block, gridBagConstraints);
 
 
-        jLabel_Data.setText(Lang.getInstance().translate("Date") + ":");
+        jLabel_Data.setText(Lang.T("Date") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 10, 0, 4);
@@ -125,7 +125,7 @@ public class MailInfo extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 9);
         add(jTextField_Data, gridBagConstraints);
 
-        jLabel_Sender.setText(Lang.getInstance().translate("Sender") + ":");
+        jLabel_Sender.setText(Lang.T("Sender") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -146,7 +146,7 @@ public class MailInfo extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
         add(jTextField_Sender, gridBagConstraints);
 
-        jLabel_Reciever.setText(Lang.getInstance().translate("Recipient") + ":");
+        jLabel_Reciever.setText(Lang.T("Recipient") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -167,7 +167,7 @@ public class MailInfo extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
         add(jTextField_Reciever, gridBagConstraints);
 
-        jLabel_Title.setText(Lang.getInstance().translate("Title") + ":");
+        jLabel_Title.setText(Lang.T("Title") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -188,7 +188,7 @@ public class MailInfo extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
         add(jTextField_Title, gridBagConstraints);
 
-        jLabel_Message.setText(Lang.getInstance().translate("Message") + ":");
+        jLabel_Message.setText(Lang.T("Message") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -239,7 +239,7 @@ public class MailInfo extends javax.swing.JPanel {
         add(jTextArea_Messge, gridBagConstraints);
 
 
-        jButton1.setText(Lang.getInstance().translate("Decrypt"));
+        jButton1.setText(Lang.T("Decrypt"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 9;
@@ -280,7 +280,7 @@ public class MailInfo extends javax.swing.JPanel {
 
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        voush_Library_Panel = new VouchLibraryPanel(trans);
+        voush_Library_Panel = new SignLibraryPanel(trans);
         jTabbedPane1.add(voush_Library_Panel);
         add(jTabbedPane1, gridBagConstraints);
 
@@ -301,7 +301,7 @@ public class MailInfo extends javax.swing.JPanel {
                 String password = PasswordPane.showUnlockWalletDialog(this);
                 if (!Controller.getInstance().unlockWallet(password)) {
                     //WRONG PASSWORD
-                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                     //		encrypted =!encrypted;
 
@@ -313,18 +313,18 @@ public class MailInfo extends javax.swing.JPanel {
                     trans.getRecipient(), trans.getData());
 
             if (decryptedData == null) {
-                jTextArea_Messge.setText(Lang.getInstance().translate("Decrypt Error!"));
+                jTextArea_Messge.setText(Lang.T("Decrypt Error!"));
             } else {
                 jTextArea_Messge.setText(trans.isText() ?
                         new String(decryptedData, StandardCharsets.UTF_8)
                         : Base58.encode(decryptedData)); //Converter.toHex(decryptedData));
 
-                jButton1.setText(Lang.getInstance().translate("Encrypt message"));
+                jButton1.setText(Lang.T("Encrypt message"));
                 encrypted = !encrypted;
             }
         } else {
             jTextArea_Messge.setText(trans.viewData());
-            jButton1.setText(Lang.getInstance().translate("Decrypt"));
+            jButton1.setText(Lang.T("Decrypt"));
             encrypted = !encrypted;
         }
         //encrypted.isSelected();
@@ -340,8 +340,8 @@ public class MailInfo extends javax.swing.JPanel {
         {
                 //jTextArea_Messge.setContentType("text/html");
                 imgLock = "<img src='file:images/messages/locked.png'>";
-                //return "<html>"+imgLock+"&nbsp;&nbsp;"+Lang.getInstance().translate( "Encrypted")+"</>";
-                return imgLock+"&nbsp;&nbsp;"+Lang.getInstance().translate( "Encrypted")+"</>";
+                //return "<html>"+imgLock+"&nbsp;&nbsp;"+Lang.T( "Encrypted")+"</>";
+                return imgLock+"&nbsp;&nbsp;"+Lang.T( "Encrypted")+"</>";
         }
 
 

@@ -20,7 +20,6 @@ import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -45,6 +44,7 @@ import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.GuiTimer;
+import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -56,6 +56,7 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
@@ -95,8 +96,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.1.02";
-    public static String buildTime = "2020-12-09 12:00:00 UTC";
+    public static String version = "5.2.1 dev 01";
+    public static String buildTime = "2021-01-21 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -503,7 +504,7 @@ public class Controller extends Observable {
         try {
             LOGGER.info("Open " + name);
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open") + " " + name));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Open") + " " + name));
 
             //// должен быть метод
             ///// DLSet.open();
@@ -511,7 +512,7 @@ public class Controller extends Observable {
 
             LOGGER.info(name + " OK");
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("OK")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("OK")));
 
         } catch (Throwable e) {
 
@@ -553,18 +554,18 @@ public class Controller extends Observable {
 
             if (useGui && Settings.getInstance().getbacUpAskToStart()) {
                 // ask dialog
-                int n = JOptionPane.showConfirmDialog(null, Lang.getInstance().translate("BackUp Database?"),
-                        Lang.getInstance().translate("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
+                int n = JOptionPane.showConfirmDialog(null, Lang.T("BackUp Database?"),
+                        Lang.T("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
                 if (n == JOptionPane.OK_OPTION) {
                     this.setChanged();
-                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("BackUp datachain")));
                     // delete & copy files in BackUp dir
 
                     //// у объекта должен быть этот метод сохранения DLSet.createDataCheckpoint();
                 }
             } else {
                 this.setChanged();
-                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("BackUp datachain")));
                 // delete & copy files in BackUp dir
                 //// у объекта должен быть этот метод сохранения DLSet.createDataCheckpoint();
             }
@@ -580,14 +581,14 @@ public class Controller extends Observable {
 
         // CHECK NETWORK PORT AVAILABLE
         if (BlockChain.TEST_DB == 0 && !Network.isPortAvailable(BlockChain.NETWORK_PORT)) {
-            throw new Exception(Lang.getInstance().translate("Network port %port% already in use!").replace("%port%",
+            throw new Exception(Lang.T("Network port %port% already in use!").replace("%port%",
                     String.valueOf(BlockChain.NETWORK_PORT)));
         }
 
         // CHECK RPC PORT AVAILABLE
         if (Settings.getInstance().isRpcEnabled()) {
             if (!Network.isPortAvailable(Settings.getInstance().getRpcPort())) {
-                throw new Exception(Lang.getInstance().translate("Rpc port %port% already in use!").replace("%port%",
+                throw new Exception(Lang.T("Rpc port %port% already in use!").replace("%port%",
                         String.valueOf(Settings.getInstance().getRpcPort())));
             }
         }
@@ -595,7 +596,7 @@ public class Controller extends Observable {
         // CHECK WEB PORT AVAILABLE
         if (Settings.getInstance().isWebEnabled()) {
             if (!Network.isPortAvailable(Settings.getInstance().getWebPort())) {
-                LOGGER.error(Lang.getInstance().translate("Web port %port% already in use!").replace("%port%",
+                LOGGER.error(Lang.T("Web port %port% already in use!").replace("%port%",
                         String.valueOf(Settings.getInstance().getWebPort())));
             }
         }
@@ -612,11 +613,11 @@ public class Controller extends Observable {
 
         try {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open DataLocale")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Open DataLocale")));
             LOGGER.info("Try Open DataLocal");
             this.dlSet = DLSet.reCreateDB();
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataLocale OK")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("DataLocale OK")));
             LOGGER.info("DataLocale OK");
         } catch (Throwable e) {
             LOGGER.error(e.getMessage(), e);
@@ -641,7 +642,7 @@ public class Controller extends Observable {
         // OPENING DATABASES
         try {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Try Open DataChain")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open DataChain"));
             LOGGER.info("Try Open DataChain");
             if (Settings.simpleTestNet) {
                 // -testnet
@@ -650,8 +651,8 @@ public class Controller extends Observable {
                 this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
             }
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
-            LOGGER.info("DataChain OK");
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "DataChain OK"));
+            LOGGER.info("DataChain OK - " + Settings.getInstance().getDataChainPath());
         } catch (Throwable e) {
             // Error open DB
             error = 1;
@@ -670,17 +671,17 @@ public class Controller extends Observable {
 
             if (Settings.getInstance().getbacUpAskToStart()) {
                 // ask dialog
-                int n = JOptionPane.showConfirmDialog(null, Lang.getInstance().translate("BackUp Database?"),
-                        Lang.getInstance().translate("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
+                int n = JOptionPane.showConfirmDialog(null, Lang.T("BackUp Database?"),
+                        Lang.T("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
                 if (n == JOptionPane.OK_OPTION) {
                     this.setChanged();
-                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("BackUp datachain")));
                     // delete & copy files in BackUp dir
                     createDataCheckpoint();
                 }
             } else {
                 this.setChanged();
-                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("BackUp datachain")));
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("BackUp datachain")));
                 // delete & copy files in BackUp dir
                 createDataCheckpoint();
             }
@@ -701,7 +702,7 @@ public class Controller extends Observable {
         }
 
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Datachain Ok")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Datachain Ok")));
         // createDataCheckpoint();
 
         // CHECK IF DB NEEDS UPDATE
@@ -746,8 +747,8 @@ public class Controller extends Observable {
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start API Service")));
-            LOGGER.info(Lang.getInstance().translate("Start API Service"));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start API Service"));
+            LOGGER.info(Lang.T("Start API Service"));
             this.rpcService = new ApiService();
             this.rpcServiceRestart();
         }
@@ -755,18 +756,19 @@ public class Controller extends Observable {
         // START WEB SERVICE
         if (Settings.getInstance().isWebEnabled()) {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Start WEB Service")));
-            LOGGER.info(Lang.getInstance().translate("Start WEB Service"));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start WEB Service"));
+            LOGGER.info(Lang.T("Start WEB Service"));
             this.webService = WebService.getInstance();
             this.webService.start();
         }
 
         // CREATE WALLET
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Wallet")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open Wallet"));
         this.wallet = new Wallet(this.dcSetWithObserver, this.dynamicGUI);
 
-        if (this.seedCommand != null && this.seedCommand.length > 1) {
+        boolean walletKeysRecovered = false;
+        if (this.seedCommand != null && this.seedCommand.length > 1 && !Wallet.walletKeysExists()) {
             /// 0 - Accounts number, 1 - seed, 2 - password, [3 - path]
             byte[] seed;
             if (this.seedCommand[1].length() < 30) {
@@ -798,13 +800,16 @@ public class Controller extends Observable {
                         path = Settings.getInstance().getWalletKeysPath();
                     }
 
-                    boolean res = recoverWallet(seed,
+                    walletKeysRecovered = recoverWallet(seed,
                             this.seedCommand.length > 2 ? this.seedCommand[2] : "1",
                             accsNum, path);
                     this.seedCommand = null;
                 }
             }
 
+        }
+
+        if (!walletKeysRecovered) {
         }
 
         if (BlockChain.TEST_DB == 0) {
@@ -814,17 +819,18 @@ public class Controller extends Observable {
                 this.wallet.initiateItemsFavorites();
             }
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wallet OK" + " " + Settings.getInstance().getDataWalletPath()));
+            LOGGER.info("Wallet OK" + " " + Settings.getInstance().getDataWalletPath());
 
             // create telegtam
 
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Telegram")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Open Telegram"));
             this.telegramStore = TelegramStore.getInstanse(this.dcSetWithObserver, this.dynamicGUI);
 
 
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Telegram OK")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Telegram OK")));
 
         }
 
@@ -869,7 +875,57 @@ public class Controller extends Observable {
     }
 
     public int loadWalletFromDir() {
-        return this.wallet.loadFromDir(this.dcSetWithObserver, this.dynamicGUI);
+        JFileChooser fileopen = new JFileChooser();
+        fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        String pathOld = Settings.getInstance().getWalletKeysPath();
+        File ff = new File(pathOld);
+        if (!ff.exists())
+            pathOld = "." + File.separator;
+        fileopen.setCurrentDirectory(new File(pathOld));
+        int ret = fileopen.showDialog(null, Lang.T("Open Wallet Dir"));
+        if (ret != JFileChooser.APPROVE_OPTION) {
+            //is abort
+            return 3;
+
+        }
+
+        String selectedDir = fileopen.getSelectedFile().toString();
+
+        // set wallet dir
+        Settings.getInstance().setWalletKeysPath(selectedDir);
+
+        // open wallet
+        Controller.getInstance().wallet = new Wallet(dcSetWithObserver, dynamicGUI);
+        // not wallet return 0;
+        if (!Controller.getInstance().wallet.walletKeysExists()) {
+            Settings.getInstance().setWalletKeysPath(pathOld);
+            return 2;
+        }
+
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            // ASK FOR PASSWORD
+            String password = PasswordPane.showUnlockWalletDialog(null);
+            if (!Controller.getInstance().unlockWallet(password)) {
+                // WRONG PASSWORD
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                        Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                return 5;
+            }
+        }
+
+        // LOAD accounts
+        Controller.getInstance().wallet.updateAccountsFromSecretKeys();
+
+        if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
+            Controller.getInstance().wallet.initiateItemsFavorites();
+            // save path from setting json
+            Settings.getInstance().updateSettingsValue();
+            // is ok
+            return 1;
+        } else {
+            Settings.getInstance().setWalletKeysPath(pathOld);
+            return 3;
+        }
     }
 
     public void replaseFavoriteItems(int type) {
@@ -1040,10 +1096,10 @@ public class Controller extends Observable {
             this.connectTimer.cancel();
 
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing")));
         // STOP MESSAGE PROCESSOR
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping message processor")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping message processor")));
 
         if (this.network != null) {
             LOGGER.info("Stopping message processor");
@@ -1063,7 +1119,7 @@ public class Controller extends Observable {
 
         // delete temp Dir
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Delete files from TEMP dir")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Delete files from TEMP dir")));
         LOGGER.info("Delete files from TEMP dir");
         try {
             File tempDir = new File(Settings.getInstance().getDataTempDir());
@@ -1073,31 +1129,31 @@ public class Controller extends Observable {
 
         // STOP TRANSACTIONS POOL
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping Transactions Pool")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping Transactions Pool")));
         LOGGER.info("Stopping Transactions Pool");
         this.transactionsPool.halt();
 
         // STOP WIN BLOCK SELECTOR
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping WinBlock Selector")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping WinBlock Selector")));
         LOGGER.info("Stopping WinBlock Selector");
         this.winBlockSelector.halt();
 
         // STOP BLOCK REQUESTER
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping Block Requester")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping Block Requester")));
         LOGGER.info("Stopping Block Requester");
         this.blockRequester.halt();
 
         // STOP BLOCK PROCESSOR
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping block synchronizer")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping block synchronizer")));
         LOGGER.info("Stopping block synchronizer");
         this.synchronizer.stop();
 
         // WAITING STOP MAIN PROCESS
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Waiting stopping processors")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Waiting stopping processors")));
         LOGGER.info("Waiting stopping processors");
 
         int i = 0;
@@ -1110,7 +1166,7 @@ public class Controller extends Observable {
 
         if (dcSet.isBusy())
             this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DCSet is busy...")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("DCSet is busy...")));
         LOGGER.info("DCSet is busy...");
 
         i = 0;
@@ -1124,28 +1180,28 @@ public class Controller extends Observable {
 
         // CLOSE DATABABASE
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing database")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
         LOGGER.info("Closing database");
         this.dcSet.close();
 
         if (this.wallet != null) {
             // CLOSE WALLET
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing wallet")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing wallet")));
             LOGGER.info("Closing wallet");
             this.wallet.close();
         }
 
         // CLOSE LOCAL
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing Local database")));
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing Local database")));
         LOGGER.info("Closing Local database");
         this.dlSet.close();
 
         if (telegramStore != null) {
             // CLOSE telegram
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing telegram")));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing telegram")));
             LOGGER.info("Closing telegram");
             this.telegramStore.close();
         }
@@ -1193,9 +1249,9 @@ public class Controller extends Observable {
     }
 
     public void playWalletEvent(Object object) {
-        if (gui == null || gui.walletTimer == null)
+        if (gui == null || gui.walletNotifyTimer == null)
             return;
-        gui.walletTimer.playEvent(object);
+        gui.walletNotifyTimer.playEvent(object);
     }
 
     /**
@@ -1369,6 +1425,13 @@ public class Controller extends Observable {
         Tuple2<Integer, Long> myHWeight = this.getBlockChain().getHWeightFull(dcSet);
         peerInfo.put("h", myHWeight.a);
         peerInfo.put("w", myHWeight.b);
+        JSONObject info = new JSONObject();
+        if (Settings.getInstance().isWebEnabled() && Settings.getInstance().getWebAllowed().length == 0) {
+            // разрешено всем - передадим его
+            info.put("port", Settings.getInstance().getWebPort());
+            info.put("scheme", Settings.getInstance().isWebUseSSL() ? "https" : "http");
+        }
+        peerInfo.put("i", info);
 
         // CheckPointSign
         peerInfo.put("cps", Base58.encode(blockChain.getMyHardCheckPointSign()));
@@ -1596,6 +1659,10 @@ public class Controller extends Observable {
                     Long peerWeight = Long.parseLong(peerIhfo.get("w").toString());
                     peer.setHWeight(new Tuple2<>(peerHeight, peerWeight));
                     peer.setVersion(peerIhfo.get("v").toString());
+                    try {
+                        peer.setNodeInfo((JSONObject) JSONValue.parse(peerIhfo.get("i").toString()));
+                    } catch (Exception e) {
+                    }
 
                 } catch (Exception e) {
                     peer.setVersion(infoStr);
@@ -2011,7 +2078,7 @@ public class Controller extends Observable {
                             + peer.getHWeight(true);
                     LOGGER.info(info);
                     this.setChanged();
-                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate(info)));
+                    this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T(info)));
                     try {
                         // SYNCHRONIZE FROM PEER
                         if (!this.isOnStopping())
@@ -2125,7 +2192,7 @@ public class Controller extends Observable {
         long weight = myHWeight.b;
         Peer maxPeer = null;
 
-        long maxHeight = blockChain.getHeightOnTimestamp(NTP.getTime());
+        long maxHeight = blockChain.getHeightOnTimestampMS(NTP.getTime());
 
         try {
             for (Peer peer : network.getActivePeers(false)) {
@@ -2179,7 +2246,7 @@ public class Controller extends Observable {
 
     public boolean doesWalletExists() {
         // CHECK IF WALLET EXISTS
-        return !noUseWallet && this.wallet != null && this.wallet.exists();
+        return !noUseWallet && this.wallet != null && this.wallet.walletKeysExists();
     }
 
     public boolean doesWalletDatabaseExists() {
@@ -2388,12 +2455,12 @@ public class Controller extends Observable {
 
         if (!GraphicsEnvironment.isHeadless()
                 && (Settings.getInstance().isGuiEnabled() || Settings.getInstance().isSysTrayEnabled())) {
-            SysTray.getInstance().sendMessage(Lang.getInstance().translate("INCOMING API CALL"),
-                    Lang.getInstance().translate("An API call needs authorization!"), MessageType.WARNING);
-            Object[] options = {Lang.getInstance().translate("Yes"), Lang.getInstance().translate("No")};
+            SysTray.getInstance().sendMessage(Lang.T("INCOMING API CALL"),
+                    Lang.T("An API call needs authorization!"), MessageType.WARNING);
+            Object[] options = {Lang.T("Yes"), Lang.T("No")};
 
-            StringBuilder sb = new StringBuilder(Lang.getInstance().translate("Permission Request: "));
-            sb.append(Lang.getInstance().translate("Do you want to authorize the following API call?\n\n") + json
+            StringBuilder sb = new StringBuilder(Lang.T("Permission Request: "));
+            sb.append(Lang.T("Do you want to authorize the following API call?\n\n") + json
                     + " \n" + request.getRequestURL());
             JTextArea jta = new JTextArea(sb.toString());
             jta.setLineWrap(true);
@@ -2413,7 +2480,7 @@ public class Controller extends Observable {
             //gui = Gui.getInstance();
             gui.bringtoFront();
 
-            result = JOptionPane.showOptionDialog(gui, jsp, Lang.getInstance().translate("INCOMING API CALL"),
+            result = JOptionPane.showOptionDialog(gui, jsp, Lang.T("INCOMING API CALL"),
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         }
 
@@ -2937,15 +3004,17 @@ public class Controller extends Observable {
     // TRANSACTIONS
 
     public void onTransactionCreate(Transaction transaction) {
-        // ADD TO UNCONFIRMED TRANSACTIONS
 
-        // очистим мясо со скелета
+        // CLEAR ALL LOCAL DATA
         transaction = transaction.copy();
+
+        // ADD TO UNCONFIRMED TRANSACTIONS
         this.transactionsPool.offerMessage(transaction);
 
         // BROADCAST
         this.broadcastTransaction(transaction);
 
+        // ADD TO WALLET TRANSACTIONS
         if (doesWalletExists() && HARD_WORK < 4) {
             wallet.processTransaction(transaction);
         }
@@ -3019,16 +3088,17 @@ public class Controller extends Observable {
 
     public Object issueAsset(HttpServletRequest request, String x) {
 
-        Object result = Transaction.decodeJson(x);
+        Object result = Transaction.decodeJson(null, x);
         if (result instanceof JSONObject) {
             return result;
         }
 
-        Fun.Tuple4<Account, Integer, String, JSONObject> transactionResult = (Fun.Tuple4<Account, Integer, String, JSONObject>) result;
-        Account creator = transactionResult.a;
-        int feePow = transactionResult.b;
-        String password = transactionResult.c;
-        JSONObject jsonObject = transactionResult.d;
+        Fun.Tuple5<Account, Integer, ExLink, String, JSONObject> resultHead = (Fun.Tuple5<Account, Integer, ExLink, String, JSONObject>) result;
+        Account creator = resultHead.a;
+        int feePow = resultHead.b;
+        ExLink linkTo = resultHead.c;
+        String password = resultHead.d;
+        JSONObject jsonObject = resultHead.e;
 
         if (jsonObject == null) {
             int error = ApiErrorFactory.ERROR_JSON;
@@ -3060,20 +3130,6 @@ public class Controller extends Observable {
                 image = Base58.decode(image58);
         } else {
             image = java.util.Base64.getDecoder().decode(image64);
-        }
-
-        String linkToRefStr = (String) jsonObject.get("linkTo");
-        ExLink linkTo;
-        if (linkToRefStr == null)
-            linkTo = null;
-        else {
-            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-            if (linkToRef == null) {
-                throw ApiErrorFactory.getInstance().createError(
-                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-            } else {
-                linkTo = new ExLinkSource(linkToRef, null);
-            }
         }
 
         Integer scale = null;
@@ -3152,35 +3208,25 @@ public class Controller extends Observable {
 
     public Object issuePerson(HttpServletRequest request, String x) {
 
-        Object result = Transaction.decodeJson(x);
+        JSONObject out = new JSONObject();
+
+        Object result = Transaction.decodeJson(null, x);
         if (result instanceof JSONObject) {
             return result;
         }
 
         int error;
-        Fun.Tuple4<Account, Integer, String, JSONObject> transactionResult = (Fun.Tuple4<Account, Integer, String, JSONObject>) result;
+        // creator, feePow, linkTo, password, jsonObject
+        Fun.Tuple5<Account, Integer, ExLink, String, JSONObject> transactionResult = (Fun.Tuple5<Account, Integer, ExLink, String, JSONObject>) result;
         Account creator = transactionResult.a;
         int feePow = transactionResult.b;
-        String password = transactionResult.c;
-        JSONObject jsonObject = transactionResult.d;
+        ExLink linkTo = transactionResult.c;
+        String password = transactionResult.d;
+        JSONObject jsonObject = transactionResult.e;
 
         if (jsonObject == null) {
-            error = ApiErrorFactory.ERROR_JSON;
-            return new Fun.Tuple2<>(error, OnDealClick.resultMess(error));
-        }
-
-        String linkToRefStr = (String) jsonObject.get("linkTo");
-        ExLink linkTo;
-        if (linkToRefStr == null)
-            linkTo = null;
-        else {
-            Long linkToRef = Transaction.parseDBRef(linkToRefStr);
-            if (linkToRef == null) {
-                throw ApiErrorFactory.getInstance().createError(
-                        Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-            } else {
-                linkTo = new ExLinkSource(linkToRef, null);
-            }
+            Transaction.updateMapByErrorSimple(ApiErrorFactory.ERROR_JSON, out);
+            return out;
         }
 
         String name = (String) jsonObject.get("name");
@@ -3225,6 +3271,13 @@ public class Controller extends Observable {
         String ownerSignature58 = null;
         byte[] ownerSignature = null;
 
+        APIUtils.askAPICallAllowed(password, "POST issue Person " + name, request, true);
+        PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
+        if (creatorPrivate == null) {
+            Transaction.updateMapByErrorSimple(Transaction.INVALID_CREATOR, out);
+            return out;
+        }
+
         String errorName = null;
         try {
             errorName = "birthday";
@@ -3254,7 +3307,9 @@ public class Controller extends Observable {
             hairСolor = (String) jsonObject.get("hairСolor");
 
             owner58 = (String) jsonObject.get("owner");
-            if (owner58 != null) {
+            if (owner58 == null) {
+                owner = new PublicKeyAccount(creatorPrivate.getPublicKey());
+            } else {
                 errorName = "owner: Base58";
                 owner = new PublicKeyAccount(owner58);
 
@@ -3265,14 +3320,9 @@ public class Controller extends Observable {
 
         } catch (Exception e) {
             error = ApiErrorFactory.ERROR_JSON;
-            JSONObject out = new JSONObject();
-            out.put("error", error);
-            out.put("error_message", errorName);
+            Transaction.updateMapByErrorValue(ApiErrorFactory.ERROR_JSON, errorName, out);
             return out;
         }
-
-        APIUtils.askAPICallAllowed(password, "POST issue Person " + name, request, true);
-        PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
 
         PersonHuman person = new PersonHuman(owner, name, birthday, deathday, gender,
                 race, birthLatitude, birthLongitude,
@@ -3364,6 +3414,18 @@ public class Controller extends Observable {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createCancelOrderTransaction(creator, orderID, feePow);
+        }
+    }
+
+    public Transaction cancelOrder1(PrivateKeyAccount creator, Order order, int feePow) {
+        Transaction orderCreate = this.dcSet.getTransactionFinalMap().get(order.getId());
+        return cancelOrder1(creator, orderCreate.getSignature(), feePow);
+    }
+
+    public Transaction cancelOrder1(PrivateKeyAccount creator, byte[] orderID, int feePow) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createCancelOrderTransaction1(creator, orderID, feePow);
         }
     }
 
@@ -3536,10 +3598,10 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction r_SignNote(byte version, byte property1, byte property2, int forDeal,
+    public Transaction r_SignNote(byte version, byte property1, byte property2,
                                   PrivateKeyAccount sender, int feePow, long key, byte[] message) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_SignNote(version, property1, property2, forDeal, sender, feePow, key,
+            return this.transactionCreator.r_SignNote(version, property1, property2, sender, feePow, key,
                     message);
         }
     }
@@ -3948,6 +4010,53 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.startsWith("-web=") && arg.length() > 5) {
+                String value = arg.substring(5).toLowerCase();
+                if (value.equals("on")) {
+                    Settings.getInstance().updateJson("webenabled", true);
+                } else if (value.equals("off")) {
+                    Settings.getInstance().updateJson("webenabled", false);
+                }
+                continue;
+            }
+            if (arg.startsWith("-weballowed=") && arg.length() > 12) {
+                String[] array = arg.substring(12).split(",");
+                JSONArray list = new JSONArray();
+                for (String ip : array) {
+                    list.add(ip);
+                }
+                Settings.getInstance().updateJson("weballowed", list);
+                continue;
+            }
+            if (arg.startsWith("-webport=") && arg.length() > 9) {
+                Long value = new Long(arg.substring(9));
+                Settings.getInstance().updateJson("webport", value);
+                continue;
+            }
+            if (arg.startsWith("-rpc=") && arg.length() > 5) {
+                String value = arg.substring(5).toLowerCase();
+                if (value.equals("on")) {
+                    Settings.getInstance().updateJson("rpcenabled", true);
+                } else if (value.equals("off")) {
+                    Settings.getInstance().updateJson("rpcenabled", false);
+                }
+                continue;
+            }
+            if (arg.startsWith("-rpcallowed=") && arg.length() > 12) {
+                String[] array = arg.substring(12).split(",");
+                JSONArray list = new JSONArray();
+                for (String ip : array) {
+                    list.add(ip);
+                }
+                Settings.getInstance().updateJson("rpcallowed", list);
+                continue;
+            }
+            if (arg.startsWith("-rpcport=") && arg.length() > 9) {
+                Long value = new Long(arg.substring(9));
+                Settings.getInstance().updateJson("rpcport", value);
+                continue;
+            }
+
         }
 
         if (Settings.genesisStamp <= 0) {
@@ -3996,12 +4105,12 @@ public class Controller extends Observable {
 
                 //ONE MUST BE ENABLED
                 if (!Settings.getInstance().isGuiEnabled() && !Settings.getInstance().isRpcEnabled()) {
-                    throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
+                    throw new Exception(Lang.T("Both gui and rpc cannot be disabled!"));
                 }
 
-                LOGGER.info(Lang.getInstance().translate("Starting %app%")
+                LOGGER.info(Lang.T("Starting %app%")
                         .replace("%app%", getApplicationName(false)));
-                LOGGER.info(getVersion(true) + Lang.getInstance().translate(" build ")
+                LOGGER.info(getVersion(true) + Lang.T(" build ")
                         + buildTime);
 
                 this.setChanged();
@@ -4054,7 +4163,7 @@ public class Controller extends Observable {
                             about_frame.setVisible(false);
                             about_frame.dispose();
                         }
-                        LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start"), e1);
+                        LOGGER.error(Lang.T("GUI ERROR - at Start"), e1);
                     }
                 }
 
@@ -4071,10 +4180,11 @@ public class Controller extends Observable {
                 if (useGui) {
                     if (Settings.getInstance().isGuiEnabled()) {
                         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
-                                Lang.getInstance().translate("STARTUP ERROR") + ": "
-                                        + errorMsg, 600, 400, Lang.getInstance().translate(" "));
+                                Lang.T("STARTUP ERROR") + ": "
+                                        + errorMsg, 600, 400, Lang.T(" "));
+                        dd.jButton0.setVisible(false);
                         dd.jButton1.setVisible(false);
-                        dd.jButton2.setText(Lang.getInstance().translate("Cancel"));
+                        dd.jButton2.setText(Lang.T("Cancel"));
                         dd.setLocationRelativeTo(null);
                         dd.setVisible(true);
                     }
@@ -4088,7 +4198,7 @@ public class Controller extends Observable {
                 }
 
                 if (Gui.isGuiStarted()) {
-                    JOptionPane.showMessageDialog(null, errorMsg, Lang.getInstance().translate("Startup Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, errorMsg, Lang.T("Startup Error"), JOptionPane.ERROR_MESSAGE);
 
                 }
 

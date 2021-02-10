@@ -19,8 +19,9 @@ import java.util.HashSet;
 // this.end_date == null -> MAX
 public class RSetUnionStatusToItem extends Transaction {
 
-    private static final byte TYPE_ID = (byte) Transaction.SET_UNION_STATUS_TO_ITEM_TRANSACTION;
-    private static final String NAME_ID = "Set Union Status to Unit";
+    public static final byte TYPE_ID = (byte) Transaction.SET_UNION_STATUS_TO_ITEM_TRANSACTION;
+    public static final String TYPE_NAME = "Set Union Status to Unit";
+
     private static final int DATE_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
 
     private static final int LOAD_LENGTH = 2 * DATE_LENGTH + KEY_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
@@ -39,7 +40,7 @@ public class RSetUnionStatusToItem extends Transaction {
 
     public RSetUnionStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
                                  Long beg_date, Long end_date, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
         this.key = key;
         this.itemType = itemType;

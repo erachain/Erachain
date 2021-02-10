@@ -98,7 +98,7 @@ public class GenesisRecord extends Transaction {
     }
 
     @Override
-    public long calcBaseFee() {
-        return 0;
+    public long calcBaseFee(boolean withFreeProtocol) {
+        return 0L;
     }
 }

@@ -1,15 +1,12 @@
 package org.erachain.gui.create;
 // 30/03
 
-import com.google.common.base.Charsets;
-import org.apache.commons.io.IOUtils;
 import org.erachain.controller.Controller;
 import org.erachain.lang.Lang;
 import org.erachain.lang.LangFile;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SaveStrToFile;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +17,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +29,7 @@ public class SettingLangFrame extends JDialog {
     private JButton nextButton;
     //private SettingLangFrame th;
     private JLabel labelSelect;
-    private JLabel label_font_size;
+    private JLabel Label_font_size;
 
     public SettingLangFrame() {
         super();
@@ -80,8 +75,8 @@ public class SettingLangFrame extends JDialog {
         font_LabelGBC.gridy = 2;
         font_LabelGBC.gridx = 1;
 
-        label_font_size = new JLabel("Font Size:");
-        this.add(label_font_size, font_LabelGBC);
+        Label_font_size = new JLabel("Font Size:");
+        this.add(Label_font_size, font_LabelGBC);
         //LANGS GBC
         GridBagConstraints fontGBC = new GridBagConstraints();
         fontGBC.insets = new Insets(0, 0, 5, 0);
@@ -103,34 +98,13 @@ public class SettingLangFrame extends JDialog {
         buttonGBC.gridy = 4;
         buttonGBC.gridx = 1;
 
-        labelSelect = new JLabel(Lang.getInstance().translate("Language") + ":");
+        labelSelect = new JLabel(Lang.T("Language") + ":");
         this.add(labelSelect, labelGBC);
 
         // read internet
-        String stringFromInternet;
-        try {
-            String url = Lang.translationsUrl + "available.json";
-
-            URL u = new URL(url);
-            InputStream in = u.openStream();
-            stringFromInternet = IOUtils.toString(in, Charsets.UTF_8);
-        } catch (Exception e1) {
-            LOGGER.error(e1.getMessage(), e1);
-            stringFromInternet = "";
-        }
-
-        JSONObject inernetLangsJSON = (JSONObject) JSONValue.parse(stringFromInternet);
-
         DefaultListModel<LangFile> listModel = new DefaultListModel<LangFile>();
-        listModel.addElement(new LangFile());
-        if (inernetLangsJSON != null && !inernetLangsJSON.isEmpty()) {
-            for (Object internetKey : inernetLangsJSON.keySet()) {
-                JSONObject internetValue = (JSONObject) inernetLangsJSON.get(internetKey);
-                listModel.addElement(new LangFile((String) internetValue.get("_lang_name_"),
-                        (String) internetValue.get("_file_"),
-                        Long.parseLong(internetValue.get("_timestamp_of_translation_").toString())
-                ));
-            }
+        for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
+            listModel.addElement(Lang.getInstance().getLangFile(iso));
         }
 
         listLang = new JList<LangFile>(listModel);
@@ -141,11 +115,11 @@ public class SettingLangFrame extends JDialog {
 
             switch (valueLang) {
                 case "[ru] Русский":
-                    label_font_size.setText("Размер шрифта:");
+                    Label_font_size.setText("Размер шрифта:");
                     labelSelect.setText("Язык");
                     break;
                 case "[en] English":
-                    label_font_size.setText("Font size:");
+                    Label_font_size.setText("Font size:");
                     labelSelect.setText("Language");
                     break;
             }
@@ -155,10 +129,7 @@ public class SettingLangFrame extends JDialog {
 
         this.add(scrollPaneLang, listLangGBC);
 
-        if (inernetLangsJSON == null || inernetLangsJSON.isEmpty()) {
-            onOKClick();
-            return;
-        }
+        onOKClick();
 
         //BUTTON OK
         nextButton = new JButton("OK");
@@ -186,7 +157,7 @@ public class SettingLangFrame extends JDialog {
                     Font font = listLang.getFont();
                     listLang.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
                     labelSelect.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
-                    label_font_size.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
+                    Label_font_size.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
                     size_Font.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
                     nextButton.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
                     pack();
@@ -218,7 +189,7 @@ public class SettingLangFrame extends JDialog {
             }
             SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
             Settings.freeInstance();
-            Lang.getInstance().loadLang();
+            Lang.getInstance().setLangForNode();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
             JOptionPane.showMessageDialog(

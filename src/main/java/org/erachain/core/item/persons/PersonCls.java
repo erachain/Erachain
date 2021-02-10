@@ -8,6 +8,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.*;
+import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ByteArrayUtils;
 import org.erachain.utils.DateTimeFormat;
@@ -33,7 +34,8 @@ public abstract class PersonCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.PERSON_TYPE;
 
-    public static final long MIN_START_KEY = 0L;
+    public static final long MIN_START_KEY_OLD = 0L;
+    //public static final long START_KEY_UP_ITEMS = 1L << 20;
 
     public static int MAX_IMAGE_LENGTH = 28000;
     public static int MIN_IMAGE_LENGTH = 10240;
@@ -120,17 +122,19 @@ public abstract class PersonCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return 1L << 18;
+            return BlockChain.START_KEY_UP_ITEMS;
+        //return START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return 1L << 17;
+            return BlockChain.START_KEY_UP_ITEMS;
+        //return START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     public String getItemTypeName() {
@@ -201,7 +205,7 @@ public abstract class PersonCls extends ItemCls {
 
     public boolean isAlive(long onThisTime) {
 
-        if(this.deathday == Long.MIN_VALUE
+        if (this.deathday == Long.MIN_VALUE
                 || this.deathday == Long.MAX_VALUE
                 || this.deathday < this.birthday)
             return true;
@@ -237,55 +241,55 @@ public abstract class PersonCls extends ItemCls {
                     switch (pos) {
                         case 1:
                             switch (side) {
-                                case Transaction.BALANCE_SIDE_DEBIT:
+                                case Account.BALANCE_SIDE_DEBIT:
                                     return balances.a.a;
-                                case Transaction.BALANCE_SIDE_LEFT:
+                                case Account.BALANCE_SIDE_LEFT:
                                     return balances.a.b;
-                                case Transaction.BALANCE_SIDE_CREDIT:
+                                case Account.BALANCE_SIDE_CREDIT:
                                     return balances.a.a.subtract(balances.a.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 2:
                             switch (side) {
-                                case Transaction.BALANCE_SIDE_DEBIT:
+                                case Account.BALANCE_SIDE_DEBIT:
                                     return balances.b.a;
-                                case Transaction.BALANCE_SIDE_LEFT:
+                                case Account.BALANCE_SIDE_LEFT:
                                     return balances.b.b;
-                                case Transaction.BALANCE_SIDE_CREDIT:
+                                case Account.BALANCE_SIDE_CREDIT:
                                     return balances.b.a.subtract(balances.b.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 3:
                             switch (side) {
-                                case Transaction.BALANCE_SIDE_DEBIT:
+                                case Account.BALANCE_SIDE_DEBIT:
                                     return balances.c.a;
-                                case Transaction.BALANCE_SIDE_LEFT:
+                                case Account.BALANCE_SIDE_LEFT:
                                     return balances.c.b;
-                                case Transaction.BALANCE_SIDE_CREDIT:
+                                case Account.BALANCE_SIDE_CREDIT:
                                     return balances.c.a.subtract(balances.c.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 4:
                             switch (side) {
-                                case Transaction.BALANCE_SIDE_DEBIT:
+                                case Account.BALANCE_SIDE_DEBIT:
                                     return balances.d.a;
-                                case Transaction.BALANCE_SIDE_LEFT:
+                                case Account.BALANCE_SIDE_LEFT:
                                     return balances.d.b;
-                                case Transaction.BALANCE_SIDE_CREDIT:
+                                case Account.BALANCE_SIDE_CREDIT:
                                     return balances.d.a.subtract(balances.d.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 5:
                             switch (side) {
-                                case Transaction.BALANCE_SIDE_DEBIT:
+                                case Account.BALANCE_SIDE_DEBIT:
                                     return balances.e.a;
-                                case Transaction.BALANCE_SIDE_LEFT:
+                                case Account.BALANCE_SIDE_LEFT:
                                     return balances.e.b;
-                                case Transaction.BALANCE_SIDE_CREDIT:
+                                case Account.BALANCE_SIDE_CREDIT:
                                     return balances.e.a.subtract(balances.e.b);
                                 default:
                                     return BigDecimal.ZERO;
@@ -405,7 +409,7 @@ public abstract class PersonCls extends ItemCls {
 
         for (String address : addresses.keySet()) {
             Account account = new Account(address);
-            Tuple2<BigDecimal, BigDecimal> balance = account.getBalanceInPosition(assetKey, position);
+            Tuple2<BigDecimal, BigDecimal> balance = account.getBalanceForAction(assetKey, position);
             if (balance != null)
                 balanceTotal = balanceTotal.add(balance.b);
         }
@@ -440,6 +444,48 @@ public abstract class PersonCls extends ItemCls {
         personJSON.put("height", Byte.toUnsignedInt(this.height));
 
         return personJSON;
+    }
+
+    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+        //DCSet dcSet = DCSet.getInstance();
+
+        JSONObject json = super.jsonForExplorerPage(langObj);
+        json.put("birthday", birthday);
+
+        return json;
+
+    }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_TXCreator", Lang.T("Registrar", langObj));
+        itemJson.put("Label_Authorship", Lang.T("Authorship", langObj));
+        itemJson.put("Label_Born", Lang.T("Birthday", langObj));
+        itemJson.put("Label_Gender", Lang.T("Gender", langObj));
+
+        itemJson.put("birthday", getBirthdayStr());
+        if (!isAlive(0L)) {
+            itemJson.put("deathday", getDeathdayStr());
+            itemJson.put("Label_dead", Lang.T("Deathday", langObj));
+
+        }
+
+        String gender = Lang.T("Man", langObj);
+        if (getGender() == 0) {
+            gender = Lang.T("Man", langObj);
+        } else if (getGender() == 1) {
+            gender = Lang.T("Woman", langObj);
+        } else {
+            gender = Lang.T("-", langObj);
+        }
+        itemJson.put("gender", gender);
+
+
+        if (!forPrint) {
+        }
+
+        return itemJson;
     }
 
 }

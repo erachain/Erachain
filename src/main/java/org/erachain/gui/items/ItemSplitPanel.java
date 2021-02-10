@@ -1,15 +1,24 @@
 package org.erachain.gui.items;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
+import org.erachain.gui.items.statement.IssueDocumentPanel;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +28,11 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Base64;
 import java.util.Timer;
 import java.util.TimerTask;
 //import java.util.TimerTask;
@@ -167,15 +180,131 @@ public abstract class ItemSplitPanel extends SplitPanel {
                 favoriteMenuItems.setVisible(true);
                 // CHECK IF FAVORITES
                 if (Controller.getInstance().isItemFavorite(itemTableSelected)) {
-                    favoriteMenuItems.setText(Lang.getInstance().translate("Remove Favorite"));
+                    favoriteMenuItems.setText(Lang.T("Remove Favorite"));
                 } else {
-                    favoriteMenuItems.setText(Lang.getInstance().translate("Add Favorite"));
+                    favoriteMenuItems.setText(Lang.T("Add Favorite"));
                 }
             }
 
-        });
+         });
 
         menuTable.add(favoriteMenuItems);
+
+        JMenuItem vouchMenu = new JMenuItem(Lang.T("Sign / Vouch"));
+        vouchMenu.addActionListener(e -> {
+            DCSet db = DCSet.getInstance();
+            Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
+            new toSignRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
+
+        });
+        menuTable.add(vouchMenu);
+
+        JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
+        linkMenu.addActionListener(e -> {
+            DCSet db = DCSet.getInstance();
+            Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
+            MainPanel.getInstance().insertNewTab(
+                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+
+        });
+        menuTable.add(linkMenu);
+
+        JMenu menuSaveCopy = new JMenu(Lang.T("Save / Copy"));
+        menuTable.add(menuSaveCopy);
+
+        JMenuItem copyNumber = new JMenuItem(Lang.T("Copy Number"));
+        copyNumber.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection("" + itemTableSelected.getKey());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Number of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyNumber);
+
+        JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
+        copyJson.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection(itemTableSelected.toJson().toJSONString());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("JSON of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyJson);
+
+        JMenuItem copyRAW = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base58"));
+        copyRAW.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection(Base58.encode(itemTableSelected.toBytes(false, false)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW);
+
+        JMenuItem copyRAW64 = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base64"));
+        copyRAW64.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(itemTableSelected.toBytes(false, false)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW64);
+
+        JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
+        saveJson.addActionListener(e -> {
+            Library.saveJSONtoFileSystem(this, itemTableSelected, itemTableSelected.viewName());
+
+        });
+        menuSaveCopy.add(saveJson);
+
+        JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
+        saveRAW.addActionListener(e -> {
+            Library.saveAsBase58FileSystem(this, itemTableSelected.toBytes(false, false),
+                    itemTableSelected.viewName());
+
+        });
+        menuSaveCopy.add(saveRAW);
+
+        JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
+        saveRAW64.addActionListener(e -> {
+            Library.saveAsBase64FileSystem(this, itemTableSelected.toBytes(false, false),
+                    itemTableSelected.viewName());
+
+        });
+        menuSaveCopy.add(saveRAW64);
+
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.T("Check in Blockexplorer"));
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
+                            + "/index/blockexplorer.html"
+                            + "?" + itemTableSelected.getItemTypeName() + "=" + itemTableSelected.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
+        menuTable.add(setSeeInBlockexplorer);
 
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menuTable);
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
@@ -190,7 +319,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
     private void favoriteSet(ItemCls itemCls) {
         // CHECK IF FAVORITES
         if (Controller.getInstance().isItemFavorite(itemCls)) {
-            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from favorite") + "?", Lang.getInstance().translate("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+            int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
                 Controller.getInstance().removeItemFavorite(itemCls);
             }

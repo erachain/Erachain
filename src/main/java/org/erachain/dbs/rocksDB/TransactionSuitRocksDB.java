@@ -96,7 +96,6 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
 
         recipientsIndex = new ArrayIndexDB<>(recipientsIndexName,
                 (aLong, transaction) -> {
-                    // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                     if (transaction.noDCSet()) {
                         transaction.setDC((DCSet) databaseSet, true);
                     }

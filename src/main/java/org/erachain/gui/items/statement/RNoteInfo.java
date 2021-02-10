@@ -1,8 +1,10 @@
 package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.exdata.exLink.ExLinkSource;
@@ -57,7 +59,7 @@ public class RNoteInfo extends javax.swing.JPanel {
     RSignNote statementEncrypted;
     Transaction transaction;
     private MAttachedFilesPanel file_Panel;
-    private VouchLibraryPanel voush_Library_Panel;
+    private SignLibraryPanel voush_Library_Panel;
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JPanel jPanel1;
     private MSplitPane jSplitPane1;
@@ -74,6 +76,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         this.transaction = transaction;
         statement = (RSignNote) transaction;
         statement.parseDataFull();
+        statement.calcFee(false);
 
         initComponents();
 
@@ -131,7 +134,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         // jTextArea_Body.setRows(5);
         // jScrollPane3.setViewportView(jTextArea_Body);
         // jScrollPane3.getViewport().add(jTextArea_Body);
-        jLabel_Title.setText(Lang.getInstance().translate("Title"));
+        jLabel_Title.setText(Lang.T("Title"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++y;
@@ -159,7 +162,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         jPanel1.add(scrol1, gridBagConstraints);
 
         if (statement.isEncrypted()) {
-            JCheckBox encrypted = new JCheckBox(Lang.getInstance().translate("Encrypted"));
+            JCheckBox encrypted = new JCheckBox(Lang.T("Encrypted"));
             encrypted.setSelected(true);
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -177,7 +180,7 @@ public class RNoteInfo extends javax.swing.JPanel {
                             String password = PasswordPane.showUnlockWalletDialog(null);
                             if (!cntr.unlockWallet(password)) {
                                 //WRONG PASSWORD
-                                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                                 encrypted.setSelected(!encrypted.isSelected());
 
@@ -191,16 +194,16 @@ public class RNoteInfo extends javax.swing.JPanel {
                         Fun.Tuple3<Integer, String, RSignNote> result = statement.decrypt(account);
                         if (result.a < 0) {
                             JOptionPane.showMessageDialog(null,
-                                    Lang.getInstance().translate(result.b == null ? "Not exists Account access" : result.b),
-                                    Lang.getInstance().translate("Not decrypted"), JOptionPane.ERROR_MESSAGE);
+                                    Lang.T(result.b == null ? "Not exists Account access" : result.b),
+                                    Lang.T("Not decrypted"), JOptionPane.ERROR_MESSAGE);
                             encrypted.setSelected(!encrypted.isSelected());
 
                             return;
 
                         } else if (result.b != null) {
                             JOptionPane.showMessageDialog(null,
-                                    Lang.getInstance().translate(" In pos: " + result.a + " - " + result.b),
-                                    Lang.getInstance().translate("Not decrypted"), JOptionPane.ERROR_MESSAGE);
+                                    Lang.T(" In pos: " + result.a + " - " + result.b),
+                                    Lang.T("Not decrypted"), JOptionPane.ERROR_MESSAGE);
                             encrypted.setSelected(!encrypted.isSelected());
 
                             return;
@@ -242,7 +245,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 11, 11, 11);
-        voush_Library_Panel = new VouchLibraryPanel(transaction);
+        voush_Library_Panel = new SignLibraryPanel(transaction);
         jPanel2.add(voush_Library_Panel, gridBagConstraints);
         //
 
@@ -267,7 +270,7 @@ public class RNoteInfo extends javax.swing.JPanel {
                 String fileName = arg0.getDescription();
 
                 FileChooser chooser = new FileChooser();
-                chooser.setDialogTitle(Lang.getInstance().translate("Save File") + ": " + fileName);
+                chooser.setDialogTitle(Lang.T("Save File") + ": " + fileName);
                 //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
@@ -282,9 +285,9 @@ public class RNoteInfo extends javax.swing.JPanel {
                     // if file
                     if (ff.exists() && ff.isFile()) {
                         int aaa = JOptionPane.showConfirmDialog(chooser,
-                                Lang.getInstance().translate("File") + " " + fileName
-                                        + " " + Lang.getInstance().translate("Exists") + "! "
-                                        + Lang.getInstance().translate("Overwrite") + "?", Lang.getInstance().translate("Message"),
+                                Lang.T("File") + " " + fileName
+                                        + " " + Lang.T("Exists") + "! "
+                                        + Lang.T("Overwrite") + "?", Lang.T("Message"),
                                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
                         if (aaa != 0) {
                             return;
@@ -335,28 +338,37 @@ public class RNoteInfo extends javax.swing.JPanel {
         ExData exData;
 
         exData = statement.getExData();
-        exData.resolveValues(DCSet.getInstance());
+        exData.setDC(DCSet.getInstance());
 
         ExLink exLink = exData.getExLink();
         if (exLink != null) {
-            resultStr += Lang.getInstance().translate("Link Type") + ": " + Lang.getInstance().translate(exData.viewLinkTypeName()) + " "
-                    + Lang.getInstance().translate("for # для") + " " + Transaction.viewDBRef(exLink.getRef());
+            resultStr += Lang.T("Link Type") + ": " + Lang.T(exData.viewLinkTypeName()) + " "
+                    + Lang.T("for # для") + " " + Transaction.viewDBRef(exLink.getRef());
             Transaction transaction = DCSet.getInstance().getTransactionFinalMap().get(exLink.getRef());
             resultStr += "<br>" + transaction.getTitle() + " : " + transaction.getCreator().getPersonAsString() + "</b><br>";
 
         }
 
+        ExPays exPays = exData.getExPays();
+        if (exPays != null) {
+            exPays.getFilteredAccruals(statement);
+            resultStr += "<h3>" + Lang.T("Accruals") + "</h3>";
+            resultStr += Lang.T("Count # кол-во") + ": <b>" + exPays.getFilteredAccrualsCount()
+                    + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(exPays.getTotalFeeBytes())
+                    + "</b>, " + Lang.T("Total") + ": <b>" + exPays.getTotalPay();
+        }
+
         String title = exData.getTitle();
         if (title != null)
-            jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + title);
+            jLabel_Title.setText(Lang.T("Title") + ": " + title);
 
         if (exData.isCanSignOnlyRecipients()) {
-            resultStr += "<br><b>" + Lang.getInstance().translate("To sign can only Recipients") + "<b><br>";
+            resultStr += "<br><b>" + Lang.T("To sign can only Recipients") + "<b><br>";
         }
 
         // recipients
         if (exData.hasRecipients()) {
-            resultStr += "<h2>" + Lang.getInstance().translate("Recipients") + "</h2>";
+            resultStr += "<h2>" + Lang.T("Recipients") + "</h2>";
             Account[] recipients = exData.getRecipients();
             int size = recipients.length;
             for (int i = 1; i <= size; ++i) {
@@ -371,7 +383,7 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         // AUTHORS
         if (exData.hasAuthors()) {
-            resultStr += "<h2>" + Lang.getInstance().translate("Authors") + "</h2>";
+            resultStr += "<h2>" + Lang.T("Authors") + "</h2>";
             ExLinkAuthor[] authors = exData.getAuthors();
             int size = authors.length;
             for (int i = 1; i <= size; ++i) {
@@ -389,7 +401,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         }
 
         if (exData.isEncrypted()) {
-            resultStr += "<h3>" + Lang.getInstance().translate("Encrypted") + "</h3><br>";
+            resultStr += "<h3>" + Lang.T("Encrypted") + "</h3><br>";
         }
 
         long templateKey = exData.getTemplateKey();
@@ -404,7 +416,7 @@ public class RNoteInfo extends javax.swing.JPanel {
 
             JSONObject params = exData.getTemplateValues();
             if (params != null) {
-                resultStr += " <h3>" + Lang.getInstance().translate("Template Values") + "</h3>";
+                resultStr += " <h3>" + Lang.T("Template Values") + "</h3>";
                 Set<String> keys = params.keySet();
                 for (String key : keys) {
                     resultStr += key + ": " + params.get(key) + "<br>";
@@ -420,7 +432,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         if (exData.hasHashes()) {
             // hashes
             JSONObject hashes = exData.getHashes();
-            resultStr += "<h3>" + Lang.getInstance().translate("Hashes") + "</h3>";
+            resultStr += "<h3>" + Lang.T("Hashes") + "</h3>";
             int i = 1;
             for (Object s : hashes.keySet()) {
                 resultStr += i + " " + s + " " + hashes.get(s) + "<br>";
@@ -431,7 +443,7 @@ public class RNoteInfo extends javax.swing.JPanel {
         if (exData.hasFiles()) {
             HashMap<String, Tuple3<byte[], Boolean, byte[]>> files = exData.getFiles();
             Iterator<Entry<String, Tuple3<byte[], Boolean, byte[]>>> it_Files = files.entrySet().iterator();
-            resultStr += "<h3>" + Lang.getInstance().translate("Files") + "</h3>";
+            resultStr += "<h3>" + Lang.T("Files") + "</h3>";
             if (true) {
                 int i = 1;
                 while (it_Files.hasNext()) {
@@ -439,7 +451,7 @@ public class RNoteInfo extends javax.swing.JPanel {
                     boolean zip = new Boolean(file.getValue().b);
                     String fileName = file.getKey();
                     resultStr += i++ + ". <a href=" + fileName + ">"
-                            + fileName + (zip ? " (" + Lang.getInstance().translate("Zipped") + ")" : "")
+                            + fileName + (zip ? " (" + Lang.T("Zipped") + ")" : "")
                             + "</a>" + " - "
                             + (file.getValue().c.length > 20000 ? (file.getValue().c.length >> 10) + "kB" : file.getValue().c.length + "B") + "<br>";
                 }
@@ -461,7 +473,7 @@ public class RNoteInfo extends javax.swing.JPanel {
 
         // AUTHORS
         if (exData.hasSources()) {
-            resultStr += "<h2>" + Lang.getInstance().translate("Sources") + "</h2>";
+            resultStr += "<h2>" + Lang.T("Sources") + "</h2>";
             ExLinkSource[] sources = exData.getSources();
             int size = sources.length;
             for (int i = 1; i <= size; ++i) {
@@ -473,13 +485,13 @@ public class RNoteInfo extends javax.swing.JPanel {
                 Transaction sourceTx = cntr.getTransaction(sources[i - 1].getRef());
                 String memo = sources[i - 1].getMemo();
 
-                resultStr += i + ". " + sources[i - 1].getValue() + " x " + sourceTx.toStringShortAsCreator() + (memo == null ? "" : " - " + memo) + "<br>";
+                resultStr += i + ". " + sources[i - 1].getValue() + " x " + sourceTx.toStringFullAndCreatorLang() + (memo == null ? "" : " - " + memo) + "<br>";
             }
             resultStr += "<br>";
         }
 
         if (exData.getTags() != null) {
-            resultStr += "<h4>" + Lang.getInstance().translate("Tags") + "</h4>";
+            resultStr += "<h4>" + Lang.T("Tags") + "</h4>";
             resultStr += statement.getExTags();
 
         }

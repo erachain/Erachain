@@ -73,22 +73,22 @@ public class ForgingStatus extends JLabel implements Observer {
                     //timeForge = "" + (BlockChain.BASE_TARGET * winBalance / target);
                     timeForge = winBalance2 > 0 ? timeForge + "%" : ("(" + winBalance2 + ")");
                     timeForge = timeForge + " " + winAccount.getAddress();
-                    timeForge = Lang.getInstance().translate("Won data for forging: %timeForge%.").replace("%timeForge%", timeForge);
+                    timeForge = Lang.T("Won data for forging: %timeForge%.").replace("%timeForge%", timeForge);
                 } else {
-                    timeForge = Lang.getInstance().translate("infinity");
+                    timeForge = Lang.T("infinity");
                 }
 
 
                 if (Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING) {
                     setToolTipText(timeForge);
                 } else if (Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_DISABLED && Controller.getInstance().getStatus() == Controller.STATUS_OK) {
-                    setToolTipText(Lang.getInstance().translate("To start forging you need to unlock the wallet."
+                    setToolTipText(Lang.T("To start forging you need to unlock the wallet."
                             + " " + timeForge));
                 } else if (Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_WAIT && Controller.getInstance().getStatus() == Controller.STATUS_OK) {
-                    setToolTipText(Lang.getInstance().translate("To start forging need await SYNC peer.")
+                    setToolTipText(Lang.T("To start forging need await SYNC peer.")
                             + " " + timeForge);
                 } else {
-                    setToolTipText(Lang.getInstance().translate("For forging wallet must be online and fully synchronized.")
+                    setToolTipText(Lang.T("For forging wallet must be online and fully synchronized.")
                             + " " + timeForge);
                 }
 
@@ -121,19 +121,19 @@ public class ForgingStatus extends JLabel implements Observer {
         //long ms = diff % ONE_SECOND;
 
         if (d > 0) {
-            result += d > 1 ? d + " " + Lang.getInstance().translate("days") + " " : d + " " + Lang.getInstance().translate("day") + " ";
+            result += d > 1 ? d + " " + Lang.T("days") + " " : d + " " + Lang.T("day") + " ";
         }
 
         if (h > 0 && d < 5) {
-            result += h > 1 ? h + " " + Lang.getInstance().translate("hours") + " " : h + " " + Lang.getInstance().translate("hour") + " ";
+            result += h > 1 ? h + " " + Lang.T("hours") + " " : h + " " + Lang.T("hour") + " ";
         }
 
         if (m > 0 && d == 0 && h < 10) {
-            result += m > 1 ? m + " " + Lang.getInstance().translate("mins") + " " : m + " " + Lang.getInstance().translate("min") + " ";
+            result += m > 1 ? m + " " + Lang.T("mins") + " " : m + " " + Lang.T("min") + " ";
         }
 
         if (s > 0 && d == 0 && h == 0 && m < 15) {
-            result += s > 1 ? s + " " + Lang.getInstance().translate("secs") + " " : s + " " + Lang.getInstance().translate("sec") + " ";
+            result += s > 1 ? s + " " + Lang.T("secs") + " " : s + " " + Lang.T("sec") + " ";
         }
 
         return result.substring(0, result.length() - 1);

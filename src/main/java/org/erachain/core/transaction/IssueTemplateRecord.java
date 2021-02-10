@@ -14,27 +14,27 @@ import java.util.Arrays;
 // import org.slf4j.LoggerFactory;
 
 public class IssueTemplateRecord extends IssueItemRecord {
-    private static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
-    private static final String NAME_ID = "Issue Template";
+    public static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
+    public static final String TYPE_NAME = "Issue Template";
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, linkTo, template, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, reference);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, template, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, reference, signature);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow,
                                long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, linkTo, template, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, reference, signature);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, template, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, (byte) 0, 0L, null, signature);
     }
 
     public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {

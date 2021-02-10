@@ -19,13 +19,13 @@ public class IssueAssetDetailsFrame extends RecDetailsFrame {
         labelGBC.fill = labelGBC.BOTH;
         labelGBC.weightx = 0.1;
         labelGBC.weightx = 0.1;
-        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(as_info, labelGBC);
 		
 	/*	
 		//LABEL NAME
 		++labelGBC.gridy;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+		JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
 		this.add(nameLabel, labelGBC);
 		
 		//NAME
@@ -37,7 +37,7 @@ public class IssueAssetDetailsFrame extends RecDetailsFrame {
 		
 		//LABEL DESCRIPTION
 		++labelGBC.gridy;
-		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+		JLabel descriptionLabel = new JLabel(Lang.T("Description") + ":");
 		this.add(descriptionLabel, labelGBC);
 				
 		//DESCRIPTION
@@ -51,7 +51,7 @@ public class IssueAssetDetailsFrame extends RecDetailsFrame {
 		
 		//LABEL QUANTITY
 		++labelGBC.gridy;
-		JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
+		JLabel quantityLabel = new JLabel(Lang.T("Quantity") + ":");
 		this.add(quantityLabel, labelGBC);
 				
 		//QUANTITY
@@ -63,7 +63,7 @@ public class IssueAssetDetailsFrame extends RecDetailsFrame {
 		
 		//LABEL DIVISIBLE
 		++labelGBC.gridy;
-		JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible") + ":");
+		JLabel divisibleLabel = new JLabel(Lang.T("Divisible") + ":");
 		this.add(divisibleLabel, labelGBC);
 				
 		//QUANTITY
@@ -75,7 +75,7 @@ public class IssueAssetDetailsFrame extends RecDetailsFrame {
 		
 		//LABEL movable
 				++labelGBC.gridy;
-				JLabel mavableLabel = new JLabel(Lang.getInstance().translate("Movable") + ":");
+				JLabel mavableLabel = new JLabel(Lang.T("Movable") + ":");
 				this.add(mavableLabel, labelGBC);
 						
 				//QUANTITY

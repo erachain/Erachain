@@ -1,5 +1,6 @@
 package org.erachain.gui.bank;
 
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -7,7 +8,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.exdata.exLink.ExLinkSource;
+import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -100,7 +101,7 @@ public class IssueSendPaymentOrder extends IconPanel {
         Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipientAddress);
         Account recipient = accountRes.a;
         if (recipient == null) {
-            //	JOptionPane.showMessageDialog(null, accountRes.b, Lang.getInstance().translate("Error"),
+            //	JOptionPane.showMessageDialog(null, accountRes.b, Lang.T("Error"),
             //			JOptionPane.ERROR_MESSAGE);
             error_mes += "\n" + accountRes.b;
             // ENABLE
@@ -113,7 +114,7 @@ public class IssueSendPaymentOrder extends IconPanel {
         if (error_mes.length() > 0) {
             JOptionPane.showMessageDialog(new JFrame(),
                     error_mes,
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             issue_Panel.jButton_OK.setEnabled(true);
             return;
         }
@@ -129,8 +130,8 @@ public class IssueSendPaymentOrder extends IconPanel {
             }
             if (!Controller.getInstance().unlockWallet(password)) {
                 // WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
-                        Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"),
+                        Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 // ENABLE
                 issue_Panel.jButton_OK.setEnabled(true);
@@ -159,8 +160,8 @@ public class IssueSendPaymentOrder extends IconPanel {
                         messageBytes = Base58.decode(message);
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.getInstance().translate("Message format is not base58 or hex!"),
-                                Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                                Lang.T("Message format is not base58 or hex!"),
+                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                         // ENABLE
                         issue_Panel.jButton_OK.setEnabled(true);
@@ -190,8 +191,8 @@ public class IssueSendPaymentOrder extends IconPanel {
         if (messageBytes != null) {
             if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Message size exceeded!") + " <= MAX",
-                        Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                        Lang.T("Message size exceeded!") + " <= MAX",
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                 // ENABLE
                 issue_Panel.jButton_OK.setEnabled(true);
@@ -208,9 +209,8 @@ public class IssueSendPaymentOrder extends IconPanel {
                 byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
                 if (publicKey == null) {
                     JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.getInstance().translate(
-                                    "The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."),
-                            Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                            Lang.T(ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
 
                     // ENABLE
                     issue_Panel.jButton_OK.setEnabled(true);
@@ -229,8 +229,8 @@ public class IssueSendPaymentOrder extends IconPanel {
         if (head.getBytes(StandardCharsets.UTF_8).length > 256) {
 
             JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.getInstance().translate("Title size exceeded!") + " <= 256",
-                    Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    Lang.T("Title size exceeded!") + " <= 256",
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             return;
 
         }
@@ -238,7 +238,7 @@ public class IssueSendPaymentOrder extends IconPanel {
         ExLink exLink = null;
         Long linkRef = Transaction.parseDBRef("");
         if (linkRef != null) {
-            exLink = new ExLinkSource(linkRef, null);
+            exLink = new ExLinkAppendix(linkRef);
         }
 
         // CREATE TX MESSAGE
@@ -247,19 +247,19 @@ public class IssueSendPaymentOrder extends IconPanel {
                 null, head, messageBytes, isTextByte, encrypted, 0);
 
         String Status_text = "";
-        IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                Lang.getInstance().translate("Send Payment Order"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
-                Status_text, Lang.getInstance().translate("Confirmation transaction send payment order"));
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+                Lang.T("Send Payment Order"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
+                Status_text, Lang.T("Confirmation transaction send payment order"));
 
         MailInfo ww = new MailInfo((RSend) transaction);
         ww.jTabbedPane1.setVisible(false);
-        dd.jScrollPane1.setViewportView(ww);
-        dd.setLocationRelativeTo(th);
-        dd.setVisible(true);
+        confirmDialog.jScrollPane1.setViewportView(ww);
+        confirmDialog.setLocationRelativeTo(th);
+        confirmDialog.setVisible(true);
 
         // JOptionPane.OK_OPTION
-        if (dd.isConfirm) {
-            ResultDialog.make(this, transaction, null);
+        if (confirmDialog.isConfirm > 0) {
+            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
         // ENABLE
         issue_Panel.jButton_OK.setEnabled(true);

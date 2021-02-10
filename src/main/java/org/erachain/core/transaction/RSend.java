@@ -65,8 +65,8 @@ public class RSend extends TransactionAmount {
 
     protected static final int LOAD_LENGTH = IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
 
-    private static final byte TYPE_ID = (byte) Transaction.SEND_ASSET_TRANSACTION;
-    private static final String NAME_ID = "Send";
+    public static final byte TYPE_ID = (byte) Transaction.SEND_ASSET_TRANSACTION;
+    public static final String TYPE_NAME = "Send";
     protected String title;
     protected byte[] data;
     protected byte[] encrypted;
@@ -75,7 +75,7 @@ public class RSend extends TransactionAmount {
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, Account recipient, long key,
                  BigDecimal amount, String title, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
                  Long reference) {
-        super(typeBytes, NAME_ID, creator, exLink, feePow, recipient, amount, key, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, exLink, feePow, recipient, amount, key, timestamp, reference);
 
         if (isText != null)
             assert (isText.length == 1);
@@ -152,7 +152,7 @@ public class RSend extends TransactionAmount {
     ////////////////////////// SHOR -text DATA
     public RSend(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,
                  BigDecimal amount, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, recipient, amount, key, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, feePow, recipient, amount, key, timestamp, reference);
         // typeBytes[3] = (byte)(typeBytes[3] & (byte)-128);
         this.title = "";
         typeBytes[3] = (byte) (typeBytes[3] | (byte) -128);

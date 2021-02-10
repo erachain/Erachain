@@ -8,6 +8,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.ItemStatusMap;
+import org.erachain.lang.Lang;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.sql.Date;
@@ -18,7 +20,7 @@ public abstract class StatusCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.STATUS_TYPE;
 
-    public static final long MIN_START_KEY = 0L;
+    public static final long MIN_START_KEY_OLD = 0L;
 
     public static final Long RIGHTS_KEY = 1L;
     public static final Long MEMBER_KEY = 2L;
@@ -49,17 +51,17 @@ public abstract class StatusCls extends ItemCls {
     @Override
     public long START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return START_KEY;
+        return START_KEY_OLD;
     }
 
     @Override
     public long MIN_START_KEY() {
         if (Transaction.parseHeightDBRef(dbRef) > BlockChain.START_KEY_UP)
-            return BlockChain.START_KEY_UO_ITEMS;
+            return BlockChain.START_KEY_UP_ITEMS;
 
-        return MIN_START_KEY;
+        return MIN_START_KEY_OLD;
     }
 
     public String getItemTypeName() {
@@ -152,6 +154,22 @@ public abstract class StatusCls extends ItemCls {
 
         return statusesItems;
 
+    }
+
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_Status", Lang.T("Status", langObj));
+
+        itemJson.put("unique", isUnique());
+
+        itemJson.put("Label_unique_state", Lang.T("Unique State", langObj));
+        itemJson.put("Label_multi_states", Lang.T("Multi States", langObj));
+
+        if (!forPrint) {
+        }
+
+        return itemJson;
     }
 
 }

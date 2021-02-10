@@ -7,8 +7,8 @@ import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
+import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.datachain.DCSet;
-import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -17,24 +17,24 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class IssueAssetTransaction extends IssueItemRecord {
-    private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
-    private static final String NAME_ID = "Issue Asset";
+    public static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
+    public static final String TYPE_NAME = "Issue Asset";
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
     //private AssetCls asset;
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, linkTo, asset, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, reference);
     }
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, asset, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, reference, signature);
     }
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow,
                                  long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, linkTo, asset, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, reference, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -42,7 +42,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     // as pack
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, asset, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, (byte) 0, 0L, null, signature);
     }
 
     public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -60,6 +60,26 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Asset"; }
+
+    int minLenAccounting = minLen / 5;
+
+    @Override
+    public long calcBaseFee(boolean withFreeProtocol) {
+
+        int len = this.getDataLength(Transaction.FOR_NETWORK, true);
+
+        if (this.height > BlockChain.USE_NEW_ISSUE_FEE) {
+            if (((AssetCls) item).isAccounting()) {
+                if (len < minLenAccounting)
+                    len = minLenAccounting;
+            } else {
+                if (len < minLen)
+                    len = minLen;
+            }
+        }
+
+        return len * BlockChain.FEE_PER_BYTE;
+    }
 
     public long getAssetKey(DCSet db) {
         return getItem().getKey(db);
@@ -114,15 +134,11 @@ public class IssueAssetTransaction extends IssueItemRecord {
     @Override
     public boolean hasPublicText() {
 
-        if (BlockChain.ANONIM_SERT_USE)
-            return false;
-
         if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
             return false;
         }
 
-        String description = item.getDescription();
-        return description != null && description.length() < 100;
+        return super.hasPublicText();
 
     }
 
@@ -141,37 +157,37 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
         //CHECK QUANTITY
         AssetCls asset = (AssetCls) this.getItem();
-        //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
-        long maxQuantity = Long.MAX_VALUE;
-        long quantity = asset.getQuantity();
-        //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
-        if (quantity > maxQuantity || quantity < -1) {
-            return INVALID_QUANTITY;
-        }
 
-        if (((AssetCls) this.item).isAccounting() && quantity != 0) {
-            return INVALID_QUANTITY;
-        }
-
-        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
-            Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
-            if (item.b < quantity) {
+        if (asset.isUnique()) {
+            if (asset instanceof AssetUnique) {
+                ;
+            } else {
+                // так как тип актива считываем в конце парсинга - по нему сразу не определить что было создано
+                // и может появиться ошибка сборки байт кода
+                return INVALID_ASSET_TYPE;
+            }
+        } else {
+            //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
+            long maxQuantity = Long.MAX_VALUE;
+            long quantity = asset.getQuantity();
+            //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
+            if (quantity > maxQuantity || quantity < -1) {
                 return INVALID_QUANTITY;
+            }
+
+            if (((AssetCls) this.item).isAccounting() && quantity != 0) {
+                return INVALID_QUANTITY;
+            }
+
+            if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+                Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
+                if (item.b < quantity) {
+                    return INVALID_QUANTITY;
+                }
             }
         }
 
         return Transaction.VALIDATE_OK;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public JSONObject toJson() {
-        //GET BASE
-        JSONObject transaction = super.toJson();
-        AssetCls asset = (AssetCls) getItem();
-        //ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
-        transaction.put("asset", asset.toJson());
-        return transaction;
     }
 
     //PARSE CONVERT

@@ -21,15 +21,15 @@ public class LeftTelegram extends javax.swing.JPanel {
     */
    public LeftTelegram() {
        initComponents();
-       this.jLabelAccount.setText(Lang.getInstance().translate("Filter by My Account") + ":");
+       this.jLabelAccount.setText(Lang.T("Filter by My Account") + ":");
        this.accountsModel = new AccountsComboBoxModel();
        this.jComboAccount.setModel(accountsModel);
-       this.jLabel_AddAccount.setText(Lang.getInstance().translate("Add Recipient"));
-       this.jButtonAddAccount.setText(Lang.getInstance().translate("Add Recipient"));
+       this.jLabel_AddAccount.setText(Lang.T("Add Recipient"));
+       this.jButtonAddAccount.setText(Lang.T("Add Recipient"));
        this.jTextField_AddAccount.setText("");
-       this.jCxbAllmessages.setText(Lang.getInstance().translate("All Recipients"));
-       this.jCxbRecipientmessages.setText(Lang.getInstance().translate("Filter by Recipients List"));
-       this.jButtonGetTelegrams.setText(Lang.getInstance().translate("Get Telegrams from Network"));
+       this.jCxbAllmessages.setText(Lang.T("All Recipients"));
+       this.jCxbRecipientmessages.setText(Lang.T("Filter by Recipients List"));
+       this.jButtonGetTelegrams.setText(Lang.T("Get Telegrams from Network"));
 
 
        //  this.jComboBox_Account.setRenderer(new AccountRenderer(0));
@@ -89,7 +89,7 @@ public class LeftTelegram extends javax.swing.JPanel {
        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
        gridBagConstraints.weightx = 0.3;
        gridBagConstraints.insets = new java.awt.Insets(4, 11, 0, 0);
-       jPanelTop.add(new JLabel(Lang.getInstance().translate("Recipients")), gridBagConstraints);
+       jPanelTop.add(new JLabel(Lang.T("Recipients")), gridBagConstraints);
        
        group = new ButtonGroup();
        group.add(jCxbAllmessages);

@@ -22,10 +22,10 @@ public class SourcesModel extends DefaultTableModel {
 
 
     public SourcesModel(int rows) {
-        super(new String[]{Lang.getInstance().translate("Number"),
-                        Lang.getInstance().translate("Share"),
-                        Lang.getInstance().translate("Source"),
-                        Lang.getInstance().translate("Description")
+        super(new String[]{Lang.T("Number"),
+                        Lang.T("Share"),
+                        Lang.T("Source"),
+                        Lang.T("Description")
                 },
                 rows);
         addEmpty();
@@ -82,7 +82,8 @@ public class SourcesModel extends DefaultTableModel {
                 Transaction result = Controller.getInstance().getTransaction(seqNo);
                 if (result != null) {
                     super.setValueAt(aValue, row, column);
-                    super.setValueAt(result.toStringShortAsCreator(), row, NAME_COL);
+
+                    super.setValueAt(result.toStringFullAndCreatorLang(), row, NAME_COL);
                     if (getRowCount() - 1 == row)
                         this.addEmpty();
 

@@ -1,8 +1,10 @@
 package org.erachain.gui.telegrams;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.IconPanel;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -10,8 +12,11 @@ import org.erachain.utils.TableMenuPopupUtil;
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Base64;
 
 /**
  * @author Саша
@@ -149,7 +154,7 @@ public class ALLTelegramPanel extends IconPanel {
 
 
         jcheckIsEnscript.setSelected(true);
-        jcheckIsEnscript.setText(Lang.getInstance().translate("Encrypt message"));
+        jcheckIsEnscript.setText(Lang.T("Encrypt message"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -201,13 +206,84 @@ public class ALLTelegramPanel extends IconPanel {
             }
         });
 
-        JMenuItem deleteTelegram = new JMenuItem(Lang.getInstance().translate("Delete Telegram"));
+        JMenu menuSaveCopy = new JMenu(Lang.T("Save / Copy"));
+        menu.add(menuSaveCopy);
+
+        JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
+        copyJson.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            StringSelection stringSelection = new StringSelection(selectedTransaction.toJson().toJSONString());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("JSON of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewSignature())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyJson);
+
+        JMenuItem copyRAW = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base58"));
+        copyRAW.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            StringSelection stringSelection = new StringSelection(Base58.encode(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewSignature())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW);
+
+        JMenuItem copyRAW64 = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base64"));
+        copyRAW64.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Bytecode of the '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewSignature())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copyRAW64);
+
+        JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
+        saveJson.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            Library.saveJSONtoFileSystem(this, selectedTransaction, "tele-" + selectedTransaction.viewSignature());
+
+        });
+        menuSaveCopy.add(saveJson);
+
+        JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
+        saveRAW.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            Library.saveAsBase58FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tele-" + selectedTransaction.viewSignature());
+
+        });
+        menuSaveCopy.add(saveRAW);
+
+        JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
+        saveRAW64.addActionListener(e -> {
+            Transaction selectedTransaction = walletTelegramsFilterTableModel.getItem(row);
+            Library.saveAsBase64FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tele-" + selectedTransaction.viewSignature());
+
+        });
+        menuSaveCopy.add(saveRAW64);
+
+
+        JMenuItem deleteTelegram = new JMenuItem(Lang.T("Delete Telegram"));
         deleteTelegram.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-
-                Transaction tt = walletTelegramsFilterTableModel.getItem(row);
-                Controller.getInstance().telegramStore.database.getTelegramsMap().delete(tt.viewSignature());
+                Transaction transaction = walletTelegramsFilterTableModel.getItem(row);
+                Controller.getInstance().telegramStore.database.getTelegramsMap().delete(transaction.viewSignature());
                 //     System.out.println(row);
             }
         });

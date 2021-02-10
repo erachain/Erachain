@@ -23,7 +23,7 @@ public class AuthorsPanel extends JPanel {
     public AuthorsPanel() {
 
         super();
-        this.setName(Lang.getInstance().translate("Authors"));
+        this.setName(Lang.T("Authors"));
         jButtonAddAuthor = new JButton();
         jScrollPaneAuthors = new JScrollPane();
         jButtonRemoveAuthor = new JButton();
@@ -61,15 +61,15 @@ public class AuthorsPanel extends JPanel {
         this.setLayout(new GridBagLayout());
 
         jScrollPaneAuthors.setOpaque(false);
-        jScrollPaneAuthors.setPreferredSize(new Dimension(0, 0));
+        //jScrollPaneAuthors.setPreferredSize(new Dimension(0, 0));
 
 
         TableColumnModel columnModel = jTableAuthors.getColumnModel();
         TableColumn columnNo = columnModel.getColumn(AuthorsModel.KEY_COL);
         columnNo.setMinWidth(50);
         columnNo.setMaxWidth(150);
-        columnNo.setPreferredWidth(50);
-        columnNo.setWidth(50);
+        columnNo.setPreferredWidth(100);
+        columnNo.setWidth(100);
         columnNo.sizeWidthToFit();
 
         TableColumn columnShare = columnModel.getColumn(AuthorsModel.SHARE_COL);
@@ -92,14 +92,14 @@ public class AuthorsPanel extends JPanel {
         gridBagConstraints.weighty = 0.1;
         this.add(jScrollPaneAuthors, gridBagConstraints);
 
-        jButtonAddAuthor.setText(Lang.getInstance().translate("Add"));
+        jButtonAddAuthor.setText(Lang.T("Add"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         this.add(jButtonAddAuthor, gridBagConstraints);
 
-        jButtonRemoveAuthor.setText(Lang.getInstance().translate("Remove"));
+        jButtonRemoveAuthor.setText(Lang.T("Remove"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;

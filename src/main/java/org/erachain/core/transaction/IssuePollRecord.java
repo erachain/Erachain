@@ -11,27 +11,27 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class IssuePollRecord extends IssueItemRecord {
-    private static final byte TYPE_ID = (byte) ISSUE_POLL_TRANSACTION;
-    private static final String NAME_ID = "Issue Poll";
+    public static final byte TYPE_ID = (byte) ISSUE_POLL_TRANSACTION;
+    public static final String TYPE_NAME = "Issue Poll";
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, linkTo, poll, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, linkTo, poll, feePow, timestamp, reference);
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, poll, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, poll, feePow, timestamp, reference, signature);
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp,
                            Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, NAME_ID, creator, linkTo, poll, feePow, timestamp, reference, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, poll, feePow, timestamp, reference, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte[] signature) {
-        super(typeBytes, NAME_ID, creator, linkTo, poll, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, poll, (byte) 0, 0L, null, signature);
     }
 
     public IssuePollRecord(PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference, byte[] signature) {
