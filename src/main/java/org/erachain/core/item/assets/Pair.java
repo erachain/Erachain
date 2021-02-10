@@ -10,7 +10,6 @@ import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.Arrays;
 
 public class Pair {
@@ -141,58 +140,30 @@ public class Pair {
     }
 
     @SuppressWarnings("unchecked")
-    public JSONObject toJson(long keyForBuySell) {
+    public JSONObject toJson() {
 
         JSONObject pair = new JSONObject();
         pair.put("id", viewID());
-        pair.put("assetKey1", assetKey1);
-        pair.put("assetKey2", assetKey2);
+        pair.put("asset_key1", assetKey1);
+        pair.put("asset_key2", assetKey2);
 
         pair.put("last_price", lastTime);
 
-        if (keyForBuySell == 0 || keyForBuySell == assetKey1) {
+        pair.put("base_currency", asset1.getName());
+        pair.put("quote_currency", asset2.getName());
 
-            if (keyForBuySell != 0) {
-                // задана пара и направление можно давать
-                pair.put("type", "sell");
-            }
+        pair.put("last_price", lastPrice);
 
-            pair.put("base_currency", asset1.getName());
-            pair.put("quote_currency", asset2.getName());
+        pair.put("lowest_ask", askPrice);
+        pair.put("highest_bid", bidPrice);
 
-            pair.put("last_price", lastPrice);
+        pair.put("base_volume", base_volume);
+        pair.put("quote_volume", quote_volume);
+        pair.put("count_24h", count24);
 
-            pair.put("lowest_ask", askPrice);
-            pair.put("highest_bid", bidPrice);
-
-            pair.put("base_volume", base_volume);
-            pair.put("quote_volume", quote_volume);
-            pair.put("count24", count24);
-
-            pair.put("price_change_percent_24h", price_change_percent_24h);
-            pair.put("highest_price_24h", highest_price_24h);
-            pair.put("lowest_price_24h", lowest_price_24h);
-
-        } else {
-            pair.put("type", "buy");
-
-            pair.put("quote_currency", asset1.getName());
-            pair.put("base_currency", asset2.getName());
-
-            pair.put("last_price", BigDecimal.ONE.divide(lastPrice, assetScale2, RoundingMode.HALF_DOWN).stripTrailingZeros());
-
-            pair.put("highest_bid", askPrice);
-            pair.put("lowest_ask", bidPrice);
-
-            pair.put("base_volume", quote_volume);
-            pair.put("quote_volume", base_volume);
-            pair.put("count24", count24);
-
-            pair.put("price_change_percent_24h", price_change_percent_24h);
-            pair.put("highest_price_24h", lowest_price_24h);
-            pair.put("lowest_price_24h", highest_price_24h);
-
-        }
+        pair.put("price_change_percent_24h", price_change_percent_24h);
+        pair.put("highest_price_24h", highest_price_24h);
+        pair.put("lowest_price_24h", lowest_price_24h);
 
         return pair;
 

@@ -42,9 +42,11 @@ public class APIExchange {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("GET apiexchange/spot/pairs",
+        help.put("GET apiexchange/spot/list",
                 "Pairs list");
-        help.put("GET apiexchange/spot/all",
+        help.put("GET apiexchange/spot/pairs",
+                "Pairs and values24");
+        help.put("GET apiexchange/spot/pair/{pair}",
                 "Pairs and values24");
 
         help.put("GET apiexchange/order/[seqNo|signature]",
@@ -330,15 +332,17 @@ public class APIExchange {
                 .build();
     }
 
+
     @GET
-    @Path("spot/all")
-    public Response spotAllPairs() {
+    @Path("spot/list")
+    // apiexchange/spot/list
+    public Response spotList() {
 
         cntrl.pairsController.updateList();
 
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(cntrl.pairsController.spotPairsJson.toJSONString())
+                .entity(cntrl.pairsController.spotPairsList.toJSONString())
                 .build();
     }
 
@@ -351,8 +355,20 @@ public class APIExchange {
 
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(cntrl.pairsController.spotPairsList.toJSONString())
+                .entity(cntrl.pairsController.spotPairsJson.toJSONString())
                 .build();
     }
 
+    @GET
+    @Path("spot/pair/{pair}")
+    // apiexchange/spot/pair/BTC_USD
+    public Response spotPair(@PathParam("pair") String pair) {
+
+        cntrl.pairsController.updateList();
+
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(((JSONObject) cntrl.pairsController.spotPairsJson.get(pair)).toJSONString())
+                .build();
+    }
 }

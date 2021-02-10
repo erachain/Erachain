@@ -98,11 +98,11 @@ public class PairsController {
             spotPairsList.put(pairJsonKey, spotJson.get(pairKey));
 
             Pair pair = mapPairs.get(key1, key2);
-            if (pair == null) {
+            if (true || pair == null) {
                 pair = reCalc(asset1, asset2);
             }
             spotPairs.put(pairJsonKey, pair);
-            spotPairsJson.put(pairJsonKey, pair.toJson(0));
+            spotPairsJson.put(pairJsonKey, pair.toJson());
 
         }
     }
@@ -122,8 +122,8 @@ public class PairsController {
         int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
 
         int count24 = 0;
-        BigDecimal minPrice = new BigDecimal(Long.MIN_VALUE);
-        BigDecimal maxPrice = new BigDecimal(Long.MAX_VALUE);
+        BigDecimal minPrice = new BigDecimal(Long.MAX_VALUE);
+        BigDecimal maxPrice = new BigDecimal(Long.MIN_VALUE);
         BigDecimal lastPrice = null;
         BigDecimal baseVolume = BigDecimal.ZERO;
         BigDecimal quoteVolume = BigDecimal.ZERO;
@@ -131,6 +131,7 @@ public class PairsController {
         BigDecimal price = null;
         BigDecimal priceChangePercent24h = BigDecimal.ZERO;
 
+        boolean reversed;
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = (tradesMap.getPairIterator(key1, key2, heightStart, heightEnd))) {
             Trade trade;
             while (iterator.hasNext()) {
@@ -140,7 +141,11 @@ public class PairsController {
                     continue;
                 }
                 count24++;
-                price = trade.calcPrice();
+
+                reversed = trade.getHaveKey().equals(key2);
+
+                // у сделки обратные Have Want
+                price = reversed ? trade.calcPrice() : trade.calcPriceRevers();
                 if (lastPrice == null) {
                     lastPrice = price;
                     lastTime = trade.getTimestamp();
@@ -151,13 +156,13 @@ public class PairsController {
                 if (maxPrice.compareTo(price) < 0)
                     maxPrice = price;
 
-                baseVolume = baseVolume.add(trade.getAmountHave());
-                quoteVolume = quoteVolume.add(trade.getAmountWant());
+                baseVolume = baseVolume.add(reversed ? trade.getAmountHave() : trade.getAmountWant());
+                quoteVolume = quoteVolume.add(reversed ? trade.getAmountWant() : trade.getAmountHave());
 
             }
             // тут подсчет отклонения за сутки
             if (price != null) {
-                priceChangePercent24h = lastPrice.subtract(price).multiply(price).setScale(3, RoundingMode.DOWN);
+                priceChangePercent24h = lastPrice.subtract(price).movePointRight(2).divide(price, 3, RoundingMode.DOWN);
             }
 
         } catch (IOException e) {
