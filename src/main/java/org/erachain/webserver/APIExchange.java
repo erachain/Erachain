@@ -53,10 +53,10 @@ public class APIExchange {
         help.put("GET apiexchange/spot/ordersbook/[pair]?depth=[depth]",
                 "Get active orders in orderbook for pair as [price, volume]."
                         + " The number of orders is limited by depth, default 50, max = 500");
-        help.put("GET apiexchange/spot/trades/[pair]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+        help.put("GET apiexchange/spot/trades/[pair]?fromOrder=[orderID]&limit=[limit]",
                 "Get trades for pair, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
-                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+                        + "Use fromOrder (initial order ID) as Block-seqNo or Long. For example 103506-3 or 928735142671");
 
         help.put("GET apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
@@ -436,9 +436,7 @@ public class APIExchange {
     @GET
     @Path("spot/trades/{pair}")
     public Response getSpotTrades(@PathParam("pair") String pair,
-                                  @QueryParam("height") Integer fromHeight,
-                                  @QueryParam("order") String fromOrder,
-                                  @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                  @QueryParam("fromOrder") String fromOrder,
                                   @DefaultValue("100") @QueryParam("limit") Integer limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
@@ -458,10 +456,16 @@ public class APIExchange {
         Long have = (Long) array.get(1);
         Long want = (Long) array.get(2);
 
+        long startOrder = 0;
+        Long startLong = Transaction.parseDBRef(fromOrder);
+        if (startLong != null)
+            startOrder = startLong;
+
         JSONArray arrayJSON = new JSONArray();
-        for (Trade trade : TradeResource.getTradesFrom_1(have, want, fromHeight, fromOrder, fromTimestamp, limit)) {
+        for (Trade trade : dcSet.getTradeMap().getTradesByOrderID(have, want, startOrder, 0, limit)) {
             JSONObject json = new JSONObject();
-            json.put("trade_id", trade.viewID());
+            json.put("initial_order_id", Transaction.viewDBRef(trade.getInitiator()));
+            json.put("target_order_id", Transaction.viewDBRef(trade.getTarget()));
             json.put("timestamp", trade.getTimestamp());
 
             boolean reversed = trade.getAmountHave().equals(want);
