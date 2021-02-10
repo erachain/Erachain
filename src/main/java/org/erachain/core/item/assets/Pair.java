@@ -329,7 +329,7 @@ public class Pair {
     //PROCESS/ORPHAN
 
     public void process(DCSet db) {
-        Trade pair = db.getPairMap().get(viewID();
+        Trade pair = db.getPairMap().get(this);
     }
 
     public void orphan(DCSet db) {
