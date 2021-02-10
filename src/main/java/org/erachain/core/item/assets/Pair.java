@@ -6,7 +6,6 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TradeMapImpl;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -90,7 +89,7 @@ public class Pair {
     }
 
     public static Pair get(DCSet db, Long assetKey1, Long assetKey2) {
-        return db.getPairMap().get(TradeMapImpl.key);
+        return db.getPairMap().get(assetKey1, assetKey2);
     }
 
     public int getCount24() {
@@ -326,15 +325,6 @@ public class Pair {
         return BASE_LENGTH;
     }
 
-    //PROCESS/ORPHAN
-
-    public void process(DCSet db) {
-        Trade pair = db.getPairMap().get(this);
-    }
-
-    public void orphan(DCSet db) {
-    }
-
     @Override
     public int hashCode() {
         return assetKey1.hashCode() + assetKey2.hashCode();
@@ -351,6 +341,14 @@ public class Pair {
         return false;
     }
 
+    //PROCESS/ORPHAN
+
+    public void process(DCSet db) {
+        Pair pair = db.getPairMap().get(this);
+    }
+
+    public void orphan(DCSet db) {
+    }
 
     @Override
     public String toString() {

@@ -58,6 +58,10 @@ public class PairMapImpl extends DBTabImpl<Tuple2<Long, Long>, Pair> implements 
         return this.get(new Tuple2<Long, Long>(asset1, asset2));
     }
 
+    public Pair get(Pair pair) {
+        return this.get(new Tuple2<Long, Long>(pair.getAssetKey1(), pair.getAssetKey2()));
+    }
+
     public void put(Pair pair) {
         this.put(new Tuple2<Long, Long>(pair.getAssetKey1(), pair.getAssetKey2()), pair);
     }

@@ -129,6 +129,7 @@ public class Controller extends Observable {
     private List<Thread> threads = new ArrayList<Thread>();
     public static long buildTimestamp;
     private static Controller instance;
+    public PairsController pairsController;
     public Wallet wallet;
     public TelegramStore telegramStore;
     private int status;
@@ -761,6 +762,8 @@ public class Controller extends Observable {
             this.webService = WebService.getInstance();
             this.webService.start();
         }
+
+        pairsController = new PairsController();
 
         // CREATE WALLET
         this.setChanged();
