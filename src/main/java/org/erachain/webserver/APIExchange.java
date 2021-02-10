@@ -24,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 //import com.google.gson.Gson;
@@ -49,6 +50,10 @@ public class APIExchange {
                 "Pairs values24");
         help.put("GET apiexchange/spot/pairs/{pairs_list}",
                 "Pairs values24. Pairs list separated by comma for example: BTC_USD,ERA_USD,GOLD_USD");
+        help.put("GET apiexchange/spot/ordersbook/[pair]?depth=[depth]",
+                "Get active orders in orderbook for pair."
+                        + " The number of orders is limited by depth, default 50, max = 200");
+
         help.put("GET apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
         help.put("GET apiexchange/pair/{have}/{want}",
@@ -376,4 +381,62 @@ public class APIExchange {
                 .entity(result.toJSONString())
                 .build();
     }
+
+    // TODO кешировать ответ по набору параметров
+    String getSpotOrdersBook; // разные параметры же на входе - поэтому несколько уровней и все - чтобы кешировать ответ
+
+    @GET
+    @Path("spot/ordersbook/{pair}")
+    public Response getSpotOrdersBook(@PathParam("pair") String pair,
+                                      @DefaultValue("50") @QueryParam("depth") Long limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 200)
+                limit = 200L;
+        }
+
+        int limitInt = (int) (long) limit;
+
+        cntrl.pairsController.updateList();
+        JSONArray array = (JSONArray) cntrl.pairsController.spotPairsList.get(pair);
+        if (array == null) {
+            return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("Ticker not found")
+                    .build();
+        }
+
+        Long have = (Long) array.get(1);
+        Long want = (Long) array.get(2);
+
+        List<Order> haveOrders = DCSet.getInstance().getOrderMap().getOrders(have, want, limitInt);
+        List<Order> wantOrders = DCSet.getInstance().getOrderMap().getOrders(want, have, limitInt);
+
+        JSONObject result = new JSONObject();
+
+        JSONArray arrayHave = new JSONArray();
+        for (Order order : haveOrders) {
+            JSONArray json = new JSONArray();
+            json.add(order.getAmountHaveLeft().toPlainString());
+            json.add(order.calcLeftPrice().toPlainString());
+            arrayHave.add(json);
+        }
+        result.put("bids", arrayHave);
+
+        JSONArray arrayWant = new JSONArray();
+        for (Order order : wantOrders) {
+            JSONArray json = new JSONArray();
+            // get REVERSE price and AMOUNT
+            json.add(order.getAmountWantLeft().toPlainString());
+            json.add(order.calcLeftPriceReverse().toPlainString());
+            arrayWant.add(json);
+        }
+        result.put("asks", arrayWant);
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(result.toJSONString())
+                .build();
+    }
+
 }

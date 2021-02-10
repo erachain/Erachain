@@ -144,13 +144,13 @@ public class Pair {
 
         JSONObject pair = new JSONObject();
         pair.put("id", viewID());
-        pair.put("asset_key1", assetKey1);
-        pair.put("asset_key2", assetKey2);
+        pair.put("base_id", assetKey1);
+        pair.put("quote_id", assetKey2);
 
         pair.put("last_price", lastTime);
 
-        pair.put("base_currency", asset1.getName());
-        pair.put("quote_currency", asset2.getName());
+        pair.put("base_ticker", asset1.getName());
+        pair.put("quote_ticker", asset2.getName());
 
         pair.put("last_price", lastPrice);
 
@@ -164,6 +164,8 @@ public class Pair {
         pair.put("price_change_percent_24h", price_change_percent_24h);
         pair.put("highest_price_24h", highest_price_24h);
         pair.put("lowest_price_24h", lowest_price_24h);
+
+        pair.put("frozen", 0);
 
         return pair;
 

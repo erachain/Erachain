@@ -10,6 +10,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.settings.Settings;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun;
@@ -109,7 +110,11 @@ public class PairsController {
             }
 
             String pairJsonKey = asset1.getName() + "_" + asset2.getName();
-            spotPairsList.put(pairJsonKey, spotJson.get(pairKey));
+            JSONArray array = new JSONArray();
+            array.add(spotJson.get(pairKey));
+            array.add(key1);
+            array.add(key2);
+            spotPairsList.put(pairJsonKey, array);
 
             Pair pair = mapPairs.get(key1, key2);
             if (true || pair == null) {
