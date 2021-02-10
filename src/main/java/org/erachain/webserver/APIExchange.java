@@ -461,6 +461,14 @@ public class APIExchange {
         JSONArray arrayJSON = new JSONArray();
         for (Trade trade : TradeResource.getTradesFrom_1(have, want, fromHeight, fromOrder, fromTimestamp, limit)) {
             JSONObject json = new JSONObject();
+            json.put("trade_id", trade.viewID());
+            json.put("timestamp", trade.getTimestamp());
+
+            boolean reversed = trade.getAmountHave().equals(want);
+
+            json.put("price", reversed ? trade.calcPrice() : trade.calcPriceRevers());
+            json.put("base_volume", reversed ? trade.getAmountHave() : trade.getAmountWant());
+            json.put("quote_volume", reversed ? trade.getAmountWant() : trade.getAmountHave());
 
             arrayJSON.add(json);
         }
