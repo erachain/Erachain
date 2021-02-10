@@ -334,9 +334,11 @@ public class APIExchange {
     @Path("spot/all")
     public Response spotAllPairs() {
 
+        cntrl.pairsController.updateList();
+
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(cntrl.pairsController.spotPairsList)
+                .entity(cntrl.pairsController.spotPairsJson.toJSONString())
                 .build();
     }
 

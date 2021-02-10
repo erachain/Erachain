@@ -76,6 +76,18 @@ public class Pair {
 
     }
 
+    public Pair(AssetCls asset1, AssetCls asset2, BigDecimal lastPrice, long lastTime,
+                BigDecimal bidPrice, BigDecimal askPrice,
+                BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
+                BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
+                int count24) {
+        this(asset1.getKey(), asset2.getKey(), asset1.getScale(), asset2.getScale(), lastPrice, lastTime,
+                bidPrice, askPrice, base_volume, quote_volume, price_change_percent_24h,
+                highest_price_24h, lowest_price_24h, count24);
+        this.asset1 = asset1;
+        this.asset2 = asset2;
+    }
+
     public String viewID() {
         return Transaction.viewDBRef(assetKey1) + "/" + Transaction.viewDBRef(assetKey2);
     }

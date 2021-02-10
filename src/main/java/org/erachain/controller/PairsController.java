@@ -99,7 +99,7 @@ public class PairsController {
 
             Pair pair = mapPairs.get(key1, key2);
             if (pair == null) {
-                pair = reCalc(key1, key2);
+                pair = reCalc(asset1, asset2);
             }
             spotPairs.put(pairJsonKey, pair);
             spotPairsJson.put(pairJsonKey, pair.toJson(0));
@@ -110,19 +110,13 @@ public class PairsController {
     /**
      * Обновить данные
      *
-     * @param key1
-     * @param key2
+     * @param asset1
+     * @param asset2
      */
-    public Pair reCalc(Long key1, Long key2) {
+    public Pair reCalc(AssetCls asset1, AssetCls asset2) {
         TradeMapImpl tradesMap = DCSet.getInstance().getTradeMap();
-
-        ItemAssetMap mapAssets = DCSet.getInstance().getItemAssetMap();
-        AssetCls asset1 = mapAssets.get(key1);
-        if (asset1 == null)
-            return null;
-        AssetCls asset2 = mapAssets.get(key2);
-        if (asset2 == null)
-            return null;
+        Long key1 = asset1.getKey();
+        Long key2 = asset2.getKey();
 
         int heightStart = Controller.getInstance().getMyHeight();
         int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
@@ -176,7 +170,7 @@ public class PairsController {
         Order bidLastOrder = ordersMap.getHaveWanFirst(key2, key1);
         BigDecimal bidPrice = bidLastOrder == null ? null : bidLastOrder.calcLeftPriceReverse();
 
-        return new Pair(key1, key2, asset1.getScale(), asset2.getScale(), lastPrice, lastTime,
+        return new Pair(asset1, asset2, lastPrice, lastTime,
                 bidPrice, askPrice, baseVolume, quoteVolume, priceChangePercent24h,
                 maxPrice, minPrice, count24);
 
