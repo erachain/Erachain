@@ -24,8 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PairsController {
-    HashMap pairs = new HashMap();
-    JSONObject pairsList;
+    public HashMap<String, Pair> spotPairs = new HashMap();
+    public JSONObject pairsJson = new JSONObject();
+    public JSONObject spotPairsJson;
+
+    public JSONObject spotPairsList;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PairsController.class.getSimpleName());
 
@@ -45,7 +48,7 @@ public class PairsController {
                 List<String> lines = Files.readLines(file, Charsets.UTF_8);
 
                 for (String line : lines) {
-                    if (line.trim().startsWith("//")) {
+                    if (line.trim().startsWith("/")) {
                         // пропускаем //
                         continue;
                     }
@@ -54,17 +57,29 @@ public class PairsController {
             } catch (Exception e) {
             }
             //CREATE JSON OBJECT
-            this.pairsList = (JSONObject) JSONValue.parse(jsonString);
+            this.spotPairsJson = (JSONObject) JSONValue.parse(jsonString);
 
         } else {
-            this.pairsList = new JSONObject();
-            pairsList.put("1/2", Boolean.TRUE);
+            JSONObject spot = new JSONObject();
+            spot.put("1/2", Boolean.TRUE);
+            spot.put("1/12", Boolean.TRUE);
+            spot.put("1/95", Boolean.TRUE);
+            spot.put("12/95", Boolean.TRUE);
+            spot.put("21/95", Boolean.TRUE);
+            this.spotPairsJson = new JSONObject();
+            spotPairsJson.put("spot", spot);
         }
 
+    }
+
+    public void updateList() {
+
+        spotPairsList = new JSONObject();
 
         ItemAssetMap mapAssets = DCSet.getInstance().getItemAssetMap();
         PairMapImpl mapPairs = DCSet.getInstance().getPairMap();
-        for (Object pairKey : pairsList.keySet()) {
+        JSONObject spotJson = (JSONObject) spotPairsJson.get("spot");
+        for (Object pairKey : spotJson.keySet()) {
             String[] pairStr = ((String) pairKey).split("/");
             Long key1 = Long.parseLong(pairStr[0]);
             AssetCls asset1 = mapAssets.get(key1);
@@ -79,13 +94,15 @@ public class PairsController {
                 continue;
             }
 
+            String pairJsonKey = asset1.getName() + "_" + asset2.getName();
+            spotPairsList.put(pairJsonKey, spotJson.get(pairKey));
+
             Pair pair = mapPairs.get(key1, key2);
             if (pair == null) {
-                LOGGER.warn("pair [" + key1 + "/" + key2 + "] not found");
-                continue;
+                pair = reCalc(key1, key2);
             }
-
-            pairs.put(key1 + "/" + key2, pair);
+            spotPairs.put(pairJsonKey, pair);
+            spotPairsJson.put(pairJsonKey, pair.toJson(0));
 
         }
     }
@@ -96,16 +113,16 @@ public class PairsController {
      * @param key1
      * @param key2
      */
-    public void update(Long key1, Long key2) {
+    public Pair reCalc(Long key1, Long key2) {
         TradeMapImpl tradesMap = DCSet.getInstance().getTradeMap();
 
         ItemAssetMap mapAssets = DCSet.getInstance().getItemAssetMap();
         AssetCls asset1 = mapAssets.get(key1);
         if (asset1 == null)
-            return;
+            return null;
         AssetCls asset2 = mapAssets.get(key2);
         if (asset2 == null)
-            return;
+            return null;
 
         int heightStart = Controller.getInstance().getMyHeight();
         int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
@@ -120,7 +137,7 @@ public class PairsController {
         BigDecimal price = null;
         BigDecimal priceChangePercent24h = BigDecimal.ZERO;
 
-        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = (tradesMap.getPairIterator(key1, key2, heightStart, heightEnd)) {
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = (tradesMap.getPairIterator(key1, key2, heightStart, heightEnd))) {
             Trade trade;
             while (iterator.hasNext()) {
                 trade = tradesMap.get(iterator.next());
@@ -159,13 +176,9 @@ public class PairsController {
         Order bidLastOrder = ordersMap.getHaveWanFirst(key2, key1);
         BigDecimal bidPrice = bidLastOrder == null ? null : bidLastOrder.calcLeftPriceReverse();
 
-        Pair pair = new Pair(key1, key2, asset1.getScale(), asset2.getScale(), lastPrice, lastTime,
+        return new Pair(key1, key2, asset1.getScale(), asset2.getScale(), lastPrice, lastTime,
                 bidPrice, askPrice, baseVolume, quoteVolume, priceChangePercent24h,
                 maxPrice, minPrice, count24);
-
-        pairs.put(key1 + "/" + key2, pair);
-
-        DCSet.getInstance().getPairMap().put(pair);
 
     }
 }

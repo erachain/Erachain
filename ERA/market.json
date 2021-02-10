@@ -1,0 +1,12 @@
+{
+  "spot": {
+    // ERA / USD
+    "1/95": true,
+    "2/95": true,
+    // BTC / USD
+    "12/95": true,
+    // GOLD / USD
+    "21/95": true,
+    "1/2": true
+  }
+}

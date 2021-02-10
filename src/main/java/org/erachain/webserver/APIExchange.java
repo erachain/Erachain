@@ -42,6 +42,11 @@ public class APIExchange {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
+        help.put("GET apiexchange/spot/pairs",
+                "Pairs list");
+        help.put("GET apiexchange/spot/all",
+                "Pairs and values24");
+
         help.put("GET apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
         help.put("GET apiexchange/pair/{have}/{want}",
@@ -322,6 +327,29 @@ public class APIExchange {
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity("\"" + dcSet.getTradeMap().getVolume24(have, want).toPlainString() + "\"")
+                .build();
+    }
+
+    @GET
+    @Path("spot/all")
+    public Response spotAllPairs() {
+
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(cntrl.pairsController.spotPairsList)
+                .build();
+    }
+
+    @GET
+    @Path("spot/pairs")
+    // apiexchange/spot/pairs
+    public Response spotPairs() {
+
+        cntrl.pairsController.updateList();
+
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(cntrl.pairsController.spotPairsList.toJSONString())
                 .build();
     }
 
