@@ -51,8 +51,12 @@ public class APIExchange {
         help.put("GET apiexchange/spot/pairs/{pairs_list}",
                 "Pairs values24. Pairs list separated by comma for example: BTC_USD,ERA_USD,GOLD_USD");
         help.put("GET apiexchange/spot/ordersbook/[pair]?depth=[depth]",
-                "Get active orders in orderbook for pair."
-                        + " The number of orders is limited by depth, default 50, max = 200");
+                "Get active orders in orderbook for pair as [price, volume]."
+                        + " The number of orders is limited by depth, default 50, max = 500");
+        help.put("GET apiexchange/spot/trades/[pair]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get trades for pair, "
+                        + "limit is count record. The number of trades is limited by input param, default 50."
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
 
         help.put("GET apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
@@ -101,7 +105,7 @@ public class APIExchange {
                                   @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 50)
+            if (limit > 50 || limit <= 0)
                 limit = 50L;
         }
 
@@ -118,7 +122,7 @@ public class APIExchange {
                                        @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 50)
+            if (limit > 50 || limit <= 0)
                 limit = 50;
         }
 
@@ -137,7 +141,7 @@ public class APIExchange {
                                           @DefaultValue("20") @QueryParam("limit") Integer limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 50)
+            if (limit > 50 || limit <= 0)
                 limit = 50;
         }
 
@@ -158,10 +162,8 @@ public class APIExchange {
 
         int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limitInt > 200)
+            if (limitInt > 200 || limitInt <= 0)
                 limitInt = 200;
-            else if (limitInt < 0)
-                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -178,10 +180,8 @@ public class APIExchange {
 
         int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limitInt > 200)
+            if (limitInt > 200 || limitInt <= 0)
                 limitInt = 200;
-            else if (limitInt < 0)
-                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -200,10 +200,8 @@ public class APIExchange {
 
         int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limitInt > 200)
+            if (limitInt > 200 || limitInt <= 0)
                 limitInt = 200;
-            else if (limitInt < 0)
-                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -222,10 +220,8 @@ public class APIExchange {
 
         int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limitInt > 200)
+            if (limitInt > 200 || limitInt <= 0)
                 limitInt = 200;
-            else if (limitInt < 0)
-                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -244,10 +240,8 @@ public class APIExchange {
 
         int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limitInt > 200)
+            if (limitInt > 200 || limitInt <= 0)
                 limitInt = 200;
-            else if (limitInt < 0)
-                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -391,8 +385,8 @@ public class APIExchange {
                                       @DefaultValue("50") @QueryParam("depth") Long limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 200)
-                limit = 200L;
+            if (limit > 500 || limit <= 0)
+                limit = 500L;
         }
 
         int limitInt = (int) (long) limit;
@@ -417,8 +411,8 @@ public class APIExchange {
         JSONArray arrayHave = new JSONArray();
         for (Order order : haveOrders) {
             JSONArray json = new JSONArray();
-            json.add(order.getAmountHaveLeft().toPlainString());
             json.add(order.calcLeftPrice().toPlainString());
+            json.add(order.getAmountHaveLeft().toPlainString());
             arrayHave.add(json);
         }
         result.put("bids", arrayHave);
@@ -427,8 +421,8 @@ public class APIExchange {
         for (Order order : wantOrders) {
             JSONArray json = new JSONArray();
             // get REVERSE price and AMOUNT
-            json.add(order.getAmountWantLeft().toPlainString());
             json.add(order.calcLeftPriceReverse().toPlainString());
+            json.add(order.getAmountWantLeft().toPlainString());
             arrayWant.add(json);
         }
         result.put("asks", arrayWant);
@@ -436,6 +430,44 @@ public class APIExchange {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(result.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("spot/trades/{pair}")
+    public Response getSpotTrades(@PathParam("pair") String pair,
+                                  @QueryParam("height") Integer fromHeight,
+                                  @QueryParam("order") String fromOrder,
+                                  @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                  @DefaultValue("100") @QueryParam("limit") Integer limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 200 || limit <= 0)
+                limit = 200;
+        }
+
+        cntrl.pairsController.updateList();
+        JSONArray array = (JSONArray) cntrl.pairsController.spotPairsList.get(pair);
+        if (array == null) {
+            return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("Ticker not found")
+                    .build();
+        }
+
+        Long have = (Long) array.get(1);
+        Long want = (Long) array.get(2);
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade : TradeResource.getTradesFrom_1(have, want, fromHeight, fromOrder, fromTimestamp, limit)) {
+            JSONObject json = new JSONObject();
+
+            arrayJSON.add(json);
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(arrayJSON.toJSONString())
                 .build();
     }
 
