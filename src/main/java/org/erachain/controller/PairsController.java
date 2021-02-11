@@ -5,8 +5,8 @@ import com.google.common.io.Files;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
-import org.erachain.core.item.assets.Pair;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.item.assets.TradePair;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.settings.Settings;
@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PairsController {
-    public HashMap<String, Pair> spotPairs = new HashMap();
+    public HashMap<String, TradePair> spotPairs = new HashMap();
     public JSONObject pairsJson = new JSONObject();
     public JSONObject spotPairsJson;
 
@@ -116,12 +116,12 @@ public class PairsController {
             array.add(key2);
             spotPairsList.put(pairJsonKey, array);
 
-            Pair pair = mapPairs.get(key1, key2);
-            if (true || pair == null) {
-                pair = reCalc(asset1, asset2);
+            TradePair tradePair = mapPairs.get(key1, key2);
+            if (true || tradePair == null) {
+                tradePair = reCalc(asset1, asset2);
             }
-            spotPairs.put(pairJsonKey, pair);
-            spotPairsJson.put(pairJsonKey, pair.toJson());
+            spotPairs.put(pairJsonKey, tradePair);
+            spotPairsJson.put(pairJsonKey, tradePair.toJson());
 
         }
     }
@@ -132,7 +132,7 @@ public class PairsController {
      * @param asset1
      * @param asset2
      */
-    public Pair reCalc(AssetCls asset1, AssetCls asset2) {
+    public TradePair reCalc(AssetCls asset1, AssetCls asset2) {
         TradeMapImpl tradesMap = DCSet.getInstance().getTradeMap();
         Long key1 = asset1.getKey();
         Long key2 = asset2.getKey();
@@ -153,35 +153,46 @@ public class PairsController {
         boolean reversed;
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = (tradesMap.getPairIterator(key1, key2, heightStart, heightEnd))) {
             Trade trade;
-            while (iterator.hasNext()) {
-                trade = tradesMap.get(iterator.next());
-                if (trade == null) {
-                    LOGGER.warn("trade for pair [" + key1 + "/" + key2 + "] not found");
-                    continue;
+            if (iterator.hasNext()) {
+                while (iterator.hasNext()) {
+                    trade = tradesMap.get(iterator.next());
+                    if (trade == null) {
+                        LOGGER.warn("trade for pair [" + key1 + "/" + key2 + "] not found");
+                        continue;
+                    }
+                    count24++;
+
+                    reversed = trade.getHaveKey().equals(key2);
+
+                    // у сделки обратные Have Want
+                    price = reversed ? trade.calcPrice() : trade.calcPriceRevers();
+                    if (lastPrice == null) {
+                        lastPrice = price;
+                        lastTime = trade.getTimestamp();
+                    }
+
+                    if (minPrice.compareTo(price) > 0)
+                        minPrice = price;
+                    if (maxPrice.compareTo(price) < 0)
+                        maxPrice = price;
+
+                    baseVolume = baseVolume.add(reversed ? trade.getAmountHave() : trade.getAmountWant());
+                    quoteVolume = quoteVolume.add(reversed ? trade.getAmountWant() : trade.getAmountHave());
+
                 }
-                count24++;
 
-                reversed = trade.getHaveKey().equals(key2);
-
-                // у сделки обратные Have Want
-                price = reversed ? trade.calcPrice() : trade.calcPriceRevers();
-                if (lastPrice == null) {
-                    lastPrice = price;
-                    lastTime = trade.getTimestamp();
+                // тут подсчет отклонения за сутки
+                if (price != null) {
+                    priceChangePercent24h = lastPrice.subtract(price).movePointRight(2).divide(price, 3, RoundingMode.DOWN);
                 }
-
-                if (minPrice.compareTo(price) > 0)
-                    minPrice = price;
-                if (maxPrice.compareTo(price) < 0)
-                    maxPrice = price;
-
-                baseVolume = baseVolume.add(reversed ? trade.getAmountHave() : trade.getAmountWant());
-                quoteVolume = quoteVolume.add(reversed ? trade.getAmountWant() : trade.getAmountHave());
-
-            }
-            // тут подсчет отклонения за сутки
-            if (price != null) {
-                priceChangePercent24h = lastPrice.subtract(price).movePointRight(2).divide(price, 3, RoundingMode.DOWN);
+            } else {
+                // за последние сутки не было сделок, значит смотрим просто последнюю цену
+                trade = tradesMap.getLastTrade(key1, key2);
+                if (trade != null) {
+                    reversed = trade.getHaveKey().equals(key2);
+                    lastPrice = reversed ? trade.calcPrice() : trade.calcPriceRevers();
+                    priceChangePercent24h = BigDecimal.ZERO;
+                }
             }
 
         } catch (IOException e) {
@@ -194,7 +205,7 @@ public class PairsController {
         Order bidLastOrder = ordersMap.getHaveWanFirst(key2, key1);
         BigDecimal bidPrice = bidLastOrder == null ? null : bidLastOrder.calcLeftPriceReverse();
 
-        return new Pair(asset1, asset2, lastPrice, lastTime,
+        return new TradePair(asset1, asset2, lastPrice, lastTime,
                 bidPrice, askPrice, baseVolume, quoteVolume, priceChangePercent24h,
                 maxPrice, minPrice, count24);
 

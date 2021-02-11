@@ -1,7 +1,7 @@
 package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.core.item.assets.Pair;
+import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.datachain.PairMap;
@@ -16,7 +16,7 @@ import org.mapdb.Fun.Tuple2;
  * Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
-public class PairSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Pair> implements PairSuit {
+public class PairSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, TradePair> implements PairSuit {
 
     public PairSuitMapDBFork(PairMap parent, DBASet databaseSet) {
         super(parent, databaseSet, logger);
