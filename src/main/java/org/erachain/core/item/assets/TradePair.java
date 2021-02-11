@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-public class Pair {
+public class TradePair {
 
     private static final int ASSET_KEY_LENGTH = Transaction.KEY_LENGTH;
     private static final int AMOUNT_LENGTH = Order.AMOUNT_LENGTH;
@@ -47,11 +47,11 @@ public class Pair {
 
 
     // make trading if two orders is seeked
-    public Pair(Long assetKey1, Long assetKey2, int AssetScale1, int assetScale2, BigDecimal lastPrice, long lastTime,
-                BigDecimal bidPrice, BigDecimal askPrice,
-                BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
-                BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
-                int count24) {
+    public TradePair(Long assetKey1, Long assetKey2, int AssetScale1, int assetScale2, BigDecimal lastPrice, long lastTime,
+                     BigDecimal bidPrice, BigDecimal askPrice,
+                     BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
+                     BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
+                     int count24) {
         this.assetKey1 = assetKey1;
         this.assetKey2 = assetKey2;
         this.assetScale1 = AssetScale1;
@@ -75,11 +75,11 @@ public class Pair {
 
     }
 
-    public Pair(AssetCls asset1, AssetCls asset2, BigDecimal lastPrice, long lastTime,
-                BigDecimal bidPrice, BigDecimal askPrice,
-                BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
-                BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
-                int count24) {
+    public TradePair(AssetCls asset1, AssetCls asset2, BigDecimal lastPrice, long lastTime,
+                     BigDecimal bidPrice, BigDecimal askPrice,
+                     BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
+                     BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
+                     int count24) {
         this(asset1.getKey(), asset2.getKey(), asset1.getScale(), asset2.getScale(), lastPrice, lastTime,
                 bidPrice, askPrice, base_volume, quote_volume, price_change_percent_24h,
                 highest_price_24h, lowest_price_24h, count24);
@@ -99,7 +99,7 @@ public class Pair {
         return this.assetKey2;
     }
 
-    public static Pair get(DCSet db, Long assetKey1, Long assetKey2) {
+    public static TradePair get(DCSet db, Long assetKey1, Long assetKey2) {
         return db.getPairMap().get(assetKey1, assetKey2);
     }
 
@@ -133,6 +133,10 @@ public class Pair {
 
     public BigDecimal getLastPrice() {
         return lastPrice;
+    }
+
+    public BigDecimal getPriceChange() {
+        return price_change_percent_24h;
     }
 
     public long getLastTime() {
@@ -173,7 +177,7 @@ public class Pair {
 
 
     //PARSE/CONVERT
-    public static Pair parse(byte[] data) throws Exception {
+    public static TradePair parse(byte[] data) throws Exception {
         //CHECK IF CORRECT LENGTH
         if (data.length != BASE_LENGTH) {
             throw new Exception("Data does not match trade length");
@@ -246,7 +250,7 @@ public class Pair {
         int count24 = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + Integer.BYTES));
         position += Integer.BYTES;
 
-        return new Pair(assetKey1, assetKey2, assetScale1, assetScale2, lastPrice, lastTime, bidPrice, askPrice,
+        return new TradePair(assetKey1, assetKey2, assetScale1, assetScale2, lastPrice, lastTime, bidPrice, askPrice,
                 baseVolume, quoteVolume, price_change_percent_24h,
                 highest_price_24h, lowest_price_24h, count24);
     }
@@ -317,8 +321,8 @@ public class Pair {
 
     @Override
     public boolean equals(Object object) {
-        if (object instanceof Pair) {
-            Pair trade = (Pair) object;
+        if (object instanceof TradePair) {
+            TradePair trade = (TradePair) object;
 
             return (trade.getAssetKey1().equals(this.getAssetKey1()) && trade.getAssetKey2().equals(this.getAssetKey2()));
         }
@@ -329,7 +333,7 @@ public class Pair {
     //PROCESS/ORPHAN
 
     public void process(DCSet db) {
-        Pair pair = db.getPairMap().get(this);
+        TradePair tradePair = db.getPairMap().get(this);
     }
 
     public void orphan(DCSet db) {

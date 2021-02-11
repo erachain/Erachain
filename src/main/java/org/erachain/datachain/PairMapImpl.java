@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.core.item.assets.Pair;
+import org.erachain.core.item.assets.TradePair;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.PairSuitMapDB;
@@ -18,7 +18,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * asset1 (Long) + asset2 (Long) -> Pair
  */
 @Slf4j
-public class PairMapImpl extends DBTabImpl<Tuple2<Long, Long>, Pair> implements PairMap {
+public class PairMapImpl extends DBTabImpl<Tuple2<Long, Long>, TradePair> implements PairMap {
 
     public PairMapImpl(int dbs, DCSet databaseSet, DB database) {
         super(dbs, databaseSet, database);
@@ -54,20 +54,20 @@ public class PairMapImpl extends DBTabImpl<Tuple2<Long, Long>, Pair> implements 
         }
     }
 
-    public Pair get(Long asset1, Long asset2) {
+    public TradePair get(Long asset1, Long asset2) {
         return this.get(new Tuple2<Long, Long>(asset1, asset2));
     }
 
-    public Pair get(Pair pair) {
-        return this.get(new Tuple2<Long, Long>(pair.getAssetKey1(), pair.getAssetKey2()));
+    public TradePair get(TradePair tradePair) {
+        return this.get(new Tuple2<Long, Long>(tradePair.getAssetKey1(), tradePair.getAssetKey2()));
     }
 
-    public void put(Pair pair) {
-        this.put(new Tuple2<Long, Long>(pair.getAssetKey1(), pair.getAssetKey2()), pair);
+    public void put(TradePair tradePair) {
+        this.put(new Tuple2<Long, Long>(tradePair.getAssetKey1(), tradePair.getAssetKey2()), tradePair);
     }
 
-    public void delete(Pair pair) {
-        this.delete(new Tuple2<Long, Long>(pair.getAssetKey1(), pair.getAssetKey2()));
+    public void delete(TradePair tradePair) {
+        this.delete(new Tuple2<Long, Long>(tradePair.getAssetKey1(), tradePair.getAssetKey2()));
     }
 
 }

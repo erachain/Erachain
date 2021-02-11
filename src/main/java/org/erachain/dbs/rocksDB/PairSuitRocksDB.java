@@ -2,7 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.core.item.assets.Pair;
+import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.PairSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
  */
 
 @Slf4j
-public class PairSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Pair> implements PairSuit {
+public class PairSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, TradePair> implements PairSuit {
 
     private final String NAME_TABLE = "PAIRS_TABLE";
 

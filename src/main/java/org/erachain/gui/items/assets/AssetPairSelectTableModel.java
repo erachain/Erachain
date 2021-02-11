@@ -3,65 +3,61 @@ package org.erachain.gui.items.assets;
 // 30/03
 
 import org.erachain.controller.Controller;
-import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.wallet.FavoriteItemMapAsset;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.utils.NumberAsString;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 @SuppressWarnings("serial")
-public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> implements Observer {
+public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<AssetCls, TradePair>> implements Observer {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
-    public static final int COLUMN_ORDERS_COUNT = 2;
-    public static final int COLUMN_ORDERS_VOLUME = 3;
-    public static final int COLUMN_TRADES_COUNT = 4;
-    public static final int COLUMN_TRADES_VOLUME = 5;
+    public static final int COLUMN_LAST_PRICE = 2;
+    public static final int COLUMN_CHANGE_PRICE = 3;
+    public static final int COLUMN_BASE_VOLUME = 4;
+    public static final int COLUMN_QUOTE_VOLUME = 5;
+    public static final int COLUMN_TRADES_COUNT = 6;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssetPairSelectTableModel.class);
 
     public long key;
+    public AssetCls assetPair;
     Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all;
 
     private String filter_Name;
 
     public AssetPairSelectTableModel(long key) {
-        super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "<html>Orders<br>count</html>", "Orders Volume",
-                        "<html>Trades<br>count</html>", "Trades Volume"},
-                new Boolean[]{false, true, false, false, false, false}, false);
+        super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Last Price", "Change %", "Base Volume 24h",
+                        "Quote Volume 24h", "Trades 24h"},
+                new Boolean[]{false, true, false, false, false, false, false}, false);
 
         this.key = key;
-        this.all = BlockExplorer.getInstance().calcForAsset(DCSet.getInstance().getOrderMap().getOrders(this.key),
-                DCSet.getInstance().getTradeMap().getTrades(this.key));
-
 
         ItemAssetMap assetMap = DCSet.getInstance().getItemAssetMap();
+        assetPair = assetMap.get(key);
         FavoriteItemMapAsset favoriteMap = Controller.getInstance().wallet.database.getAssetFavoritesSet();
         list = new ArrayList<>();
 
         try (IteratorCloseable<Long> iterator = favoriteMap.getIterator()) {
-
             while (iterator.hasNext()) {
                 AssetCls asset = assetMap.get(iterator.next());
                 if (asset == null) {
                     continue;
                 }
-                list.add(asset);
+                list.add(new Fun.Tuple2<AssetCls, TradePair>(asset, Controller.getInstance().pairsController.reCalc(asset, assetPair)));
             }
         } catch (IOException e) {
         }
@@ -74,57 +70,32 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
             return null;
         }
 
-        Long keyAsset = this.list.get(row).getKey();
-        Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal> item = this.all.get(keyAsset);
+        AssetCls asset = this.list.get(row).a;
+        TradePair tradePair = this.list.get(row).b;
 
         try {
 
-
             switch (column) {
                 case COLUMN_KEY:
-
-                    return keyAsset;
+                    return asset.getKey();
 
                 case COLUMN_NAME:
+                    return asset.viewName();
 
-                    return this.list.get(row).viewName();
+                case COLUMN_LAST_PRICE:
+                    return tradePair.getLastPrice();
 
-                case COLUMN_ORDERS_COUNT:
+                case COLUMN_CHANGE_PRICE:
+                    return tradePair.getPriceChange();
 
+                case COLUMN_BASE_VOLUME:
+                    return tradePair.getBase_volume();
 
-                    return item == null ? "" : item.a;
-
-                case COLUMN_ORDERS_VOLUME:
-
-
-                    return item == null ? "" : ("<html>" + (item.c == null ? "0" : NumberAsString.formatAsString(item.c)))
-                            //+ " " + this.list.get(row).getShort() + "&hArr;  "//"<br>"
-                            + " " + this.list.get(row).getShort()
-                            + " +" + NumberAsString.formatAsString(item.d)
-                            + " " + Controller.getInstance().getAsset(keyAsset).getShort()
-                            + "</html>";
+                case COLUMN_QUOTE_VOLUME:
+                    return tradePair.getQuote_volume();
 
                 case COLUMN_TRADES_COUNT:
-
-                    if (item == null) return "";
-                    if (item.b > 0)
-                        return item.b;
-                    else
-                        return "";
-
-                case COLUMN_TRADES_VOLUME:
-
-                    if (item == null) return "";
-                    if (item.b > 0)
-                        return "<html>" + NumberAsString.formatAsString(item.e)
-                                //+ " " + this.list.get(row).getShort() + "&hArr; " //"<br>"
-                                + " " + this.list.get(row).getShort()
-                                + " +" + NumberAsString.formatAsString(item.f)
-                                + " " + Controller.getInstance().getAsset(keyAsset).getShort()
-                                + "</html>";
-                    else
-                        return "";
-
+                    return tradePair.getCount24();
 
             }
 
@@ -148,19 +119,24 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
         AssetCls asset = Controller.getInstance().getAsset(key_filter);
         if (asset == null || asset.getKey() == this.key)
             return;
-        list.add(asset);
+        list.add(new Fun.Tuple2<>(asset, Controller.getInstance().pairsController.reCalc(asset, assetPair)));
         this.fireTableDataChanged();
     }
 
     public void set_Filter_By_Name(String str) {
         filter_Name = str;
-        list = ((ItemMap)map).getByFilterAsArray(filter_Name, 0, 1000);
+        list = new ArrayList<>();
+        List<ItemCls> foundAssets = ((ItemMap) map).getByFilterAsArray(filter_Name, 0, 1000);
+        for (ItemCls asset : foundAssets) {
+            list.add(new Fun.Tuple2<>((AssetCls) asset, Controller.getInstance().pairsController.reCalc((AssetCls) asset, assetPair)));
+        }
+
         this.fireTableDataChanged();
 
     }
 
     public void clear() {
-        list = new ArrayList<ItemCls>();
+        list = new ArrayList<>();
         this.fireTableDataChanged();
 
     }
