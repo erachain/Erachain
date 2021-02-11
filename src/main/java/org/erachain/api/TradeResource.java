@@ -414,13 +414,11 @@ public class TradeResource {
         return arrayJSON.toJSONString();
     }
 
-    @GET
-    @Path("tradesfrom/{have}/{want}")
-    public static String getTradesFrom(@PathParam("have") Long have, @PathParam("want") Long want,
-                                       @QueryParam("height") Integer fromHeight,
-                                       @QueryParam("order") String fromOrder,
-                                       @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
-                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
+    public static List<Trade> getTradesFrom_1(Long have, Long want,
+                                              Integer fromHeight,
+                                              String fromOrder,
+                                              Long fromTimestamp,
+                                              Integer limit) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
         // DOES ASSETID EXIST
@@ -448,8 +446,19 @@ public class TradeResource {
             listResult = Controller.getInstance().getTradeByTimestamp(have, want, fromTimestamp * 1000, limit);
         }
 
+        return listResult;
+    }
+
+    @GET
+    @Path("tradesfrom/{have}/{want}")
+    public static String getTradesFrom(@PathParam("have") Long have, @PathParam("want") Long want,
+                                       @QueryParam("height") Integer fromHeight,
+                                       @QueryParam("order") String fromOrder,
+                                       @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
         JSONArray arrayJSON = new JSONArray();
-        for (Trade trade : listResult) {
+        for (Trade trade : getTradesFrom_1(have, want, fromHeight, fromOrder, fromTimestamp, limit)) {
             arrayJSON.add(trade.toJson(have, true));
         }
 

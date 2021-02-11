@@ -15,6 +15,7 @@ import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 //import com.google.gson.Gson;
@@ -41,6 +43,20 @@ public class APIExchange {
     @GET
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
+
+        help.put("GET apiexchange/spot/list",
+                "Pairs list");
+        help.put("GET apiexchange/spot/pairs",
+                "Pairs values24");
+        help.put("GET apiexchange/spot/pairs/{pairs_list}",
+                "Pairs values24. Pairs list separated by comma for example: BTC_USD,ERA_USD,GOLD_USD");
+        help.put("GET apiexchange/spot/ordersbook/[pair]?depth=[depth]",
+                "Get active orders in orderbook for pair as [price, volume]."
+                        + " The number of orders is limited by depth, default 50, max = 500");
+        help.put("GET apiexchange/spot/trades/[pair]?fromOrder=[orderID]&limit=[limit]",
+                "Get trades for pair, "
+                        + "limit is count record. The number of trades is limited by input param, default 50."
+                        + "Use fromOrder (initial order ID) as Block-seqNo or Long. For example 103506-3 or 928735142671");
 
         help.put("GET apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
@@ -89,7 +105,7 @@ public class APIExchange {
                                   @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 50)
+            if (limit > 50 || limit <= 0)
                 limit = 50L;
         }
 
@@ -106,7 +122,7 @@ public class APIExchange {
                                        @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 50)
+            if (limit > 50 || limit <= 0)
                 limit = 50;
         }
 
@@ -125,7 +141,7 @@ public class APIExchange {
                                           @DefaultValue("20") @QueryParam("limit") Integer limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 50)
+            if (limit > 50 || limit <= 0)
                 limit = 50;
         }
 
@@ -146,10 +162,8 @@ public class APIExchange {
 
         int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limitInt > 200)
+            if (limitInt > 200 || limitInt <= 0)
                 limitInt = 200;
-            else if (limitInt < 0)
-                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -166,10 +180,8 @@ public class APIExchange {
 
         int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limitInt > 200)
+            if (limitInt > 200 || limitInt <= 0)
                 limitInt = 200;
-            else if (limitInt < 0)
-                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -188,10 +200,8 @@ public class APIExchange {
 
         int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limitInt > 200)
+            if (limitInt > 200 || limitInt <= 0)
                 limitInt = 200;
-            else if (limitInt < 0)
-                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -210,10 +220,8 @@ public class APIExchange {
 
         int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limitInt > 200)
+            if (limitInt > 200 || limitInt <= 0)
                 limitInt = 200;
-            else if (limitInt < 0)
-                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -232,10 +240,8 @@ public class APIExchange {
 
         int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limitInt > 200)
+            if (limitInt > 200 || limitInt <= 0)
                 limitInt = 200;
-            else if (limitInt < 0)
-                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -322,6 +328,158 @@ public class APIExchange {
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity("\"" + dcSet.getTradeMap().getVolume24(have, want).toPlainString() + "\"")
+                .build();
+    }
+
+
+    @GET
+    @Path("spot/list")
+    // apiexchange/spot/list
+    public Response spotList() {
+
+        cntrl.pairsController.updateList();
+
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(cntrl.pairsController.spotPairsList.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("spot/pairs")
+    // apiexchange/spot/pairs
+    public Response spotPairs() {
+
+        cntrl.pairsController.updateList();
+
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(cntrl.pairsController.spotPairsJson.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("spot/pairs/{pairs}")
+    // apiexchange/spot/pair/BTC_USD
+    public Response spotPair(@PathParam("pairs") String pairs) {
+
+        cntrl.pairsController.updateList();
+
+        JSONArray result = new JSONArray();
+        for (String pair : pairs.split(",")) {
+            result.add(cntrl.pairsController.spotPairsJson.get(pair));
+        }
+
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(result.toJSONString())
+                .build();
+    }
+
+    // TODO кешировать ответ по набору параметров
+    String getSpotOrdersBook; // разные параметры же на входе - поэтому несколько уровней и все - чтобы кешировать ответ
+
+    @GET
+    @Path("spot/ordersbook/{pair}")
+    public Response getSpotOrdersBook(@PathParam("pair") String pair,
+                                      @DefaultValue("50") @QueryParam("depth") Long limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 500 || limit <= 0)
+                limit = 500L;
+        }
+
+        int limitInt = (int) (long) limit;
+
+        cntrl.pairsController.updateList();
+        JSONArray array = (JSONArray) cntrl.pairsController.spotPairsList.get(pair);
+        if (array == null) {
+            return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("Ticker not found")
+                    .build();
+        }
+
+        Long have = (Long) array.get(1);
+        Long want = (Long) array.get(2);
+
+        List<Order> haveOrders = DCSet.getInstance().getOrderMap().getOrders(have, want, limitInt);
+        List<Order> wantOrders = DCSet.getInstance().getOrderMap().getOrders(want, have, limitInt);
+
+        JSONObject result = new JSONObject();
+
+        JSONArray arrayHave = new JSONArray();
+        for (Order order : haveOrders) {
+            JSONArray json = new JSONArray();
+            json.add(order.calcLeftPrice().toPlainString());
+            json.add(order.getAmountHaveLeft().toPlainString());
+            arrayHave.add(json);
+        }
+        result.put("bids", arrayHave);
+
+        JSONArray arrayWant = new JSONArray();
+        for (Order order : wantOrders) {
+            JSONArray json = new JSONArray();
+            // get REVERSE price and AMOUNT
+            json.add(order.calcLeftPriceReverse().toPlainString());
+            json.add(order.getAmountWantLeft().toPlainString());
+            arrayWant.add(json);
+        }
+        result.put("asks", arrayWant);
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(result.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("spot/trades/{pair}")
+    public Response getSpotTrades(@PathParam("pair") String pair,
+                                  @QueryParam("fromOrder") String fromOrder,
+                                  @DefaultValue("100") @QueryParam("limit") Integer limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 200 || limit <= 0)
+                limit = 200;
+        }
+
+        cntrl.pairsController.updateList();
+        JSONArray array = (JSONArray) cntrl.pairsController.spotPairsList.get(pair);
+        if (array == null) {
+            return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("Ticker not found")
+                    .build();
+        }
+
+        Long have = (Long) array.get(1);
+        Long want = (Long) array.get(2);
+
+        long startOrder = 0;
+        Long startLong = Transaction.parseDBRef(fromOrder);
+        if (startLong != null)
+            startOrder = startLong;
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade : dcSet.getTradeMap().getTradesByOrderID(have, want, startOrder, 0, limit)) {
+            JSONObject json = new JSONObject();
+            json.put("initial_order_id", Transaction.viewDBRef(trade.getInitiator()));
+            json.put("target_order_id", Transaction.viewDBRef(trade.getTarget()));
+            json.put("timestamp", trade.getTimestamp());
+
+            boolean reversed = trade.getAmountHave().equals(want);
+
+            json.put("price", reversed ? trade.calcPrice() : trade.calcPriceRevers());
+            json.put("base_volume", reversed ? trade.getAmountHave() : trade.getAmountWant());
+            json.put("quote_volume", reversed ? trade.getAmountWant() : trade.getAmountHave());
+
+            arrayJSON.add(json);
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(arrayJSON.toJSONString())
                 .build();
     }
 

@@ -59,10 +59,12 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JLabel exLinkDescriptionLabel = new JLabel(Lang.T("Parent") + ":");
     protected JTextField exLinkText = new JTextField();
     protected JTextField exLinkDescription = new JTextField();
+    boolean useIcon;
 
-    public IssueItemPanel(String name, String title, String issueMess) {
+    public IssueItemPanel(String name, String title, String issueMess, boolean useIcon) {
         super(name, title);
 
+        this.useIcon = useIcon;
         this.issueMess = issueMess;
         this.confirmMess = "Confirmation Transaction";
 
@@ -75,8 +77,8 @@ public abstract class IssueItemPanel extends IconPanel {
                 WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
                 0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
         addLogoIconLabel.setBorder(null);
-        addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
         addLogoIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -140,14 +142,16 @@ public abstract class IssueItemPanel extends IconPanel {
         fieldGBC.weightx = 0.4;
         fieldGBC.insets = new java.awt.Insets(0, 5, 5, 8);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
-        jPanelLeft.add(addLogoIconLabel, gridBagConstraints);
+        if (useIcon) {
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+            gridBagConstraints.weightx = 0.1;
+            gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
+            jPanelLeft.add(addLogoIconLabel, gridBagConstraints);
+        }
 
         jScrollPane3.setBorder(null);
 

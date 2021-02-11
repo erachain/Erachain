@@ -217,6 +217,24 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         return null;
     }
 
+    public IteratorCloseable<Tuple2<Long, Long>> getPairIterator(long have, long want) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        return ((TradeSuit) this.map).getPairIteratorDesc(have, want);
+    }
+
+    public IteratorCloseable<Tuple2<Long, Long>> getPairIterator(long have, long want, int heightStart, int heightEnd) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        return ((TradeSuit) this.map).getPairHeightIterator(have, want, heightStart, heightEnd);
+    }
+
     /**
      * Get trades by timestamp. From Timestamp to deep.
      *

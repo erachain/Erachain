@@ -102,6 +102,7 @@ public class DCSet extends DBASet implements Closeable {
     public static final int ORDERS_MAP = DBS_MAP_DB;
     public static final int COMPLETED_ORDERS_MAP = DBS_ROCK_DB;
     public static final int TRADES_MAP = DBS_MAP_DB;
+    public static final int PAIRS_MAP = DBS_MAP_DB;
 
     /**
      * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
@@ -158,6 +159,7 @@ public class DCSet extends DBASet implements Closeable {
     private OrderMapImpl orderMap;
     private CompletedOrderMap completedOrderMap;
     private TradeMapImpl tradeMap;
+    private PairMapImpl pairMap;
     private ItemStatusMap itemStatusMap;
     private IssueStatusMap issueStatusMap;
     private ItemImprintMap itemImprintMap;
@@ -238,6 +240,10 @@ public class DCSet extends DBASet implements Closeable {
 
             this.tradeMap = new TradeMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     TRADES_MAP
+                    , this, database);
+
+            this.pairMap = new PairMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
+                    PAIRS_MAP
                     , this, database);
 
             this.addressPersonMap = new AddressPersonMapImpl(defaultDBS != DBS_FAST ? defaultDBS : DBS_MAP_DB, this, database);
@@ -400,6 +406,11 @@ public class DCSet extends DBASet implements Closeable {
                 //DBS_ROCK_DB
                 //DBS_NATIVE_MAP
                 , parent.tradeMap, this);
+        this.pairMap = new PairMapImpl(
+                DBS_MAP_DB
+                //DBS_ROCK_DB
+                //DBS_NATIVE_MAP
+                , parent.pairMap, this);
 
         this.addressPersonMap = new AddressPersonMapImpl(DBS_MAP_DB, parent.addressPersonMap, this);
 
@@ -807,6 +818,7 @@ public class DCSet extends DBASet implements Closeable {
         this.voteOnItemPollMap.clear();
 
         this.tradeMap.clear();
+        this.pairMap.clear();
 
         this.orderMap.clear();
         this.completedOrderMap.clear();
@@ -1328,21 +1340,31 @@ public class DCSet extends DBASet implements Closeable {
      * Хранит сделки на бирже
      * Ключ: ссылка на иницатора + ссылка на цель
      * Значение - Сделка
-     Initiator DBRef (Long) + Target DBRef (Long) -> Trade
+     * Initiator DBRef (Long) + Target DBRef (Long) -> Trade
      */
     public TradeMapImpl getTradeMap() {
         return this.tradeMap;
+    }
+
+    /**
+     * Хранит пары на бирже - для статитки чтобы не пересчитывать
+     * Ключ: пара - первый наименьший ключ
+     * Значение - статистика
+     * AssetKey (Long) + AssetKey (Long) -> Stats
+     */
+    public PairMapImpl getPairMap() {
+        return this.pairMap;
     }
 
     public ItemImprintMap getItemImprintMap() {
         return this.itemImprintMap;
     }
 
-/**
- * see datachain.IssueItemMap
- *
- * @return
- */
+    /**
+     * see datachain.IssueItemMap
+     *
+     * @return
+     */
     public IssueImprintMap getIssueImprintMap() {
         return this.issueImprintMap;
     }
