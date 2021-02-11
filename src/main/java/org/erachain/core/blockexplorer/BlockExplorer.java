@@ -13,6 +13,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.item.assets.TradePair;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
@@ -730,7 +731,7 @@ public class BlockExplorer {
     }
 
     // TODO: что-то тут напутано
-    public Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> calcForAsset(
+    public Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> calcForAsset_old(
             List<Order> orders,
             List<Trade> trades) {
 
@@ -899,62 +900,36 @@ public class BlockExplorer {
         output.put("totalOpenOrdersCount", orders.size());
         output.put("totalTradesCount", trades.size());
 
-        Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all = calcForAsset(orders,
-                trades);
+        //Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all = calcForAsset(orders,
+        //        trades);
 
-        if (all.containsKey(key)) {
-            output.put("totalOrdersVolume", all.get(key).c.toPlainString());
-        } else {
-            output.put("totalOrdersVolume", BigDecimal.ZERO.toPlainString());
-        }
-
-        if (all.containsKey(key)) {
-            output.put("totalTradesVolume", all.get(key).f.toPlainString());
-        } else {
-            output.put("totalTradesVolume", BigDecimal.ZERO.toPlainString());
+        List<TradePair> pairs = new ArrayList();
+        PairMapImpl pairMap = dcSet.getPairMap();
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = pairMap.getIterator(key)) {
+            while (iterator.hasNext()) {
+                TradePair pair = pairMap.get(iterator.next());
+                pairs.add(pair);
+            }
+        } catch (IOException e) {
         }
 
         Map pairsJSON = new LinkedHashMap();
 
-        for (Map.Entry<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> pair : all
-                .entrySet()) {
-            if (pair.getKey() == key) {
-                continue;
-            }
-            AssetCls assetWant = Controller.getInstance().getAsset(pair.getKey());
+        for (TradePair pair : pairs) {
+
+            AssetCls assetWant = Controller.getInstance().getAsset(pair.getAssetKey2());
 
             Map pairJSON = new LinkedHashMap();
-            pairJSON.put("openOrdersCount", pair.getValue().a);
-            pairJSON.put("tradesCount", pair.getValue().b);
-            pairJSON.put("sum", pair.getValue().a + pair.getValue().b);
-            pairJSON.put("ordersPriceVolume", pair.getValue().c.toPlainString());
-            pairJSON.put("ordersAmountVolume", pair.getValue().d.toPlainString());
-            pairJSON.put("tradesPriceVolume", pair.getValue().e.toPlainString());
-            pairJSON.put("tradeAmountVolume", pair.getValue().f.toPlainString());
-            pairJSON.put("asset", pair.getKey());
+            pairJSON.put("tradesCount", pair.getCount24());
+            pairJSON.put("tradesPriceVolume", pair.getBase_volume().toPlainString());
+            pairJSON.put("tradeAmountVolume", pair.getQuote_volume().toPlainString());
+            pairJSON.put("asset", pair.getAssetKey2());
             pairJSON.put("assetName", assetWant.viewName());
-            if (assetWant.getKey() > 0 && assetWant.getKey() < 1000) {
-                pairJSON.put("description", Lang.T(assetWant.viewDescription(), langObj));
-            } else {
-                pairJSON.put("description", assetWant.viewDescription());
-            }
 
-            Trade trade = tradesMap.getLastTrade(key, pair.getKey());
-            //Order initiator
-            if (trade == null) {
-                pairJSON.put("last", "---");
-                pairJSON.put("lastReverse", "---");
-            } else {
-                if (trade.getHaveKey().equals(pair.getKey())) {
-                    pairJSON.put("last", trade.calcPrice().toPlainString());
-                    pairJSON.put("lastReverse", trade.calcPriceRevers().toPlainString());
-                } else {
-                    pairJSON.put("last", trade.calcPriceRevers().toPlainString());
-                    pairJSON.put("lastReverse", trade.calcPrice().toPlainString());
-                }
-            }
+            pairJSON.put("lastPrice", pair.getLastPrice().toPlainString());
+            pairJSON.put("lastTime", pair.getLastTime());
 
-            pairsJSON.put(pair.getKey(), pairJSON);
+            pairsJSON.put(pair.getAssetKey2(), pairJSON);
         }
 
         output.put("pairs", pairsJSON);

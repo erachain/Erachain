@@ -17,8 +17,9 @@ public class TradePair {
     private static final int ASSET_KEY_LENGTH = Transaction.KEY_LENGTH;
     private static final int AMOUNT_LENGTH = Order.AMOUNT_LENGTH;
     private static final int SCALE_LENGTH = 1;
-    private static final int BASE_LENGTH = 2 * (ASSET_KEY_LENGTH + 1) + 8 * (AMOUNT_LENGTH + SCALE_LENGTH)
-            + Long.BYTES + Integer.BYTES;
+    private static final int BASE_LENGTH = 2 * (ASSET_KEY_LENGTH + 1)
+            + 8 * (AMOUNT_LENGTH + SCALE_LENGTH)
+            + 2 * Long.BYTES + Integer.BYTES;
 
     private Long assetKey1;
     private Long assetKey2;
@@ -45,13 +46,15 @@ public class TradePair {
 
     private int count24;
 
+    // last updated on
+    public final long updateTime;
 
     // make trading if two orders is seeked
     public TradePair(Long assetKey1, Long assetKey2, int AssetScale1, int assetScale2, BigDecimal lastPrice, long lastTime,
                      BigDecimal bidPrice, BigDecimal askPrice,
                      BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
                      BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
-                     int count24) {
+                     int count24, long updateTime) {
         this.assetKey1 = assetKey1;
         this.assetKey2 = assetKey2;
         this.assetScale1 = AssetScale1;
@@ -73,16 +76,18 @@ public class TradePair {
 
         this.count24 = count24;
 
+        this.updateTime = updateTime;
+
     }
 
     public TradePair(AssetCls asset1, AssetCls asset2, BigDecimal lastPrice, long lastTime,
                      BigDecimal bidPrice, BigDecimal askPrice,
                      BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
                      BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
-                     int count24) {
+                     int count24, long updateTime) {
         this(asset1.getKey(), asset2.getKey(), asset1.getScale(), asset2.getScale(), lastPrice, lastTime,
                 bidPrice, askPrice, base_volume, quote_volume, price_change_percent_24h,
-                highest_price_24h, lowest_price_24h, count24);
+                highest_price_24h, lowest_price_24h, count24, updateTime);
         this.asset1 = asset1;
         this.asset2 = asset2;
     }
@@ -171,6 +176,8 @@ public class TradePair {
 
         pair.put("frozen", 0);
 
+        pair.put("update_time", updateTime);
+
         return pair;
 
     }
@@ -250,9 +257,13 @@ public class TradePair {
         int count24 = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + Integer.BYTES));
         position += Integer.BYTES;
 
+        //READ UPDATE TIME
+        Long updateTime = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH));
+        position += ASSET_KEY_LENGTH;
+
         return new TradePair(assetKey1, assetKey2, assetScale1, assetScale2, lastPrice, lastTime, bidPrice, askPrice,
                 baseVolume, quoteVolume, price_change_percent_24h,
-                highest_price_24h, lowest_price_24h, count24);
+                highest_price_24h, lowest_price_24h, count24, updateTime);
     }
 
     public byte[] toBytes() {
@@ -306,6 +317,9 @@ public class TradePair {
 
         // count 24
         data = Bytes.concat(data, Ints.toByteArray(this.count24));
+
+        // last time
+        data = Bytes.concat(data, Longs.toByteArray(this.updateTime));
 
         return data;
     }

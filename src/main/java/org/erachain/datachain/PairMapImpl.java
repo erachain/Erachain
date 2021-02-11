@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.item.assets.TradePair;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.mapDB.PairSuitMapDB;
 import org.erachain.dbs.mapDB.PairSuitMapDBFork;
 import org.erachain.dbs.rocksDB.PairSuitRocksDB;
@@ -53,6 +54,11 @@ public class PairMapImpl extends DBTabImpl<Tuple2<Long, Long>, TradePair> implem
             }
         }
     }
+
+    public IteratorCloseable<Tuple2<Long, Long>> getIterator(long have) {
+        return ((PairSuit) map).getIterator(have);
+    }
+
 
     public TradePair get(Long asset1, Long asset2) {
         return this.get(new Tuple2<Long, Long>(asset1, asset2));

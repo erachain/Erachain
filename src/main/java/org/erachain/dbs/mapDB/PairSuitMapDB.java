@@ -5,6 +5,8 @@ import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.datachain.PairSuit;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -34,4 +36,12 @@ public class PairSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, TradePair> impl
         this.map = map;
 
     }
+
+    @Override
+    public IteratorCloseable<Tuple2<Long, Long>> getIterator(long have) {
+        return IteratorCloseableImpl.make(((BTreeMap<Tuple2<Long, Long>, TradePair>) map).subMap(Fun.t2(have, null),
+                Fun.t2(have, Fun.HI())).keySet().iterator());
+
+    }
+
 }
