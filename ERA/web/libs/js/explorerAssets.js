@@ -137,8 +137,10 @@ function asset(data, forPrint) {
         output += getAssetName2(pair.quote_id, pair.quote_name);
 
 
-        output += '<td><a href="?asset=' + pair.base_id + '&asset=' + pair.quote_id  + get_lang() + '"><b>';
-        output += addCommas(pair.last_price.toPrecision(8)) + '<br>' + addCommas((1.0 / pair.last_price).toPrecision(8));
+        output += '<td><a href="?asset=' + pair.base_id + '&asset=' + pair.quote_id  + get_lang() + '"><b>'
+                + addCommas(pair.last_price.toPrecision(8)) + '</a><br>';
+        output += '<a href="?asset=' + pair.quote_id + '&asset=' + pair.base_id  + get_lang() + '"><b>'
+                + addCommas((1.0 / pair.last_price).toPrecision(8));
 
         output += '<td>';
         output += pair.price_change_percent_24h + ' %<br>' + pair.count_24h;
