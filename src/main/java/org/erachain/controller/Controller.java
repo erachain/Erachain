@@ -2161,6 +2161,8 @@ public class Controller extends Observable {
             LOGGER.error(e.getMessage(), e);
         }
 
+        PairsController.foundPairs(dcSet, dlSet);
+
         this.statusInfo();
         return peer;
 

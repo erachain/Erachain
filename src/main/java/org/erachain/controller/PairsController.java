@@ -8,6 +8,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.assets.TradePair;
+import org.erachain.database.DLSet;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
@@ -222,5 +223,39 @@ public class PairsController {
                 highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, priceChangePercent24h,
                 minPrice, maxPrice, count24, Block.getTimestamp(heightStart));
 
+    }
+
+    static int foundDepth = 10 * 24 * 3600000;
+
+    public static void foundPairs(DCSet dcSet, DLSet dlSet) {
+        TradeMapImpl tradesMap = dcSet.getTradeMap();
+        PairMapImpl pairMap = dlSet.getPairMap();
+
+        LOGGER.info("update TRADE PAIRS");
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getDescendingIterator()) {
+            Trade lastTrade = null;
+            while (iterator.hasNext()) {
+                Trade trade = tradesMap.get(iterator.next());
+                if (trade == null)
+                    continue;
+
+                if (lastTrade == null)
+                    lastTrade = trade;
+
+                if (lastTrade.getTimestamp() - trade.getTimestamp() > foundDepth)
+                    break;
+
+                Long key1 = trade.getHaveKey();
+                Long key2 = trade.getWantKey();
+                if (!pairMap.contains(new Fun.Tuple2(key1, key2))) {
+                    AssetCls asset1 = dcSet.getItemAssetMap().get(key1);
+                    AssetCls asset2 = dcSet.getItemAssetMap().get(key2);
+                    pairMap.put(reCalc(asset1, asset2));
+                    pairMap.put(reCalc(asset2, asset1));
+                }
+            }
+        } catch (IOException e) {
+        }
+        LOGGER.info("TRADE PAIRS updated for days:" + foundDepth / 24 / 3600000);
     }
 }
