@@ -12,7 +12,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.TradePair;
-import org.erachain.database.DLSet;
+import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -618,25 +618,27 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         //this.order.process(this);
 
         // изменяемые объекты нужно заново создавать
-        //.copy() // тут надо что-то сделать новым - а то значения впамяти по ссылке меняются
+        //.copy() // тут надо что-то сделать новым - а то значения в памяти по ссылке меняются
         Order order = makeOrder(); //.copy();
         order.process(block, this);
 
-        DLSet dlSet = Controller.getInstance().dlSet;
-        if (!dlSet.getPairMap().contains(new Fun.Tuple2(haveKey, wantKey))) {
-            dlSet.getPairMap().put(new TradePair(haveAsset, wantAsset, order.getPrice(), timestamp,
-                    order.getPrice(), order.getPrice(),
-                    amountHave, amountWant, BigDecimal.ZERO,
-                    order.getPrice(), order.getPrice(),
-                    1, timestamp));
+        if (!dcSet.isFork()) {
+            // статистику по парам
+            PairMapImpl pairMap = Controller.getInstance().dlSet.getPairMap();
+            if (!pairMap.contains(new Fun.Tuple2(haveKey, wantKey))) {
+                pairMap.put(new TradePair(haveAsset, wantAsset, order.getPrice(), timestamp,
+                        order.getPrice(), order.getPrice(),
+                        amountHave, amountWant, BigDecimal.ZERO,
+                        order.getPrice(), order.getPrice(),
+                        1, timestamp));
 
-            BigDecimal reverse = order.calcPriceReverse();
-            dlSet.getPairMap().put(new TradePair(wantAsset, haveAsset, reverse, timestamp,
-                    reverse, reverse,
-                    amountWant, amountHave, BigDecimal.ZERO,
-                    reverse, reverse,
-                    1, timestamp));
-
+                BigDecimal reverse = order.calcPriceReverse();
+                pairMap.put(new TradePair(wantAsset, haveAsset, reverse, timestamp,
+                        reverse, reverse,
+                        amountWant, amountHave, BigDecimal.ZERO,
+                        reverse, reverse,
+                        1, timestamp));
+            }
         }
 
     }
