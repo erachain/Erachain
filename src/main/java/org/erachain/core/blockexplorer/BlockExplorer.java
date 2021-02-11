@@ -891,6 +891,13 @@ public class BlockExplorer {
         }
 
         output.put("Label_Total", Lang.T("Total", langObj));
+        output.put("Label_Last_Price", Lang.T("Last Price", langObj));
+        output.put("Label_Price_Change", Lang.T("Change % 24h", langObj));
+        output.put("Label_Trades_Count", Lang.T("Trades 24h", langObj));
+        output.put("Label_Bit_Ask", Lang.T("Bid / Ask", langObj));
+        output.put("Label_Volume24", Lang.T("Volume 24h", langObj));
+        output.put("Label_Price_Low_High", Lang.T("Price Low / High", langObj));
+
 
         PairMapImpl pairMap = dcSet.getPairMap();
         JSONArray pairsJSON = new JSONArray();

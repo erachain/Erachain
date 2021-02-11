@@ -121,9 +121,11 @@ function asset(data, forPrint) {
     output += '<h3>' + item.Label_Available_pairs + '</h3>';
 
     output += '<table border="0" cellspacing="10" class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
-    output += '<td><b>' + item.Label_Name + '</b></td><td><b>' + item.Label_Last_Price + '</b></td>';
-    output += '<td><b>' + item.Label_Open_Orders_Volume + '</b></td>';
-    output += '<td><b>' + item.Label_Trades_Count + '</b></td><td><b>' + item.Label_Trades_Volume + '</b></td></tr>';
+    output += '<td><b>' + item.Label_Asset + '<td><b>' + data.Label_Last_Price + '</b></td>';
+    output += '<td><b>' + data.Label_Price_Change + '<br>' + data.Label_Trades_Count;
+    output += '<td><b>' + data.Label_Bit_Ask;
+    output += '<td><b>' + data.Label_Volume24;
+    output += '<td><b>' + data.Label_Price_Low_High + '</b></td></tr>';
 
     for (key in data.pairs) {
         var pair = data.pairs[key];
@@ -145,10 +147,7 @@ function asset(data, forPrint) {
         output += addCommas(pair.lowest_ask.toPrecision(8)) + ' / ' + addCommas(pair.highest_bid.toPrecision(8));
         output += '<br>' + addCommas((1.0 / pair.lowest_ask).toPrecision(8)) + ' / ' + addCommas((1.0 / pair.highest_bid).toPrecision(8));
 
-        output += '<td>' + pair.count_24h;
-
-        //output += '<td nowrap>';
-        output += '<td>';
+        output += '<td nowrap>';
         output += addCommas(pair.base_volume.toPrecision(8)) + '<br>' + addCommas(pair.quote_volume.toPrecision(8));
 
         output += '<td>';
