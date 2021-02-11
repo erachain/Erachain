@@ -144,7 +144,7 @@ function asset(data, forPrint) {
         output += pair.price_change_percent_24h + ' %<br>' + pair.count_24h;
 
         output += '<td>';
-        output += addCommas(pair.lowest_ask.toPrecision(8)) + ' / ' + addCommas(pair.highest_bid.toPrecision(8));
+        output += addCommas(pair.highest_bid.toPrecision(8)) + ' / ' + addCommas(pair.lowest_ask.toPrecision(8));
         output += '<br>' + addCommas((1.0 / pair.lowest_ask).toPrecision(8)) + ' / ' + addCommas((1.0 / pair.highest_bid).toPrecision(8));
 
         output += '<td nowrap>';

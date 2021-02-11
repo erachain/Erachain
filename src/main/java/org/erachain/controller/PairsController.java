@@ -202,11 +202,12 @@ public class PairsController {
         }
 
         OrderMapImpl ordersMap = DCSet.getInstance().getOrderMap();
-        Order askLastOrder = ordersMap.getHaveWanFirst(key1, key2);
-        BigDecimal askPrice = askLastOrder == null ? null : askLastOrder.calcLeftPrice();
 
-        Order bidLastOrder = ordersMap.getHaveWanFirst(key2, key1);
-        BigDecimal bidPrice = bidLastOrder == null ? null : bidLastOrder.calcLeftPriceReverse();
+        Order bidLastOrder = ordersMap.getHaveWanFirst(key1, key2);
+        BigDecimal bidPrice = bidLastOrder == null ? BigDecimal.ZERO : bidLastOrder.calcLeftPriceReverse();
+
+        Order askLastOrder = ordersMap.getHaveWanFirst(key2, key1);
+        BigDecimal askPrice = askLastOrder == null ? BigDecimal.ZERO : askLastOrder.calcLeftPrice();
 
         return new TradePair(asset1, asset2, lastPrice, lastTime,
                 bidPrice, askPrice, baseVolume, quoteVolume, priceChangePercent24h,
