@@ -3,6 +3,7 @@ package org.erachain.controller;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import org.erachain.core.BlockChain;
+import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
@@ -132,7 +133,7 @@ public class PairsController {
      * @param asset1
      * @param asset2
      */
-    public TradePair reCalc(AssetCls asset1, AssetCls asset2) {
+    public static TradePair reCalc(AssetCls asset1, AssetCls asset2) {
         TradeMapImpl tradesMap = DCSet.getInstance().getTradeMap();
         Long key1 = asset1.getKey();
         Long key2 = asset2.getKey();
@@ -207,7 +208,7 @@ public class PairsController {
 
         return new TradePair(asset1, asset2, lastPrice, lastTime,
                 bidPrice, askPrice, baseVolume, quoteVolume, priceChangePercent24h,
-                maxPrice, minPrice, count24, System.currentTimeMillis());
+                maxPrice, minPrice, count24, Block.getTimestamp(heightStart));
 
     }
 }

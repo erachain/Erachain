@@ -3,6 +3,7 @@ package org.erachain.core.blockexplorer;
 import org.apache.commons.net.util.Base64;
 import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
+import org.erachain.controller.PairsController;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
@@ -891,32 +892,17 @@ public class BlockExplorer {
 
         output.put("Label_Total", Lang.T("Total", langObj));
 
-        List<Order> orders = dcSet.getOrderMap().getOrders(key);
-
-        TradeMapImpl tradesMap = dcSet.getTradeMap();
-        List<Trade> trades = tradesMap.getTrades(key);
-
-        output.put("operations", orders.size() + trades.size());
-        output.put("totalOpenOrdersCount", orders.size());
-        output.put("totalTradesCount", trades.size());
-
-        //Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all = calcForAsset(orders,
-        //        trades);
-
-        List<TradePair> pairs = new ArrayList();
         PairMapImpl pairMap = dcSet.getPairMap();
+        JSONArray pairsJSON = new JSONArray();
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = pairMap.getIterator(key)) {
             while (iterator.hasNext()) {
                 TradePair pair = pairMap.get(iterator.next());
                 pair.setDC(dcSet);
-                pairs.add(pair);
+                pair = PairsController.reCalc(pair.getAsset1(), pair.getAsset2());
+                pairMap.put(pair);
+                pairsJSON.add(pair.toJson());
             }
         } catch (IOException e) {
-        }
-
-        JSONArray pairsJSON = new JSONArray();
-        for (TradePair pair : pairs) {
-            pairsJSON.add(pair.toJson());
         }
 
         output.put("pairs", pairsJSON);

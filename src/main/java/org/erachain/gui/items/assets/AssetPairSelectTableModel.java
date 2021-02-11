@@ -3,6 +3,7 @@ package org.erachain.gui.items.assets;
 // 30/03
 
 import org.erachain.controller.Controller;
+import org.erachain.controller.PairsController;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.TradePair;
@@ -57,7 +58,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
                 if (asset == null) {
                     continue;
                 }
-                list.add(new Fun.Tuple2<AssetCls, TradePair>(asset, Controller.getInstance().pairsController.reCalc(asset, assetPair)));
+                list.add(new Fun.Tuple2<AssetCls, TradePair>(asset, PairsController.reCalc(asset, assetPair)));
             }
         } catch (IOException e) {
         }
@@ -119,7 +120,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
         AssetCls asset = Controller.getInstance().getAsset(key_filter);
         if (asset == null || asset.getKey() == this.key)
             return;
-        list.add(new Fun.Tuple2<>(asset, Controller.getInstance().pairsController.reCalc(asset, assetPair)));
+        list.add(new Fun.Tuple2<>(asset, PairsController.reCalc(asset, assetPair)));
         this.fireTableDataChanged();
     }
 
@@ -128,7 +129,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
         list = new ArrayList<>();
         List<ItemCls> foundAssets = ((ItemMap) map).getByFilterAsArray(filter_Name, 0, 1000);
         for (ItemCls asset : foundAssets) {
-            list.add(new Fun.Tuple2<>((AssetCls) asset, Controller.getInstance().pairsController.reCalc((AssetCls) asset, assetPair)));
+            list.add(new Fun.Tuple2<>((AssetCls) asset, PairsController.reCalc((AssetCls) asset, assetPair)));
         }
 
         this.fireTableDataChanged();

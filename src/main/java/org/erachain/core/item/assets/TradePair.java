@@ -60,19 +60,19 @@ public class TradePair {
         this.assetScale1 = AssetScale1;
         this.assetScale2 = assetScale2;
 
-        this.lastPrice = lastPrice;
+        this.lastPrice = lastPrice == null ? BigDecimal.ZERO : lastPrice;
         this.lastTime = lastTime;
 
-        this.bidPrice = bidPrice;
-        this.askPrice = askPrice;
+        this.bidPrice = bidPrice == null ? BigDecimal.ZERO : bidPrice;
+        this.askPrice = askPrice == null ? BigDecimal.ZERO : askPrice;
 
-        this.base_volume = base_volume;
-        this.quote_volume = quote_volume;
+        this.base_volume = base_volume == null ? BigDecimal.ZERO : base_volume;
+        this.quote_volume = quote_volume == null ? BigDecimal.ZERO : quote_volume;
 
-        this.price_change_percent_24h = price_change_percent_24h;
+        this.price_change_percent_24h = price_change_percent_24h == null ? BigDecimal.ZERO : price_change_percent_24h;
 
-        this.highest_price_24h = highest_price_24h;
-        this.lowest_price_24h = lowest_price_24h;
+        this.highest_price_24h = highest_price_24h == null ? BigDecimal.ZERO : highest_price_24h;
+        this.lowest_price_24h = lowest_price_24h == null ? BigDecimal.ZERO : lowest_price_24h;
 
         this.count24 = count24;
 
@@ -107,6 +107,14 @@ public class TradePair {
 
     public Long getAssetKey2() {
         return this.assetKey2;
+    }
+
+    public AssetCls getAsset1() {
+        return this.asset1;
+    }
+
+    public AssetCls getAsset2() {
+        return this.asset2;
     }
 
     public static TradePair get(DCSet db, Long assetKey1, Long assetKey2) {
@@ -159,25 +167,27 @@ public class TradePair {
         JSONObject pair = new JSONObject();
         pair.put("id", viewID());
         pair.put("base_id", assetKey1);
+        if (asset1 != null) {
+            pair.put("base_name", asset1.viewName());
+        }
         pair.put("quote_id", assetKey2);
+        if (asset2 != null) {
+            pair.put("quote_name", asset2.viewName());
+        }
 
-        pair.put("last_price", lastTime);
+        pair.put("last_price", lastPrice.toPlainString());
+        pair.put("last_time", lastTime);
+        pair.put("price_change_percent_24h", price_change_percent_24h.toPlainString());
 
-        pair.put("base_ticker", asset1.getName());
-        pair.put("quote_ticker", asset2.getName());
+        pair.put("lowest_ask", askPrice.toPlainString());
+        pair.put("highest_bid", bidPrice.toPlainString());
 
-        pair.put("last_price", lastPrice);
-
-        pair.put("lowest_ask", askPrice);
-        pair.put("highest_bid", bidPrice);
-
-        pair.put("base_volume", base_volume);
-        pair.put("quote_volume", quote_volume);
+        pair.put("base_volume", base_volume.toPlainString());
+        pair.put("quote_volume", quote_volume.toPlainString());
         pair.put("count_24h", count24);
 
-        pair.put("price_change_percent_24h", price_change_percent_24h);
-        pair.put("highest_price_24h", highest_price_24h);
-        pair.put("lowest_price_24h", lowest_price_24h);
+        pair.put("highest_price_24h", highest_price_24h.toPlainString());
+        pair.put("lowest_price_24h", lowest_price_24h.toPlainString());
 
         pair.put("frozen", 0);
 
