@@ -2242,6 +2242,7 @@ public class BlockExplorer {
             list.add(new Pair<Long, Long>(1L, 2L));
         } else {
             // BTC
+
             list.add(new Pair<Long, Long>(12L, 95L));
             list.add(new Pair<Long, Long>(12L, 92L));
             // ERA
@@ -2271,34 +2272,34 @@ public class BlockExplorer {
 
         JSONArray pairsArray = new JSONArray();
 
-        for (Pair<Long, Long> pair : list) {
+        for (Tuple2<Long, Long> pair : Controller.getInstance().pairsController.commonPairsList) {
 
-            AssetCls assetHave = Controller.getInstance().getAsset(pair.getA());
+            AssetCls assetHave = Controller.getInstance().getAsset(pair.a);
             if (assetHave == null)
                 continue;
-            AssetCls assetWant = Controller.getInstance().getAsset(pair.getB());
+            AssetCls assetWant = Controller.getInstance().getAsset(pair.b);
             if (assetWant == null)
                 continue;
 
             Map pairJSON = new HashMap(100, 1);
             pairJSON.put("have", assetHave.jsonForExplorerPage(langObj));
             pairJSON.put("want", assetWant.jsonForExplorerPage(langObj));
-            pairJSON.put("orders", orders.getCount(pair.getA(), pair.getB())
-                    + orders.getCount(pair.getB(), pair.getA()));
+            pairJSON.put("orders", orders.getCount(pair.a, pair.b)
+                    + orders.getCount(pair.b, pair.a));
 
-            Trade trade = trades.getLastTrade(pair.getA(), pair.getB());
+            Trade trade = trades.getLastTrade(pair.a, pair.b);
             //Order initiator
             if (trade == null) {
                 pairJSON.put("last", "--");
             } else {
-                if (trade.getHaveKey().equals(pair.getB())) {
+                if (trade.getHaveKey().equals(pair.b)) {
                     pairJSON.put("last", trade.calcPrice().toPlainString());
                 } else {
                     pairJSON.put("last", trade.calcPriceRevers().toPlainString());
                 }
             }
 
-            pairJSON.put("volume24", trades.getVolume24(pair.getA(), pair.getB()).toPlainString());
+            pairJSON.put("volume24", trades.getVolume24(pair.a, pair.b).toPlainString());
 
             pairsArray.add(pairJSON);
         }

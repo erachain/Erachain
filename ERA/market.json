@@ -1,12 +1,71 @@
 {
-  "spot": {
-    // ERA / USD
-    "1/95": true,
-    "2/95": true,
-    // BTC / USD
-    "12/95": true,
-    // GOLD / USD
-    "21/95": true,
-    "1/2": true
-  }
+  "spot": [
+    // USD market
+    // BTC
+    [
+      12,
+      95,
+      true
+    ],
+    // ERA
+    [
+      1,
+      95,
+      true
+    ],
+    // COMPU
+    [
+      2,
+      95,
+      true
+    ],
+    // GOLD
+    [
+      21,
+      95,
+      true
+    ],
+    // RUB market
+    [
+      12,
+      92,
+      true
+    ],
+    [
+      1,
+      92,
+      true
+    ],
+    [
+      2,
+      92,
+      true
+    ],
+    [
+      21,
+      92,
+      true
+    ],
+    [
+      95,
+      92,
+      true
+    ],
+    [
+      1001,
+      92,
+      true
+    ],
+    // COMPU market
+    [
+      1,
+      2,
+      true
+    ],
+    [
+      12,
+      2,
+      true
+    ]
+  ]
 }
