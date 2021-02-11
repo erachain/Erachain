@@ -14,10 +14,12 @@ import java.nio.file.Files;
 public class DLSet extends DBASet {
 
     private PeerMap peerMap;
+    private PairMapImpl pairMap;
 
     public DLSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
         super(dbFile, database, withObserver, dynamicGUI);
         this.peerMap = new PeerMap(this, this.database);
+        this.pairMap = new PairMapImpl(DBS_FAST, this, database);
     }
 
     static DB makeDB(File dbFile) {
@@ -74,6 +76,16 @@ public class DLSet extends DBASet {
 
     public PeerMap getPeerMap() {
         return this.peerMap;
+    }
+
+    /**
+     * Хранит пары на бирже - для статитки чтобы не пересчитывать
+     * Ключ: пара - первый наименьший ключ
+     * Значение - статистика
+     * AssetKey (Long) + AssetKey (Long) -> Stats
+     */
+    public PairMapImpl getPairMap() {
+        return this.pairMap;
     }
 
     @Override

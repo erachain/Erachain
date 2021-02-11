@@ -8,7 +8,11 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.assets.TradePair;
-import org.erachain.datachain.*;
+import org.erachain.database.PairMapImpl;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetMap;
+import org.erachain.datachain.OrderMapImpl;
+import org.erachain.datachain.TradeMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.settings.Settings;
 import org.json.simple.JSONArray;
@@ -101,7 +105,7 @@ public class PairsController {
         commonPairsList = new ArrayList<>();
 
         ItemAssetMap mapAssets = DCSet.getInstance().getItemAssetMap();
-        PairMapImpl mapPairs = DCSet.getInstance().getPairMap();
+        PairMapImpl mapPairs = Controller.getInstance().dlSet.getPairMap();
         JSONArray spotJson = (JSONArray) spotPairsJson.get("spot");
         for (Object item : spotJson) {
             JSONArray array = (JSONArray) item;

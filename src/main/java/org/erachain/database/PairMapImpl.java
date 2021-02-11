@@ -1,4 +1,4 @@
-package org.erachain.datachain;
+package org.erachain.database;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.item.assets.TradePair;
@@ -21,7 +21,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
 @Slf4j
 public class PairMapImpl extends DBTabImpl<Tuple2<Long, Long>, TradePair> implements PairMap {
 
-    public PairMapImpl(int dbs, DCSet databaseSet, DB database) {
+    public PairMapImpl(int dbs, DLSet databaseSet, DB database) {
         super(dbs, databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
@@ -32,7 +32,7 @@ public class PairMapImpl extends DBTabImpl<Tuple2<Long, Long>, TradePair> implem
         }
     }
 
-    public PairMapImpl(int dbs, PairMap parent, DCSet dcSet) {
+    public PairMapImpl(int dbs, PairMap parent, DLSet dcSet) {
         super(dbs, parent, dcSet);
     }
 

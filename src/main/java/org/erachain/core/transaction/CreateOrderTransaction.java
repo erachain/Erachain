@@ -2,6 +2,7 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -11,6 +12,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.TradePair;
+import org.erachain.database.DLSet;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -620,15 +622,16 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         Order order = makeOrder(); //.copy();
         order.process(block, this);
 
-        if (!dcSet.getPairMap().contains(new Fun.Tuple2(haveKey, wantKey))) {
-            dcSet.getPairMap().put(new TradePair(haveAsset, wantAsset, order.getPrice(), timestamp,
+        DLSet dlSet = Controller.getInstance().dlSet;
+        if (!dlSet.getPairMap().contains(new Fun.Tuple2(haveKey, wantKey))) {
+            dlSet.getPairMap().put(new TradePair(haveAsset, wantAsset, order.getPrice(), timestamp,
                     order.getPrice(), order.getPrice(),
                     amountHave, amountWant, BigDecimal.ZERO,
                     order.getPrice(), order.getPrice(),
                     1, timestamp));
 
             BigDecimal reverse = order.calcPriceReverse();
-            dcSet.getPairMap().put(new TradePair(wantAsset, haveAsset, reverse, timestamp,
+            dlSet.getPairMap().put(new TradePair(wantAsset, haveAsset, reverse, timestamp,
                     reverse, reverse,
                     amountWant, amountHave, BigDecimal.ZERO,
                     reverse, reverse,

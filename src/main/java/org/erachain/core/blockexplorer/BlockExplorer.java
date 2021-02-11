@@ -22,6 +22,7 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.database.FilteredByStringArray;
+import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.*;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
@@ -760,7 +761,7 @@ public class BlockExplorer {
         output.put("Label_Price_Low_High", Lang.T("Price Low / High", langObj));
 
 
-        PairMapImpl pairMap = dcSet.getPairMap();
+        PairMapImpl pairMap = Controller.getInstance().dlSet.getPairMap();
         JSONArray pairsJSON = new JSONArray();
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = pairMap.getIterator(key)) {
             while (iterator.hasNext()) {

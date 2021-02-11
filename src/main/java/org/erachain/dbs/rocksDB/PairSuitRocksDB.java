@@ -4,7 +4,7 @@ import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.DBASet;
-import org.erachain.datachain.PairSuit;
+import org.erachain.database.PairSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
