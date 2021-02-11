@@ -191,8 +191,10 @@ public class PairsController {
                 trade = tradesMap.getLastTrade(key1, key2);
                 if (trade != null) {
                     reversed = trade.getHaveKey().equals(key2);
-                    lastPrice = reversed ? trade.calcPrice() : trade.calcPriceRevers();
+                    lastPrice = maxPrice = minPrice = reversed ? trade.calcPrice() : trade.calcPriceRevers();
                     priceChangePercent24h = BigDecimal.ZERO;
+                } else {
+                    lastPrice = maxPrice = minPrice = BigDecimal.ZERO;
                 }
             }
 

@@ -175,19 +175,19 @@ public class TradePair {
             pair.put("quote_name", asset2.viewName());
         }
 
-        pair.put("last_price", lastPrice.toPlainString());
+        pair.put("last_price", lastPrice);
         pair.put("last_time", lastTime);
-        pair.put("price_change_percent_24h", price_change_percent_24h.toPlainString());
+        pair.put("price_change_percent_24h", price_change_percent_24h);
 
-        pair.put("lowest_ask", askPrice.toPlainString());
-        pair.put("highest_bid", bidPrice.toPlainString());
+        pair.put("lowest_ask", askPrice);
+        pair.put("highest_bid", bidPrice);
 
-        pair.put("base_volume", base_volume.toPlainString());
-        pair.put("quote_volume", quote_volume.toPlainString());
+        pair.put("base_volume", base_volume);
+        pair.put("quote_volume", quote_volume);
         pair.put("count_24h", count24);
 
-        pair.put("highest_price_24h", highest_price_24h.toPlainString());
-        pair.put("lowest_price_24h", lowest_price_24h.toPlainString());
+        pair.put("highest_price_24h", highest_price_24h);
+        pair.put("lowest_price_24h", lowest_price_24h);
 
         pair.put("frozen", 0);
 
