@@ -148,7 +148,7 @@ function asset(data, forPrint) {
         output += '<br>' + addCommas((1.0 / pair.lowest_ask).toPrecision(8)) + ' / ' + addCommas((1.0 / pair.highest_bid).toPrecision(8));
 
         output += '<td nowrap>';
-        output += addCommas(pair.base_volume.toPrecision(8)) + '<br>' + addCommas(pair.quote_volume.toPrecision(8));
+        output += addCommas(pair.quote_volume.toPrecision(8)) + '<br>' + addCommas(pair.base_volume.toPrecision(8));
 
         output += '<td>';
         output += addCommas(pair.lowest_price_24h.toPrecision(8)) + ' / ' + addCommas(pair.highest_price_24h.toPrecision(8));
