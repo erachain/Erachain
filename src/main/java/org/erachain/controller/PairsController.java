@@ -80,8 +80,8 @@ public class PairsController {
         } else {
             JSONArray spot = new JSONArray();
             JSONArray array = new JSONArray();
-            array.add(1);
-            array.add(2);
+            array.add(1L);
+            array.add(2L);
             array.add(Boolean.TRUE);
 
             spot.add(array);
