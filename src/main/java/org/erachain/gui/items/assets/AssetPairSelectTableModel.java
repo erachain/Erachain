@@ -40,7 +40,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
     private String filter_Name;
 
     public AssetPairSelectTableModel(long key) {
-        super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Last Price", "Change %", "Base Volume 24h",
+        super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Last Price", "Change % 24h", "Base Volume 24h",
                         "Quote Volume 24h", "Trades 24h"},
                 new Boolean[]{false, true, false, false, false, false, false}, false);
 
