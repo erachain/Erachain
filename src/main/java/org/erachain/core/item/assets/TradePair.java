@@ -41,8 +41,8 @@ public class TradePair {
 
     private BigDecimal price_change_percent_24h; //
 
-    private BigDecimal highest_price_24h; // base_volume - объем в токене базовом
     private BigDecimal lowest_price_24h; // quote_volume - объем в ценовом токене
+    private BigDecimal highest_price_24h; // base_volume - объем в токене базовом
 
     private int count24;
 
@@ -53,7 +53,7 @@ public class TradePair {
     public TradePair(Long assetKey1, Long assetKey2, int AssetScale1, int assetScale2, BigDecimal lastPrice, long lastTime,
                      BigDecimal highest_bidPrice, BigDecimal lower_askPrice,
                      BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
-                     BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
+                     BigDecimal lowest_price_24h, BigDecimal highest_price_24h,
                      int count24, long updateTime) {
         this.assetKey1 = assetKey1;
         this.assetKey2 = assetKey2;
@@ -71,8 +71,8 @@ public class TradePair {
 
         this.price_change_percent_24h = price_change_percent_24h == null ? BigDecimal.ZERO : price_change_percent_24h;
 
-        this.highest_price_24h = highest_price_24h == null ? BigDecimal.ZERO : highest_price_24h;
         this.lowest_price_24h = lowest_price_24h == null ? BigDecimal.ZERO : lowest_price_24h;
+        this.highest_price_24h = highest_price_24h == null ? BigDecimal.ZERO : highest_price_24h;
 
         this.count24 = count24;
 
@@ -83,11 +83,11 @@ public class TradePair {
     public TradePair(AssetCls asset1, AssetCls asset2, BigDecimal lastPrice, long lastTime,
                      BigDecimal highest_bidPrice, BigDecimal lower_askPrice,
                      BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
-                     BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
+                     BigDecimal lowest_price_24h, BigDecimal highest_price_24h,
                      int count24, long updateTime) {
         this(asset1.getKey(), asset2.getKey(), asset1.getScale(), asset2.getScale(), lastPrice, lastTime,
                 highest_bidPrice, lower_askPrice, base_volume, quote_volume, price_change_percent_24h,
-                highest_price_24h, lowest_price_24h, count24, updateTime);
+                lowest_price_24h, highest_price_24h, count24, updateTime);
         this.asset1 = asset1;
         this.asset2 = asset2;
     }
@@ -186,8 +186,8 @@ public class TradePair {
         pair.put("quote_volume", quote_volume);
         pair.put("count_24h", count24);
 
-        pair.put("highest_price_24h", highest_price_24h);
         pair.put("lowest_price_24h", lowest_price_24h);
+        pair.put("highest_price_24h", highest_price_24h);
 
         pair.put("frozen", 0);
 
@@ -258,14 +258,14 @@ public class TradePair {
         BigDecimal price_change_percent_24h = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH)), scale);
         position += AMOUNT_LENGTH;
 
-        //READ highest_price_24h
-        scale = data[position++];
-        BigDecimal highest_price_24h = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH)), scale);
-        position += AMOUNT_LENGTH;
-
         //READ lowest_price_24h
         scale = data[position++];
         BigDecimal lowest_price_24h = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH)), scale);
+        position += AMOUNT_LENGTH;
+
+        //READ highest_price_24h
+        scale = data[position++];
+        BigDecimal highest_price_24h = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH)), scale);
         position += AMOUNT_LENGTH;
 
         //READ COUNT 24
@@ -278,7 +278,7 @@ public class TradePair {
 
         return new TradePair(assetKey1, assetKey2, assetScale1, assetScale2, lastPrice, lastTime, bidPrice, askPrice,
                 baseVolume, quoteVolume, price_change_percent_24h,
-                highest_price_24h, lowest_price_24h, count24, updateTime);
+                lowest_price_24h, highest_price_24h, count24, updateTime);
     }
 
     public byte[] toBytes() {
@@ -322,13 +322,13 @@ public class TradePair {
         data = Bytes.concat(data, new byte[]{(byte) this.price_change_percent_24h.scale()});
         data = Bytes.concat(data, Longs.toByteArray(price_change_percent_24h.unscaledValue().longValue()));
 
-        // highest_price_24h
-        data = Bytes.concat(data, new byte[]{(byte) this.highest_price_24h.scale()});
-        data = Bytes.concat(data, Longs.toByteArray(highest_price_24h.unscaledValue().longValue()));
-
         // lowest_price_24h
         data = Bytes.concat(data, new byte[]{(byte) this.lowest_price_24h.scale()});
         data = Bytes.concat(data, Longs.toByteArray(lowest_price_24h.unscaledValue().longValue()));
+
+        // highest_price_24h
+        data = Bytes.concat(data, new byte[]{(byte) this.highest_price_24h.scale()});
+        data = Bytes.concat(data, Longs.toByteArray(highest_price_24h.unscaledValue().longValue()));
 
         // count 24
         data = Bytes.concat(data, Ints.toByteArray(this.count24));
@@ -357,15 +357,6 @@ public class TradePair {
         }
 
         return false;
-    }
-
-    //PROCESS/ORPHAN
-
-    public void process(DCSet db) {
-        TradePair tradePair = db.getPairMap().get(this);
-    }
-
-    public void orphan(DCSet db) {
     }
 
     @Override

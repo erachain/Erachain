@@ -211,7 +211,7 @@ public class PairsController {
 
         return new TradePair(asset1, asset2, lastPrice, lastTime,
                 highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, priceChangePercent24h,
-                maxPrice, minPrice, count24, Block.getTimestamp(heightStart));
+                minPrice, maxPrice, count24, Block.getTimestamp(heightStart));
 
     }
 }
