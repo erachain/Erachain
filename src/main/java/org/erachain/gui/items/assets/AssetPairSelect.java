@@ -230,7 +230,7 @@ public class AssetPairSelect extends JDialog {
 
                     try {
                         row = pair_Panel.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                        AssetCls asset = (AssetCls)assetPairSelectTableModel.getItem(row);
+                        AssetCls asset = assetPairSelectTableModel.getItem(row).a;
 
                         if (asset == null)
                             return;
@@ -253,39 +253,16 @@ public class AssetPairSelect extends JDialog {
         // column #1
         TableColumn column1 = pair_Panel.jTableJScrollPanelLeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
         column1.setMinWidth(1);
-        column1.setMaxWidth(1000);
-        column1.setPreferredWidth(50);
+        column1.setMaxWidth(200);
+        column1.setPreferredWidth(100);
         // column #1
         TableColumn column2 = pair_Panel.jTableJScrollPanelLeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_NAME);//.COLUMN_CONFIRMED);
-        column2.setMinWidth(50);
-        column2.setMaxWidth(1000);
-        column2.setPreferredWidth(200);
-        // column #1
-        TableColumn column3 = pair_Panel.jTableJScrollPanelLeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_ORDERS_COUNT);//.COLUMN_CONFIRMED);
-        column3.setMinWidth(50);
-        column3.setMaxWidth(1000);
-        column3.setPreferredWidth(50);
-        // column #1
-        TableColumn column4 = pair_Panel.jTableJScrollPanelLeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_ORDERS_VOLUME);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
-        column4.setMinWidth(50);
-        column4.setMaxWidth(1000);
-        column4.setPreferredWidth(200);
+        column2.setMinWidth(150);
+        column2.setMaxWidth(500);
+        column2.setPreferredWidth(300);
 
-        TableColumn column5 = pair_Panel.jTableJScrollPanelLeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_TRADES_COUNT);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
-        column5.setMinWidth(50);
-        column5.setMaxWidth(1000);
-        column5.setPreferredWidth(50);
-
-        TableColumn column6 = pair_Panel.jTableJScrollPanelLeftPanel.getColumnModel().getColumn(AssetPairSelectTableModel.COLUMN_TRADES_VOLUME);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
-        column6.setMinWidth(50);
-        column6.setMaxWidth(1000);
-        column6.setPreferredWidth(200);
-
-
-        // изменение высоты строки при изменении ширины
-
+        // изменение высоты строки при изменении ширины - в заголовках можно HTML с переносом сделать
         //		pair_Panel.setRowHeightFormat(true);
-
 
         pair_Panel.jTableJScrollPanelLeftPanel.getTableHeader().setPreferredSize(new Dimension(10, (int) (pair_Panel.jTableJScrollPanelLeftPanel.getTableHeader().getPreferredSize().getHeight() + 6)));
 
@@ -357,7 +334,7 @@ public class AssetPairSelect extends JDialog {
     private void selectAsset() {
         if (pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
             AssetPairSelectTableModel tableModelAssets1 = (AssetPairSelectTableModel) pair_Panel.jTableJScrollPanelLeftPanel.getModel();//new WalletItemAssetsTableModel();//(WalletItemAssetsTableModel) my_Assets_SplitPanel.jTableJScrollPanelLeftPanel.getModel();
-            pairAsset = (AssetCls) tableModelAssets1.getItem(pair_Panel.jTableJScrollPanelLeftPanel.convertRowIndexToModel(pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow()));
+            pairAsset = (AssetCls) tableModelAssets1.getItem(pair_Panel.jTableJScrollPanelLeftPanel.convertRowIndexToModel(pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow())).a;
             dispose();
         }
 

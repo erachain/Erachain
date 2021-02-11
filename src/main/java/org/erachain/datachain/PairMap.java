@@ -1,15 +1,15 @@
 package org.erachain.datachain;
 
-import org.erachain.core.item.assets.Pair;
+import org.erachain.core.item.assets.TradePair;
 import org.erachain.dbs.DBTab;
 import org.mapdb.Fun;
 
-public interface PairMap extends DBTab<Fun.Tuple2<Long, Long>, Pair> {
-    Pair get(Long key1, Long key2);
+public interface PairMap extends DBTab<Fun.Tuple2<Long, Long>, TradePair> {
+    TradePair get(Long key1, Long key2);
 
-    Pair get(Pair pair);
+    TradePair get(TradePair tradePair);
 
-    void put(Pair pair);
+    void put(TradePair tradePair);
 
-    void delete(Pair pair);
+    void delete(TradePair tradePair);
 }

@@ -3,6 +3,7 @@ package org.erachain.core.blockexplorer;
 import org.apache.commons.net.util.Base64;
 import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
+import org.erachain.controller.PairsController;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
@@ -13,6 +14,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.item.assets.TradePair;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
@@ -34,7 +36,10 @@ import org.erachain.utils.ReverseComparator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
-import org.mapdb.Fun.*;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -729,149 +734,7 @@ public class BlockExplorer {
 
     }
 
-    // TODO: что-то тут напутано
-    public Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> calcForAsset(
-            List<Order> orders,
-            List<Trade> trades) {
-
-        Map<Long, Integer> pairsOpenOrders = new HashMap<Long, Integer>();
-        Map<Long, BigDecimal> volumePriceOrders = new HashMap<Long, BigDecimal>();
-        Map<Long, BigDecimal> volumeAmountOrders = new HashMap<Long, BigDecimal>();
-
-        int count;
-        BigDecimal volumePrice = BigDecimal.ZERO;
-        BigDecimal volumeAmount = BigDecimal.ZERO;
-
-        if (orders != null) {
-            for (Order order : orders) {
-                if (!pairsOpenOrders.containsKey(order.getWantAssetKey())) {
-                    count = 0;
-                } else {
-                    count = pairsOpenOrders.get(order.getWantAssetKey());
-                }
-
-                if (!volumeAmountOrders.containsKey(order.getWantAssetKey())) {
-                    volumeAmount = BigDecimal.ZERO;
-                } else {
-                    volumeAmount = volumeAmountOrders.get(order.getWantAssetKey());
-                }
-
-                if (!volumePriceOrders.containsKey(order.getWantAssetKey())) {
-                    volumePrice = BigDecimal.ZERO;
-                } else {
-                    volumePrice = volumePriceOrders.get(order.getWantAssetKey());
-                }
-
-                count++;
-                pairsOpenOrders.put(order.getWantAssetKey(), count);
-
-                volumeAmount = volumeAmount.add(order.getAmountHaveLeft());
-
-                volumeAmountOrders.put(order.getWantAssetKey(), volumeAmount);
-
-                volumePriceOrders.put(order.getWantAssetKey(), volumePrice);
-
-                if (!pairsOpenOrders.containsKey(order.getHaveAssetKey())) {
-                    count = 0;
-                } else {
-                    count = pairsOpenOrders.get(order.getHaveAssetKey());
-                }
-
-                if (!volumePriceOrders.containsKey(order.getHaveAssetKey())) {
-                    volumePrice = BigDecimal.ZERO;
-                } else {
-                    volumePrice = volumePriceOrders.get(order.getHaveAssetKey());
-                }
-
-                if (!volumeAmountOrders.containsKey(order.getHaveAssetKey())) {
-                    volumeAmount = BigDecimal.ZERO;
-                } else {
-                    volumeAmount = volumeAmountOrders.get(order.getHaveAssetKey());
-                }
-
-                count++;
-                pairsOpenOrders.put(order.getHaveAssetKey(), count);
-
-                volumePrice = volumePrice.add(order.getAmountHaveLeft());
-
-                volumePriceOrders.put(order.getHaveAssetKey(), volumePrice);
-
-                volumeAmountOrders.put(order.getHaveAssetKey(), volumeAmount);
-            }
-        }
-
-        Map<Long, Integer> pairsTrades = new TreeMap<Long, Integer>();
-        Map<Long, BigDecimal> volumePriceTrades = new TreeMap<Long, BigDecimal>();
-        Map<Long, BigDecimal> volumeAmountTrades = new TreeMap<Long, BigDecimal>();
-
-        if (trades != null) {
-            for (Trade trade : trades) {
-
-                Order initiator = Order.getOrder(dcSet, trade.getInitiator());
-                if (!pairsTrades.containsKey(initiator.getWantAssetKey())) { //.c.a)) {
-                    count = 0;
-                    volumePrice = BigDecimal.ZERO;
-                    volumeAmount = BigDecimal.ZERO;
-                } else {
-                    count = pairsTrades.get(initiator.getWantAssetKey());
-                    volumePrice = volumePriceTrades.get(initiator.getWantAssetKey());
-                    volumeAmount = volumeAmountTrades.get(initiator.getWantAssetKey());
-                }
-
-                count++;
-                pairsTrades.put(initiator.getWantAssetKey(), count);
-
-                volumePrice = volumePrice.add(trade.getAmountHave());
-                volumeAmount = volumeAmount.add(trade.getAmountWant());
-
-                volumePriceTrades.put(initiator.getWantAssetKey(), volumePrice);
-                volumeAmountTrades.put(initiator.getWantAssetKey(), volumeAmount);
-
-                Order target = Order.getOrder(dcSet, trade.getTarget());
-                if (!pairsTrades.containsKey(target.getWantAssetKey())) {
-                    count = 0;
-                    volumePrice = BigDecimal.ZERO;
-                    volumeAmount = BigDecimal.ZERO; // ;
-                } else {
-                    count = pairsTrades.get(target.getWantAssetKey());
-                    volumePrice = volumePriceTrades.get(target.getWantAssetKey());
-                    volumeAmount = volumeAmountTrades.get(target.getWantAssetKey());
-                }
-
-                count++;
-                pairsTrades.put(target.getWantAssetKey(), count);
-
-                volumePrice = volumePrice.add(trade.getAmountHave());
-                volumeAmount = volumeAmount.add(trade.getAmountWant());
-
-                volumePriceTrades.put(target.getWantAssetKey(), volumePrice);
-                volumeAmountTrades.put(target.getWantAssetKey(), volumeAmount);
-            }
-        }
-
-        Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all = new TreeMap<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>>();
-
-        for (Map.Entry<Long, Integer> pair : pairsOpenOrders.entrySet()) {
-            all.put(pair.getKey(), Fun.t6(pair.getValue(), 0, volumePriceOrders.get(pair.getKey()),
-                    volumeAmountOrders.get(pair.getKey()), BigDecimal.ZERO, BigDecimal.ZERO));
-        }
-
-        for (Map.Entry<Long, Integer> pair : pairsTrades.entrySet()) {
-
-            if (all.containsKey(pair.getKey())) {
-                all.put(pair.getKey(),
-                        Fun.t6(all.get(pair.getKey()).a, pair.getValue(), all.get(pair.getKey()).c,
-                                all.get(pair.getKey()).d, volumePriceTrades.get(pair.getKey()),
-                                volumeAmountTrades.get(pair.getKey())));
-            } else {
-                all.put(pair.getKey(), Fun.t6(0, pair.getValue(), BigDecimal.ZERO, BigDecimal.ZERO,
-                        volumePriceTrades.get(pair.getKey()), volumeAmountTrades.get(pair.getKey())));
-            }
-        }
-
-        return all;
-    }
-
+    int cacheTime = 2 * 60 * 1000; // in ms
     public void jsonQueryItemAsset(long key) {
 
         output.put("type", "asset");
@@ -889,72 +752,27 @@ public class BlockExplorer {
         }
 
         output.put("Label_Total", Lang.T("Total", langObj));
+        output.put("Label_Last_Price", Lang.T("Last Price", langObj));
+        output.put("Label_Price_Change", Lang.T("Change % 24h", langObj));
+        output.put("Label_Trades_Count", Lang.T("Trades 24h", langObj));
+        output.put("Label_Bit_Ask", Lang.T("Bid / Ask", langObj));
+        output.put("Label_Volume24", Lang.T("Volume 24h", langObj));
+        output.put("Label_Price_Low_High", Lang.T("Price Low / High", langObj));
 
-        List<Order> orders = dcSet.getOrderMap().getOrders(key);
 
-        TradeMapImpl tradesMap = dcSet.getTradeMap();
-        List<Trade> trades = tradesMap.getTrades(key);
-
-        output.put("operations", orders.size() + trades.size());
-        output.put("totalOpenOrdersCount", orders.size());
-        output.put("totalTradesCount", trades.size());
-
-        Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all = calcForAsset(orders,
-                trades);
-
-        if (all.containsKey(key)) {
-            output.put("totalOrdersVolume", all.get(key).c.toPlainString());
-        } else {
-            output.put("totalOrdersVolume", BigDecimal.ZERO.toPlainString());
-        }
-
-        if (all.containsKey(key)) {
-            output.put("totalTradesVolume", all.get(key).f.toPlainString());
-        } else {
-            output.put("totalTradesVolume", BigDecimal.ZERO.toPlainString());
-        }
-
-        Map pairsJSON = new LinkedHashMap();
-
-        for (Map.Entry<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> pair : all
-                .entrySet()) {
-            if (pair.getKey() == key) {
-                continue;
-            }
-            AssetCls assetWant = Controller.getInstance().getAsset(pair.getKey());
-
-            Map pairJSON = new LinkedHashMap();
-            pairJSON.put("openOrdersCount", pair.getValue().a);
-            pairJSON.put("tradesCount", pair.getValue().b);
-            pairJSON.put("sum", pair.getValue().a + pair.getValue().b);
-            pairJSON.put("ordersPriceVolume", pair.getValue().c.toPlainString());
-            pairJSON.put("ordersAmountVolume", pair.getValue().d.toPlainString());
-            pairJSON.put("tradesPriceVolume", pair.getValue().e.toPlainString());
-            pairJSON.put("tradeAmountVolume", pair.getValue().f.toPlainString());
-            pairJSON.put("asset", pair.getKey());
-            pairJSON.put("assetName", assetWant.viewName());
-            if (assetWant.getKey() > 0 && assetWant.getKey() < 1000) {
-                pairJSON.put("description", Lang.T(assetWant.viewDescription(), langObj));
-            } else {
-                pairJSON.put("description", assetWant.viewDescription());
-            }
-
-            Trade trade = tradesMap.getLastTrade(key, pair.getKey());
-            //Order initiator
-            if (trade == null) {
-                pairJSON.put("last", "---");
-                pairJSON.put("lastReverse", "---");
-            } else {
-                if (trade.getHaveKey().equals(pair.getKey())) {
-                    pairJSON.put("last", trade.calcPrice().toPlainString());
-                    pairJSON.put("lastReverse", trade.calcPriceRevers().toPlainString());
-                } else {
-                    pairJSON.put("last", trade.calcPriceRevers().toPlainString());
-                    pairJSON.put("lastReverse", trade.calcPrice().toPlainString());
+        PairMapImpl pairMap = dcSet.getPairMap();
+        JSONArray pairsJSON = new JSONArray();
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = pairMap.getIterator(key)) {
+            while (iterator.hasNext()) {
+                TradePair pair = pairMap.get(iterator.next());
+                pair.setDC(dcSet);
+                if (System.currentTimeMillis() - pair.updateTime > cacheTime) {
+                    pair = PairsController.reCalc(pair.getAsset1(), pair.getAsset2());
+                    pairMap.put(pair);
                 }
+                pairsJSON.add(pair.toJson());
             }
-
-            pairsJSON.put(pair.getKey(), pairJSON);
+        } catch (IOException e) {
         }
 
         output.put("pairs", pairsJSON);
