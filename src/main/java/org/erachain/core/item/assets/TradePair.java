@@ -33,8 +33,8 @@ public class TradePair {
     private BigDecimal lastPrice;
     private long lastTime;
 
-    private BigDecimal askPrice; // lowest_ask - наилучшая цена продажи
-    private BigDecimal bidPrice; // highest_bid - наилучшая цена покупки
+    private BigDecimal lower_askPrice; // lowest_ask - наилучшая цена продажи
+    private BigDecimal highest_bidPrice; // highest_bid - наилучшая цена покупки
 
     private BigDecimal base_volume; // base_volume - объем 24 в токене базовом
     private BigDecimal quote_volume; // quote_volume - объем 24 в ценовом токене
@@ -51,7 +51,7 @@ public class TradePair {
 
     // make trading if two orders is seeked
     public TradePair(Long assetKey1, Long assetKey2, int AssetScale1, int assetScale2, BigDecimal lastPrice, long lastTime,
-                     BigDecimal bidPrice, BigDecimal askPrice,
+                     BigDecimal highest_bidPrice, BigDecimal lower_askPrice,
                      BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
                      BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
                      int count24, long updateTime) {
@@ -63,8 +63,8 @@ public class TradePair {
         this.lastPrice = lastPrice == null ? BigDecimal.ZERO : lastPrice;
         this.lastTime = lastTime;
 
-        this.bidPrice = bidPrice == null ? BigDecimal.ZERO : bidPrice;
-        this.askPrice = askPrice == null ? BigDecimal.ZERO : askPrice;
+        this.highest_bidPrice = highest_bidPrice == null ? BigDecimal.ZERO : highest_bidPrice;
+        this.lower_askPrice = lower_askPrice == null ? BigDecimal.ZERO : lower_askPrice;
 
         this.base_volume = base_volume == null ? BigDecimal.ZERO : base_volume;
         this.quote_volume = quote_volume == null ? BigDecimal.ZERO : quote_volume;
@@ -81,12 +81,12 @@ public class TradePair {
     }
 
     public TradePair(AssetCls asset1, AssetCls asset2, BigDecimal lastPrice, long lastTime,
-                     BigDecimal bidPrice, BigDecimal askPrice,
+                     BigDecimal highest_bidPrice, BigDecimal lower_askPrice,
                      BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
                      BigDecimal highest_price_24h, BigDecimal lowest_price_24h,
                      int count24, long updateTime) {
         this(asset1.getKey(), asset2.getKey(), asset1.getScale(), asset2.getScale(), lastPrice, lastTime,
-                bidPrice, askPrice, base_volume, quote_volume, price_change_percent_24h,
+                highest_bidPrice, lower_askPrice, base_volume, quote_volume, price_change_percent_24h,
                 highest_price_24h, lowest_price_24h, count24, updateTime);
         this.asset1 = asset1;
         this.asset2 = asset2;
@@ -141,12 +141,12 @@ public class TradePair {
         return quote_volume;
     }
 
-    public BigDecimal getBidPrice() {
-        return this.bidPrice;
+    public BigDecimal getHighest_bidPrice() {
+        return this.highest_bidPrice;
     }
 
-    public BigDecimal getAskPrice() {
-        return this.askPrice;
+    public BigDecimal getLower_askPrice() {
+        return this.lower_askPrice;
     }
 
     public BigDecimal getLastPrice() {
@@ -179,8 +179,8 @@ public class TradePair {
         pair.put("last_time", lastTime);
         pair.put("price_change_percent_24h", price_change_percent_24h);
 
-        pair.put("lowest_ask", askPrice);
-        pair.put("highest_bid", bidPrice);
+        pair.put("lowest_ask", lower_askPrice);
+        pair.put("highest_bid", highest_bidPrice);
 
         pair.put("base_volume", base_volume);
         pair.put("quote_volume", quote_volume);
@@ -303,12 +303,12 @@ public class TradePair {
         data = Bytes.concat(data, Longs.toByteArray(this.lastTime));
 
         // bid price
-        data = Bytes.concat(data, new byte[]{(byte) this.bidPrice.scale()});
-        data = Bytes.concat(data, Longs.toByteArray(bidPrice.unscaledValue().longValue()));
+        data = Bytes.concat(data, new byte[]{(byte) this.highest_bidPrice.scale()});
+        data = Bytes.concat(data, Longs.toByteArray(highest_bidPrice.unscaledValue().longValue()));
 
         // ask price
-        data = Bytes.concat(data, new byte[]{(byte) this.askPrice.scale()});
-        data = Bytes.concat(data, Longs.toByteArray(askPrice.unscaledValue().longValue()));
+        data = Bytes.concat(data, new byte[]{(byte) this.lower_askPrice.scale()});
+        data = Bytes.concat(data, Longs.toByteArray(lower_askPrice.unscaledValue().longValue()));
 
         // base volume
         data = Bytes.concat(data, new byte[]{(byte) this.base_volume.scale()});

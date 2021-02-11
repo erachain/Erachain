@@ -146,6 +146,7 @@ public class Start {
             //CREATE JSON OBJECT
             Settings.genesisJSON = (JSONArray) JSONValue.parse(jsonString);
             if (Settings.genesisJSON == null) {
+                LOGGER.error("Wrong JSON or not UTF-8 encode in " + file.getName());
                 throw new Exception("Wrong JSON or not UTF-8 encode in " + file.getName());
             }
 

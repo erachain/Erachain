@@ -203,14 +203,14 @@ public class PairsController {
 
         OrderMapImpl ordersMap = DCSet.getInstance().getOrderMap();
 
-        Order bidLastOrder = ordersMap.getHaveWanFirst(key1, key2);
-        BigDecimal bidPrice = bidLastOrder == null ? BigDecimal.ZERO : bidLastOrder.calcLeftPriceReverse();
+        Order bidLastOrder = ordersMap.getHaveWanFirst(key2, key1);
+        BigDecimal highest_bidPrice = bidLastOrder == null ? BigDecimal.ZERO : bidLastOrder.calcLeftPriceReverse();
 
-        Order askLastOrder = ordersMap.getHaveWanFirst(key2, key1);
-        BigDecimal askPrice = askLastOrder == null ? BigDecimal.ZERO : askLastOrder.calcLeftPrice();
+        Order askLastOrder = ordersMap.getHaveWanFirst(key1, key2);
+        BigDecimal lower_askPrice = askLastOrder == null ? BigDecimal.ZERO : askLastOrder.calcLeftPrice();
 
         return new TradePair(asset1, asset2, lastPrice, lastTime,
-                bidPrice, askPrice, baseVolume, quoteVolume, priceChangePercent24h,
+                highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, priceChangePercent24h,
                 maxPrice, minPrice, count24, Block.getTimestamp(heightStart));
 
     }
