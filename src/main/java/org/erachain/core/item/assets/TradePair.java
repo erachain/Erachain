@@ -92,6 +92,11 @@ public class TradePair {
         this.asset2 = asset2;
     }
 
+    public void setDC(DCSet dcSet) {
+        asset1 = dcSet.getItemAssetMap().get(assetKey1);
+        asset2 = dcSet.getItemAssetMap().get(assetKey2);
+    }
+
     public String viewID() {
         return Transaction.viewDBRef(assetKey1) + "/" + Transaction.viewDBRef(assetKey2);
     }

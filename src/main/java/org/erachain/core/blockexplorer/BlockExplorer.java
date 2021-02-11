@@ -908,28 +908,15 @@ public class BlockExplorer {
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = pairMap.getIterator(key)) {
             while (iterator.hasNext()) {
                 TradePair pair = pairMap.get(iterator.next());
+                pair.setDC(dcSet);
                 pairs.add(pair);
             }
         } catch (IOException e) {
         }
 
-        Map pairsJSON = new LinkedHashMap();
-
+        JSONArray pairsJSON = new JSONArray();
         for (TradePair pair : pairs) {
-
-            AssetCls assetWant = Controller.getInstance().getAsset(pair.getAssetKey2());
-
-            Map pairJSON = new LinkedHashMap();
-            pairJSON.put("tradesCount", pair.getCount24());
-            pairJSON.put("tradesPriceVolume", pair.getBase_volume().toPlainString());
-            pairJSON.put("tradeAmountVolume", pair.getQuote_volume().toPlainString());
-            pairJSON.put("asset", pair.getAssetKey2());
-            pairJSON.put("assetName", assetWant.viewName());
-
-            pairJSON.put("lastPrice", pair.getLastPrice().toPlainString());
-            pairJSON.put("lastTime", pair.getLastTime());
-
-            pairsJSON.put(pair.getAssetKey2(), pairJSON);
+            pairsJSON.add(pair.toJson());
         }
 
         output.put("pairs", pairsJSON);
