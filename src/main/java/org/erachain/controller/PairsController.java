@@ -81,11 +81,12 @@ public class PairsController {
 
     }
 
+    int cacheTime = 2 * 60 * 1000; // in ms
     long updateList;
     public void updateList() {
 
         init();
-        if (System.currentTimeMillis() - updateList < 300000) {
+        if (System.currentTimeMillis() - updateList < cacheTime) {
             return;
         }
         updateList = System.currentTimeMillis();

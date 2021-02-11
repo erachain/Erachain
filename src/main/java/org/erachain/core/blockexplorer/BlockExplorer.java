@@ -874,6 +874,7 @@ public class BlockExplorer {
         return all;
     }
 
+    int cacheTime = 2 * 60 * 1000; // in ms
     public void jsonQueryItemAsset(long key) {
 
         output.put("type", "asset");
@@ -905,8 +906,10 @@ public class BlockExplorer {
             while (iterator.hasNext()) {
                 TradePair pair = pairMap.get(iterator.next());
                 pair.setDC(dcSet);
-                pair = PairsController.reCalc(pair.getAsset1(), pair.getAsset2());
-                pairMap.put(pair);
+                if (System.currentTimeMillis() - pair.updateTime > cacheTime) {
+                    pair = PairsController.reCalc(pair.getAsset1(), pair.getAsset2());
+                    pairMap.put(pair);
+                }
                 pairsJSON.add(pair.toJson());
             }
         } catch (IOException e) {
