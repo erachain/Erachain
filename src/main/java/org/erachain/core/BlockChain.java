@@ -268,6 +268,7 @@ public class BlockChain {
 
     public static final int START_ITEM_DUPLICATE = VERS_5_01_01;
 
+    public static final int START_ASSET_UNIQUE = DEMO_MODE ? 122000 : MAIN_MODE ? 1770000 : 0;
 
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 

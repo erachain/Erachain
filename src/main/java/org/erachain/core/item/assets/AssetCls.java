@@ -738,8 +738,9 @@ public abstract class AssetCls extends ItemCls {
         return isUnHoldable(key, assetType);
     }
 
-    public static boolean isUnique(int assetType) {
-        if (assetType == AS_OUTSIDE_BILL
+    public static boolean isTypeUnique(int assetType, long quantity) {
+        if (quantity == 1L
+                || assetType == AS_OUTSIDE_BILL
                 || assetType == AS_OUTSIDE_BILL_EX
                 || assetType == AS_BANK_GUARANTEE
         ) {
@@ -748,9 +749,7 @@ public abstract class AssetCls extends ItemCls {
         return false;
     }
 
-    public boolean isUnique() {
-        return isUnique(assetType);
-    }
+    public abstract boolean isUnique();
 
     public abstract boolean isUnlimited(Account address, boolean notAccounting);
 

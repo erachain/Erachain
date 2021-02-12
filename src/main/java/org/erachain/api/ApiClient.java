@@ -797,10 +797,14 @@ public class ApiClient {
                     {
                             "GET trade/cancelbyid/{creator}/{orderID}?password={password}",
                             "Cancel Order by orderID"
+                    },
+                    {
+                            "GET trade/updatepairs/[days]",
+                            "Update pairs stat by trades deep days. May be need after resynchronization"
                     }
 
 
-};
+            };
 
     public static boolean isAllowedDebugWindowCall(String uuid) {
         return allowedcalls.contains(uuid);

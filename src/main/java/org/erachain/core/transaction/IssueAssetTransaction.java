@@ -158,7 +158,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
         //CHECK QUANTITY
         AssetCls asset = (AssetCls) this.getItem();
 
-        if (asset.isUnique()) {
+        if (height > BlockChain.START_ASSET_UNIQUE && asset.isUnique()) {
             if (asset instanceof AssetUnique) {
                 ;
             } else {

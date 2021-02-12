@@ -5,6 +5,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.DLSet;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 
@@ -117,7 +118,7 @@ public class TradePair {
         return this.asset2;
     }
 
-    public static TradePair get(DCSet db, Long assetKey1, Long assetKey2) {
+    public static TradePair get(DLSet db, Long assetKey1, Long assetKey2) {
         return db.getPairMap().get(assetKey1, assetKey2);
     }
 

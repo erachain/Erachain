@@ -72,6 +72,8 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jTitle_Label.setText(title_Text);
         jTextPane1.setText(text);
         if (transaction != null) {
+            // кое где эта форма используется без транзакции - просто как окно - в настройках например
+
             // посчитаем без учета что она может быть бесплатной - для инфо нужно показать
             transaction.calcFee(false);
             String feeText = "" + Lang.T("Size") + ":&nbsp;"
@@ -81,23 +83,23 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
                         + "</b>";
             }
             status_Text += feeText;
+
+            if (!receive) {
+                jButton0.setVisible(false);
+                jButton1.setText(Lang.T("Save"));
+            } else {
+                // проверим а вообще такая транзакция может быть бесплатна?
+                jButton0.setVisible(BlockChain.FREE_FEE_TO_SEQNO > 0
+                        && transaction.isFreeFee()
+                        && BlockChain.FREE_FEE_FROM_HEIGHT < Controller.getInstance().getMyHeight()
+                        && transaction.getDataLength(Transaction.FOR_NETWORK, true) < BlockChain.FREE_FEE_LENGTH);
+            }
         }
 
         jStatus_Label.setText("<HTML>" + status_Text + "</HTML>");
         //  setMaximumSize(new Dimension(350,200));
         if (w > 0 && h > 0) {
             setSize(w, h);
-        }
-
-        if (!receive) {
-            jButton0.setVisible(false);
-            jButton1.setText(Lang.T("Save"));
-        } else {
-            // проверим а вообще такая транзакция может быть бесплатна?
-            jButton0.setVisible(BlockChain.FREE_FEE_TO_SEQNO > 0
-                    && transaction.isFreeFee()
-                    && BlockChain.FREE_FEE_FROM_HEIGHT < Controller.getInstance().getMyHeight()
-                    && transaction.getDataLength(Transaction.FOR_NETWORK, true) < BlockChain.FREE_FEE_LENGTH);
         }
 
         jButton0.addActionListener(new ActionListener() {

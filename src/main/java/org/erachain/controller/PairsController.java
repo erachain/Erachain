@@ -8,7 +8,12 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.assets.TradePair;
-import org.erachain.datachain.*;
+import org.erachain.database.DLSet;
+import org.erachain.database.PairMapImpl;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetMap;
+import org.erachain.datachain.OrderMapImpl;
+import org.erachain.datachain.TradeMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.settings.Settings;
 import org.json.simple.JSONArray;
@@ -22,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,14 +37,17 @@ public class PairsController {
     public JSONObject spotPairsJson;
 
     public JSONObject spotPairsList;
+    public List<Fun.Tuple2<Long, Long>> commonPairsList;
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PairsController.class.getSimpleName());
 
     PairsController() {
-        init();
+        updateList();
     }
 
     long updateInit;
+
     public void init() {
 
         if (System.currentTimeMillis() - updateInit < 600000) {
@@ -50,7 +59,7 @@ public class PairsController {
         File file = new File(Settings.getInstance().getUserPath() + "market.json");
 
         //CREATE FILE IF IT DOESNT EXIST
-        if (file.exists()) {
+        if (BlockChain.MAIN_MODE && file.exists()) {
             String jsonString = "";
             try {
                 //READ PEERS FILE
@@ -69,12 +78,15 @@ public class PairsController {
             this.spotPairsJson = (JSONObject) JSONValue.parse(jsonString);
 
         } else {
-            JSONObject spot = new JSONObject();
-            spot.put("1/2", Boolean.TRUE);
-            spot.put("1/12", Boolean.TRUE);
-            spot.put("1/95", Boolean.TRUE);
-            spot.put("12/95", Boolean.TRUE);
-            spot.put("21/95", Boolean.TRUE);
+            JSONArray spot = new JSONArray();
+
+            JSONArray array = new JSONArray();
+            array.add(1L);
+            array.add(2L);
+            array.add(Boolean.TRUE);
+
+            spot.add(array);
+
             this.spotPairsJson = new JSONObject();
             spotPairsJson.put("spot", spot);
         }
@@ -92,19 +104,20 @@ public class PairsController {
         updateList = System.currentTimeMillis();
 
         spotPairsList = new JSONObject();
+        commonPairsList = new ArrayList<>();
 
         ItemAssetMap mapAssets = DCSet.getInstance().getItemAssetMap();
-        PairMapImpl mapPairs = DCSet.getInstance().getPairMap();
-        JSONObject spotJson = (JSONObject) spotPairsJson.get("spot");
-        for (Object pairKey : spotJson.keySet()) {
-            String[] pairStr = ((String) pairKey).split("/");
-            Long key1 = Long.parseLong(pairStr[0]);
+        PairMapImpl mapPairs = Controller.getInstance().dlSet.getPairMap();
+        JSONArray spotJson = (JSONArray) spotPairsJson.get("spot");
+        for (Object item : spotJson) {
+            JSONArray array = (JSONArray) item;
+            Long key1 = (Long) array.get(0);
             AssetCls asset1 = mapAssets.get(key1);
             if (asset1 == null) {
                 LOGGER.warn("asset [" + key1 + "] not found");
                 continue;
             }
-            Long key2 = Long.parseLong(pairStr[1]);
+            Long key2 = (Long) array.get(1);
             AssetCls asset2 = mapAssets.get(key2);
             if (asset2 == null) {
                 LOGGER.warn("asset [" + key2 + "] not found");
@@ -112,10 +125,6 @@ public class PairsController {
             }
 
             String pairJsonKey = asset1.getName() + "_" + asset2.getName();
-            JSONArray array = new JSONArray();
-            array.add(spotJson.get(pairKey));
-            array.add(key1);
-            array.add(key2);
             spotPairsList.put(pairJsonKey, array);
 
             TradePair tradePair = mapPairs.get(key1, key2);
@@ -124,6 +133,7 @@ public class PairsController {
             }
             spotPairs.put(pairJsonKey, tradePair);
             spotPairsJson.put(pairJsonKey, tradePair.toJson());
+            commonPairsList.add(new Fun.Tuple2<>(key1, key2));
 
         }
     }
@@ -214,5 +224,38 @@ public class PairsController {
                 highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, priceChangePercent24h,
                 minPrice, maxPrice, count24, Block.getTimestamp(heightStart));
 
+    }
+
+    public static void foundPairs(DCSet dcSet, DLSet dlSet, int days) {
+        TradeMapImpl tradesMap = dcSet.getTradeMap();
+        PairMapImpl pairMap = dlSet.getPairMap();
+        int foundDepth = days * 24 * 3600000;
+
+        LOGGER.info("update TRADE PAIRS");
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getDescendingIterator()) {
+            Trade lastTrade = null;
+            while (iterator.hasNext()) {
+                Trade trade = tradesMap.get(iterator.next());
+                if (trade == null)
+                    continue;
+
+                if (lastTrade == null)
+                    lastTrade = trade;
+
+                if (lastTrade.getTimestamp() - trade.getTimestamp() > foundDepth)
+                    break;
+
+                Long key1 = trade.getHaveKey();
+                Long key2 = trade.getWantKey();
+                if (!pairMap.contains(new Fun.Tuple2(key1, key2))) {
+                    AssetCls asset1 = dcSet.getItemAssetMap().get(key1);
+                    AssetCls asset2 = dcSet.getItemAssetMap().get(key2);
+                    pairMap.put(reCalc(asset1, asset2));
+                    pairMap.put(reCalc(asset2, asset1));
+                }
+            }
+        } catch (IOException e) {
+        }
+        LOGGER.info("TRADE PAIRS updated for days:" + foundDepth / 24 / 3600000);
     }
 }

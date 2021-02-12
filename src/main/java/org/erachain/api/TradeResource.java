@@ -1,6 +1,7 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
+import org.erachain.controller.PairsController;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -80,6 +81,9 @@ public class TradeResource {
 
         help.put("GET trade/cancel/[creator]/[signature]?password=[password]",
                 "Cancel Order");
+
+        help.put("GET trade/updatepairs/[days]",
+                "Update pairs stat by trades deep days. May be need after resynchronization");
 
         return StrJSonFine.convert(help);
     }
@@ -1044,4 +1048,13 @@ public class TradeResource {
 
         return "OK";
     }
+
+    /// get trade/updatepairs/days
+    @GET
+    @Path("updatepairs/{days}")
+    public String updatePairs(@PathParam("days") Integer days) {
+        PairsController.foundPairs(DCSet.getInstance(), Controller.getInstance().dlSet, days);
+        return "OK";
+    }
+
 }

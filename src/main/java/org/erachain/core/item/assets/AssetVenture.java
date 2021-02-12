@@ -108,6 +108,11 @@ public class AssetVenture extends AssetCls {
         return !notAccounting && isAccounting() || getQuantity() == 0L && owner.equals(address);
     }
 
+    @Override
+    public boolean isUnique() {
+        return quantity == 1L;
+    }
+
     //PARSE
     // includeReference - TRUE only for store in local DB
     public static AssetVenture parse(byte[] data, boolean includeReference) throws Exception {

@@ -2,6 +2,7 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -11,6 +12,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.TradePair;
+import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -616,24 +618,28 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         //this.order.process(this);
 
         // изменяемые объекты нужно заново создавать
-        //.copy() // тут надо что-то сделать новым - а то значения впамяти по ссылке меняются
+        //.copy() // тут надо что-то сделать новым - а то значения в памяти по ссылке меняются
         Order order = makeOrder(); //.copy();
         order.process(block, this);
 
-        if (!dcSet.getPairMap().contains(new Fun.Tuple2(haveKey, wantKey))) {
-            dcSet.getPairMap().put(new TradePair(haveAsset, wantAsset, order.getPrice(), timestamp,
-                    order.getPrice(), order.getPrice(),
-                    amountHave, amountWant, BigDecimal.ZERO,
-                    order.getPrice(), order.getPrice(),
-                    1, timestamp));
+        if (true // так как проверка в Форке - потом быстрый слив и эта таблица вообще не будет просчитана
+                || !dcSet.isFork()) {
+            // статистику по парам
+            PairMapImpl pairMap = Controller.getInstance().dlSet.getPairMap();
+            if (!pairMap.contains(new Fun.Tuple2(haveKey, wantKey))) {
+                pairMap.put(new TradePair(haveAsset, wantAsset, order.getPrice(), timestamp,
+                        order.getPrice(), order.getPrice(),
+                        amountHave, amountWant, BigDecimal.ZERO,
+                        order.getPrice(), order.getPrice(),
+                        1, timestamp));
 
-            BigDecimal reverse = order.calcPriceReverse();
-            dcSet.getPairMap().put(new TradePair(wantAsset, haveAsset, reverse, timestamp,
-                    reverse, reverse,
-                    amountWant, amountHave, BigDecimal.ZERO,
-                    reverse, reverse,
-                    1, timestamp));
-
+                BigDecimal reverse = order.calcPriceReverse();
+                pairMap.put(new TradePair(wantAsset, haveAsset, reverse, timestamp,
+                        reverse, reverse,
+                        amountWant, amountHave, BigDecimal.ZERO,
+                        reverse, reverse,
+                        1, timestamp));
+            }
         }
 
     }

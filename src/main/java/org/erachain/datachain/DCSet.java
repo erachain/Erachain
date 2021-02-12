@@ -159,7 +159,6 @@ public class DCSet extends DBASet implements Closeable {
     private OrderMapImpl orderMap;
     private CompletedOrderMap completedOrderMap;
     private TradeMapImpl tradeMap;
-    private PairMapImpl pairMap;
     private ItemStatusMap itemStatusMap;
     private IssueStatusMap issueStatusMap;
     private ItemImprintMap itemImprintMap;
@@ -240,10 +239,6 @@ public class DCSet extends DBASet implements Closeable {
 
             this.tradeMap = new TradeMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     TRADES_MAP
-                    , this, database);
-
-            this.pairMap = new PairMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
-                    PAIRS_MAP
                     , this, database);
 
             this.addressPersonMap = new AddressPersonMapImpl(defaultDBS != DBS_FAST ? defaultDBS : DBS_MAP_DB, this, database);
@@ -406,11 +401,6 @@ public class DCSet extends DBASet implements Closeable {
                 //DBS_ROCK_DB
                 //DBS_NATIVE_MAP
                 , parent.tradeMap, this);
-        this.pairMap = new PairMapImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
-                , parent.pairMap, this);
 
         this.addressPersonMap = new AddressPersonMapImpl(DBS_MAP_DB, parent.addressPersonMap, this);
 
@@ -818,7 +808,6 @@ public class DCSet extends DBASet implements Closeable {
         this.voteOnItemPollMap.clear();
 
         this.tradeMap.clear();
-        this.pairMap.clear();
 
         this.orderMap.clear();
         this.completedOrderMap.clear();
@@ -1344,16 +1333,6 @@ public class DCSet extends DBASet implements Closeable {
      */
     public TradeMapImpl getTradeMap() {
         return this.tradeMap;
-    }
-
-    /**
-     * Хранит пары на бирже - для статитки чтобы не пересчитывать
-     * Ключ: пара - первый наименьший ключ
-     * Значение - статистика
-     * AssetKey (Long) + AssetKey (Long) -> Stats
-     */
-    public PairMapImpl getPairMap() {
-        return this.pairMap;
     }
 
     public ItemImprintMap getItemImprintMap() {

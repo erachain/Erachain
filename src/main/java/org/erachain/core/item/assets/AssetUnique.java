@@ -45,6 +45,11 @@ public class AssetUnique extends AssetCls {
     }
 
     @Override
+    public boolean isUnique() {
+        return true;
+    }
+
+    @Override
     public int getScale() {
         return 0;
     }
