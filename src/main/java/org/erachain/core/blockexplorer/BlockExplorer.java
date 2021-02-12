@@ -760,13 +760,18 @@ public class BlockExplorer {
         output.put("Label_Volume24", Lang.T("Volume 24h", langObj));
         output.put("Label_Price_Low_High", Lang.T("Price Low / High", langObj));
 
-
         PairMapImpl pairMap = Controller.getInstance().dlSet.getPairMap();
         JSONArray pairsJSON = new JSONArray();
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = pairMap.getIterator(key)) {
             while (iterator.hasNext()) {
                 TradePair pair = pairMap.get(iterator.next());
                 pair.setDC(dcSet);
+                if (pair.getAsset1() == null || pair.getAsset2() == null) {
+                    // не та цепочка
+                    pairMap.delete(pair);
+                    continue;
+                }
+
                 if (System.currentTimeMillis() - pair.updateTime > cacheTime) {
                     pair = PairsController.reCalc(pair.getAsset1(), pair.getAsset2());
                     pairMap.put(pair);

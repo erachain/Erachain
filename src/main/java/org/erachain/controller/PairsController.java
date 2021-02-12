@@ -226,11 +226,10 @@ public class PairsController {
 
     }
 
-    static int foundDepth = 10 * 24 * 3600000;
-
-    public static void foundPairs(DCSet dcSet, DLSet dlSet) {
+    public static void foundPairs(DCSet dcSet, DLSet dlSet, int days) {
         TradeMapImpl tradesMap = dcSet.getTradeMap();
         PairMapImpl pairMap = dlSet.getPairMap();
+        int foundDepth = days * 24 * 3600000;
 
         LOGGER.info("update TRADE PAIRS");
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getDescendingIterator()) {

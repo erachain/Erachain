@@ -782,6 +782,7 @@ public class API {
             }
 
         } catch (Exception e) {
+            LOGGER.warn(" on step: " + step + " - " + e.toString() + " - " + e.getMessage(), e);
             Transaction.updateMapByErrorSimple(-1, e.toString() + " on step: " + step, out);
             return out;
         }
