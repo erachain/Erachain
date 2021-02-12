@@ -2261,8 +2261,9 @@ public class BlockExplorer {
             Map pairJSON = new HashMap(32, 1);
             pairJSON.put("have", assetHave.jsonForExplorerPage(langObj));
             pairJSON.put("want", assetWant.jsonForExplorerPage(langObj));
-            pairJSON.put("orders", orders.getCount(pairKey.a, pairKey.b)
-                    + orders.getCount(pairKey.b, pairKey.a));
+            long ordersCount = orders.getCount(pairKey.a, pairKey.b, 250)
+                    + orders.getCount(pairKey.b, pairKey.a, 250);
+            pairJSON.put("orders", ordersCount > 200 ? "200+" : ordersCount);
 
             String key = assetHave.getName() + "_" + assetWant.getName();
             TradePair pair = pairsCnt.spotPairs.get(key);
