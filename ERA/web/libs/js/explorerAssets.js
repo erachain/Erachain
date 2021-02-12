@@ -148,7 +148,14 @@ function asset(data, forPrint) {
                 + addCommas((1.0 / pair.last_price).toPrecision(8));
 
         output += '<td>';
-        output += pair.price_change_percent_24h + ' %<br>' + pair.count_24h;
+        if (pair.price_change_percent_24h > 0) {
+            output += '<span style="color:green"><b>+' + pair.price_change_percent_24h.toPrecision(3) + '</b></span>';
+        } else if (pair.price_change_percent_24h < 0) {
+            output += '<span style="color:red"><b>' + pair.price_change_percent_24h.toPrecision(3) + '</b></span>';
+        } else {
+            output += '0';
+        }
+        output += '<br>' + pair.count_24h;
 
         output += '<td>';
         output += addCommas(pair.highest_bid.toPrecision(8)) + ' / ' + addCommas(pair.lowest_ask.toPrecision(8));
