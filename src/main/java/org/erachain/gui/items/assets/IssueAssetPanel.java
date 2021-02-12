@@ -117,7 +117,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         textareasAssetTypeDescription.setText(fontStyle + assetType.getDescription());
 
-        if (AssetCls.isUnique(assetType.getId())) {
+        if (AssetCls.isTypeUnique(assetType.getId())) {
             textQuantity.setVisible(false);
             quantityJLabel.setVisible(false);
             textScale.setVisible(false);
@@ -138,7 +138,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         int parseStep = 0;
         try {
 
-            if (!AssetCls.isUnique(assetType)) {
+            if (!AssetCls.isTypeUnique(assetType)) {
                 // READ SCALE
                 scale = Byte.parseByte((String) textScale.getSelectedItem());
 
@@ -169,7 +169,7 @@ public class IssueAssetPanel extends IssueItemPanel {
     protected void makeTransaction() {
 
         AssetCls asset;
-        if (AssetCls.isUnique(assetType)) {
+        if (AssetCls.isTypeUnique(assetType)) {
             asset = new AssetUnique(creator, textName.getText(), addLogoIconLabel.getImgBytes(),
                     addImageLabel.getImgBytes(), textAreaDescription.getText(),
                     assetType);

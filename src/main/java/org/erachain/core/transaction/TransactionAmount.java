@@ -598,7 +598,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         boolean wrong;
 
-        if (asset.isUnique() && !amount.abs().equals(BigDecimal.ONE)) {
+        if (asset.isTypeUnique() && !amount.abs().equals(BigDecimal.ONE)) {
             return Transaction.INVALID_AMOUNT;
         }
 
