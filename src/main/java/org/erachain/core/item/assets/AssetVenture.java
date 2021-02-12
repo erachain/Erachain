@@ -109,7 +109,7 @@ public class AssetVenture extends AssetCls {
     }
 
     @Override
-    public boolean isTypeUnique() {
+    public boolean isUnique() {
         return quantity == 1L;
     }
 

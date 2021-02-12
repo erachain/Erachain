@@ -45,7 +45,7 @@ public class AssetUnique extends AssetCls {
     }
 
     @Override
-    public boolean isTypeUnique() {
+    public boolean isUnique() {
         return true;
     }
 

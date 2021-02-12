@@ -738,8 +738,9 @@ public abstract class AssetCls extends ItemCls {
         return isUnHoldable(key, assetType);
     }
 
-    public static boolean isTypeUnique(int assetType) {
-        if (assetType == AS_OUTSIDE_BILL
+    public static boolean isTypeUnique(int assetType, long quantity) {
+        if (quantity == 1L
+                || assetType == AS_OUTSIDE_BILL
                 || assetType == AS_OUTSIDE_BILL_EX
                 || assetType == AS_BANK_GUARANTEE
         ) {
@@ -748,7 +749,7 @@ public abstract class AssetCls extends ItemCls {
         return false;
     }
 
-    abstract boolean isTypeUnique();
+    public abstract boolean isUnique();
 
     public abstract boolean isUnlimited(Account address, boolean notAccounting);
 
@@ -1981,7 +1982,7 @@ public abstract class AssetCls extends ItemCls {
             joiner.add(Lang.T("Unlimited", langObj));
         if (isAccounting())
             joiner.add(Lang.T("Accounting", langObj));
-        if (isTypeUnique())
+        if (isUnique())
             joiner.add(Lang.T("Unique", langObj));
         if (isUnHoldable())
             joiner.add(Lang.T("Not holdable", langObj));
@@ -2029,7 +2030,7 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("isImMovable", this.isImMovable());
         assetJSON.put("isUnlimited", this.isUnlimited(owner, false));
         assetJSON.put("isAccounting", this.isAccounting());
-        assetJSON.put("isUnique", this.isTypeUnique());
+        assetJSON.put("isUnique", this.isUnique());
         assetJSON.put("isUnHoldable", this.isUnHoldable());
         assetJSON.put("isOutsideType", this.isOutsideType());
         assetJSON.put("isSelfManaged", this.isSelfManaged());

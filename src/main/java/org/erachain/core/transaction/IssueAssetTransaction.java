@@ -158,7 +158,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
         //CHECK QUANTITY
         AssetCls asset = (AssetCls) this.getItem();
 
-        if (asset.isTypeUnique()) {
+        if (asset.isUnique()) {
             if (asset instanceof AssetUnique) {
                 ;
             } else {
