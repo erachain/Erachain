@@ -178,8 +178,7 @@ public class PairsController {
                     // у сделки обратные Have Want
                     price = reversed ? trade.calcPrice() : trade.calcPriceRevers();
                     if (lastPrice == null) {
-                        // TODO вставить сюда проверку времени первой сделки - если совпадет то не делать перебор а взять из базы
-                        if (currentPair != null && trade.getTimestamp() == currentPair.getLastTime()) {
+                        if (currentPair != null && trade.getTimestamp().equals(currentPair.getLastTime())) {
                             return currentPair;
                         }
                         lastPrice = price;
