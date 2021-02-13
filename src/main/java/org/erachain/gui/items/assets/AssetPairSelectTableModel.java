@@ -58,7 +58,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
                 if (asset == null) {
                     continue;
                 }
-                list.add(new Fun.Tuple2<AssetCls, TradePair>(asset, PairsController.reCalc(asset, assetPair)));
+                list.add(new Fun.Tuple2<AssetCls, TradePair>(asset, PairsController.reCalc(asset, assetPair, null)));
             }
         } catch (IOException e) {
         }
@@ -120,7 +120,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
         AssetCls asset = Controller.getInstance().getAsset(key_filter);
         if (asset == null || asset.getKey() == this.key)
             return;
-        list.add(new Fun.Tuple2<>(asset, PairsController.reCalc(asset, assetPair)));
+        list.add(new Fun.Tuple2<>(asset, PairsController.reCalc(asset, assetPair, null)));
         this.fireTableDataChanged();
     }
 
@@ -129,7 +129,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
         list = new ArrayList<>();
         List<ItemCls> foundAssets = ((ItemMap) map).getByFilterAsArray(filter_Name, 0, 1000);
         for (ItemCls asset : foundAssets) {
-            list.add(new Fun.Tuple2<>((AssetCls) asset, PairsController.reCalc((AssetCls) asset, assetPair)));
+            list.add(new Fun.Tuple2<>((AssetCls) asset, PairsController.reCalc((AssetCls) asset, assetPair, null)));
         }
 
         this.fireTableDataChanged();
