@@ -128,9 +128,7 @@ public class PairsController {
             spotPairsList.put(pairJsonKey, array);
 
             TradePair tradePair = mapPairs.get(key1, key2);
-            if (true || tradePair == null) {
-                tradePair = reCalc(asset1, asset2);
-            }
+            tradePair = reCalc(asset1, asset2, tradePair);
             spotPairs.put(pairJsonKey, tradePair);
             spotPairsJson.put(pairJsonKey, tradePair.toJson());
             commonPairsList.add(new Fun.Tuple2<>(key1, key2));
@@ -143,8 +141,9 @@ public class PairsController {
      *
      * @param asset1
      * @param asset2
+     * @param currentPair
      */
-    public static TradePair reCalc(AssetCls asset1, AssetCls asset2) {
+    public static TradePair reCalc(AssetCls asset1, AssetCls asset2, TradePair currentPair) {
         TradeMapImpl tradesMap = DCSet.getInstance().getTradeMap();
         Long key1 = asset1.getKey();
         Long key2 = asset2.getKey();
@@ -180,6 +179,9 @@ public class PairsController {
                     price = reversed ? trade.calcPrice() : trade.calcPriceRevers();
                     if (lastPrice == null) {
                         // TODO вставить сюда проверку времени первой сделки - если совпадет то не делать перебор а взять из базы
+                        if (currentPair != null && trade.getTimestamp() == currentPair.getLastTime()) {
+                            return currentPair;
+                        }
                         lastPrice = price;
                         lastTime = trade.getTimestamp();
                     }
@@ -255,8 +257,8 @@ public class PairsController {
                 if (!pairMap.contains(new Fun.Tuple2(key1, key2))) {
                     AssetCls asset1 = dcSet.getItemAssetMap().get(key1);
                     AssetCls asset2 = dcSet.getItemAssetMap().get(key2);
-                    pairMap.put(reCalc(asset1, asset2));
-                    pairMap.put(reCalc(asset2, asset1));
+                    pairMap.put(reCalc(asset1, asset2, null));
+                    pairMap.put(reCalc(asset2, asset1, null));
                 }
             }
         } catch (IOException e) {
