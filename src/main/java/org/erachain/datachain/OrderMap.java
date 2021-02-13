@@ -13,6 +13,8 @@ public interface OrderMap extends DBTab<Long, Order> {
 
     long getCount(long have, long want);
 
+    long getCount(long have, long want, int limit);
+
     long getCountHave(long have);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
