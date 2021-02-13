@@ -179,6 +179,7 @@ public class PairsController {
                     // у сделки обратные Have Want
                     price = reversed ? trade.calcPrice() : trade.calcPriceRevers();
                     if (lastPrice == null) {
+                        // TODO вставить сюда проверку времени первой сделки - если совпадет то не делать перебор а взять из базы
                         lastPrice = price;
                         lastTime = trade.getTimestamp();
                     }
@@ -224,6 +225,10 @@ public class PairsController {
                 highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, priceChangePercent24h,
                 minPrice, maxPrice, count24, Block.getTimestamp(heightStart));
 
+    }
+
+    public static TradePair reverse(TradePair pair) {
+        return null;
     }
 
     public static void foundPairs(DCSet dcSet, DLSet dlSet, int days) {
