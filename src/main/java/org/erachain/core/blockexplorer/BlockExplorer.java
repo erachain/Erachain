@@ -2273,7 +2273,7 @@ public class BlockExplorer {
                 Controller.getInstance().dlSet.getPairMap().put(pair);
 
                 pairJSON.put("last", pair.getLastPrice().toPlainString());
-                pairJSON.put("volume24", pair.getBase_volume().toPlainString());
+                pairJSON.put("volume24", pair.getQuote_volume().toPlainString());
 
             } else {
                 Trade trade = trades.getLastTrade(pairKey.a, pairKey.b);
