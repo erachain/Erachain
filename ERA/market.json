@@ -51,19 +51,25 @@
       92,
       true
     ],
+    // BTC market
     [
-      1001,
-      92,
+      1,
+      12,
       true
     ],
+    [
+      2,
+      12,
+      true
+    ],
+    [
+      21,
+      12,
+      true
+    ]
     // COMPU market
     [
       1,
-      2,
-      true
-    ],
-    [
-      12,
       2,
       true
     ]

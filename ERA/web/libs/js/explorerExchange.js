@@ -12,11 +12,11 @@ function exchange(data){
     output += lastBlock(data.lastBlock);
     var start = data.start;
 
-    output += '<div><div class="col-lg-5" style="padding-left: 5em;">';
+    output += '<div class="col-lg-1 col-md-0"></div><div class="col-lg-5 col-md-6">';
 
     output += '<h4 style="text-align: center;">' + data.Label_table_PopularPairs + '</h4>';
 
-    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; font-size:1.0em">';
     output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.Label_table_have;
     output += '<td><b>' + data.Label_table_want + '<td><b>' + data.Label_table_orders + '<td><b>' +
          data.Label_table_last_price + '<td><b>' + data.Label_table_volume24 + '</tr>';
@@ -29,17 +29,17 @@ function exchange(data){
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.orders + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
-            + '&asset=' + item.want.key + get_lang() + '"><b>' + item.last + '</b></a>';
+            + '&asset=' + item.want.key + get_lang() + '"><b>' + (item.last > 100? item.last.toPrecision(10) : item.last > 1? item.last.toPrecision(8) : item.last.toPrecision(6)) + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.volume24 + '</b></a>';
 
         output += '</tr>';
     }
-    output += '</table></div><div class="col-lg-7" style="padding-right: 5em;">';
+    output += '</table></div><div class="col-lg-6 col-md-5">';
 
     output += '<h4 style="text-align: center;">' + data.Label_table_LastTrades + '</h4>';
 
-    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; font-size:0.9em; line-height: 0.8em">';
     output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.Label_Date;
     output += '<td align=center><b>' + data.Label_Pair + '<td align=center><b>' + data.Label_Trade_Initiator;
     output += '<td align=center><b>' + data.Label_Amount;
@@ -79,7 +79,7 @@ function exchange(data){
             else {
                 output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>';
             }
-            output += '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice) + '</span>';
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice.toPrecision(10)) + '</span>';
 
         } else {
             output += '<td align=right>' + addCommas(trade.amountHave);
@@ -89,13 +89,13 @@ function exchange(data){
             else {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>';
             }
-            output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice.toPrecision(10)) + '</span>';
 
         }
 
         output += '<td>';
 
-        // отобрадает что это создатель актива действует
+        // отображает что это создатель актива действует
         if (trade.targetCreator_addr == trade.assetHaveOwner) {
             if (trade.type == 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
@@ -108,7 +108,7 @@ function exchange(data){
 
     }
 
-    output += '</table>';
+    output += '</table></div>';
 
     return output;
 }
