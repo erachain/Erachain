@@ -259,7 +259,7 @@ public class BlockChain {
     public static int START_KEY_UP = MAIN_MODE ? 1670000 : DEMO_MODE ? 0 : Integer.MAX_VALUE;
     public static int START_KEY_UP_ITEMS = 1 << 20;
 
-    public static final int USE_NEW_ISSUE_FEE = MAIN_MODE ? Integer.MAX_VALUE : 0;
+    public static final int USE_NEW_ISSUE_FEE = MAIN_MODE ? 1777777 : 0;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
