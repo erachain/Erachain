@@ -513,12 +513,18 @@ public class API {
         Transaction transaction = null;
         try {
             transaction = TransactionFactory.getInstance().parse(Base58.decode(raw), Transaction.FOR_NETWORK);
-            out = transaction.toJson();
+            try {
+                out = transaction.toJson();
+            } catch (Exception e) {
+                out.put("error", -1);
+                out.put("message", APIUtils.errorMess(-1, e.toString(), transaction));
+                transaction.updateMapByError(-1, e.toString(), out);
+            }
         } catch (Exception e) {
             out.put("error", -1);
-            out.put("message", APIUtils.errorMess(-1, e.toString(), transaction));
-            transaction.updateMapByError(-1, e.toString(), out);
+            out.put("message", e.toString());
         }
+
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -768,10 +774,7 @@ public class API {
                 out.put("status", "ok");
                 return out;
             } else {
-                JSONObject langObj = null;
-                if (lang != null) {
-                    langObj = Lang.getInstance().getLangJson(lang.toLowerCase());
-                }
+                JSONObject langObj = Lang.getInstance().getLangJson(lang);
 
                 out.put("error", result.getB());
                 out.put("message", langObj == null ? OnDealClick.resultMess(result.getB()) : Lang.T(OnDealClick.resultMess(result.getB()), langObj));
