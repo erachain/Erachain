@@ -72,7 +72,6 @@ public class ExDataPanel extends JPanel {
     private MTable jTable_Attached_Files;
     private MTable jTable_Other_Hashes;
     private JTextPane jTextPane_Message;
-    private MImprintEDITPane jTextPane_Message_Public;
     public JCheckBox checkBoxMakeHashAndCheckUniqueText;
     public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
@@ -85,8 +84,6 @@ public class ExDataPanel extends JPanel {
     public ExDataPanel(IssueDocumentPanel parentPanel) {
 
         this.parentPanel = parentPanel;
-
-        jTextPane_Message_Public = new MImprintEDITPane();
 
         initComponents();
 
@@ -294,8 +291,6 @@ public class ExDataPanel extends JPanel {
         layout.columnWidths = new int[]{0, 0, 0};
         layout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
         setLayout(layout);
-
-        jScrollPane_Message_Public_TextPane.setViewportView(jTextPane_Message_Public);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
