@@ -12,6 +12,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.Caret;
 import javax.validation.constraints.Null;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -64,11 +65,25 @@ public class MFillTemplatePanel extends JPanel {
                 }
                 if (str == null || str.equals(""))
                     return;
+
+                MImprintEDITPane source = (MImprintEDITPane) arg0.getSource();
+                Caret carret = source.getCaret();
+                Point pos = carret.getMagicCaretPosition();
+                int mark = carret.getMark();
+
                 jTextPane_Message_Public.pars.replace("{{" + arg0.getDescription().replace("!$@!", "") + "}}", str);
                 for (int i = 0; i < params_Template_Model.getRowCount(); i++) {
                     if (arg0.getDescription().replace("!$@!", "").equals(params_Template_Model.getValueAt(i, 0)))
                         params_Template_Model.setValueAt(str, i, 1);
                 }
+                carret.setMagicCaretPosition(pos);
+
+                MImprintEDITPane source1 = (MImprintEDITPane) arg0.getSource();
+                Caret carret1 = source1.getCaret();
+                Point pos1 = carret1.getMagicCaretPosition();
+                int mark1 = carret1.getMark();
+
+                //carret.set
             }
         });
 
@@ -123,8 +138,9 @@ public class MFillTemplatePanel extends JPanel {
                 jTextPane_Message_Public.pars.replace("{{" + params_Template_Model.getValueAt(arg0.getFirstRow(), 0) + "}}", (String) params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()));
                 //			 System.out.print("\n" + get_TemplateCls().viewName() + "\n");
                 //				System.out.print(get_Params());
-                jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
-                //jTextPane_Message_Public.updateText();
+                //jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(false));
+
+                jTextPane_Message_Public.updateText();
                 arg0 = arg0;
             }
         });

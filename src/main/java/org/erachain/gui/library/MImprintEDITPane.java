@@ -28,14 +28,17 @@ public class MImprintEDITPane extends JTextPane {
 
     public void set_Text(String text1) {
         this.text = text1;
-        super.setText(init_String(text, true));
+        super.setText(init_String(true));
+        setCaretPosition(1);
     }
 
     public void updateText() {
-        super.setText(init_String(text, true));
+        int pos = getCaretPosition();
+        super.setText(init_String(false));
+        setCaretPosition(pos);
     }
 
-    public String init_String(String text, boolean first) {
+    public String init_String(boolean first) {
         Pattern p = Pattern.compile("\\{\\{(.+?)\\}\\}");
         //	if(BlockChain.DEVELOP_USE)	text = text + "\n {{!Bottom}}";
         String out = text;  // переводим в маркдаун
