@@ -49,6 +49,15 @@ public class MImprintEDITPane extends JTextPane {
         return text.indexOf(value);
     }
 
+    String updatedParam;
+
+    public void updateParam(String param, String value) {
+        updatedParam = param;
+        pars.replace("{{" + param + "}}", value);
+        updateText();
+    }
+
+
     public String init_String(boolean first) {
         Pattern p = Pattern.compile("\\{\\{(.+?)\\}\\}");
 
@@ -63,6 +72,7 @@ public class MImprintEDITPane extends JTextPane {
             out = out.replace(m.group(), "<A href='!$@!" + m.group(1) + "' style='color:green'>" + to_HTML(pars.get(m.group())) + "</a>");
         }
 
+        updatedParam = null;
         int fontSize = UIManager.getFont("Label.font").getSize();
 
         return "<head><style>"
