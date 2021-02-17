@@ -66,12 +66,10 @@ public class MFillTemplatePanel extends JPanel {
                     return;
 
                 jTextPane_Message_Public.fixCaretPosition();
-                jTextPane_Message_Public.pars.replace("{{" + arg0.getDescription().replace("!$@!", "") + "}}", str);
 
-                for (int i = 0; i < params_Template_Model.getRowCount(); i++) {
-                    if (findArg.equals(params_Template_Model.getValueAt(i, 0)))
-                        params_Template_Model.setValueAt(str, i, 1);
-                }
+                jTextPane_Message_Public.updateParam(arg0.getDescription().replace("!$@!", ""),
+                        str);
+
             }
         });
 
@@ -121,20 +119,8 @@ public class MFillTemplatePanel extends JPanel {
                 if (arg0.getType() != 0 && arg0.getColumn() < 0)
                     return;
 
-                if (true) {
-                    jTextPane_Message_Public.updateParam(params_Template_Model.getValueAt(arg0.getFirstRow(), 0).toString(),
-                            (String) params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()));
-                } else {
-                    String argKey = "{{" + params_Template_Model.getValueAt(arg0.getFirstRow(), 0) + "}}";
-                    if (jTextPane_Message_Public.caretPosition == 0) {
-                        // UTF-8 - 2 bytes
-                        //jTextPane_Message_Public.caretPosition = -50 + jTextPane_Message_Public.indexOf(argKey) >> 1;
-                        if (jTextPane_Message_Public.caretPosition < 0)
-                            jTextPane_Message_Public.caretPosition = 0;
-                    }
-                    jTextPane_Message_Public.pars.replace(argKey, (String) params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()));
-                    jTextPane_Message_Public.updateText();
-                }
+                jTextPane_Message_Public.updateParam(params_Template_Model.getValueAt(arg0.getFirstRow(), 0).toString(),
+                        (String) params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()));
             }
         });
 
