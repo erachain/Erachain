@@ -52,19 +52,24 @@ public class MFillTemplatePanel extends JPanel {
             public void hyperlinkUpdate(HyperlinkEvent arg0) {
                 // TODO Auto-generated method stub
                 String str = null;
-                if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
+                if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED)
+                    return;
+
+                String findArg = arg0.getDescription().replace("!$@!", "");
                 if (arg0.getDescription().indexOf("!$@!") != 0) {
                 } else {
                     str = JOptionPane.showInputDialog(MainFrame.getInstance(),
-                            Lang.T("Insert") + " " + arg0.getDescription().replace("!$@!", ""),
-                            jTextPane_Message_Public.pars.get("{{" + arg0.getDescription().replace("!$@!", "") + "}}"));
+                            Lang.T("Insert") + " " + findArg,
+                            jTextPane_Message_Public.pars.get("{{" + findArg + "}}"));
                 }
-                if (str == null || str.equals(""))
+                if (str == null || str.isEmpty())
                     return;
 
+                jTextPane_Message_Public.fixCaretPosition();
                 jTextPane_Message_Public.pars.replace("{{" + arg0.getDescription().replace("!$@!", "") + "}}", str);
+
                 for (int i = 0; i < params_Template_Model.getRowCount(); i++) {
-                    if (arg0.getDescription().replace("!$@!", "").equals(params_Template_Model.getValueAt(i, 0)))
+                    if (findArg.equals(params_Template_Model.getValueAt(i, 0)))
                         params_Template_Model.setValueAt(str, i, 1);
                 }
             }
@@ -113,10 +118,18 @@ public class MFillTemplatePanel extends JPanel {
             public void tableChanged(TableModelEvent arg0) {
                 // TODO Auto-generated method stub
 
-                if (arg0.getType() != 0 && arg0.getColumn() < 0) return;
-                jTextPane_Message_Public.pars.replace("{{" + params_Template_Model.getValueAt(arg0.getFirstRow(), 0) + "}}", (String) params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()));
+                if (arg0.getType() != 0 && arg0.getColumn() < 0)
+                    return;
+
+                String argKey = "{{" + params_Template_Model.getValueAt(arg0.getFirstRow(), 0) + "}}";
+                if (jTextPane_Message_Public.caretPosition == 0) {
+                    // UTF-8 - 2 bytes
+                    jTextPane_Message_Public.caretPosition = -50 + jTextPane_Message_Public.indexOf(argKey) >> 1;
+                    if (jTextPane_Message_Public.caretPosition < 0)
+                        jTextPane_Message_Public.caretPosition = 0;
+                }
+                jTextPane_Message_Public.pars.replace(argKey, (String) params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()));
                 jTextPane_Message_Public.updateText();
-                arg0 = arg0;
             }
         });
 
@@ -247,7 +260,7 @@ public class MFillTemplatePanel extends JPanel {
 
         }
         jTextPane_Message_Public.pars.clear();
-        jTextPane_Message_Public.set_Text(ww);
+        jTextPane_Message_Public.setText(ww);
         HashMap<String, String> ss = jTextPane_Message_Public.get_Params();
         Set<String> sk = ss.keySet();
 

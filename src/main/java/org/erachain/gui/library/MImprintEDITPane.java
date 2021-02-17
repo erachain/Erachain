@@ -26,33 +26,42 @@ public class MImprintEDITPane extends JTextPane {
 
     }
 
-    public void set_Text(String text1) {
-        this.text = text1;
+    public void setText(String text) {
+        this.text = text;
         super.setText(init_String(true));
-        setCaretPosition(1);
+        setCaretPosition((caretPosition = 0));
+    }
+
+    public int caretPosition;
+
+    public void fixCaretPosition() {
+        caretPosition = getCaretPosition();
     }
 
     public void updateText() {
-        int pos = getCaretPosition();
         super.setText(init_String(false));
-        setCaretPosition(pos);
+        setCaretPosition(caretPosition);
+        caretPosition = 0;
+
+    }
+
+    public int indexOf(String value) {
+        return text.indexOf(value);
     }
 
     public String init_String(boolean first) {
         Pattern p = Pattern.compile("\\{\\{(.+?)\\}\\}");
-        //	if(BlockChain.DEVELOP_USE)	text = text + "\n {{!Bottom}}";
-        String out = text;  // переводим в маркдаун
 
-        Matcher m = p.matcher(text);
+        // переводим в нужный формат
+        String out = Library.viewDescriptionHTML(text);
+        out = out.replaceAll("\n", "<br>");
+
+        Matcher m = p.matcher(out);
         // начальный разбор и присвоение начальных параметров строке
         while (m.find()) {
             if (first) pars.put(m.group(), m.group(1));
-            out = Library.viewDescriptionHTML(out);
             out = out.replace(m.group(), "<A href='!$@!" + m.group(1) + "' style='color:green'>" + to_HTML(pars.get(m.group())) + "</a>");
-
         }
-
-        out = out.replaceAll("\n", "<br>");
 
         int fontSize = UIManager.getFont("Label.font").getSize();
 
@@ -66,7 +75,6 @@ public class MImprintEDITPane extends JTextPane {
                 + UIManager.getFont("Label.font").getFamily() + "; font-size:" + fontSize + "px;"
                 + "word-wrap:break-word;}"
                 + "</style> </head><body>" + out
-                //	+ "<br><a href= 111jcnfkBOTTOM>Bottom</a>"
                 + "</body>";
 
     }

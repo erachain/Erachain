@@ -110,17 +110,15 @@ public class ExDataPanel extends JPanel {
                         jTextPane_Message_Public.pars.get("{{" + arg0.getDescription() + "}}"));
                 if (str == null || str.isEmpty())
                     return;
-                int pos = jTextPane_Message_Public.getCaretPosition();
-                jTextPane_Message_Public.pars.replace("{{" + arg0.getDescription() + "}}", str);
-                jTextPane_Message_Public
-                        .setText(jTextPane_Message_Public.init_String(false));
-                //jTextPane_Message_Public.updateText();
-                for (int i1 = 0; i1 < jTable_Params_Message_Public.getRowCount(); i1++) {
 
-                    if (arg0.getDescription().equals(jTable_Params_Message_Public.getValueAt(i1, 0)))
+                jTextPane_Message_Public.fixCaretPosition();
+                jTextPane_Message_Public.pars.replace("{{" + arg0.getDescription() + "}}", str);
+                for (int i1 = 0; i1 < jTable_Params_Message_Public.getRowCount(); i1++) {
+                    if (arg0.getDescription().equals(jTable_Params_Message_Public.getValueAt(i1, 0))) {
+                        // rise UPDATE event
                         jTable_Params_Message_Public.setValueAt(str, i1, 1);
+                    }
                 }
-                jTextPane_Message_Public.setCaretPosition(pos);
             }
         });
         initComponents();
@@ -339,13 +337,11 @@ public class ExDataPanel extends JPanel {
 
                 if (arg0.getType() != 0 && arg0.getColumn() < 0)
                     return;
+
                 jTextPane_Message_Public.pars.replace(
                         "{{" + params_Template_Model.getValueAt(arg0.getFirstRow(), 0) + "}}",
                         (String) params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()));
-                // System.out.print("\n");
-                // System.out.print(jTextPane_Message_Public.pars);
-                jTextPane_Message_Public
-                        .setText(jTextPane_Message_Public.init_String(false));
+                jTextPane_Message_Public.updateText();
             }
         });
 
