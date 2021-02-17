@@ -1775,6 +1775,22 @@ public class BlockExplorer {
         // balance assets from
         LinkedHashMap output = new LinkedHashMap();
 
+        output.put("side", side);
+
+        output.put("Side_Help", Lang.T("Side_Help", langObj));
+        output.put("Label_TotalDebit", Lang.T("Total Debit", langObj));
+        output.put("Label_Left", Lang.T("Left # остаток", langObj));
+        output.put("Label_TotalCredit", Lang.T("Total Credit", langObj));
+
+        output.put("Label_Balance_table", Lang.T("Balance", langObj));
+        output.put("Label_asset_key", Lang.T("Key", langObj));
+        output.put("Label_asset_name", Lang.T("Name", langObj));
+
+        output.put("Label_Balance_1", Lang.T("OWN (1)", langObj));
+        output.put("Label_Balance_2", Lang.T("DEBT (2)", langObj));
+        output.put("Label_Balance_3", Lang.T("HOLD (3)", langObj));
+        output.put("Label_Balance_4", Lang.T("SPEND (4)", langObj));
+
         ItemAssetMap assetsMap = DCSet.getInstance().getItemAssetMap();
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
 
@@ -1824,21 +1840,6 @@ public class BlockExplorer {
         }
 
         output.put("balances", balAssets);
-        output.put("side", side);
-
-        output.put("Side_Help", Lang.T("Side_Help", langObj));
-        output.put("Label_TotalDebit", Lang.T("Total Debit", langObj));
-        output.put("Label_Left", Lang.T("Left # остаток", langObj));
-        output.put("Label_TotalCredit", Lang.T("Total Credit", langObj));
-
-        output.put("Label_Balance_table", Lang.T("Balance", langObj));
-        output.put("Label_asset_key", Lang.T("Key", langObj));
-        output.put("Label_asset_name", Lang.T("Name", langObj));
-
-        output.put("Label_Balance_1", Lang.T("OWN (1)", langObj));
-        output.put("Label_Balance_2", Lang.T("DEBT (2)", langObj));
-        output.put("Label_Balance_3", Lang.T("HOLD (3)", langObj));
-        output.put("Label_Balance_4", Lang.T("SPEND (4)", langObj));
 
         return output;
 

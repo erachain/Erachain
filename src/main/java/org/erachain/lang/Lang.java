@@ -37,6 +37,10 @@ public class Lang {
     }
 
     public JSONObject getLangJson(String iso) {
+        if (iso == null) {
+            return langList.get("en").getLangJson();
+        }
+
         iso = iso.toLowerCase();
         LangFile langISO = langList.get(iso);
         if (langISO == null) {
