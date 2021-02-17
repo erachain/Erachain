@@ -108,11 +108,12 @@ public class ExDataPanel extends JPanel {
                 String str = JOptionPane.showInputDialog(jTextPane_Message_Public.th,
                         Lang.T("Insert") + " " + arg0.getDescription(),
                         jTextPane_Message_Public.pars.get("{{" + arg0.getDescription() + "}}"));
-                if (str == null || str.equals(""))
+                if (str == null || str.isEmpty())
                     return;
                 jTextPane_Message_Public.pars.replace("{{" + arg0.getDescription() + "}}", str);
                 jTextPane_Message_Public
                         .setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
+                //jTextPane_Message_Public.updateText();
                 for (int i1 = 0; i1 < jTable_Params_Message_Public.getRowCount(); i1++) {
 
                     if (arg0.getDescription().equals(jTable_Params_Message_Public.getValueAt(i1, 0)))
@@ -160,7 +161,7 @@ public class ExDataPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String str = JOptionPane.showInputDialog(null, Lang.T("Insert Hash"),
                         Lang.T("Add"), JOptionPane.INFORMATION_MESSAGE);
-                if (str == null || str == "" || str.equals(""))
+                if (str == null || str == "" || str.isEmpty())
                     return;
                 hashes_Table_Model.addRow(new Object[]{str, "Add"});
                 hashes_Table_Model.fireTableDataChanged();

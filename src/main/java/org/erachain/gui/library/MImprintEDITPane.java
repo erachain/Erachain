@@ -28,18 +28,12 @@ public class MImprintEDITPane extends JTextPane {
 
     public void set_Text(String text1) {
         this.text = text1;
-        setText(init_String(text, true));
-
-
+        super.setText(init_String(text, true));
     }
 
-    public void set_View(String text1) {
-        this.text = text1;
-        setText(init_String(text, true));
-
-
+    public void updateText() {
+        super.setText(init_String(text, true));
     }
-
 
     public String init_String(String text, boolean first) {
         Pattern p = Pattern.compile("\\{\\{(.+?)\\}\\}");
@@ -82,14 +76,6 @@ public class MImprintEDITPane extends JTextPane {
             pps.put(a.replace("{{", "").replace("}}", ""), pars.get(a));
         }
         return pps;
-    }
-
-    public String init_view(String text1, HashMap<String, String> pars) {
-        Set<String> aa = pars.keySet();
-        for (String par : aa) {
-            text1 = text1.replace("{{" + par + "}}", pars.get(par));
-        }
-        return text1;
     }
 
     public String to_HTML(String str) {

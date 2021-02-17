@@ -65,7 +65,6 @@ public class MFillTemplatePanel extends JPanel {
                 if (str == null || str.equals(""))
                     return;
                 jTextPane_Message_Public.pars.replace("{{" + arg0.getDescription().replace("!$@!", "") + "}}", str);
-                jTextPane_Message_Public.init_view(jTextPane_Message_Public.text, jTextPane_Message_Public.get_Params());
                 for (int i = 0; i < params_Template_Model.getRowCount(); i++) {
                     if (arg0.getDescription().replace("!$@!", "").equals(params_Template_Model.getValueAt(i, 0)))
                         params_Template_Model.setValueAt(str, i, 1);
@@ -125,6 +124,7 @@ public class MFillTemplatePanel extends JPanel {
                 //			 System.out.print("\n" + get_TemplateCls().viewName() + "\n");
                 //				System.out.print(get_Params());
                 jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
+                //jTextPane_Message_Public.updateText();
                 arg0 = arg0;
             }
         });
