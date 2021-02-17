@@ -1229,6 +1229,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Transaction> txs = new ArrayList<>();
+        long timeOut = System.currentTimeMillis();
 
         int forgedCount = 0;
         if (offset < 0 || limit < 0) {
@@ -1255,6 +1256,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                                 forgedCount++;
                                 continue;
                             } else {
+                                if (System.currentTimeMillis() - timeOut > 5000) {
+                                    break;
+                                }
                                 forgedCount = 0;
                             }
                         }
@@ -1315,6 +1319,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                                 forgedCount++;
                                 continue;
                             } else {
+                                if (System.currentTimeMillis() - timeOut > 5000) {
+                                    break;
+                                }
                                 forgedCount = 0;
                             }
                         }
