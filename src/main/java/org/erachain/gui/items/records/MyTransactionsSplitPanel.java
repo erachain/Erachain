@@ -316,6 +316,19 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         });
         menuSaveCopy.add(copyNumber);
 
+        JMenuItem copySign = new JMenuItem(Lang.T("Copy Signature"));
+        copyNumber.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection(selectedTransaction.viewSignature());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Signature '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewSignature())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copySign);
+
         JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
         copyJson.addActionListener(e -> {
             StringSelection stringSelection = new StringSelection(selectedTransaction.toJson().toJSONString());

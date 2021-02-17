@@ -152,6 +152,20 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         });
         menuSaveCopy.add(copyNumber);
 
+        JMenuItem copySign = new JMenuItem(Lang.T("Copy Signature"));
+        copyNumber.addActionListener(e -> {
+            Transaction transaction = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            StringSelection stringSelection = new StringSelection(transaction.viewSignature());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Signature '%1' has been copy to buffer")
+                            .replace("%1", transaction.viewSignature())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copySign);
+
         JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
         copyJson.addActionListener(e -> {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
