@@ -701,9 +701,17 @@ button.white-bgc[disabled]:focus,
             }
 
             output += '</table>';
+
+            if (!data.Balance) {
+                // при долгом ответе данные пустые и сайт валится
+               output += 'Data unavailable. Try late!';
+               return output;
+            }
+
             output += '<table width="1280" border=0><tr><td align=left>';
 
             output += '<span style="font-size:1.2em">';
+
             output += data.Balance.Label_Balance_table;
 
             if (false) {

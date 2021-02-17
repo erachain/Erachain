@@ -1230,6 +1230,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         List<Transaction> txs = new ArrayList<>();
 
+        int forgedCount = 0;
         if (offset < 0 || limit < 0) {
             if (limit < 0)
                 limit = -limit;
@@ -1249,7 +1250,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         RCalculated tx = (RCalculated) item;
                         String mess = tx.getMessage();
                         if (mess != null && mess.equals("forging")) {
-                            continue;
+                            if (forgedCount < 100) {
+                                // skip all but not 100
+                                forgedCount++;
+                                continue;
+                            } else {
+                                forgedCount = 0;
+                            }
                         }
                     }
 
@@ -1303,7 +1310,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         RCalculated tx = (RCalculated) item;
                         String mess = tx.getMessage();
                         if (mess != null && mess.equals("forging")) {
-                            continue;
+                            if (forgedCount < 100) {
+                                // skip all but not 100
+                                forgedCount++;
+                                continue;
+                            } else {
+                                forgedCount = 0;
+                            }
                         }
                     }
 
