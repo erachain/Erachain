@@ -67,8 +67,12 @@ public class MFillTemplatePanel extends JPanel {
 
                 jTextPane_Message_Public.fixCaretPosition();
 
-                jTextPane_Message_Public.updateParam(arg0.getDescription().replace("!$@!", ""),
-                        str);
+                // RISE event
+                for (int i = 0; i < params_Template_Model.getRowCount(); i++) {
+                    if (arg0.getDescription().replace("!$@!", "").equals(params_Template_Model.getValueAt(i, 0)))
+                        params_Template_Model.setValueAt(str, i, 1);
+                }
+
 
             }
         });
