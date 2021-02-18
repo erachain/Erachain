@@ -52,8 +52,8 @@ public class MImprintEDITPane extends JTextPane {
     String updatedParam;
 
     public void updateParam(String param, String value) {
-        updatedParam = param;
-        pars.replace("{{" + param + "}}", value);
+        updatedParam = "{{" + param + "}}";
+        pars.replace(updatedParam, value);
         updateText();
     }
 
@@ -62,20 +62,32 @@ public class MImprintEDITPane extends JTextPane {
         Pattern p = Pattern.compile("\\{\\{(.+?)\\}\\}");
 
         // переводим в нужный формат
-        String out = Library.viewDescriptionHTML(text);
-        out = out.replaceAll("\n", "<br>");
+        String out = text;
 
         Matcher m = p.matcher(out);
         // начальный разбор и присвоение начальных параметров строке
+        String updatedValue = "";
         while (m.find()) {
-            if (first) pars.put(m.group(), m.group(1));
-            out = out.replace(m.group(), "<A href='!$@!" + m.group(1) + "' style='color:green'>" + to_HTML(pars.get(m.group())) + "</a>");
+            if (first)
+                pars.put(m.group(), m.group(1));
+
+            String newValue = "<A href='!$@!" + m.group(1) + "' style='color:green'>" + to_HTML(pars.get(m.group())) + "</a>";
+
+            if (caretPosition == 0 && updatedParam != null && updatedParam.equals(m.group())) {
+                updatedValue = newValue;
+            }
+            out = out.replace(m.group(), newValue);
         }
 
-        updatedParam = null;
+        out = Library.viewDescriptionHTML(out);
+        out = out.replaceAll("\n", "<br>");
+
         int fontSize = UIManager.getFont("Label.font").getSize();
 
-        return "<head><style>"
+        if (caretPosition == 0)
+            caretPosition = out.indexOf(updatedValue) >> 1;
+
+        out = "<head><style>"
                 + " h1{ font-size: " + (fontSize + 5) + "px;  } "
                 + " h2{ font-size: " + (fontSize + 3) + "px;  }"
                 + " h3{ font-size: " + (fontSize + 1) + "px;  }"
@@ -86,6 +98,9 @@ public class MImprintEDITPane extends JTextPane {
                 + "word-wrap:break-word;}"
                 + "</style> </head><body>" + out
                 + "</body>";
+
+        updatedParam = null;
+        return out;
 
     }
 
