@@ -40,7 +40,11 @@ public class MImprintEDITPane extends JTextPane {
 
     public void updateText() {
         super.setText(init_String(false));
-        setCaretPosition(caretPosition);
+        try {
+            setCaretPosition(caretPosition);
+        } catch (Exception e) {
+            // if out size
+        }
         caretPosition = 0;
 
     }
@@ -84,8 +88,10 @@ public class MImprintEDITPane extends JTextPane {
 
         int fontSize = UIManager.getFont("Label.font").getSize();
 
-        if (caretPosition == 0)
+        if (caretPosition == 0) {
+            // UTF-8 2 byte
             caretPosition = out.indexOf(updatedValue) >> 1;
+        }
 
         out = "<head><style>"
                 + " h1{ font-size: " + (fontSize + 5) + "px;  } "
