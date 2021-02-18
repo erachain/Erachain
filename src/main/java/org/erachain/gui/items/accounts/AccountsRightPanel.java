@@ -209,26 +209,30 @@ public class AccountsRightPanel extends JPanel {
                 Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
 
                 if (selectedTransaction == null) return;
-                // DLSet db = DLSet.getInstance();
 
-                if (!selectedTransaction.isSignatureValid(DCSet.getInstance())) {
+                DCSet dcSet = DCSet.getInstance();
+                if (!selectedTransaction.isSignatureValid(dcSet)) {
                     JOptionPane.showMessageDialog(new JFrame(),
                             Lang.T("Signature Invalid") + "!",
-                            Lang.T("Wrong"), JOptionPane.ERROR_MESSAGE);
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (selectedTransaction.getConfirmations(DCSet.getInstance()) <= 0) {
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.T("Unconfirmed") + "!",
-                            Lang.T("Wrong"), JOptionPane.INFORMATION_MESSAGE);
-                    return;
+                selectedTransaction.setDC(dcSet, false);
+                if (selectedTransaction.getConfirmations(dcSet) <= 0) {
+                    Long dbRef = dcSet.getTransactionFinalMapSigns().get(selectedTransaction.getSignature());
+                    if (dbRef == null) {
+                        JOptionPane.showMessageDialog(new JFrame(),
+                                Lang.T("Transaction unconfirmed") + "!",
+                                Lang.T("Wrong"), JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    selectedTransaction.setHeightSeq(dbRef);
                 }
 
-                selectedTransaction.setDC(DCSet.getInstance(), true);
                 Controller.getInstance().wallet.processTransaction(selectedTransaction);
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.T("Good") + "!",
+                        Lang.T("Transaction confirmed") + "!",
                         Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
             }
@@ -289,6 +293,20 @@ public class AccountsRightPanel extends JPanel {
 
         });
         menuSaveCopy.add(copyNumber);
+
+        JMenuItem copySign = new JMenuItem(Lang.T("Copy Signature"));
+        copyNumber.addActionListener(e -> {
+            Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
+            StringSelection stringSelection = new StringSelection(selectedTransaction.viewSignature());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Signature '%1' has been copy to buffer")
+                            .replace("%1", selectedTransaction.viewSignature())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copySign);
 
         JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
         copyJson.addActionListener(e -> {
