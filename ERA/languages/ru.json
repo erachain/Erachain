@@ -1401,6 +1401,7 @@
   "Sign / Vouch": "Подписать / Заверить",
   "Signatory / Voucher": "Подписант / Поручитель",
   "Signature": "Подпись",
+  "Signature '%1' has been copy to buffer": "Подпись '%1' была скопирована в карман",
   "Signatures": "Подписи",
   "Signatures of the parties": "Подписи сторон",
   "Signed Transaction": "Подписанная транзакция",
