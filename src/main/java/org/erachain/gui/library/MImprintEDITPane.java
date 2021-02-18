@@ -49,10 +49,6 @@ public class MImprintEDITPane extends JTextPane {
 
     }
 
-    public int indexOf(String value) {
-        return text.indexOf(value);
-    }
-
     String updatedParam;
 
     public void updateParam(String param, String value) {
