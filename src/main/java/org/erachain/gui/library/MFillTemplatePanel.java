@@ -52,24 +52,28 @@ public class MFillTemplatePanel extends JPanel {
             public void hyperlinkUpdate(HyperlinkEvent arg0) {
                 // TODO Auto-generated method stub
                 String str = null;
-                if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
-                if (arg0.getDescription().toString().indexOf("!$@!") != 0) {
-                    //		System.out.print(arg0.getDescription());
-                    //		MTemplateParamTextPaneDialog d = new MTemplateParamTextPaneDialog(jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"), getMousePosition());
-                    //			str =d.tp.getText();
+                if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED)
+                    return;
+
+                String findArg = arg0.getDescription().replace("!$@!", "");
+                if (arg0.getDescription().indexOf("!$@!") != 0) {
                 } else {
                     str = JOptionPane.showInputDialog(MainFrame.getInstance(),
-                            Lang.T("Insert") + " " + arg0.getDescription().replace("!$@!", ""),
-                            jTextPane_Message_Public.pars.get("{{" + arg0.getDescription().replace("!$@!", "") + "}}"));
+                            Lang.T("Insert") + " " + findArg,
+                            jTextPane_Message_Public.pars.get("{{" + findArg + "}}"));
                 }
-                if (str == null || str.equals(""))
+                if (str == null || str.isEmpty())
                     return;
-                jTextPane_Message_Public.pars.replace("{{" + arg0.getDescription().replace("!$@!", "") + "}}", str);
-                jTextPane_Message_Public.init_view(jTextPane_Message_Public.text, jTextPane_Message_Public.get_Params());
+
+                jTextPane_Message_Public.fixCaretPosition();
+
+                // RISE event
                 for (int i = 0; i < params_Template_Model.getRowCount(); i++) {
                     if (arg0.getDescription().replace("!$@!", "").equals(params_Template_Model.getValueAt(i, 0)))
                         params_Template_Model.setValueAt(str, i, 1);
                 }
+
+
             }
         });
 
@@ -116,16 +120,11 @@ public class MFillTemplatePanel extends JPanel {
             public void tableChanged(TableModelEvent arg0) {
                 // TODO Auto-generated method stub
 
-                if (arg0.getType() != 0 && arg0.getColumn() < 0) return;
-                //			System.out.print("\n row = " + arg0.getFirstRow() + "  Col="+ arg0.getColumn() + "   type =" + arg0.getType());
-                String dd = params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()).toString();
-                //			System.out.print("\n key:"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +" value:" + params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
+                if (arg0.getType() != 0 && arg0.getColumn() < 0)
+                    return;
 
-                jTextPane_Message_Public.pars.replace("{{" + params_Template_Model.getValueAt(arg0.getFirstRow(), 0) + "}}", (String) params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()));
-                //			 System.out.print("\n" + get_TemplateCls().viewName() + "\n");
-                //				System.out.print(get_Params());
-                jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
-                arg0 = arg0;
+                jTextPane_Message_Public.updateParam(params_Template_Model.getValueAt(arg0.getFirstRow(), 0).toString(),
+                        (String) params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()));
             }
         });
 
@@ -256,7 +255,7 @@ public class MFillTemplatePanel extends JPanel {
 
         }
         jTextPane_Message_Public.pars.clear();
-        jTextPane_Message_Public.set_Text(ww);
+        jTextPane_Message_Public.setText(ww);
         HashMap<String, String> ss = jTextPane_Message_Public.get_Params();
         Set<String> sk = ss.keySet();
 
