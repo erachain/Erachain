@@ -10,6 +10,7 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.WalletTableRenderer;
+import org.erachain.gui.items.records.MyTransactionsSplitPanel;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
@@ -204,37 +205,8 @@ public class AccountsRightPanel extends JPanel {
         itemCheckTX.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // code Rebroadcast
-
                 Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
-
-                if (selectedTransaction == null) return;
-
-                DCSet dcSet = DCSet.getInstance();
-                if (!selectedTransaction.isSignatureValid(dcSet)) {
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            Lang.T("Signature Invalid") + "!",
-                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                selectedTransaction.setDC(dcSet, false);
-                if (selectedTransaction.getConfirmations(dcSet) <= 0) {
-                    Long dbRef = dcSet.getTransactionFinalMapSigns().get(selectedTransaction.getSignature());
-                    if (dbRef == null) {
-                        JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.T("Transaction unconfirmed") + "!",
-                                Lang.T("Wrong"), JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                    selectedTransaction.setHeightSeq(dbRef);
-                }
-
-                Controller.getInstance().wallet.processTransaction(selectedTransaction);
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.T("Transaction confirmed") + "!",
-                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
-
+                MyTransactionsSplitPanel.validate(selectedTransaction);
             }
         });
         mainMenu.add(itemCheckTX);
