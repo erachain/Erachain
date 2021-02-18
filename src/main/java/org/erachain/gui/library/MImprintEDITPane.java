@@ -26,40 +26,70 @@ public class MImprintEDITPane extends JTextPane {
 
     }
 
-    public void set_Text(String text1) {
-        this.text = text1;
-        setText(init_String(text, true));
+    public void setText(String text) {
+        this.text = text;
+        super.setText(init_String(true));
+        setCaretPosition((caretPosition = 0));
+    }
 
+    public int caretPosition;
+
+    public void fixCaretPosition() {
+        caretPosition = getCaretPosition();
+    }
+
+    public void updateText() {
+        super.setText(init_String(false));
+        try {
+            setCaretPosition(caretPosition);
+        } catch (Exception e) {
+            // if out size
+        }
+        caretPosition = 0;
 
     }
 
-    public void set_View(String text1) {
-        this.text = text1;
-        setText(init_String(text, true));
+    String updatedParam;
 
-
+    public void updateParam(String param, String value) {
+        updatedParam = "{{" + param + "}}";
+        pars.replace(updatedParam, value);
+        updateText();
     }
 
 
-    public String init_String(String text, boolean first) {
+    public String init_String(boolean first) {
         Pattern p = Pattern.compile("\\{\\{(.+?)\\}\\}");
-        //	if(BlockChain.DEVELOP_USE)	text = text + "\n {{!Bottom}}";
-        String out = text;  // переводим в маркдаун
 
-        Matcher m = p.matcher(text);
+        // переводим в нужный формат
+        String out = text;
+
+        Matcher m = p.matcher(out);
         // начальный разбор и присвоение начальных параметров строке
+        String updatedValue = "";
         while (m.find()) {
-            if (first) pars.put(m.group(), m.group(1));
-            out = Library.viewDescriptionHTML(out);
-            out = out.replace(m.group(), "<A href='!$@!" + m.group(1) + "' style='color:green'>" + to_HTML(pars.get(m.group())) + "</a>");
+            if (first)
+                pars.put(m.group(), m.group(1));
 
+            String newValue = "<A href='!$@!" + m.group(1) + "' style='color:green'>" + to_HTML(pars.get(m.group())) + "</a>";
+
+            if (caretPosition == 0 && updatedParam != null && updatedParam.equals(m.group())) {
+                updatedValue = newValue;
+            }
+            out = out.replace(m.group(), newValue);
         }
 
+        out = Library.viewDescriptionHTML(out);
         out = out.replaceAll("\n", "<br>");
 
         int fontSize = UIManager.getFont("Label.font").getSize();
 
-        return "<head><style>"
+        if (caretPosition == 0) {
+            // UTF-8 2 byte
+            caretPosition = out.indexOf(updatedValue) >> 1;
+        }
+
+        out = "<head><style>"
                 + " h1{ font-size: " + (fontSize + 5) + "px;  } "
                 + " h2{ font-size: " + (fontSize + 3) + "px;  }"
                 + " h3{ font-size: " + (fontSize + 1) + "px;  }"
@@ -69,8 +99,10 @@ public class MImprintEDITPane extends JTextPane {
                 + UIManager.getFont("Label.font").getFamily() + "; font-size:" + fontSize + "px;"
                 + "word-wrap:break-word;}"
                 + "</style> </head><body>" + out
-                //	+ "<br><a href= 111jcnfkBOTTOM>Bottom</a>"
                 + "</body>";
+
+        updatedParam = null;
+        return out;
 
     }
 
@@ -82,14 +114,6 @@ public class MImprintEDITPane extends JTextPane {
             pps.put(a.replace("{{", "").replace("}}", ""), pars.get(a));
         }
         return pps;
-    }
-
-    public String init_view(String text1, HashMap<String, String> pars) {
-        Set<String> aa = pars.keySet();
-        for (String par : aa) {
-            text1 = text1.replace("{{" + par + "}}", pars.get(par));
-        }
-        return text1;
     }
 
     public String to_HTML(String str) {

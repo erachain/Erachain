@@ -9,6 +9,7 @@ import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
+import org.erachain.gui.items.records.MyTransactionsSplitPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
@@ -189,6 +190,17 @@ public class StatementsMySplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
+        JMenuItem itemCheckTX = new JMenuItem(Lang.T("Validate"));
+        itemCheckTX.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Transaction selectedTransaction = my_Statements_Model.getItem(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;
+                MyTransactionsSplitPanel.validate(selectedTransaction);
+            }
+        });
+        menu.add(itemCheckTX);
+
         JMenuItem vouch_menu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -232,6 +244,23 @@ public class StatementsMySplitPanel extends SplitPanel {
 
         });
         menuSaveCopy.add(copyNumber);
+
+        JMenuItem copySign = new JMenuItem(Lang.T("Copy Signature"));
+        copyNumber.addActionListener(e -> {
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
+            Transaction transaction = my_Statements_Model.getItem(jTableJScrollPanelLeftPanel
+                    .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;
+            if (transaction == null) return;
+            StringSelection stringSelection = new StringSelection(transaction.viewSignature());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Signature '%1' has been copy to buffer")
+                            .replace("%1", transaction.viewSignature())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copySign);
 
         JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
         copyJson.addActionListener(e -> {

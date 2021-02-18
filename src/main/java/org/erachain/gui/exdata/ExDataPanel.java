@@ -20,10 +20,6 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -47,16 +43,12 @@ public class ExDataPanel extends JPanel {
     IssueDocumentPanel parentPanel;
 
     public MultipleRecipientsPanel multipleRecipientsPanel;
-    public MSplitPane sp_pan;
     public MFillTemplatePanel fill_Template_Panel;
     public JTextField jTextField_Title_Message;
     public MTable jTable_Params_Message_Public;
     protected TemplateCls sel_Template;
     private TableModelIssueHashes hashes_Table_Model;
     private AttacheFilesModel attached_Files_Model;
-    private org.erachain.gui.exdata.ParamsTemplateModel params_Template_Model;
-    private ExDataPanel th;
-    // Variables declaration - do not modify
     private MButton jButton_Add_Attached_Files;
     private MButton jButton_Add_From_File_Other_Hashes;
     private MButton jButton_Add_Other_Hashes;
@@ -68,7 +60,6 @@ public class ExDataPanel extends JPanel {
     private AuthorsPanel authorsPanel;
     private SourcesPanel sourcesPanel;
     private JPanel jPanel_Message;
-    private JPanel jPanel_Message_Public;
     private JPanel jPanel_Other_Attached_Files_Work;
     private JPanel jPanel_Other_Hashes;
     private JPanel jPanel_Title;
@@ -76,13 +67,11 @@ public class ExDataPanel extends JPanel {
     private JScrollPane jScrollPane_Hashes_Files_Tale;
     private JScrollPane jScrollPane_Message_TextPane;
     private JScrollPane jScrollPane_Message_Public_TextPane;
-    private JScrollPane jScrollPane_Params_Template_Public_TextPane;
     public JTabbedPane jTabbedPane_Type;
     private JTabbedPane jTabbedPane_Other;
     private MTable jTable_Attached_Files;
     private MTable jTable_Other_Hashes;
     private JTextPane jTextPane_Message;
-    private MImprintEDITPane jTextPane_Message_Public;
     public JCheckBox checkBoxMakeHashAndCheckUniqueText;
     public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
@@ -96,34 +85,8 @@ public class ExDataPanel extends JPanel {
 
         this.parentPanel = parentPanel;
 
-        jTextPane_Message_Public = new MImprintEDITPane();
-        jTextPane_Message_Public.addHyperlinkListener(new HyperlinkListener() {
-
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent arg0) {
-                // TODO Auto-generated method stub
-                //EventType i = arg0.getEventType();
-                if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED)
-                    return;
-                String str = JOptionPane.showInputDialog(jTextPane_Message_Public.th,
-                        Lang.T("Insert") + " " + arg0.getDescription(),
-                        jTextPane_Message_Public.pars.get("{{" + arg0.getDescription() + "}}"));
-                if (str == null || str.equals(""))
-                    return;
-                jTextPane_Message_Public.pars.replace("{{" + arg0.getDescription() + "}}", str);
-                jTextPane_Message_Public
-                        .setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
-                for (int i1 = 0; i1 < jTable_Params_Message_Public.getRowCount(); i1++) {
-
-                    if (arg0.getDescription().equals(jTable_Params_Message_Public.getValueAt(i1, 0)))
-                        jTable_Params_Message_Public.setValueAt(str, i1, 1);
-                }
-            }
-        });
         initComponents();
 
-        // jLabel_Template.setText(Lang.T("Select
-        // Template") + ":");
         jLabel_Title_Message.setText(Lang.T("Title") + ":");
         jTextField_Title_Message.setText("");
 
@@ -160,7 +123,7 @@ public class ExDataPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String str = JOptionPane.showInputDialog(null, Lang.T("Insert Hash"),
                         Lang.T("Add"), JOptionPane.INFORMATION_MESSAGE);
-                if (str == null || str == "" || str.equals(""))
+                if (str == null || str == "" || str.isEmpty())
                     return;
                 hashes_Table_Model.addRow(new Object[]{str, "Add"});
                 hashes_Table_Model.fireTableDataChanged();
@@ -299,9 +262,7 @@ public class ExDataPanel extends JPanel {
 
         multipleRecipientsPanel = new MultipleRecipientsPanel();
         jTabbedPane_Type = new JTabbedPane();
-        jPanel_Message_Public = new JPanel();
         jScrollPane_Message_Public_TextPane = new JScrollPane();
-        jScrollPane_Params_Template_Public_TextPane = new JScrollPane();
         jPanel_Message = new JPanel();
         jScrollPane_Message_TextPane = new JScrollPane();
         jTextPane_Message = new JTextPane();
@@ -323,52 +284,13 @@ public class ExDataPanel extends JPanel {
         jLabel_Title_Message = new JLabel();
         jTextField_Title_Message = new JTextField();
         jButton_Input_Hashes_From_File_Other_Hashes = new MButton();
-        params_Template_Model = new ParamsTemplateModel();
-        jTable_Params_Message_Public = new MTable(params_Template_Model);
         docTypeAppendixPanel = new DocTypeAppendixPanel(this);
         exAccrualsPanel = new ExAccrualsPanel(this);
-
-        params_Template_Model.addTableModelListener(new TableModelListener() {
-
-            @Override
-            public void tableChanged(TableModelEvent arg0) {
-                // TODO Auto-generated method stub
-
-                if (arg0.getType() != 0 && arg0.getColumn() < 0)
-                    return;
-                jTextPane_Message_Public.pars.replace(
-                        "{{" + params_Template_Model.getValueAt(arg0.getFirstRow(), 0) + "}}",
-                        (String) params_Template_Model.getValueAt(arg0.getFirstRow(), arg0.getColumn()));
-                // System.out.print("\n");
-                // System.out.print(jTextPane_Message_Public.pars);
-                jTextPane_Message_Public
-                        .setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
-            }
-        });
 
         GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = new int[]{0, 0, 0};
         layout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
         setLayout(layout);
-
-        jPanel_Message_Public.setLayout(new GridBagLayout());
-
-        jScrollPane_Message_Public_TextPane.setViewportView(jTextPane_Message_Public);
-        sp_pan = new MSplitPane();
-        sp_pan.set_CloseOnOneTouch(MSplitPane.ONE_TOUCH_CLOSE_RIGHT_BOTTOM);
-        sp_pan.setLeftComponent(jScrollPane_Message_Public_TextPane);
-        jScrollPane_Params_Template_Public_TextPane.setViewportView(jTable_Params_Message_Public);
-        jScrollPane_Params_Template_Public_TextPane.setMinimumSize(new Dimension(0, 0));
-        jTable_Params_Message_Public.setMinimumSize(new Dimension(0, 0));
-        sp_pan.setRightComponent(jScrollPane_Params_Template_Public_TextPane);
-        sp_pan.setDividerLocation(400);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        jPanel_Message_Public.add(sp_pan, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
