@@ -1,9 +1,8 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.*;
+import org.erachain.core.transaction.Itemable;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.WTransactionMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
@@ -54,25 +53,6 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
         Tuple2<Tuple2<Long, Integer>, Transaction> rowItem = this.list.get(row);
         Transaction transaction = rowItem.b;
 
-        ItemCls item = null;
-        if (transaction instanceof TransactionAmount && transaction.getAbsKey() > 0) {
-            TransactionAmount transAmo = (TransactionAmount) transaction;
-            item = dcSet.getItemAssetMap().get(transAmo.getAbsKey());
-        } else if (transaction instanceof GenesisTransferAssetTransaction) {
-            GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction) transaction;
-            item = dcSet.getItemAssetMap().get(transGen.getAbsKey());
-        } else if (transaction instanceof IssueItemRecord) {
-            IssueItemRecord transIssue = (IssueItemRecord) transaction;
-            item = transIssue.getItem();
-        } else if (transaction instanceof GenesisIssueItemRecord) {
-            GenesisIssueItemRecord transIssue = (GenesisIssueItemRecord) transaction;
-            item = transIssue.getItem();
-        } else if (transaction instanceof RCertifyPubKeys) {
-            RCertifyPubKeys certifyPK = (RCertifyPubKeys) transaction;
-            item = dcSet.getItemPersonMap().get(certifyPK.getAbsKey());
-        } else {
-
-        }
         switch (column) {
             case COLUMN_IS_OUTCOME:
                 if (transaction.getCreator() != null)
@@ -98,13 +78,22 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
                 return transaction.viewCreator();
 
             case COLUMN_ITEM:
-                return item;
+
+                Long itemKey;
+                if (transaction instanceof Itemable) {
+                    return ((Itemable) transaction).getItem();
+                } else {
+                    itemKey = transaction.getAbsKey();
+                }
+
+                if (itemKey == null)
+                    return null;
+
+                return dcSet.getItemAssetMap().get(itemKey);
 
             case COLUMN_AMOUNT:
-                BigDecimal amount = transaction.getAmount();
-                if (amount != null && item != null && item instanceof AssetCls) {
-                    amount = amount.setScale(((AssetCls) item).getScale());
-                }
+                BigDecimal amount;
+                amount = transaction.getAmount();
 
                 return amount;
 

@@ -100,11 +100,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     // GETTERS/SETTERS
     // public static String getName() { return "Create Order"; }
 
-    @Override
-    public ItemCls getItem() {
-        return this.haveAsset;
-    }
-
     public String getTitle() {
         ///return viewTypeName();
         return ItemCls.getItemTypeChar(ItemCls.ASSET_TYPE, haveKey) + " " + ItemCls.getItemTypeChar(ItemCls.ASSET_TYPE, wantKey);
@@ -281,6 +276,16 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     @Override
     public long getKey() {
         return this.haveKey;
+    }
+
+    @Override
+    public long getAssetKey() {
+        return this.haveKey;
+    }
+
+    @Override
+    public ItemCls getItem() {
+        return this.haveAsset;
     }
 
     public long getHaveKey() {
