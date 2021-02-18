@@ -265,6 +265,11 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             isUnViewed = ((WTransactionMap) map).isUnViewed(transaction);
             if (transaction instanceof Itemable) {
                 itemCls = ((Itemable) transaction).getItem();
+            } else {
+                Long itemKey = transaction.getAbsKey();
+                if (itemKey != null && itemKey > 0) {
+                    itemCls = dcSet.getItemAssetMap().get(itemKey);
+                }
             }
             owner = transaction.getCreator();
             if (owner != null)
