@@ -267,7 +267,7 @@ public class AccountsRightPanel extends JPanel {
         menuSaveCopy.add(copyNumber);
 
         JMenuItem copySign = new JMenuItem(Lang.T("Copy Signature"));
-        copyNumber.addActionListener(e -> {
+        copySign.addActionListener(e -> {
             Transaction selectedTransaction = tableModel.getItem(th.row).transaction;
             StringSelection stringSelection = new StringSelection(selectedTransaction.viewSignature());
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);

@@ -153,7 +153,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         menuSaveCopy.add(copyNumber);
 
         JMenuItem copySign = new JMenuItem(Lang.T("Copy Signature"));
-        copyNumber.addActionListener(e -> {
+        copySign.addActionListener(e -> {
             Transaction transaction = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             StringSelection stringSelection = new StringSelection(transaction.viewSignature());
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
