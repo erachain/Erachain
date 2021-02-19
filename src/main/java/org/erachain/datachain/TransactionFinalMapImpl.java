@@ -821,6 +821,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Transaction> txs = new ArrayList<>();
+        int forgedCount = 0;
+        long timeOut = System.currentTimeMillis();
 
         if (offset < 0 || limit < 0) {
             if (limit < 0)
@@ -841,7 +843,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         RCalculated tx = (RCalculated) item;
                         String mess = tx.getMessage();
                         if (mess != null && mess.equals("forging")) {
-                            continue;
+                            if (forgedCount < 100) {
+                                // skip all but not 100
+                                forgedCount++;
+                                continue;
+                            } else {
+                                if (System.currentTimeMillis() - timeOut > 5000) {
+                                    break;
+                                }
+                                forgedCount = 0;
+                            }
                         }
                     }
 
@@ -891,7 +902,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         RCalculated tx = (RCalculated) item;
                         String mess = tx.getMessage();
                         if (mess != null && mess.equals("forging")) {
-                            continue;
+                            if (forgedCount < 100) {
+                                // skip all but not 100
+                                forgedCount++;
+                                continue;
+                            } else {
+                                if (System.currentTimeMillis() - timeOut > 5000) {
+                                    break;
+                                }
+                                forgedCount = 0;
+                            }
                         }
                     }
 
@@ -950,6 +970,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
+        int forgedCount = 0;
+        long timeOut = System.currentTimeMillis();
+
         List<Transaction> txs = new ArrayList<>();
         try (IteratorCloseable iterator = getIteratorByAddress(addressShort, descending)) {
             Transaction item;
@@ -961,7 +984,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     RCalculated tx = (RCalculated) item;
                     String mess = tx.getMessage();
                     if (mess != null && mess.equals("forging")) {
-                        continue;
+                        if (forgedCount < 100) {
+                            // skip all but not 100
+                            forgedCount++;
+                            continue;
+                        } else {
+                            if (System.currentTimeMillis() - timeOut > 5000) {
+                                break;
+                            }
+                            forgedCount = 0;
+                        }
                     }
                 }
 
