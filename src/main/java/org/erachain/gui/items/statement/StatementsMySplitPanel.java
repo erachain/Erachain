@@ -246,7 +246,7 @@ public class StatementsMySplitPanel extends SplitPanel {
         menuSaveCopy.add(copyNumber);
 
         JMenuItem copySign = new JMenuItem(Lang.T("Copy Signature"));
-        copyNumber.addActionListener(e -> {
+        copySign.addActionListener(e -> {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
             Transaction transaction = my_Statements_Model.getItem(jTableJScrollPanelLeftPanel
                     .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;

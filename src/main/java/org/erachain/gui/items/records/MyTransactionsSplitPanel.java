@@ -293,7 +293,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         menuSaveCopy.add(copyNumber);
 
         JMenuItem copySign = new JMenuItem(Lang.T("Copy Signature"));
-        copyNumber.addActionListener(e -> {
+        copySign.addActionListener(e -> {
             StringSelection stringSelection = new StringSelection(selectedTransaction.viewSignature());
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
