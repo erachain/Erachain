@@ -21,14 +21,14 @@ public class MultiPaymentDetailsFrame extends RecDetailsFrame {
         this.add(paymentsLabel, labelGBC);
 
         //PAYMENTS
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         PaymentsTableModel paymentsTableModel = new PaymentsTableModel(multiPayment.getPayments());
         JTable table = Gui.createSortableTable(paymentsTableModel, 1);
 
         TableRowSorter<PaymentsTableModel> sorter = (TableRowSorter<PaymentsTableModel>) table.getRowSorter();
         sorter.setComparator(PaymentsTableModel.COLUMN_AMOUNT, new BigDecimalStringComparator());
 
-        this.add(new JScrollPane(table), detailGBC);
+        this.add(new JScrollPane(table), fieldGBC);
 
         //PACK
 //		this.pack();

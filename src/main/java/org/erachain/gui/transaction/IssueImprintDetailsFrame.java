@@ -18,11 +18,11 @@ public class IssueImprintDetailsFrame extends RecDetailsFrame {
         this.add(nameLabel, labelGBC);
 
         //NAME
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField name = new JTextField(imprintIssue.getItem().viewName());
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
-        this.add(name, detailGBC);
+        this.add(name, fieldGBC);
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
@@ -30,13 +30,13 @@ public class IssueImprintDetailsFrame extends RecDetailsFrame {
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         MTextPane txtAreaDescription = new MTextPane(imprintIssue.getItem().getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaDescription);
-        this.add(txtAreaDescription, detailGBC);
+        this.add(txtAreaDescription, fieldGBC);
 
         //PACK
         //	this.pack();

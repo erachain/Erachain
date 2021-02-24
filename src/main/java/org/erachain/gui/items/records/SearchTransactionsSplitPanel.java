@@ -46,7 +46,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
     public JPanel info_Panel;
     public SignLibraryPanel voush_Library_Panel;
-    SearchTransactionsTableModel transactionsTableModel;
+    public SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
     private JTextField searchString;
 

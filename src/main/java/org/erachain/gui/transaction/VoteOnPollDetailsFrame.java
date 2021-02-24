@@ -12,11 +12,11 @@ public class VoteOnPollDetailsFrame extends RecDetailsFrame {
         super(pollVote, true);
 
         //NAME
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField name = new JTextField(pollVote.getPoll());
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
-        this.add(name, detailGBC);
+        this.add(name, fieldGBC);
 
         //LABEL OPTION
         ++labelGBC.gridy;
@@ -24,11 +24,11 @@ public class VoteOnPollDetailsFrame extends RecDetailsFrame {
         this.add(descriptionLabel, labelGBC);
 
         //OPTION
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField option = new JTextField(String.valueOf(pollVote.getOption()));
         option.setEditable(false);
         MenuPopupUtil.installContextMenu(option);
-        this.add(option, detailGBC);
+        this.add(option, fieldGBC);
 
         //PACK
         //	this.pack();

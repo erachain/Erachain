@@ -24,11 +24,11 @@ public class CreatePollDetailsFrame extends RecDetailsFrame {
         this.add(nameLabel, labelGBC);
 
         //NAME
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField name = new JTextField(pollCreation.getPoll().getName());
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
-        this.add(name, detailGBC);
+        this.add(name, fieldGBC);
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
@@ -36,13 +36,13 @@ public class CreatePollDetailsFrame extends RecDetailsFrame {
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextArea txtAreaDescription = new JTextArea(pollCreation.getPoll().getDescription());
         txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         txtAreaDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaDescription);
-        this.add(txtAreaDescription, detailGBC);
+        this.add(txtAreaDescription, fieldGBC);
 
         //LABEL OPTIONS
         ++labelGBC.gridy;
@@ -50,7 +50,7 @@ public class CreatePollDetailsFrame extends RecDetailsFrame {
         this.add(optionsLabel, labelGBC);
 
         //OPTIONS
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         PollOptionsTableModel pollOptionsTableModel = new PollOptionsTableModel(pollCreation.getPoll(),
                 Controller.getInstance().getAsset(AssetCls.FEE_KEY));
         JTable table = Gui.createSortableTable(pollOptionsTableModel, 0);
@@ -58,7 +58,7 @@ public class CreatePollDetailsFrame extends RecDetailsFrame {
         TableRowSorter<PollOptionsTableModel> sorter = (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();
         sorter.setComparator(PollOptionsTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
 
-        this.add(new JScrollPane(table), detailGBC);
+        this.add(new JScrollPane(table), fieldGBC);
 
         //PACK
         //	this.pack();

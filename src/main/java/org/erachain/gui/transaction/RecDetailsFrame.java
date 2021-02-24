@@ -3,7 +3,9 @@ package org.erachain.gui.transaction;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
 import org.erachain.gui.library.MAccoutnTextField;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
@@ -14,6 +16,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +26,7 @@ public class RecDetailsFrame extends JPanel //JFrame
 {
 
     public GridBagConstraints labelGBC;
-    public GridBagConstraints detailGBC;
+    public GridBagConstraints fieldGBC;
     public JTextField signature;
     Transaction transaction;
 
@@ -58,30 +62,16 @@ public class RecDetailsFrame extends JPanel //JFrame
         labelGBC.gridx = 0;
 
         //DETAIL GBC
-        detailGBC = new GridBagConstraints();
-        detailGBC.insets = new Insets(10, 5, 5, 5);
-        detailGBC.fill = GridBagConstraints.HORIZONTAL;
-        detailGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
-        detailGBC.weightx = 1;
-        detailGBC.gridwidth = 3;
-        detailGBC.gridx = 1;
+        fieldGBC = new GridBagConstraints();
+        fieldGBC.insets = new Insets(10, 5, 5, 5);
+        fieldGBC.fill = GridBagConstraints.HORIZONTAL;
+        fieldGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+        fieldGBC.weightx = 1;
+        fieldGBC.gridwidth = 3;
+        fieldGBC.gridx = 1;
 
 
         int componentLevel = 0;
-		
-		/*
-		//LABEL TYPE
-		labelGBC.gridy = componentLevel;
-		
-		JLabel typeLabel = new JLabel(Lang.T("Type") + ":");
-		this.add(typeLabel, labelGBC);
-		
-		//TYPE
-		detailGBC.gridy = componentLevel;
-		JLabel type = new JLabel(Lang.T("Message Transaction"));
-		this.add(type, detailGBC);
-		componentLevel ++;
-		*/
 
         //LABEL Height + Seq
         labelGBC.gridy = componentLevel;
@@ -89,7 +79,7 @@ public class RecDetailsFrame extends JPanel //JFrame
         this.add(heSeqLabel, labelGBC);
 
         //Height + Seq
-        detailGBC.gridy = componentLevel++;
+        fieldGBC.gridy = componentLevel++;
         JTextField shortInfo = new JTextField(DateTimeFormat.timestamptoString(transaction.getTimestamp())
                 + " [" + transaction.viewHeightSeq() + " "
                 + String.valueOf(transaction.getDataLength(Transaction.FOR_NETWORK, true)) + "^" + String.valueOf(transaction.getFeePow())
@@ -97,7 +87,7 @@ public class RecDetailsFrame extends JPanel //JFrame
                 + ">>" + transaction.getConfirmations(dcSet));
         shortInfo.setEditable(false);
 //		MenuPopupUtil.installContextMenu(shortInfo);
-        this.add(shortInfo, detailGBC);
+        this.add(shortInfo, fieldGBC);
 
         if (transaction.getCreator() != null) {
 
@@ -108,29 +98,29 @@ public class RecDetailsFrame extends JPanel //JFrame
             this.add(creatorLabel, labelGBC);
 
             //CREATOR
-            detailGBC.gridy = componentLevel;
+            fieldGBC.gridy = componentLevel;
             MAccoutnTextField creator = new MAccoutnTextField(transaction.getCreator());
 
             creator.setEditable(false);
 
-            this.add(creator, detailGBC);
+            this.add(creator, fieldGBC);
 
             String personStr = transaction.getCreator().viewPerson();
             if (personStr.length() > 0) {
                 //LABEL PERSON
                 componentLevel++;
-                detailGBC.gridy = componentLevel;
+                fieldGBC.gridy = componentLevel;
                 //		this.add(new JLabel(personStr), detailGBC);
             }
 
             //LABEL CREATOR PUBLIC KEY
             componentLevel++;
             labelGBC.gridy = componentLevel;
-            JLabel creator_Pub_keyLabel = new JLabel(Lang.T("Creator Publick Key") + ":");
+            JLabel creator_Pub_keyLabel = new JLabel(Lang.T("Creator Public Key") + ":");
             //	this.add(creator_Pub_keyLabel, labelGBC);
 
             //CREATOR
-            detailGBC.gridy = componentLevel;
+            fieldGBC.gridy = componentLevel;
 
             JTextField creator_Pub_key = new JTextField(transaction.getCreator().getBase58());
             creator_Pub_key.setEditable(false);
@@ -147,7 +137,7 @@ public class RecDetailsFrame extends JPanel //JFrame
             //			this.add(signatureLabel, labelGBC);
 
             //SIGNATURE
-            detailGBC.gridy = componentLevel;
+            fieldGBC.gridy = componentLevel;
             //JTextField signature = new JTextField(Base58.encode(record.getSignature()).substring(0, 12) + "..");
             signature = new JTextField(Base58.encode(transaction.getSignature()));
             signature.setEditable(false);
@@ -226,16 +216,65 @@ public class RecDetailsFrame extends JPanel //JFrame
     }
 
     public void linksTree() {
-        detailGBC = new GridBagConstraints();
-        detailGBC.gridx = 0;
-        detailGBC.gridy = 2;
-        detailGBC.fill = GridBagConstraints.BOTH;
-        detailGBC.anchor = GridBagConstraints.FIRST_LINE_START;
-        detailGBC.weightx = 0.3;
-        detailGBC.weighty = 0.1;
-        JTree tree = transaction.viewLinksTree();
-        add(tree, detailGBC);
 
+        JTree tree = transaction.viewLinksTree(this);
+        if (tree == null)
+            return;
+
+        tree.setToggleClickCount(1);
+        ++labelGBC.gridy;
+        JLabel linksLabel = new JLabel(Lang.T("Links") + ":");
+        this.add(linksLabel, labelGBC);
+
+        fieldGBC.gridy = labelGBC.gridy;
+        add(tree, fieldGBC);
+
+        tree.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                // TODO Auto-generated method stub
+                if (arg0.getClickCount() == 2) {
+
+                    Component aa = arg0.getComponent();
+                    if (aa instanceof JTree) {
+                        JTree tr = ((JTree) aa);
+                        if (tr.getLastSelectedPathComponent() == null)
+                            return;
+
+                        SearchTransactionsSplitPanel panel = new SearchTransactionsSplitPanel();
+                        panel.transactionsTableModel.clear();
+                        panel.transactionsTableModel.setBlockNumber(tr.getLastSelectedPathComponent().toString());
+                        MainPanel.getInstance().insertTab(panel);
+                    }
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+        });
 
     }
 

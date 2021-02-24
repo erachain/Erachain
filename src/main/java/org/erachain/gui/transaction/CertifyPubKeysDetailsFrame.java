@@ -25,7 +25,7 @@ public class CertifyPubKeysDetailsFrame extends RecDetailsFrame {
         this.add(personLabel, labelGBC);
 
         // PERSON
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField person;
         PersonCls personItem = Controller.getInstance().getPerson(certifyPubKeysRecord.getKey());
         if (personItem == null)
@@ -35,7 +35,7 @@ public class CertifyPubKeysDetailsFrame extends RecDetailsFrame {
 
         person.setEditable(false);
         MenuPopupUtil.installContextMenu(person);
-        this.add(person, detailGBC);
+        this.add(person, fieldGBC);
 
         //LABEL to DAYS
         ++labelGBC.gridy;
@@ -43,11 +43,11 @@ public class CertifyPubKeysDetailsFrame extends RecDetailsFrame {
         this.add(amountLabel, labelGBC);
 
         //ens DAYS
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField amount = new JTextField("" + certifyPubKeysRecord.getAddDay());
         amount.setEditable(false);
         MenuPopupUtil.installContextMenu(amount);
-        this.add(amount, detailGBC);
+        this.add(amount, fieldGBC);
 
         int i = 0;
         for (String address : certifyPubKeysRecord.getCertifiedPublicKeysB58()) {
@@ -55,11 +55,11 @@ public class CertifyPubKeysDetailsFrame extends RecDetailsFrame {
             JLabel lbl = new JLabel(++i + " :");
             this.add(lbl, labelGBC);
 
-            ++detailGBC.gridy;
+            ++fieldGBC.gridy;
             JTextField txt = new JTextField(address);
             txt.setEditable(false);
             MenuPopupUtil.installContextMenu(txt);
-            this.add(txt, detailGBC);
+            this.add(txt, fieldGBC);
 
         }
         //PACK

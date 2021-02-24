@@ -16,9 +16,6 @@ public class MTabbedPanel extends JTabbedPane {
     public void addTabWithCloseButton(String str, Component comp) {
         // add tab to tabbed panel
         this.addTab(str, comp);
-
-        //init(comp);
-
     }
 
     public void addTabWithCloseButton(String str, Image icon,  JPanel comp) {
@@ -28,17 +25,15 @@ public class MTabbedPanel extends JTabbedPane {
     }
 
     public void addTabWithCloseButton(String str, Image icon, Component comp, String tip) {
-      //  this.addTab(str, icon, comp, tip);
         init(comp, icon);
     }
 
     private void init(Component comp, Image icon) {
 
-        // set for tab view close buton
+        // set for tab view close button
         ButtonTabComponent button_Comp = new ButtonTabComponent(this, icon);
         this.setTabComponentAt(this.indexOfComponent(comp), button_Comp);
         // write info to tabbed setting object
-        button_Comp = null;
 
     }
 

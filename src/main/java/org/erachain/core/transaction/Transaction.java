@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -1483,16 +1484,29 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return "";
     }
 
-    public JTree viewLinksTree() {
-        if (exLink == null) {
+    public static DefaultMutableTreeNode viewLinksTreeItem(Transaction transaction) {
+        return new DefaultMutableTreeNode(transaction.viewHeightSeq() + " ("
+                + Lang.T(transaction.viewFullTypeName()) + ") " + transaction.getTitle());
+    }
+
+    public JTree viewLinksTree(JComponent component) {
+        if (false && exLink == null) {
             return new JTree();
         }
 
-        ASMutableTreeNode root = new ASMutableTreeNode("root", Lang.T("Root"), null);
+        DefaultMutableTreeNode root = viewLinksTreeItem(this);
 
         ASMutableTreeNode parent = new ASMutableTreeNode("parent", Lang.T("Parent"), null);
-        parent.add(new ASMutableTreeNode("SeqNo", exLink.viewRef(), null));
+        //parent.add(new ASMutableTreeNode("SeqNo", exLink.viewRef(), null));
+        parent.add(viewLinksTreeItem(this));
         root.add(parent);
+
+        ASMutableTreeNode links = new ASMutableTreeNode("links", Lang.T("Links"), null);
+        links.add(viewLinksTreeItem(this));
+        links.add(viewLinksTreeItem(this));
+        links.add(viewLinksTreeItem(this));
+        links.add(viewLinksTreeItem(this));
+        root.add(links);
 
         return new JTree(root);
     }
