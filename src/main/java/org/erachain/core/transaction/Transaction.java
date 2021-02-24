@@ -1524,13 +1524,18 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         try (IteratorCloseable<Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
                 .getTXLinksIterator(dbRef, ExData.LINK_REPLY_COMMENT_TYPE, false)) {
-            ASMutableTreeNode list = new ASMutableTreeNode("Replays and Comments", Lang.T("Replays and Comments"), null);
-            while (iterator.hasNext()) {
-                list.add(new DefaultMutableTreeNode(dcSet.getTransactionFinalMap().get(iterator.next().c)));
+            if (iterator.hasNext()) {
+                ASMutableTreeNode list = new ASMutableTreeNode("Replays and Comments", Lang.T("Replays and Comments"), null);
+                while (iterator.hasNext()) {
+                    list.add(new DefaultMutableTreeNode(dcSet.getTransactionFinalMap().get(iterator.next().c)));
+                }
+                root.add(list);
             }
-            root.add(list);
         } catch (IOException e) {
         }
+
+        if (root.isLeaf())
+            return null;
 
         return new JTree(root);
     }

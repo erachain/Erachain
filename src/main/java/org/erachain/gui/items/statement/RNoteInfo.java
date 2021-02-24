@@ -47,7 +47,7 @@ import java.util.zip.DataFormatException;
  * @author Саша
  */
 @SuppressWarnings("serial")
-public class RNoteInfo extends javax.swing.JPanel {
+public class RNoteInfo extends RecDetailsFrame {
 
     public javax.swing.JPanel jPanel2;
     /**
@@ -68,6 +68,8 @@ public class RNoteInfo extends javax.swing.JPanel {
     Controller cntr;
 
     public RNoteInfo(Transaction transaction) {
+
+        super(transaction, true);
 
         cntr = Controller.getInstance();
 
@@ -511,5 +513,7 @@ public class RNoteInfo extends javax.swing.JPanel {
                 + "</body>";
 
         jTextArea_Body.setText(resultStr);
+
+        linksTree();
     }
 }
