@@ -200,6 +200,8 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             }
         }
 
+        linksTree();
+
         //PACK
         //	this.pack();
         //    this.setResizable(false);

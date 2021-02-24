@@ -21,16 +21,16 @@ import java.util.List;
 public class RecDetailsFrame extends JPanel //JFrame
 {
 
-    public GridBagConstraints labelGBC = new GridBagConstraints();
-    public GridBagConstraints detailGBC = new GridBagConstraints();
+    public GridBagConstraints labelGBC;
+    public GridBagConstraints detailGBC;
     public JTextField signature;
-    Transaction record;
+    Transaction transaction;
 
-    public RecDetailsFrame(Transaction record1, boolean andSetup) {
+    public RecDetailsFrame(Transaction transaction, boolean andSetup) {
 
-        this.record = record1;
+        this.transaction = transaction;
         DCSet dcSet = DCSet.getInstance();
-        this.record.setDC(dcSet, andSetup);
+        this.transaction.setDC(dcSet, andSetup);
 
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -90,16 +90,16 @@ public class RecDetailsFrame extends JPanel //JFrame
 
         //Height + Seq
         detailGBC.gridy = componentLevel++;
-        JTextField shorn_Info = new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
-                + " [" + record.viewHeightSeq() + " "
-                + String.valueOf(record.getDataLength(Transaction.FOR_NETWORK, true)) + "^" + String.valueOf(record.getFeePow())
-                + "=" + record.getFee() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
-                + ">>" + record.getConfirmations(dcSet));
-        shorn_Info.setEditable(false);
-//		MenuPopupUtil.installContextMenu(shorn_Info);
-        this.add(shorn_Info, detailGBC);
+        JTextField shortInfo = new JTextField(DateTimeFormat.timestamptoString(transaction.getTimestamp())
+                + " [" + transaction.viewHeightSeq() + " "
+                + String.valueOf(transaction.getDataLength(Transaction.FOR_NETWORK, true)) + "^" + String.valueOf(transaction.getFeePow())
+                + "=" + transaction.getFee() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
+                + ">>" + transaction.getConfirmations(dcSet));
+        shortInfo.setEditable(false);
+//		MenuPopupUtil.installContextMenu(shortInfo);
+        this.add(shortInfo, detailGBC);
 
-        if (record.getCreator() != null) {
+        if (transaction.getCreator() != null) {
 
             //LABEL CREATOR
             componentLevel++;
@@ -109,13 +109,13 @@ public class RecDetailsFrame extends JPanel //JFrame
 
             //CREATOR
             detailGBC.gridy = componentLevel;
-            MAccoutnTextField creator = new MAccoutnTextField(record.getCreator());
+            MAccoutnTextField creator = new MAccoutnTextField(transaction.getCreator());
 
             creator.setEditable(false);
 
             this.add(creator, detailGBC);
 
-            String personStr = record.getCreator().viewPerson();
+            String personStr = transaction.getCreator().viewPerson();
             if (personStr.length() > 0) {
                 //LABEL PERSON
                 componentLevel++;
@@ -132,14 +132,14 @@ public class RecDetailsFrame extends JPanel //JFrame
             //CREATOR
             detailGBC.gridy = componentLevel;
 
-            JTextField creator_Pub_key = new JTextField(record.getCreator().getBase58());
+            JTextField creator_Pub_key = new JTextField(transaction.getCreator().getBase58());
             creator_Pub_key.setEditable(false);
             MenuPopupUtil.installContextMenu(creator_Pub_key);
             //	this.add(creator_Pub_key, detailGBC);
 
         }
 
-        if (record.getSignature() != null) {
+        if (transaction.getSignature() != null) {
             componentLevel++;
             //LABEL SIGNATURE
             labelGBC.gridy = componentLevel;
@@ -149,7 +149,7 @@ public class RecDetailsFrame extends JPanel //JFrame
             //SIGNATURE
             detailGBC.gridy = componentLevel;
             //JTextField signature = new JTextField(Base58.encode(record.getSignature()).substring(0, 12) + "..");
-            signature = new JTextField(Base58.encode(record.getSignature()));
+            signature = new JTextField(Base58.encode(transaction.getSignature()));
             signature.setEditable(false);
             MenuPopupUtil.installContextMenu(signature);
             //			this.add(signature, detailGBC);
@@ -185,14 +185,14 @@ public class RecDetailsFrame extends JPanel //JFrame
 		this.add(confirmations, detailGBC);
 		*/
 
-        new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
+        new JTextField(DateTimeFormat.timestamptoString(transaction.getTimestamp())
 
-                + String.valueOf(record.getDataLength(Transaction.FOR_NETWORK, true)) + "^" + String.valueOf(record.getFeePow())
-                + "=" + record.getFee() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
-                + ">>" + record.getConfirmations(dcSet));
+                + String.valueOf(transaction.getDataLength(Transaction.FOR_NETWORK, true)) + "^" + String.valueOf(transaction.getFeePow())
+                + "=" + transaction.getFee() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
+                + ">>" + transaction.getConfirmations(dcSet));
 
 
-        JPopupMenu shorn_Info_Meny = new JPopupMenu();
+        JPopupMenu shortInfoMeny = new JPopupMenu();
 
         JMenuItem copy_Transaction_Sign = new JMenuItem(Lang.T("Copy Signature"));
         copy_Transaction_Sign.addActionListener(new ActionListener() {
@@ -200,8 +200,8 @@ public class RecDetailsFrame extends JPanel //JFrame
 
                 StringSelection value;
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                if (record.getSignature() != null) {
-                    value = new StringSelection(Base58.encode(record.getSignature()));
+                if (transaction.getSignature() != null) {
+                    value = new StringSelection(Base58.encode(transaction.getSignature()));
                 } else {
                     value = new StringSelection("null");
                 }
@@ -209,19 +209,34 @@ public class RecDetailsFrame extends JPanel //JFrame
 
             }
         });
-        shorn_Info_Meny.add(copy_Transaction_Sign);
+        shortInfoMeny.add(copy_Transaction_Sign);
 
         JMenuItem copy_Heigt_Block = new JMenuItem(Lang.T("Copy Block"));
         copy_Heigt_Block.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(record.viewHeightSeq());
+                StringSelection value = new StringSelection(transaction.viewHeightSeq());
                 clipboard.setContents(value, null);
             }
         });
-        shorn_Info_Meny.add(copy_Heigt_Block);
+        shortInfoMeny.add(copy_Heigt_Block);
 
-        shorn_Info.setComponentPopupMenu(shorn_Info_Meny);
+        shortInfo.setComponentPopupMenu(shortInfoMeny);
     }
+
+    public void linksTree() {
+        detailGBC = new GridBagConstraints();
+        detailGBC.gridx = 0;
+        detailGBC.gridy = 2;
+        detailGBC.fill = GridBagConstraints.BOTH;
+        detailGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+        detailGBC.weightx = 0.3;
+        detailGBC.weighty = 0.1;
+        JTree tree = transaction.viewLinksTree();
+        add(tree, detailGBC);
+
+
+    }
+
 }

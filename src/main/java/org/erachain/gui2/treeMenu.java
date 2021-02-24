@@ -58,23 +58,21 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.TreeMap;
 
 /**
  * @author DarkRaha
  */
-public class tt extends JPanel { // implements TreeSelectionListener {
+public class treeMenu extends JPanel { // implements TreeSelectionListener {
 
     private static final long serialVersionUID = 1L;
     public JTree tree;
     public JTextField jtf = new JTextField();
 
-    public tt() {
+    public treeMenu() {
         // ------------------------------------------
         // Container c = getContentPane();
         setLayout(new BorderLayout());
@@ -102,25 +100,6 @@ public class tt extends JPanel { // implements TreeSelectionListener {
                 + Lang.T("Network DashBoard") + "</b></html>", getIcon(pathIcons + "other_Node.png"));
         ASMutableTreeNode bank_Tree = new ASMutableTreeNode("bank_Tree", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Bank") + "</b></html>", getIcon(pathIcons + "bank_Tree.png"));
         ASMutableTreeNode telegrams_Tree = new ASMutableTreeNode("telegrams_Tree", "<html><span style='font-size:1.1em;'><b>" + Lang.T("Telegrams") + "</b></html>", getIcon(pathIcons + "telegrams_Tree.png"));
-
-        TreeMap<String, DefaultMutableTreeNode> nodeList = new TreeMap<String, DefaultMutableTreeNode>();
-        nodeList.put("account_Node", account_Node);
-        nodeList.put("person_Node", person_Node);
-        nodeList.put("document_Node", document_Node);
-        nodeList.put("mails_Node", mails_Node);
-        nodeList.put("assets_Node", assets_Node);
-        nodeList.put("exchange_Node", exchange_Node);
-        nodeList.put("templates_Node", templates_Node);
-        nodeList.put("statuses_Node", statuses_Node);
-        nodeList.put("unions_Node", unions_Node);
-        nodeList.put("polls_Node", polls_Node);
-        nodeList.put("hashes_Node", hashes_Node);
-        nodeList.put("linked_hashes_Node", linked_hashes_Node);
-        nodeList.put("records_Node", records_Node);
-        nodeList.put("other_Node", other_Node);
-        nodeList.put("bank_Tree", bank_Tree);
-        nodeList.put("telegrams_Tree", telegrams_Tree);
-
 
         if (BlockChain.TEST_MODE)
             root.add(bank_Tree);

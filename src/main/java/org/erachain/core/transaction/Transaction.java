@@ -23,6 +23,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.gui.library.ASMutableTreeNode;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -36,6 +37,7 @@ import org.mapdb.Fun.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -1480,6 +1482,21 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public String viewAmount() {
         return "";
     }
+
+    public JTree viewLinksTree() {
+        if (exLink == null) {
+            return new JTree();
+        }
+
+        ASMutableTreeNode root = new ASMutableTreeNode("root", Lang.T("Root"), null);
+
+        ASMutableTreeNode parent = new ASMutableTreeNode("parent", Lang.T("Parent"), null);
+        parent.add(new ASMutableTreeNode("SeqNo", exLink.viewRef(), null));
+        root.add(parent);
+
+        return new JTree(root);
+    }
+
 
     @SuppressWarnings("unchecked")
     protected JSONObject getJsonBase() {
