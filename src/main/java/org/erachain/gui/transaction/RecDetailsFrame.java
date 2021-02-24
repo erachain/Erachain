@@ -11,6 +11,7 @@ import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -236,16 +237,22 @@ public class RecDetailsFrame extends JPanel //JFrame
                 // TODO Auto-generated method stub
                 if (arg0.getClickCount() == 2) {
 
-                    Component aa = arg0.getComponent();
-                    if (aa instanceof JTree) {
-                        JTree tr = ((JTree) aa);
-                        if (tr.getLastSelectedPathComponent() == null)
+                    Component component = arg0.getComponent();
+                    if (component instanceof JTree) {
+                        JTree jTree = ((JTree) component);
+                        if (jTree.getLastSelectedPathComponent() == null)
                             return;
 
-                        SearchTransactionsSplitPanel panel = new SearchTransactionsSplitPanel();
-                        panel.transactionsTableModel.clear();
-                        panel.transactionsTableModel.setBlockNumber(tr.getLastSelectedPathComponent().toString());
-                        MainPanel.getInstance().insertTab(panel);
+                        Object obj = ((DefaultMutableTreeNode) jTree.getLastSelectedPathComponent()).getUserObject();
+                        if (obj instanceof Transaction) {
+                            String seqNo = ((Transaction) obj).viewHeightSeq();
+                            SearchTransactionsSplitPanel panel = new SearchTransactionsSplitPanel();
+                            panel.transactionsTableModel.clear();
+                            panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
+                            panel.transactionsTableModel.setBlockNumber(seqNo);
+                            panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
+                            MainPanel.getInstance().insertTab(panel);
+                        }
                     }
                 }
             }
