@@ -7,7 +7,6 @@ import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.lang.Lang;
-import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +27,8 @@ public class InfoTemplates extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel_Content;
     private javax.swing.JLabel jLabel_Title;
-    private javax.swing.JScrollPane jScrollPane1;
+    //private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextPane textPaneDesc;
     private MTextPane jTextArea_Content;
     private MAccoutnTextField jTextField_Account_Creator;
     private javax.swing.JTextField jTextField_Title;
@@ -41,7 +41,9 @@ public class InfoTemplates extends javax.swing.JPanel {
         initComponents();
 
         jTextField_Title.setText(template.viewName());
-        jTextArea_Content.setText(template.viewDescription());
+        //jTextArea_Content.setText(template.viewDescription());
+        textPaneDesc.setContentType("text/html");
+        textPaneDesc.setText(template.viewDescription());
 
     }
 
@@ -50,17 +52,12 @@ public class InfoTemplates extends javax.swing.JPanel {
 
         jLabel4 = new javax.swing.JLabel();
         jTextField_Title = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        //jScrollPane1 = new javax.swing.JScrollPane();
+        textPaneDesc = new javax.swing.JTextPane();
         jLabel2 = new javax.swing.JLabel();
 
         jTextArea_Content = new MTextPane();
         jPanel_Image = new javax.swing.JPanel();
-        new javax.swing.JScrollPane();
-        new javax.swing.JTable();
-        new javax.swing.JScrollPane();
-        new javax.swing.JTable();
-        new javax.swing.JLabel();
-        new javax.swing.JLabel();
 
         jLabel4.setText("jLabel4");
 
@@ -148,23 +145,25 @@ public class InfoTemplates extends javax.swing.JPanel {
 
         //jTextArea_Content.setColumns(20);
         //jTextArea_Content.setRows(6);
-        jTextArea_Content.setAlignmentY(1.0F);
+        //jTextArea_Content.setAlignmentY(1.0F);
         //jTextArea_Content.setWrapStyleWord(true);
         //jTextArea_Content.setLineWrap(true);
         //jTextArea_Content.setEditable(false);
-        MenuPopupUtil.installContextMenu(jTextArea_Content);
-        jScrollPane1.setViewportView(jTextArea_Content);
+        //MenuPopupUtil.installContextMenu(jTextArea_Content);
+        //jScrollPane1.setViewportView(jTextArea_Content);
+        //textPaneDesc.setText();
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        //gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.3;
         gridBagConstraints.insets = new Insets(0, 0, 5, 10);
-        add(jScrollPane1, gridBagConstraints);
+        //add(jScrollPane1, gridBagConstraints);
+        add(textPaneDesc, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

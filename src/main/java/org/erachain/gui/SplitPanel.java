@@ -246,13 +246,13 @@ public class SplitPanel extends IconPanel {
         jScrollPaneJPanelRightPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jScrollPaneJPanelRightPanel.setAlignmentX(1.0F);
         jScrollPaneJPanelRightPanel.setAlignmentY(1.0F);
-        jScrollPaneJPanelRightPanel.setAutoscrolls(true);
-        jScrollPaneJPanelRightPanel.setMinimumSize(new Dimension(0, 0));
+        //jScrollPaneJPanelRightPanel.setAutoscrolls(true);
+        jScrollPaneJPanelRightPanel.setMinimumSize(new Dimension(100, 3000));
         jScrollPaneJPanelRightPanel.setName(""); // NOI18N
-        jScrollPaneJPanelRightPanel.setPreferredSize(new Dimension(0, 0));
+        jScrollPaneJPanelRightPanel.setPreferredSize(new Dimension(200, 300));
         jScrollPaneJPanelRightPanel.setVerifyInputWhenFocusTarget(false);
-        jScrollPaneJPanelRightPanel.setWheelScrollingEnabled(false);
-        jScrollPaneJPanelRightPanel.setFocusable(false);
+        //jScrollPaneJPanelRightPanel.setWheelScrollingEnabled(false);
+        //jScrollPaneJPanelRightPanel.setFocusable(false);
 
         jLabel2.setText(" ");
         jLabel2.setToolTipText("");

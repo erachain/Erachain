@@ -47,14 +47,14 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     public JPanel info_Panel;
     public SignLibraryPanel voush_Library_Panel;
     public SearchTransactionsTableModel transactionsTableModel;
-    JScrollPane jScrollPane4;
+    //JScrollPane jScrollPane4;
     private JTextField searchString;
 
     public SearchTransactionsSplitPanel() {
         super(NAME, TITLE);
 
         this.searchToolBar_LeftPanel.setVisible(true);
-        jScrollPane4 = new JScrollPane();
+        //jScrollPane4 = new JScrollPane();
 
         this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Height or seqNo") + ": ");
         this.toolBarLeftPanel.add(new JLabel(Lang.T("Search") + ": "));
