@@ -28,6 +28,7 @@ public class TemplateInfo extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel_Content;
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JTextPane textPaneDesc;
+    private JScrollPane jScrollPaneDesc;
     private MTextPane jTextArea_Content;
     private MAccoutnTextField jTextField_Account_Creator;
     private javax.swing.JTextField jTextField_Title;
@@ -39,14 +40,12 @@ public class TemplateInfo extends javax.swing.JPanel {
         this.template = template;
         initComponents();
 
-        // убирает прокрутка по горизонтали но криво по вертикали ((
-        setPreferredSize(new Dimension(0, 999));
-        //pack();
-
         jTextField_Title.setText(template.viewName());
-        //jTextArea_Content.setText(template.viewDescription());
         textPaneDesc.setContentType("text/html");
-        textPaneDesc.setText(template.viewDescription());
+        textPaneDesc.setText(template.makeHTMLFootView());
+
+        // убирает прокрутка по горизонтали
+        jScrollPaneDesc.setPreferredSize(new Dimension(0, 555));
 
     }
 
@@ -56,6 +55,8 @@ public class TemplateInfo extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         jTextField_Title = new javax.swing.JTextField();
         textPaneDesc = new javax.swing.JTextPane();
+        jScrollPaneDesc = new JScrollPane();
+
         jLabel2 = new javax.swing.JLabel();
 
         jTextArea_Content = new MTextPane();
@@ -153,7 +154,9 @@ public class TemplateInfo extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new Insets(0, 0, 5, 10);
-        add(textPaneDesc, gridBagConstraints);
+
+        add(jScrollPaneDesc, gridBagConstraints);
+        jScrollPaneDesc.setViewportView(textPaneDesc);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
