@@ -232,7 +232,7 @@ public class RSignNote extends Transaction implements Itemable {
         return hasTemplate(this.typeBytes);
     }
 
-    public boolean hasRecipients() {
+    public boolean hasLinkRecipients() {
         return extendedData.hasRecipients();
     }
 
@@ -379,23 +379,23 @@ public class RSignNote extends Transaction implements Itemable {
         DefaultMutableTreeNode root = super.viewLinksTree(component);
 
         if (extendedData.getTemplate() != null) {
-            ASMutableTreeNode item = new ASMutableTreeNode("Template", Lang.T("Template"), null);
+            ASMutableTreeNode item = new ASMutableTreeNode(Lang.T("Template"));
             item.add(new DefaultMutableTreeNode(extendedData.getTemplate()));
             root.add(item);
         }
 
         if (extendedData.hasAuthors()) {
-            ASMutableTreeNode item = new ASMutableTreeNode("Authors", Lang.T("Authors"), null);
+            ASMutableTreeNode item = new ASMutableTreeNode(Lang.T("Authors"));
             for (ExLinkAuthor author : extendedData.getAuthors()) {
-                item.add(new DefaultMutableTreeNode(dcSet.getItemPersonMap().get(author.getRef())));
+                item.add(new DefaultMutableTreeNode(author));
             }
             root.add(item);
         }
 
         if (extendedData.hasSources()) {
-            ASMutableTreeNode item = new ASMutableTreeNode("Sources", Lang.T("Sources"), null);
+            ASMutableTreeNode item = new ASMutableTreeNode(Lang.T("Sources"));
             for (ExLinkSource source : extendedData.getSources()) {
-                item.add(new DefaultMutableTreeNode(dcSet.getItemPersonMap().get(source.getRef())));
+                item.add(new DefaultMutableTreeNode(source));
             }
             root.add(item);
         }

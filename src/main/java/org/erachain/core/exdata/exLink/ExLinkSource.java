@@ -9,6 +9,8 @@ import org.json.simple.JSONObject;
 
 public class ExLinkSource extends ExLinkMemo {
 
+    Transaction source;
+
     public ExLinkSource(long parentSeqNo, int value, String memo) {
         super(ExData.LINK_SOURCE_TYPE, parentSeqNo, value, memo);
     }
@@ -23,6 +25,17 @@ public class ExLinkSource extends ExLinkMemo {
 
     public ExLinkSource(byte flags, int value, long ref, byte[] memoBytes) {
         super(ExData.LINK_SOURCE_TYPE, flags, value, ref, memoBytes);
+    }
+
+    public Transaction getSource() {
+        if (source == null)
+            source = DCSet.getInstance().getTransactionFinalMap().get(ref);
+        return source;
+    }
+
+    @Override
+    public String toString() {
+        return getSource() + " " + getValue() + " " + getMemo();
     }
 
     public JSONObject makeJSONforHTML(JSONObject langObj) {

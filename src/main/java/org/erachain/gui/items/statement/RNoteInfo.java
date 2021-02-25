@@ -5,7 +5,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
-import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.persons.PersonCls;
@@ -87,8 +86,11 @@ public class RNoteInfo extends RecDetailsFrame {
         file_Panel.setVisible(false);
 
         ++labelGBC.gridy;
-        jLabel_Title = new javax.swing.JLabel(Lang.T("Title"));
+        jLabel_Title = new JLabel(Lang.T("Title") + ":");
         add(jLabel_Title, labelGBC);
+
+        fieldGBC.gridy = labelGBC.gridy;
+        add(new JLabel(statement.getTitle()), fieldGBC);
 
         MenuPopupUtil.installContextMenu(jTextArea_Body);
         fieldGBC.gridy = ++labelGBC.gridy;
@@ -245,15 +247,6 @@ public class RNoteInfo extends RecDetailsFrame {
         exData = statement.getExData();
         exData.setDC(DCSet.getInstance());
 
-        ExLink exLink = exData.getExLink();
-        if (exLink != null) {
-            resultStr += Lang.T("Link Type") + ": " + Lang.T(exData.viewLinkTypeName()) + " "
-                    + Lang.T("for # для") + " " + Transaction.viewDBRef(exLink.getRef());
-            Transaction transaction = DCSet.getInstance().getTransactionFinalMap().get(exLink.getRef());
-            resultStr += "<br>" + transaction.getTitle() + " : " + transaction.getCreator().getPersonAsString() + "</b><br>";
-
-        }
-
         ExPays exPays = exData.getExPays();
         if (exPays != null) {
             exPays.getFilteredAccruals(statement);
@@ -262,10 +255,6 @@ public class RNoteInfo extends RecDetailsFrame {
                     + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(exPays.getTotalFeeBytes())
                     + "</b>, " + Lang.T("Total") + ": <b>" + exPays.getTotalPay();
         }
-
-        String title = exData.getTitle();
-        if (title != null)
-            jLabel_Title.setText(Lang.T("Title") + ": " + title);
 
         if (exData.isCanSignOnlyRecipients()) {
             resultStr += "<br><b>" + Lang.T("To sign can only Recipients") + "<b><br>";
@@ -287,7 +276,8 @@ public class RNoteInfo extends RecDetailsFrame {
         }
 
         // AUTHORS
-        if (exData.hasAuthors()) {
+        if (false && // in JTree
+                exData.hasAuthors()) {
             resultStr += "<h2>" + Lang.T("Authors") + "</h2>";
             ExLinkAuthor[] authors = exData.getAuthors();
             int size = authors.length;
@@ -377,7 +367,8 @@ public class RNoteInfo extends RecDetailsFrame {
         }
 
         // AUTHORS
-        if (exData.hasSources()) {
+        if (false && // in JTree
+                exData.hasSources()) {
             resultStr += "<h2>" + Lang.T("Sources") + "</h2>";
             ExLinkSource[] sources = exData.getSources();
             int size = sources.length;

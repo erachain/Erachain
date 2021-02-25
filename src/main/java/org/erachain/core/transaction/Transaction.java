@@ -1487,13 +1487,18 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return "";
     }
 
+    public boolean hasLinkRecipients() {
+        return false;
+    }
+
     public DefaultMutableTreeNode viewLinksTree(JComponent component) {
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(this);
 
-        if (getExLink() != null) {
+        exLink = getExLink();
+        if (exLink != null) {
             Transaction parentTX = dcSet.getTransactionFinalMap().get(getExLink().getRef());
-            ASMutableTreeNode parent = new ASMutableTreeNode("Parent", Lang.T("Parent"), null);
+            ASMutableTreeNode parent = new ASMutableTreeNode(Lang.T(exLink.viewTypeName(hasLinkRecipients())));
             parent.add(new DefaultMutableTreeNode(parentTX));
             root.add(parent);
         }
@@ -1501,7 +1506,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         try (IteratorCloseable<Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
                 .getTXLinksIterator(dbRef, ExData.LINK_APPENDIX_TYPE, false)) {
             if (iterator.hasNext()) {
-                ASMutableTreeNode list = new ASMutableTreeNode("Appendixes", Lang.T("Appendixes"), null);
+                ASMutableTreeNode list = new ASMutableTreeNode(Lang.T("Appendixes"));
                 while (iterator.hasNext()) {
                     list.add(new DefaultMutableTreeNode(dcSet.getTransactionFinalMap().get(iterator.next().c)));
                 }
@@ -1513,7 +1518,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         try (IteratorCloseable<Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
                 .getTXLinksIterator(dbRef, ExData.LINK_SOURCE_TYPE, false)) {
             if (iterator.hasNext()) {
-                ASMutableTreeNode list = new ASMutableTreeNode("Usage", Lang.T("Usage"), null);
+                ASMutableTreeNode list = new ASMutableTreeNode(Lang.T("Usage"));
                 while (iterator.hasNext()) {
                     list.add(new DefaultMutableTreeNode(dcSet.getTransactionFinalMap().get(iterator.next().c)));
                 }
@@ -1525,7 +1530,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         try (IteratorCloseable<Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
                 .getTXLinksIterator(dbRef, ExData.LINK_REPLY_COMMENT_TYPE, false)) {
             if (iterator.hasNext()) {
-                ASMutableTreeNode list = new ASMutableTreeNode("Replays and Comments", Lang.T("Replays and Comments"), null);
+                ASMutableTreeNode list = new ASMutableTreeNode(Lang.T("Replays and Comments"));
                 while (iterator.hasNext()) {
                     list.add(new DefaultMutableTreeNode(dcSet.getTransactionFinalMap().get(iterator.next().c)));
                 }

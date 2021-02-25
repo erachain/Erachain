@@ -19,11 +19,23 @@ public class ASMutableTreeNode extends DefaultMutableTreeNode {
 
     }
 
+    public ASMutableTreeNode(String s, Image i) {
+        super(s);
+        title = Lang.T(s);
+        icon = i;
+
+    }
+
     public ASMutableTreeNode(String o, String s) {
         super(o);
         title = Lang.T(s);
         icon = IconPanel.getIcon(o);
 
+    }
+
+    public ASMutableTreeNode(String s) {
+        super(s);
+        title = Lang.T(s);
     }
 
     public String getTitle() {
