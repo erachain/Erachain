@@ -76,6 +76,7 @@ public class ItemInfo extends JPanel {
         fieldGBC.gridy = labelGBC.gridy;
         add(textName, fieldGBC);
 
+        ++labelGBC.gridy;
         if (useIcon) {
             byte[] iconBytes = item.getIcon();
             if (iconBytes != null && iconBytes.length > 0) {
@@ -83,7 +84,6 @@ public class ItemInfo extends JPanel {
                 ImageIcon image = new ImageIcon(iconBytes);
                 jLabelIcon.setIcon(new ImageIcon(image.getImage().getScaledInstance(rowSize, rowSize, 1)));
 
-                ++labelGBC.gridy;
                 add(jLabelIcon, labelGBC);
 
             }
@@ -111,12 +111,28 @@ public class ItemInfo extends JPanel {
 
     public void initFoot() {
 
-        jLabelContent = new JLabel(Lang.T("Content") + ":");
+        byte[] imageBytes = item.getImage();
+        if (imageBytes != null && imageBytes.length > 0) {
+            ImageIcon image = new ImageIcon(imageBytes);
+            jLabelContent = new JLabel();
+            jLabelContent.setIcon(image);
+
+            fieldGBC.gridy = labelGBC.gridy;
+            add(jLabelContent, fieldGBC);
+
+        } else {
+            jLabelContent = new JLabel(Lang.T("Content") + ":");
+        }
+
         ++labelGBC.gridy;
         add(jLabelContent, labelGBC);
 
         textPaneDesc.setContentType("text/html");
-        textPaneDesc.setText(item.makeHTMLFootView(false));
+        String color = "#" + Integer.toHexString(UIManager.getColor("Panel.background").getRGB()).substring(2);
+        String text = "<body style= 'font-family:"
+                + UIManager.getFont("Label.font").getFamily() + "; font-size: " + UIManager.getFont("Label.font").getSize() + "pt;'>";
+
+        textPaneDesc.setText(text + item.makeHTMLFootView(false));
 
         fieldGBC.gridy = labelGBC.gridy;
         add(jScrollPaneDesc, fieldGBC);
