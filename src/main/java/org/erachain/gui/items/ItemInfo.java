@@ -30,13 +30,8 @@ public class ItemInfo extends JPanel {
     protected GridBagConstraints labelGBC;
     protected GridBagConstraints fieldGBC;
 
-    public ItemInfo(ItemCls item) {
+    public ItemInfo(ItemCls item, boolean useIcon) {
         this.item = item;
-        initComponents();
-
-    }
-
-    private void initComponents() {
 
         labelGBC = new java.awt.GridBagConstraints();
         labelGBC.anchor = java.awt.GridBagConstraints.EAST;
@@ -58,20 +53,6 @@ public class ItemInfo extends JPanel {
 
         jTextArea_Content = new MTextPane();
         jPanel_Image = new JPanel();
-
-        ImageIcon image = new ImageIcon(item.getImage());
-        int x = image.getIconWidth();
-        int y = image.getIconHeight();
-        int x1 = 250;
-        double k = ((double) x / (double) x1);
-        y = (int) ((double) y / k);
-
-        if (y != 0) {
-            Image Im = image.getImage().getScaledInstance(x1, y, 1);
-            jLabelIcon.setIcon(new ImageIcon(Im));
-        }
-
-        jLabelIcon.addMouseListener(new Image_mouse_Clikl());
 
         GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = new int[]{0, 0, 8, 0, 8, 0};
@@ -95,20 +76,35 @@ public class ItemInfo extends JPanel {
         fieldGBC.gridy = labelGBC.gridy;
         add(textName, fieldGBC);
 
-        GridBagLayout gbl_jPanel_Image = new GridBagLayout();
-        gbl_jPanel_Image.columnWidths = new int[]{81};
-        gbl_jPanel_Image.rowHeights = new int[]{152};
-        gbl_jPanel_Image.rowWeights = new double[]{1.0};
-        gbl_jPanel_Image.columnWeights = new double[]{0.0};
-        jPanel_Image.setLayout(gbl_jPanel_Image);
-        GridBagConstraints gridBagConstraints_1 = new GridBagConstraints();
-        gridBagConstraints_1.gridheight = 2;
-        gridBagConstraints_1.gridx = 0;
-        gridBagConstraints_1.gridy = ++labelGBC.gridy;
-        gridBagConstraints_1.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints_1.weighty = 0.6;
-        gridBagConstraints_1.insets = new Insets(0, 8, 8, 5);
-        add(jPanel_Image, gridBagConstraints_1);
+        if (useIcon) {
+            byte[] iconBytes = item.getIcon();
+            if (iconBytes != null && iconBytes.length > 0) {
+                int rowSize = getFont().getSize() << 2;
+                ImageIcon image = new ImageIcon(iconBytes);
+                jLabelIcon.setIcon(new ImageIcon(image.getImage().getScaledInstance(rowSize, rowSize, 1)));
+
+                ++labelGBC.gridy;
+                add(jLabelIcon, labelGBC);
+
+            }
+        }
+
+        if (false) {
+            GridBagLayout gbl_jPanel_Image = new GridBagLayout();
+            gbl_jPanel_Image.columnWidths = new int[]{81};
+            gbl_jPanel_Image.rowHeights = new int[]{152};
+            gbl_jPanel_Image.rowWeights = new double[]{1.0};
+            gbl_jPanel_Image.columnWeights = new double[]{0.0};
+            jPanel_Image.setLayout(gbl_jPanel_Image);
+            GridBagConstraints gridBagConstraints_1 = new GridBagConstraints();
+            gridBagConstraints_1.gridheight = 2;
+            gridBagConstraints_1.gridx = 0;
+            gridBagConstraints_1.gridy = ++labelGBC.gridy;
+            gridBagConstraints_1.anchor = GridBagConstraints.FIRST_LINE_START;
+            gridBagConstraints_1.weighty = 0.6;
+            gridBagConstraints_1.insets = new Insets(0, 8, 8, 5);
+            add(jPanel_Image, gridBagConstraints_1);
+        }
 
 
     }

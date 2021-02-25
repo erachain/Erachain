@@ -51,6 +51,8 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
             }
         });
 
+        this.toolBarLeftPanel.add(new JLabel("(" + Lang.T("Enter Empty for seek the latest") + ")"));
+
 
         // UPDATE FILTER ON TEXT CHANGE
 
@@ -104,7 +106,12 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
         new Thread() {
             @Override
             public void run() {
-                search_Table_Model.findByKey(key_Item.getText());
+                String seqNo = key_Item.getText();
+                if (seqNo == null || seqNo.isEmpty()) {
+                    search_Table_Model.getLast();
+                } else {
+                    search_Table_Model.findByKey(seqNo);
+                }
                 if (search_Table_Model.getRowCount() > 0) {
                     jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
                     jTableJScrollPanelLeftPanel.getSelectionModel().addSelectionInterval(0, 0);

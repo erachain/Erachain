@@ -6,7 +6,7 @@ import org.erachain.gui.items.ItemInfo;
 public class TemplateInfo extends ItemInfo {
 
     public TemplateInfo(TemplateCls template) {
-        super(template);
+        super(template, true);
 
         initFoot();
 
