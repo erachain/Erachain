@@ -176,6 +176,8 @@ public class RecDetailsFrame extends JPanel //JFrame
 		this.add(confirmations, detailGBC);
 		*/
 
+        linksTree();
+
         new JTextField(DateTimeFormat.timestamptoString(transaction.getTimestamp())
 
                 + String.valueOf(transaction.getDataLength(Transaction.FOR_NETWORK, true)) + "^" + String.valueOf(transaction.getFeePow())
@@ -214,11 +216,12 @@ public class RecDetailsFrame extends JPanel //JFrame
         shortInfoMeny.add(copy_Heigt_Block);
 
         shortInfo.setComponentPopupMenu(shortInfoMeny);
+
     }
 
     public void linksTree() {
 
-        JTree tree = transaction.viewLinksTree(this);
+        JTree tree = new JTree(transaction.viewLinksTree(this));
         if (tree == null)
             return;
 
@@ -251,7 +254,7 @@ public class RecDetailsFrame extends JPanel //JFrame
                             panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
                             panel.transactionsTableModel.setBlockNumber(seqNo);
                             panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
-                            MainPanel.getInstance().insertTab(panel);
+                            MainPanel.getInstance().insertNewTab(Lang.T("Links"), panel);
                         }
                     }
                 }

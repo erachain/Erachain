@@ -22,8 +22,6 @@ public class IssueAssetDetailsFrame extends RecDetailsFrame {
         JLabel nameLabel = new JLabel(Lang.T("Name") + ":");
         this.add(as_info, labelGBC);
 
-        linksTree();
-
         //PACK
         //	this.pack();
         //    this.setResizable(false);

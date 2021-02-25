@@ -26,6 +26,7 @@ import org.mapdb.Fun.Tuple3;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -75,7 +76,7 @@ public class RNoteInfo extends RecDetailsFrame {
 
         if (transaction == null)
             return;
-        this.transaction = transaction;
+
         statement = (RSignNote) transaction;
         statement.parseDataFull();
         statement.calcFee(false);
@@ -93,7 +94,6 @@ public class RNoteInfo extends RecDetailsFrame {
 
     //// <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         jLabel_Title = new javax.swing.JLabel();
         jSplitPane1 = new MSplitPane();
@@ -115,17 +115,6 @@ public class RNoteInfo extends RecDetailsFrame {
 
         setLayout(new java.awt.GridBagLayout());
 
-        JPanel pp = new RecDetailsFrame(transaction, true);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(11, 11, 0, 11);
-        add(pp, gridBagConstraints);
-
         jSplitPane1.setBorder(null);
         jSplitPane1.setOrientation(MSplitPane.VERTICAL_SPLIT);
 
@@ -137,7 +126,7 @@ public class RNoteInfo extends RecDetailsFrame {
         // jScrollPane3.setViewportView(jTextArea_Body);
         // jScrollPane3.getViewport().add(jTextArea_Body);
         jLabel_Title.setText(Lang.T("Title"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++y;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -514,6 +503,5 @@ public class RNoteInfo extends RecDetailsFrame {
 
         jTextArea_Body.setText(resultStr);
 
-        linksTree();
     }
 }

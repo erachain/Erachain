@@ -1487,12 +1487,12 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return "";
     }
 
-    public JTree viewLinksTree(JComponent component) {
+    public DefaultMutableTreeNode viewLinksTree(JComponent component) {
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(this);
 
-        if (exLink != null) {
-            Transaction parentTX = dcSet.getTransactionFinalMap().get(exLink.getRef());
+        if (getExLink() != null) {
+            Transaction parentTX = dcSet.getTransactionFinalMap().get(getExLink().getRef());
             ASMutableTreeNode parent = new ASMutableTreeNode("Parent", Lang.T("Parent"), null);
             parent.add(new DefaultMutableTreeNode(parentTX));
             root.add(parent);
@@ -1537,7 +1537,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         if (root.isLeaf())
             return null;
 
-        return new JTree(root);
+        return root;
     }
 
 
