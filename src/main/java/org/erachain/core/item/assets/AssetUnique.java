@@ -179,7 +179,7 @@ public class AssetUnique extends AssetCls {
     public String makeHTMLView() {
 
         String text = super.makeHTMLHeadView();
-        text += super.makeHTMLFootView();
+        text += super.makeHTMLFootView(true);
 
         return text;
 

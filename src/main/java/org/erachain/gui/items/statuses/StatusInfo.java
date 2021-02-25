@@ -13,9 +13,9 @@ public class StatusInfo extends ItemInfo {
     public StatusInfo(StatusCls status) {
         super(status);
 
-        JLabel singleLabel = new JLabel(Lang.T("Single") + ":");
-        ++labelGBC.gridy;
-        add(singleLabel, labelGBC);
+        JCheckBox singleParam = new JCheckBox(Lang.T("Single") + ":", status.isUnique());
+        fieldGBC.gridy = ++labelGBC.gridy;
+        add(singleParam, fieldGBC);
 
         initFoot();
 

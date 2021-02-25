@@ -34,13 +34,6 @@ public class ItemInfo extends JPanel {
         this.item = item;
         initComponents();
 
-        textName.setText(item.viewName());
-        textPaneDesc.setContentType("text/html");
-        textPaneDesc.setText(item.makeHTMLFootView());
-
-        // убирает прокрутка по горизонтали
-        jScrollPaneDesc.setPreferredSize(new Dimension(0, 555));
-
     }
 
     private void initComponents() {
@@ -58,6 +51,8 @@ public class ItemInfo extends JPanel {
         fieldGBC.insets = new java.awt.Insets(0, 5, 5, 8);
 
         textName = new JTextField();
+        textName.setText(item.viewName());
+
         textPaneDesc = new JTextPane();
         jScrollPaneDesc = new JScrollPane();
 
@@ -100,14 +95,6 @@ public class ItemInfo extends JPanel {
         fieldGBC.gridy = labelGBC.gridy;
         add(textName, fieldGBC);
 
-        jLabelContent = new JLabel(Lang.T("Content") + ":");
-        ++labelGBC.gridy;
-        add(jLabelContent, labelGBC);
-
-        fieldGBC.gridy = labelGBC.gridy;
-        add(jScrollPaneDesc, fieldGBC);
-        jScrollPaneDesc.setViewportView(textPaneDesc);
-
         GridBagLayout gbl_jPanel_Image = new GridBagLayout();
         gbl_jPanel_Image.columnWidths = new int[]{81};
         gbl_jPanel_Image.rowHeights = new int[]{152};
@@ -115,13 +102,10 @@ public class ItemInfo extends JPanel {
         gbl_jPanel_Image.columnWeights = new double[]{0.0};
         jPanel_Image.setLayout(gbl_jPanel_Image);
         GridBagConstraints gridBagConstraints_1 = new GridBagConstraints();
-        gridBagConstraints_1.gridheight = 6;
-        gridBagConstraints_1.gridx = 1;
-        gridBagConstraints_1.gridy = 1;
-        // gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        // gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints_1.gridheight = 2;
+        gridBagConstraints_1.gridx = 0;
+        gridBagConstraints_1.gridy = ++labelGBC.gridy;
         gridBagConstraints_1.anchor = GridBagConstraints.FIRST_LINE_START;
-        // gridBagConstraints.weightx = 1.0;
         gridBagConstraints_1.weighty = 0.6;
         gridBagConstraints_1.insets = new Insets(0, 8, 8, 5);
         add(jPanel_Image, gridBagConstraints_1);
@@ -130,6 +114,21 @@ public class ItemInfo extends JPanel {
     }
 
     public void initFoot() {
+
+        jLabelContent = new JLabel(Lang.T("Content") + ":");
+        ++labelGBC.gridy;
+        add(jLabelContent, labelGBC);
+
+        textPaneDesc.setContentType("text/html");
+        textPaneDesc.setText(item.makeHTMLFootView(false));
+
+        fieldGBC.gridy = labelGBC.gridy;
+        add(jScrollPaneDesc, fieldGBC);
+        jScrollPaneDesc.setViewportView(textPaneDesc);
+
+        // убирает прокрутка по горизонтали
+        jScrollPaneDesc.setPreferredSize(new Dimension(0, 555));
+
         // vouch panel
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
