@@ -1,9 +1,11 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
+import org.erachain.gui.items.templates.SearchTemplatesSplitPanel;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -12,6 +14,7 @@ import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -30,6 +33,7 @@ public class RecDetailsFrame extends JPanel //JFrame
     public GridBagConstraints fieldGBC;
     public JTextField signature;
     Transaction transaction;
+    protected JTree linksTree;
 
     public RecDetailsFrame(Transaction transaction, boolean andSetup) {
 
@@ -176,7 +180,7 @@ public class RecDetailsFrame extends JPanel //JFrame
 		this.add(confirmations, detailGBC);
 		*/
 
-        linksTree();
+        linksTree(shortInfo);
 
         new JTextField(DateTimeFormat.timestamptoString(transaction.getTimestamp())
 
@@ -219,21 +223,24 @@ public class RecDetailsFrame extends JPanel //JFrame
 
     }
 
-    public void linksTree() {
+    public void linksTree(JComponent component) {
 
-        JTree tree = new JTree(transaction.viewLinksTree(this));
-        if (tree == null)
+        DefaultMutableTreeNode rootLinkTree = transaction.viewLinksTree();
+        if (rootLinkTree == null)
             return;
 
-        tree.setToggleClickCount(1);
+        linksTree = new JTree(rootLinkTree);
+        linksTree.setBackground(component.getBackground());
+
+        linksTree.setToggleClickCount(1);
         ++labelGBC.gridy;
         JLabel linksLabel = new JLabel(Lang.T("Links") + ":");
         this.add(linksLabel, labelGBC);
 
         fieldGBC.gridy = labelGBC.gridy;
-        add(tree, fieldGBC);
+        add(linksTree, fieldGBC);
 
-        tree.addMouseListener(new MouseListener() {
+        linksTree.addMouseListener(new MouseListener() {
 
             @Override
             public void mouseClicked(MouseEvent arg0) {
@@ -250,6 +257,14 @@ public class RecDetailsFrame extends JPanel //JFrame
                         if (obj instanceof Transaction) {
                             String seqNo = ((Transaction) obj).viewHeightSeq();
                             SearchTransactionsSplitPanel panel = new SearchTransactionsSplitPanel();
+                            panel.transactionsTableModel.clear();
+                            panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
+                            panel.transactionsTableModel.setBlockNumber(seqNo);
+                            panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
+                            MainPanel.getInstance().insertNewTab(Lang.T("Links"), panel);
+                        } else if (obj instanceof TemplateCls) {
+                            long key = ((TemplateCls) obj).getKey();
+                            SearchTransactionsSplitPanel panel = new SearchTemplatesSplitPanel();
                             panel.transactionsTableModel.clear();
                             panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
                             panel.transactionsTableModel.setBlockNumber(seqNo);
@@ -286,6 +301,35 @@ public class RecDetailsFrame extends JPanel //JFrame
 
         });
 
+        linksTree.setCellRenderer(new MyCellRenderer());
+
     }
 
+    public class MyCellRenderer extends DefaultTreeCellRenderer {
+
+        @Override
+        public Color getBackgroundNonSelectionColor() {
+            return null;
+        }
+
+        @Override
+        public Color getBackgroundSelectionColor() {
+            //color = getTex
+            return new Color(90, 90, 90); //Color.GREEN;
+        }
+
+        @Override
+        public Color getBackground() {
+            return null;
+        }
+
+        //@Override
+        //public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+        //    final Component ret = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+
+        ///final DefaultMutableTreeNode node = ((DefaultMutableTreeNode) (value));
+        //this.setText(value.toString());
+        //return ret;
+        //}
+    }
 }

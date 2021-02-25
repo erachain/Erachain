@@ -35,7 +35,7 @@ public class ExLinkSource extends ExLinkMemo {
 
     @Override
     public String toString() {
-        return getSource() + " " + getValue() + " " + getMemo();
+        return getSource() + " x" + getValue() + (memo == null ? "" : " " + memo);
     }
 
     public JSONObject makeJSONforHTML(JSONObject langObj) {

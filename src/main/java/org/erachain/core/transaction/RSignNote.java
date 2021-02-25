@@ -25,7 +25,6 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.mapdb.Fun;
 
-import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -374,9 +373,9 @@ public class RSignNote extends Transaction implements Itemable {
         return extendedData.getMessage();
     }
 
-    public DefaultMutableTreeNode viewLinksTree(JComponent component) {
+    public DefaultMutableTreeNode viewLinksTree() {
 
-        DefaultMutableTreeNode root = super.viewLinksTree(component);
+        DefaultMutableTreeNode root = super.viewLinksTree();
 
         if (extendedData.getTemplate() != null) {
             ASMutableTreeNode item = new ASMutableTreeNode(Lang.T("Template"));

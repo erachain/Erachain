@@ -39,7 +39,6 @@ import org.mapdb.Fun.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -1491,14 +1490,16 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return false;
     }
 
-    public DefaultMutableTreeNode viewLinksTree(JComponent component) {
+    public DefaultMutableTreeNode viewLinksTree() {
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(this);
 
         exLink = getExLink();
         if (exLink != null) {
             Transaction parentTX = dcSet.getTransactionFinalMap().get(getExLink().getRef());
-            ASMutableTreeNode parent = new ASMutableTreeNode(Lang.T(exLink.viewTypeName(hasLinkRecipients())));
+            ASMutableTreeNode parent = new ASMutableTreeNode(
+                    Lang.T(exLink.viewTypeName(hasLinkRecipients())) + " "
+                            + Lang.T("for # для"));
             parent.add(new DefaultMutableTreeNode(parentTX));
             root.add(parent);
         }

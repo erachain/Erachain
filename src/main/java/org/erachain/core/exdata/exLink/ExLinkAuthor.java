@@ -35,7 +35,7 @@ public class ExLinkAuthor extends ExLinkMemo {
 
     @Override
     public String toString() {
-        return "[" + ref + "] " + getPerson().getName() + " " + getValue() + " " + getMemo();
+        return "[" + ref + "] " + getPerson().getName() + " x" + getValue() + (memo == null ? "" : " " + memo);
     }
 
     public JSONObject makeJSONforHTML(JSONObject langObj) {

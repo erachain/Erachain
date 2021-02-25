@@ -402,7 +402,8 @@ public class RNoteInfo extends RecDetailsFrame {
                 + " h5{ font-size: " + (fontSize - 1) + "px;  }"
                 + " body{ font-family:"
                 + UIManager.getFont("Label.font").getFamily() + "; font-size:" + fontSize + "px;"
-                + "word-wrap:break-word;}"
+                //+ "word-wrap:break-word;}"
+                + "word-wrap:normal;}"
                 + "</style> </head><body>" + resultStr
                 + "</body>";
 
