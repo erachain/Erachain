@@ -25,7 +25,7 @@ public class TemplateMySplitPanel extends ItemSplitPanel {
     // show details
     @Override
     public Component getShow(ItemCls item) {
-        return new InfoTemplates((TemplateCls) item);
+        return new TemplateInfo((TemplateCls) item);
     }
 
 }

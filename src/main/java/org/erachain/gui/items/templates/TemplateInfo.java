@@ -13,10 +13,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class InfoTemplates extends javax.swing.JPanel {
+public class TemplateInfo extends javax.swing.JPanel {
 
     /**
-     * Creates new form InfoTemplates
+     * Creates new form TemplateInfo
      *
      * @param template
      */
@@ -27,7 +27,6 @@ public class InfoTemplates extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel_Content;
     private javax.swing.JLabel jLabel_Title;
-    //private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextPane textPaneDesc;
     private MTextPane jTextArea_Content;
     private MAccoutnTextField jTextField_Account_Creator;
@@ -36,9 +35,13 @@ public class InfoTemplates extends javax.swing.JPanel {
     private GridBagConstraints gridBagConstraints_1;
     private GridBagConstraints gridBagConstraints_2;
 
-    public InfoTemplates(TemplateCls template) {
+    public TemplateInfo(TemplateCls template) {
         this.template = template;
         initComponents();
+
+        // убирает прокрутка по горизонтали но криво по вертикали ((
+        setPreferredSize(new Dimension(0, 999));
+        //pack();
 
         jTextField_Title.setText(template.viewName());
         //jTextArea_Content.setText(template.viewDescription());
@@ -52,7 +55,6 @@ public class InfoTemplates extends javax.swing.JPanel {
 
         jLabel4 = new javax.swing.JLabel();
         jTextField_Title = new javax.swing.JTextField();
-        //jScrollPane1 = new javax.swing.JScrollPane();
         textPaneDesc = new javax.swing.JTextPane();
         jLabel2 = new javax.swing.JLabel();
 
@@ -143,26 +145,14 @@ public class InfoTemplates extends javax.swing.JPanel {
         gridBagConstraints_2.weighty = 0.2;
         jPanel_Image.add(jLabel2, gridBagConstraints_2);
 
-        //jTextArea_Content.setColumns(20);
-        //jTextArea_Content.setRows(6);
-        //jTextArea_Content.setAlignmentY(1.0F);
-        //jTextArea_Content.setWrapStyleWord(true);
-        //jTextArea_Content.setLineWrap(true);
-        //jTextArea_Content.setEditable(false);
-        //MenuPopupUtil.installContextMenu(jTextArea_Content);
-        //jScrollPane1.setViewportView(jTextArea_Content);
-        //textPaneDesc.setText();
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        //gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.3;
+        gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new Insets(0, 0, 5, 10);
-        //add(jScrollPane1, gridBagConstraints);
         add(textPaneDesc, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
