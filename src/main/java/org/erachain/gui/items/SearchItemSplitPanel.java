@@ -13,7 +13,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     protected SearchItemsTableModel search_Table_Model;
-    private MDecimalFormatedTextField key_Item;
+    public MDecimalFormatedTextField key_Item;
 
     @SuppressWarnings("rawtypes")
     public SearchItemSplitPanel(SearchItemsTableModel search_Table_Model1, String gui_Name, String search_Label_Text) {
@@ -47,23 +47,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                searchTextFieldSearchToolBarLeftPanelDocument.setText("");
-                Label_search_Info_Panel.setText(Lang.T("Waiting..."));
-                jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
-                new Thread() {
-                    @Override
-                    public void run() {
-                        search_Table_Model.findByKey(key_Item.getText());
-                        if (search_Table_Model.getRowCount() > 0) {
-                            jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
-                            jTableJScrollPanelLeftPanel. getSelectionModel().addSelectionInterval(0, 0);
-                            return;
-                        }
-                        Label_search_Info_Panel.setText(Lang.T("Not Found"));
-                        jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
-                        jScrollPaneJPanelRightPanel.setViewportView(null);
-                    }
-                }.start();
+                startSearch();
             }
         });
 
@@ -104,13 +88,33 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
                             return;
                         }
                         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
-                        jTableJScrollPanelLeftPanel. getSelectionModel().addSelectionInterval(0, 0);
+                        jTableJScrollPanelLeftPanel.getSelectionModel().addSelectionInterval(0, 0);
                     }
                 }.start();
             }
 
         });
 
+    }
+
+    public void startSearch() {
+        searchTextFieldSearchToolBarLeftPanelDocument.setText("");
+        Label_search_Info_Panel.setText(Lang.T("Waiting..."));
+        jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+        new Thread() {
+            @Override
+            public void run() {
+                search_Table_Model.findByKey(key_Item.getText());
+                if (search_Table_Model.getRowCount() > 0) {
+                    jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
+                    jTableJScrollPanelLeftPanel.getSelectionModel().addSelectionInterval(0, 0);
+                    return;
+                }
+                Label_search_Info_Panel.setText(Lang.T("Not Found"));
+                jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+                jScrollPaneJPanelRightPanel.setViewportView(null);
+            }
+        }.start();
     }
 
 }

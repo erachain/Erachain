@@ -261,15 +261,13 @@ public class RecDetailsFrame extends JPanel //JFrame
                             panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
                             panel.transactionsTableModel.setBlockNumber(seqNo);
                             panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
-                            MainPanel.getInstance().insertNewTab(Lang.T("Links"), panel);
+                            MainPanel.getInstance().insertNewTab(Lang.T("Link"), panel);
                         } else if (obj instanceof TemplateCls) {
                             long key = ((TemplateCls) obj).getKey();
-                            SearchTransactionsSplitPanel panel = new SearchTemplatesSplitPanel();
-                            panel.transactionsTableModel.clear();
-                            panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
-                            panel.transactionsTableModel.setBlockNumber(seqNo);
-                            panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
-                            MainPanel.getInstance().insertNewTab(Lang.T("Links"), panel);
+                            SearchTemplatesSplitPanel panel = new SearchTemplatesSplitPanel();
+                            panel.key_Item.setText("" + key);
+                            panel.startSearch();
+                            MainPanel.getInstance().insertNewTab(Lang.T("Template"), panel);
                         }
                     }
                 }
