@@ -161,7 +161,7 @@ public class SplitPanel extends IconPanel {
         searchToolBar_LeftPanel.add(searchFavoriteJCheckBoxLeftPanel);
 
 
-        searthLabelSearchToolBarLeftPanel.setText("    " + Lang.T("Search") + ":   ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ": ");
         searthLabelSearchToolBarLeftPanel.setToolTipText("");
         searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel);
 
