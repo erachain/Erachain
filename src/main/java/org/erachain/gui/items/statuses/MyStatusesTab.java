@@ -19,8 +19,6 @@ public class MyStatusesTab extends ItemSplitPanel {
     // show details
     @Override
     public Component getShow(ItemCls item) {
-        StatusInfo statusInfo = new StatusInfo();
-        statusInfo.show_001((StatusCls) item);
-        return statusInfo;
+        return new StatusInfo((StatusCls) item);
     }
 }
