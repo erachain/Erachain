@@ -1,9 +1,12 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.exdata.exLink.ExLinkAuthor;
+import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.items.persons.SearchPersonsSplitPanel;
 import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
 import org.erachain.gui.items.templates.SearchTemplatesSplitPanel;
 import org.erachain.gui.library.MAccoutnTextField;
@@ -234,7 +237,7 @@ public class RecDetailsFrame extends JPanel //JFrame
 
         linksTree.setToggleClickCount(1);
         ++labelGBC.gridy;
-        JLabel linksLabel = new JLabel(Lang.T("Links") + ":");
+        JLabel linksLabel = new JLabel(Lang.T("Links # Связи") + ":");
         this.add(linksLabel, labelGBC);
 
         fieldGBC.gridy = labelGBC.gridy;
@@ -260,14 +263,29 @@ public class RecDetailsFrame extends JPanel //JFrame
                             panel.transactionsTableModel.clear();
                             panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
                             panel.transactionsTableModel.setBlockNumber(seqNo);
+                            MainPanel.getInstance().insertNewTab(Lang.T("Link # Связь"), panel);
                             panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
-                            MainPanel.getInstance().insertNewTab(Lang.T("Link"), panel);
                         } else if (obj instanceof TemplateCls) {
                             long key = ((TemplateCls) obj).getKey();
                             SearchTemplatesSplitPanel panel = new SearchTemplatesSplitPanel();
                             panel.key_Item.setText("" + key);
                             panel.startSearch();
                             MainPanel.getInstance().insertNewTab(Lang.T("Template"), panel);
+                        } else if (obj instanceof ExLinkSource) {
+                            long dbRef = ((ExLinkSource) obj).getRef();
+                            String seqNo = Transaction.viewDBRef(dbRef);
+                            SearchTransactionsSplitPanel panel = new SearchTransactionsSplitPanel();
+                            panel.transactionsTableModel.clear();
+                            panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
+                            panel.transactionsTableModel.setBlockNumber(seqNo);
+                            MainPanel.getInstance().insertNewTab(Lang.T("Source"), panel);
+                            panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
+                        } else if (obj instanceof ExLinkAuthor) {
+                            long key = ((ExLinkAuthor) obj).getRef();
+                            SearchPersonsSplitPanel panel = new SearchPersonsSplitPanel();
+                            panel.key_Item.setText("" + key);
+                            panel.startSearch();
+                            MainPanel.getInstance().insertNewTab(Lang.T("Author"), panel);
                         }
                     }
                 }
