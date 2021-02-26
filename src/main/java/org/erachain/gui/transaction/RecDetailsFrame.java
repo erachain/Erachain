@@ -265,12 +265,6 @@ public class RecDetailsFrame extends JPanel //JFrame
                             panel.transactionsTableModel.setBlockNumber(seqNo);
                             MainPanel.getInstance().insertNewTab(Lang.T("Link # Связь"), panel);
                             panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
-                        } else if (obj instanceof TemplateCls) {
-                            long key = ((TemplateCls) obj).getKey();
-                            SearchTemplatesSplitPanel panel = new SearchTemplatesSplitPanel();
-                            panel.key_Item.setText("" + key);
-                            panel.startSearch();
-                            MainPanel.getInstance().insertNewTab(Lang.T("Template"), panel);
                         } else if (obj instanceof ExLinkSource) {
                             long dbRef = ((ExLinkSource) obj).getRef();
                             String seqNo = Transaction.viewDBRef(dbRef);
@@ -278,8 +272,14 @@ public class RecDetailsFrame extends JPanel //JFrame
                             panel.transactionsTableModel.clear();
                             panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
                             panel.transactionsTableModel.setBlockNumber(seqNo);
-                            MainPanel.getInstance().insertNewTab(Lang.T("Source"), panel);
+                            MainPanel.getInstance().insertNewTab(Lang.T("Link # Связь"), panel);
                             panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
+                        } else if (obj instanceof TemplateCls) {
+                            long key = ((TemplateCls) obj).getKey();
+                            SearchTemplatesSplitPanel panel = new SearchTemplatesSplitPanel();
+                            panel.key_Item.setText("" + key);
+                            panel.startSearch();
+                            MainPanel.getInstance().insertNewTab(Lang.T("Template"), panel);
                         } else if (obj instanceof ExLinkAuthor) {
                             long key = ((ExLinkAuthor) obj).getRef();
                             SearchPersonsSplitPanel panel = new SearchPersonsSplitPanel();
