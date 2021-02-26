@@ -380,6 +380,8 @@ public class RSignNote extends Transaction implements Itemable {
         if (extendedData.getTemplate() != null) {
             ASMutableTreeNode item = new ASMutableTreeNode(Lang.T("Template"));
             item.add(new DefaultMutableTreeNode(extendedData.getTemplate()));
+            if (root == null) root = new DefaultMutableTreeNode(this);
+
             root.add(item);
         }
 
@@ -388,6 +390,7 @@ public class RSignNote extends Transaction implements Itemable {
             for (ExLinkAuthor author : extendedData.getAuthors()) {
                 item.add(new DefaultMutableTreeNode(author));
             }
+            if (root == null) root = new DefaultMutableTreeNode(this);
             root.add(item);
         }
 
@@ -396,6 +399,7 @@ public class RSignNote extends Transaction implements Itemable {
             for (ExLinkSource source : extendedData.getSources()) {
                 item.add(new DefaultMutableTreeNode(source));
             }
+            if (root == null) root = new DefaultMutableTreeNode(this);
             root.add(item);
         }
 
