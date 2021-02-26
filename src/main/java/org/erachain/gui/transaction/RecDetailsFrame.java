@@ -6,6 +6,7 @@ import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.SearchPersonsSplitPanel;
 import org.erachain.gui.items.records.SearchTransactionsSplitPanel;
 import org.erachain.gui.items.templates.SearchTemplatesSplitPanel;
@@ -263,8 +264,13 @@ public class RecDetailsFrame extends JPanel //JFrame
                             panel.transactionsTableModel.clear();
                             panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
                             panel.transactionsTableModel.setBlockNumber(seqNo);
-                            MainPanel.getInstance().insertNewTab(Lang.T("Link # Связь"), panel);
+                            String title = Lang.T("Link # Связь");
+                            SplitPanel oldPanel = (SplitPanel) MainPanel.getInstance().getTabComponent(title);
+                            if (oldPanel != null)
+                                panel.setDividerParameters(oldPanel.getDividerParameters());
+                            MainPanel.getInstance().insertNewTab(title, panel);
                             panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
+
                         } else if (obj instanceof ExLinkSource) {
                             long dbRef = ((ExLinkSource) obj).getRef();
                             String seqNo = Transaction.viewDBRef(dbRef);
@@ -272,14 +278,20 @@ public class RecDetailsFrame extends JPanel //JFrame
                             panel.transactionsTableModel.clear();
                             panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
                             panel.transactionsTableModel.setBlockNumber(seqNo);
-                            MainPanel.getInstance().insertNewTab(Lang.T("Link # Связь"), panel);
+                            String title = Lang.T("Link # Связь");
+                            SplitPanel oldPanel = (SplitPanel) MainPanel.getInstance().getTabComponent(title);
+                            if (oldPanel != null)
+                                panel.setDividerParameters(oldPanel.getDividerParameters());
+                            MainPanel.getInstance().insertNewTab(title, panel);
                             panel.jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
+
                         } else if (obj instanceof TemplateCls) {
                             long key = ((TemplateCls) obj).getKey();
                             SearchTemplatesSplitPanel panel = new SearchTemplatesSplitPanel();
                             panel.key_Item.setText("" + key);
                             panel.startSearch();
                             MainPanel.getInstance().insertNewTab(Lang.T("Template"), panel);
+
                         } else if (obj instanceof ExLinkAuthor) {
                             long key = ((ExLinkAuthor) obj).getRef();
                             SearchPersonsSplitPanel panel = new SearchPersonsSplitPanel();

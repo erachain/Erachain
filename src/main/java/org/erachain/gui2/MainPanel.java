@@ -651,6 +651,14 @@ public class MainPanel extends javax.swing.JPanel {
         }
     }
 
+    public Component getTabComponent(String title) {
+        int index = jTabbedPane1.indexOfTab(title);
+        if (index > 0) {
+            return jTabbedPane1.getComponentAt(index);
+        }
+        return null;
+    }
+
     // get node by name
     private DefaultMutableTreeNode getNodeByName(String sNodeName, DefaultMutableTreeNode parent) {
         if (parent != null)
