@@ -14,6 +14,8 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     protected SearchItemsTableModel search_Table_Model;
     public MDecimalFormatedTextField key_Item;
+    public JButton buttonGetLasts = new JButton(Lang.T("Get Last"));
+
 
     @SuppressWarnings("rawtypes")
     public SearchItemSplitPanel(SearchItemsTableModel search_Table_Model1, String gui_Name, String search_Label_Text) {
@@ -21,6 +23,8 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
         super(search_Table_Model1, gui_Name, search_Label_Text);
         this.search_Table_Model = search_Table_Model1;
         searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
+
+        this.toolBarLeftPanel.add(buttonGetLasts);
 
         // CHECKBOX FOR FAVORITE
         TableColumn favorite_Column = jTableJScrollPanelLeftPanel.getColumnModel()
@@ -41,7 +45,6 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
         MenuPopupUtil.installContextMenu(key_Item);
 
-        this.toolBarLeftPanel.add(key_Item);
         key_Item.addActionListener(new ActionListener() {
 
             @Override
@@ -51,7 +54,17 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
             }
         });
 
-        this.toolBarLeftPanel.add(new JLabel("(" + Lang.T("Enter Empty for seek the latest") + ")"));
+        this.toolBarLeftPanel.add(key_Item);
+
+
+        this.toolBarLeftPanel.add(buttonGetLasts);
+        buttonGetLasts.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                startGetLast();
+            }
+        });
 
 
         // UPDATE FILTER ON TEXT CHANGE
@@ -112,6 +125,25 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
                 } else {
                     search_Table_Model.findByKey(seqNo);
                 }
+                if (search_Table_Model.getRowCount() > 0) {
+                    jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
+                    jTableJScrollPanelLeftPanel.getSelectionModel().addSelectionInterval(0, 0);
+                    return;
+                }
+                Label_search_Info_Panel.setText(Lang.T("Not Found"));
+                jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+                jScrollPaneJPanelRightPanel.setViewportView(null);
+            }
+        }.start();
+    }
+
+    public void startGetLast() {
+        Label_search_Info_Panel.setText(Lang.T("Waiting..."));
+        jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+        new Thread() {
+            @Override
+            public void run() {
+                search_Table_Model.getLast();
                 if (search_Table_Model.getRowCount() > 0) {
                     jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
                     jTableJScrollPanelLeftPanel.getSelectionModel().addSelectionInterval(0, 0);
