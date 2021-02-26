@@ -19,7 +19,7 @@ public class ASMakeHashMenuItem extends JButton {
         super();
         th = this;
         //     this.set_Text_and_Size_From_UIManaget(Lang.T("make Hash"),1.0);
-        this.setText(Lang.T("Hash"));
+        this.setText(Lang.T("Make Hash"));
         this.addActionListener(new ActionListener() {
 
             @Override

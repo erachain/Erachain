@@ -45,6 +45,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     public static String TITLE = "Search Transactions";
 
     public JPanel info_Panel;
+    public JButton buttonGetLasts = new JButton(Lang.T("Get Last"));
     public SignLibraryPanel voush_Library_Panel;
     public SearchTransactionsTableModel transactionsTableModel;
     //JScrollPane jScrollPane4;
@@ -70,7 +71,6 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         this.toolBarLeftPanel.add(searchString);
         searchString.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 transactionsTableModel.clear();
@@ -80,6 +80,16 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         });
 
+        this.toolBarLeftPanel.add(buttonGetLasts);
+        buttonGetLasts.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                transactionsTableModel.clear();
+                transactionsTableModel.find(null, null);
+
+            }
+
+        });
 
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
@@ -104,6 +114,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                 //searchString.setText("");
                 transactionsTableModel.clear();
                 transactionsTableModel.setBlockNumber(searchTextFieldSearchToolBarLeftPanelDocument.getText());
+                if (transactionsTableModel.getRowCount() == 1)
+                    jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
 
             }
 
@@ -350,6 +362,8 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
     public void listener() {
         transactionsTableModel.setBlockNumber(searchTextFieldSearchToolBarLeftPanelDocument.getText());
+        if (transactionsTableModel.getRowCount() == 1)
+            jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
     }
 
     // listener select row
