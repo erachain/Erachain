@@ -57,6 +57,8 @@ public class MyTransactionsSplitPanel extends SplitPanel {
     private JPopupMenu menu;
     private JMenuItem item_Delete;
     private JMenuItem item_Rebroadcast;
+    private JMenuItem copyNumber;
+    private JMenuItem vouchMenu;
     public WalletTransactionsTableModel recordsModel;
     public SetIntervalPanel setIntervalPanel;
 
@@ -186,11 +188,6 @@ public class MyTransactionsSplitPanel extends SplitPanel {
             @Override
             public void ancestorAdded(AncestorEvent event) {
                 // TODO Auto-generated method stub
-                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                if (row < 0) return;
-                selectedTransaction = recordsModel.getItem(row).b;
-                //selectedTransactionKey = records_model.getItem(row);
             }
 
             @Override
@@ -228,7 +225,6 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         menu.add(itemCheckTX);
 
         item_Rebroadcast = new JMenuItem(Lang.T("Rebroadcast"));
-
         item_Rebroadcast.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -240,7 +236,6 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
             }
         });
-
         menu.add(item_Rebroadcast);
 
         item_Delete = new JMenuItem(Lang.T("Delete"));
@@ -257,10 +252,9 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
             }
         });
-
         menu.add(item_Delete);
 
-        JMenuItem vouchMenu = new JMenuItem(Lang.T("Sign / Vouch"));
+        vouchMenu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouchMenu.addActionListener(e -> {
             new toSignRecordDialog(selectedTransaction.getBlockHeight(), selectedTransaction.getSeqNo());
 
@@ -279,7 +273,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         JMenu menuSaveCopy = new JMenu(Lang.T("Save / Copy"));
         menu.add(menuSaveCopy);
 
-        JMenuItem copyNumber = new JMenuItem(Lang.T("Copy Number"));
+        copyNumber = new JMenuItem(Lang.T("Copy Number"));
         copyNumber.addActionListener(e -> {
             StringSelection stringSelection = new StringSelection(selectedTransaction.viewHeightSeq());
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
@@ -397,17 +391,15 @@ public class MyTransactionsSplitPanel extends SplitPanel {
             @Override
             public void ancestorAdded(AncestorEvent event) {
                 // TODO Auto-generated method stub
-                //	int row = my_Records_Panel.records_Table.getSelectedRow();
-                //	row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
-                //	Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
                 if (selectedTransaction == null) return;
-                if (selectedTransaction.isConfirmed(DCSet.getInstance())) {
-                    item_Delete.setEnabled(false);
-                    item_Rebroadcast.setEnabled(false);
-                } else {
-                    item_Delete.setEnabled(true);
-                    item_Rebroadcast.setEnabled(true);
-                }
+
+                boolean isConfirmed = selectedTransaction.isConfirmed(DCSet.getInstance());
+
+                item_Delete.setEnabled(!isConfirmed);
+                item_Rebroadcast.setEnabled(!isConfirmed);
+                vouchMenu.setEnabled(isConfirmed);
+                copyNumber.setEnabled(isConfirmed);
+
             }
 
             @Override
@@ -487,15 +479,6 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
 
     public void onClick() {
-        // GET SELECTED OPTION
-        int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-        if (row == -1) {
-            row = 0;
-        }
-        row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-
-        if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
-        }
     }
 
     //@Override
@@ -516,12 +499,11 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
-            Transaction trans = null;
             if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0 && jTableJScrollPanelLeftPanel.getSelectedRow() < recordsModel.getRowCount()) {
-                trans = (Transaction) recordsModel
+                selectedTransaction = recordsModel
                         .getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow())).b;
 
-                ((WTransactionMap) recordsModel.getMap()).clearUnViewed(trans);
+                ((WTransactionMap) recordsModel.getMap()).clearUnViewed(selectedTransaction);
 
                 records_Info_Panel = new JPanel();
                 records_Info_Panel.setLayout(new GridBagLayout());
@@ -534,10 +516,10 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                 tableGBC.weighty = 1;
                 tableGBC.gridx = 0;
                 tableGBC.gridy = 0;
-                records_Info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(trans), tableGBC);
+                records_Info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(selectedTransaction), tableGBC);
 
                 Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap()
-                        .get(Transaction.makeDBRef(trans.getBlockHeight(), trans.getSeqNo()));
+                        .get(Transaction.makeDBRef(selectedTransaction.getBlockHeight(), selectedTransaction.getSeqNo()));
                 GridBagConstraints gridBagConstraints = null;
                 if (keys != null) {
 
@@ -557,7 +539,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new SignLibraryPanel(trans);
+                    voush_Library_Panel = new SignLibraryPanel(selectedTransaction);
                     records_Info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }
