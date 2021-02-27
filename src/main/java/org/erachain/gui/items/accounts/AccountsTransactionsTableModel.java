@@ -160,22 +160,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
         }
     }
 
-    /*
-    public void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
-                && !Controller.getInstance().isStatusSynchronizing()) {
-            needUpdate = true;
-        }
-
-        super.syncUpdate(o, arg);
-    }
-
-     */
-
     private boolean transParse(Fun.Tuple2<Long, Integer> walletKey, Transaction transaction) {
-
 
         //transaction.setDC_HeightSeq(dcSet, true);
         transaction.setDC(dcSet, false);
