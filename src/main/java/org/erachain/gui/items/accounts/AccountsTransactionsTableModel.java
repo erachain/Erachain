@@ -148,21 +148,25 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
     }
 
-    @Override
-    protected void repaintConfirms() {
+    boolean needCheckUnconfirmed = true;
 
-        needUpdate = true;
-        if (list != null) {
+    @Override
+    public void fireTableDataChanged() {
+        if (list != null && needCheckUnconfirmed) {
             for (int i = 0; i < list.size(); i++) {
                 setValueAt(i, COLUMN_CONFIRMATIONS, list.get(i).transaction.getConfirmations(dcSet));
             }
-            fireTableDataChanged();
+            super.fireTableDataChanged();
         }
+    }
+
+    @Override
+    protected void repaintConfirms() {
+        fireTableDataChanged();
     }
 
     private boolean transParse(Fun.Tuple2<Long, Integer> walletKey, Transaction transaction) {
 
-        //transaction.setDC_HeightSeq(dcSet, true);
         transaction.setDC(dcSet, false);
 
         if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {

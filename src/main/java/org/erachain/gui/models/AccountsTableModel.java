@@ -136,19 +136,40 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
 
     public void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
+        super.syncUpdate(o, arg);
 
-        if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
-                && !Controller.getInstance().isStatusSynchronizing()) {
+        // если блок собрали или транзакция наша - обновим баланс
+        if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
+                || message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
             needUpdate = true;
         }
 
-        super.syncUpdate(o, arg);
     }
 
     @Override
     public void getInterval() {
         list = Controller.getInstance().wallet.getPublicKeyAccounts();
+    }
 
+    public void addObservers() {
+
+        super.addObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
+            Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
+        }
+
+    }
+
+    public void deleteObservers() {
+
+        super.deleteObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this);
+            Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
+        }
     }
 
 }
