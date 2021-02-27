@@ -121,16 +121,6 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
     }
 
     @Override
-    protected void repaintConfirms() {
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                setValueAt(i, COLUMN_CONFIRMATIONS, list.get(i).transaction.getConfirmations(dcSet));
-            }
-            fireTableDataChanged();
-        }
-    }
-
-    @Override
     public void getInterval() {
 
         try {
@@ -157,6 +147,32 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
         }
 
     }
+
+    @Override
+    protected void repaintConfirms() {
+
+        needUpdate = true;
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                setValueAt(i, COLUMN_CONFIRMATIONS, list.get(i).transaction.getConfirmations(dcSet));
+            }
+            fireTableDataChanged();
+        }
+    }
+
+    /*
+    public void syncUpdate(Observable o, Object arg) {
+        ObserverMessage message = (ObserverMessage) arg;
+
+        if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                && !Controller.getInstance().isStatusSynchronizing()) {
+            needUpdate = true;
+        }
+
+        super.syncUpdate(o, arg);
+    }
+
+     */
 
     private boolean transParse(Fun.Tuple2<Long, Integer> walletKey, Transaction transaction) {
 
