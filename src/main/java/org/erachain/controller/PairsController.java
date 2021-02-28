@@ -165,12 +165,22 @@ public class PairsController {
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = (tradesMap.getPairIterator(key1, key2, heightStart, heightEnd))) {
             Trade trade;
             if (iterator.hasNext()) {
+                Trade lastTrade = null;
                 while (iterator.hasNext()) {
                     trade = tradesMap.get(iterator.next());
                     if (trade == null) {
                         LOGGER.warn("trade for pair [" + key1 + "/" + key2 + "] not found");
                         continue;
                     }
+                    if (currentPair != null && lastTrade == null) {
+                        // изменений не было
+                        if (trade.getTimestamp() == currentPair.getLastTime()) {
+                            currentPair.setUpdateTime(Block.getTimestamp(heightStart));
+                            return currentPair;
+                        }
+                        lastTrade = trade;
+                    }
+
                     count24++;
 
                     reversed = trade.getHaveKey().equals(key2);
@@ -245,14 +255,14 @@ public class PairsController {
         }
 
         TradePair tradePair = reCalc(asset1, asset2, tradePairOld);
-        if (!tradePair.equals(tradePairOld)) {
+        if (tradePair.equals(tradePairOld)) {
+            if (tradePair.updateTime != tradePairOld.updateTime) {
+                pairMap.put(tradePair);
+            }
+        } else {
             pairMap.put(tradePair);
         }
         return tradePair;
-    }
-
-    public static TradePair reverse(TradePair pair) {
-        return null;
     }
 
     public static void foundPairs(DCSet dcSet, DLSet dlSet, int days) {

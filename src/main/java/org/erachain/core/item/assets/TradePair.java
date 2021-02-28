@@ -55,7 +55,7 @@ public class TradePair {
     private int countOrdersAsk;
 
     // last updated on
-    public final long updateTime;
+    public long updateTime;
 
     // make trading if two orders is seeked
     public TradePair(Long assetKey1, Long assetKey2, int AssetScale1, int assetScale2, BigDecimal lastPrice, long lastTime,
@@ -107,6 +107,10 @@ public class TradePair {
     public void setDC(DCSet dcSet) {
         asset1 = dcSet.getItemAssetMap().get(assetKey1);
         asset2 = dcSet.getItemAssetMap().get(assetKey2);
+    }
+
+    public void setUpdateTime(long updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String viewID() {
