@@ -128,7 +128,7 @@ public class PairsController {
             String pairJsonKey = asset1.getName() + "_" + asset2.getName();
             spotPairsList.put(pairJsonKey, array);
 
-            TradePair tradePair = reCalcAndUpdate(asset1, asset2, mapPairs);
+            TradePair tradePair = reCalcAndUpdate(asset1, asset2, mapPairs, 2);
             spotPairs.put(pairJsonKey, tradePair);
             spotPairsJson.put(pairJsonKey, tradePair.toJson());
             commonPairsList.add(new Fun.Tuple2<>(key1, key2));
@@ -231,8 +231,19 @@ public class PairsController {
 
     }
 
-    public static TradePair reCalcAndUpdate(AssetCls asset1, AssetCls asset2, PairMap pairMap) {
+    /**
+     * @param asset1
+     * @param asset2
+     * @param pairMap
+     * @param cacheTimeMin time not use recalc
+     * @return
+     */
+    public static TradePair reCalcAndUpdate(AssetCls asset1, AssetCls asset2, PairMap pairMap, int cacheTimeMin) {
         TradePair tradePairOld = pairMap.get(asset1.getKey(), asset2.getKey());
+        if (tradePairOld != null && System.currentTimeMillis() - tradePairOld.updateTime < cacheTimeMin * 60000) {
+            return tradePairOld;
+        }
+
         TradePair tradePair = reCalc(asset1, asset2, tradePairOld);
         if (!tradePair.equals(tradePairOld)) {
             pairMap.put(tradePair);
@@ -267,7 +278,7 @@ public class PairsController {
                 Long key2 = trade.getWantKey();
                 AssetCls asset1 = dcSet.getItemAssetMap().get(key1);
                 AssetCls asset2 = dcSet.getItemAssetMap().get(key2);
-                reCalcAndUpdate(asset1, asset2, pairMap);
+                reCalcAndUpdate(asset1, asset2, pairMap, 30);
             }
         } catch (IOException e) {
         }

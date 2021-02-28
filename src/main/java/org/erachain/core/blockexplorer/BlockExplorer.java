@@ -772,7 +772,7 @@ public class BlockExplorer {
                 }
 
                 if (System.currentTimeMillis() - pair.updateTime > cacheTime) {
-                    pair = PairsController.reCalcAndUpdate(pair.getAsset1(), pair.getAsset2(), pairMap);
+                    pair = PairsController.reCalcAndUpdate(pair.getAsset1(), pair.getAsset2(), pairMap, 30);
                 }
                 pairsJSON.add(pair.toJson());
             }
@@ -2265,7 +2265,7 @@ public class BlockExplorer {
 
             String key = assetHave.getName() + "_" + assetWant.getName();
 
-            TradePair pair = PairsController.reCalcAndUpdate(assetHave, assetWant, pairsMap);
+            TradePair pair = PairsController.reCalcAndUpdate(assetHave, assetWant, pairsMap, 30);
             pairsCnt.spotPairs.put(key, pair);
 
             int ordersCount = pair.getCountOrdersBid() + pair.getCountOrdersAsk();

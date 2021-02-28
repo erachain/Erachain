@@ -62,7 +62,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
                     continue;
                 }
 
-                TradePair pair = PairsController.reCalcAndUpdate(asset, assetPair, pairsMap);
+                TradePair pair = PairsController.reCalcAndUpdate(asset, assetPair, pairsMap, 30);
                 list.add(new Fun.Tuple2<AssetCls, TradePair>(asset, pair));
             }
         } catch (IOException e) {
@@ -127,7 +127,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
             return;
 
         list.add(new Fun.Tuple2<>(asset, PairsController.reCalcAndUpdate(asset, assetPair,
-                Controller.getInstance().dlSet.getPairMap())));
+                Controller.getInstance().dlSet.getPairMap(), 30)));
 
         this.fireTableDataChanged();
     }
@@ -140,7 +140,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
         List<ItemCls> foundAssets = ((ItemMap) map).getByFilterAsArray(filter_Name, 0, 1000);
         for (ItemCls asset : foundAssets) {
             list.add(new Fun.Tuple2<>((AssetCls) asset, PairsController.reCalcAndUpdate((AssetCls) asset, assetPair,
-                    pairsMap)));
+                    pairsMap, 30)));
         }
 
         this.fireTableDataChanged();
