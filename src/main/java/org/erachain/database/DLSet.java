@@ -65,7 +65,7 @@ public class DLSet extends DBASet {
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
             try {
-                Files.walkFileTree(new File(Settings.getInstance().getLocalDir()).toPath(),
+                Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
             } catch (Throwable e1) {
                 logger.error(e1.getMessage(), e1);
@@ -76,7 +76,7 @@ public class DLSet extends DBASet {
         if (DBASet.getVersion(database) != CURRENT_VERSION) {
             database.close();
             try {
-                Files.walkFileTree(new File(Settings.getInstance().getLocalDir()).toPath(),
+                Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
