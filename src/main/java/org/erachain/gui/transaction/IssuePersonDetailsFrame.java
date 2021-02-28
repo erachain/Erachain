@@ -21,11 +21,11 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
         this.add(nameLabel, labelGBC);
 
         //NAME
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField name = new JTextField(personIssue.getItem().viewName());
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
-        this.add(name, detailGBC);
+        this.add(name, fieldGBC);
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
@@ -33,13 +33,13 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         MTextPane txtAreaDescription = new MTextPane(personIssue.getItem().getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaDescription);
-        this.add(txtAreaDescription, detailGBC);
+        this.add(txtAreaDescription, fieldGBC);
 
         //LABEL Birthday
         ++labelGBC.gridy;
@@ -47,10 +47,10 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
         this.add(birthdayLabel, labelGBC);
 
         //Birthday
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField birtday = new JTextField(person.getBirthdayStr());
         birtday.setEditable(false);
-        this.add(birtday, detailGBC);
+        this.add(birtday, fieldGBC);
 
         //LABEL Death
         if (!person.isAlive(0l)) {
@@ -59,11 +59,11 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
             this.add(deadLabel, labelGBC);
 
             //Deathday
-            ++detailGBC.gridy;
+            ++fieldGBC.gridy;
             JTextField dead = new JTextField(person.getDeathdayStr());
             dead.setEditable(false);
             birtday.setEditable(false);
-            this.add(dead, detailGBC);
+            this.add(dead, fieldGBC);
         }
 
 
@@ -73,14 +73,14 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
         this.add(genderLabel, labelGBC);
 
         //GENDER
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         String txt = "";
         if (person.getGender() == 0) txt = Lang.T("Male");
         else if (person.getGender() == 1) txt = Lang.T("Female");
         JTextField gender = new JTextField(txt);
 
         gender.setEditable(false);
-        this.add(gender, detailGBC);
+        this.add(gender, fieldGBC);
 
         //LABEL owner
         ++labelGBC.gridy;
@@ -88,10 +88,10 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
         this.add(ownerLabel, labelGBC);
 
         //owner
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField owner = new JTextField(person.getOwner().getAddress());
         owner.setEditable(false);
-        this.add(owner, detailGBC);
+        this.add(owner, fieldGBC);
 
         //LABEL owner Public key
         ++labelGBC.gridy;
@@ -99,10 +99,10 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
         this.add(owner_Public_keyLabel, labelGBC);
 
         //owner public key
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField owner_Public_Key = new JTextField(person.getOwner().getBase58());
         owner_Public_Key.setEditable(false);
-        this.add(owner_Public_Key, detailGBC);
+        this.add(owner_Public_Key, fieldGBC);
 
         //PACK
         //	this.pack();

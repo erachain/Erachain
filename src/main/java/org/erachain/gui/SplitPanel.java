@@ -161,15 +161,19 @@ public class SplitPanel extends IconPanel {
         searchToolBar_LeftPanel.add(searchFavoriteJCheckBoxLeftPanel);
 
 
-        searthLabelSearchToolBarLeftPanel.setText("    " + Lang.T("Search") + ":   ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ": ");
+        searthLabelSearchToolBarLeftPanel.setToolTipText("");
+        searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel);
+
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ": ");
         searthLabelSearchToolBarLeftPanel.setToolTipText("");
         searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel);
 
         searchTextFieldSearchToolBarLeftPanelDocument.setToolTipText("");
         searchTextFieldSearchToolBarLeftPanelDocument.setAlignmentX(1.0F);
-        searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(200, UIManager.getFont("Label.font").getSize()+ UIManager.getFont("Label.font").getSize()/2));
+        searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
         searchTextFieldSearchToolBarLeftPanelDocument.setName(""); // NOI18N
-        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(200, UIManager.getFont("Label.font").getSize()+ UIManager.getFont("Label.font").getSize()/2));
+        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
         searchToolBar_LeftPanel.add(searchTextFieldSearchToolBarLeftPanelDocument);
 
         gridBagConstraints = new GridBagConstraints();
@@ -246,13 +250,13 @@ public class SplitPanel extends IconPanel {
         jScrollPaneJPanelRightPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jScrollPaneJPanelRightPanel.setAlignmentX(1.0F);
         jScrollPaneJPanelRightPanel.setAlignmentY(1.0F);
-        jScrollPaneJPanelRightPanel.setAutoscrolls(true);
-        jScrollPaneJPanelRightPanel.setMinimumSize(new Dimension(0, 0));
+        //jScrollPaneJPanelRightPanel.setAutoscrolls(true);
+        jScrollPaneJPanelRightPanel.setMinimumSize(new Dimension(100, 3000));
         jScrollPaneJPanelRightPanel.setName(""); // NOI18N
-        jScrollPaneJPanelRightPanel.setPreferredSize(new Dimension(0, 0));
+        jScrollPaneJPanelRightPanel.setPreferredSize(new Dimension(200, 300));
         jScrollPaneJPanelRightPanel.setVerifyInputWhenFocusTarget(false);
-        jScrollPaneJPanelRightPanel.setWheelScrollingEnabled(false);
-        jScrollPaneJPanelRightPanel.setFocusable(false);
+        //jScrollPaneJPanelRightPanel.setWheelScrollingEnabled(false);
+        //jScrollPaneJPanelRightPanel.setFocusable(false);
 
         jLabel2.setText(" ");
         jLabel2.setToolTipText("");
@@ -310,14 +314,41 @@ public class SplitPanel extends IconPanel {
         // преобразуем все в ыекштп т.к. JSONObject в методе GET  преобразует <String>"2" -> <int>2
         HashMap param = (HashMap) params.get(panelName);
         if (param.containsKey("Div_Last_Loc"))
-            jSplitPanel.setLastDividerLocation(new Integer(param.get("Div_Last_Loc")+""));
-        if (param.containsKey("Div_Loc")) jSplitPanel.setDividerLocation(new Integer(param.get("Div_Loc")+""));
-        int ii = new Integer(param.get("Div_Orientation")+"");
+            jSplitPanel.setLastDividerLocation(new Integer(param.get("Div_Last_Loc") + ""));
+        if (param.containsKey("Div_Loc")) jSplitPanel.setDividerLocation(new Integer(param.get("Div_Loc") + ""));
+        int ii = new Integer(param.get("Div_Orientation") + "");
         if (param.containsKey("Div_Orientation")) jSplitPanel.setOrientation(ii);
         jSplitPanel.set_button_title();
 
     }
 
+    public void setDividerParameters(int divLastLoc, int divLoc, int divOrientation) {
+        jSplitPanel.setLastDividerLocation(divLastLoc);
+        jSplitPanel.setDividerLocation(divLoc);
+        jSplitPanel.setOrientation(divOrientation);
+        jSplitPanel.set_button_title();
+    }
+
+    public void setDividerParameters(JSONObject json) {
+        setDividerParameters((Integer) json.get("Div_Last_Loc"), (Integer) json.get("Div_Loc"), (Integer) json.get("Div_Orientation"));
+    }
+
+    public JSONObject getDividerParameters() {
+        JSONObject json = new JSONObject();
+        json.put("Div_Last_Loc", jSplitPanel.getLastDividerLocation());
+        json.put("Div_Loc", jSplitPanel.getDividerLocation());
+        json.put("Div_Orientation", jSplitPanel.getOrientation());
+        return json;
+    }
+
+
     public void onClose() {
+        settingsJSONbuf = Settings.getInstance().getJSONObject();
+        JSONObject params;
+        if (!settingsJSONbuf.containsKey("Main_Frame_Setting"))
+            settingsJSONbuf.put("Main_Frame_Setting", new JSONObject());
+
+        params = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
+        params.put(panelName, getDividerParameters());
     }
 }

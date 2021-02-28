@@ -36,8 +36,6 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
     // show details
     @Override
     public Component getShow(ItemCls item) {
-        StatusInfo info = new StatusInfo();
-        info.show_001((StatusCls) item);
-        return info;
+        return new StatusInfo((StatusCls) item);
     }
 }

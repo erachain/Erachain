@@ -3,12 +3,14 @@ package org.erachain.core.exdata.exLink;
 import org.erachain.controller.Controller;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 
 public class ExLinkAuthor extends ExLinkMemo {
 
+    PersonCls author;
     public ExLinkAuthor(byte[] data) {
         super(data);
     }
@@ -23,6 +25,17 @@ public class ExLinkAuthor extends ExLinkMemo {
 
     public ExLinkAuthor(byte flags, int value, long ref, byte[] memoBytes) {
         super(ExData.LINK_AUTHOR_TYPE, flags, value, ref, memoBytes);
+    }
+
+    public PersonCls getPerson() {
+        if (author == null)
+            author = (PersonCls) DCSet.getInstance().getItemPersonMap().get(ref);
+        return author;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + ref + "] " + getPerson().getName() + " x" + getValue() + (memo == null ? "" : " " + memo);
     }
 
     public JSONObject makeJSONforHTML(JSONObject langObj) {

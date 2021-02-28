@@ -121,16 +121,6 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
     }
 
     @Override
-    protected void repaintConfirms() {
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                setValueAt(i, COLUMN_CONFIRMATIONS, list.get(i).transaction.getConfirmations(dcSet));
-            }
-            fireTableDataChanged();
-        }
-    }
-
-    @Override
     public void getInterval() {
 
         try {
@@ -158,10 +148,25 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
     }
 
+    boolean needCheckUnconfirmed = true;
+
+    @Override
+    public void fireTableDataChanged() {
+        if (list != null && needCheckUnconfirmed) {
+            for (int i = 0; i < list.size(); i++) {
+                setValueAt(i, COLUMN_CONFIRMATIONS, list.get(i).transaction.getConfirmations(dcSet));
+            }
+            super.fireTableDataChanged();
+        }
+    }
+
+    @Override
+    protected void repaintConfirms() {
+        fireTableDataChanged();
+    }
+
     private boolean transParse(Fun.Tuple2<Long, Integer> walletKey, Transaction transaction) {
 
-
-        //transaction.setDC_HeightSeq(dcSet, true);
         transaction.setDC(dcSet, false);
 
         if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {

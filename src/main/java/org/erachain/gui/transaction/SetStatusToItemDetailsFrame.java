@@ -25,11 +25,11 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         this.add(resutLabel, labelGBC);
 
         //RESULT
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField result = new JTextField(setStatusToItem.getResultText());
         result.setEditable(false);
         MenuPopupUtil.installContextMenu(result);
-        this.add(result, detailGBC);
+        this.add(result, fieldGBC);
 
         // STATUS
         //LABEL NAME
@@ -38,11 +38,11 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         this.add(nameLabel, labelGBC);
 
         ////// STATUS
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField statusName = new JTextField(status.viewName());
         statusName.setEditable(false);
         MenuPopupUtil.installContextMenu(statusName);
-        this.add(statusName, detailGBC);
+        this.add(statusName, fieldGBC);
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
@@ -50,18 +50,18 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         MTextPane txtAreaDescription = new MTextPane(status.getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(statusName.getBorder());
         //txtAreaDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaDescription);
-        this.add(txtAreaDescription, detailGBC);
+        this.add(txtAreaDescription, fieldGBC);
 
         // FROM - TO DATE
         ++labelGBC.gridy;
         this.add(new JLabel(Lang.T("From - To") + ":"), labelGBC);
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         long beginDate = setStatusToItem.getBeginDate();
         long endDate = setStatusToItem.getEndDate();
 
@@ -69,18 +69,18 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
                 + " - " + (endDate == Long.MAX_VALUE ? "?" : DateTimeFormat.timestamptoString(endDate)));
         fromToDate.setEditable(false);
         MenuPopupUtil.installContextMenu(fromToDate);
-        this.add(fromToDate, detailGBC);
+        this.add(fromToDate, fieldGBC);
 
         if (setStatusToItem.getValue1() != 0) {
             //LABEL VALUE 1
             ++labelGBC.gridy;
             this.add(new JLabel(Lang.T("Value") + " 1:"), labelGBC);
             //VALUE 1
-            ++detailGBC.gridy;
+            ++fieldGBC.gridy;
             JTextField statusValue1 = new JTextField("" + setStatusToItem.getValue1());
             statusValue1.setEditable(false);
             MenuPopupUtil.installContextMenu(statusValue1);
-            this.add(statusValue1, detailGBC);
+            this.add(statusValue1, fieldGBC);
         }
 
         if (setStatusToItem.getValue2() != 0) {
@@ -88,11 +88,11 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
             ++labelGBC.gridy;
             this.add(new JLabel(Lang.T("Value") + " 2:"), labelGBC);
             //VALUE 2
-            ++detailGBC.gridy;
+            ++fieldGBC.gridy;
             JTextField statusValue2 = new JTextField("" + setStatusToItem.getValue2());
             statusValue2.setEditable(false);
             MenuPopupUtil.installContextMenu(statusValue2);
-            this.add(statusValue2, detailGBC);
+            this.add(statusValue2, fieldGBC);
         }
 
         if (setStatusToItem.getData1() != null) {
@@ -101,11 +101,11 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
             ++labelGBC.gridy;
             this.add(new JLabel(Lang.T("DATA") + " 1:"), labelGBC);
             //DATA
-            ++detailGBC.gridy;
+            ++fieldGBC.gridy;
             JTextField statusAData = new JTextField(new String(setStatusToItem.getData1(), StandardCharsets.UTF_8));
             statusAData.setEditable(false);
             MenuPopupUtil.installContextMenu(statusAData);
-            this.add(statusAData, detailGBC);
+            this.add(statusAData, fieldGBC);
         }
         if (setStatusToItem.getData2() != null) {
 
@@ -113,11 +113,11 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
             ++labelGBC.gridy;
             this.add(new JLabel(Lang.T("DATA") + " 2:"), labelGBC);
             //DATA
-            ++detailGBC.gridy;
+            ++fieldGBC.gridy;
             JTextField statusAData = new JTextField(new String(setStatusToItem.getData2(), StandardCharsets.UTF_8));
             statusAData.setEditable(false);
             MenuPopupUtil.installContextMenu(statusAData);
-            this.add(statusAData, detailGBC);
+            this.add(statusAData, fieldGBC);
         }
 
         if (setStatusToItem.getRefParent() != 0l) {
@@ -126,11 +126,11 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
             ++labelGBC.gridy;
             this.add(new JLabel(Lang.T("Parent") + ":"), labelGBC);
             //DATA
-            ++detailGBC.gridy;
+            ++fieldGBC.gridy;
             JTextField statusRefParent = new JTextField("" + setStatusToItem.viewRefParent());
             statusRefParent.setEditable(false);
             MenuPopupUtil.installContextMenu(statusRefParent);
-            this.add(statusRefParent, detailGBC);
+            this.add(statusRefParent, fieldGBC);
         }
 
         if (setStatusToItem.getDescription() != null) {
@@ -139,13 +139,13 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
             ++labelGBC.gridy;
             this.add(new JLabel(Lang.T("Description") + ":"), labelGBC);
             //DATA
-            ++detailGBC.gridy;
+            ++fieldGBC.gridy;
             JTextArea descrData = new JTextArea(new String(setStatusToItem.getDescription(), StandardCharsets.UTF_8));
             descrData.setRows(4);
             descrData.setBorder(statusName.getBorder());
             descrData.setEditable(false);
             MenuPopupUtil.installContextMenu(descrData);
-            this.add(descrData, detailGBC);
+            this.add(descrData, fieldGBC);
 
         }
 
@@ -156,12 +156,12 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         this.add(itemNameLabel, labelGBC);
 
         //NAME
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField itemName = new JTextField(item.getItemTypeName() + " - " + item.getItemSubType()
                 + ": " + item.viewName());
         itemName.setEditable(false);
         MenuPopupUtil.installContextMenu(itemName);
-        this.add(itemName, detailGBC);
+        this.add(itemName, fieldGBC);
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
@@ -169,13 +169,13 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
         this.add(itemDescriptionLabel, labelGBC);
 
         //DESCRIPTION
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         MTextPane txtAreaItemDescription = new MTextPane(item.getDescription());
         //txtAreaItemDescription.setRows(4);
         txtAreaItemDescription.setBorder(itemName.getBorder());
         //txtAreaItemDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaItemDescription);
-        this.add(txtAreaItemDescription, detailGBC);
+        this.add(txtAreaItemDescription, fieldGBC);
 
         //PACK
         //	this.pack();

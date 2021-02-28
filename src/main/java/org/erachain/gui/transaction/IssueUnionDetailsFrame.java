@@ -19,11 +19,11 @@ public class IssueUnionDetailsFrame extends RecDetailsFrame {
         this.add(nameLabel, labelGBC);
 
         //NAME
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField name = new JTextField(unionIssue.getItem().viewName());
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
-        this.add(name, detailGBC);
+        this.add(name, fieldGBC);
 
         UnionCls union = (UnionCls) unionIssue.getItem();
 
@@ -33,13 +33,13 @@ public class IssueUnionDetailsFrame extends RecDetailsFrame {
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         MTextPane txtAreaDescription = new MTextPane(unionIssue.getItem().getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaDescription);
-        this.add(txtAreaDescription, detailGBC);
+        this.add(txtAreaDescription, fieldGBC);
 
         //LABEL Birthday
         ++labelGBC.gridy;
@@ -47,11 +47,11 @@ public class IssueUnionDetailsFrame extends RecDetailsFrame {
         this.add(birthdayLabel, labelGBC);
 
         //Birthday
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         //JTextField birtday = new JTextField(new Date(union.getBirthday()).toString());
         JTextField birtday = new JTextField(union.getBirthdayStr());
         birtday.setEditable(false);
-        this.add(birtday, detailGBC);
+        this.add(birtday, fieldGBC);
 
         //LABEL PARENT
         ++labelGBC.gridy;
@@ -59,11 +59,11 @@ public class IssueUnionDetailsFrame extends RecDetailsFrame {
         this.add(parentLabel, labelGBC);
 
         //PARENT
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField parent = new JTextField(String.valueOf(union.getParent()));
         parent.setEditable(false);
         //MenuPopupUtil.installContextMenu(gender);
-        this.add(parent, detailGBC);
+        this.add(parent, fieldGBC);
 
         //PACK
 //		this.pack();

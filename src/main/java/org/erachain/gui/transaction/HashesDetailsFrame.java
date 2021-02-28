@@ -18,11 +18,11 @@ public class HashesDetailsFrame extends RecDetailsFrame {
         this.add(nameLabel, labelGBC);
 
         //NAME
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField name = new JTextField(new String(r_Hashes.getURL(), StandardCharsets.UTF_8));
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
-        this.add(name, detailGBC);
+        this.add(name, fieldGBC);
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
@@ -30,7 +30,7 @@ public class HashesDetailsFrame extends RecDetailsFrame {
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextPane txtAreaDescription = new JTextPane();
         txtAreaDescription.setContentType("text/html");
         //	txtAreaDescription.setBackground(MainFrame.getFrames()[0].getBackground());
@@ -43,7 +43,7 @@ public class HashesDetailsFrame extends RecDetailsFrame {
         txtAreaDescription.setBorder(name.getBorder());
         txtAreaDescription.setEditable(false);
         //MenuPopupUtil.installContextMenu(txtAreaDescription);
-        this.add(txtAreaDescription, detailGBC);
+        this.add(txtAreaDescription, fieldGBC);
 
         //LABEL HASHES
         ++labelGBC.gridy;
@@ -51,7 +51,7 @@ public class HashesDetailsFrame extends RecDetailsFrame {
         this.add(hashesLabel, labelGBC);
 
         //HASHES
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextPane txtAreaHashes = new JTextPane();
         txtAreaHashes.setContentType("text/html");
         //	txtAreaHashes.setBackground(MainFrame.getFrames()[0].getBackground());
@@ -60,7 +60,7 @@ public class HashesDetailsFrame extends RecDetailsFrame {
         txtAreaHashes.setBorder(name.getBorder());
         txtAreaHashes.setEditable(false);
         //MenuPopupUtil.installContextMenu(txtAreaHashes);
-        this.add(txtAreaHashes, detailGBC);
+        this.add(txtAreaHashes, fieldGBC);
 
         //txtAreaHashes.setText(String.join(" ", r_Hashes.getHashesB58()));
 

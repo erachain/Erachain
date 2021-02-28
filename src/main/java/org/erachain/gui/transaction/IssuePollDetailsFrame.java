@@ -21,11 +21,11 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
         this.add(nameLabel, labelGBC);
 
         //NAME
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField name = new JTextField(poll.viewName());
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
-        this.add(name, detailGBC);
+        this.add(name, fieldGBC);
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
@@ -33,13 +33,13 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         MTextPane txtAreaDescription = new MTextPane(poll.getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaDescription);
-        this.add(txtAreaDescription, detailGBC);
+        this.add(txtAreaDescription, fieldGBC);
 
         //LABEL OPTIONS
         ++labelGBC.gridy;
@@ -47,20 +47,20 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
         this.add(optionLabel, labelGBC);
 
         // OPTIONs
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextArea txtAreaOption = new JTextArea(String.join("\n", poll.getOptions()));
         txtAreaOption.setRows(4);
         txtAreaOption.setBorder(name.getBorder());
         txtAreaOption.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaOption);
-        this.add(txtAreaOption, detailGBC);
+        this.add(txtAreaOption, fieldGBC);
 
 
         //owner
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField owner = new JTextField(poll.getOwner().getAddress());
         owner.setEditable(false);
-        this.add(owner, detailGBC);
+        this.add(owner, fieldGBC);
 
         //LABEL owner Public key
         ++labelGBC.gridy;
@@ -68,10 +68,10 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
         this.add(owner_Public_keyLabel, labelGBC);
 
         //owner public key
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField owner_Public_Key = new JTextField(poll.getOwner().getBase58());
         owner_Public_Key.setEditable(false);
-        this.add(owner_Public_Key, detailGBC);
+        this.add(owner_Public_Key, fieldGBC);
 
         //PACK
         //	this.pack();

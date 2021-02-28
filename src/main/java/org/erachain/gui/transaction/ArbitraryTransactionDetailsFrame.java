@@ -24,11 +24,11 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
         this.add(serviceLabel, labelGBC);
 
         //SERVICE
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField service = new JTextField(String.valueOf(arbitraryTransaction.getService()));
         service.setEditable(false);
         MenuPopupUtil.installContextMenu(service);
-        this.add(service, detailGBC);
+        this.add(service, fieldGBC);
 
         //LABEL DATA AS BASE58
         ++labelGBC.gridy;
@@ -36,7 +36,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
         this.add(dataLabel, labelGBC);
 
         //DATA AS BASE58
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextArea txtAreaData = new JTextArea(Base58.encode(arbitraryTransaction.getData()));
         txtAreaData.setRows(6);
         txtAreaData.setColumns(63);
@@ -48,7 +48,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
         JScrollPane AreaDataScroll = new JScrollPane(txtAreaData);
         AreaDataScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         AreaDataScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        this.add(AreaDataScroll, detailGBC);
+        this.add(AreaDataScroll, fieldGBC);
 
         //LABEL DATA AS TEXT
         ++labelGBC.gridy;
@@ -56,7 +56,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
         this.add(dataTextLabel, labelGBC);
 
         //DATA AS TEXT
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextArea txtAreaDataText = new JTextArea(new String(arbitraryTransaction.getData(), StandardCharsets.UTF_8));
         txtAreaDataText.setRows(6);
         txtAreaData.setColumns(63);
@@ -68,7 +68,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
         JScrollPane AreaDataTextScroll = new JScrollPane(txtAreaDataText);
         AreaDataTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         AreaDataTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        this.add(AreaDataTextScroll, detailGBC);
+        this.add(AreaDataTextScroll, fieldGBC);
 
         if (!arbitraryTransaction.getPayments().isEmpty()) {
 
@@ -78,7 +78,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
             this.add(paymentsLabel, labelGBC);
 
             //PAYMENTS
-            ++detailGBC.gridy;
+            ++fieldGBC.gridy;
             PaymentsTableModel paymentsTableModel = new PaymentsTableModel(arbitraryTransaction.getPayments());
             JTable table = Gui.createSortableTable(paymentsTableModel, 1);
 
@@ -86,7 +86,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
             TableRowSorter<PaymentsTableModel> sorter = (TableRowSorter<PaymentsTableModel>) table.getRowSorter();
             sorter.setComparator(PaymentsTableModel.COLUMN_AMOUNT, new BigDecimalStringComparator());
 
-            this.add(new JScrollPane(table), detailGBC);
+            this.add(new JScrollPane(table), fieldGBC);
         }
 
         //PACK

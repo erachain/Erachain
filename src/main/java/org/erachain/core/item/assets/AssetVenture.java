@@ -245,7 +245,7 @@ public class AssetVenture extends AssetCls {
         String text = super.makeHTMLHeadView();
         text += Lang.T("Quantity") + ":&nbsp;" + getQuantity() + ", "
                 + Lang.T("Scale") + ":&nbsp;" + getScale() + "<br>";
-        text += super.makeHTMLFootView();
+        text += super.makeHTMLFootView(true);
 
         return text;
 

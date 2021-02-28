@@ -9,12 +9,14 @@ import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.utils.NumberAsString;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
+import java.util.Observable;
 
 @SuppressWarnings("serial")
 public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> implements ObserverWaiter {
@@ -41,7 +43,7 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
         fireTableDataChanged();
         needUpdate = false;
 
-        // переиницализация после установуи таблиц
+        // переиницализация после установки таблиц
         this.addObservers();
 
     }
@@ -132,10 +134,42 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
         return new Tuple4(totalBalance1, totalBalance2, totalBalance3, totalBalance4);
     }
 
+    public void syncUpdate(Observable o, Object arg) {
+        ObserverMessage message = (ObserverMessage) arg;
+        super.syncUpdate(o, arg);
+
+        // если блок собрали или транзакция наша - обновим баланс
+        if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
+                || message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+            needUpdate = true;
+        }
+
+    }
+
     @Override
     public void getInterval() {
         list = Controller.getInstance().wallet.getPublicKeyAccounts();
+    }
 
+    public void addObservers() {
+
+        super.addObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
+            Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
+        }
+
+    }
+
+    public void deleteObservers() {
+
+        super.deleteObservers();
+
+        if (Controller.getInstance().doesWalletDatabaseExists()) {
+            Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this);
+            Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
+        }
     }
 
 }

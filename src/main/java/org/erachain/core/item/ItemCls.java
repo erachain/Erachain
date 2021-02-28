@@ -846,9 +846,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     }
 
-    public String makeHTMLFootView() {
+    public String makeHTMLFootView(boolean andLabel) {
 
-        String text = Lang.T("Description") + ":<br>";
+        String text = andLabel ? Lang.T("Description") + ":<br>" : "";
         if (getKey() > 0 && getKey() < START_KEY()) {
             text += Library.to_HTML(Lang.T(viewDescription())) + "<br>";
         } else {

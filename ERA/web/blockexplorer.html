@@ -674,6 +674,13 @@ button.white-bgc[disabled]:focus,
         function address(data) {
 
             var output ='';
+
+            if (data.hasOwnProperty('error')) {
+                output += '<h2>' + data.error + '</h2>';
+                output += '<h4>for Help use blockexplorer.json</h4>';
+                return output;
+            }
+
             output += '<table width="1280" border=0><tr><td align=left>';
             if (data.hasOwnProperty('person')) {
 

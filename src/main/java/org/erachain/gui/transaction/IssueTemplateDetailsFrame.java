@@ -19,11 +19,11 @@ public class IssueTemplateDetailsFrame extends RecDetailsFrame {
         this.add(nameLabel, labelGBC);
 
         //NAME
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         JTextField name = new JTextField(templateIssue.getItem().viewName());
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
-        this.add(name, detailGBC);
+        this.add(name, fieldGBC);
 
         //LABEL DESCRIPTION
         ++labelGBC.gridy;
@@ -31,7 +31,7 @@ public class IssueTemplateDetailsFrame extends RecDetailsFrame {
         this.add(descriptionLabel, labelGBC);
 
         //DESCRIPTION
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         MTextPane txtAreaDescription = new MTextPane(templateIssue.getItem().getDescription());
         JScrollPane scroller = new JScrollPane(txtAreaDescription, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroller.setPreferredSize(new Dimension(0,400));
@@ -39,7 +39,7 @@ public class IssueTemplateDetailsFrame extends RecDetailsFrame {
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);
         //MenuPopupUtil.installContextMenu(txtAreaDescription);
-        this.add(scroller, detailGBC);
+        this.add(scroller, fieldGBC);
 
 
         //PACK

@@ -1,10 +1,13 @@
 package org.erachain.gui.items;
 
+import com.google.common.collect.Iterators;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.ItemMap;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.Pair;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -46,6 +49,13 @@ public abstract class SearchItemsTableModel extends WalletItemTableModel<ItemCls
         Pair<String, Iterable> result = ((ItemMap) map).getKeysIteratorByFilterAsArray(filter, 0, 1000);
         Iterator iterator = result.getB().iterator();
         fill(iterator);
+    }
+
+    public void getLast() {
+        try (IteratorCloseable iterator = ((ItemMap) map).getIterator(0, true)) {
+            fill(Iterators.limit(iterator, 200));
+        } catch (IOException e) {
+        }
     }
 
     public void findByKey(String text) {

@@ -19,31 +19,13 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
 
         this.th = this;
 
-        /*
-        JMenuItem vouch_Item = new JMenuItem(Lang.T("Sign / Vouch"));
-
-        vouch_Item.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                TemplateCls template = (TemplateCls) itemTableSelected;
-                if (template == null) return;
-                Transaction trans = DCSet.getInstance().getTransactionFinalMap().get(template.getReference());
-                new toSignRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
-            }
-        });
-        this.menuTable.add(vouch_Item);
-
-         */
-
     }
 
 
     //show details
     @Override
     protected Component getShow(ItemCls item) {
-        return new InfoTemplates((TemplateCls) item);
+        return new TemplateInfo((TemplateCls) item);
 
     }
 

@@ -16,6 +16,7 @@ import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.blockexplorer.WebTransactionsHTML;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
@@ -23,6 +24,8 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.gui.library.ASMutableTreeNode;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -36,6 +39,8 @@ import org.mapdb.Fun.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -1481,6 +1486,67 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return "";
     }
 
+    public boolean hasLinkRecipients() {
+        return false;
+    }
+
+    public DefaultMutableTreeNode viewLinksTree() {
+
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(this);
+
+        exLink = getExLink();
+        if (exLink != null) {
+            Transaction parentTX = dcSet.getTransactionFinalMap().get(getExLink().getRef());
+            ASMutableTreeNode parent = new ASMutableTreeNode(
+                    Lang.T(exLink.viewTypeName(hasLinkRecipients())) + " "
+                            + Lang.T("for # для"));
+            parent.add(new DefaultMutableTreeNode(parentTX));
+            root.add(parent);
+        }
+
+        try (IteratorCloseable<Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                .getTXLinksIterator(dbRef, ExData.LINK_APPENDIX_TYPE, false)) {
+            if (iterator.hasNext()) {
+                ASMutableTreeNode list = new ASMutableTreeNode(Lang.T("Appendixes"));
+                while (iterator.hasNext()) {
+                    list.add(new DefaultMutableTreeNode(dcSet.getTransactionFinalMap().get(iterator.next().c)));
+                }
+                root.add(list);
+            }
+        } catch (IOException e) {
+        }
+
+        try (IteratorCloseable<Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                .getTXLinksIterator(dbRef, ExData.LINK_SOURCE_TYPE, false)) {
+            if (iterator.hasNext()) {
+                ASMutableTreeNode list = new ASMutableTreeNode(Lang.T("Usage"));
+                while (iterator.hasNext()) {
+                    list.add(new DefaultMutableTreeNode(dcSet.getTransactionFinalMap().get(iterator.next().c)));
+                }
+                root.add(list);
+            }
+        } catch (IOException e) {
+        }
+
+        try (IteratorCloseable<Tuple3<Long, Byte, Long>> iterator = dcSet.getExLinksMap()
+                .getTXLinksIterator(dbRef, ExData.LINK_REPLY_COMMENT_TYPE, false)) {
+            if (iterator.hasNext()) {
+                ASMutableTreeNode list = new ASMutableTreeNode(Lang.T("Replays and Comments"));
+                while (iterator.hasNext()) {
+                    list.add(new DefaultMutableTreeNode(dcSet.getTransactionFinalMap().get(iterator.next().c)));
+                }
+                root.add(list);
+            }
+        } catch (IOException e) {
+        }
+
+        if (root.isLeaf())
+            return null;
+
+        return root;
+    }
+
+
     @SuppressWarnings("unchecked")
     protected JSONObject getJsonBase() {
 
@@ -2441,10 +2507,14 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     @Override
     public String toString() {
-        if (signature == null) {
-            return viewTypeName() + ": " + getTitle();
+        if (height > 0) {
+            return viewHeightSeq() + "(" + viewTypeName() + ") " + getTitle();
         }
-        return viewTypeName() + ": " + getTitle() + " - " + Base58.encode(signature);
+
+        if (signature == null) {
+            return "(" + viewTypeName() + ") " + getTitle();
+        }
+        return "(" + viewTypeName() + ") " + getTitle() + " - " + Base58.encode(signature);
     }
 
     public String toStringShort() {

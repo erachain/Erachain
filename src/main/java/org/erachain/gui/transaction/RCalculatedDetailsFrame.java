@@ -29,12 +29,12 @@ public class RCalculatedDetailsFrame extends RecDetailsFrame {
         this.add(recipientLabel, labelGBC);
 
         //RECIPIENT
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         MAccoutnTextField recipient = new MAccoutnTextField(r_Calc.getRecipient());
         //	JTextField recipient = new JTextField(r_Send.getRecipient().getAddress());
         recipient.setEditable(false);
         //	MenuPopupUtil.installContextMenu(recipient);
-        this.add(recipient, detailGBC);
+        this.add(recipient, fieldGBC);
 
 	/*	String personStr = r_Send.getRecipient().viewPerson();
 		if (personStr.length()>0) {
@@ -51,12 +51,12 @@ public class RCalculatedDetailsFrame extends RecDetailsFrame {
             this.add(title_Label, labelGBC);
 
             // ISTEXT
-            ++detailGBC.gridy;
-            detailGBC.gridwidth = 2;
+            ++fieldGBC.gridy;
+            fieldGBC.gridwidth = 2;
             JTextField head_Text = new JTextField(r_Calc.getMessage());
             head_Text.setEditable(false);
             MenuPopupUtil.installContextMenu(head_Text);
-            this.add(head_Text, detailGBC);
+            this.add(head_Text, fieldGBC);
         }
 
         if (r_Calc.getAmount() != null) {
@@ -68,24 +68,24 @@ public class RCalculatedDetailsFrame extends RecDetailsFrame {
             this.add(amountLabel, labelGBC);
 
             //AMOUNT
-            detailGBC.gridy = labelGBC.gridy;
-            detailGBC.gridwidth = 2;
+            fieldGBC.gridy = labelGBC.gridy;
+            fieldGBC.gridwidth = 2;
             JTextField amount = new JTextField(r_Calc.getAmount().toPlainString());
             amount.setEditable(false);
             MenuPopupUtil.installContextMenu(amount);
-            this.add(amount, detailGBC);
+            this.add(amount, fieldGBC);
 
             //ASSET
             long assetKey = r_Calc.getAbsKey();
             if (assetKey > 0) {
-                detailGBC.gridx = 3;
-                detailGBC.gridwidth = 1;
+                fieldGBC.gridx = 3;
+                fieldGBC.gridwidth = 1;
                 JTextField asset = new JTextField(Controller.getInstance().getAsset(assetKey).toString());
                 asset.setEditable(false);
                 MenuPopupUtil.installContextMenu(asset);
-                this.add(asset, detailGBC);
-                detailGBC.gridx = 1;
-                detailGBC.gridwidth = 3;
+                this.add(asset, fieldGBC);
+                fieldGBC.gridx = 1;
+                fieldGBC.gridwidth = 3;
             }
         }
 

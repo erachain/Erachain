@@ -7,11 +7,13 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
+import java.io.IOException;
 import java.util.List;
 
 @SuppressWarnings("serial")
@@ -74,7 +76,31 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
         clear();
 
-        if (filter == null || (filter = filter.trim()).isEmpty()) return;
+        if (filter == null || (filter = filter.trim()).isEmpty()) {
+            try (IteratorCloseable<Long> iterator = ((TransactionFinalMap) map).getIterator(0, true)) {
+                int limit = 100;
+                int countForge = 0;
+                while (iterator.hasNext() && limit > 0) {
+                    Transaction transaction = ((TransactionFinalMap) map).get(iterator.next());
+                    if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+                        RCalculated tx = (RCalculated) transaction;
+                        String mess = tx.getMessage();
+                        if (mess != null && mess.equals("forging")) {
+                            if (++countForge < 100)
+                                continue;
+                            else
+                                countForge = 0;
+                        }
+
+                    }
+
+                    --limit;
+                    list.add(transaction);
+                }
+            } catch (IOException e) {
+            }
+            return;
+        }
 
         Tuple2<Account, String> accountResult = Account.tryMakeAccount(filter);
         Account account = accountResult.a;

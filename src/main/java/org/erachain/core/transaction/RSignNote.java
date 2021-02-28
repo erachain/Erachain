@@ -18,11 +18,14 @@ import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapSigns;
+import org.erachain.gui.library.ASMutableTreeNode;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.mapdb.Fun;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -228,7 +231,7 @@ public class RSignNote extends Transaction implements Itemable {
         return hasTemplate(this.typeBytes);
     }
 
-    public boolean hasRecipients() {
+    public boolean hasLinkRecipients() {
         return extendedData.hasRecipients();
     }
 
@@ -368,6 +371,40 @@ public class RSignNote extends Transaction implements Itemable {
             parseDataV2WithoutFiles();
         }
         return extendedData.getMessage();
+    }
+
+    public DefaultMutableTreeNode viewLinksTree() {
+
+        DefaultMutableTreeNode root = super.viewLinksTree();
+
+        if (extendedData.getTemplate() != null) {
+            ASMutableTreeNode item = new ASMutableTreeNode(Lang.T("Template"));
+            item.add(new DefaultMutableTreeNode(extendedData.getTemplate()));
+            if (root == null) root = new DefaultMutableTreeNode(this);
+
+            root.add(item);
+        }
+
+        if (extendedData.hasAuthors()) {
+            ASMutableTreeNode item = new ASMutableTreeNode(Lang.T("Authors"));
+            for (ExLinkAuthor author : extendedData.getAuthors()) {
+                item.add(new DefaultMutableTreeNode(author));
+            }
+            if (root == null) root = new DefaultMutableTreeNode(this);
+            root.add(item);
+        }
+
+        if (extendedData.hasSources()) {
+            ASMutableTreeNode item = new ASMutableTreeNode(Lang.T("Sources"));
+            for (ExLinkSource source : extendedData.getSources()) {
+                item.add(new DefaultMutableTreeNode(source));
+            }
+            if (root == null) root = new DefaultMutableTreeNode(this);
+            root.add(item);
+        }
+
+        return root;
+
     }
 
     public ExData getExData() {

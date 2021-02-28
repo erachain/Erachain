@@ -21,10 +21,7 @@ public class SearchStatusesSplitPanel extends SearchItemSplitPanel {
     //show details
     @Override
     protected Component getShow(ItemCls item) {
-        StatusInfo info = new StatusInfo();
-        info.show_001((StatusCls) item);
-        return info;
-
+        return new StatusInfo((StatusCls) item);
     }
 
 }

@@ -36,12 +36,12 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
         this.add(recipientLabel, labelGBC);
 
         //RECIPIENT
-        ++detailGBC.gridy;
+        ++fieldGBC.gridy;
         MAccoutnTextField recipient = new MAccoutnTextField(r_Send.getRecipient());
         //	JTextField recipient = new JTextField(r_Send.getRecipient().getAddress());
         recipient.setEditable(false);
         //	MenuPopupUtil.installContextMenu(recipient);
-        this.add(recipient, detailGBC);
+        this.add(recipient, fieldGBC);
 		
 	/*	String personStr = r_Send.getRecipient().viewPerson();
 		if (personStr.length()>0) {
@@ -58,12 +58,12 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             this.add(title_Label, labelGBC);
 
             // ISTEXT
-            ++detailGBC.gridy;
+            ++fieldGBC.gridy;
             //detailGBC.gridwidth = 2;
             JTextField head_Text = new JTextField(r_Send.getTitle());
             head_Text.setEditable(false);
             MenuPopupUtil.installContextMenu(head_Text);
-            this.add(head_Text, detailGBC);
+            this.add(head_Text, fieldGBC);
         }
 
         if (r_Send.getAmount() != null) {
@@ -77,23 +77,23 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             } else {
                 sendType = "???";
             }
-            detailGBC.gridy = ++labelGBC.gridy;
+            fieldGBC.gridy = ++labelGBC.gridy;
 
             JLabel amountLabel = new JLabel(sendType);
-            this.add(amountLabel, detailGBC);
+            this.add(amountLabel, fieldGBC);
 
             //AMOUNT
-            detailGBC.gridy = ++labelGBC.gridy;
-            detailGBC.gridwidth = 2;
+            fieldGBC.gridy = ++labelGBC.gridy;
+            fieldGBC.gridwidth = 2;
             JTextField amount = new JTextField(r_Send.getAmount().toPlainString());
             amount.setEditable(false);
             MenuPopupUtil.installContextMenu(amount);
-            this.add(amount, detailGBC);
+            this.add(amount, fieldGBC);
 
             //ASSET
             //detailGBC.gridy;
-            detailGBC.gridx = 3;
-            detailGBC.gridwidth = 1;
+            fieldGBC.gridx = 3;
+            fieldGBC.gridwidth = 1;
             JTextField assetFld = new JTextField();
             assetFld.setEditable(false);
             if (asset != null) {
@@ -102,9 +102,9 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             } else {
                 assetFld.setText("???");
             }
-            this.add(assetFld, detailGBC);
-            detailGBC.gridx = 1;
-            detailGBC.gridwidth = 3;
+            this.add(assetFld, fieldGBC);
+            fieldGBC.gridx = 1;
+            fieldGBC.gridwidth = 3;
         }
 
         byte[] r_data = r_Send.getData();
@@ -134,7 +134,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
 
             GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = detailGBC.gridy + 1;
+            gridBagConstraints.gridy = fieldGBC.gridy + 1;
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;

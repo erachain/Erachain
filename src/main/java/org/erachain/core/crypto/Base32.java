@@ -164,7 +164,7 @@ public class Base32 {
     }
 
     public static byte[] decode(String string, int length) {
-        byte[] bytes = Base58.decode(string);
+        byte[] bytes = decode(string);
         int left = length - bytes.length;
         if (left > 0) {
             byte[] bytesNeg = new byte[left];

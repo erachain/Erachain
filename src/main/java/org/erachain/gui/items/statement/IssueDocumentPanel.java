@@ -318,7 +318,7 @@ public class IssueDocumentPanel extends IconPanel {
         // for calculate ExPays
         ///issueDoc.setDC(DCSet.getInstance());
         RNoteInfo rNoteInfo = new RNoteInfo(issueDoc); // here load all values and calc FEE
-        rNoteInfo.jPanel2.setVisible(false);
+        //rNoteInfo.jPanel2.setVisible(false);
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, issueDoc,
                 text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
