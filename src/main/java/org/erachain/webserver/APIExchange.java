@@ -8,10 +8,14 @@ package org.erachain.webserver;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.TradeResource;
 import org.erachain.controller.Controller;
+import org.erachain.controller.PairsController;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.item.assets.TradePair;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
+import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.utils.StrJSonFine;
@@ -60,6 +64,8 @@ public class APIExchange {
 
         help.put("GET apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
+        help.put("GET apiexchange/v2/pair/{baseKey}/{quoteKey}",
+                "Get Pair info fot baseKey / quoteKey");
         help.put("GET apiexchange/pair/{have}/{want}",
                 "Get Pair info fot Have / Want");
         help.put("GET apiexchange/ordersbook/[have]/[want]?limit=[limit]",
@@ -306,6 +312,40 @@ public class APIExchange {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(out.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("v2/pair/{have}/{want}")
+    // apiexchange/pair?have=1&want=2
+    public Response getPair2(@PathParam("have") Long have, @PathParam("want") Long want) {
+
+        ItemAssetMap map = this.dcSet.getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        PairMapImpl mapPairs = Controller.getInstance().dlSet.getPairMap();
+        TradePair tradePair = mapPairs.get(have, want);
+        AssetCls asset1 = map.get(want);
+        AssetCls asset2 = map.get(have);
+
+        TradePair tradePairNew = PairsController.reCalc(asset1, asset2, tradePair);
+        if (!tradePairNew.equals(tradePair)) {
+            mapPairs.put(tradePairNew);
+            mapPairs.put(PairsController.reCalc(asset2, asset1, null));
+
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(tradePair.toJson().toJSONString())
                 .build();
     }
 
