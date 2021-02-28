@@ -174,7 +174,7 @@ public class PairsController {
                     }
                     if (currentPair != null && lastTrade == null) {
                         // изменений не было
-                        if (trade.getTimestamp() == currentPair.getLastTime()) {
+                        if (trade.getTimestamp().equals(currentPair.getLastTime())) {
                             currentPair.setUpdateTime(Block.getTimestamp(heightStart));
                             return currentPair;
                         }
@@ -188,9 +188,6 @@ public class PairsController {
                     // у сделки обратные Have Want
                     price = reversed ? trade.calcPrice() : trade.calcPriceRevers();
                     if (lastPrice == null) {
-                        if (currentPair != null && trade.getTimestamp().equals(currentPair.getLastTime())) {
-                            return currentPair;
-                        }
                         lastPrice = price;
                         lastTime = trade.getTimestamp();
                     }
