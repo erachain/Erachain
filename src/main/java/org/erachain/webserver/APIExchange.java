@@ -332,16 +332,10 @@ public class APIExchange {
         }
 
         PairMapImpl mapPairs = Controller.getInstance().dlSet.getPairMap();
-        TradePair tradePair = mapPairs.get(have, want);
         AssetCls asset1 = map.get(want);
         AssetCls asset2 = map.get(have);
 
-        TradePair tradePairNew = PairsController.reCalc(asset1, asset2, tradePair);
-        if (!tradePairNew.equals(tradePair)) {
-            mapPairs.put(tradePairNew);
-            mapPairs.put(PairsController.reCalc(asset2, asset1, null));
-
-        }
+        TradePair tradePair = PairsController.reCalcAndUpdate(asset1, asset2, mapPairs);
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")

@@ -100,21 +100,21 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
 
     @Override
-    public long getCountHave(long have) {
+    public int getCountHave(long have, int limit) {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
         try (IteratorCloseable iterator = ((OrderSuit) map).getHaveWantIterator(have)) {
-            return Iterators.size(iterator);
+            return Iterators.size(Iterators.limit(iterator, limit));
         } catch (IOException e) {
             return 0;
         }
     }
 
     @Override
-    public long getCountWant(long want) {
+    public int getCountWant(long want, int limit) {
         try (IteratorCloseable iterator = ((OrderSuit) map).getWantHaveIterator(want)) {
-            return Iterators.size(iterator);
+            return Iterators.size(Iterators.limit(iterator, limit));
         } catch (IOException e) {
             return 0;
         }
@@ -148,12 +148,12 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
-    public long getCountOrders(long haveWant) {
+    public int getCountOrders(long haveWant) {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
 
-        return this.getCountHave(haveWant) + this.getCountWant(haveWant);
+        return this.getCountHave(haveWant, 200) + this.getCountWant(haveWant, 200);
     }
 
 

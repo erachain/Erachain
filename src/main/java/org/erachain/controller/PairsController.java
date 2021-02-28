@@ -9,6 +9,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.DLSet;
+import org.erachain.database.PairMap;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
@@ -127,8 +128,7 @@ public class PairsController {
             String pairJsonKey = asset1.getName() + "_" + asset2.getName();
             spotPairsList.put(pairJsonKey, array);
 
-            TradePair tradePair = mapPairs.get(key1, key2);
-            tradePair = reCalc(asset1, asset2, tradePair);
+            TradePair tradePair = reCalcAndUpdate(asset1, asset2, mapPairs);
             spotPairs.put(pairJsonKey, tradePair);
             spotPairsJson.put(pairJsonKey, tradePair.toJson());
             commonPairsList.add(new Fun.Tuple2<>(key1, key2));
@@ -222,10 +222,22 @@ public class PairsController {
         Order askLastOrder = ordersMap.getHaveWanFirst(key1, key2);
         BigDecimal lower_askPrice = askLastOrder == null ? BigDecimal.ZERO : askLastOrder.calcLeftPrice();
 
+        int countOrdersBid = ordersMap.getCountHave(key2, 100);
+        int countOrdersAsk = ordersMap.getCountHave(key1, 100);
+
         return new TradePair(asset1, asset2, lastPrice, lastTime,
                 highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, priceChangePercent24h,
-                minPrice, maxPrice, count24, Block.getTimestamp(heightStart));
+                minPrice, maxPrice, count24, Block.getTimestamp(heightStart), countOrdersBid, countOrdersAsk);
 
+    }
+
+    public static TradePair reCalcAndUpdate(AssetCls asset1, AssetCls asset2, PairMap pairMap) {
+        TradePair tradePairOld = pairMap.get(asset1.getKey(), asset2.getKey());
+        TradePair tradePair = reCalc(asset1, asset2, tradePairOld);
+        if (!tradePair.equals(tradePairOld)) {
+            pairMap.put(tradePair);
+        }
+        return tradePair;
     }
 
     public static TradePair reverse(TradePair pair) {
@@ -253,12 +265,9 @@ public class PairsController {
 
                 Long key1 = trade.getHaveKey();
                 Long key2 = trade.getWantKey();
-                if (!pairMap.contains(new Fun.Tuple2(key1, key2))) {
-                    AssetCls asset1 = dcSet.getItemAssetMap().get(key1);
-                    AssetCls asset2 = dcSet.getItemAssetMap().get(key2);
-                    pairMap.put(reCalc(asset1, asset2, null));
-                    pairMap.put(reCalc(asset2, asset1, null));
-                }
+                AssetCls asset1 = dcSet.getItemAssetMap().get(key1);
+                AssetCls asset2 = dcSet.getItemAssetMap().get(key2);
+                reCalcAndUpdate(asset1, asset2, pairMap);
             }
         } catch (IOException e) {
         }

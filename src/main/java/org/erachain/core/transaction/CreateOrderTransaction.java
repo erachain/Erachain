@@ -636,14 +636,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                         order.getPrice(), order.getPrice(),
                         amountHave, amountWant, BigDecimal.ZERO,
                         order.getPrice(), order.getPrice(),
-                        1, timestamp));
-
-                BigDecimal reverse = order.calcPriceReverse();
-                pairMap.put(new TradePair(wantAsset, haveAsset, reverse, timestamp,
-                        reverse, reverse,
-                        amountWant, amountHave, BigDecimal.ZERO,
-                        reverse, reverse,
-                        1, timestamp));
+                        1, timestamp, 0, 0));
             }
         }
 

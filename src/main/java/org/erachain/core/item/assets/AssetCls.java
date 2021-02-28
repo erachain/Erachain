@@ -1885,9 +1885,8 @@ public abstract class AssetCls extends ItemCls {
 
     }
 
-    public long getOperations(DCSet dcSet) {
-        long total = dcSet.getOrderMap().getCountOrders(key);
-        return total;
+    public int getOperations(DCSet dcSet) {
+        return dcSet.getOrderMap().getCountOrders(key);
     }
 
     //OTHER
@@ -2079,6 +2078,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public JSONObject jsonForExplorerPage(JSONObject langObj) {
+
 
         JSONObject assetJSON = super.jsonForExplorerPage(langObj);
         assetJSON.put("assetTypeKey", this.assetType);
