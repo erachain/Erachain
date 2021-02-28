@@ -94,7 +94,7 @@ public class PairsController {
 
     }
 
-    int cacheTime = 2 * 60 * 1000; // in ms
+    int cacheTime = 10 * 60 * 1000; // in ms
     long updateList;
     public void updateList() {
 
@@ -128,7 +128,7 @@ public class PairsController {
             String pairJsonKey = asset1.getName() + "_" + asset2.getName();
             spotPairsList.put(pairJsonKey, array);
 
-            TradePair tradePair = reCalcAndUpdate(asset1, asset2, mapPairs, 2);
+            TradePair tradePair = reCalcAndUpdate(asset1, asset2, mapPairs, 10);
             spotPairs.put(pairJsonKey, tradePair);
             spotPairsJson.put(pairJsonKey, tradePair.toJson());
             commonPairsList.add(new Fun.Tuple2<>(key1, key2));
