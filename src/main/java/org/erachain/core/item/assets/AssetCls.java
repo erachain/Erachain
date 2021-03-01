@@ -738,6 +738,26 @@ public abstract class AssetCls extends ItemCls {
         return isUnHoldable(key, assetType);
     }
 
+    public static boolean isUnSpendable(long key, int assetType) {
+        return key < 100
+                || assetType == AssetCls.AS_INDEX
+                || assetType == AssetCls.AS_INSIDE_ACCESS
+                || assetType == AssetCls.AS_INSIDE_BONUS;
+    }
+
+    public boolean isUnSpendable() {
+        return isUnSpendable(key, assetType);
+    }
+
+    public static boolean isUnDebtable(long key, int assetType) {
+        return assetType == AssetCls.AS_INDEX
+                || assetType == AssetCls.AS_INSIDE_BONUS;
+    }
+
+    public boolean isUnDebtable() {
+        return isUnDebtable(key, assetType);
+    }
+
     public static boolean isTypeUnique(int assetType, long quantity) {
         if (quantity == 1L
                 || assetType == AS_OUTSIDE_BILL
@@ -772,11 +792,18 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static boolean isAccounting(int assetType) {
-        return assetType >= AS_SELF_MANAGED_ACCOUNTING;
+        return assetType >= AS_ACCOUNTING;
     }
 
     public boolean isAccounting() {
         return isAccounting(assetType);
+    }
+
+    public boolean isPersonProtected() {
+        return (key <= AssetCls.ERA_KEY || key > getStartKey()) // GATE Assets
+                && !isAccounting()
+                && assetType != AssetCls.AS_INSIDE_BONUS
+                && assetType != AssetCls.AS_INSIDE_VOTE;
     }
 
     /**
@@ -1858,9 +1885,8 @@ public abstract class AssetCls extends ItemCls {
 
     }
 
-    public long getOperations(DCSet dcSet) {
-        long total = dcSet.getOrderMap().getCountOrders(key);
-        return total;
+    public int getOperations(DCSet dcSet) {
+        return dcSet.getOrderMap().getCountOrders(key);
     }
 
     //OTHER
@@ -2052,6 +2078,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public JSONObject jsonForExplorerPage(JSONObject langObj) {
+
 
         JSONObject assetJSON = super.jsonForExplorerPage(langObj);
         assetJSON.put("assetTypeKey", this.assetType);

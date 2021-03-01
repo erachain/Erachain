@@ -772,8 +772,7 @@ public class BlockExplorer {
                 }
 
                 if (System.currentTimeMillis() - pair.updateTime > cacheTime) {
-                    pair = PairsController.reCalc(pair.getAsset1(), pair.getAsset2(), pair);
-                    pairMap.put(pair);
+                    pair = PairsController.reCalcAndUpdate(pair.getAsset1(), pair.getAsset2(), pairMap, 30);
                 }
                 pairsJSON.add(pair.toJson());
             }
@@ -2247,6 +2246,7 @@ public class BlockExplorer {
         JSONArray pairsArray = new JSONArray();
 
         PairsController pairsCnt = Controller.getInstance().pairsController;
+        PairMapImpl pairsMap = Controller.getInstance().dlSet.getPairMap();
         // CACHE or UPDATE
         pairsCnt.updateList();
 
@@ -2262,35 +2262,16 @@ public class BlockExplorer {
             Map pairJSON = new HashMap(32, 1);
             pairJSON.put("have", assetHave.jsonForExplorerPage(langObj));
             pairJSON.put("want", assetWant.jsonForExplorerPage(langObj));
-            long ordersCount = orders.getCount(pairKey.a, pairKey.b, 250)
-                    + orders.getCount(pairKey.b, pairKey.a, 250);
-            pairJSON.put("orders", ordersCount > 200 ? "200+" : ordersCount);
 
             String key = assetHave.getName() + "_" + assetWant.getName();
-            TradePair pair = pairsCnt.spotPairs.get(key);
-            if (true) {
-                pair = PairsController.reCalc(assetHave, assetWant, pair);
-                pairsCnt.spotPairs.put(key, pair);
-                Controller.getInstance().dlSet.getPairMap().put(pair);
 
-                pairJSON.put("last", pair.getLastPrice());
-                pairJSON.put("volume24", pair.getQuote_volume().toPlainString());
+            TradePair pair = PairsController.reCalcAndUpdate(assetHave, assetWant, pairsMap, 30);
+            pairsCnt.spotPairs.put(key, pair);
 
-            } else {
-                Trade trade = trades.getLastTrade(pairKey.a, pairKey.b);
-                //Order initiator
-                if (trade == null) {
-                    pairJSON.put("last", "--");
-                } else {
-                    if (trade.getHaveKey().equals(pairKey.b)) {
-                        pairJSON.put("last", trade.calcPrice().toPlainString());
-                    } else {
-                        pairJSON.put("last", trade.calcPriceRevers().toPlainString());
-                    }
-                }
-
-                pairJSON.put("volume24", trades.getVolume24(pairKey.a, pairKey.b).toPlainString());
-            }
+            int ordersCount = pair.getCountOrdersBid() + pair.getCountOrdersAsk();
+            pairJSON.put("last", pair.getLastPrice());
+            pairJSON.put("volume24", pair.getQuote_volume().toPlainString());
+            pairJSON.put("orders", ordersCount > 99 ? "99+" : ordersCount);
 
             pairsArray.add(pairJSON);
         }

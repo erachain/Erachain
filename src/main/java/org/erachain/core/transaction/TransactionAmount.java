@@ -569,10 +569,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                                AssetCls asset) {
         if (BlockChain.PERSON_SEND_PROTECT && creatorIsPerson && absKey != FEE_KEY
                 && actionType != ACTION_DEBT && actionType != ACTION_HOLD && actionType != ACTION_SPEND
-                && (absKey <= AssetCls.ERA_KEY || absKey > asset.getStartKey()) // GATE Assets
-                && !asset.isAccounting()
-                && asset.getAssetType() != AssetCls.AS_INSIDE_BONUS
-                && asset.getAssetType() != AssetCls.AS_INSIDE_VOTE
+                && asset.isPersonProtected()
         ) {
             if (!recipient.isPerson(dcSet, height)
                     && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
@@ -752,9 +749,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                             case ACTION_DEBT: // DEBT, CREDIT and BORROW
 
-                                if (assetType == AssetCls.AS_INDEX
-                                        || assetType == AssetCls.AS_INSIDE_BONUS
-                                ) {
+                                if (asset.isUnDebtable()) {
                                     if (height > BlockChain.HOLD_VALID_START + 20000)
                                         return NOT_DEBTABLE_ASSET;
                                 }
@@ -979,11 +974,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                             case ACTION_SPEND: // PRODUCE - SPEND
 
-                                if (absKey < 100
-                                        || assetType == AssetCls.AS_INDEX
-                                        || assetType == AssetCls.AS_INSIDE_ACCESS
-                                        || assetType == AssetCls.AS_INSIDE_BONUS
-                                ) {
+                                if (asset.isUnSpendable()) {
                                     if (height > BlockChain.HOLD_VALID_START)
                                         return NOT_SPENDABLE_ASSET;
                                 }
