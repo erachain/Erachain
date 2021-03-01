@@ -75,6 +75,7 @@ public class DLSet extends DBASet {
 
         if (DBASet.getVersion(database) != CURRENT_VERSION) {
             database.close();
+            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DLSet.");
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
