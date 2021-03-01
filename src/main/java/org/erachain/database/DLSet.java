@@ -32,7 +32,7 @@ public class DLSet extends DBASet {
                 ///// добавил dcSet.clearCache(); --
                 ///.cacheDisable()
 
-                // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                // это чистит сама память если осталось 25% от кучи - так что она безопасная
                 //.cacheHardRefEnable()
                 //.cacheLRUEnable()
                 ///.cacheSoftRefEnable()
