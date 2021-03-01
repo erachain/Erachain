@@ -7,6 +7,7 @@ import org.erachain.controller.PairsController;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.TradePair;
+import org.erachain.database.PairMapImpl;
 import org.erachain.database.wallet.FavoriteItemMapAsset;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
@@ -52,13 +53,17 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
         FavoriteItemMapAsset favoriteMap = Controller.getInstance().wallet.database.getAssetFavoritesSet();
         list = new ArrayList<>();
 
+        PairMapImpl pairsMap = Controller.getInstance().dlSet.getPairMap();
+
         try (IteratorCloseable<Long> iterator = favoriteMap.getIterator()) {
             while (iterator.hasNext()) {
                 AssetCls asset = assetMap.get(iterator.next());
                 if (asset == null) {
                     continue;
                 }
-                list.add(new Fun.Tuple2<AssetCls, TradePair>(asset, PairsController.reCalc(asset, assetPair, null)));
+
+                TradePair pair = PairsController.reCalcAndUpdate(asset, assetPair, pairsMap, 30);
+                list.add(new Fun.Tuple2<AssetCls, TradePair>(asset, pair));
             }
         } catch (IOException e) {
         }
@@ -120,16 +125,22 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
         AssetCls asset = Controller.getInstance().getAsset(key_filter);
         if (asset == null || asset.getKey() == this.key)
             return;
-        list.add(new Fun.Tuple2<>(asset, PairsController.reCalc(asset, assetPair, null)));
+
+        list.add(new Fun.Tuple2<>(asset, PairsController.reCalcAndUpdate(asset, assetPair,
+                Controller.getInstance().dlSet.getPairMap(), 30)));
+
         this.fireTableDataChanged();
     }
 
     public void set_Filter_By_Name(String str) {
         filter_Name = str;
         list = new ArrayList<>();
+        PairMapImpl pairsMap = Controller.getInstance().dlSet.getPairMap();
+
         List<ItemCls> foundAssets = ((ItemMap) map).getByFilterAsArray(filter_Name, 0, 1000);
         for (ItemCls asset : foundAssets) {
-            list.add(new Fun.Tuple2<>((AssetCls) asset, PairsController.reCalc((AssetCls) asset, assetPair, null)));
+            list.add(new Fun.Tuple2<>((AssetCls) asset, PairsController.reCalcAndUpdate((AssetCls) asset, assetPair,
+                    pairsMap, 30)));
         }
 
         this.fireTableDataChanged();

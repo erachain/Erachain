@@ -54,9 +54,13 @@ abstract public class DBASet implements IDB {
 
     public int getVersion() {
         this.uses++;
-        int u = this.database.getAtomicInteger(VERSION).intValue();
+        int u = getVersion(database);
         this.uses--;
         return u;
+    }
+
+    public static int getVersion(DB database) {
+        return database.getAtomicInteger(VERSION).intValue();
     }
 
     public File getFile() {
@@ -67,6 +71,10 @@ abstract public class DBASet implements IDB {
         this.uses++;
         this.database.getAtomicInteger(VERSION).set(version);
         this.uses--;
+    }
+
+    public static void setVersion(DB database, int version) {
+        database.getAtomicInteger(VERSION).set(version);
     }
 
     public void addTable(DBTab table) {

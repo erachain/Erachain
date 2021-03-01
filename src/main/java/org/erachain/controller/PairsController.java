@@ -9,6 +9,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.DLSet;
+import org.erachain.database.PairMap;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
@@ -93,7 +94,7 @@ public class PairsController {
 
     }
 
-    int cacheTime = 2 * 60 * 1000; // in ms
+    int cacheTime = 10 * 60 * 1000; // in ms
     long updateList;
     public void updateList() {
 
@@ -127,8 +128,7 @@ public class PairsController {
             String pairJsonKey = asset1.getName() + "_" + asset2.getName();
             spotPairsList.put(pairJsonKey, array);
 
-            TradePair tradePair = mapPairs.get(key1, key2);
-            tradePair = reCalc(asset1, asset2, tradePair);
+            TradePair tradePair = reCalcAndUpdate(asset1, asset2, mapPairs, 10);
             spotPairs.put(pairJsonKey, tradePair);
             spotPairsJson.put(pairJsonKey, tradePair.toJson());
             commonPairsList.add(new Fun.Tuple2<>(key1, key2));
@@ -165,12 +165,22 @@ public class PairsController {
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = (tradesMap.getPairIterator(key1, key2, heightStart, heightEnd))) {
             Trade trade;
             if (iterator.hasNext()) {
+                Trade lastTrade = null;
                 while (iterator.hasNext()) {
                     trade = tradesMap.get(iterator.next());
                     if (trade == null) {
                         LOGGER.warn("trade for pair [" + key1 + "/" + key2 + "] not found");
                         continue;
                     }
+                    if (currentPair != null && lastTrade == null) {
+                        // изменений не было
+                        if (trade.getTimestamp().equals(currentPair.getLastTime())) {
+                            currentPair.setUpdateTime(Block.getTimestamp(heightStart));
+                            return currentPair;
+                        }
+                        lastTrade = trade;
+                    }
+
                     count24++;
 
                     reversed = trade.getHaveKey().equals(key2);
@@ -178,9 +188,6 @@ public class PairsController {
                     // у сделки обратные Have Want
                     price = reversed ? trade.calcPrice() : trade.calcPriceRevers();
                     if (lastPrice == null) {
-                        if (currentPair != null && trade.getTimestamp().equals(currentPair.getLastTime())) {
-                            return currentPair;
-                        }
                         lastPrice = price;
                         lastTime = trade.getTimestamp();
                     }
@@ -222,14 +229,37 @@ public class PairsController {
         Order askLastOrder = ordersMap.getHaveWanFirst(key1, key2);
         BigDecimal lower_askPrice = askLastOrder == null ? BigDecimal.ZERO : askLastOrder.calcLeftPrice();
 
+        int countOrdersBid = ordersMap.getCountHave(key2, 100);
+        int countOrdersAsk = ordersMap.getCountHave(key1, 100);
+
         return new TradePair(asset1, asset2, lastPrice, lastTime,
                 highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, priceChangePercent24h,
-                minPrice, maxPrice, count24, Block.getTimestamp(heightStart));
+                minPrice, maxPrice, count24, Block.getTimestamp(heightStart), countOrdersBid, countOrdersAsk);
 
     }
 
-    public static TradePair reverse(TradePair pair) {
-        return null;
+    /**
+     * @param asset1
+     * @param asset2
+     * @param pairMap
+     * @param cacheTimeMin time not use recalc
+     * @return
+     */
+    public static TradePair reCalcAndUpdate(AssetCls asset1, AssetCls asset2, PairMap pairMap, int cacheTimeMin) {
+        TradePair tradePairOld = pairMap.get(asset1.getKey(), asset2.getKey());
+        if (tradePairOld != null && System.currentTimeMillis() - tradePairOld.updateTime < cacheTimeMin * 60000) {
+            return tradePairOld;
+        }
+
+        TradePair tradePair = reCalc(asset1, asset2, tradePairOld);
+        if (tradePair.equals(tradePairOld)) {
+            if (tradePair.updateTime != tradePairOld.updateTime) {
+                pairMap.put(tradePair);
+            }
+        } else {
+            pairMap.put(tradePair);
+        }
+        return tradePair;
     }
 
     public static void foundPairs(DCSet dcSet, DLSet dlSet, int days) {
@@ -253,12 +283,9 @@ public class PairsController {
 
                 Long key1 = trade.getHaveKey();
                 Long key2 = trade.getWantKey();
-                if (!pairMap.contains(new Fun.Tuple2(key1, key2))) {
-                    AssetCls asset1 = dcSet.getItemAssetMap().get(key1);
-                    AssetCls asset2 = dcSet.getItemAssetMap().get(key2);
-                    pairMap.put(reCalc(asset1, asset2, null));
-                    pairMap.put(reCalc(asset2, asset1, null));
-                }
+                AssetCls asset1 = dcSet.getItemAssetMap().get(key1);
+                AssetCls asset2 = dcSet.getItemAssetMap().get(key2);
+                reCalcAndUpdate(asset1, asset2, pairMap, 30);
             }
         } catch (IOException e) {
         }

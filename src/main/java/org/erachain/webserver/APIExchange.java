@@ -64,8 +64,8 @@ public class APIExchange {
 
         help.put("GET apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
-        help.put("GET apiexchange/v2/pair/{baseKey}/{quoteKey}",
-                "Get Pair info fot baseKey / quoteKey");
+        help.put("GET apiexchange/v2/pair/{baseAssetKey}/{quoteAssetKey}",
+                "Get Pair info fot baseAssetKey / quoteAssetKey");
         help.put("GET apiexchange/pair/{have}/{want}",
                 "Get Pair info fot Have / Want");
         help.put("GET apiexchange/ordersbook/[have]/[want]?limit=[limit]",
@@ -316,32 +316,26 @@ public class APIExchange {
     }
 
     @GET
-    @Path("v2/pair/{have}/{want}")
-    // apiexchange/pair?have=1&want=2
-    public Response getPair2(@PathParam("have") Long have, @PathParam("want") Long want) {
+    @Path("v2/pair/{baseAssetKey}/{quoteAssetKey}")
+    // apiexchange/v2/pair/1/2
+    public Response getPair2(@PathParam("baseAssetKey") Long baseAssetKey, @PathParam("quoteAssetKey") Long quoteAssetKey) {
 
         ItemAssetMap map = this.dcSet.getItemAssetMap();
         // DOES ASSETID EXIST
-        if (have == null || !map.contains(have)) {
+        if (baseAssetKey == null || !map.contains(baseAssetKey)) {
             throw ApiErrorFactory.getInstance().createError(
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
-        if (want == null || !map.contains(want)) {
+        if (quoteAssetKey == null || !map.contains(quoteAssetKey)) {
             throw ApiErrorFactory.getInstance().createError(
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
         PairMapImpl mapPairs = Controller.getInstance().dlSet.getPairMap();
-        TradePair tradePair = mapPairs.get(have, want);
-        AssetCls asset1 = map.get(want);
-        AssetCls asset2 = map.get(have);
+        AssetCls asset1 = map.get(quoteAssetKey);
+        AssetCls asset2 = map.get(baseAssetKey);
 
-        TradePair tradePairNew = PairsController.reCalc(asset1, asset2, tradePair);
-        if (!tradePairNew.equals(tradePair)) {
-            mapPairs.put(tradePairNew);
-            mapPairs.put(PairsController.reCalc(asset2, asset1, null));
-
-        }
+        TradePair tradePair = PairsController.reCalcAndUpdate(asset1, asset2, mapPairs, 30);
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")

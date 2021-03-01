@@ -5,7 +5,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -102,9 +101,7 @@ public class Trade {
 
     public Long getTimestamp() {
         Tuple2<Integer, Integer> key = Transaction.parseDBRef(this.initiator);
-        BlockChain blockChain = Controller.getInstance().getBlockChain();
-        Long timestamp = blockChain.getTimestamp(key.a) + key.b * 0; // for add SEQUENCE in asset.Trade
-        return timestamp; // + this.sequence;
+        return Controller.getInstance().getBlockChain().getTimestamp(key.a);
     }
 
     public static long[] parseID(String ordersID) {

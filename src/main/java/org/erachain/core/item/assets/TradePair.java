@@ -1,6 +1,7 @@
 package org.erachain.core.item.assets;
 // 16/03
 
+import com.google.common.hash.HashCode;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -20,7 +21,7 @@ public class TradePair {
     private static final int SCALE_LENGTH = 1;
     private static final int BASE_LENGTH = 2 * (ASSET_KEY_LENGTH + 1)
             + 8 * (AMOUNT_LENGTH + SCALE_LENGTH)
-            + 2 * Long.BYTES + Integer.BYTES;
+            + 2 * Long.BYTES + 3 * Integer.BYTES;
 
     private Long assetKey1;
     private Long assetKey2;
@@ -47,15 +48,21 @@ public class TradePair {
 
     private int count24;
 
+    /**
+     * Count orders in Cup
+     */
+    private int countOrdersBid;
+    private int countOrdersAsk;
+
     // last updated on
-    public final long updateTime;
+    public long updateTime;
 
     // make trading if two orders is seeked
     public TradePair(Long assetKey1, Long assetKey2, int AssetScale1, int assetScale2, BigDecimal lastPrice, long lastTime,
                      BigDecimal highest_bidPrice, BigDecimal lower_askPrice,
                      BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
                      BigDecimal lowest_price_24h, BigDecimal highest_price_24h,
-                     int count24, long updateTime) {
+                     int count24, long updateTime, int countOrdersBid, int countOrdersAsk) {
         this.assetKey1 = assetKey1;
         this.assetKey2 = assetKey2;
         this.assetScale1 = AssetScale1;
@@ -79,16 +86,20 @@ public class TradePair {
 
         this.updateTime = updateTime;
 
+        this.countOrdersBid = countOrdersBid;
+        this.countOrdersAsk = countOrdersAsk;
+
+
     }
 
     public TradePair(AssetCls asset1, AssetCls asset2, BigDecimal lastPrice, long lastTime,
                      BigDecimal highest_bidPrice, BigDecimal lower_askPrice,
                      BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
                      BigDecimal lowest_price_24h, BigDecimal highest_price_24h,
-                     int count24, long updateTime) {
+                     int count24, long updateTime, int countOrdersBid, int countOrdersAsk) {
         this(asset1.getKey(), asset2.getKey(), asset1.getScale(), asset2.getScale(), lastPrice, lastTime,
                 highest_bidPrice, lower_askPrice, base_volume, quote_volume, price_change_percent_24h,
-                lowest_price_24h, highest_price_24h, count24, updateTime);
+                lowest_price_24h, highest_price_24h, count24, updateTime, countOrdersBid, countOrdersAsk);
         this.asset1 = asset1;
         this.asset2 = asset2;
     }
@@ -96,6 +107,10 @@ public class TradePair {
     public void setDC(DCSet dcSet) {
         asset1 = dcSet.getItemAssetMap().get(assetKey1);
         asset2 = dcSet.getItemAssetMap().get(assetKey2);
+    }
+
+    public void setUpdateTime(long updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String viewID() {
@@ -124,6 +139,14 @@ public class TradePair {
 
     public int getCount24() {
         return this.count24;
+    }
+
+    public int getCountOrdersBid() {
+        return this.countOrdersBid;
+    }
+
+    public int getCountOrdersAsk() {
+        return this.countOrdersAsk;
     }
 
     public BigDecimal getHighest_price_24h() {
@@ -186,6 +209,9 @@ public class TradePair {
         pair.put("base_volume", base_volume);
         pair.put("quote_volume", quote_volume);
         pair.put("count_24h", count24);
+
+        pair.put("countOrdersBid", countOrdersBid);
+        pair.put("countOrdersAsk", countOrdersAsk);
 
         pair.put("lowest_price_24h", lowest_price_24h);
         pair.put("highest_price_24h", highest_price_24h);
@@ -273,13 +299,21 @@ public class TradePair {
         int count24 = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + Integer.BYTES));
         position += Integer.BYTES;
 
+        //READ COUNT 24
+        int countOrdersBid = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + Integer.BYTES));
+        position += Integer.BYTES;
+
+        //READ COUNT 24
+        int countOrdersAsk = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + Integer.BYTES));
+        position += Integer.BYTES;
+
         //READ UPDATE TIME
         Long updateTime = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH));
         position += ASSET_KEY_LENGTH;
 
         return new TradePair(assetKey1, assetKey2, assetScale1, assetScale2, lastPrice, lastTime, bidPrice, askPrice,
                 baseVolume, quoteVolume, price_change_percent_24h,
-                lowest_price_24h, highest_price_24h, count24, updateTime);
+                lowest_price_24h, highest_price_24h, count24, updateTime, countOrdersBid, countOrdersAsk);
     }
 
     public byte[] toBytes() {
@@ -334,6 +368,12 @@ public class TradePair {
         // count 24
         data = Bytes.concat(data, Ints.toByteArray(this.count24));
 
+        // countOrdersBid
+        data = Bytes.concat(data, Ints.toByteArray(this.countOrdersBid));
+
+        // countOrdersAsk
+        data = Bytes.concat(data, Ints.toByteArray(this.countOrdersAsk));
+
         // last time
         data = Bytes.concat(data, Longs.toByteArray(this.updateTime));
 
@@ -346,18 +386,55 @@ public class TradePair {
 
     @Override
     public int hashCode() {
-        return assetKey1.hashCode() + assetKey2.hashCode();
+        return assetKey1.hashCode() + assetKey2.hashCode() + HashCode.fromLong(lastTime).asInt();
     }
 
     @Override
     public boolean equals(Object object) {
         if (object instanceof TradePair) {
-            TradePair trade = (TradePair) object;
+            TradePair tradePair = (TradePair) object;
 
-            return (trade.getAssetKey1().equals(this.getAssetKey1()) && trade.getAssetKey2().equals(this.getAssetKey2()));
+            return (tradePair.assetKey1.equals(this.assetKey1) && tradePair.assetKey2.equals(this.assetKey2)
+                    && tradePair.lastTime == lastTime);
         }
 
         return false;
+    }
+
+    public static TradePair reverse(TradePair tradePair) {
+
+        BigDecimal lastPriceRev = Order.calcPrice(BigDecimal.ONE, tradePair.lastPrice, tradePair.assetScale1);
+        BigDecimal highest_bidPriceRev = Order.calcPrice(BigDecimal.ONE, tradePair.lower_askPrice, tradePair.assetScale1);
+        BigDecimal lower_askPriceRev = Order.calcPrice(BigDecimal.ONE, tradePair.highest_bidPrice, tradePair.assetScale1);
+
+        BigDecimal highest_price_24hRev = Order.calcPrice(BigDecimal.ONE, tradePair.lowest_price_24h, tradePair.assetScale1);
+        BigDecimal lowest_price_24hRev = Order.calcPrice(BigDecimal.ONE, tradePair.highest_price_24h, tradePair.assetScale1);
+
+        if (tradePair.asset1 != null && tradePair.asset2 != null) {
+            return new TradePair(
+                    tradePair.asset2, tradePair.asset1, // reversed
+                    lastPriceRev, // 1/
+                    tradePair.lastTime, // same
+                    highest_bidPriceRev, lower_askPriceRev, // 1/
+                    tradePair.quote_volume, tradePair.base_volume, // reversed
+                    tradePair.price_change_percent_24h, // same
+                    lowest_price_24hRev, highest_price_24hRev, // 1/
+                    tradePair.count24, tradePair.updateTime, // same
+                    tradePair.countOrdersAsk, tradePair.countOrdersBid // reversed
+            );
+        } else {
+            return new TradePair(
+                    tradePair.assetKey2, tradePair.assetKey1, tradePair.assetScale2, tradePair.assetScale1, // reversed
+                    lastPriceRev, // 1/
+                    tradePair.lastTime, // same
+                    highest_bidPriceRev, lower_askPriceRev, // 1/
+                    tradePair.quote_volume, tradePair.base_volume, // reversed
+                    tradePair.price_change_percent_24h, // same
+                    lowest_price_24hRev, highest_price_24hRev, // 1/
+                    tradePair.count24, tradePair.updateTime, // same
+                    tradePair.countOrdersAsk, tradePair.countOrdersBid // reversed
+            );
+        }
     }
 
     @Override

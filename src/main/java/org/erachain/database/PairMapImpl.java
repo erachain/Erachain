@@ -72,6 +72,13 @@ public class PairMapImpl extends DBTabImpl<Tuple2<Long, Long>, TradePair> implem
         this.put(new Tuple2<Long, Long>(tradePair.getAssetKey1(), tradePair.getAssetKey2()), tradePair);
     }
 
+    @Override
+    public void put(Tuple2<Long, Long> key, TradePair tradePair) {
+        super.put(key, tradePair);
+        // reverse KEY and PAIR
+        super.put(new Tuple2<Long, Long>(key.b, key.a), TradePair.reverse(tradePair));
+    }
+
     public void delete(TradePair tradePair) {
         this.delete(new Tuple2<Long, Long>(tradePair.getAssetKey1(), tradePair.getAssetKey2()));
     }

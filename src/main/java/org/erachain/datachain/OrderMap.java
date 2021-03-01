@@ -15,14 +15,14 @@ public interface OrderMap extends DBTab<Long, Order> {
 
     long getCount(long have, long want, int limit);
 
-    long getCountHave(long have);
+    int getCountHave(long have, int limit);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    long getCountWant(long want);
+    int getCountWant(long want, int limit);
 
     List<Order> getOrders(long haveWant);
 
-    long getCountOrders(long haveWant);
+    int getCountOrders(long haveWant);
 
     HashMap<Long, Order> getProtocolEntries(long have, long want, BigDecimal limit, Map deleted);
 
