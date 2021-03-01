@@ -705,10 +705,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             // HOLD GOODS, CHECK myself DEBT for CLAIMS
                             case AssetCls.AS_INSIDE_OTHER_CLAIM:
                                 break;
-                            //case AssetCls.AS_ACCOUNTING:
-                            //    if (absKey >= 1000 && !creator.equals(asset.getOwner())) {
-                            //        return INVALID_CREATOR;
-                            //    }
+                            case AssetCls.AS_ACCOUNTING:
+                                //if (actionType == ACTION_SEND && absKey >= 1000 && !creator.equals(asset.getOwner())) {
+                                //    return INVALID_CREATOR;
+                                //}
+                                break;
                         }
 
                         boolean unLimited;
