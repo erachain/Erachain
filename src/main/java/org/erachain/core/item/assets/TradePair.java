@@ -403,12 +403,14 @@ public class TradePair {
 
     public static TradePair reverse(TradePair tradePair) {
 
-        BigDecimal lastPriceRev = Order.calcPrice(BigDecimal.ONE, tradePair.lastPrice, tradePair.assetScale1);
-        BigDecimal highest_bidPriceRev = Order.calcPrice(BigDecimal.ONE, tradePair.lower_askPrice, tradePair.assetScale1);
-        BigDecimal lower_askPriceRev = Order.calcPrice(BigDecimal.ONE, tradePair.highest_bidPrice, tradePair.assetScale1);
+        BigDecimal lastPriceRev = Order.calcPrice(tradePair.lastPrice, BigDecimal.ONE, tradePair.assetScale1);
+        BigDecimal highest_bidPriceRev = Order.calcPrice(tradePair.lower_askPrice, BigDecimal.ONE, tradePair.assetScale1);
+        BigDecimal lower_askPriceRev = Order.calcPrice(tradePair.highest_bidPrice, BigDecimal.ONE, tradePair.assetScale1);
 
-        BigDecimal highest_price_24hRev = Order.calcPrice(BigDecimal.ONE, tradePair.lowest_price_24h, tradePair.assetScale1);
-        BigDecimal lowest_price_24hRev = Order.calcPrice(BigDecimal.ONE, tradePair.highest_price_24h, tradePair.assetScale1);
+        BigDecimal highest_price_24hRev = Order.calcPrice(tradePair.lowest_price_24h, BigDecimal.ONE, tradePair.assetScale1);
+        BigDecimal lowest_price_24hRev = Order.calcPrice(tradePair.highest_price_24h, BigDecimal.ONE, tradePair.assetScale1);
+
+        BigDecimal first_priceRev = Order.calcPrice(tradePair.firstPrice, BigDecimal.ONE, tradePair.assetScale1);
 
         if (tradePair.asset1 != null && tradePair.asset2 != null) {
             return new TradePair(
@@ -417,7 +419,7 @@ public class TradePair {
                     tradePair.lastTime, // same
                     highest_bidPriceRev, lower_askPriceRev, // 1/
                     tradePair.quote_volume, tradePair.base_volume, // reversed
-                    tradePair.firstPrice, // same
+                    first_priceRev, // 1/
                     lowest_price_24hRev, highest_price_24hRev, // 1/
                     tradePair.count24, tradePair.updateTime, // same
                     tradePair.countOrdersAsk, tradePair.countOrdersBid // reversed
