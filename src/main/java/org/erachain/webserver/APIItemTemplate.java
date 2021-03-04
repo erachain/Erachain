@@ -45,6 +45,7 @@ public class APIItemTemplate {
         help.put("Get apitemplate/image/{key}", "GET Template Image");
         help.put("Get apitemplate/icon/{key}", "GET Template Icon");
         help.put("Get apitemplate/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
+        help.put("GET apitemplate/text/{key", "Get description by ID");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -229,6 +230,31 @@ public class APIItemTemplate {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(output.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("text/{key}")
+    public Response getText(@PathParam("key") Long key) {
+
+        if (key <= 0) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        ItemTemplateMap map = DCSet.getInstance().getItemTemplateMap();
+
+        // DOES EXIST
+        if (!map.contains(key)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_TEMPLATE_NOT_EXIST);
+        }
+
+        ItemCls item = map.get(key);
+
+        return Response.status(200).header("Content-Type", "text/plain; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(item.getDescription())
                 .build();
     }
 

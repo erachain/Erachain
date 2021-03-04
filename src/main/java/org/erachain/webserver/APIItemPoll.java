@@ -48,6 +48,7 @@ public class APIItemPoll {
         help.put("Get apipoll/image/{key}", "GET Poll Image");
         help.put("Get apipoll/icon/{key}", "GET Poll Icon");
         help.put("Get apipoll/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
+        help.put("GET apipoll/text/{key", "Get description by ID");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -232,6 +233,31 @@ public class APIItemPoll {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(output.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("text/{key}")
+    public Response getText(@PathParam("key") Long key) {
+
+        if (key <= 0) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        ItemPollMap map = DCSet.getInstance().getItemPollMap();
+
+        // DOES EXIST
+        if (!map.contains(key)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_POLL_NOT_EXIST);
+        }
+
+        ItemCls item = map.get(key);
+
+        return Response.status(200).header("Content-Type", "text/plain; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(item.getDescription())
                 .build();
     }
 

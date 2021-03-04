@@ -1433,6 +1433,7 @@ public class ExData {
                     output.put("messageUnique", 1);
                 }
                 output.put("messageHash", Base58.encode(getMessageHash()));
+                output.put("Label_Source_Mess", Lang.T("Source Message # исходное сообщение", langObj));
             }
 
             ///////// NATIVE HASHES

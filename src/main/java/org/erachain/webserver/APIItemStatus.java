@@ -1,10 +1,5 @@
 package org.erachain.webserver;
 
-//import com.google.common.collect.Iterables;
-//import com.google.gson.internal.LinkedHashTreeMap;
-//import com.sun.org.apache.xpath.internal.operations.Or;
-//import javafx.print.Collation;
-
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
@@ -28,9 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-//import com.google.gson.Gson;
-//import org.mapdb.Fun;
-
 @Path("apistatus")
 @Produces(MediaType.APPLICATION_JSON)
 public class APIItemStatus {
@@ -52,6 +44,7 @@ public class APIItemStatus {
         help.put("Get apistatus/image/{key}", "GET Status Image");
         help.put("Get apistatus/icon/{key}", "GET Status Icon");
         help.put("Get apistatus/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
+        help.put("GET apistatus/text/{key", "Get description by ID");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -236,6 +229,31 @@ public class APIItemStatus {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(output.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("text/{key}")
+    public Response getText(@PathParam("key") Long key) {
+
+        if (key <= 0) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        ItemStatusMap map = DCSet.getInstance().getItemStatusMap();
+
+        // DOES EXIST
+        if (!map.contains(key)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_STATUS_NOT_EXIST);
+        }
+
+        ItemCls item = map.get(key);
+
+        return Response.status(200).header("Content-Type", "text/plain; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(item.getDescription())
                 .build();
     }
 
