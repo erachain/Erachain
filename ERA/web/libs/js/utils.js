@@ -83,19 +83,16 @@ function cutBlank(string, max) {
         for (index in words) {
             if (index == 0)
                 result += words[0];
-            else if (index == 1) {
-                if (result.length + 3 < max)
-                    result += words[index].substring(0,3) + '.';
-                else
-                    result += words[index].substring(0,1) + '.';
-            }
             else
-                if (result.length + 3 < max)
-                    result += words[index].substring(0,3) + '.';
+                if (result.length > max / 3)
+                    if (words[index].length > 4)
+                        result += words[index].substring(0,3) + '.';
+                    else
+                        result += words[index];
                 else
-                    result += words[index].substring(0,1) + '.';
+                    result += words[index];
 
-            if (result > max) break;
+            if (result.length > max) break;
 
             result += ' ';
         }

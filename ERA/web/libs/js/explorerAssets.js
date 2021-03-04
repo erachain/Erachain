@@ -36,14 +36,14 @@ function assets(data) {
         if (item.icon.length > 0)
             output += '<img src="data:image/gif;base64,' + item.icon + '"  style="width:2em;" /> ';
 
-        output += escapeHtml(item.name);
+        output += cutBlank(escapeHtml(item.name), 50);
         output += '</a>';
         output += '<td>' + item.assetTypeNameFull;
         ////output += '<td>' + escapeHtml(item.description.substr(0, 60));
 
         output += '<td><a href=?address=' + item.owner + get_lang() + '>';
         if (item.hasOwnProperty('person'))
-            output += '[' + item.person_key + ']' + escapeHtml(item.person);
+            output += '[' + item.person_key + ']' + cutBlank(escapeHtml(item.person), 25);
         else
             output += item.owner;
         output += '</a></td>';
