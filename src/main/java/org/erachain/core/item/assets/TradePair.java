@@ -438,7 +438,7 @@ public class TradePair {
                     tradePair.lastTime, // same
                     highest_bidPriceRev, lower_askPriceRev, // 1/
                     tradePair.quote_volume, tradePair.base_volume, // reversed
-                    tradePair.firstPrice, // same
+                    first_priceRev, // 1/
                     lowest_price_24hRev, highest_price_24hRev, // 1/
                     tradePair.count24, tradePair.updateTime, // same
                     tradePair.countOrdersAsk, tradePair.countOrdersBid // reversed
