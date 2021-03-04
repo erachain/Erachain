@@ -2099,7 +2099,7 @@ public abstract class AssetCls extends ItemCls {
             AssetCls quoteAsset = (AssetCls) args[0];
             TradePair tradePair = PairsController.reCalcAndUpdate(this, quoteAsset, (PairMap) args[1], 10);
 
-            BigDecimal marketCap = released.multiply(tradePair.getLastPrice());
+            BigDecimal marketCap = released.multiply(tradePair.getLower_askPrice());
             assetJSON.put("marketCap", marketCap);
             assetJSON.put("lastPrice", tradePair.getLastPrice());
 
