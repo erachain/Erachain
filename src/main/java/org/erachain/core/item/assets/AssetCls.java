@@ -2098,14 +2098,8 @@ public abstract class AssetCls extends ItemCls {
             // параметры для показа Объемов торгов
             AssetCls quoteAsset = (AssetCls) args[0];
             TradePair tradePair = PairsController.reCalcAndUpdate(this, quoteAsset, (PairMap) args[1], 10);
-            BigDecimal averagePrice = tradePair.getHighest_bidPrice()
-                                 .add(tradePair.getLower_askPrice())
-                                 .add(tradePair.getHighest_price_24h())
-                                 .add(tradePair.getLowest_price_24h())
-                                 .add(tradePair.getLastPrice())
-                    .multiply(new BigDecimal("0.2"));
 
-            BigDecimal marketCap = released.multiply(averagePrice);
+            BigDecimal marketCap = released.multiply(tradePair.getLastPrice());
             assetJSON.put("marketCap", marketCap);
             assetJSON.put("lastPrice", tradePair.getLastPrice());
 
