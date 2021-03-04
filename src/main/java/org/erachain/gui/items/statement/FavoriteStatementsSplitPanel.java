@@ -2,6 +2,7 @@ package org.erachain.gui.items.statement;
 
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
@@ -151,6 +152,22 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
         });
         menuSaveCopy.add(copyNumber);
+
+        JMenuItem copySourceText = new JMenuItem(Lang.T("Copy Source Message"));
+        copySourceText.addActionListener(e -> {
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
+            RSignNote transaction = (RSignNote) favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            if (transaction == null) return;
+            StringSelection stringSelection = new StringSelection(transaction.getMessage());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Source Message of the '%1' has been copy to buffer")
+                            .replace("%1", transaction.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copySourceText);
 
         JMenuItem copySign = new JMenuItem(Lang.T("Copy Signature"));
         copySign.addActionListener(e -> {

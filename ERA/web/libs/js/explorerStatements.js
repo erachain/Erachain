@@ -232,10 +232,13 @@ function statement(data) {
             output += '<br>' + data.Label_mess_hash + ': ';
             if (data.hasOwnProperty('messageUnique')) {
                 output += '<a href="?search=transactions&q=' + data.messageHash + get_lang() + '"><b>'
-                 + data.messageHash + '</b></a><br>';
+                 + data.messageHash + '</b></a>';
             } else {
-                output += data.messageHash + '<br>';
+                output += data.messageHash;
             }
+            output += ' <a class="button ll-blue-bgc" href="../apidocuments/message/' + data.tx.seqNo
+                + '"><b>' + data.Label_Source_Mess + '</b></a><br>';
+
             output += fformat(data.message);
         }
 
