@@ -717,9 +717,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     /**
      * JSON for BlockExplorer lists
      * @param langObj
+     * @param args
      * @return
      */
-    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+    public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
         //DCSet dcSet = DCSet.getInstance();
 
         JSONObject json = new JSONObject();

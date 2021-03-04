@@ -417,7 +417,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             return head;
         }
 
-        public JSONObject jsonForExplorerPage(JSONObject langObj) {
+        public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
             JSONObject blockJSON = new JSONObject();
             blockJSON.put("height", heightBlock);
             blockJSON.put("signature", Base58.encode(signature));
@@ -440,7 +440,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     }
 
-    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+    public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
         JSONObject blockJSON = new JSONObject();
         if (blockHead == null) {
             // LOAD HEAD

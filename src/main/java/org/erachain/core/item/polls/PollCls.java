@@ -380,9 +380,9 @@ public abstract class PollCls extends ItemCls {
         return pollJSON;
     }
 
-    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+    public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
 
-        JSONObject json = super.jsonForExplorerPage(langObj);
+        JSONObject json = super.jsonForExplorerPage(langObj, args);
 
         json.put("optionsCount", options.size());
         json.put("totalVotes", getTotalVotes(DCSet.getInstance()).toPlainString());

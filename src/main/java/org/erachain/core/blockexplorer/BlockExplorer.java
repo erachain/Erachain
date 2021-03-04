@@ -107,7 +107,7 @@ public class BlockExplorer {
     }
 
     public void makePage(Class type, int start, int pageSize,
-                         Map output, JSONObject langObj) {
+                         Map output, JSONObject langObj, Object[] expArgs) {
 
         DBTab map = dcSet.getMap(type);
         ExplorerJsonLine element;
@@ -124,7 +124,7 @@ public class BlockExplorer {
         while (key > start - pageSize && key > 0) {
             element = (ExplorerJsonLine) map.get(key--);
             if (element != null) {
-                array.add(element.jsonForExplorerPage(langObj));
+                array.add(element.jsonForExplorerPage(langObj, expArgs));
             }
         }
 
@@ -137,15 +137,15 @@ public class BlockExplorer {
 
     /**
      * Для списков с ключом LONG - для сущностей всех например
-     *
-     * @param type
+     *  @param type
      * @param start    LONG
      * @param pageSize
      * @param output
      * @param langObj
+     * @param expArgs
      */
     public void makePage(Class type, long start, int pageSize,
-                         Map output, JSONObject langObj) {
+                         Map output, JSONObject langObj, Object[] expArgs) {
 
         DBTab map = dcSet.getMap(type);
         ExplorerJsonLine element;
@@ -162,7 +162,7 @@ public class BlockExplorer {
         while (key > start - pageSize && key > 0) {
             element = (ExplorerJsonLine) map.get(key--);
             if (element != null) {
-                array.add(element.jsonForExplorerPage(langObj));
+                array.add(element.jsonForExplorerPage(langObj, expArgs));
             }
 
         }
@@ -176,16 +176,16 @@ public class BlockExplorer {
 
     /**
      * Для списков с ключом INT - для блоков
-     *
-     * @param type
+     *  @param type
      * @param keys
      * @param start
      * @param pageSize
      * @param output
      * @param langObj
+     * @param expArgs
      */
     public void makePage(Class type, List keys, int start, int pageSize,
-                         Map output, JSONObject langObj) {
+                         Map output, JSONObject langObj, Object[] expArgs) {
 
         int size = keys.size();
 
@@ -204,7 +204,7 @@ public class BlockExplorer {
             while (index > start - pageSize && index > 0) {
                 element = (ExplorerJsonLine) map.get(keys.get(--index));
                 if (element != null) {
-                    array.add(element.jsonForExplorerPage(langObj));
+                    array.add(element.jsonForExplorerPage(langObj, expArgs));
                 }
             }
         }
@@ -215,23 +215,23 @@ public class BlockExplorer {
 
     }
 
-    public Map jsonQueryPages(Class type, int start, int pageSize) {
+    public Map jsonQueryPages(Class type, int start, int pageSize, Object[] expArgs) {
         Map result = new LinkedHashMap();
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
-        makePage(type, start, pageSize, result, langObj);
+        makePage(type, start, pageSize, result, langObj, expArgs);
         return result;
     }
 
-    public Map jsonQueryPages(Class type, long start, int pageSize) {
+    public Map jsonQueryPages(Class type, long start, int pageSize, Object[] expArgs) {
         Map result = new LinkedHashMap();
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
-        makePage(type, start, pageSize, result, langObj);
+        makePage(type, start, pageSize, result, langObj, expArgs);
         return result;
     }
 
-    public Map jsonQuerySearchPages(UriInfo info, Class type, String search, int start, int pageSize) throws WrongSearchException, Exception {
+    public LinkedHashMap jsonQuerySearchPages(UriInfo info, Class type, String search, int start, int pageSize, Object[] expArgs) throws WrongSearchException, Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
-        Map result = new LinkedHashMap();
+        LinkedHashMap result = new LinkedHashMap();
         List<Object> keys = new ArrayList();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
@@ -269,7 +269,7 @@ public class BlockExplorer {
             throw new WrongSearchException();
         }
 
-        makePage(type, keys, start, pageSize, result, langObj);
+        makePage(type, keys, start, pageSize, result, langObj, expArgs);
 
         return result;
     }
@@ -349,27 +349,31 @@ public class BlockExplorer {
                         break;
                     case "persons":
                         //search persons
-                        output.putAll(jsonQuerySearchPages(info, PersonCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, PersonCls.class, search, (int) start, pageSize, null));
                         break;
                     case "assets":
                         //search assets
-                        output.putAll(jsonQuerySearchPages(info, AssetCls.class, search, (int) start, pageSize));
+                        Object[] expArgs = new Object[2];
+                        expArgs[0] = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
+                        expArgs[1] = Controller.getInstance().dlSet.getPairMap();
+                        output.putAll(jsonQuerySearchPages(info, AssetCls.class, search, (int) start, pageSize, expArgs));
+
                         break;
                     case "statuses":
                         //search statuses
-                        output.putAll(jsonQuerySearchPages(info, StatusCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, StatusCls.class, search, (int) start, pageSize, null));
                         break;
                     case "templates":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(info, TemplateCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, TemplateCls.class, search, (int) start, pageSize, null));
                         break;
                     case "polls":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(info, PollCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, PollCls.class, search, (int) start, pageSize, null));
                         break;
                     case "blocks":
                         //search block
-                        output.putAll(jsonQuerySearchPages(info, Block.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, Block.class, search, (int) start, pageSize, null));
                         break;
                     case "top":
                         output.putAll(jsonQueryTopRichest100(100, Long.valueOf(search)));
@@ -386,7 +390,7 @@ public class BlockExplorer {
         // persons list
         else if (info.getQueryParameters().containsKey("persons")) {
             output.put("type", "persons");
-            output.putAll(jsonQueryPages(PersonCls.class, start, pageSize));
+            output.putAll(jsonQueryPages(PersonCls.class, start, pageSize, null));
         }
         // person
         else if (info.getQueryParameters().containsKey("person")) {
@@ -447,7 +451,7 @@ public class BlockExplorer {
             // polls list
         } else if (info.getQueryParameters().containsKey("polls")) {
             output.put("type", "polls");
-            output.putAll(jsonQueryPages(PollCls.class, start, pageSize));
+            output.putAll(jsonQueryPages(PollCls.class, start, pageSize, null));
         } else if (info.getQueryParameters().containsKey("poll")) {
             jsonQueryItemPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
                     info.getQueryParameters().getFirst("asset"));
@@ -458,7 +462,12 @@ public class BlockExplorer {
             output.putAll(jsonQueryTopRichest(info));
         } else if (info.getQueryParameters().containsKey("assets")) {
             output.put("type", "assets");
-            output.putAll(jsonQueryPages(AssetCls.class, start, pageSize));
+
+            Object[] expArgs = new Object[2];
+            expArgs[0] = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
+            expArgs[1] = Controller.getInstance().dlSet.getPairMap();
+            output.putAll(jsonQueryPages(AssetCls.class, start, pageSize, expArgs));
+
         } else if (info.getQueryParameters().containsKey("asset")) {
             if (info.getQueryParameters().get("asset").size() == 1) {
                 try {
@@ -496,7 +505,7 @@ public class BlockExplorer {
             ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
             output.put("type", "blocks");
-            output.putAll(jsonQueryPages(Block.BlockHead.class, (int) start, pageSize));
+            output.putAll(jsonQueryPages(Block.BlockHead.class, (int) start, pageSize, null));
         } else if (info.getQueryParameters().containsKey("block")) {
             jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int) start);
         }
@@ -531,7 +540,7 @@ public class BlockExplorer {
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
             output.put("type", "templates");
-            output.putAll(jsonQueryPages(TemplateCls.class, start, pageSize));
+            output.putAll(jsonQueryPages(TemplateCls.class, start, pageSize, null));
         }
         // template
         else if (info.getQueryParameters().containsKey("template")) {
@@ -542,7 +551,7 @@ public class BlockExplorer {
         // statuses list
         else if (info.getQueryParameters().containsKey("statuses")) {
             output.put("type", "statuses");
-            output.putAll(jsonQueryPages(StatusCls.class, start, pageSize));
+            output.putAll(jsonQueryPages(StatusCls.class, start, pageSize, null));
         }
         // status
         else if (info.getQueryParameters().containsKey("status")) {
@@ -2260,8 +2269,8 @@ public class BlockExplorer {
                 continue;
 
             Map pairJSON = new HashMap(32, 1);
-            pairJSON.put("have", assetHave.jsonForExplorerPage(langObj));
-            pairJSON.put("want", assetWant.jsonForExplorerPage(langObj));
+            pairJSON.put("have", assetHave.jsonForExplorerPage(langObj, null));
+            pairJSON.put("want", assetWant.jsonForExplorerPage(langObj, null));
 
             String key = assetHave.getName() + "_" + assetWant.getName();
 

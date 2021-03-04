@@ -1,12 +1,14 @@
 package org.erachain.core.item.assets;
 
 
+import org.erachain.controller.PairsController;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.database.PairMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
@@ -18,6 +20,7 @@ import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -2077,17 +2080,41 @@ public abstract class AssetCls extends ItemCls {
         return assetJSON;
     }
 
-    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+    public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
 
-
-        JSONObject assetJSON = super.jsonForExplorerPage(langObj);
-        assetJSON.put("assetTypeKey", this.assetType);
+        JSONObject assetJSON = super.jsonForExplorerPage(langObj, args);
+        //assetJSON.put("assetTypeKey", this.assetType);
         assetJSON.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
-        assetJSON.put("released", getReleased());
-        assetJSON.put("orders", getOperations(DCSet.getInstance()));
 
-        assetJSON.put("scale", this.getScale());
+        //assetJSON.put("orders", getOperations(DCSet.getInstance()));
+
+        //assetJSON.put("scale", this.getScale());
         assetJSON.put("quantity", this.getQuantity());
+
+        BigDecimal released = getReleased();
+        assetJSON.put("released", released);
+
+        if (args != null) {
+            // параметры для показа Объемов торгов
+            AssetCls quoteAsset = (AssetCls) args[0];
+            TradePair tradePair = PairsController.reCalcAndUpdate(this, quoteAsset, (PairMap) args[1], 10);
+            BigDecimal averagePrice = tradePair.getHighest_bidPrice()
+                                 .add(tradePair.getLower_askPrice())
+                                 .add(tradePair.getHighest_price_24h())
+                                 .add(tradePair.getLowest_price_24h())
+                                 .add(tradePair.getLastPrice())
+                    .multiply(new BigDecimal("0.2"));
+
+            BigDecimal marketCap = released.multiply(averagePrice);
+            assetJSON.put("marketCap", marketCap);
+            assetJSON.put("lastPrice", tradePair.getLastPrice());
+
+            assetJSON.put("changePrice", tradePair.getFirstPrice().signum() > 0?
+                    tradePair.getLastPrice().subtract(tradePair.getFirstPrice())
+                        .movePointRight(2).divide(tradePair.getFirstPrice(), 3, RoundingMode.DOWN)
+                    : 0.0);
+
+        }
 
         return assetJSON;
     }
