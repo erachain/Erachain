@@ -130,10 +130,16 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 if (info != null) {
                     Long port = (Long) info.get("port");
                     if (port != null) {
-                        return "<html><a href=#>" + peer.getHostName() + "</a>";
+                        // need for blockexplorer list:
+                        String url = peer.getScheme()
+                                + "://" + peer.getHostName()
+                                + ":" + peer.getWEBPort()
+                                + "/index/blockexplorer.html";
+
+                        return "<html><a href='" + url + "'>" + peer.getHostName() + "</a>";
                     }
                 }
-                return peer.getAddress().getHostName();
+                return peer.getHostName();
 
             case COLUMN_HEIGHT:
                 Tuple2<Integer, Long> res = peer.getHWeight(true);
