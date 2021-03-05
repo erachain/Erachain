@@ -46,6 +46,7 @@ public class APIItemPerson {
         help.put("Get apiperson/image/{key}", "GET Person Image");
         help.put("Get apiperson/icon/{key}", "GET Person Icon");
         help.put("Get apiperson/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
+        help.put("GET apiperson/text/{key", "Get description by ID");
 
         help.put("apiperson/balance/{personKey}/{assetKey}/{position}?side=[]side",
                 "Get Asset Key balance in Position [1..5] for Person Key. Balance Side =0 - total debit; =1 - left; =2 - total credit");
@@ -327,5 +328,29 @@ public class APIItemPerson {
                 .build();
     }
 
+    @GET
+    @Path("text/{key}")
+    public Response getText(@PathParam("key") Long key) {
+
+        if (key <= 0) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
+
+        // DOES EXIST
+        if (!map.contains(key)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        }
+
+        ItemCls item = map.get(key);
+
+        return Response.status(200).header("Content-Type", "text/plain; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(item.getDescription())
+                .build();
+    }
 
 }

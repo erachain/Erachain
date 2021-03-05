@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -158,8 +157,7 @@ public class PairsController {
         BigDecimal baseVolume = BigDecimal.ZERO;
         BigDecimal quoteVolume = BigDecimal.ZERO;
         long lastTime = 0;
-        BigDecimal price = null;
-        BigDecimal priceChangePercent24h = BigDecimal.ZERO;
+        BigDecimal price = BigDecimal.ZERO;
 
         boolean reversed;
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = (tradesMap.getPairIterator(key1, key2, heightStart, heightEnd))) {
@@ -203,18 +201,14 @@ public class PairsController {
                 }
 
                 // тут подсчет отклонения за сутки
-                if (price != null) {
-                    priceChangePercent24h = lastPrice.subtract(price).movePointRight(2).divide(price, 3, RoundingMode.DOWN);
-                }
             } else {
                 // за последние сутки не было сделок, значит смотрим просто последнюю цену
                 trade = tradesMap.getLastTrade(key1, key2);
                 if (trade != null) {
                     reversed = trade.getHaveKey().equals(key2);
-                    lastPrice = maxPrice = minPrice = reversed ? trade.calcPrice() : trade.calcPriceRevers();
-                    priceChangePercent24h = BigDecimal.ZERO;
+                    price = lastPrice = maxPrice = minPrice = reversed ? trade.calcPrice() : trade.calcPriceRevers();
                 } else {
-                    lastPrice = maxPrice = minPrice = BigDecimal.ZERO;
+                    price = lastPrice = maxPrice = minPrice = BigDecimal.ZERO;
                 }
             }
 
@@ -233,7 +227,7 @@ public class PairsController {
         int countOrdersAsk = ordersMap.getCountHave(key1, 100);
 
         return new TradePair(asset1, asset2, lastPrice, lastTime,
-                highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, priceChangePercent24h,
+                highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, price,
                 minPrice, maxPrice, count24, Block.getTimestamp(heightStart), countOrdersBid, countOrdersAsk);
 
     }
