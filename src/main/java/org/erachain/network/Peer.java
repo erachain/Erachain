@@ -330,6 +330,20 @@ public class Peer extends MonitoredThread {
         return null;
     }
 
+    public String getHostName() {
+        if (nodeInfo != null) {
+            return (String) nodeInfo.getOrDefault("host", nodeInfo.getOrDefault("host2", address.getHostName()));
+        }
+        return address.getHostName();
+    }
+
+    public String getScheme() {
+        if (nodeInfo != null) {
+            return (String) nodeInfo.getOrDefault("scheme", "http");
+        }
+        return "http";
+    }
+
     public String getBanMessage() {
         return banMessage;
     }
