@@ -260,7 +260,7 @@ public class WithdrawExchange extends IconPanel {
                 + ". " + Lang.T("Where You need to set only amount of withdraw asset in the panel for payment")
                 + ".</h3>"
                 + Lang.T("Minimal payment in equivalent")
-                + " <b>" + 0.0025 + " " + cryto + "</b>" + "<br>"
+                + " <b>" + 0.00025 + " " + cryto + "</b>" + "<br>"
                 //+ Lang.T("Service will take commission fee approx - %1%").replace("%1","2.75")
                 + Lang.T("Service will have some commission")
                 + "</html>");
@@ -309,7 +309,7 @@ public class WithdrawExchange extends IconPanel {
                             + ". " + Lang.T("Where You need to set only amount of withdraw asset in the panel for payment")
                             + ".</h3>"
                             + Lang.T("Minimal payment in equivalent")
-                            + " <b>" + 0.0025 + " " + cryto + "</b>" + "<br>"
+                            + " <b>" + 0.00025 + " " + cryto + "</b>" + "<br>"
                             //+ Lang.T("Service will take commission fee approx - %1%").replace("%1","2.75")
                             + Lang.T("Service will have some commission")
                     );
