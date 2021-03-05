@@ -331,9 +331,6 @@ public class Peer extends MonitoredThread {
     }
 
     public String getHostName() {
-        if (nodeInfo != null) {
-            return (String) nodeInfo.getOrDefault("host", nodeInfo.getOrDefault("host2", address.getHostName()));
-        }
         return address.getHostName();
     }
 
