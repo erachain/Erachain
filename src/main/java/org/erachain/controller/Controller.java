@@ -76,7 +76,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -1433,6 +1435,14 @@ public class Controller extends Observable {
             // разрешено всем - передадим его
             info.put("port", Settings.getInstance().getWebPort());
             info.put("scheme", Settings.getInstance().isWebUseSSL() ? "https" : "http");
+
+            try {
+                InetAddress localHost = InetAddress.getLocalHost();
+                info.put("host", localHost.getHostName());
+                info.put("host2", localHost.getCanonicalHostName());
+            } catch (UnknownHostException e) {
+            }
+
         }
         peerInfo.put("i", info);
 
