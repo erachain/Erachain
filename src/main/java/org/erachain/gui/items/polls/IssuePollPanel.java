@@ -3,6 +3,7 @@ package org.erachain.gui.items.polls;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.gui.items.IssueItemPanel;
+import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.CreateOptionsTableModel;
@@ -21,7 +22,7 @@ public class IssuePollPanel extends IssueItemPanel {
     private final MTable table;
 
     public IssuePollPanel() {
-        super(NAME, TITLE, "Poll issue has been sent", true);
+        super(NAME, TITLE, "Poll issue has been sent", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE);
 
         initComponents();
 

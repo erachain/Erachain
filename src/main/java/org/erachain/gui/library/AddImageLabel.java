@@ -110,6 +110,9 @@ public class AddImageLabel extends JPanel {
                     }
                     ImageIcon imageIcon = new ImageIcon(image);
                     mainLabel.setIcon(imageIcon);
+                    mainLabel.setPreferredSize(new Dimension(initialWidth, initialHeight));
+                    mainLabel.setMaximumSize(new Dimension(initialWidth, initialHeight));
+
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
                     try {
                         if (typeOfImage == TypeOfImage.GIF) {
@@ -173,6 +176,8 @@ public class AddImageLabel extends JPanel {
     public void set(byte[] imgBytes) {
         this.imgBytes = imgBytes;
         mainLabel.setIcon(new ImageIcon(imgBytes));
+        mainLabel.setPreferredSize(new Dimension(initialWidth, initialHeight));
+        mainLabel.setMaximumSize(new Dimension(initialWidth, initialHeight));
     }
 
     public byte[] getImgBytes() {
