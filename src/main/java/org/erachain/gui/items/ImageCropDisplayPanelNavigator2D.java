@@ -30,6 +30,8 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private java.util.List<ChangeListener> zoomListeners = new ArrayList<>();
 
     private double zoom = 1;
+    private double size = 1;
+
     private final int originalCropHeight;
     private final int originalCropWidth;
 
@@ -199,11 +201,11 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         }
         Point2D.Double zeroPoint = new Point2D.Double(0, 0);
         Point2D.Double pointZeroDst = new Point2D.Double();
-        currentTransform.transform(zeroPoint, pointZeroDst);
+        //currentTransform.transform(zeroPoint, pointZeroDst);
 
         Point2D.Double cropPointRightBottom = new Point2D.Double(cropX + cropWidth, cropY + cropHeight);
         Point2D.Double pointCropDstRightBottom = new Point2D.Double();
-        currentTransform.transform(cropPointRightBottom, pointCropDstRightBottom);
+        //currentTransform.transform(cropPointRightBottom, pointCropDstRightBottom);
         int shift = 0;
         try {
 
@@ -264,6 +266,13 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
     public double getZoom() {
         return zoom;
+    }
+
+    public void setSize(double new_size) {
+        if (new_size < 0.01) {
+            new_size = 0.01;
+        }
+        this.size = new_size;
     }
 
     public void setZoom(double new_zoom) {

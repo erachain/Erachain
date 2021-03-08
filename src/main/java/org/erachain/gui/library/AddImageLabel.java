@@ -103,46 +103,61 @@ public class AddImageLabel extends JPanel {
             File file = new File(chooser.getSelectedFile().getPath());
             new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage) {
                 @Override
-                public void onFinish(BufferedImage image) {
-                    if (image == null) {
+                public void onFinish(BufferedImage bufferedImage) {
+                    if (bufferedImage == null) {
                         logger.error("Image does not setup");
                         return;
                     }
-                    ImageIcon imageIcon = new ImageIcon(image);
+
+                    int h = bufferedImage.getHeight();
+                    int w = bufferedImage.getWidth();
+                    int ph = mainLabel.getPreferredSize().height;
+                    int pw = mainLabel.getPreferredSize().width;
+
+                    ImageIcon imageIcon;
+                    if (mainLabel.getPreferredSize().height < bufferedImage.getHeight()) {
+                        Image imagePack = bufferedImage.getScaledInstance(getPreferredSize().width, getPreferredSize().height,
+                                Image.SCALE_AREA_AVERAGING);
+                        imageIcon = new ImageIcon(imagePack);
+                    } else {
+                        imageIcon = new ImageIcon(bufferedImage);
+                    }
+
                     mainLabel.setIcon(imageIcon);
                     mainLabel.setPreferredSize(new Dimension(initialWidth, initialHeight));
                     mainLabel.setMaximumSize(new Dimension(initialWidth, initialHeight));
 
+
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
                     try {
                         if (typeOfImage == TypeOfImage.GIF) {
-                            ImageIO.write(image, "gif", imageStream);
+                            ImageIO.write(bufferedImage, "gif", imageStream);
                         } else if (typeOfImage == TypeOfImage.JPEG) {
-                            ImageIO.write(image, "jpeg", imageStream);
+                            ImageIO.write(bufferedImage, "jpeg", imageStream);
                         }
 
                         imgBytes = imageStream.toByteArray();
                         if (minSize > 0) {
-                            int templWidth = image.getWidth();
-                            int templHeight = image.getHeight();
+                            int templWidth = bufferedImage.getWidth();
+                            int templHeight = bufferedImage.getHeight();
                             int counter = 0;
                             while (imgBytes.length < minSize && counter++ < 100) {
                                 imageStream.reset();
                                 templWidth *= 1.2;
                                 templHeight *= 1.2;
-                                Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
+                                Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
                                 writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                             }
                         }
                         if (maxSize > 0) {
-                            int templWidth = image.getWidth();
-                            int templHeight = image.getHeight();
+                            int templWidth = bufferedImage.getWidth();
+                            int templHeight = bufferedImage.getHeight();
                             int counter = 0;
                             while (imgBytes.length > maxSize && counter++ < 100) {
                                 imageStream.reset();
                                 templWidth /= 1.2;
                                 templHeight /= 1.2;
-                                Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
+                                Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
                                 writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                             }
                         }
