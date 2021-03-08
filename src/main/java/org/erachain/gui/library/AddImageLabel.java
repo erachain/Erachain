@@ -43,7 +43,7 @@ public class AddImageLabel extends JPanel {
         this.bezelHeight = bezelHeight;
         this.initialWidth = initialWidth;
         this.initialHeight = initialHeight;
-        mainLabel.setIcon(createImageIcon(Color.WHITE, this.initialWidth, this.initialHeight));
+        mainLabel.setIcon(createEmptyImage(Color.WHITE, this.initialWidth, this.initialHeight));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
         setBorder(BorderFactory.createEtchedBorder());
         mainLabel.setVerticalAlignment(SwingConstants.TOP);
@@ -82,7 +82,7 @@ public class AddImageLabel extends JPanel {
         label.setHorizontalAlignment(alig);
     }
 
-    private ImageIcon createImageIcon(Color color, int width, int height) {
+    private ImageIcon createEmptyImage(Color color, int width, int height) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
         graphics.setPaint(color);
@@ -170,7 +170,7 @@ public class AddImageLabel extends JPanel {
 
     public void reset() {
         imgBytes = null;
-        mainLabel.setIcon(createImageIcon(Color.WHITE, initialWidth, initialHeight));
+        mainLabel.setIcon(createEmptyImage(Color.WHITE, initialWidth, initialHeight));
     }
 
     public void set(byte[] imgBytes) {

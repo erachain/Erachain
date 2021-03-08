@@ -26,7 +26,7 @@ public class ImageCropPanelNavigator2D extends JPanel {
         zoomSlider.addChangeListener(e -> imageCropDisplayPanelNavigator2D.setZoom(zoomSlider.getValue() / 100d));
         imageCropDisplayPanelNavigator2D.addZoomListener(e -> zoomSlider.setValue((int) (imageCropDisplayPanelNavigator2D.getZoom() * 100)));
         sliderPanel.add(zoomSlider, BorderLayout.NORTH);
-        frameSlider = new JSlider(JSlider.HORIZONTAL, 0, 30, 0);
+        frameSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
         frameSlider.setMajorTickSpacing(10);
         frameSlider.setMinorTickSpacing(1);
         frameSlider.setPaintTicks(true);

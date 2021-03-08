@@ -20,14 +20,17 @@ import java.util.ArrayList;
 
 public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private int cropY;
-    private final int cropHeight;
+    private int cropHeight;
     private int cropX;
     private int cropWidth;
+
+    private BufferedImage imageOrig;
     private BufferedImage image;
 
     private java.util.List<ChangeListener> zoomListeners = new ArrayList<>();
 
     private double zoom = 1;
+    private final int originalCropHeight;
     private final int originalCropWidth;
 
     private AffineTransform currentTransform = new AffineTransform();
@@ -40,16 +43,17 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, File imageFile, int cropWidth, int cropHeight) {
 
         setPreferredSize(new Dimension((int) (cropWidth * 2.0f), (int) (cropHeight * 1.5f)));
-        this.cropWidth = cropWidth;
-        this.originalCropWidth = cropWidth;
-        this.cropHeight = cropHeight;
+        this.cropWidth = this.originalCropWidth = cropWidth;
+        this.cropHeight = this.originalCropHeight = cropHeight;
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
         cropY = getPreferredSize().height / 2 - cropHeight / 2;
         try {
-            image = ImageIO.read(imageFile);
+            image = imageOrig = ImageIO.read(imageFile);
         } catch (IOException e) {
             logger.error("Error read image File in crop component", e);
+            return;
         }
+
         AffineTransform newTransformBegin = new AffineTransform();
         newTransformBegin.concatenate(AffineTransform.getTranslateInstance(
                 -image.getWidth() / 2 + cropX + cropWidth / 2,
@@ -235,8 +239,25 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     }
 
     public void setFrameRate(int value) {
-        cropWidth = originalCropWidth - originalCropWidth * value / 100;
-        cropX = getPreferredSize().width / 2 - cropWidth / 2;
+        if (value > 100) {
+            cropWidth = originalCropWidth * (220 - value) / 120;
+            cropX = getPreferredSize().width / 2 - cropWidth / 2;
+
+            cropHeight = originalCropHeight * 120 / (220 - value);
+            if (cropHeight > originalCropHeight * 1.3)
+                cropHeight = (int) (originalCropHeight * 1.3);
+            cropY = getPreferredSize().height / 2 - cropHeight / 2;
+
+        } else {
+            cropHeight = originalCropHeight * (20 + value) / 120;
+            cropY = getPreferredSize().height / 2 - cropHeight / 2;
+
+            cropWidth = originalCropWidth * 120 / (20 + value);
+            if (cropWidth > originalCropWidth * 1.6)
+                cropWidth = (int) (originalCropWidth * 1.6);
+            cropX = getPreferredSize().width / 2 - cropWidth / 2;
+
+        }
         //moveImageBy(0, 0);
     }
 

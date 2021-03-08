@@ -8,6 +8,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public abstract class ImageCropDialog extends JDialog {
+
+
     public ImageCropDialog(File imageFile, int cropWidth, int cropHeight, TypeOfImage typeOfImage) {
         JPanel contentPanel = new JPanel(new BorderLayout());
         ImageCropPanelNavigator2D imageCropPanel = new ImageCropPanelNavigator2D(imageFile, cropWidth, cropHeight);
