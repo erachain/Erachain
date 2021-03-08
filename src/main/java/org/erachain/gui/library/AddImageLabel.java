@@ -30,6 +30,7 @@ public class AddImageLabel extends JPanel {
     private Logger logger = LoggerFactory.getLogger(getClass());
     private JLabel label;
     private JLabel mainLabel = new JLabel();
+    private JLabel sizeLabel = new JLabel();
     private boolean editable = true;
 
     public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
@@ -39,6 +40,8 @@ public class AddImageLabel extends JPanel {
         label.setText(this.text);
         add(label, BorderLayout.NORTH);
         add(mainLabel, BorderLayout.CENTER);
+        add(sizeLabel, BorderLayout.AFTER_LAST_LINE);
+
         this.bezelWidth = bezelWidth;
         this.bezelHeight = bezelHeight;
         this.initialWidth = initialWidth;
@@ -58,6 +61,7 @@ public class AddImageLabel extends JPanel {
                 }
             }
         });
+
 
 
         JPopupMenu menu = new JPopupMenu();
@@ -111,9 +115,9 @@ public class AddImageLabel extends JPanel {
 
                     int bufferedWidth = bufferedImage.getWidth();
                     int preferredWidth = mainLabel.getPreferredSize().width;
-                    int sw = mainLabel.getSize().width;
 
                     ImageIcon imageIcon;
+                    // под размеры поля подгоним чтобы поле не обрезало каритнку
                     if (bufferedWidth > preferredWidth) {
                         float scaleView = (float) preferredWidth / bufferedWidth;
                         Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
@@ -133,6 +137,7 @@ public class AddImageLabel extends JPanel {
                         }
 
                         imgBytes = imageStream.toByteArray();
+
                         if (false && minSize > 0) {
                             int templWidth = bufferedImage.getWidth();
                             int templHeight = bufferedImage.getHeight();
@@ -156,7 +161,11 @@ public class AddImageLabel extends JPanel {
                                 Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
                                 writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                             }
+
                         }
+
+                        sizeLabel.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
+
                     } catch (Exception e) {
                         logger.error("Can not write image in ImageCropDialog dialog onFinish method", e);
                     }
