@@ -174,12 +174,10 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         drawRect(g2d, cropX - 4, cropY - 4, cropWidth + 8, cropHeight + 8, Color.BLACK);
     }
 
-
     private void drawRect(Graphics2D g2d, int x, int y, int width, int height, Color color) {
         g2d.setColor(color);
         g2d.drawRect(x, y, width, height);
     }
-
 
     public BufferedImage getSnapshot(TypeOfImage typeOfImage) {
         Point2D.Double pointSrcRightBottomImage = new Point2D.Double(image.getWidth(), image.getHeight());
@@ -201,11 +199,11 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         }
         Point2D.Double zeroPoint = new Point2D.Double(0, 0);
         Point2D.Double pointZeroDst = new Point2D.Double();
-        //currentTransform.transform(zeroPoint, pointZeroDst);
+        currentTransform.transform(zeroPoint, pointZeroDst);
 
         Point2D.Double cropPointRightBottom = new Point2D.Double(cropX + cropWidth, cropY + cropHeight);
         Point2D.Double pointCropDstRightBottom = new Point2D.Double();
-        //currentTransform.transform(cropPointRightBottom, pointCropDstRightBottom);
+        currentTransform.transform(cropPointRightBottom, pointCropDstRightBottom);
         int shift = 0;
         try {
 
@@ -214,22 +212,53 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             int width = cropWidth;
             int height = cropHeight;
 
-            if (pointZeroDst.x > cropX) {
+            if ((int) pointZeroDst.x > cropX) {
                 poinX = (int) pointZeroDst.x;
                 width = cropWidth - poinX + cropX;
             }
-            if (pointZeroDst.y > cropY) {
+            if ((int) pointZeroDst.y > cropY) {
                 poinY = (int) pointZeroDst.y;
                 height = cropHeight - poinY + cropY;
             }
 
-            if (pointDstRightBottomImage.x < poinX + width)
+            if ((int) pointDstRightBottomImage.x < poinX + width)
                 width = (int) pointDstRightBottomImage.x - poinX;
 
-            if (pointDstRightBottomImage.y < poinY + height)
+            if ((int) pointDstRightBottomImage.y < poinY + height)
                 height = (int) pointDstRightBottomImage.y - poinY;
 
-            return snapshot.getSubimage(poinX, poinY, width, height);
+            if (false) {
+                return snapshot.getSubimage(poinX + shift, poinY + shift, width - shift, height - shift);
+            } else {
+                int heightSnap = snapshot.getHeight();
+                int heightImage = image.getHeight();
+                int heightOrig = imageOrig.getHeight();
+                //float zoom2 = (float) heightSnap / heightOrig;
+
+                int cropX = (int) ((poinX - pointZeroDst.x + shift) / zoom);
+                if (cropX > imageOrig.getWidth()) {
+                    cropX = imageOrig.getWidth();
+                } else if (cropX < 0) {
+                    cropX = 0;
+                }
+
+                int cropY = (int) ((poinY - pointZeroDst.y + shift) / zoom);
+                if (cropY > imageOrig.getHeight()) {
+                    cropY = imageOrig.getHeight();
+                } else if (cropY < 0) {
+                    cropY = 0;
+                }
+
+                int cropWidth = (int) ((width - shift) / zoom);
+                if (cropWidth + cropX > imageOrig.getHeight())
+                    cropWidth = imageOrig.getHeight() - cropX;
+
+                int cropHeight = (int) ((height - shift) / zoom);
+                if (cropHeight + cropY > imageOrig.getWidth())
+                    cropHeight = imageOrig.getWidth() - cropY;
+
+                return imageOrig.getSubimage(cropX, cropY, cropWidth, cropHeight);
+            }
 
         } catch (RasterFormatException e) {
             logger.error("Error size of sub image", e);

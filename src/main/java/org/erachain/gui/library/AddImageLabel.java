@@ -109,14 +109,15 @@ public class AddImageLabel extends JPanel {
                         return;
                     }
 
-                    int h = bufferedImage.getHeight();
-                    int w = bufferedImage.getWidth();
-                    int ph = mainLabel.getPreferredSize().height;
-                    int pw = mainLabel.getPreferredSize().width;
+                    int bufferedWidth = bufferedImage.getWidth();
+                    int preferredWidth = mainLabel.getPreferredSize().width;
+                    int sw = mainLabel.getSize().width;
 
                     ImageIcon imageIcon;
-                    if (mainLabel.getPreferredSize().height < bufferedImage.getHeight()) {
-                        Image imagePack = bufferedImage.getScaledInstance(getPreferredSize().width, getPreferredSize().height,
+                    if (bufferedWidth > preferredWidth) {
+                        float scaleView = (float) preferredWidth / bufferedWidth;
+                        Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
+                                (int) (scaleView * bufferedImage.getHeight()),
                                 Image.SCALE_AREA_AVERAGING);
                         imageIcon = new ImageIcon(imagePack);
                     } else {
@@ -124,9 +125,6 @@ public class AddImageLabel extends JPanel {
                     }
 
                     mainLabel.setIcon(imageIcon);
-                    mainLabel.setPreferredSize(new Dimension(initialWidth, initialHeight));
-                    mainLabel.setMaximumSize(new Dimension(initialWidth, initialHeight));
-
 
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
                     try {
@@ -137,7 +135,7 @@ public class AddImageLabel extends JPanel {
                         }
 
                         imgBytes = imageStream.toByteArray();
-                        if (minSize > 0) {
+                        if (false && minSize > 0) {
                             int templWidth = bufferedImage.getWidth();
                             int templHeight = bufferedImage.getHeight();
                             int counter = 0;
@@ -149,7 +147,7 @@ public class AddImageLabel extends JPanel {
                                 writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                             }
                         }
-                        if (maxSize > 0) {
+                        if (false && maxSize > 0) {
                             int templWidth = bufferedImage.getWidth();
                             int templHeight = bufferedImage.getHeight();
                             int counter = 0;
@@ -191,8 +189,6 @@ public class AddImageLabel extends JPanel {
     public void set(byte[] imgBytes) {
         this.imgBytes = imgBytes;
         mainLabel.setIcon(new ImageIcon(imgBytes));
-        mainLabel.setPreferredSize(new Dimension(initialWidth, initialHeight));
-        mainLabel.setMaximumSize(new Dimension(initialWidth, initialHeight));
     }
 
     public byte[] getImgBytes() {
