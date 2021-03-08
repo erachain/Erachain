@@ -30,7 +30,6 @@ public class AddImageLabel extends JPanel {
     private Logger logger = LoggerFactory.getLogger(getClass());
     private JLabel label;
     private JLabel mainLabel = new JLabel();
-    private JLabel sizeLabel = new JLabel();
     private boolean editable = true;
 
     public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
@@ -40,7 +39,6 @@ public class AddImageLabel extends JPanel {
         label.setText(this.text);
         add(label, BorderLayout.NORTH);
         add(mainLabel, BorderLayout.CENTER);
-        add(sizeLabel, BorderLayout.AFTER_LAST_LINE);
 
         this.bezelWidth = bezelWidth;
         this.bezelHeight = bezelHeight;
@@ -61,8 +59,6 @@ public class AddImageLabel extends JPanel {
                 }
             }
         });
-
-
 
         JPopupMenu menu = new JPopupMenu();
         JMenuItem resetMenu = new JMenuItem(Lang.T("Reset"));
@@ -128,6 +124,8 @@ public class AddImageLabel extends JPanel {
                         imageIcon = new ImageIcon(bufferedImage);
                     }
 
+                    mainLabel.setIcon(imageIcon);
+
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
                     try {
                         if (typeOfImage == TypeOfImage.GIF) {
@@ -138,10 +136,11 @@ public class AddImageLabel extends JPanel {
 
                         imgBytes = imageStream.toByteArray();
 
-                        if (false && minSize > 0) {
-                            int templWidth = bufferedImage.getWidth();
-                            int templHeight = bufferedImage.getHeight();
-                            int counter = 0;
+                        int templWidth = bufferedImage.getWidth();
+                        int templHeight = bufferedImage.getHeight();
+                        int counter = 0;
+
+                        if (false && minSize > 0 && imgBytes.length < minSize) {
                             while (imgBytes.length < minSize && counter++ < 100) {
                                 imageStream.reset();
                                 templWidth *= 1.2;
@@ -149,11 +148,8 @@ public class AddImageLabel extends JPanel {
                                 Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
                                 writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                             }
-                        }
-                        if (false && maxSize > 0) {
-                            int templWidth = bufferedImage.getWidth();
-                            int templHeight = bufferedImage.getHeight();
-                            int counter = 0;
+
+                        } else if (false && maxSize > 0 && imgBytes.length > maxSize) {
                             while (imgBytes.length > maxSize && counter++ < 100) {
                                 imageStream.reset();
                                 templWidth /= 1.2;
@@ -162,15 +158,19 @@ public class AddImageLabel extends JPanel {
                                 writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                             }
 
+                        } else if (false) {
+                            // преобразуем GIF с прозрачным фоном в непрозрачный если надо
+                            // это может понядобиться если Оригинальный размер картинки взяли и не было преобразования в snapshot в ImageCropDisplayPanelNavigator2D.getSnapshot
+                            Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
+                            writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
+
                         }
 
-                        sizeLabel.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
+                        label.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
 
                     } catch (Exception e) {
                         logger.error("Can not write image in ImageCropDialog dialog onFinish method", e);
                     }
-
-                    mainLabel.setIcon(imageIcon);
 
                 }
 
