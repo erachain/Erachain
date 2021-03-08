@@ -130,7 +130,7 @@ public class AddImageLabel extends JPanel {
                     try {
                         if (typeOfImage == TypeOfImage.GIF) {
                             ImageIO.write(bufferedImage, "gif", imageStream);
-                        } else if (typeOfImage == TypeOfImage.JPEG) {
+                        } else {
                             ImageIO.write(bufferedImage, "jpeg", imageStream);
                         }
 
@@ -158,12 +158,11 @@ public class AddImageLabel extends JPanel {
                                 writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                             }
 
-                        } else if (false) {
+                        } else if (false && typeOfImage == TypeOfImage.JPEG) {
                             // преобразуем GIF с прозрачным фоном в непрозрачный если надо
-                            // это может понядобиться если Оригинальный размер картинки взяли и не было преобразования в snapshot в ImageCropDisplayPanelNavigator2D.getSnapshot
+                            // это может понадобиться если Оригинальный размер картинки взяли и не было преобразования в snapshot в ImageCropDisplayPanelNavigator2D.getSnapshot
                             Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
                             writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
-
                         }
 
                         label.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
@@ -182,7 +181,7 @@ public class AddImageLabel extends JPanel {
                         ImageIO.write(image, "gif", imageStream);
                     } else {
                         image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_RGB);
-                        image.getGraphics().drawImage(scaledImage, 0, 0, null);
+                        image.getGraphics().drawImage(scaledImage, 0, 0, Color.WHITE, null);
                         ImageIO.write(image, "jpeg", imageStream);
                     }
                     imgBytes = imageStream.toByteArray();

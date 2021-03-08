@@ -229,38 +229,52 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             if (originalSize) {
                 // get size of Original IMAGE
 
-                int cropX = (int) ((poinX - pointZeroDst.x + shift) / zoom);
+                int cropX = (int) ((poinX - pointZeroDst.x) / zoom) - 1; // нужно для сглаживания округлений
                 if (cropX > image.getWidth()) {
                     cropX = image.getWidth();
                 } else if (cropX < 0) {
                     cropX = 0;
                 }
 
-                int cropY = (int) ((poinY - pointZeroDst.y + shift) / zoom);
+                int cropY = (int) ((poinY - pointZeroDst.y) / zoom) - 1; // нужно для сглаживания округлений
                 if (cropY > image.getHeight()) {
                     cropY = image.getHeight();
                 } else if (cropY < 0) {
                     cropY = 0;
                 }
 
-                int cropWidth = (int) ((width - shift) / zoom);
-                if (cropWidth + cropX > image.getHeight())
-                    cropWidth = image.getHeight() - cropX;
+                int cropWidth = (int) ((width) / zoom) + 1; // нужно для сглаживания округлений
+                if (cropWidth + cropX > image.getWidth())
+                    cropWidth = image.getWidth() - cropX;
 
-                int cropHeight = (int) ((height - shift) / zoom);
-                if (cropHeight + cropY > image.getWidth())
-                    cropHeight = image.getWidth() - cropY;
+                int cropHeight = (int) ((height) / zoom) + 1; // нужно для сглаживания округлений
+                if (cropHeight + cropY > image.getHeight())
+                    cropHeight = image.getHeight() - cropY;
 
-                return image.getSubimage(cropX, cropY, cropWidth, cropHeight);
+                BufferedImage cropedImage;
+                if (cropX == 0 && cropY == 0 && cropWidth == image.getWidth() && cropHeight == image.getHeight()) {
+                    cropedImage = image;
+                } else {
+                    cropedImage = image.getSubimage(cropX, cropY, cropWidth, cropHeight);
+                }
+
+                if (typeOfImage == TypeOfImage.JPEG) {
+                    // надо преобразовать если это была ГИФка - иначе цвета съезжают
+                    snapshot = new BufferedImage(cropedImage.getWidth(), cropedImage.getHeight(), type);
+                    g2d = (Graphics2D) snapshot.getGraphics();
+                    g2d.drawImage(image, 0, 0, Color.WHITE, this);
+                    return snapshot;
+                }
+                return cropedImage;
+
+
             } else {
                 return snapshot.getSubimage(poinX + shift, poinY + shift, width - shift, height - shift);
             }
 
         } catch (RasterFormatException e) {
             logger.error("Error size of sub image", e);
-            return snapshot.getSubimage((int) pointZeroDst.x + shift, (int) pointZeroDst.y + shift,
-                    snapshot.getWidth() - (int) pointZeroDst.x - shift,
-                    snapshot.getHeight() - (int) pointZeroDst.y - shift);
+            return image;
         }
 
     }

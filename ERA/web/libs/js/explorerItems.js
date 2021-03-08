@@ -4,7 +4,7 @@ function itemHead(item, forPrint) {
     var type = item.item_type;
 
     if (item.image) {
-        output += '<td><img src="data:image/gif;base64,' + item.image + '" width = "350" /></td><td style ="width: 70%; padding-left:20px">';
+        output += '<td><a href="#" ><img src="data:image/gif;base64,' + item.image + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
         output += '<br>';
     }
 
