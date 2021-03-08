@@ -200,7 +200,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         Point2D.Double cropPointRightBottom = new Point2D.Double(cropX + cropWidth, cropY + cropHeight);
         Point2D.Double pointCropDstRightBottom = new Point2D.Double();
         currentTransform.transform(cropPointRightBottom, pointCropDstRightBottom);
-        int shift = 2;
+        int shift = 0;
         try {
 
             int poinX = cropX;
