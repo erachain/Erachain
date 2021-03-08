@@ -20,7 +20,7 @@ public class IssueStatusPanel extends IssueItemPanel {
 
 
     public IssueStatusPanel() {
-        super(NAME, TITLE, "Status issue has been sent", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, false);
+        super(NAME, TITLE, "Status issue has been sent", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true);
 
         initComponents();
 
