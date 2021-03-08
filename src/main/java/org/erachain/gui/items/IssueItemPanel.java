@@ -61,7 +61,7 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JTextField exLinkDescription = new JTextField();
     boolean useIcon;
 
-    public IssueItemPanel(String name, String title, String issueMess, boolean useIcon, int cropWidth, int cropHeight) {
+    public IssueItemPanel(String name, String title, String issueMess, boolean useIcon, int cropWidth, int cropHeight, boolean originalSize) {
         super(name, title);
 
         this.useIcon = useIcon;
@@ -72,13 +72,13 @@ public abstract class IssueItemPanel extends IconPanel {
 
         addLogoIconLabel = new AddImageLabel(Lang.T("Add Logo"),
                 WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
-                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
+                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL, false);
         addLogoIconLabel.setBorder(null);
         addLogoIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
 
         addImageLabel = new AddImageLabel(
                 Lang.T("Add image"), cropWidth, cropHeight, TypeOfImage.JPEG,
-                0, ItemCls.MAX_IMAGE_LENGTH, cropWidth >> 1, cropHeight >> 1);
+                0, ItemCls.MAX_IMAGE_LENGTH, cropWidth >> 1, cropHeight >> 1, originalSize);
         addImageLabel.setBorder(null);
         addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
 

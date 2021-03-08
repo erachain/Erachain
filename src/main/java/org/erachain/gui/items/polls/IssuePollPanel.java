@@ -22,7 +22,7 @@ public class IssuePollPanel extends IssueItemPanel {
     private final MTable table;
 
     public IssuePollPanel() {
-        super(NAME, TITLE, "Poll issue has been sent", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE);
+        super(NAME, TITLE, "Poll issue has been sent", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true);
 
         initComponents();
 

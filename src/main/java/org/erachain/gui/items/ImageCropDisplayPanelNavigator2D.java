@@ -24,7 +24,6 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private int cropX;
     private int cropWidth;
 
-    private BufferedImage imageOrig;
     private BufferedImage image;
 
     private java.util.List<ChangeListener> zoomListeners = new ArrayList<>();
@@ -50,7 +49,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
         cropY = getPreferredSize().height / 2 - cropHeight / 2;
         try {
-            image = imageOrig = ImageIO.read(imageFile);
+            image = ImageIO.read(imageFile);
         } catch (IOException e) {
             logger.error("Error read image File in crop component", e);
             return;
@@ -179,7 +178,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         g2d.drawRect(x, y, width, height);
     }
 
-    public BufferedImage getSnapshot(TypeOfImage typeOfImage) {
+    public BufferedImage getSnapshot(TypeOfImage typeOfImage, boolean originalSize) {
         Point2D.Double pointSrcRightBottomImage = new Point2D.Double(image.getWidth(), image.getHeight());
         Point2D.Double pointDstRightBottomImage = new Point2D.Double();
         currentTransform.transform(pointSrcRightBottomImage, pointDstRightBottomImage);
@@ -227,37 +226,34 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             if ((int) pointDstRightBottomImage.y < poinY + height)
                 height = (int) pointDstRightBottomImage.y - poinY;
 
-            if (false) {
-                return snapshot.getSubimage(poinX + shift, poinY + shift, width - shift, height - shift);
-            } else {
-                int heightSnap = snapshot.getHeight();
-                int heightImage = image.getHeight();
-                int heightOrig = imageOrig.getHeight();
-                //float zoom2 = (float) heightSnap / heightOrig;
+            if (originalSize) {
+                // get size of Original IMAGE
 
                 int cropX = (int) ((poinX - pointZeroDst.x + shift) / zoom);
-                if (cropX > imageOrig.getWidth()) {
-                    cropX = imageOrig.getWidth();
+                if (cropX > image.getWidth()) {
+                    cropX = image.getWidth();
                 } else if (cropX < 0) {
                     cropX = 0;
                 }
 
                 int cropY = (int) ((poinY - pointZeroDst.y + shift) / zoom);
-                if (cropY > imageOrig.getHeight()) {
-                    cropY = imageOrig.getHeight();
+                if (cropY > image.getHeight()) {
+                    cropY = image.getHeight();
                 } else if (cropY < 0) {
                     cropY = 0;
                 }
 
                 int cropWidth = (int) ((width - shift) / zoom);
-                if (cropWidth + cropX > imageOrig.getHeight())
-                    cropWidth = imageOrig.getHeight() - cropX;
+                if (cropWidth + cropX > image.getHeight())
+                    cropWidth = image.getHeight() - cropX;
 
                 int cropHeight = (int) ((height - shift) / zoom);
-                if (cropHeight + cropY > imageOrig.getWidth())
-                    cropHeight = imageOrig.getWidth() - cropY;
+                if (cropHeight + cropY > image.getWidth())
+                    cropHeight = image.getWidth() - cropY;
 
-                return imageOrig.getSubimage(cropX, cropY, cropWidth, cropHeight);
+                return image.getSubimage(cropX, cropY, cropWidth, cropHeight);
+            } else {
+                return snapshot.getSubimage(poinX + shift, poinY + shift, width - shift, height - shift);
             }
 
         } catch (RasterFormatException e) {

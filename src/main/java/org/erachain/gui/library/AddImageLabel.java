@@ -32,7 +32,7 @@ public class AddImageLabel extends JPanel {
     private JLabel mainLabel = new JLabel();
     private boolean editable = true;
 
-    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight) {
+    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
         setLayout(new BorderLayout());
         this.text = text;
         label = new JLabel("The Label", SwingConstants.CENTER);
@@ -53,7 +53,7 @@ public class AddImageLabel extends JPanel {
             public void mousePressed(MouseEvent e) {
                 if (editable) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
-                        addImage(typeOfImage, minSize, maxSize);
+                        addImage(typeOfImage, minSize, maxSize, originalSize);
                     }
                 }
             }
@@ -90,7 +90,7 @@ public class AddImageLabel extends JPanel {
         return new ImageIcon(image);
     }
 
-    private void addImage(TypeOfImage typeOfImage, int minSize, int maxSize) {
+    private void addImage(TypeOfImage typeOfImage, int minSize, int maxSize, boolean originalSize) {
         // открыть диалог для файла
         FileChooser chooser = new FileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -101,7 +101,7 @@ public class AddImageLabel extends JPanel {
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = new File(chooser.getSelectedFile().getPath());
-            new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage) {
+            new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage, originalSize) {
                 @Override
                 public void onFinish(BufferedImage bufferedImage) {
                     if (bufferedImage == null) {
@@ -123,8 +123,6 @@ public class AddImageLabel extends JPanel {
                     } else {
                         imageIcon = new ImageIcon(bufferedImage);
                     }
-
-                    mainLabel.setIcon(imageIcon);
 
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
                     try {
@@ -162,6 +160,9 @@ public class AddImageLabel extends JPanel {
                     } catch (Exception e) {
                         logger.error("Can not write image in ImageCropDialog dialog onFinish method", e);
                     }
+
+                    mainLabel.setIcon(imageIcon);
+
                 }
 
                 private void writeImage(ByteArrayOutputStream imageStream, int templWidth, int templHeight, Image scaledImage, TypeOfImage typeOfImage) throws IOException {

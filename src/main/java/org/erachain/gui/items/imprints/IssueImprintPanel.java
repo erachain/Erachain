@@ -24,7 +24,7 @@ public class IssueImprintPanel extends IssueItemPanel {
     private JTextField txtAmount;
 
     public IssueImprintPanel() {
-        super(NAME, TITLE, "Imprint issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE);
+        super(NAME, TITLE, "Imprint issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, false);
 
         initComponents();
 

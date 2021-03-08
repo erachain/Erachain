@@ -49,7 +49,7 @@ public class ImageCropPanelNavigator2D extends JPanel {
     }
 
 
-    public BufferedImage getSnapshot(TypeOfImage typeOfImage) {
-        return imageCropDisplayPanelNavigator2D.getSnapshot(typeOfImage);
+    public BufferedImage getSnapshot(TypeOfImage typeOfImage, boolean originalSize) {
+        return imageCropDisplayPanelNavigator2D.getSnapshot(typeOfImage, originalSize);
     }
 }

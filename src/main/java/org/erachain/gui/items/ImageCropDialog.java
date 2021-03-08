@@ -10,7 +10,7 @@ import java.io.File;
 public abstract class ImageCropDialog extends JDialog {
 
 
-    public ImageCropDialog(File imageFile, int cropWidth, int cropHeight, TypeOfImage typeOfImage) {
+    public ImageCropDialog(File imageFile, int cropWidth, int cropHeight, TypeOfImage typeOfImage, boolean originalSize) {
         JPanel contentPanel = new JPanel(new BorderLayout());
         ImageCropPanelNavigator2D imageCropPanel = new ImageCropPanelNavigator2D(imageFile, cropWidth, cropHeight);
         contentPanel.add(imageCropPanel, BorderLayout.CENTER);
@@ -19,7 +19,7 @@ public abstract class ImageCropDialog extends JDialog {
         c.gridx = 0;
         JButton okButton = new JButton("OK");
         okButton.addActionListener(e -> {
-            BufferedImage snapshot = imageCropPanel.getSnapshot(typeOfImage);
+            BufferedImage snapshot = imageCropPanel.getSnapshot(typeOfImage, originalSize);
             onFinish(snapshot);
             dispose();
         });

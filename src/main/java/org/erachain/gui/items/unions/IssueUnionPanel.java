@@ -36,7 +36,7 @@ public class IssueUnionPanel extends IssueItemPanel {
     private JLabel parentJLabel = new JLabel();
 
     public IssueUnionPanel() {
-        super(NAME, TITLE, "Union issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE);
+        super(NAME, TITLE, "Union issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, false);
 
         initComponents();
 
