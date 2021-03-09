@@ -259,9 +259,12 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
                 Image imagePack;
                 if (imgSize < 0.98) {
+                    int sss = croppedImage.getWidth();
+                    sss = (int) (croppedImage.getWidth() * imgSize);
                     imagePack = croppedImage.getScaledInstance((int) (croppedImage.getWidth() * imgSize),
                             (int) (croppedImage.getHeight() * imgSize),
                             Image.SCALE_AREA_AVERAGING);
+                    sss = imagePack.getWidth(null);
                 } else {
                     imagePack = croppedImage;
                 }
@@ -273,7 +276,10 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                     g2d.drawImage(imagePack, 0, 0, Color.WHITE, this);
                     return snapshot;
                 }
-                return croppedImage;
+                snapshot = new BufferedImage(imagePack.getWidth(null), imagePack.getHeight(null), type);
+                g2d = (Graphics2D) snapshot.getGraphics();
+                g2d.drawImage(imagePack, 0, 0, this);
+                return snapshot;
 
 
             } else {
