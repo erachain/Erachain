@@ -37,6 +37,8 @@ public abstract class FavoriteItemModelTable extends WalletItemTableModel implem
         DELETE_EVENT = deleteObserver;
         LIST_EVENT = listObserver;
 
+        step = 500;
+
         // теперь нужно опять послать событие чтобы загрузить
         getInterval();
         fireTableDataChanged();
@@ -47,8 +49,8 @@ public abstract class FavoriteItemModelTable extends WalletItemTableModel implem
 
     }
 
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
+    @Override
+    public void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
@@ -80,12 +82,12 @@ public abstract class FavoriteItemModelTable extends WalletItemTableModel implem
         int count = 0;
         list = new ArrayList<>();
         if (startKey == null) {
-            try (IteratorCloseable iterator = favoriteMap.getIterator()) {
+            try (IteratorCloseable iterator = favoriteMap.getDescIterator()) {
                 while (iterator.hasNext() && count < step) {
                     key = iterator.next();
                     Object item = map.get(key);
                     if (item == null)
-                        // это может бюыть так как пока еще не вся цепочка засосалась но Избранные уже заданы
+                        // это может быть так как пока еще не вся цепочка засосалась но Избранные уже заданы
                         continue;
                     list.add(item);
                     count++; // только теперь счетчик увеличим - иначе пустые сбивают счет
@@ -93,14 +95,15 @@ public abstract class FavoriteItemModelTable extends WalletItemTableModel implem
             } catch (IOException e) {
             }
         } else {
-            try (IteratorCloseable iterator = favoriteMap.getIterator()) {
-                while (iterator.hasNext() && count++ < step) {
+            try (IteratorCloseable iterator = favoriteMap.getDescIterator()) {
+                while (iterator.hasNext() && count < step) {
                     key = iterator.next();
                     Object item = map.get(key);
                     if (item == null)
-                        // это может бюыть так как пока еще не вся цепочка засосалась но Избранные уже заданы
+                        // это может быть так как пока еще не вся цепочка засосалась но Избранные уже заданы
                         continue;
                     list.add(item);
+                    count++; // только теперь счетчик увеличим - иначе пустые сбивают счет
                 }
             } catch (IOException e) {
             }

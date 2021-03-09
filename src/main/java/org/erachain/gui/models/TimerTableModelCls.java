@@ -182,21 +182,30 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
     public void getInterval() {
         Object key;
+        U item;
         int count = 0;
         list = new ArrayList<>();
         if (startKey == null) {
             try (IteratorCloseable iterator = map.getIterator(0, descending)) {
-                while (iterator.hasNext() && count++ < step) {
+                while (iterator.hasNext() && count < step) {
                     key = iterator.next();
-                    list.add((U) map.get(key));
+                    item = (U) map.get(key);
+                    if (item == null)
+                        continue;
+                    list.add(item);
+                    count++;
                 }
             } catch (IOException e) {
             }
         } else {
             try (IteratorCloseable iterator = map.getIterator(0, descending)) {
-                while (iterator.hasNext() && count++ < step) {
+                while (iterator.hasNext() && count < step) {
                     key = iterator.next();
-                    list.add((U) map.get(key));
+                    item = (U) map.get(key);
+                    if (item == null)
+                        continue;
+                    list.add(item);
+                    count++;
                 }
             } catch (IOException e) {
             }
