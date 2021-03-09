@@ -101,6 +101,7 @@ public class AddImageLabel extends JPanel {
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = new File(chooser.getSelectedFile().getPath());
+            typeOfImage = file.getName().endsWith("jpg") || file.getName().endsWith("jpeg") ? TypeOfImage.JPEG : TypeOfImage.GIF;
             new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage, originalSize) {
                 @Override
                 public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage) {
