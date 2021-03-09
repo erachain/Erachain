@@ -47,6 +47,9 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         this.parent = parent;
         this.cropWidth = cropWidth;
 
+        this.cropWidth = this.originalCropWidth = cropWidth;
+        this.cropHeight = this.originalCropHeight = cropHeight;
+
         try {
             image = ImageIO.read(imageFile);
         } catch (IOException e) {
@@ -54,19 +57,26 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             return;
         }
 
-        init(cropWidth, cropHeight);
+        init();
 
     }
 
-    public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, BufferedImage image, int cropWidth, int cropHeight) {
+    public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, ImageIcon imageIcon, int cropWidth, int cropHeight) {
 
         this.parent = parent;
-        this.image = image;
 
-        init(cropWidth, cropHeight);
+        image = new BufferedImage(cropWidth, cropHeight, BufferedImage.TYPE_INT_ARGB);
+        image.getGraphics().drawImage(imageIcon.getImage(), 0, 0, null);
+
+        //this.image = image;
+
+        this.cropWidth = this.originalCropWidth = cropWidth;
+        this.cropHeight = this.originalCropHeight = cropHeight;
+
+        init();
     }
 
-    public void init(int cropWidth, int cropHeight) {
+    public void init() {
 
         setPreferredSize(new Dimension((int) (cropWidth * 2.0f), (int) (cropHeight * 1.5f)));
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
@@ -178,7 +188,9 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         graphics2D.transform(currentTransform);
         graphics2D.drawImage(image, 0, 0, null);
         graphics2D.setTransform(new AffineTransform());
-        drawFrame(graphics2D);
+
+        if (parent.frameSlider != null)
+            drawFrame(graphics2D);
     }
 
     private void drawFrame(Graphics2D g2d) {

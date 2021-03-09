@@ -65,6 +65,25 @@ public class ImageCropPanelNavigator2D extends JPanel {
 
     }
 
+    public ImageCropPanelNavigator2D(ImageIcon image) {
+        setLayout(new BorderLayout());
+
+        imageCropDisplayPanelNavigator2D = new ImageCropDisplayPanelNavigator2D(this, image, 400, 500);
+
+        add(imageCropDisplayPanelNavigator2D, BorderLayout.CENTER);
+
+        JPanel sliderPanel = new JPanel(new BorderLayout());
+        add(sliderPanel, BorderLayout.SOUTH);
+
+        zoomSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
+        zoomSlider.setMajorTickSpacing(50);
+        zoomSlider.setMinorTickSpacing(10);
+        zoomSlider.setPaintTicks(true);
+        zoomSlider.addChangeListener(e -> imageCropDisplayPanelNavigator2D.setZoom(zoomSlider.getValue() / 100d));
+        imageCropDisplayPanelNavigator2D.addListener(e -> zoomSlider.setValue((int) (imageCropDisplayPanelNavigator2D.getZoom() * 100)));
+        sliderPanel.add(zoomSlider, BorderLayout.CENTER);
+
+    }
 
     public BufferedImage getSnapshot(TypeOfImage typeOfImage) {
         return imageCropDisplayPanelNavigator2D.getSnapshot(typeOfImage, originalSize);
