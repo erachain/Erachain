@@ -1,5 +1,7 @@
 package org.erachain.gui.items;
 
+import org.erachain.lang.Lang;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,12 +14,15 @@ public class ImageCropPanelNavigator2D extends JPanel {
     public JSlider zoomSlider;
     public JSlider frameSlider;
 
+    public JCheckBox asGif = new JCheckBox(Lang.T("as GIF/PNG with transparent background"));
+
     private boolean originalSize;
 
-    public ImageCropPanelNavigator2D(File imageFile, int cropWidth, int cropHeight, boolean originalSize) {
+    public ImageCropPanelNavigator2D(File imageFile, int cropWidth, int cropHeight, boolean originalSize, TypeOfImage typeOfImage) {
         setLayout(new BorderLayout());
 
         this.originalSize = originalSize;
+        this.asGif.setSelected(typeOfImage == TypeOfImage.GIF);
 
         imageCropDisplayPanelNavigator2D = new ImageCropDisplayPanelNavigator2D(this, imageFile, cropWidth, cropHeight);
 
@@ -36,6 +41,9 @@ public class ImageCropPanelNavigator2D extends JPanel {
 
         JPanel sliderPanel = new JPanel(new BorderLayout());
         add(sliderPanel, BorderLayout.SOUTH);
+
+        add(asGif, BorderLayout.NORTH);
+
         zoomSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
         zoomSlider.setMajorTickSpacing(50);
         zoomSlider.setMinorTickSpacing(10);

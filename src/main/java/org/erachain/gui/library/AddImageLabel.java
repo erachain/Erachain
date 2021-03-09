@@ -103,7 +103,7 @@ public class AddImageLabel extends JPanel {
             File file = new File(chooser.getSelectedFile().getPath());
             new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage, originalSize) {
                 @Override
-                public void onFinish(BufferedImage bufferedImage) {
+                public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage) {
                     if (bufferedImage == null) {
                         logger.error("Image does not setup");
                         return;
@@ -128,6 +128,7 @@ public class AddImageLabel extends JPanel {
                     mainLabel.setIcon(imageIcon);
 
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
+
                     try {
                         if (typeOfImage == TypeOfImage.GIF) {
                             ImageIO.write(bufferedImage, "gif", imageStream);
