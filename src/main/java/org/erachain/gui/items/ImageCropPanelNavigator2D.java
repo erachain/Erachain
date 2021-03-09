@@ -28,8 +28,7 @@ public class ImageCropPanelNavigator2D extends JPanel {
             sizeSlider.setMajorTickSpacing(20);
             sizeSlider.setMinorTickSpacing(5);
             sizeSlider.setPaintTicks(true);
-            sizeSlider.addChangeListener(e -> imageCropDisplayPanelNavigator2D.setZoom(sizeSlider.getValue() / 100d));
-            imageCropDisplayPanelNavigator2D.addZoomListener(e -> sizeSlider.setValue((int) (imageCropDisplayPanelNavigator2D.getZoom() * 100)));
+            sizeSlider.addChangeListener(e -> imageCropDisplayPanelNavigator2D.setImgSize(sizeSlider.getValue() / 100d));
             add(sizeSlider, BorderLayout.WEST);
         }
 
@@ -42,8 +41,9 @@ public class ImageCropPanelNavigator2D extends JPanel {
         zoomSlider.setMinorTickSpacing(10);
         zoomSlider.setPaintTicks(true);
         zoomSlider.addChangeListener(e -> imageCropDisplayPanelNavigator2D.setZoom(zoomSlider.getValue() / 100d));
-        imageCropDisplayPanelNavigator2D.addZoomListener(e -> zoomSlider.setValue((int) (imageCropDisplayPanelNavigator2D.getZoom() * 100)));
+        imageCropDisplayPanelNavigator2D.addListener(e -> zoomSlider.setValue((int) (imageCropDisplayPanelNavigator2D.getZoom() * 100)));
         sliderPanel.add(zoomSlider, BorderLayout.NORTH);
+
         frameSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
         frameSlider.setMajorTickSpacing(50);
         frameSlider.setMinorTickSpacing(10);

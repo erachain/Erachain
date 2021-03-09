@@ -111,6 +111,7 @@ public class AddImageLabel extends JPanel {
 
                     int bufferedWidth = bufferedImage.getWidth();
                     int preferredWidth = mainLabel.getPreferredSize().width;
+                    preferredWidth = 250;
 
                     ImageIcon imageIcon;
                     // под размеры поля подгоним чтобы поле не обрезало каритнку

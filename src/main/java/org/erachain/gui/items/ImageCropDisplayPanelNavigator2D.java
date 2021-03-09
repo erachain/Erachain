@@ -26,10 +26,10 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
     private BufferedImage image;
 
-    private java.util.List<ChangeListener> zoomListeners = new ArrayList<>();
+    private java.util.List<ChangeListener> listeners = new ArrayList<>();
 
     private double zoom = 1;
-    private double size = 1;
+    private double imgSize = 1;
 
     private final int originalCropHeight;
     private final int originalCropWidth;
@@ -203,7 +203,6 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         Point2D.Double cropPointRightBottom = new Point2D.Double(cropX + cropWidth, cropY + cropHeight);
         Point2D.Double pointCropDstRightBottom = new Point2D.Double();
         currentTransform.transform(cropPointRightBottom, pointCropDstRightBottom);
-        int shift = 0;
         try {
 
             int poinX = cropX;
@@ -212,11 +211,11 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             int height = cropHeight;
 
             if ((int) pointZeroDst.x > cropX) {
-                poinX = (int) pointZeroDst.x;
+                poinX = (int) pointZeroDst.x + 1; // нужно для сглаживания округлений
                 width = cropWidth - poinX + cropX;
             }
             if ((int) pointZeroDst.y > cropY) {
-                poinY = (int) pointZeroDst.y;
+                poinY = (int) pointZeroDst.y + 1; // нужно для сглаживания округлений
                 height = cropHeight - poinY + cropY;
             }
 
@@ -226,6 +225,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             if ((int) pointDstRightBottomImage.y < poinY + height)
                 height = (int) pointDstRightBottomImage.y - poinY;
 
+            BufferedImage croppedImage;
             if (originalSize) {
                 // get size of Original IMAGE
 
@@ -251,25 +251,33 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 if (cropHeight + cropY > image.getHeight())
                     cropHeight = image.getHeight() - cropY;
 
-                BufferedImage cropedImage;
                 if (cropX == 0 && cropY == 0 && cropWidth == image.getWidth() && cropHeight == image.getHeight()) {
-                    cropedImage = image;
+                    croppedImage = image;
                 } else {
-                    cropedImage = image.getSubimage(cropX, cropY, cropWidth, cropHeight);
+                    croppedImage = image.getSubimage(cropX, cropY, cropWidth, cropHeight);
+                }
+
+                Image imagePack;
+                if (imgSize < 0.98) {
+                    imagePack = croppedImage.getScaledInstance((int) (croppedImage.getWidth() * imgSize),
+                            (int) (croppedImage.getHeight() * imgSize),
+                            Image.SCALE_AREA_AVERAGING);
+                } else {
+                    imagePack = croppedImage;
                 }
 
                 if (typeOfImage == TypeOfImage.JPEG) {
                     // надо преобразовать если это была ГИФка - иначе цвета съезжают
-                    snapshot = new BufferedImage(cropedImage.getWidth(), cropedImage.getHeight(), type);
+                    snapshot = new BufferedImage(imagePack.getWidth(null), imagePack.getHeight(null), type);
                     g2d = (Graphics2D) snapshot.getGraphics();
-                    g2d.drawImage(image, 0, 0, Color.WHITE, this);
+                    g2d.drawImage(imagePack, 0, 0, Color.WHITE, this);
                     return snapshot;
                 }
-                return cropedImage;
+                return croppedImage;
 
 
             } else {
-                return snapshot.getSubimage(poinX + shift, poinY + shift, width - shift, height - shift);
+                return snapshot.getSubimage(poinX, poinY, width, height);
             }
 
         } catch (RasterFormatException e) {
@@ -307,11 +315,15 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         return zoom;
     }
 
-    public void setSize(double new_size) {
-        if (new_size < 0.01) {
-            new_size = 0.01;
+    public double getImgSize() {
+        return imgSize;
+    }
+
+    public void setImgSize(double imgSize) {
+        if (imgSize < 0.01) {
+            imgSize = 0.01;
         }
-        this.size = new_size;
+        this.imgSize = imgSize;
     }
 
     public void setZoom(double new_zoom) {
@@ -332,8 +344,8 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         repaint();
     }
 
-    public void addZoomListener(ChangeListener listener) {
-        zoomListeners.add(listener);
+    public void addListener(ChangeListener listener) {
+        listeners.add(listener);
     }
 
 }
