@@ -71,13 +71,13 @@ public abstract class IssueItemPanel extends IconPanel {
         jScrollPane2 = new JScrollPane();
 
         addLogoIconLabel = new AddImageLabel(Lang.T("Add Logo"),
-                WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
+                WIDTH_LOGO, HEIGHT_LOGO,
                 0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL, false);
         addLogoIconLabel.setBorder(null);
         addLogoIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
 
         addImageLabel = new AddImageLabel(
-                Lang.T("Add image"), cropWidth, cropHeight, TypeOfImage.JPEG,
+                Lang.T("Add image"), cropWidth, cropHeight,
                 0, ItemCls.MAX_IMAGE_LENGTH, cropWidth >> 1, cropHeight >> 1, originalSize);
         addImageLabel.setBorder(null);
         addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);

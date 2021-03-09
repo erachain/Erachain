@@ -32,7 +32,7 @@ public class AddImageLabel extends JPanel {
     private JLabel mainLabel = new JLabel();
     private boolean editable = true;
 
-    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
+    public AddImageLabel(String text, int bezelWidth, int bezelHeight, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
         setLayout(new BorderLayout());
         this.text = text;
         label = new JLabel("The Label", SwingConstants.CENTER);
@@ -54,7 +54,7 @@ public class AddImageLabel extends JPanel {
             public void mousePressed(MouseEvent e) {
                 if (editable) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
-                        addImage(typeOfImage, minSize, maxSize, originalSize);
+                        addImage(minSize, maxSize, originalSize);
                     }
                 }
             }
@@ -90,7 +90,7 @@ public class AddImageLabel extends JPanel {
         return new ImageIcon(image);
     }
 
-    private void addImage(TypeOfImage typeOfImage, int minSize, int maxSize, boolean originalSize) {
+    private void addImage(int minSize, int maxSize, boolean originalSize) {
         // открыть диалог для файла
         FileChooser chooser = new FileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -101,8 +101,10 @@ public class AddImageLabel extends JPanel {
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = new File(chooser.getSelectedFile().getPath());
-            typeOfImage = file.getName().endsWith("jpg") || file.getName().endsWith("jpeg") ? TypeOfImage.JPEG : TypeOfImage.GIF;
-            new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage, originalSize) {
+            new ImageCropDialog(file, bezelWidth, bezelHeight,
+                    file.getName().endsWith("jpg") || file.getName().endsWith("jpeg") ?
+                            TypeOfImage.JPEG : TypeOfImage.GIF,
+                    originalSize) {
                 @Override
                 public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage) {
                     if (bufferedImage == null) {

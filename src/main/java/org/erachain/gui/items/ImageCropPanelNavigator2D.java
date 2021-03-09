@@ -14,7 +14,7 @@ public class ImageCropPanelNavigator2D extends JPanel {
     public JSlider zoomSlider;
     public JSlider frameSlider;
 
-    public JCheckBox asGif = new JCheckBox(Lang.T("as GIF/PNG with transparent background"));
+    public JCheckBox asGif = new JCheckBox(Lang.T("As GIF/PNG with transparent background"));
 
     private boolean originalSize;
 
