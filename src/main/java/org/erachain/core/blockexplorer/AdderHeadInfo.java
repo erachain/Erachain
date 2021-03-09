@@ -113,6 +113,11 @@ public class AdderHeadInfo {
         output.put("Label_table_asset_amount", Lang.T("Amount", langObj));
         output.put("Label_Assets", Lang.T("Assets", langObj));
         output.put("Label_table_asset_orders", Lang.T("Orders", langObj));
+        output.put("Label_table_asset_quantity", Lang.T("Quantity", langObj));
+        output.put("Label_table_asset_released", Lang.T("Released", langObj));
+        output.put("Label_table_asset_marketCap", Lang.T("Market Cap", langObj));
+        output.put("Label_table_asset_lastPrice", Lang.T("Price", langObj));
+        output.put("Label_table_asset_changePrice", Lang.T("24h", langObj));
         addLaterPrevious(output, langObj);
     }
 

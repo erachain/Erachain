@@ -81,6 +81,7 @@ public class APITXResource {
         help.put("api/tx/links/{height-sequence}",
                 "GET Links of transaction by Height and Sequence (SeqNo)");
 
+        help.put("GET api/tx/types", "Return array of transaction types.");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -786,6 +787,29 @@ public class APITXResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(out.toString())
                 .build();
+    }
+
+    static String getTypesCACHE = null;
+
+    @GET
+    @Path("types")
+    public String getTypes() {
+        if (getTypesCACHE != null)
+            return getTypesCACHE;
+
+        JSONArray jsonArray = new JSONArray();
+        for (int type : Transaction.getTransactionTypes(true)) {
+            if (type <= 0)
+                continue;
+
+            JSONObject json = new JSONObject();
+            json.put("id", type);
+            json.put("name", Transaction.viewTypeName(type));
+
+            jsonArray.add(json);
+        }
+
+        return (getTypesCACHE = jsonArray.toJSONString());
     }
 
 }

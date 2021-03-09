@@ -41,7 +41,7 @@ public class TradePair {
     private BigDecimal base_volume; // base_volume - объем 24 в токене базовом
     private BigDecimal quote_volume; // quote_volume - объем 24 в ценовом токене
 
-    private BigDecimal price_change_percent_24h; //
+    private BigDecimal firstPrice; //
 
     private BigDecimal lowest_price_24h; // quote_volume - объем в ценовом токене
     private BigDecimal highest_price_24h; // base_volume - объем в токене базовом
@@ -60,7 +60,7 @@ public class TradePair {
     // make trading if two orders is seeked
     public TradePair(Long assetKey1, Long assetKey2, int AssetScale1, int assetScale2, BigDecimal lastPrice, long lastTime,
                      BigDecimal highest_bidPrice, BigDecimal lower_askPrice,
-                     BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
+                     BigDecimal base_volume, BigDecimal quote_volume, BigDecimal firstPrice,
                      BigDecimal lowest_price_24h, BigDecimal highest_price_24h,
                      int count24, long updateTime, int countOrdersBid, int countOrdersAsk) {
         this.assetKey1 = assetKey1;
@@ -77,7 +77,7 @@ public class TradePair {
         this.base_volume = base_volume == null ? BigDecimal.ZERO : base_volume;
         this.quote_volume = quote_volume == null ? BigDecimal.ZERO : quote_volume;
 
-        this.price_change_percent_24h = price_change_percent_24h == null ? BigDecimal.ZERO : price_change_percent_24h;
+        this.firstPrice = firstPrice == null ? BigDecimal.ZERO : firstPrice;
 
         this.lowest_price_24h = lowest_price_24h == null ? BigDecimal.ZERO : lowest_price_24h;
         this.highest_price_24h = highest_price_24h == null ? BigDecimal.ZERO : highest_price_24h;
@@ -94,11 +94,11 @@ public class TradePair {
 
     public TradePair(AssetCls asset1, AssetCls asset2, BigDecimal lastPrice, long lastTime,
                      BigDecimal highest_bidPrice, BigDecimal lower_askPrice,
-                     BigDecimal base_volume, BigDecimal quote_volume, BigDecimal price_change_percent_24h,
+                     BigDecimal base_volume, BigDecimal quote_volume, BigDecimal firstPrice,
                      BigDecimal lowest_price_24h, BigDecimal highest_price_24h,
                      int count24, long updateTime, int countOrdersBid, int countOrdersAsk) {
         this(asset1.getKey(), asset2.getKey(), asset1.getScale(), asset2.getScale(), lastPrice, lastTime,
-                highest_bidPrice, lower_askPrice, base_volume, quote_volume, price_change_percent_24h,
+                highest_bidPrice, lower_askPrice, base_volume, quote_volume, firstPrice,
                 lowest_price_24h, highest_price_24h, count24, updateTime, countOrdersBid, countOrdersAsk);
         this.asset1 = asset1;
         this.asset2 = asset2;
@@ -177,8 +177,8 @@ public class TradePair {
         return lastPrice;
     }
 
-    public BigDecimal getPriceChange() {
-        return price_change_percent_24h;
+    public BigDecimal getFirstPrice() {
+        return firstPrice;
     }
 
     public long getLastTime() {
@@ -201,7 +201,7 @@ public class TradePair {
 
         pair.put("last_price", lastPrice);
         pair.put("last_time", lastTime);
-        pair.put("price_change_percent_24h", price_change_percent_24h);
+        pair.put("first_price", firstPrice);
 
         pair.put("lowest_ask", lower_askPrice);
         pair.put("highest_bid", highest_bidPrice);
@@ -280,9 +280,9 @@ public class TradePair {
         BigDecimal quoteVolume = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH)), scale);
         position += AMOUNT_LENGTH;
 
-        //READ PRICE _change_percent_24h
+        //READ FIRST PRICE
         scale = data[position++];
-        BigDecimal price_change_percent_24h = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH)), scale);
+        BigDecimal firstPrice = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH)), scale);
         position += AMOUNT_LENGTH;
 
         //READ lowest_price_24h
@@ -312,7 +312,7 @@ public class TradePair {
         position += ASSET_KEY_LENGTH;
 
         return new TradePair(assetKey1, assetKey2, assetScale1, assetScale2, lastPrice, lastTime, bidPrice, askPrice,
-                baseVolume, quoteVolume, price_change_percent_24h,
+                baseVolume, quoteVolume, firstPrice,
                 lowest_price_24h, highest_price_24h, count24, updateTime, countOrdersBid, countOrdersAsk);
     }
 
@@ -353,9 +353,9 @@ public class TradePair {
         data = Bytes.concat(data, new byte[]{(byte) this.quote_volume.scale()});
         data = Bytes.concat(data, Longs.toByteArray(quote_volume.unscaledValue().longValue()));
 
-        // PRICE _change_percent_24h
-        data = Bytes.concat(data, new byte[]{(byte) this.price_change_percent_24h.scale()});
-        data = Bytes.concat(data, Longs.toByteArray(price_change_percent_24h.unscaledValue().longValue()));
+        // PRICE firstPrice
+        data = Bytes.concat(data, new byte[]{(byte) this.firstPrice.scale()});
+        data = Bytes.concat(data, Longs.toByteArray(firstPrice.unscaledValue().longValue()));
 
         // lowest_price_24h
         data = Bytes.concat(data, new byte[]{(byte) this.lowest_price_24h.scale()});
@@ -403,12 +403,21 @@ public class TradePair {
 
     public static TradePair reverse(TradePair tradePair) {
 
-        BigDecimal lastPriceRev = Order.calcPrice(BigDecimal.ONE, tradePair.lastPrice, tradePair.assetScale1);
-        BigDecimal highest_bidPriceRev = Order.calcPrice(BigDecimal.ONE, tradePair.lower_askPrice, tradePair.assetScale1);
-        BigDecimal lower_askPriceRev = Order.calcPrice(BigDecimal.ONE, tradePair.highest_bidPrice, tradePair.assetScale1);
+        BigDecimal lastPriceRev = tradePair.lastPrice.signum() == 0 ? tradePair.lastPrice
+                : Order.calcPrice(tradePair.lastPrice, BigDecimal.ONE, tradePair.assetScale1);
 
-        BigDecimal highest_price_24hRev = Order.calcPrice(BigDecimal.ONE, tradePair.lowest_price_24h, tradePair.assetScale1);
-        BigDecimal lowest_price_24hRev = Order.calcPrice(BigDecimal.ONE, tradePair.highest_price_24h, tradePair.assetScale1);
+        BigDecimal highest_bidPriceRev = tradePair.lower_askPrice.signum() == 0 ? tradePair.lower_askPrice
+                : Order.calcPrice(tradePair.lower_askPrice, BigDecimal.ONE, tradePair.assetScale1);
+        BigDecimal lower_askPriceRev = tradePair.highest_bidPrice.signum() == 0 ? tradePair.highest_bidPrice
+                : Order.calcPrice(tradePair.highest_bidPrice, BigDecimal.ONE, tradePair.assetScale1);
+
+        BigDecimal highest_price_24hRev = tradePair.lowest_price_24h.signum() == 0 ? tradePair.lowest_price_24h
+                : Order.calcPrice(tradePair.lowest_price_24h, BigDecimal.ONE, tradePair.assetScale1);
+        BigDecimal lowest_price_24hRev = tradePair.highest_price_24h.signum() == 0 ? tradePair.highest_price_24h
+                : Order.calcPrice(tradePair.highest_price_24h, BigDecimal.ONE, tradePair.assetScale1);
+
+        BigDecimal first_priceRev = tradePair.firstPrice.signum() == 0 ? tradePair.firstPrice
+                : Order.calcPrice(tradePair.firstPrice, BigDecimal.ONE, tradePair.assetScale1);
 
         if (tradePair.asset1 != null && tradePair.asset2 != null) {
             return new TradePair(
@@ -417,7 +426,7 @@ public class TradePair {
                     tradePair.lastTime, // same
                     highest_bidPriceRev, lower_askPriceRev, // 1/
                     tradePair.quote_volume, tradePair.base_volume, // reversed
-                    tradePair.price_change_percent_24h, // same
+                    first_priceRev, // 1/
                     lowest_price_24hRev, highest_price_24hRev, // 1/
                     tradePair.count24, tradePair.updateTime, // same
                     tradePair.countOrdersAsk, tradePair.countOrdersBid // reversed
@@ -429,7 +438,7 @@ public class TradePair {
                     tradePair.lastTime, // same
                     highest_bidPriceRev, lower_askPriceRev, // 1/
                     tradePair.quote_volume, tradePair.base_volume, // reversed
-                    tradePair.price_change_percent_24h, // same
+                    first_priceRev, // 1/
                     lowest_price_24hRev, highest_price_24hRev, // 1/
                     tradePair.count24, tradePair.updateTime, // same
                     tradePair.countOrdersAsk, tradePair.countOrdersBid // reversed

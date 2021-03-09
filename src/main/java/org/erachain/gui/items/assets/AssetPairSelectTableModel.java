@@ -92,7 +92,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
                     return tradePair.getLastPrice();
 
                 case COLUMN_CHANGE_PRICE:
-                    return tradePair.getPriceChange();
+                    return tradePair.getFirstPrice();
 
                 case COLUMN_BASE_VOLUME:
                     return tradePair.getBase_volume();

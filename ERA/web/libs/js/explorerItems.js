@@ -4,7 +4,7 @@ function itemHead(item, forPrint) {
     var type = item.item_type;
 
     if (item.image) {
-        output += '<td><img src="data:image/gif;base64,' + item.image + '" width = "350" /></td><td style ="width: 70%; padding-left:20px">';
+        output += '<td><a href="#" ><img src="data:image/gif;base64,' + item.image + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
         output += '<br>';
     }
 
@@ -82,6 +82,7 @@ function itemHead(item, forPrint) {
     if (!forPrint) {
         output += ' &nbsp&nbsp<a href=../api'+ type + '/raw/' + item.key + ' class="button ll-blue-bgc"><b>' + item.Label_RAW + '</b></a>';
         output += ' &nbsp&nbsp<a href=?'+ type + '=' + item.key + get_lang() + '&print class="button ll-blue-bgc"><b>' + item.Label_Print + '</b></a></h4>';
+        output += ' &nbsp&nbsp<a href=../api'+ type + '/text/' + item.key + ' class="button ll-blue-bgc"><b>' + item.Label_SourceText + '</b></a></h4>';
     }
 
     return output;

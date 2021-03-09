@@ -54,6 +54,7 @@ public class APIItemAsset {
         help.put("Get apiasset/image/{key}", "Get Asset Image");
         help.put("Get apiasset/icon/{key}", "Get Asset Icon");
         help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
+        help.put("GET apiasset/text/{key", "Get description by ID");
 
         help.put("GET apiasset/types", "Return array of asset types.");
         help.put("GET apiasset/types/actions", "Return array of asset types and Actions for localize.");
@@ -282,6 +283,30 @@ public class APIItemAsset {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(ItemAssetsResource.getBalances(assetKey, offset, position, limit))
+                .build();
+    }
+
+    @GET
+    @Path("text/{key}")
+    public Response getText(@PathParam("key") Long key) {
+
+        if (key <= 0) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ITEM_KEY);
+        }
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+        // DOES EXIST
+        if (!map.contains(key)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        ItemCls item = map.get(key);
+
+        return Response.status(200).header("Content-Type", "text/plain; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(item.getDescription())
                 .build();
     }
 

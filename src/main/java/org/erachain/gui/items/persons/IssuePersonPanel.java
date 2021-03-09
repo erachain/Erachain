@@ -15,6 +15,7 @@ import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.IssueItemPanel;
+import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
@@ -76,14 +77,14 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
     }
 
     public IssuePersonPanel(String name, String title) {
-        super(name, title, "Person issue has been sent!", false);
+        super(name, title, "Person issue has been sent!", false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false);
         initComponents(true);
         initLabels();
 
     }
 
     public IssuePersonPanel(String name, String title, String issueMess) {
-        super(name, title, issueMess, false);
+        super(name, title, issueMess, false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false);
     }
 
     protected void initLabels() {

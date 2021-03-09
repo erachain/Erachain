@@ -717,9 +717,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     /**
      * JSON for BlockExplorer lists
      * @param langObj
+     * @param args
      * @return
      */
-    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+    public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
         //DCSet dcSet = DCSet.getInstance();
 
         JSONObject json = new JSONObject();
@@ -805,7 +806,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJson.put("Label_Print", Lang.T("Print", langObj));
         itemJson.put("Label_Description", Lang.T("Description", langObj));
         itemJson.put("Label_seqNo", Lang.T("Номер", langObj));
-
+        itemJson.put("Label_SourceText", Lang.T("Source Text # исходный текст", langObj));
 
         itemJson.put("owner", this.getOwner().getAddress());
         Fun.Tuple2<Integer, PersonCls> person = this.getOwner().getPerson();

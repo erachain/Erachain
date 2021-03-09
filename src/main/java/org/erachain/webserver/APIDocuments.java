@@ -11,10 +11,7 @@ import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -46,11 +43,32 @@ public class APIDocuments {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
+        help.put("apidocuments/message/{seqNo}", "Get message from transaction");
         help.put("apidocuments/getFiles?block={block}&seqNo={seqNo}", "get files from transaction");
         help.put("apidocuments/getFile?download={true/false}block={block}&seqNo={seqNo}&name={name]", "get file (name) from transaction");
-               
+
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
+    }
+
+    @GET
+    @Path("message/{seqNo}")
+    public Response getMessage(@PathParam("seqNo") String seqNo) {
+        String out;
+        Transaction tx = DCSet.getInstance().getTransactionFinalMap().getRecord(seqNo);
+        if (tx == null) {
+            JSONObject result = new JSONObject();
+            result.put("code", 2);
+            result.put("message", "Transaction not exist");
+            out = result.toJSONString();
+        } else {
+            out = ((RSignNote) tx).getMessage();
+        }
+
+        return Response.status(200).header("Content-Type", "text/plain; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out)
+                .build();
     }
 
     /**

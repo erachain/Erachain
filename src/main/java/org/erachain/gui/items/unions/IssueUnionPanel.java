@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.gui.items.IssueItemPanel;
+import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class IssueUnionPanel extends IssueItemPanel {
     private JLabel parentJLabel = new JLabel();
 
     public IssueUnionPanel() {
-        super(NAME, TITLE, "Union issue has been sent!", true);
+        super(NAME, TITLE, "Union issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true);
 
         initComponents();
 

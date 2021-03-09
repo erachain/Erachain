@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.transaction.IssueImprintRecord;
 import org.erachain.gui.items.IssueItemPanel;
+import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 
@@ -23,7 +24,7 @@ public class IssueImprintPanel extends IssueItemPanel {
     private JTextField txtAmount;
 
     public IssueImprintPanel() {
-        super(NAME, TITLE, "Imprint issue has been sent!", true);
+        super(NAME, TITLE, "Imprint issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true);
 
         initComponents();
 

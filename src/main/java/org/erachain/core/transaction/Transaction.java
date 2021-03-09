@@ -1589,7 +1589,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return transaction;
     }
 
-    public JSONObject jsonForExplorerPage(JSONObject langObj) {
+    public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
         return toJson();
     }
 

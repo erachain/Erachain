@@ -85,8 +85,9 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
                             itemPeerMenu = peersTableModel.getItem(convertRowIndexToModel);
                             if (itemPeerMenu.getWEBPort() != null) {
                                 try {
-                                    String url = itemPeerMenu.getNodeInfo().getOrDefault("scheme", "https").toString()
-                                            + "://" + itemPeerMenu.getAddress().getHostAddress() + ":" + itemPeerMenu.getWEBPort()
+                                    String url = itemPeerMenu.getScheme()
+                                            + "://" + itemPeerMenu.getHostName()
+                                            + ":" + itemPeerMenu.getWEBPort()
                                             + "/index/blockexplorer.html";
                                     URLViewer.openWebpage(new URL(url));
                                 } catch (MalformedURLException e1) {

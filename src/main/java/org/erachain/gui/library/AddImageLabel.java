@@ -32,18 +32,19 @@ public class AddImageLabel extends JPanel {
     private JLabel mainLabel = new JLabel();
     private boolean editable = true;
 
-    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight) {
+    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
         setLayout(new BorderLayout());
         this.text = text;
         label = new JLabel("The Label", SwingConstants.CENTER);
         label.setText(this.text);
         add(label, BorderLayout.NORTH);
         add(mainLabel, BorderLayout.CENTER);
+
         this.bezelWidth = bezelWidth;
         this.bezelHeight = bezelHeight;
         this.initialWidth = initialWidth;
         this.initialHeight = initialHeight;
-        mainLabel.setIcon(createImageIcon(Color.WHITE, this.initialWidth, this.initialHeight));
+        mainLabel.setIcon(createEmptyImage(Color.WHITE, this.initialWidth, this.initialHeight));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
         setBorder(BorderFactory.createEtchedBorder());
         mainLabel.setVerticalAlignment(SwingConstants.TOP);
@@ -53,12 +54,11 @@ public class AddImageLabel extends JPanel {
             public void mousePressed(MouseEvent e) {
                 if (editable) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
-                        addImage(typeOfImage, minSize, maxSize);
+                        addImage(typeOfImage, minSize, maxSize, originalSize);
                     }
                 }
             }
         });
-
 
         JPopupMenu menu = new JPopupMenu();
         JMenuItem resetMenu = new JMenuItem(Lang.T("Reset"));
@@ -82,7 +82,7 @@ public class AddImageLabel extends JPanel {
         label.setHorizontalAlignment(alig);
     }
 
-    private ImageIcon createImageIcon(Color color, int width, int height) {
+    private ImageIcon createEmptyImage(Color color, int width, int height) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
         graphics.setPaint(color);
@@ -90,7 +90,7 @@ public class AddImageLabel extends JPanel {
         return new ImageIcon(image);
     }
 
-    private void addImage(TypeOfImage typeOfImage, int minSize, int maxSize) {
+    private void addImage(TypeOfImage typeOfImage, int minSize, int maxSize, boolean originalSize) {
         // открыть диалог для файла
         FileChooser chooser = new FileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -101,51 +101,79 @@ public class AddImageLabel extends JPanel {
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = new File(chooser.getSelectedFile().getPath());
-            new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage) {
+            typeOfImage = file.getName().endsWith("jpg") || file.getName().endsWith("jpeg") ? TypeOfImage.JPEG : TypeOfImage.GIF;
+            new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage, originalSize) {
                 @Override
-                public void onFinish(BufferedImage image) {
-                    if (image == null) {
+                public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage) {
+                    if (bufferedImage == null) {
                         logger.error("Image does not setup");
                         return;
                     }
-                    ImageIcon imageIcon = new ImageIcon(image);
+
+                    int bufferedWidth = bufferedImage.getWidth();
+                    int preferredWidth = mainLabel.getPreferredSize().width;
+                    preferredWidth = 250;
+
+                    ImageIcon imageIcon;
+                    // под размеры поля подгоним чтобы поле не обрезало каритнку
+                    if (bufferedWidth > preferredWidth) {
+                        float scaleView = (float) preferredWidth / bufferedWidth;
+                        Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
+                                (int) (scaleView * bufferedImage.getHeight()),
+                                Image.SCALE_AREA_AVERAGING);
+                        imageIcon = new ImageIcon(imagePack);
+                    } else {
+                        imageIcon = new ImageIcon(bufferedImage);
+                    }
+
                     mainLabel.setIcon(imageIcon);
+
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
+
                     try {
                         if (typeOfImage == TypeOfImage.GIF) {
-                            ImageIO.write(image, "gif", imageStream);
-                        } else if (typeOfImage == TypeOfImage.JPEG) {
-                            ImageIO.write(image, "jpeg", imageStream);
+                            ImageIO.write(bufferedImage, "gif", imageStream);
+                        } else {
+                            ImageIO.write(bufferedImage, "jpeg", imageStream);
                         }
 
                         imgBytes = imageStream.toByteArray();
-                        if (minSize > 0) {
-                            int templWidth = image.getWidth();
-                            int templHeight = image.getHeight();
-                            int counter = 0;
+
+                        int templWidth = bufferedImage.getWidth();
+                        int templHeight = bufferedImage.getHeight();
+                        int counter = 0;
+
+                        if (false && minSize > 0 && imgBytes.length < minSize) {
                             while (imgBytes.length < minSize && counter++ < 100) {
                                 imageStream.reset();
                                 templWidth *= 1.2;
                                 templHeight *= 1.2;
-                                Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
+                                Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
                                 writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                             }
-                        }
-                        if (maxSize > 0) {
-                            int templWidth = image.getWidth();
-                            int templHeight = image.getHeight();
-                            int counter = 0;
+
+                        } else if (false && maxSize > 0 && imgBytes.length > maxSize) {
                             while (imgBytes.length > maxSize && counter++ < 100) {
                                 imageStream.reset();
                                 templWidth /= 1.2;
                                 templHeight /= 1.2;
-                                Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
+                                Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
                                 writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                             }
+
+                        } else if (false && typeOfImage == TypeOfImage.JPEG) {
+                            // преобразуем GIF с прозрачным фоном в непрозрачный если надо
+                            // это может понадобиться если Оригинальный размер картинки взяли и не было преобразования в snapshot в ImageCropDisplayPanelNavigator2D.getSnapshot
+                            Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
+                            writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                         }
+
+                        label.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
+
                     } catch (Exception e) {
                         logger.error("Can not write image in ImageCropDialog dialog onFinish method", e);
                     }
+
                 }
 
                 private void writeImage(ByteArrayOutputStream imageStream, int templWidth, int templHeight, Image scaledImage, TypeOfImage typeOfImage) throws IOException {
@@ -156,7 +184,7 @@ public class AddImageLabel extends JPanel {
                         ImageIO.write(image, "gif", imageStream);
                     } else {
                         image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_RGB);
-                        image.getGraphics().drawImage(scaledImage, 0, 0, null);
+                        image.getGraphics().drawImage(scaledImage, 0, 0, Color.WHITE, null);
                         ImageIO.write(image, "jpeg", imageStream);
                     }
                     imgBytes = imageStream.toByteArray();
@@ -167,7 +195,7 @@ public class AddImageLabel extends JPanel {
 
     public void reset() {
         imgBytes = null;
-        mainLabel.setIcon(createImageIcon(Color.WHITE, initialWidth, initialHeight));
+        mainLabel.setIcon(createEmptyImage(Color.WHITE, initialWidth, initialHeight));
     }
 
     public void set(byte[] imgBytes) {

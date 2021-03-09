@@ -61,7 +61,7 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JTextField exLinkDescription = new JTextField();
     boolean useIcon;
 
-    public IssueItemPanel(String name, String title, String issueMess, boolean useIcon) {
+    public IssueItemPanel(String name, String title, String issueMess, boolean useIcon, int cropWidth, int cropHeight, boolean originalSize) {
         super(name, title);
 
         this.useIcon = useIcon;
@@ -69,21 +69,26 @@ public abstract class IssueItemPanel extends IconPanel {
         this.confirmMess = "Confirmation Transaction";
 
         jScrollPane2 = new JScrollPane();
-        addImageLabel = new AddImageLabel(
-                Lang.T("Add image"), WIDTH_IMAGE, HEIGHT_IMAGE, TypeOfImage.JPEG,
-                0, ItemCls.MAX_IMAGE_LENGTH, WIDTH_IMAGE_INITIAL, HEIGHT_IMAGE_INITIAL);
-        addImageLabel.setBorder(null);
+
         addLogoIconLabel = new AddImageLabel(Lang.T("Add Logo"),
                 WIDTH_LOGO, HEIGHT_LOGO, TypeOfImage.GIF,
-                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL);
+                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL, false);
         addLogoIconLabel.setBorder(null);
         addLogoIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+
+        addImageLabel = new AddImageLabel(
+                Lang.T("Add image"), cropWidth, cropHeight, TypeOfImage.JPEG,
+                0, ItemCls.MAX_IMAGE_LENGTH, cropWidth >> 1, cropHeight >> 1, originalSize);
+        addImageLabel.setBorder(null);
         addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         titleJLabel.setText(Lang.T(title));
+
         textAreaDescription.setLineWrap(true);
+
         textFeePow.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(9)));
         textFeePow.setSelectedItem("0");
         feeJLabel.setVisible(Gui.SHOW_FEE_POWER);

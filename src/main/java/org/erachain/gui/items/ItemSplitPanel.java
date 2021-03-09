@@ -226,6 +226,20 @@ public abstract class ItemSplitPanel extends SplitPanel {
         });
         menuSaveCopy.add(copyNumber);
 
+        JMenuItem copySourceText = new JMenuItem(Lang.T("Copy Source Text"));
+        copySourceText.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection("" + itemTableSelected.getDescription());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Source text of the '%1' has been copy to buffer")
+                            .replace("%1", itemTableSelected.getName())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        });
+        menuSaveCopy.add(copySourceText);
+
+
         JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
         copyJson.addActionListener(e -> {
             StringSelection stringSelection = new StringSelection(itemTableSelected.toJson().toJSONString());

@@ -8,6 +8,7 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.IssueItemPanel;
+import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.lang.Lang;
@@ -36,7 +37,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
 
     public IssueAssetPanel() {
-        super(NAME, TITLE, "Asset issue has been sent!", true);
+        super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true);
 
         assetTypesComboBoxModel = new AssetTypesComboBoxModel();
         assetTypeJComboBox.setModel(assetTypesComboBoxModel);

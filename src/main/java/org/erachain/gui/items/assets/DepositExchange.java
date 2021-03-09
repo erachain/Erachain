@@ -261,7 +261,7 @@ public class DepositExchange extends IconPanel {
                 }
 
                 help += "<br>" + Lang.T("Minimal payment in equivalent")
-                        + " <b>" + 0.0025 + " " + assetIncomeABBR + "</b>" + "<br>";
+                        + " <b>" + 0.00025 + " " + assetIncomeABBR + "</b>" + "<br>";
 
                 jTextField_Details.setText(jsonObject.get("addr_in").toString());
                 jTextField_Details_Check.setText("<html>" + help + "</html>");
