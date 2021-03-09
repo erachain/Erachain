@@ -37,23 +37,40 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private AffineTransform currentTransform = new AffineTransform();
     private Point currentPoint = new Point();
 
+    ImageCropPanelNavigator2D parent;
 
     private Logger logger = LoggerFactory.getLogger(ImageCropDisplayPanelNavigator2D.class);
     private boolean flag = false;
 
     public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, File imageFile, int cropWidth, int cropHeight) {
 
-        setPreferredSize(new Dimension((int) (cropWidth * 2.0f), (int) (cropHeight * 1.5f)));
-        this.cropWidth = this.originalCropWidth = cropWidth;
-        this.cropHeight = this.originalCropHeight = cropHeight;
-        cropX = getPreferredSize().width / 2 - cropWidth / 2;
-        cropY = getPreferredSize().height / 2 - cropHeight / 2;
+        this.parent = parent;
+        this.cropWidth = cropWidth;
+
         try {
             image = ImageIO.read(imageFile);
         } catch (IOException e) {
             logger.error("Error read image File in crop component", e);
             return;
         }
+
+        init(cropWidth, cropHeight);
+
+    }
+
+    public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, BufferedImage image, int cropWidth, int cropHeight) {
+
+        this.parent = parent;
+        this.image = image;
+
+        init(cropWidth, cropHeight);
+    }
+
+    public void init(int cropWidth, int cropHeight) {
+
+        setPreferredSize(new Dimension((int) (cropWidth * 2.0f), (int) (cropHeight * 1.5f)));
+        cropX = getPreferredSize().width / 2 - cropWidth / 2;
+        cropY = getPreferredSize().height / 2 - cropHeight / 2;
 
         AffineTransform newTransformBegin = new AffineTransform();
         newTransformBegin.concatenate(AffineTransform.getTranslateInstance(
@@ -153,7 +170,6 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         timer.setRepeats(true);
         timer.start();
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {

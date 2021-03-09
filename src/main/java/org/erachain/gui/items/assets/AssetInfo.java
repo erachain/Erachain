@@ -4,10 +4,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.library.HoldersLibraryPanel;
-import org.erachain.gui.library.HyperLinkAccount;
-import org.erachain.gui.library.Library;
-import org.erachain.gui.library.SignLibraryPanel;
+import org.erachain.gui.library.*;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.NumberAsString;
@@ -161,6 +158,13 @@ public class AssetInfo extends JTextPane {
                         return;
                     }
                     if (arg0.getDescription().toString().equals("!!img")) {
+                        JFrame frame = new JFrame();
+                        AddImageLabel imageLabel = new AddImageLabel(new ImageIcon(asset.getImage()));
+                        JPanel panel = new JPanel();
+                        panel.add(imageLabel);
+                        frame.add(panel);
+                        new JDialog(frame);
+                        //frame
                     }
                 }
             });

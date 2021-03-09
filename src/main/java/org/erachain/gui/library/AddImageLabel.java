@@ -25,14 +25,14 @@ public class AddImageLabel extends JPanel {
     private final int initialHeight;
     private final String text;
     private byte[] imgBytes;
-    private int bezelWidth;
-    private int bezelHeight;
+    private int baseWidth;
+    private int baseHeight;
     private Logger logger = LoggerFactory.getLogger(getClass());
     private JLabel label;
     private JLabel mainLabel = new JLabel();
     private boolean editable = true;
 
-    public AddImageLabel(String text, int bezelWidth, int bezelHeight, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
+    public AddImageLabel(String text, int baseWidth, int baseHeight, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
         setLayout(new BorderLayout());
         this.text = text;
         label = new JLabel("The Label", SwingConstants.CENTER);
@@ -40,8 +40,8 @@ public class AddImageLabel extends JPanel {
         add(label, BorderLayout.NORTH);
         add(mainLabel, BorderLayout.CENTER);
 
-        this.bezelWidth = bezelWidth;
-        this.bezelHeight = bezelHeight;
+        this.baseWidth = baseWidth;
+        this.baseHeight = baseHeight;
         this.initialWidth = initialWidth;
         this.initialHeight = initialHeight;
         mainLabel.setIcon(createEmptyImage(Color.WHITE, this.initialWidth, this.initialHeight));
@@ -65,6 +65,22 @@ public class AddImageLabel extends JPanel {
         resetMenu.addActionListener(e -> reset());
         menu.add(resetMenu);
         setComponentPopupMenu(menu);
+        validate();
+    }
+
+    public AddImageLabel(Icon image) {
+
+        this.text = "";
+        this.initialWidth = this.initialHeight = 1000;
+
+        setLayout(new BorderLayout());
+        this.baseHeight = baseHeight;
+        mainLabel.setIcon(image);
+        setCursor(new Cursor(Cursor.HAND_CURSOR));
+        setBorder(BorderFactory.createEtchedBorder());
+        mainLabel.setVerticalAlignment(SwingConstants.TOP);
+        mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
         validate();
     }
 
@@ -101,7 +117,7 @@ public class AddImageLabel extends JPanel {
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = new File(chooser.getSelectedFile().getPath());
-            new ImageCropDialog(file, bezelWidth, bezelHeight,
+            new ImageCropDialog(file, baseWidth, baseHeight,
                     file.getName().endsWith("jpg") || file.getName().endsWith("jpeg") ?
                             TypeOfImage.JPEG : TypeOfImage.GIF,
                     originalSize) {
