@@ -193,15 +193,19 @@ public class WebTransactionsHTML {
 
         if (!(transaction instanceof RCalculated)) {
             out += "<br><b>" + Lang.T("Size", langObj) + ": </b>" + tras_json.get("size");
-            out += "<br><b>" + Lang.T("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
+            out += "<br><b>" + Lang.T("Public Key", langObj) + ": </b><a href=?address="
+                    + tras_json.get("publickey") + get_Lang() + ">" + tras_json.get("publickey") + "</a>";
             out += "<br><b>" + Lang.T("Signature", langObj) + ": </b>" + tras_json.get("signature");
             out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + tras_json.get("fee");
             if (transaction.isWiped()) {
                 out += "<BR><b>" + Lang.T("WIPED", langObj) + ": </b>" + "true";
             }
             out += "<br> ";
-            out += "<b>" + Lang.T("Creator", langObj)
-                    + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang() + ">" + tras_json.get("creator") + "</a>";
+            if (transaction.getCreator() != null) {
+                out += "<b>" + Lang.T("Creator", langObj)
+                        + ": </b><a href=?address=" + tras_json.get("creator") + get_Lang() + ">"
+                        + transaction.getCreator().getPersonAsString() + "</a>";
+            }
         }
 
         JSONObject outTX = get_HTML_Body(transaction, out);
