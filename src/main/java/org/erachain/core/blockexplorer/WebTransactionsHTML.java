@@ -46,9 +46,9 @@ public class WebTransactionsHTML {
         this.langObj = langObj;
     }
 
-    public JSONObject get_HTML_Body(Transaction transaction) {
+    public JSONObject get_HTML_Body(Transaction transaction, String out) {
 
-        String out = "";
+        //String out = "";
 
         ExLink exLink = transaction.getExLink();
         if (exLink != null) {
@@ -184,8 +184,8 @@ public class WebTransactionsHTML {
         JSONObject tras_json = transaction.toJson();
 
         String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ": </b>" + tras_json.get("type");
-        out += " (" + Lang.T("Block", langObj) + ": </b><a href=?block=" + tras_json.get("block") + get_Lang() + ">" + tras_json.get("block") + "</a>";
-        out += ", " + Lang.T("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("block") + "-" + tras_json.get("seqNo") + get_Lang() + ">" + tras_json.get("block") + "-" + tras_json.get("seqNo") + "</a> ) </font><br>";
+        out += " (" + Lang.T("Block", langObj) + ": </b><a href=?block=" + tras_json.get("height") + get_Lang() + ">" + tras_json.get("height") + "</a>";
+        out += ", " + Lang.T("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("seqNo") + get_Lang() + ">" + tras_json.get("seqNo") + "</a> ) </font><br>";
 
         // она и так в заголовке будет
         //out += "<br><b>" + Lang.TFromLangObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
@@ -204,7 +204,7 @@ public class WebTransactionsHTML {
                     + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang() + ">" + tras_json.get("creator") + "</a>";
         }
 
-        JSONObject outTX = get_HTML_Body(transaction);
+        JSONObject outTX = get_HTML_Body(transaction, out);
 
         if (explorer == null) {
             this.outTX = outTX;
