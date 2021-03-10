@@ -29,6 +29,7 @@ public class AddImageLabel extends JPanel {
     private int baseHeight;
     private Logger logger = LoggerFactory.getLogger(getClass());
     private JLabel label;
+    private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
     private boolean editable = true;
 
@@ -39,6 +40,7 @@ public class AddImageLabel extends JPanel {
         label.setText(this.text);
         add(label, BorderLayout.NORTH);
         add(mainLabel, BorderLayout.CENTER);
+        add(labelSize, BorderLayout.SOUTH);
 
         this.baseWidth = baseWidth;
         this.baseHeight = baseHeight;
@@ -186,7 +188,7 @@ public class AddImageLabel extends JPanel {
                             writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                         }
 
-                        label.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
+                        labelSize.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
 
                     } catch (Exception e) {
                         logger.error("Can not write image in ImageCropDialog dialog onFinish method", e);

@@ -45,10 +45,10 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JScrollPane jScrollPane1 = new JScrollPane();
     protected JTextField textName = new JTextField("");
     protected JTextArea textAreaDescription = new JTextArea("");
-    protected AddImageLabel addImageLabel;
     protected AddImageLabel addLogoIconLabel;
+    protected AddImageLabel addImageLabel;
     protected JScrollPane jScrollPane2;
-    protected JScrollPane jScrollPane3 = new JScrollPane();
+    //protected JScrollPane jScrollPane3 = new JScrollPane();
     protected JPanel jPanelMain = new javax.swing.JPanel();
     protected JPanel jPanelAdd = new javax.swing.JPanel();
     protected JPanel jPanelLeft = new javax.swing.JPanel();
@@ -158,19 +158,21 @@ public abstract class IssueItemPanel extends IconPanel {
             jPanelLeft.add(addLogoIconLabel, gridBagConstraints);
         }
 
-        jScrollPane3.setBorder(null);
-
-        jScrollPane3.setViewportView(addImageLabel);
+        //jScrollPane3.setBorder(null);
+        //jScrollPane3.setViewportView(addImageLabel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.NORTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.weighty = 0.4;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         jPanelLeft.add(addImageLabel, gridBagConstraints);
+
+        //gridBagConstraints.gridy++;
+        //jPanelLeft.add(new JLabel(), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
