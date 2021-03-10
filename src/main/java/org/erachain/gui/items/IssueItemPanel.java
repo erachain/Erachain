@@ -48,7 +48,6 @@ public abstract class IssueItemPanel extends IconPanel {
     protected AddImageLabel addLogoIconLabel;
     protected AddImageLabel addImageLabel;
     protected JScrollPane jScrollPane2;
-    //protected JScrollPane jScrollPane3 = new JScrollPane();
     protected JPanel jPanelMain = new javax.swing.JPanel();
     protected JPanel jPanelAdd = new javax.swing.JPanel();
     protected JPanel jPanelLeft = new javax.swing.JPanel();
@@ -158,9 +157,6 @@ public abstract class IssueItemPanel extends IconPanel {
             jPanelLeft.add(addLogoIconLabel, gridBagConstraints);
         }
 
-        //jScrollPane3.setBorder(null);
-        //jScrollPane3.setViewportView(addImageLabel);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -171,25 +167,17 @@ public abstract class IssueItemPanel extends IconPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         jPanelLeft.add(addImageLabel, gridBagConstraints);
 
-        //gridBagConstraints.gridy++;
-        //jPanelLeft.add(new JLabel(), gridBagConstraints);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.gridheight = 38;
-        //   gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        //    gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.9;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
         jPanelMain.add(jPanelLeft, gridBagConstraints);
 
-        //mainJScrollPane.setViewportView(jPanelMain);
-
-        //this.add(mainJScrollPane, java.awt.BorderLayout.CENTER);
         add(jPanelMain);
     }
 
