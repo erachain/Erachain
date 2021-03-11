@@ -41,7 +41,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
         key_Item.setMinimumSize(new java.awt.Dimension(100, 20));
         key_Item.setName(""); // NOI18N
         key_Item.setPreferredSize(new java.awt.Dimension(100, 20));
-        key_Item.setMaximumSize(new java.awt.Dimension(2000, 20));
+        key_Item.setMaximumSize(new java.awt.Dimension(200, 20));
 
         MenuPopupUtil.installContextMenu(key_Item);
 
@@ -50,7 +50,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                startSearch();
+                startSearchKey();
             }
         });
 
@@ -75,44 +75,48 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 // GET VALUE
-                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
-                if (search.equals("")) {
-                    jScrollPaneJPanelRightPanel.setViewportView(null);
-                    search_Table_Model.clear();
-                    Label_search_Info_Panel.setText(Lang.T("Enter more  2 characters"));
-                    jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
-                    return;
-                }
-                if (search.length() < 3) {
-                    Label_search_Info_Panel.setText(Lang.T("Enter more  2 characters"));
-                    jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
-                    return;
-                }
-                key_Item.setText("");
-
-                Label_search_Info_Panel.setText(Lang.T("Waiting..."));
-                jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
-                new Thread() {
-                    @Override
-                    public void run() {
-                        search_Table_Model.findByName(search);
-                        if (search_Table_Model.getRowCount() < 1) {
-                            Label_search_Info_Panel.setText(Lang.T("Not Found"));
-                            jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
-                            jScrollPaneJPanelRightPanel.setViewportView(null);
-                            return;
-                        }
-                        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
-                        jTableJScrollPanelLeftPanel.getSelectionModel().addSelectionInterval(0, 0);
-                    }
-                }.start();
+                startSearchName();
             }
 
         });
 
     }
 
-    public void startSearch() {
+    public void startSearchName() {
+        String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
+        if (search.equals("")) {
+            jScrollPaneJPanelRightPanel.setViewportView(null);
+            search_Table_Model.clear();
+            Label_search_Info_Panel.setText(Lang.T("Enter more  2 characters"));
+            jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+            return;
+        }
+        if (search.length() < 3) {
+            Label_search_Info_Panel.setText(Lang.T("Enter more  2 characters"));
+            jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+            return;
+        }
+        key_Item.setText("");
+
+        Label_search_Info_Panel.setText(Lang.T("Waiting..."));
+        jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+        new Thread() {
+            @Override
+            public void run() {
+                search_Table_Model.findByName(search);
+                if (search_Table_Model.getRowCount() < 1) {
+                    Label_search_Info_Panel.setText(Lang.T("Not Found"));
+                    jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
+                    jScrollPaneJPanelRightPanel.setViewportView(null);
+                    return;
+                }
+                jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
+                jTableJScrollPanelLeftPanel.getSelectionModel().addSelectionInterval(0, 0);
+            }
+        }.start();
+    }
+
+    public void startSearchKey() {
         searchTextFieldSearchToolBarLeftPanelDocument.setText("");
         Label_search_Info_Panel.setText(Lang.T("Waiting..."));
         jScrollPanelLeftPanel.setViewportView(search_Info_Panel);

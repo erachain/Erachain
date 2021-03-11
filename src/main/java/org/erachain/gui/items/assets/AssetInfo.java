@@ -10,6 +10,7 @@ import org.erachain.gui.library.HoldersLibraryPanel;
 import org.erachain.gui.library.HyperLinkAccount;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.SignLibraryPanel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.NumberAsString;
@@ -123,9 +124,9 @@ public class AssetInfo extends JTextPane {
             }
             text += "<div>" + Lang.T("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
             text += "<div>" + Lang.T("Class") + ": <b>" + Lang.T(asset.getItemSubType()) + "</b>,";
-            text += " " + Lang.T("Type") + ": <b>" +
+            text += " " + Lang.T("Type") + ": <a href='!!Type'><b>" +
                     asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:"
-                    + Lang.T(asset.viewAssetTypeFull()) + ",";
+                    + Lang.T(asset.viewAssetTypeFull()) + "</a>,";
             text += " " + Lang.T("Accuracy") + ": <b>" + asset.getScale() + "</b>,";
             text += " " + Lang.T("Quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
             text += " " + Lang.T("Released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
@@ -167,6 +168,12 @@ public class AssetInfo extends JTextPane {
                             public void onFinish(BufferedImage image, TypeOfImage typeOfImage) {
                             }
                         };
+                    } else if (arg0.getDescription().equals("!!Type")) {
+                        String find = asset.viewAssetTypeAbbrev();
+                        SearchAssetsSplitPanel panel = new SearchAssetsSplitPanel(false);
+                        panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(":" + find);
+                        panel.startSearchName();
+                        MainPanel.getInstance().insertNewTab(Lang.T("Search") + " :" + find, panel);
                     }
                 }
             });

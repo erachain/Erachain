@@ -108,7 +108,7 @@ function asset(data, forPrint) {
     if (!forPrint)
         output += ', &nbsp&nbsp<a href=?top=all&asset=' + item.key + get_lang() + ' class="button ll-blue-bgc"><b>' + item.Label_Holders + '</b></a>';
 
-    output += '<br>' + item.Label_AssetType + ': <b>' + item.assetTypeNameFull + '</b><br>';
+    output += '<br>' + item.Label_AssetType + ': <a href=?q=%3A' + item.type_abbrev + get_lang() + '&search=assets ><b>' + item.assetTypeNameFull + '</b></a><br>';
     if (item.properties) {
         output += '</p><p style="margin-bottom:0px">';
         output += '<b>' + item.Label_Properties + '</b>: ' + item.properties + '</p>';
