@@ -75,12 +75,12 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         if (creatorPersonDuration != null) {
             // запомним что тут две сущности
             itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
-                    new Object[]{item.getItemType(), key}
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                    new Object[]{item.getItemType(), key, item.getTags()}
             };
         } else {
             itemsKeys = new Object[][]{
-                    new Object[]{item.getItemType(), key}
+                    new Object[]{item.getItemType(), key, item.getTags()}
             };
         }
     }

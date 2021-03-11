@@ -171,15 +171,15 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (creatorPersonDuration != null) {
             // AS PERSON
-            listTags.add(new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a});
+            listTags.add(new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()});
             // AS AUTHOR
-            listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, creatorPersonDuration.a});
+            listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, creatorPersonDuration.a, creatorPerson.getTags()});
         }
 
         if (extendedData.hasExPays()) {
             ExPays pays = extendedData.getExPays();
             if (pays.hasAmount()) {
-                listTags.add(new Object[]{ItemCls.ASSET_TYPE, pays.getAssetKey()});
+                listTags.add(new Object[]{ItemCls.ASSET_TYPE, pays.getAssetKey(), pays.getAsset().getTags()});
             }
         }
 

@@ -603,12 +603,12 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         if (creatorPersonDuration == null) {
             // Creator is ADMIN
             itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, key}
+                    new Object[]{ItemCls.PERSON_TYPE, key, person.getTags()}
             };
         } else {
             itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, key},
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
+                    new Object[]{ItemCls.PERSON_TYPE, key, person.getTags()},
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()}
             };
         }
     }

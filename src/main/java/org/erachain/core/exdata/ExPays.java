@@ -236,6 +236,10 @@ public class ExPays {
         return assetKey;
     }
 
+    public AssetCls getAsset() {
+        return asset;
+    }
+
     public int getFilteredAccrualsCount() {
         return filteredAccrualsCount;
     }

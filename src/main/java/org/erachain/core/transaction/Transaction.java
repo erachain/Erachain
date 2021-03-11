@@ -928,7 +928,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public void makeItemsKeys() {
         if (creatorPersonDuration != null) {
             itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()}
             };
         }
     }

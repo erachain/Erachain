@@ -536,6 +536,11 @@ public abstract class AssetCls extends ItemCls {
     }
 
     @Override
+    public Object[] getTags() {
+        return new Object[]{viewAssetTypeAbbrev()};
+    }
+
+    @Override
     public byte[] getIcon() {
         switch ((int) key) {
             case 1:

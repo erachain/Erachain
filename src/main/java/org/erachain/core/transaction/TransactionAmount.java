@@ -220,25 +220,25 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             if (creatorPersonDuration != null) {
                 if (recipientPersonDuration != null) {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
                     };
                 } else {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
                     };
                 }
             } else {
                 if (recipientPersonDuration != null) {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
                     };
                 } else {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
                     };
                 }
             }
@@ -246,18 +246,18 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             if (creatorPersonDuration != null) {
                 if (recipientPersonDuration != null) {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
                     };
                 } else {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
                     };
                 }
             } else {
                 if (recipientPersonDuration != null) {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
                     };
                 }
             }

@@ -221,11 +221,20 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public String getTickerName() {
         String[] words = this.name.split(" ");
         String name = words[0].trim();
-        if (name.length() >6) {
+        if (name.length() > 6) {
             name = name.substring(0, 6);
         }
         return name;
 
+    }
+
+    /**
+     * доп метки для поиска данной сущности или её типа
+     *
+     * @return
+     */
+    public Object[] getTags() {
+        return null;
     }
 
     public byte[] getIcon() {

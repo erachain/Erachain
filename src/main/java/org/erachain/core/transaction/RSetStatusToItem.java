@@ -817,10 +817,18 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public void makeItemsKeys() {
-        itemsKeys = new Object[][]{
-                new Object[]{ItemCls.STATUS_TYPE, key},
-                new Object[]{this.itemType, this.itemKey}
-        };
+        if (creatorPersonDuration == null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.STATUS_TYPE, key, status.getTags()},
+                    new Object[]{this.itemType, this.itemKey, item.getTags()}
+            };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.STATUS_TYPE, key, status.getTags()},
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                    new Object[]{this.itemType, this.itemKey, item.getTags()}
+            };
+        }
     }
 
     //PROCESS/ORPHAN
