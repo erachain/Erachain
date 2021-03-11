@@ -399,11 +399,12 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     /**
      * Используется для разделения строки поисковых слов для всех трнзакций.<br>
-     * % и @ и # - пусть они будут служебные и по ним не делать разделения
+     * % @ # - пусть они будут служебные и по ним не делать разделения
      * так чтобы можно было найти @P указатель на персон например
      * % - это указатель на параметр например иак - %1
+     * see https://regex101.com/
      */
-    public static String SPLIT_CHARS = "[!?/_., \\~`+&^№*()<>\\\"\\'|\\[\\]{}=;:\\\\]";
+    public static String SPLIT_CHARS = "[!?\\/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
 
     // in pack toByte and Parse - reference not included
     static Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
@@ -955,15 +956,28 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         String[] tagsArray = new String[tagsWords.length + itemsKeys.length];
 
         System.arraycopy(tagsWords, 0, tagsArray, 0, tagsWords.length);
+        List<String> exTagsList = new ArrayList();
         for (int i = tagsWords.length; i < tagsArray.length; i++) {
             try {
                 Object[] itemKey = itemsKeys[i - tagsWords.length];
-                tagsArray[i] = ItemCls.getItemTypeChar((int) itemKey[0], (Long) itemKey[1]).toLowerCase();
+                tagsArray[i] = ItemCls.getItemTypeAndKey((int) itemKey[0], (Long) itemKey[1]).toLowerCase();
+                // возможно там есть дополнительные метка
+                if (itemKey.length > 2 && itemKey[2] != null) {
+                    for (Object exTag : (Object[]) itemKey[2]) {
+                        exTagsList.add(ItemCls.getItemTypeAndTag((int) itemKey[0], exTag.toString()).toLowerCase());
+                    }
+                }
             } catch (Exception e) {
                 LOGGER.error("itemsKeys[" + i + "] = " + itemsKeys[i - tagsWords.length].toString());
                 throw (e);
             }
         }
+
+        if (!exTagsList.isEmpty()) {
+            exTagsList.addAll(Arrays.asList(tagsArray));
+            tagsArray = exTagsList.toArray(tagsArray);
+        }
+
         return tagsArray;
     }
 

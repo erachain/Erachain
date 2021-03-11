@@ -291,7 +291,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      * @param itemType
      * @return
      */
-    public static String getItemTypeChar(int itemType) {
+    public static String getItemTypeAndKey(int itemType) {
         switch (itemType) {
             case ItemCls.ASSET_TYPE:
                 return "A";
@@ -317,12 +317,16 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         }
     }
 
-    public static String getItemTypeChar(int itemType, Object itemKey) {
-        return "@" + getItemTypeChar(itemType) + itemKey.toString();
+    public static String getItemTypeAndKey(int itemType, Object itemKey) {
+        return "@" + getItemTypeAndKey(itemType) + itemKey.toString();
     }
 
-    public String getItemTypeChar() {
-        return getItemTypeChar(getItemType(), key);
+    public static String getItemTypeAndTag(int itemType, Object tag) {
+        return "@" + getItemTypeAndKey(itemType) + ":" + tag.toString();
+    }
+
+    public String getItemTypeAndKey() {
+        return getItemTypeAndKey(getItemType(), key);
     }
 
     public static String getItemTypeName(int itemType) {
@@ -662,10 +666,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         JSONObject itemJSON = toJsonLite(false, false);
 
-        itemJSON.put("charKey", getItemTypeChar());
+        itemJSON.put("charKey", getItemTypeAndKey());
 
         // ADD DATA
-        itemJSON.put("itemCharKey", getItemTypeChar());
+        itemJSON.put("itemCharKey", getItemTypeAndKey());
         itemJSON.put("item_type", this.getItemTypeName());
         //itemJSON.put("itemType", this.getItemTypeName());
         itemJSON.put("item_type_sub", this.getItemSubType());

@@ -687,7 +687,7 @@ public class BlockExplorer {
             return;
         }
 
-        output.put("charKey", poll.getItemTypeChar());
+        output.put("charKey", poll.getItemTypeAndKey());
         output.put("Label_Actions", Lang.T("Actions", langObj));
         output.put("Label_RAW", Lang.T("Bytecode", langObj));
 
