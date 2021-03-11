@@ -229,6 +229,12 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_BANK_GUARANTEE_TOTAL = 61;
 
     /**
+     * NFT - Non Fungible Token. невзаимозаменяемый токен
+     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_NON_FUNGIBLE = 65;
+
+    /**
      * INDEXES (FOREX etc.)
      * +++ требования и обязательства
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
@@ -335,6 +341,7 @@ public abstract class AssetCls extends ItemCls {
                 AS_INSIDE_VOTE,
                 AS_BANK_GUARANTEE,
                 AS_BANK_GUARANTEE_TOTAL,
+                AS_NON_FUNGIBLE,
                 AS_INDEX,
                 AS_INSIDE_OTHER_CLAIM,
 
@@ -771,6 +778,7 @@ public abstract class AssetCls extends ItemCls {
                 || assetType == AS_OUTSIDE_BILL
                 || assetType == AS_OUTSIDE_BILL_EX
                 || assetType == AS_BANK_GUARANTEE
+                || assetType == AS_NON_FUNGIBLE
         ) {
             return true;
         }
@@ -877,9 +885,10 @@ public abstract class AssetCls extends ItemCls {
     public BigDecimal defaultAmountAssetType() {
         switch (assetType) {
             case AS_BANK_GUARANTEE:
+            case AS_NON_FUNGIBLE:
                 return BigDecimal.ONE;
         }
-        return null;
+        return isUnique() ? BigDecimal.ONE : null;
     }
 
     public PublicKeyAccount defaultRecipient(int actionType, boolean backward) {
@@ -938,6 +947,8 @@ public abstract class AssetCls extends ItemCls {
                 return "Bank Guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
                 return "Accounting Bank Guarantee";
+            case AS_NON_FUNGIBLE:
+                return "Non Fungible Token";
             case AS_INDEX:
                 return "Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -1009,6 +1020,8 @@ public abstract class AssetCls extends ItemCls {
                 return "Bank Guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
                 return "Accounting Bank Guarantee";
+            case AS_NON_FUNGIBLE:
+                return "Non Fungible Token";
             case AS_INDEX:
                 return "Digital Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -1084,6 +1097,8 @@ public abstract class AssetCls extends ItemCls {
                 return "BGu";
             case AS_BANK_GUARANTEE_TOTAL:
                 return "BGuT";
+            case AS_NON_FUNGIBLE:
+                return "NFT";
             case AS_INDEX:
                 return "Idx";
             case AS_INSIDE_OTHER_CLAIM:
@@ -1157,6 +1172,8 @@ public abstract class AssetCls extends ItemCls {
                 return "A digital bank guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
                 return "A digital accounting bank guarantee";
+            case AS_NON_FUNGIBLE:
+                return "A non fungible token (unique)";
             case AS_INDEX:
                 return "Index on foreign and domestic assets, for example currencies on FOREX";
             case AS_INSIDE_OTHER_CLAIM:
