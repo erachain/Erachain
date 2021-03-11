@@ -404,7 +404,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * % - это указатель на параметр например иак - %1
      * see https://regex101.com/
      */
-    public static String SPLIT_CHARS = "[!?\\/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
+    //public static String SPLIT_CHARS = "[!?\\/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
+    public static String SPLIT_CHARS = "[!?/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
 
     // in pack toByte and Parse - reference not included
     static Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
@@ -962,7 +963,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 Object[] itemKey = itemsKeys[i - tagsWords.length];
                 tagsArray[i] = ItemCls.getItemTypeAndKey((int) itemKey[0], (Long) itemKey[1]).toLowerCase();
                 // возможно там есть дополнительные метка
-                if (itemKey.length > 2 && itemKey[2] != null) {
+                if (// false && // пока отключим
+                        typeID != CALCULATED_TRANSACTION && // все форжинговые и вычисляемые пропустим
+                                itemKey.length > 2 && itemKey[2] != null) {
                     for (Object exTag : (Object[]) itemKey[2]) {
                         exTagsList.add(ItemCls.getItemTypeAndTag((int) itemKey[0], exTag.toString()).toLowerCase());
                     }
