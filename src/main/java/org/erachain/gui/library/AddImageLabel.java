@@ -25,23 +25,25 @@ public class AddImageLabel extends JPanel {
     private final int initialHeight;
     private final String text;
     private byte[] imgBytes;
-    private int bezelWidth;
-    private int bezelHeight;
+    private int baseWidth;
+    private int baseHeight;
     private Logger logger = LoggerFactory.getLogger(getClass());
     private JLabel label;
+    private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
     private boolean editable = true;
 
-    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
+    public AddImageLabel(String text, int baseWidth, int baseHeight, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
         setLayout(new BorderLayout());
         this.text = text;
         label = new JLabel("The Label", SwingConstants.CENTER);
         label.setText(this.text);
         add(label, BorderLayout.NORTH);
         add(mainLabel, BorderLayout.CENTER);
+        add(labelSize, BorderLayout.SOUTH);
 
-        this.bezelWidth = bezelWidth;
-        this.bezelHeight = bezelHeight;
+        this.baseWidth = baseWidth;
+        this.baseHeight = baseHeight;
         this.initialWidth = initialWidth;
         this.initialHeight = initialHeight;
         mainLabel.setIcon(createEmptyImage(Color.WHITE, this.initialWidth, this.initialHeight));
@@ -54,7 +56,7 @@ public class AddImageLabel extends JPanel {
             public void mousePressed(MouseEvent e) {
                 if (editable) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
-                        addImage(typeOfImage, minSize, maxSize, originalSize);
+                        addImage(minSize, maxSize, originalSize);
                     }
                 }
             }
@@ -65,6 +67,22 @@ public class AddImageLabel extends JPanel {
         resetMenu.addActionListener(e -> reset());
         menu.add(resetMenu);
         setComponentPopupMenu(menu);
+        validate();
+    }
+
+    public AddImageLabel(Icon image) {
+
+        this.text = "";
+        this.initialWidth = this.initialHeight = 1000;
+
+        setLayout(new BorderLayout());
+        this.baseHeight = baseHeight;
+        mainLabel.setIcon(image);
+        setCursor(new Cursor(Cursor.HAND_CURSOR));
+        setBorder(BorderFactory.createEtchedBorder());
+        mainLabel.setVerticalAlignment(SwingConstants.TOP);
+        mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
         validate();
     }
 
@@ -90,7 +108,7 @@ public class AddImageLabel extends JPanel {
         return new ImageIcon(image);
     }
 
-    private void addImage(TypeOfImage typeOfImage, int minSize, int maxSize, boolean originalSize) {
+    private void addImage(int minSize, int maxSize, boolean originalSize) {
         // открыть диалог для файла
         FileChooser chooser = new FileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -101,8 +119,10 @@ public class AddImageLabel extends JPanel {
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = new File(chooser.getSelectedFile().getPath());
-            typeOfImage = file.getName().endsWith("jpg") || file.getName().endsWith("jpeg") ? TypeOfImage.JPEG : TypeOfImage.GIF;
-            new ImageCropDialog(file, bezelWidth, bezelHeight, typeOfImage, originalSize) {
+            new ImageCropDialog(file, baseWidth, baseHeight,
+                    file.getName().endsWith("jpg") || file.getName().endsWith("jpeg") ?
+                            TypeOfImage.JPEG : TypeOfImage.GIF,
+                    originalSize) {
                 @Override
                 public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage) {
                     if (bufferedImage == null) {
@@ -168,7 +188,7 @@ public class AddImageLabel extends JPanel {
                             writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                         }
 
-                        label.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
+                        labelSize.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
 
                     } catch (Exception e) {
                         logger.error("Can not write image in ImageCropDialog dialog onFinish method", e);

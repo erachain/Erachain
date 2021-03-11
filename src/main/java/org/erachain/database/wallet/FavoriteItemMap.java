@@ -6,14 +6,14 @@ import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.SortedSet;
 
 public class FavoriteItemMap extends Observable {
 
     protected DWSet dWSet;
-    private SortedSet<Long> itemsSet;
+    private NavigableSet<Long> itemsSet;
 
     private int observerFavorites;
 
@@ -66,6 +66,10 @@ public class FavoriteItemMap extends Observable {
 
     public IteratorCloseable<Long> getIterator() {
         return IteratorCloseableImpl.make(itemsSet.iterator());
+    }
+
+    public IteratorCloseable<Long> getDescIterator() {
+        return IteratorCloseableImpl.make(itemsSet.descendingIterator());
     }
 
     public int getObserverEvent() {

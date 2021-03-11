@@ -71,9 +71,8 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
         return null;
     }
 
-
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
+    @Override
+    public void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate
@@ -81,7 +80,7 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
                 || message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE) {
             needUpdate = false;
             list = new ArrayList<>();
-            try (IteratorCloseable iterator = map.getIterator(0,true)) {
+            try (IteratorCloseable iterator = map.getIterator(0, true)) {
                 int count = 50;
                 while (iterator.hasNext() && --count > 0) {
                     list.add((Block.BlockHead) map.get(iterator.next()));

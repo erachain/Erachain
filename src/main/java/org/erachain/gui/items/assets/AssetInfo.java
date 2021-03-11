@@ -4,6 +4,8 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.items.ImageCropDialog;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.HoldersLibraryPanel;
 import org.erachain.gui.library.HyperLinkAccount;
 import org.erachain.gui.library.Library;
@@ -153,14 +155,18 @@ public class AssetInfo extends JTextPane {
                 public void hyperlinkUpdate(HyperlinkEvent arg0) {
                     // TODO Auto-generated method stub
                     if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
-                    if (arg0.getDescription().toString().equals("!!Owner")) {
+                    if (arg0.getDescription().equals("!!Owner")) {
                         Point location = MouseInfo.getPointerInfo().getLocation();
                         int x = location.x - th.getLocationOnScreen().x;
                         int y = location.y - th.getLocationOnScreen().y;
                         hl_Owner.get_PopupMenu().show(th, x, y);
                         return;
-                    }
-                    if (arg0.getDescription().toString().equals("!!img")) {
+                    } else if (arg0.getDescription().equals("!!img")) {
+                        new ImageCropDialog(new ImageIcon(asset.getImage())) {
+                            @Override
+                            public void onFinish(BufferedImage image, TypeOfImage typeOfImage) {
+                            }
+                        };
                     }
                 }
             });

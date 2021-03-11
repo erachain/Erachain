@@ -39,5 +39,27 @@ public abstract class ImageCropDialog extends JDialog {
         setVisible(true);
     }
 
+    public ImageCropDialog(ImageIcon image) {
+        //setTitle();
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        ImageCropPanelNavigator2D imageCropPanel = new ImageCropPanelNavigator2D(image);
+        contentPanel.add(imageCropPanel, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        JButton okButton = new JButton("OK");
+        okButton.addActionListener(e ->
+                dispose()
+        );
+        buttonPanel.add(okButton, c);
+        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+        setContentPane(contentPanel);
+        pack();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setResizable(true);
+        setModal(true);
+        setVisible(true);
+    }
+
     public abstract void onFinish(BufferedImage image, TypeOfImage typeOfImage);
 }

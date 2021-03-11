@@ -5,7 +5,6 @@ import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
 import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +68,7 @@ public class WItemMap extends DCUMapImpl<Long, ItemCls> {
                 .valueSerializer(new ItemSerializer(this.type))
                 .counterEnable()
                 .makeOrGet();
-        map = ((BTreeMap) map).descendingMap();
+        //map = ((BTreeMap) map).descendingMap();
     }
 
     @Override
