@@ -233,7 +233,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      *
      * @return
      */
-    public Object[] getTags() {
+    public String[] getTags() {
         return null;
     }
 
@@ -322,7 +322,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public static String getItemTypeAndTag(int itemType, Object tag) {
-        return "@" + getItemTypeAndKey(itemType) + ":" + tag.toString();
+        return "@" + getItemTypeAndKey(itemType) + tag.toString();
     }
 
     public String getItemTypeAndKey() {

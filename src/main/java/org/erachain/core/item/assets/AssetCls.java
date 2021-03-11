@@ -536,8 +536,8 @@ public abstract class AssetCls extends ItemCls {
     }
 
     @Override
-    public Object[] getTags() {
-        return new Object[]{viewAssetTypeAbbrev()};
+    public String[] getTags() {
+        return new String[]{":" + viewAssetTypeAbbrev().toLowerCase()};
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
+import org.apache.commons.lang3.ArrayUtils;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.ItemCls;
@@ -132,14 +133,16 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                 new Fun.Function2<String[], Long, ItemCls>() {
                     @Override
                     public String[] run(Long key, ItemCls item) {
-                        // see https://regexr.com/
                         String[] keys = item.getName().toLowerCase().split(Transaction.SPLIT_CHARS);
                         for (int i = 0; i < keys.length; ++i) {
                             if (keys[i].length() > CUT_NAME_INDEX) {
                                 keys[i] = keys[i].substring(0, CUT_NAME_INDEX);
                             }
                         }
-                        return keys;
+                        String[] addTags = item.getTags();
+                        if (addTags == null || addTags.length == 0)
+                            return keys;
+                        return ArrayUtils.addAll(keys, addTags);
                     }
                 });
     }
