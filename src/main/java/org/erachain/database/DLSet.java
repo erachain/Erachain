@@ -94,7 +94,6 @@ public class DLSet extends DBASet {
                 logger.error(e.getMessage(), e);
             }
             database = makeDB(dbFile);
-            DBASet.setVersion(database, CURRENT_VERSION);
 
         }
 

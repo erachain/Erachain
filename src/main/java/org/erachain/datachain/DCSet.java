@@ -41,7 +41,7 @@ import java.util.Random;
 @Slf4j
 public class DCSet extends DBASet implements Closeable {
 
-    final static int CURRENT_VERSION = 530;
+    final static int CURRENT_VERSION = 531;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     /**
@@ -700,7 +700,6 @@ public class DCSet extends DBASet implements Closeable {
                 logger.error(e.getMessage(), e);
             }
             database = makeFileDB(dbFile);
-            DBASet.setVersion(database, CURRENT_VERSION);
 
         }
 
