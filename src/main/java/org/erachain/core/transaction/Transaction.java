@@ -928,6 +928,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
         if (creatorPersonDuration != null) {
             itemsKeys = new Object[][]{
                     new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()}

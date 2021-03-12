@@ -286,6 +286,10 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
         if (creatorPersonDuration == null) {
             itemsKeys = new Object[][]{
                     new Object[]{ItemCls.POLL_TYPE, key, poll.getTags()},

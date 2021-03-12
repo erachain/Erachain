@@ -166,6 +166,9 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
 
         ArrayList<Object> listTags = new ArrayList<>();
 

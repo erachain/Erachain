@@ -215,6 +215,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
         // запомним что тут две сущности
         if (key != 0) {
             if (creatorPersonDuration != null) {

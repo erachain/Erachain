@@ -819,6 +819,10 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
         if (creatorPersonDuration == null) {
             itemsKeys = new Object[][]{
                     new Object[]{ItemCls.STATUS_TYPE, key, status.getTags()},

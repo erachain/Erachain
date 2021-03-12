@@ -383,6 +383,10 @@ public class RSetUnionStatusToItem extends Transaction {
 
     @Override
     public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
         if (creatorPersonDuration == null) {
             itemsKeys = new Object[][]{
                     new Object[]{ItemCls.UNION_TYPE, key, unionItem.getTags()},

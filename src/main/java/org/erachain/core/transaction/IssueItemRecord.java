@@ -69,6 +69,10 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
         if (key == null || key == 0)
             return;
 
