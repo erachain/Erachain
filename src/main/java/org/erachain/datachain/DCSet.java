@@ -58,7 +58,7 @@ public class DCSet extends DBASet implements Closeable {
     public static final long DELETIONS_BEFORE_COMPACT = (long) ACTIONS_BEFORE_COMMIT;
 
     /**
-     * Включает подсчет количество в основной таблице трнзакций или в Таблице с подписями
+     * Включает подсчет количество в основной таблице транзакций или в Таблице с подписями
      */
     static private boolean SIZE_ENABLE_IN_FINAL = true;
 
