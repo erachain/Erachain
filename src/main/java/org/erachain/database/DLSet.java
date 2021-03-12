@@ -84,7 +84,7 @@ public class DLSet extends DBASet {
             database = makeDB(dbFile);
         }
 
-        if (DBASet.getVersion(database) != CURRENT_VERSION) {
+        if (DBASet.getVersion(database) < CURRENT_VERSION) {
             database.close();
             logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DLSet.");
             try {
@@ -106,7 +106,7 @@ public class DLSet extends DBASet {
     }
 
     /**
-     * Хранит пары на бирже - для статитки чтобы не пересчитывать
+     * Хранит пары на бирже - для статиcтbки чтобы не пересчитывать
      * Ключ: пара - первый наименьший ключ
      * Значение - статистика
      * AssetKey (Long) + AssetKey (Long) -> Stats

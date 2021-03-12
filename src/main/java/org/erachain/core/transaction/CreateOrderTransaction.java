@@ -98,6 +98,19 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     }
 
     // GETTERS/SETTERS
+
+    public void setDC(DCSet dcSet, boolean andUpdateFromState) {
+
+        super.setDC(dcSet, false);
+
+        this.haveAsset = dcSet.getItemAssetMap().get(this.haveKey);
+        this.wantAsset = dcSet.getItemAssetMap().get(this.wantKey);
+
+        if (false && andUpdateFromState && !isWiped())
+            updateFromStateDB();
+
+    }
+
     // public static String getName() { return "Create Order"; }
 
     public String getTitle() {
@@ -247,20 +260,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
         return new CreateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp,
                 reference, signatureBytes, seqNo, feeLong);
-    }
-
-    public void setDC(DCSet dcSet, boolean andUpdateFromState) {
-
-        super.setDC(dcSet, false);
-
-        if (dcSet != null && dcSet.getItemAssetMap() != null) {
-            this.haveAsset = dcSet.getItemAssetMap().get(this.haveKey);
-            this.wantAsset = dcSet.getItemAssetMap().get(this.wantKey);
-        }
-
-        if (false && andUpdateFromState && !isWiped())
-            updateFromStateDB();
-
     }
 
     public Long getOrderId() {
@@ -607,6 +606,26 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         }
 
         return super.isValid(forDeal, flags);
+    }
+
+    @Override
+    public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
+        if (creatorPersonDuration == null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.ASSET_TYPE, haveKey, haveAsset == null ? null : haveAsset.getTags()}, // транзакция ошибочная
+                    new Object[]{ItemCls.ASSET_TYPE, wantKey, wantAsset == null ? null : wantAsset.getTags()},
+            };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                    new Object[]{ItemCls.ASSET_TYPE, haveKey, haveAsset == null ? null : haveAsset.getTags()},
+                    new Object[]{ItemCls.ASSET_TYPE, wantKey, wantAsset == null ? null : wantAsset.getTags()},
+            };
+        }
     }
 
     // PROCESS/ORPHAN

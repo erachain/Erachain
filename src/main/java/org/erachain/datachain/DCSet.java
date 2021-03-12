@@ -41,7 +41,7 @@ import java.util.Random;
 @Slf4j
 public class DCSet extends DBASet implements Closeable {
 
-    final static int CURRENT_VERSION = 531;
+    final static int CURRENT_VERSION = 534;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     /**
@@ -690,7 +690,7 @@ public class DCSet extends DBASet implements Closeable {
             database = makeFileDB(dbFile);
         }
 
-        if (DBASet.getVersion(database) != CURRENT_VERSION) {
+        if (DBASet.getVersion(database) < CURRENT_VERSION) {
             database.close();
             logger.warn("New Version: " + CURRENT_VERSION + ". Try remake datachain Set " + dbFile.getParentFile().toPath());
             try {

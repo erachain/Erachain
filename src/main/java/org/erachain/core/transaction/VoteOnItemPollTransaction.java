@@ -284,6 +284,20 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     }
 
+    @Override
+    public void makeItemsKeys() {
+        if (creatorPersonDuration == null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.POLL_TYPE, key, poll.getTags()},
+            };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                    new Object[]{ItemCls.POLL_TYPE, key, poll.getTags()},
+            };
+        }
+    }
+
     //PROCESS/ORPHAN
 
     public void process(Block block, int forDeal) {
