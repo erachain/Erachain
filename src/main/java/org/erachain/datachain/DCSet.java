@@ -41,6 +41,8 @@ import java.util.Random;
 @Slf4j
 public class DCSet extends DBASet implements Closeable {
 
+    final static int CURRENT_VERSION = 530;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
@@ -515,6 +517,11 @@ public class DCSet extends DBASet implements Closeable {
      */
     public static DB makeFileDB(File dbFile) {
 
+        boolean isNew = !dbFile.exists();
+        if (isNew) {
+            dbFile.getParentFile().mkdirs();
+        }
+
         /// https://jankotek.gitbooks.io/mapdb/performance/
         DBMaker databaseStruc = DBMaker.newFileDB(dbFile)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
@@ -553,7 +560,7 @@ public class DCSet extends DBASet implements Closeable {
          * WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
          */
 
-        if (false) {
+        if (true) {
             // USE CACHE
             if (BLOCKS_MAP != DBS_MAP_DB) {
                 // если блоки не сохраняются в общей базе данных
@@ -611,7 +618,11 @@ public class DCSet extends DBASet implements Closeable {
             databaseStruc.cacheDisable();
         }
 
-        return databaseStruc.make();
+        DB database = databaseStruc.make();
+        if (isNew)
+            DBASet.setVersion(database, CURRENT_VERSION);
+
+        return database;
 
     }
 
@@ -664,9 +675,34 @@ public class DCSet extends DBASet implements Closeable {
 
         //OPEN DB
         File dbFile = new File(Settings.getInstance().getDataChainPath(), "chain.dat");
-        dbFile.getParentFile().mkdirs();
 
-        DB database = makeFileDB(dbFile);
+        DB database = null;
+        try {
+            database = makeFileDB(dbFile);
+        } catch (Throwable e) {
+            logger.error(e.getMessage(), e);
+            try {
+                Files.walkFileTree(dbFile.getParentFile().toPath(),
+                        new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (Throwable e1) {
+                logger.error(e1.getMessage(), e1);
+            }
+            database = makeFileDB(dbFile);
+        }
+
+        if (DBASet.getVersion(database) != CURRENT_VERSION) {
+            database.close();
+            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake datachain Set " + dbFile.getParentFile().toPath());
+            try {
+                Files.walkFileTree(dbFile.getParentFile().toPath(),
+                        new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (Throwable e) {
+                logger.error(e.getMessage(), e);
+            }
+            database = makeFileDB(dbFile);
+            DBASet.setVersion(database, CURRENT_VERSION);
+
+        }
 
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false, Controller.getInstance().databaseSystem);

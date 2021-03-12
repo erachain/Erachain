@@ -13,7 +13,7 @@ import java.nio.file.Files;
 @Slf4j
 public class DLSet extends DBASet {
 
-    final static int CURRENT_VERSION = 1;
+    final static int CURRENT_VERSION = 315;
 
     private PeerMap peerMap;
     private PairMapImpl pairMap;
@@ -25,10 +25,15 @@ public class DLSet extends DBASet {
     }
 
     static DB makeDB(File dbFile) {
-        dbFile.getParentFile().mkdirs();
-        return DBMaker.newFileDB(dbFile)
 
-               //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+        boolean isNew = !dbFile.exists();
+        if (isNew) {
+            dbFile.getParentFile().mkdirs();
+        }
+
+        DB database = DBMaker.newFileDB(dbFile)
+
+                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
                 ///// добавил dcSet.clearCache(); --
                 ///.cacheDisable()
 
@@ -43,16 +48,22 @@ public class DLSet extends DBASet {
 
                .checksumEnable()
                .mmapFileEnableIfSupported() // ++
-               /// ICREATOR
-               .commitFileSyncDisable() // ++
+                /// ICREATOR
+                .commitFileSyncDisable() // ++
 
-               // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-               .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+                // если при записи на диск блока процессор сильно нагружается - то уменьшить это
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
 
-               //.compressionEnable()
+                //.compressionEnable()
 
-               .transactionDisable()
-               .make();
+                .transactionDisable()
+                .make();
+
+        if (isNew)
+            DBASet.setVersion(database, CURRENT_VERSION);
+
+        return database;
+
     }
     public static DLSet reCreateDB() {
 
