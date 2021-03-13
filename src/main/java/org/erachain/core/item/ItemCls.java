@@ -53,8 +53,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public static final int POLL_TYPE = 8;
     public static final int AUTHOR_TYPE = 41;
 
-    public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
-    public static final int MAX_IMAGE_LENGTH = 1100000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
+    public static final int MAX_ICON_LENGTH = 150000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
+    public static final int MAX_IMAGE_LENGTH = 1500000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
     protected static final int TYPE_LENGTH = 2;
     protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int NAME_SIZE_LENGTH = 1;

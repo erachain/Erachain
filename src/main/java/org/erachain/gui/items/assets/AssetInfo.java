@@ -165,7 +165,7 @@ public class AssetInfo extends JTextPane {
                     } else if (arg0.getDescription().equals("!!img")) {
                         new ImageCropDialog(new ImageIcon(asset.getImage())) {
                             @Override
-                            public void onFinish(BufferedImage image, TypeOfImage typeOfImage) {
+                            public void onFinish(BufferedImage image, TypeOfImage typeOfImage, boolean useOriginal) {
                             }
                         };
                     } else if (arg0.getDescription().equals("!!Type")) {
