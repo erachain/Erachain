@@ -15,7 +15,7 @@ function assets(data) {
     output += '<br><br>';
 
     output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
-        'class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
+        'class="tiny table table-striped" style="font-size:1.3em; border: 1px solid #ddd;"><tr>';
     output += '<td><b>' + data.Label_table_asset_key + ': <b>' + data.Label_table_asset_name +
         '<td><b>' + data.Label_table_asset_type + '<td><b>' + data.Label_table_asset_owner;
     //output += '<td><b>' + data.Label_table_asset_orders + '<td><b>' + data.Label_table_asset_amount
