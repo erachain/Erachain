@@ -4,6 +4,7 @@
   max-width: 100%;
   max-height: auto%;
   position: absolute;
+  background-color: white;
   left: 0px;
   top: 0px; /* Or perhaps different coordinates */
   display: none;
