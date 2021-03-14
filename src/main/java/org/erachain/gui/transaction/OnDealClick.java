@@ -177,6 +177,10 @@ public class OnDealClick {
             case Transaction.HASH_ALREADY_EXIST:
                 mess = "HASH_ALREADY_EXIST";
                 break;
+            case Transaction.NOT_TRANSFERABLE_ASSET:
+                mess = "Not transferable asset";
+                break;
+
             case Transaction.WRONG_SIGNER:
                 mess = "Wrong Signer";
                 break;

@@ -142,6 +142,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int NO_INCLAIM_BALANCE = 49;
 
     public static final int HASH_ALREADY_EXIST = 51;
+    public static final int NOT_TRANSFERABLE_ASSET = 52;
 
     public static final int WRONG_SIGNER = 55;
 

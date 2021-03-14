@@ -767,6 +767,17 @@ public abstract class AssetCls extends ItemCls {
         return isUnSpendable(key, assetType);
     }
 
+    public static boolean isUnTransferable(long key, int assetType) {
+        return assetType == AssetCls.AS_NON_FUNGIBLE
+                || assetType == AssetCls.AS_RARE_FUNGIBLE_10
+                || assetType == AssetCls.AS_RARE_FUNGIBLE_100
+                || assetType == AssetCls.AS_RARE_FUNGIBLE_1000;
+    }
+
+    public boolean isUnTransferable() {
+        return isUnTransferable(key, assetType);
+    }
+
     public static boolean isUnDebtable(long key, int assetType) {
         return assetType == AssetCls.AS_INDEX
                 || assetType == AssetCls.AS_INSIDE_BONUS;

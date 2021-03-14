@@ -603,6 +603,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return Transaction.INVALID_AMOUNT;
         }
 
+        if (asset.isUnTransferable()) {
+            return Transaction.NOT_TRANSFERABLE_ASSET;
+        }
+
         // CHECK IF AMOUNT AND ASSET
         if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0L
                 && amount != null) {
