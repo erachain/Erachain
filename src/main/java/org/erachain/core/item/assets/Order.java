@@ -953,7 +953,7 @@ public class Order implements Comparable<Order> {
                 if (tradeAmountForHave.signum() <= 0
                         || tradeAmountForWant.signum() < 0) {
                     Long error = null;
-                    error ++;
+                    error++;
                 }
 
                 trade = new Trade(this.getId(), order.getId(), this.haveAssetKey, this.wantAssetKey,
@@ -963,8 +963,8 @@ public class Order implements Comparable<Order> {
                 //ADD TRADE TO DATABASE
                 tradesMap.put(trade);
 
-                /// так как у нас Индексы высчитываются по плавающей цене для остатков и она сейчас измениится
-                /// то сперва удалим Ордер - до изменения Остатокв и цены по Остаткам
+                /// так как у нас Индексы высчитываются по плавающей цене для остатков и она сейчас изменится
+                /// то сперва удалим Ордер - до изменения Остатков и цены по Остаткам
                 /// тогда можно ключи делать по цене на Остатки
                 //REMOVE FROM ORDERS
                 ordersMap.delete(order);

@@ -2119,12 +2119,8 @@ public abstract class AssetCls extends ItemCls {
     public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
 
         JSONObject assetJSON = super.jsonForExplorerPage(langObj, args);
-        //assetJSON.put("assetTypeKey", this.assetType);
         assetJSON.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
 
-        //assetJSON.put("orders", getOperations(DCSet.getInstance()));
-
-        //assetJSON.put("scale", this.getScale());
         assetJSON.put("quantity", this.getQuantity());
 
         BigDecimal released = getReleased();
@@ -2135,19 +2131,19 @@ public abstract class AssetCls extends ItemCls {
             AssetCls quoteAsset = (AssetCls) args[0];
             TradePair tradePair = PairsController.reCalcAndUpdate(this, quoteAsset, (PairMap) args[1], 10);
 
-            BigDecimal price = tradePair.getLower_askPrice();
+            BigDecimal price = tradePair.getLastPrice();
             if (price.signum() == 0) {
-                price = tradePair.getHighest_bidPrice();
+                price = tradePair.getLower_askPrice();
                 if (price.signum() == 0) {
-                    price = tradePair.getLastPrice();
+                    price = tradePair.getHighest_bidPrice();
                 }
             }
             BigDecimal marketCap = released.multiply(price);
             assetJSON.put("marketCap", marketCap);
-            assetJSON.put("lastPrice", tradePair.getLastPrice());
+            assetJSON.put("price", price);
 
             assetJSON.put("changePrice", tradePair.getFirstPrice().signum() > 0 ?
-                    tradePair.getLastPrice().subtract(tradePair.getFirstPrice())
+                    price.subtract(tradePair.getFirstPrice())
                             .movePointRight(2).divide(tradePair.getFirstPrice(), 3, RoundingMode.DOWN)
                     : 0.0);
 

@@ -14,7 +14,6 @@ function assets(data) {
     output += '</table>';
 
     if (!notDisplayPages) {
-        //output += pagesComponentBeauty(start, data.Label_Assets, data.lastNumber, data.pageSize, 'start');
         output += pagesComponent2(data);
     }
 
@@ -22,16 +21,12 @@ function assets(data) {
         'class="tiny table table-striped" style="font-size:1.2em; border: 1px solid #ddd;"><tr>';
     output += '<td><b>' + data.Label_table_asset_key + ': <b>' + data.Label_table_asset_name +
         '<td><b>' + data.Label_table_asset_type + '<td><b>' + data.Label_table_asset_owner;
-    //output += '<td><b>' + data.Label_table_asset_orders + '<td><b>' + data.Label_table_asset_amount
-    //     + '<td><b>' + data.Label_table_asset_scale;
     output += '<td><b>' + data.Label_table_asset_quantity + '<td><b>' + data.Label_table_asset_released
          + '<td><b>' + data.Label_table_asset_lastPrice
          + '<td><b>' + data.Label_table_asset_changePrice
          + '<td><b>' + data.Label_table_asset_marketCap;
 
     //Отображение таблицы элементов активов
-    //var length = Object.keys(data.pageItems).length;
-    //for (var i = 0; i < length - 1; i++) {
     for (var i in data.pageItems) {
         var item = data.pageItems[i];
         output += '<tr>';
@@ -43,7 +38,6 @@ function assets(data) {
         output += cutBlank(escapeHtml(item.name), 50);
         output += '</a>';
         output += '<td>' + item.assetTypeNameFull;
-        ////output += '<td>' + escapeHtml(item.description.substr(0, 60));
 
         output += '<td><a href=?address=' + item.owner + get_lang() + '>';
         if (item.hasOwnProperty('person'))
@@ -52,15 +46,14 @@ function assets(data) {
             output += item.owner;
         output += '</a></td>';
 
-        //output += '<td>' + item.orders;
         output += '<td>' + item.quantity;
         output += '<td>' + item.released;
-        output += '<td>' + item.lastPrice.toPrecision(8);
-        output += '<td>' + item.changePrice.toPrecision(4);
-        output += '<td>' + item.marketCap.toPrecision(10);
-
+        output += '<td>' + item.price.toPrecision(6);
+        output += '<td>' + (item.changePrice != 0? item.changePrice.toPrecision(3) : "--");
+        output += '<td>' + item.marketCap.toPrecision(6);
 
     }
+
     if (!notDisplayPages) {
         output += '</table>';
         output += pagesComponent2(data);

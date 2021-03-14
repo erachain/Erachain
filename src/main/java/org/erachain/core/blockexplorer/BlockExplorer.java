@@ -74,6 +74,8 @@ public class BlockExplorer {
     JSONObject output;
     private boolean forPrint;
 
+    static long ASSET_QUOTE_KEY = AssetCls.ERA_KEY;
+
     public static BlockExplorer getInstance() {
         if (blockExplorer == null) {
             blockExplorer = new BlockExplorer();
@@ -349,8 +351,9 @@ public class BlockExplorer {
                         break;
                     case "assets":
                         //search assets
+                        // use ERA for PRICES
                         Object[] expArgs = new Object[2];
-                        expArgs[0] = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
+                        expArgs[0] = Controller.getInstance().getAsset(ASSET_QUOTE_KEY);
                         expArgs[1] = Controller.getInstance().dlSet.getPairMap();
                         output.putAll(jsonQuerySearchPages(info, AssetCls.class, search, (int) start, pageSize, expArgs));
 
@@ -460,7 +463,7 @@ public class BlockExplorer {
             output.put("type", "assets");
 
             Object[] expArgs = new Object[2];
-            expArgs[0] = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
+            expArgs[0] = Controller.getInstance().getAsset(ASSET_QUOTE_KEY);
             expArgs[1] = Controller.getInstance().dlSet.getPairMap();
             output.putAll(jsonQueryPages(AssetCls.class, start, pageSize, expArgs));
 
