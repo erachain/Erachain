@@ -366,7 +366,8 @@ function persons(data) {
 
 
         output += '<tr>';
-        output += ' <td><img src="personimage?key=' + item.key + '" width="100"/>';
+        output += ' <td><a href=?person=' + item.key + get_lang()
+            + '><img src="personimage?key=' + item.key + '" width="100"/></a>';
         output += '<td>' + item.key + '<td><a href=?person=' +
             item.key + get_lang() + '>' + escapeHtml(item.name) + '</a>';
         var dateDiff = new Date(item.birthday);
