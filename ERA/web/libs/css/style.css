@@ -1,3 +1,14 @@
+#image-holder {
+  width: auto;
+  height: 80%;
+  position: absolute;
+  //left: 300px;
+  //top: 200px; /* Or perhaps different coordinates */
+  display: none;
+  z-index: 999;
+
+}
+
 table.tiny td {
     padding: 1px 5px !important;
     flex-wrap: nowrap !important;

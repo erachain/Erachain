@@ -4,9 +4,11 @@ function itemHead(item, forPrint) {
     var type = item.item_type;
 
     if (item.image) {
-        output += '<td><a href="#" ><img src="data:image/gif;base64,' + item.image + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
+        output += '<img id="image-holder" alt="" onclick="style.display = \'none\'">';
+        output += '<td><a href="#" onclick="showWindowImage(\'data:image/gif;base64,' + item.image + '\')" ><img src="data:image/gif;base64,' + item.image + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
         output += '<br>';
     }
+
 
     output += '<h3 style="display:inline;">';
 

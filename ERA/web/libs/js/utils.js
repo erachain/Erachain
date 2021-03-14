@@ -125,3 +125,10 @@ function updateURLParameter(url, param, paramVal){
     var rows_txt = temp + "" + param + "=" + paramVal;
     return baseURL + "?" + newAdditionalURL + rows_txt;
 }
+
+function showWindowImage(source) {
+  var img = document.getElementById('image-holder');
+  img.src = source;
+  img.style.display = 'block';
+  img.style.resizable = 1;
+}
