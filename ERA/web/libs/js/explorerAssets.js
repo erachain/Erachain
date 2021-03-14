@@ -4,18 +4,22 @@ function assets(data) {
     var numberShiftDelta = data.pageSize;
     output += lastBlock(data.lastBlock);
     var start = data.start;
+
+    output += '<table width="1280" border=0><tr><td align=left><br>';
+    output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.Label_Title + '</h3></a>';
+    output += '<br>';
+    for (var key in data.types_abbrevs) {
+        output += ' &nbsp&nbsp<a href=?q=:' + data.types_abbrevs[key] + get_lang() + '&search=assets class="button ll-blue-bgc"<b>' + data.types_abbrevs[key] + '</b></a>';
+    }
+    output += '</table>';
+
     if (!notDisplayPages) {
         //output += pagesComponentBeauty(start, data.Label_Assets, data.lastNumber, data.pageSize, 'start');
         output += pagesComponent2(data);
     }
 
-
-    output += '<table width="1280" border=0><tr><td align=left><br>';
-    output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.Label_Title + '</h3></a>';
-    output += '<br><br>';
-
-    output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
-        'class="tiny table table-striped" style="font-size:1.3em; border: 1px solid #ddd;"><tr>';
+    output += '<table BORDER=0 cellpadding=10 cellspacing=0 ' +
+        'class="tiny table table-striped" style="font-size:1.2em; border: 1px solid #ddd;"><tr>';
     output += '<td><b>' + data.Label_table_asset_key + ': <b>' + data.Label_table_asset_name +
         '<td><b>' + data.Label_table_asset_type + '<td><b>' + data.Label_table_asset_owner;
     //output += '<td><b>' + data.Label_table_asset_orders + '<td><b>' + data.Label_table_asset_amount
@@ -58,7 +62,7 @@ function assets(data) {
 
     }
     if (!notDisplayPages) {
-        output += '</table></td></tr></table>';
+        output += '</table>';
         output += pagesComponent2(data);
     }
     return output;

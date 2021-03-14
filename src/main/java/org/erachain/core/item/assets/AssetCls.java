@@ -233,6 +233,9 @@ public abstract class AssetCls extends ItemCls {
      * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_NON_FUNGIBLE = 65;
+    public static final int AS_RARE_FUNGIBLE_10 = 66;
+    public static final int AS_RARE_FUNGIBLE_100 = 67;
+    public static final int AS_RARE_FUNGIBLE_1000 = 68;
 
     /**
      * INDEXES (FOREX etc.)
@@ -312,7 +315,7 @@ public abstract class AssetCls extends ItemCls {
 
     public static int[] assetTypes;
 
-    public static int[] AssetTypes() {
+    public static int[] assetTypes() {
 
         if (assetTypes != null)
             return assetTypes;
@@ -1979,7 +1982,7 @@ public abstract class AssetCls extends ItemCls {
         for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
             JSONObject langObj = Lang.getInstance().getLangJson(iso);
             JSONObject langJson = new JSONObject();
-            for (int type : AssetTypes()) {
+            for (int type : assetTypes()) {
                 langJson.put(type, AssetTypeJson(type, langObj));
             }
             assetTypesJson.put(iso, langJson);
