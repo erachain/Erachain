@@ -1,7 +1,7 @@
 #image-holder {
   width: 100%;
   height: auto;
-  max-width: 100%;
+  max-width: 1000px;
   max-height: auto%;
   position: absolute;
   background-color: white;
