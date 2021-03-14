@@ -134,8 +134,14 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             return 0L;
         }
 
+        if (wantKey == AssetCls.ERA_KEY || haveKey == AssetCls.ERA_KEY
+                || wantKey == AssetCls.FEE_KEY || haveKey == AssetCls.FEE_KEY) {
+            return 100L * BlockChain.FEE_PER_BYTE;
+        }
+
+
         if (!BlockChain.MAIN_MODE || height > BlockChain.VERS_5_01_01) {
-            return 1000 * BlockChain.FEE_PER_BYTE;
+            return 1000L * BlockChain.FEE_PER_BYTE;
         } else {
             return long_fee;
         }
