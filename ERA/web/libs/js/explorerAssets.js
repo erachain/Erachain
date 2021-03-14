@@ -49,7 +49,7 @@ function assets(data) {
         output += '<td>' + item.quantity;
         output += '<td>' + item.released;
         output += '<td>' + (item.price == 0? "--" : item.price.toPrecision(6));
-        output += '<td>' + (item.changePrice == 0? "--" : item.changePrice.toPrecision(3));
+        output += '<td>' + (item.changePrice == 0? "--" : item.changePrice.toPrecision(2));
         output += '<td>' + (item.marketCap == 0? "--" : item.marketCap.toPrecision(6));
 
     }
