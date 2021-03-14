@@ -74,7 +74,7 @@ public class AssetInfo extends JTextPane {
                 int x = image.getIconWidth();
                 max_Height = image.getIconHeight();
 
-                max_Widht = 200;
+                max_Widht = 250;
                 double k = ((double) x / (double) max_Widht);
                 max_Height = (int) (max_Height / k);
 
@@ -89,14 +89,11 @@ public class AssetInfo extends JTextPane {
 
             if (cachedImage == null) {
                 imageByte = asset.getIcon();
-                if (imageByte != null && imageByte.length > 1) {
-                    //if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
+                if (imageByte != null && imageByte.length > 0) {
                     image = new ImageIcon(imageByte);
                     cachedImage = image.getImage().getScaledInstance(40, 40, 1);
                 }
             }
-
-            //   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
 
             String color = "#" + Integer.toHexString(UIManager.getColor("Panel.background").getRGB()).substring(2);
 
@@ -106,7 +103,7 @@ public class AssetInfo extends JTextPane {
             text += "<table><tr valign='top' align = 'left'><td>";
             text += "<DIV  style='float:left'><b>" + Lang.T("Key") + ": </b>" + asset.getKey() + "</DIV>";
 
-            // ADD IMAGE to THML
+            // ADD IMAGE to HTML
             if (cachedImage != null) {
                 text += "<div><a href ='!!img'  style='color: " + color + "' ><img src=\"" + img_Local_URL + "\"></a></div>";
             }
@@ -163,7 +160,7 @@ public class AssetInfo extends JTextPane {
                         hl_Owner.get_PopupMenu().show(th, x, y);
                         return;
                     } else if (arg0.getDescription().equals("!!img")) {
-                        new ImageCropDialog(new ImageIcon(asset.getImage())) {
+                        new ImageCropDialog(image) {
                             @Override
                             public void onFinish(BufferedImage image, TypeOfImage typeOfImage, boolean useOriginal) {
                             }
