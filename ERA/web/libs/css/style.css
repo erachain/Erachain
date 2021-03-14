@@ -1,11 +1,11 @@
 #image-holder {
-  width: auto;
-  height: 200%;
-  max-width: 80%;
-  max-height: 80%;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: auto%;
   position: absolute;
-  //left: 300px;
-  //top: 200px; /* Or perhaps different coordinates */
+  left: 0px;
+  top: 0px; /* Or perhaps different coordinates */
   display: none;
   z-index: 999;
 
