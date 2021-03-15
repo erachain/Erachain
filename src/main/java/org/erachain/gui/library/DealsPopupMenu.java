@@ -297,7 +297,7 @@ public class DealsPopupMenu extends JPopupMenu {
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), null);
+                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getMaker(), null);
                 panel.selectAccruals(null, asset);
                 MainPanel.getInstance().insertNewTab(Lang.T("Pay Dividend"), panel);
             }
@@ -344,7 +344,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
     public void init() {
 
-        boolean isCreatorOwner = asset != null && pubKey.equals(asset.getOwner());
+        boolean isCreatorMaker = asset != null && pubKey.equals(asset.getMaker());
         boolean isSelfManaged = asset.isSelfManaged();
         boolean isUnlimited = isSelfManaged || asset.isUnlimited(pubKey, false);
 
@@ -361,7 +361,7 @@ public class DealsPopupMenu extends JPopupMenu {
         String actionName;
 
         /// **** SEND
-        actionName = asset.viewAssetTypeAction(asset.isReverseSend(), TransactionAmount.ACTION_SEND, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(asset.isReverseSend(), TransactionAmount.ACTION_SEND, isCreatorMaker);
         if (actionName == null) {
             this.sendAsset.setVisible(false);
         } else {
@@ -369,7 +369,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.sendAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(!asset.isReverseSend(), TransactionAmount.ACTION_SEND, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(!asset.isReverseSend(), TransactionAmount.ACTION_SEND, isCreatorMaker);
         if (actionName == null) {
             this.sendAssetBackward.setVisible(false);
         } else {
@@ -378,7 +378,7 @@ public class DealsPopupMenu extends JPopupMenu {
         }
 
         /// **** DEBT
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_DEBT, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_DEBT, isCreatorMaker);
         if (actionName == null) {
             this.debtAsset.setVisible(false);
         } else {
@@ -386,7 +386,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.debtAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_REPAY_DEBT, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_REPAY_DEBT, isCreatorMaker);
         if (actionName == null) {
             this.debtAssetReturn.setVisible(false);
         } else {
@@ -394,7 +394,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.debtAssetReturn.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_DEBT, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_DEBT, isCreatorMaker);
         if (actionName == null) {
             this.debtAssetBackward.setVisible(false);
         } else {
@@ -403,7 +403,7 @@ public class DealsPopupMenu extends JPopupMenu {
         }
 
         //// **** HOLD
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_HOLD, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_HOLD, isCreatorMaker);
         if (actionName == null) {
             this.holdAsset.setVisible(false);
         } else {
@@ -411,7 +411,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.holdAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_HOLD, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_HOLD, isCreatorMaker);
         if (actionName == null) {
             this.holdAssetBackward.setVisible(false);
         } else {
@@ -420,7 +420,7 @@ public class DealsPopupMenu extends JPopupMenu {
         }
 
         //// **** SPEND
-        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SPEND, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SPEND, isCreatorMaker);
         if (actionName == null) {
             this.spendAsset.setVisible(false);
         } else {
@@ -428,7 +428,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.spendAsset.setVisible(true);
         }
 
-        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_SPEND, isCreatorOwner);
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_SPEND, isCreatorMaker);
         if (actionName == null) {
             this.spendAssetBackward.setVisible(false);
         } else {
@@ -485,7 +485,7 @@ public class DealsPopupMenu extends JPopupMenu {
             case AssetCls.AS_BANK_GUARANTEE_TOTAL:
 
                 balance = pubKey.getBalance(asset.getKey());
-                if (pubKey.equals(asset.getOwner()) || balance.a.b.signum() > 0) {
+                if (pubKey.equals(asset.getMaker()) || balance.a.b.signum() > 0) {
 
                 } else {
                     this.sendAsset.setEnabled(false);
@@ -502,7 +502,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
             this.debtAssetReturn.setVisible(false);
 
-            if (pubKey.equals(asset.getOwner())) {
+            if (pubKey.equals(asset.getMaker())) {
                 this.holdAsset.setEnabled(false);
                 this.debtAsset.setEnabled(false);
                 this.debtAssetBackward.setEnabled(false);
@@ -528,15 +528,15 @@ public class DealsPopupMenu extends JPopupMenu {
         } else if (isSelfManaged) {
             this.debtAssetReturn.setVisible(false);
 
-            this.sendAsset.setEnabled(isCreatorOwner);
-            this.debtAsset.setEnabled(isCreatorOwner);
-            this.holdAsset.setEnabled(isCreatorOwner);
-            this.spendAsset.setEnabled(isCreatorOwner);
+            this.sendAsset.setEnabled(isCreatorMaker);
+            this.debtAsset.setEnabled(isCreatorMaker);
+            this.holdAsset.setEnabled(isCreatorMaker);
+            this.spendAsset.setEnabled(isCreatorMaker);
 
-            //this.sendAssetBackward.setVisible(isCreatorOwner);
-            //this.debtAssetBackward.setVisible(isCreatorOwner);
-            //this.holdAssetBackward.setVisible(isCreatorOwner);
-            //this.spendAssetBackward.setVisible(isCreatorOwner);
+            //this.sendAssetBackward.setVisible(isCreatorMaker);
+            //this.debtAssetBackward.setVisible(isCreatorMaker);
+            //this.holdAssetBackward.setVisible(isCreatorMaker);
+            //this.spendAssetBackward.setVisible(isCreatorMaker);
         }
 
         ownSeparator.setVisible(sendAsset.isVisible() || sendAssetBackward.isVisible());

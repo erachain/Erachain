@@ -16,12 +16,12 @@ public abstract class StatementCls extends ItemCls {
 
     public static final int INITIAL_FAVORITES = 0;
 
-    public StatementCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, owner, name, icon, image, description);
+    public StatementCls(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, maker, name, icon, image, description);
     }
 
-    public StatementCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
+    public StatementCls(int type, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        this(new byte[TYPE_LENGTH], maker, name, icon, image, description);
         typeBytes[0] = (byte) type;
 
     }

@@ -122,7 +122,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         Bind.secondaryKey((BTreeMap) map, this.ownerKeyMap, new Fun.Function2<String, Long, ItemCls>() {
             @Override
             public String run(Long key, ItemCls value) {
-                return value.getOwner().getAddress();
+                return value.getMaker().getAddress();
             }
         });
 

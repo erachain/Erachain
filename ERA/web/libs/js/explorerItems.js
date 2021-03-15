@@ -40,17 +40,17 @@ function itemHead(item, forPrint) {
 
     output += ', &nbsp' + item.Label_DateIssue + ':<b> ' + convertTimestamp(item.block_timestamp, true) + '</b></h4>';
 
-    output += '<h4>' + item.Label_Owner + ': ';
-    if (item.owner_person) {
+    output += '<h4>' + item.Label_Maker + ': ';
+    if (item.maker_person) {
         if (forPrint)
-            output += '<b>' + item.owner_person + ' (' + item.creator + ')</b></h4>';
+            output += '<b>' + item.maker_person + ' (' + item.creator + ')</b></h4>';
         else
-            output += '<a href ="?address=' + item.owner + get_lang() + '"><b> ' + item.owner_person + '</b></a></h4>';
+            output += '<a href ="?address=' + item.maker + get_lang() + '"><b> ' + item.maker_person + '</b></a></h4>';
     } else {
         if (forPrint)
-            output += '<b>' + item.owner + '</b></h4>';
+            output += '<b>' + item.maker + '</b></h4>';
         else
-            output += '<a href ="?address=' + item.owner + get_lang() + '"><b> ' + item.owner + '</b></a></h4>';
+            output += '<a href ="?address=' + item.maker + get_lang() + '"><b> ' + item.maker + '</b></a></h4>';
     }
 
     if (item.tx_seqNo) {

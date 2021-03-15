@@ -14,7 +14,7 @@ public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls>
 
     public WalletItemTemplatesTableModel() {
         super(Controller.getInstance().wallet.database.getTemplateMap(),
-                new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
+                new String[]{"Key", "Name", "Maker", "Confirmed", "Favorite"},
                 new Boolean[]{true, true, true, true, true}, true, COLUMN_FAVORITE);
     }
 
@@ -37,7 +37,7 @@ public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls>
                 return template;
 
             case COLUMN_ADDRESS:
-                return template.getOwner().getPersonAsString();
+                return template.getMaker().getPersonAsString();
 
             case COLUMN_CONFIRMED:
                 return template.isConfirmed();

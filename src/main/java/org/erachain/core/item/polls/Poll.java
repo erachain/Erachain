@@ -16,12 +16,12 @@ public class Poll extends PollCls {
 
     private static final int TYPE_ID = POLL;
 
-    public Poll(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, List<String> options) {
-        super(TYPE_ID, owner, name, icon, image, description, options);
+    public Poll(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, List<String> options) {
+        super(TYPE_ID, maker, name, icon, image, description, options);
     }
 
-    public Poll(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, List<String> options) {
-        super(typeBytes, owner, name, icon, image, description, options);
+    public Poll(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, List<String> options) {
+        super(typeBytes, maker, name, icon, image, description, options);
     }
 
     //PARSE
@@ -33,9 +33,9 @@ public class Poll extends PollCls {
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
-        position += OWNER_LENGTH;
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
+        position += MAKER_LENGTH;
 
         //READ NAME
         //byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
@@ -122,7 +122,7 @@ public class Poll extends PollCls {
         }
 
         //RETURN
-        Poll poll = new Poll(typeBytes, owner, name, icon, image, description, options);
+        Poll poll = new Poll(typeBytes, maker, name, icon, image, description, options);
         if (includeReference) {
             poll.setReference(reference, dbRef);
         }

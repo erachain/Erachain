@@ -15,7 +15,7 @@ public class WalletItemImprintsTableModel extends WalletTableModel<ImprintCls> {
 
     public WalletItemImprintsTableModel() {
         super(Controller.getInstance().wallet.database.getImprintMap(),
-                new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"},
+                new String[]{"Key", "Name", "Maker", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false}, true, COLUMN_FAVORITE);
     }
 
@@ -35,7 +35,7 @@ public class WalletItemImprintsTableModel extends WalletTableModel<ImprintCls> {
                 return imprint;
 
             case COLUMN_ADDRESS:
-                return imprint.getOwner().getPersonAsString();
+                return imprint.getMaker().getPersonAsString();
 
             case COLUMN_CONFIRMED:
                 return imprint.isConfirmed();

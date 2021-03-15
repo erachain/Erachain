@@ -81,14 +81,14 @@ public class ImprintDetailsPanel extends JPanel {
 
         //LABEL OWNER
         labelGBC.gridy = 4;
-        JLabel ownerLabel = new JLabel(Lang.T("Owner") + ":");
-        this.add(ownerLabel, labelGBC);
+        JLabel makerLabel = new JLabel(Lang.T("Maker") + ":");
+        this.add(makerLabel, labelGBC);
 
         //OWNER
         detailGBC.gridy = 4;
-        JTextField owner = new JTextField(imprint.getOwner().getPersonAsString());
-        owner.setEditable(false);
-        this.add(owner, detailGBC);
+        JTextField maker = new JTextField(imprint.getMaker().getPersonAsString());
+        maker.setEditable(false);
+        this.add(maker, detailGBC);
 
         //IF IMPRINT CONFIRMED
         if (this.imprint.getKey() >= 0) {

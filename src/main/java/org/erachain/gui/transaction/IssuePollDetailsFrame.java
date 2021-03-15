@@ -56,22 +56,22 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
         this.add(txtAreaOption, fieldGBC);
 
 
-        //owner
+        //maker
         ++fieldGBC.gridy;
-        JTextField owner = new JTextField(poll.getOwner().getAddress());
-        owner.setEditable(false);
-        this.add(owner, fieldGBC);
+        JTextField maker = new JTextField(poll.getMaker().getAddress());
+        maker.setEditable(false);
+        this.add(maker, fieldGBC);
 
-        //LABEL owner Public key
+        //LABEL maker Public key
         ++labelGBC.gridy;
-        JLabel owner_Public_keyLabel = new JLabel(Lang.T("Public key") + ":");
-        this.add(owner_Public_keyLabel, labelGBC);
+        JLabel maker_Public_keyLabel = new JLabel(Lang.T("Public key") + ":");
+        this.add(maker_Public_keyLabel, labelGBC);
 
-        //owner public key
+        //maker public key
         ++fieldGBC.gridy;
-        JTextField owner_Public_Key = new JTextField(poll.getOwner().getBase58());
-        owner_Public_Key.setEditable(false);
-        this.add(owner_Public_Key, fieldGBC);
+        JTextField maker_Public_Key = new JTextField(poll.getMaker().getBase58());
+        maker_Public_Key.setEditable(false);
+        this.add(maker_Public_Key, fieldGBC);
 
         //PACK
         //	this.pack();

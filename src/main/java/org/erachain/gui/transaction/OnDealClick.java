@@ -150,7 +150,7 @@ public class OnDealClick {
                 break;
 
             case Transaction.BUYER_ALREADY_OWNER:
-                mess = "Buyer already owner";
+                mess = "Buyer already maker";
                 break;
             case Transaction.INVALID_AMOUNT:
                 mess = "Invalid amount";
@@ -264,7 +264,7 @@ public class OnDealClick {
                 mess = "Invalid signature";
                 break;
             case Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID:
-                mess = "Invalid Person Owner signature";
+                mess = "Invalid Person Maker signature";
                 break;
             case Transaction.TRANSACTION_DOES_NOT_EXIST:
                 mess = "Transaction does not exist";
@@ -389,7 +389,7 @@ public class OnDealClick {
                 mess = "Invalid item value";
                 break;
             case Transaction.CREATOR_NOT_OWNER:
-                mess = "Creator not owner";
+                mess = "Creator not maker";
                 break;
 
             case Transaction.ITEM_DOES_NOT_EXIST:

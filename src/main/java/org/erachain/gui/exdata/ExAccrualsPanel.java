@@ -237,7 +237,7 @@ public class ExAccrualsPanel extends IconPanel {
 
         int selected = jComboBoxAccrualAction.getSelectedIndex();
         jComboBoxAccrualAction.setModel(new javax.swing.DefaultComboBoxModel(
-                asset.viewAssetTypeActionsList(creator.equals(asset.getOwner()), false).toArray()));
+                asset.viewAssetTypeActionsList(creator.equals(asset.getMaker()), false).toArray()));
         if (selected >= 0)
             jComboBoxAccrualAction.setSelectedIndex(selected);
 

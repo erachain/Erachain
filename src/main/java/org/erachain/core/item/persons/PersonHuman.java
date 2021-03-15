@@ -19,42 +19,42 @@ import org.json.simple.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-//  typeBytes[1] ::: ownerSignature==null?(byte)0:(byte)1
+//  typeBytes[1] ::: makerSignature==null?(byte)0:(byte)1
 public class PersonHuman extends PersonCls {
 
     private static final int TYPE_ID = HUMAN;
 
-    // for personal data owner - his signature
-    protected byte[] ownerSignature;
+    // for personal data maker - his signature
+    protected byte[] makerSignature;
 
-    public PersonHuman(PublicKeyAccount owner, String fullName, long birthday, long deathday,
+    public PersonHuman(PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
-                       byte[] ownerSignature) {
-        super(new byte[]{(byte) TYPE_ID, ownerSignature == null ? (byte) 0 : (byte) 1}, owner, fullName, birthday, deathday,
+                       byte[] makerSignature) {
+        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
-        this.ownerSignature = ownerSignature;
+        this.makerSignature = makerSignature;
     }
 
-    public PersonHuman(PublicKeyAccount owner, String fullName, String birthday, String deathday,
+    public PersonHuman(PublicKeyAccount maker, String fullName, String birthday, String deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
-                       byte[] ownerSignature) {
-        super(new byte[]{(byte) TYPE_ID, ownerSignature == null ? (byte) 0 : (byte) 1}, owner, fullName, birthday, deathday,
+                       byte[] makerSignature) {
+        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
-        this.ownerSignature = ownerSignature;
+        this.makerSignature = makerSignature;
     }
 
-    public PersonHuman(byte[] typeBytes, PublicKeyAccount owner, String fullName, long birthday, long deathday,
+    public PersonHuman(byte[] typeBytes, PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image,
-                       String description, byte[] ownerSignature) {
-        super(typeBytes, owner, fullName, birthday, deathday,
+                       String description, byte[] makerSignature) {
+        super(typeBytes, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
-        this.ownerSignature = ownerSignature;
+        this.makerSignature = makerSignature;
     }
 
     //GETTERS/SETTERS
@@ -69,9 +69,9 @@ public class PersonHuman extends PersonCls {
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
-        position += OWNER_LENGTH;
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
+        position += MAKER_LENGTH;
 
         //READ FULL NAME
         int fullNameLength = Byte.toUnsignedInt(data[position]);
@@ -209,20 +209,20 @@ public class PersonHuman extends PersonCls {
         byte height = data[position];
         position++;
 
-        byte[] ownerSignature;
+        byte[] makerSignature;
         if (typeBytes[1] == 1) {
             // with signature
             //READ SIGNATURE
-            ownerSignature = Arrays.copyOfRange(data, position, position + Transaction.SIGNATURE_LENGTH);
+            makerSignature = Arrays.copyOfRange(data, position, position + Transaction.SIGNATURE_LENGTH);
             position += Transaction.SIGNATURE_LENGTH;
         } else {
-            ownerSignature = null;
+            makerSignature = null;
         }
 
         //RETURN
-        PersonHuman personHuman = new PersonHuman(typeBytes, owner, fullName, birthday, deathday,
+        PersonHuman personHuman = new PersonHuman(typeBytes, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
-                skinColor, eyeColor, hairСolor, height, icon, image, description, ownerSignature);
+                skinColor, eyeColor, hairСolor, height, icon, image, description, makerSignature);
 
         if (includeReference) {
             personHuman.setReference(reference, dbRef);
@@ -239,8 +239,8 @@ public class PersonHuman extends PersonCls {
         return 5;
     }
 
-    public byte[] getOwnerSignature() {
-        return ownerSignature;
+    public byte[] getMakerSignature() {
+        return makerSignature;
     }
 
     public boolean isMustBeSigned() {
@@ -250,7 +250,7 @@ public class PersonHuman extends PersonCls {
     public byte[] toBytes(boolean includeReference, boolean onlyBody) {
         byte[] data = super.toBytes(includeReference, onlyBody);
         if (this.typeBytes[1] == 1) {
-            data = Bytes.concat(data, this.ownerSignature);
+            data = Bytes.concat(data, this.makerSignature);
         }
 
         return data;
@@ -261,8 +261,8 @@ public class PersonHuman extends PersonCls {
 
         JSONObject personJSON = super.toJson();
 
-        if (this.ownerSignature != null) {
-            personJSON.put("ownerSignature", Base58.encode(this.ownerSignature));
+        if (this.makerSignature != null) {
+            personJSON.put("makerSignature", Base58.encode(this.makerSignature));
         }
 
         return personJSON;
@@ -274,31 +274,31 @@ public class PersonHuman extends PersonCls {
     }
 
     //
-    public void sign(PrivateKeyAccount owner) {
+    public void sign(PrivateKeyAccount maker) {
 
-        if (!Arrays.equals(owner.getPublicKey(), this.owner.getPublicKey())) {
+        if (!Arrays.equals(maker.getPublicKey(), this.maker.getPublicKey())) {
             //this.typeBytes[1] = (byte)0;
             return;
         }
 
         boolean includeReference = false;
         // not use SIGNATURE here
-        boolean forOwnerSign = true;
-        byte[] data = super.toBytes(includeReference, forOwnerSign);
+        boolean forMakerSign = true;
+        byte[] data = super.toBytes(includeReference, forMakerSign);
         if (data == null) {
             //this.typeBytes[1] = (byte)0;
             return;
         }
 
-        this.ownerSignature = Crypto.getInstance().sign(owner, data);
+        this.makerSignature = Crypto.getInstance().sign(maker, data);
         this.typeBytes[1] = (byte) 1;
 
     }
 
     public boolean isSignatureValid(DCSet dcSet) {
 
-        if (this.ownerSignature == null || this.ownerSignature.length != Crypto.SIGNATURE_LENGTH
-                || Arrays.equals(this.ownerSignature, new byte[Crypto.SIGNATURE_LENGTH]))
+        if (this.makerSignature == null || this.makerSignature.length != Crypto.SIGNATURE_LENGTH
+                || Arrays.equals(this.makerSignature, new byte[Crypto.SIGNATURE_LENGTH]))
             return false;
 
         if (dcSet.getBlocksHeadsMap().size() < BlockChain.SKIP_VALID_SIGN_BEFORE) {
@@ -314,13 +314,13 @@ public class PersonHuman extends PersonCls {
         }
 
         boolean includeReference = false;
-        boolean forOwnerSign = true;
+        boolean forMakerSign = true;
         // not use SIGNATURE here
-        byte[] data = super.toBytes(includeReference, forOwnerSign);
+        byte[] data = super.toBytes(includeReference, forMakerSign);
         if (data == null)
             return false;
 
-        return Crypto.getInstance().verify(this.owner.getPublicKey(), this.ownerSignature, data);
+        return Crypto.getInstance().verify(this.maker.getPublicKey(), this.makerSignature, data);
     }
 
 }

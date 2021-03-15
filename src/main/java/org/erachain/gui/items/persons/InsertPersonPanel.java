@@ -278,9 +278,9 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtHeight.setText("" + person.getHeight());
 
         txtSign.setText(
-                person.isSignatureValid(DCSet.getInstance()) ? Base58.encode(person.getOwnerSignature())
-                        : Lang.T("Wrong signature for data owner"));
-        txtPublicKey.setText(Base58.encode(person.getOwner().getPublicKey()));
+                person.isSignatureValid(DCSet.getInstance()) ? Base58.encode(person.getMakerSignature())
+                        : Lang.T("Wrong signature for data maker"));
+        txtPublicKey.setText(Base58.encode(person.getMaker().getPublicKey()));
 
     }
 

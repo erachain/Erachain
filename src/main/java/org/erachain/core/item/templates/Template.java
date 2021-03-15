@@ -32,9 +32,9 @@ public class Template extends TemplateCls {
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
+        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
         PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
-        position += OWNER_LENGTH;
+        position += MAKER_LENGTH;
 
         //READ NAME
         //byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);

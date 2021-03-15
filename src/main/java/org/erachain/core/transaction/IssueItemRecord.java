@@ -323,8 +323,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public HashSet<Account> getRecipientAccounts() {
         HashSet<Account> accounts = new HashSet<>(3, 1);
-        if (!this.item.getOwner().equals(this.creator)) {
-            accounts.add(this.item.getOwner());
+        if (!this.item.getMaker().equals(this.creator)) {
+            accounts.add(this.item.getMaker());
         }
         return accounts;
     }
@@ -332,7 +332,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public boolean isInvolved(Account account) {
 
-        if (account.equals(this.creator) || account.equals(this.item.getOwner())) {
+        if (account.equals(this.creator) || account.equals(this.item.getMaker())) {
             return true;
         }
 

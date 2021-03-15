@@ -1678,7 +1678,7 @@ public class ExData {
 
         if (template != null) {
             DCSet dcSet = transaction.getDCSet();
-            Account templateOwner = template.getOwner();
+            Account templateOwner = template.getMaker();
 
             BigDecimal royaltyFee = getRoyaltyFeeBG();
             if (royaltyFee != null && royaltyFee.signum() != 0) {
@@ -1715,7 +1715,7 @@ public class ExData {
 
         if (template != null) {
             DCSet dcSet = transaction.getDCSet();
-            Account templateOwner = template.getOwner();
+            Account templateOwner = template.getMaker();
 
             BigDecimal royaltyFee = getRoyaltyFeeBG();
             if (royaltyFee != null && royaltyFee.signum() != 0) {

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
+import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
@@ -992,10 +993,14 @@ public class Order implements Comparable<Order> {
                 }
 
                 //TRANSFER FUNDS
-                order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey,
-                        tradeAmountForWant, false, false, false);
-                transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
-                        "Trade Order @" + Transaction.viewDBRef(order.id));
+                if (false) {
+                    AssetCls.processTrade(block, (CreateOrderTransaction) transaction, order, false, tradeAmountForWant);
+                } else {
+                    order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey,
+                            tradeAmountForWant, false, false, false);
+                    transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
+                            "Trade Order @" + Transaction.viewDBRef(order.id));
+                }
 
                 // Учтем что у стороны ордера обновилась форжинговая информация
                 if (order.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {

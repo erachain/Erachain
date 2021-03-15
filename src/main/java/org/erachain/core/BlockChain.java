@@ -935,7 +935,7 @@ public class BlockChain {
         if (FEE_ASSET == null)
             FEE_ASSET = Controller.getInstance().getDCSet().getItemAssetMap().get(AssetCls.FEE_KEY);
 
-        return FEE_ASSET.getOwner().equals(account);
+        return FEE_ASSET.getMaker().equals(account);
     }
 
 

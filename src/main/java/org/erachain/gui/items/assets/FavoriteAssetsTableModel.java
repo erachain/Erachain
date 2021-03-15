@@ -19,7 +19,7 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
     public FavoriteAssetsTableModel() {
         super(DCSet.getInstance().getItemAssetMap(),
                 Controller.getInstance().wallet.database.getAssetFavoritesSet(),
-                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
+                new String[]{"Key", "Name", "Maker", "Type", "Quantity", "Favorite", "I Maker"},
                 new Boolean[]{false, true, true, false, false, false, false},
                 ObserverMessage.RESET_ASSET_FAVORITES_TYPE,
                 ObserverMessage.ADD_ASSET_FAVORITES_TYPE,
@@ -47,7 +47,7 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
             case COLUMN_NAME:
                 return asset;
             case COLUMN_ADDRESS:
-                return asset.getOwner().getPersonAsString();
+                return asset.getMaker().getPersonAsString();
             case COLUMN_ASSET_TYPE:
                 return Lang.T(asset.viewAssetType());
             case COLUMN_AMOUNT:
@@ -55,7 +55,7 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
             case COLUMN_FAVORITE:
                 return asset.isFavorite();
             case COLUMN_I_OWNER:
-                return Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress());
+                return Controller.getInstance().isAddressIsMine(asset.getMaker().getAddress());
         }
         return null;
     }

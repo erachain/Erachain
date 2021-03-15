@@ -107,7 +107,7 @@ public class AdderHeadInfo {
         output.put("Label_Title", Lang.T("Assets", langObj));
         output.put("Label_table_asset_key", Lang.T("Key", langObj));
         output.put("Label_table_asset_name", Lang.T("Name", langObj));
-        output.put("Label_table_asset_owner", Lang.T("Owner", langObj));
+        output.put("Label_table_asset_maker", Lang.T("Maker", langObj));
         output.put("Label_table_asset_type", Lang.T("Type", langObj));
         output.put("Label_table_asset_description", Lang.T("Description", langObj));
         output.put("Label_table_asset_scale", Lang.T("Scale", langObj));

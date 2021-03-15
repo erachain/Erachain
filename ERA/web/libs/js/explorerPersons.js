@@ -375,11 +375,11 @@ function persons(data) {
         //output += '<td>' + convertTimestamp(item.birthday, true) + ' - '
         output += '<td>' + (new Date().getFullYear() - dateDiff.getFullYear());
         //output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
-        output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+        output += '<td><a href=?address=' + item.maker + get_lang() + '>';
         if (item.hasOwnProperty('person'))
             output += '[' + item.person_key + ']' + escapeHtml(item.person);
         else
-            output += item.owner;
+            output += item.maker;
         output += '</a>';
     }
     if (!notDisplayPages) {

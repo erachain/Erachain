@@ -12,7 +12,7 @@ public class TableModelImprints extends TimerTableModelCls<ImprintCls> implement
     public static final int COLUMN_ADDRESS = 2;
 
     public TableModelImprints() {
-        super(new String[]{"Key", "Name", "Owner"}, new Boolean[]{false, true, true}, false);
+        super(new String[]{"Key", "Name", "Maker"}, new Boolean[]{false, true, true}, false);
     }
 
 
@@ -35,7 +35,7 @@ public class TableModelImprints extends TimerTableModelCls<ImprintCls> implement
 
             case COLUMN_ADDRESS:
 
-                return imprint.getOwner().getPersonAsString();
+                return imprint.getMaker().getPersonAsString();
 
         }
 

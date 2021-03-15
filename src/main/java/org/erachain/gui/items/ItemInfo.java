@@ -63,7 +63,7 @@ public class ItemInfo extends JPanel {
         jLabel_Account_Creator.setText(Lang.T("Account Creator") + ":");
         add(jLabel_Account_Creator, labelGBC);
 
-        jTextField_Account_Creator = new MAccoutnTextField(item.getOwner());
+        jTextField_Account_Creator = new MAccoutnTextField(item.getMaker());
         jTextField_Account_Creator.setEditable(false);
         add(jTextField_Account_Creator, fieldGBC);
 

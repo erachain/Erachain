@@ -157,8 +157,8 @@ public class PollsDialog extends JDialog {
 
         // LABEL ACCOUNT
         labelGBC.gridy = 4;
-        JLabel ownerLabel = new JLabel(Lang.T("Account") + ":");
-        this.add(ownerLabel, labelGBC);
+        JLabel makerLabel = new JLabel(Lang.T("Account") + ":");
+        this.add(makerLabel, labelGBC);
 
         // CBX ACCOUNT
         detailGBC.gridy = 4;

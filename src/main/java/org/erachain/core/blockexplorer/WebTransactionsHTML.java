@@ -313,19 +313,19 @@ public class WebTransactionsHTML {
         out += "<br>";
         //out += "<b>" + Lang.TFromLangObj("Description", langObj) + ":</b> "
         //        + person.getDescription() + "<br>";
-        if (person.getOwner().getPerson() != null) {
-            // out += "<b>" + Lang.TFromLangObj("Owner",
+        if (person.getMaker().getPerson() != null) {
+            // out += "<b>" + Lang.TFromLangObj("Maker",
             // langObj) + ":</b> <a href=?person="
-            // +person.getOwner().getPerson().b.getKey()+ get_Lang(langObj) +
-            // ">" + person.getOwner().viewPerson() +"</a><br>";
+            // +person.getMaker().getPerson().b.getKey()+ get_Lang(langObj) +
+            // ">" + person.getMaker().viewPerson() +"</a><br>";
         } else {
-            // out += "<b>" +Lang.TFromLangObj("Owner",
+            // out += "<b>" +Lang.TFromLangObj("Maker",
             // langObj) + ":</b> <a href=?address=" +
-            // person.getOwner().getAddress() + get_Lang(langObj) + ">" +
-            // person.getOwner().getAddress() +"</a><br>";
+            // person.getMaker().getAddress() + get_Lang(langObj) + ">" +
+            // person.getMaker().getAddress() +"</a><br>";
         }
         // out += "<b>" + Lang.TFromLangObj("Public
-        // Key", langObj) + ":</b> " + person.getOwner().getBase58() +"<br>";
+        // Key", langObj) + ":</b> " + person.getMaker().getBase58() +"<br>";
         return out;
     }
 
@@ -603,19 +603,19 @@ public class WebTransactionsHTML {
         out += "</b><br>";
         //out += "<b>" + Lang.TFromLangObj("Description", langObj) + ":</b> "
         //        + person.getDescription() + "<br>";
-        if (person.getOwner().getPerson() != null) {
-            // out += "<b>" + Lang.TFromLangObj("Owner",
+        if (person.getMaker().getPerson() != null) {
+            // out += "<b>" + Lang.TFromLangObj("Maker",
             // langObj) + ":</b> <a href=?person="
-            // +person.getOwner().getPerson().b.getKey()+ get_Lang(langObj) +
-            // ">" + person.getOwner().viewPerson() +"</a><br>";
+            // +person.getMaker().getPerson().b.getKey()+ get_Lang(langObj) +
+            // ">" + person.getMaker().viewPerson() +"</a><br>";
         } else {
-            // out += "<b>" +Lang.TFromLangObj("Owner",
+            // out += "<b>" +Lang.TFromLangObj("Maker",
             // langObj) + ":</b> <a href=?address=" +
-            // person.getOwner().getAddress() + get_Lang(langObj) + ">" +
-            // person.getOwner().getAddress() +"</a><br>";
+            // person.getMaker().getAddress() + get_Lang(langObj) + ">" +
+            // person.getMaker().getAddress() +"</a><br>";
         }
         // out += "<b>" + Lang.TFromLangObj("Public
-        // Key", langObj) + ":</b> " + person.getOwner().getBase58() +"<br>";
+        // Key", langObj) + ":</b> " + person.getMaker().getBase58() +"<br>";
         return out;
     }
 

@@ -41,7 +41,7 @@ public class AssetInfo extends JTextPane {
     private AssetCls asset;
     private Transaction transaction;
     private AssetInfo th;
-    private PublicKeyAccount owner;
+    private PublicKeyAccount maker;
     private int max_Widht;
     private int max_Height;
     private Image cachedImage;
@@ -58,8 +58,8 @@ public class AssetInfo extends JTextPane {
             //   initComponents();
             th = this;
             this.asset = asset;
-            owner = asset.getOwner();
-            HyperLinkAccount hl_Owner = new HyperLinkAccount(owner);
+            maker = asset.getMaker();
+            HyperLinkAccount hl_Maker = new HyperLinkAccount(maker);
 
             byte[] recordReference = asset.getReference();
             transaction = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
@@ -119,7 +119,7 @@ public class AssetInfo extends JTextPane {
             } else {
                 text += Library.to_HTML(asset.viewDescription()) + "</div>";
             }
-            text += "<div>" + Lang.T("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
+            text += "<div>" + Lang.T("Maker") + ": <a href = '!!Maker'><b>" + hl_Maker.get_Text() + "</b></a></div>";
             text += "<div>" + Lang.T("Class") + ": <b>" + Lang.T(asset.getItemSubType()) + "</b>,";
             text += " " + Lang.T("Type") + ": <a href='!!Type'><b>" +
                     asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:"
@@ -153,11 +153,11 @@ public class AssetInfo extends JTextPane {
                 public void hyperlinkUpdate(HyperlinkEvent arg0) {
                     // TODO Auto-generated method stub
                     if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
-                    if (arg0.getDescription().equals("!!Owner")) {
+                    if (arg0.getDescription().equals("!!Maker")) {
                         Point location = MouseInfo.getPointerInfo().getLocation();
                         int x = location.x - th.getLocationOnScreen().x;
                         int y = location.y - th.getLocationOnScreen().y;
-                        hl_Owner.get_PopupMenu().show(th, x, y);
+                        hl_Maker.get_PopupMenu().show(th, x, y);
                         return;
                     } else if (arg0.getDescription().equals("!!img")) {
                         new ImageCropDialog(image) {

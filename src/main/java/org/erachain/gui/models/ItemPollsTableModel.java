@@ -47,7 +47,7 @@ public class ItemPollsTableModel extends TimerTableModelCls<ItemCls> implements 
 
             case COLUMN_CREATOR:
 
-                return poll.getOwner().getPersonAsString();
+                return poll.getMaker().getPersonAsString();
 
             case COLUMN_VOTES:
 

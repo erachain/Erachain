@@ -254,7 +254,7 @@ public class ItemPersonsResource {
         if (pubkeyStr == null) {
             // by Default - from Person
             PersonCls person = cntr.getPerson(personKey);
-            pubKey = person.getOwner();
+            pubKey = person.getMaker();
         } else {
             if (!PublicKeyAccount.isValidPublicKey(pubkeyStr)) {
                 throw ApiErrorFactory.getInstance().createError(

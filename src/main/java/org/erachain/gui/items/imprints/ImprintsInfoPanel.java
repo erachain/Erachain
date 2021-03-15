@@ -31,8 +31,9 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel key_jLabel;
     private javax.swing.JTextField key_jTextField;
-    private javax.swing.JLabel owner_jLabel;
-    private javax.swing.JTextField owner_jTextField;
+    private javax.swing.JLabel maker_jLabel;
+    private javax.swing.JTextField maker_jTextField;
+
     /**
      * Creates new form ImprintsInfoPanel
      */
@@ -58,8 +59,8 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         description_jLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         description_jTextArea = new MTextPane();
-        owner_jLabel = new javax.swing.JLabel();
-        owner_jTextField = new javax.swing.JTextField();
+        maker_jLabel = new javax.swing.JLabel();
+        maker_jTextField = new javax.swing.JTextField();
         holders_jLabel = new javax.swing.JLabel();
 
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
@@ -132,23 +133,23 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
         add(jScrollPane1, gridBagConstraints);
 
-        owner_jLabel.setText(Lang.T("Owner") + ":");
+        maker_jLabel.setText(Lang.T("Maker") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 9);
-        add(owner_jLabel, gridBagConstraints);
-        owner_jTextField.setText(imprint.getOwner().getPersonAsString());
-        owner_jTextField.setEditable(false);
+        add(maker_jLabel, gridBagConstraints);
+        maker_jTextField.setText(imprint.getMaker().getPersonAsString());
+        maker_jTextField.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 9);
-        add(owner_jTextField, gridBagConstraints);
+        add(maker_jTextField, gridBagConstraints);
 
         holders_jLabel.setText(Lang.T("Holders"));
         gridBagConstraints = new java.awt.GridBagConstraints();

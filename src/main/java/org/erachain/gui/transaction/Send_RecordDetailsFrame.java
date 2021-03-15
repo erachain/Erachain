@@ -73,7 +73,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             String sendType;
             if (asset != null) {
                 sendType = Lang.T(asset.viewAssetTypeAction(r_Send.isBackward(), r_Send.balancePosition(),
-                        r_Send.getCreator() != null && r_Send.getAsset().getOwner().equals(r_Send.getCreator())));
+                        r_Send.getCreator() != null && r_Send.getAsset().getMaker().equals(r_Send.getCreator())));
             } else {
                 sendType = "???";
             }

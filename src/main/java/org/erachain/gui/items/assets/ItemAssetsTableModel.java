@@ -18,7 +18,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_I_OWNER = 6;
 
     public ItemAssetsTableModel() {
-        super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"},
+        super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Maker", "Type", "Quantity", "Favorite", "I Maker"},
                 new Boolean[]{false, true, true, false, false, false, false, false},
                 COLUMN_FAVORITE);
 
@@ -48,7 +48,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
 
             case COLUMN_ADDRESS:
 
-                return asset.getOwner().getPersonAsString();
+                return asset.getMaker().getPersonAsString();
 
             case COLUMN_AMOUNT:
 
@@ -60,7 +60,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
 
             case COLUMN_I_OWNER:
 
-                if (Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress()))
+                if (Controller.getInstance().isAddressIsMine(asset.getMaker().getAddress()))
                     return true;
                 return false;
         }

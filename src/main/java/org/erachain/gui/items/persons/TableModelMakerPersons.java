@@ -16,7 +16,7 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 @SuppressWarnings("serial")
-public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
+public class TableModelMakerPersons extends TimerTableModelCls<PersonCls> {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_BORN = 2;
@@ -27,7 +27,7 @@ public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
     private PersonAddressMap personMap;
     private TransactionFinalMap transactionFinalMap;
 
-    public TableModelOwnerPersons(Long key) {
+    public TableModelMakerPersons(Long key) {
         super(DCSet.getInstance().getItemPersonMap(),
                 new String[]{"Key", "Name", "Birthday", "Favorite"},
                 null, COLUMN_FAVORITE, true);

@@ -40,7 +40,7 @@ public class ItemsPersonsTableModel extends SearchItemsTableModel {
 
             case COLUMN_PUBLISHER:
 
-                return person.getOwner().getPersonAsString();
+                return person.getMaker().getPersonAsString();
 
             case COLUMN_FAVORITE:
 

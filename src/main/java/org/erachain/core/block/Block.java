@@ -2153,10 +2153,10 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 // учтем для эмитента что для него сгорело
                 if (earnedPair.b.signum() != 0) {
-                    asset.getOwner().changeBalance(dcSet, asOrphan, false, asset.getKey(),
+                    asset.getMaker().changeBalance(dcSet, asOrphan, false, asset.getKey(),
                             earnedPair.b, false, false, true);
                     if (this.txCalculated != null) {
-                        this.txCalculated.add(new RCalculated(asset.getOwner(), asset.getKey(),
+                        this.txCalculated.add(new RCalculated(asset.getMaker(), asset.getKey(),
                                 earnedPair.b, "Asset Total Burned", Transaction.makeDBRef(this.heightBlock, 0), 0L));
                     }
                 }
@@ -2339,7 +2339,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                 byte[] key = iterator.next();
                 holder = new Account(ItemAssetBalanceMap.getShortAccountFromKey(key));
                 if (holder.equals(BlockChain.FEE_ASSET_EMITTER)
-                        || holder.equals(asset.getOwner()))
+                        || holder.equals(asset.getMaker()))
                     continue;
 
                 balanceHold = map.get(key).a.b;

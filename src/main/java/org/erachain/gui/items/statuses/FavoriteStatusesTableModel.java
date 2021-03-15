@@ -47,7 +47,7 @@ public class FavoriteStatusesTableModel extends FavoriteItemModelTable {
                 return status;
 
             case COLUMN_ADDRESS:
-                return status.getOwner().getPersonAsString();
+                return status.getMaker().getPersonAsString();
 
             case COLUMN_FAVORITE:
                 return status.isFavorite();

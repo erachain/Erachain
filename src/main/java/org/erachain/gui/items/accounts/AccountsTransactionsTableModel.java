@@ -101,7 +101,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
                 return Lang.T(itemTran.transaction.viewFullTypeName());
 
             case COLUMN_SENDER:
-                if (itemTran.owner != null) {
+                if (itemTran.maker != null) {
                     return itemTran.transaction.viewCreator();
                 }
                 return "GENESIS";
@@ -208,7 +208,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
         } else if (transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
             GenesisTransferAssetTransaction gen_send = (GenesisTransferAssetTransaction) transaction;
 
-            // if is owner
+            // if is maker
             String own = "";
             if (gen_send.getCreator() != null) own = gen_send.getCreator().getAddress();
 
@@ -217,9 +217,9 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             if (filterAccount != null && !gen_send.getRecipient().getAddress().equals(this.filterAccount.getAddress()))
                 trr.amount = gen_send.getAmount().negate();
             // if is creator
-            if (gen_send.getCreator() != null) trr.owner = gen_send.getCreator();
-            // if is owner
-            if (gen_send.getCreator() != null) trr.owner = gen_send.getCreator();
+            if (gen_send.getCreator() != null) trr.maker = gen_send.getCreator();
+            // if is maker
+            if (gen_send.getCreator() != null) trr.maker = gen_send.getCreator();
             trr.recipient = gen_send.viewRecipient();
 
         } else if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
@@ -260,7 +260,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
         public Transaction transaction;
         public ItemCls itemCls;
         public BigDecimal amount;
-        public Account owner;
+        public Account maker;
         public String recipient;
         public String title;
 
@@ -276,9 +276,9 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
                     itemCls = dcSet.getItemAssetMap().get(itemKey);
                 }
             }
-            owner = transaction.getCreator();
-            if (owner != null)
-                isOutCome = owner.hashCode() == walletKey.b;
+            maker = transaction.getCreator();
+            if (maker != null)
+                isOutCome = maker.hashCode() == walletKey.b;
             amount = transaction.getAmount();
             title = transaction.getTitle();
         }

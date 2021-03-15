@@ -20,7 +20,7 @@ function assets(data) {
     output += '<table BORDER=0 cellpadding=10 cellspacing=0 ' +
         'class="tiny table table-striped" style="font-size:1.2em; border: 1px solid #ddd;"><tr>';
     output += '<td><b>' + data.Label_table_asset_key + ': <b>' + data.Label_table_asset_name +
-        '<td><b>' + data.Label_table_asset_type + '<td><b>' + data.Label_table_asset_owner;
+        '<td><b>' + data.Label_table_asset_type + '<td><b>' + data.Label_table_asset_maker;
     output += '<td><b>' + data.Label_table_asset_quantity + '<td><b>' + data.Label_table_asset_released
          + '<td><b>' + data.Label_table_asset_lastPrice
          + '<td><b>' + data.Label_table_asset_changePrice
@@ -39,11 +39,11 @@ function assets(data) {
         output += '</a>';
         output += '<td>' + item.assetTypeNameFull;
 
-        output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+        output += '<td><a href=?address=' + item.maker + get_lang() + '>';
         if (item.hasOwnProperty('person'))
             output += '[' + item.person_key + ']' + cutBlank(escapeHtml(item.person), 25);
         else
-            output += item.owner;
+            output += item.maker;
         output += '</a></td>';
 
         output += '<td>' + item.quantity;
@@ -295,7 +295,7 @@ function trades(data) {
 
         output += '<td align=right style="line-height: 150%;">';
 
-        if (trade.initiatorCreator_addr == data.assetWantOwner) {
+        if (trade.initiatorCreator_addr == data.assetWantMaker) {
             if (trade.type != 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
             } else {
@@ -328,7 +328,7 @@ function trades(data) {
         output += '<td style="line-height: 150%;">';
         output += '<a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
 
-        if (trade.targetCreator_addr == data.assetHaveOwner) {
+        if (trade.targetCreator_addr == data.assetHaveMaker) {
             if (trade.type == 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
             } else {

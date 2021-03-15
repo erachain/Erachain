@@ -38,7 +38,7 @@ public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
                 return union;
 
             case COLUMN_ADDRESS:
-                return union.getOwner().getPersonAsString();
+                return union.getMaker().getPersonAsString();
 
             case COLUMN_FAVORITE:
                 return union.isFavorite();

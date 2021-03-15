@@ -12,12 +12,12 @@ public class Note extends StatementCls {
 
     private static final int TYPE_ID = NOTE;
 
-    public Note(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(TYPE_ID, owner, name, icon, image, description);
+    public Note(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(TYPE_ID, maker, name, icon, image, description);
     }
 
-    public Note(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, owner, name, icon, image, description);
+    public Note(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, maker, name, icon, image, description);
     }
 
     //GETTERS/SETTERS
@@ -31,9 +31,9 @@ public class Note extends StatementCls {
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
-        position += OWNER_LENGTH;
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
+        position += MAKER_LENGTH;
 
         //READ NAME
         //byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
@@ -101,7 +101,7 @@ public class Note extends StatementCls {
         }
 
         //RETURN
-        Note status = new Note(typeBytes, owner, name, icon, image, description);
+        Note status = new Note(typeBytes, maker, name, icon, image, description);
         if (includeReference) {
             status.setReference(reference, dbRef);
         }

@@ -181,7 +181,7 @@ public class TestRecSetStatusToItem {
         assertEquals(item.getName(), itemParsed.getName());
 
         //CHECK OWNER
-        assertEquals(item.getOwner().getAddress(), itemParsed.getOwner().getAddress());
+        assertEquals(item.getMaker().getAddress(), itemParsed.getMaker().getAddress());
 
         //CHECK DESCRIPTION
         assertEquals(item.getDescription(), itemParsed.getDescription());
