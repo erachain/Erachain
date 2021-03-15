@@ -677,7 +677,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
         itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
         itemJSON.put("description", this.description);
-        itemJSON.put("maker", this.maker.getAddress()); // @Deprecated
+        itemJSON.put("maker", this.maker.getAddress());
+        itemJSON.put("creator", this.maker.getAddress()); // @Deprecated
         itemJSON.put("maker_public_key", this.maker.getBase58());
         itemJSON.put("maker_publickey", this.maker.getBase58());
         //itemJSON.put("makerPubkey", this.maker.getBase58());
