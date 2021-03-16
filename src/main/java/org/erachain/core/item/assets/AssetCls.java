@@ -7,6 +7,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.PairMap;
@@ -2237,29 +2238,42 @@ public abstract class AssetCls extends ItemCls {
     static BigDecimal taxCoefficient = new BigDecimal("0.1");
     static BigDecimal referralsCoefficient = new BigDecimal("0.02");
 
-    public static void processTrade(DCSet dcSet, Block block, AssetCls assetHave, AssetCls assetWant, Order order,
+    public static void processTrade(DCSet dcSet, Block block, Transaction transaction, Account receiver,
+                                    AssetCls assetHave, AssetCls assetWant, Order order,
                                     boolean asOrphan, BigDecimal tradeAmountForWant) {
         //TRANSFER FUNDS
-        if (assetHave.getAssetType() == AS_NON_FUNGIBLE) {
+        PublicKeyAccount haveAssetMaker = assetHave.getMaker();
+        if (assetHave.getAssetType() == AS_NON_FUNGIBLE
+                && !receiver.equals(haveAssetMaker)) {
             // значит приход это тот актив который мы можем поделить
-            BigDecimal tax = tradeAmountForWant.multiply(taxCoefficient);
-            BigDecimal referral = tradeAmountForWant.multiply(referralsCoefficient);
-            tradeAmountForWant = tradeAmountForWant.subtract(tax);
-            tax = tax.subtract(referral);
+            // и это не сам автор продает
+            BigDecimal royalty = tradeAmountForWant.multiply(taxCoefficient);
+            tradeAmountForWant = tradeAmountForWant.subtract(royalty);
+            BigDecimal referralAmount = tradeAmountForWant.multiply(referralsCoefficient);
+            royalty = royalty.subtract(referralAmount);
 
-            assetWant.getReference();
+            haveAssetMaker.changeBalance(dcSet, asOrphan, false, assetWant.getKey(),
+                    royalty, false, false, false);
+            if (!asOrphan)
+                transaction.addCalculated(block, haveAssetMaker, order.getWantAssetKey(), royalty,
+                        "NFT Royalty by Order @" + Transaction.viewDBRef(order.getId()));
 
-            assetWant.getMaker().changeBalance(dcSet, asOrphan, false, assetWant.getKey(),
-                    //        tradeAmountForWant, false, false, false);
-                    //transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
-                    //        "Trade Order @" + Transaction.viewDBRef(order.getId()));
+            Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
+
+            PublicKeyAccount authorInviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
+            authorInviter.changeBalance(dcSet, asOrphan, false, assetWant.getKey(),
+                    referralAmount, false, false, false);
+            if (!asOrphan)
+                transaction.addCalculated(block, authorInviter, order.getWantAssetKey(), royalty,
+                        "NFT Royalty Referral by Order @" + Transaction.viewDBRef(order.getId()));
 
         }
 
-        order.getCreator().changeBalance(transaction.getDCSet(), asOrphan, false, order.getWantAssetKey(),
+        receiver.changeBalance(dcSet, asOrphan, false, order.getWantAssetKey(),
                 tradeAmountForWant, false, false, false);
-        transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
-                "Trade Order @" + Transaction.viewDBRef(order.getId()));
+        if (!asOrphan)
+            transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
+                    "Trade Order @" + Transaction.viewDBRef(order.getId()));
 
     }
 

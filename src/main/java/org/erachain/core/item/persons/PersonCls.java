@@ -304,6 +304,16 @@ public abstract class PersonCls extends ItemCls {
 
     }
 
+    public static PublicKeyAccount getIssuer(DCSet dcSet, Long personKey) {
+        ItemCls person = dcSet.getItemPersonMap().get(personKey);
+        Long issuerDBRef = dcSet.getTransactionFinalMapSigns().get(person.getReference());
+        Transaction issueRecord = dcSet.getTransactionFinalMap().get(issuerDBRef);
+        return issueRecord.getCreator();
+    }
+
+    public PublicKeyAccount getIssuer(DCSet dcSet) {
+        return getIssuer(dcSet, key);
+    }
 
     // DB
     public ItemMap getDBMap(DCSet db) {

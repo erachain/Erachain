@@ -2079,11 +2079,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         // CREATOR is PERSON
         // FIND person
-        ItemCls person = this.dcSet.getItemPersonMap().get(invitedPersonKey);
-        Long inviteredDBRef = this.dcSet.getTransactionFinalMapSigns().get(person.getReference());
-
-        Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
-        Account issuerAccount = issueRecord.getCreator();
+        Account issuerAccount = PersonCls.getIssuer(dcSet, invitedPersonKey);
         Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(this.dcSet);
         long issuerPersonKey;
         if (issuerPersonDuration == null) {
@@ -2383,7 +2379,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 if (invitedFee > 0) {
                     process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
                             block != null && block.txCalculated != null ?
-                                    block.txCalculated : null, "Referal bonus " + "@" + this.viewHeightSeq());
+                                    block.txCalculated : null, "Referral bonus " + "@" + this.viewHeightSeq());
                 }
             }
 

@@ -994,7 +994,12 @@ public class Order implements Comparable<Order> {
 
                 //TRANSFER FUNDS
                 if (true) {
-                    AssetCls.processTrade(block, (CreateOrderTransaction) transaction, order, false, tradeAmountForWant);
+                    AssetCls.processTrade(dcSet, block, (CreateOrderTransaction) transaction, order.getCreator(),
+                            ((CreateOrderTransaction) transaction).getHaveAsset(),
+                            ((CreateOrderTransaction) transaction).getWantAsset(),
+                            order, false,
+                            tradeAmountForWant);
+
                 } else {
                     order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey,
                             tradeAmountForWant, false, false, false);
