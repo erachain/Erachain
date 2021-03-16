@@ -22,16 +22,16 @@ public class AssetUnique extends AssetCls {
     private static final int TYPE_ID = UNIQUE;
     private Account owner;
 
-    public AssetUnique(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, PublicKeyAccount owner) {
-        super(typeBytes, maker, name, icon, image, description, asset_type);
+    public AssetUnique(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        super(typeBytes, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(int props, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, maker, name, icon, image, description, asset_type, owner);
+    public AssetUnique(int props, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type) {
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, maker, name, icon, image, description, asset_type, owner);
+    public AssetUnique(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, maker, name, icon, image, description, assetType);
     }
 
     //GETTERS/SETTERS
@@ -156,13 +156,13 @@ public class AssetUnique extends AssetCls {
         position += ASSET_TYPE_LENGTH;
 
         //READ OWNER
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
-        position += MAKER_LENGTH;
+        //byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        //PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+        //position += MAKER_LENGTH;
 
 
         //RETURN
-        AssetUnique unique = new AssetUnique(typeBytes, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]), owner);
+        AssetUnique unique = new AssetUnique(typeBytes, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
         if (includeReference) {
             unique.setReference(reference, dbRef);
         }
@@ -179,7 +179,7 @@ public class AssetUnique extends AssetCls {
         data = Bytes.concat(data, new byte[]{(byte) this.getAssetType()});
 
         // WRITE OWNER
-        data = Bytes.concat(data, this.maker.getPublicKey());
+        //data = Bytes.concat(data, this.maker.getPublicKey());
 
         return data;
     }
