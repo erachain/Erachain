@@ -15,8 +15,6 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-//import com.google.common.primitives.Bytes;
-
 public class AssetUnique extends AssetCls {
 
     private static final int TYPE_ID = UNIQUE;
