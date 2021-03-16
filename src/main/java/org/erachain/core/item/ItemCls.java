@@ -250,7 +250,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public long getKey() {
-        return this.key; //getKey(DCSet.getInstance());
+        return this.key;
     }
 
     public long getKey(DCSet db) {

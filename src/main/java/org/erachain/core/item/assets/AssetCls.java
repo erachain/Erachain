@@ -7,7 +7,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.PairMap;
@@ -2238,22 +2237,22 @@ public abstract class AssetCls extends ItemCls {
     static BigDecimal taxCoefficient = new BigDecimal("0.1");
     static BigDecimal referralsCoefficient = new BigDecimal("0.02");
 
-    public static void processTrade(Block block, CreateOrderTransaction transaction, Order order,
+    public static void processTrade(DCSet dcSet, Block block, AssetCls assetHave, AssetCls assetWant, Order order,
                                     boolean asOrphan, BigDecimal tradeAmountForWant) {
         //TRANSFER FUNDS
-        if (transaction.getHaveAsset().getAssetType() == AS_NON_FUNGIBLE) {
+        if (assetHave.getAssetType() == AS_NON_FUNGIBLE) {
+            // значит приход это тот актив который мы можем поделить
             BigDecimal tax = tradeAmountForWant.multiply(taxCoefficient);
             BigDecimal referral = tradeAmountForWant.multiply(referralsCoefficient);
             tradeAmountForWant = tradeAmountForWant.subtract(tax);
             tax = tax.subtract(referral);
 
-            AssetCls wantAsset = transaction.getWantAsset();
-            wantAsset.getReference();
+            assetWant.getReference();
 
-            //wantAsset.getCreator().changeBalance(transaction.getDCSet(), asOrphan, false, order.getWantAssetKey(),
-            //        tradeAmountForWant, false, false, false);
-            //transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
-            //        "Trade Order @" + Transaction.viewDBRef(order.getId()));
+            assetWant.getMaker().changeBalance(dcSet, asOrphan, false, assetWant.getKey(),
+                    //        tradeAmountForWant, false, false, false);
+                    //transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
+                    //        "Trade Order @" + Transaction.viewDBRef(order.getId()));
 
         }
 
