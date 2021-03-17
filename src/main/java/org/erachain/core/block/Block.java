@@ -114,6 +114,8 @@ public class Block implements Closeable, ExplorerJsonLine {
     // FORGING INFO
     // при обработке трнзакций используем для запоминания что данные менялись
     protected List<Account> forgingInfoUpdate;
+    protected HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> earnedAllAssets;
+
 
     // was validated
     protected boolean wasValidated;
@@ -1692,6 +1694,9 @@ public class Block implements Closeable, ExplorerJsonLine {
             TransactionFinalMapImpl finalMap = dcSetPlace.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSigns = dcSetPlace.getTransactionFinalMapSigns();
 
+            // CLEAR ASSETS FEE
+            earnedAllAssets = new HashMap<>();
+
             int seqNo = 0;
             for (Transaction transaction : this.transactions) {
                 if (cnt.isOnStopping())
@@ -2043,6 +2048,35 @@ public class Block implements Closeable, ExplorerJsonLine {
     }
 
     //PROCESS/ORPHAN
+
+    public void addAssetFee(AssetCls asset, BigDecimal assetFeeAdd, BigDecimal assetFeeBurnAdd) {
+
+        Tuple2<BigDecimal, BigDecimal> earnedPair;
+        BigDecimal assetFee;
+        BigDecimal assetFeeBurn;
+
+        if (earnedAllAssets.containsKey(asset)) {
+            earnedPair = earnedAllAssets.get(asset);
+            assetFee = earnedPair.a;
+            assetFeeBurn = earnedPair.b;
+        } else {
+            assetFee = BigDecimal.ZERO;
+            assetFeeBurn = BigDecimal.ZERO;
+        }
+
+        if (assetFeeAdd != null && assetFeeAdd.signum() != 0) {
+            assetFee = assetFee.add(assetFeeAdd);
+        }
+
+        if (assetFeeBurnAdd != null && assetFeeBurnAdd.signum() != 0) {
+            assetFee = assetFee.subtract(assetFeeBurnAdd);
+            assetFeeBurn = assetFeeBurn.add(assetFeeBurnAdd);
+        }
+
+        earnedPair = new Tuple2(assetFee, assetFeeBurn);
+        earnedAllAssets.put(asset, earnedPair);
+    }
+
     public void feeProcess(DCSet dcSet, boolean asOrphan) {
         //REMOVE FEE
 
@@ -2092,7 +2126,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Account.BALANCE_SIDE_FORGED);
 
             // MAKE CALCULATED TRANSACTIONS
-            if (this.txCalculated != null) {
+            if (!asOrphan && this.txCalculated != null) {
                 this.txCalculated.add(new RCalculated(this.creator, Transaction.FEE_KEY,
                         forgerEarn, "forging", Transaction.makeDBRef(this.heightBlock, 0), 0L));
             }
@@ -2104,63 +2138,55 @@ public class Block implements Closeable, ExplorerJsonLine {
                     new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), false, false, true);
         }
 
-        if (transactionCount > 0 && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()) {
-            // подсчет наград с ПЕРЕВОДОВ
-            HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> earnedAllAssets = new HashMap<>();
-            Tuple2<BigDecimal, BigDecimal> earnedPair;
-            BigDecimal assetFee;
-            BigDecimal assetFeeBurn;
-            for (Transaction transaction : getTransactions()) {
-                if (transaction.assetFee == null)
-                    continue;
+    }
 
-                AssetCls asset = transaction.getAsset();
-                if (earnedAllAssets.containsKey(asset)) {
-                    earnedPair = earnedAllAssets.get(asset);
-                    assetFee = earnedPair.a;
-                    assetFeeBurn = earnedPair.b;
-                } else {
-                    assetFee = BigDecimal.ZERO;
-                    assetFeeBurn = BigDecimal.ZERO;
+    /**
+     * Начисляет подати с конкретных транзакций по активу - разные выплаты.
+     * Необходимо перед просчетом транзакций очищать earnedAllAssets
+     *
+     * @param dcSet
+     * @param asOrphan
+     */
+    public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
+
+        if (transactionCount == 0)
+            return;
+
+        // подсчет наград с ПЕРЕВОДОВ
+        Tuple2<BigDecimal, BigDecimal> earnedPair;
+        BigDecimal assetFee;
+        BigDecimal assetFeeBurn;
+        for (Transaction transaction : getTransactions()) {
+            if (transaction.assetFee == null)
+                continue;
+
+            AssetCls asset = transaction.getAsset();
+            addAssetFee(asset, transaction.assetFee, transaction.assetFeeBurn);
+
+        }
+
+        // FOR ASSETS
+        for (AssetCls asset : earnedAllAssets.keySet()) {
+            earnedPair = earnedAllAssets.get(asset);
+
+            // учтем для форжера что он нафоржил
+            if (earnedPair.a.signum() != 0) {
+                this.creator.changeBalance(dcSet, asOrphan, false, asset.getKey(),
+                        earnedPair.a, false, false, true);
+                if (!asOrphan && this.txCalculated != null) {
+                    this.txCalculated.add(new RCalculated(this.creator, asset.getKey(),
+                            earnedPair.a, "Asset Total Forged", Transaction.makeDBRef(this.heightBlock, 0), 0L));
                 }
-
-                if (transaction.assetFee.signum() != 0) {
-                    assetFee = assetFee.add(transaction.assetFee);
-                }
-                if (transaction.assetFeeBurn != null && transaction.assetFeeBurn.signum() != 0) {
-                    assetFee = assetFee.subtract(transaction.assetFeeBurn);
-                    assetFeeBurn = assetFeeBurn.add(transaction.assetFeeBurn);
-                }
-
-                earnedPair = new Tuple2(assetFee, assetFeeBurn);
-                earnedAllAssets.put(asset, earnedPair);
-
             }
 
-            // FOR ASSETS
-            for (AssetCls asset : earnedAllAssets.keySet()) {
-                earnedPair = earnedAllAssets.get(asset);
-
-                // учтем для форжера что он нафоржил
-                if (earnedPair.a.signum() != 0) {
-                    this.creator.changeBalance(dcSet, asOrphan, false, asset.getKey(),
-                            earnedPair.a, false, false, true);
-                    if (this.txCalculated != null) {
-                        this.txCalculated.add(new RCalculated(this.creator, asset.getKey(),
-                                earnedPair.a, "Asset Total Forged", Transaction.makeDBRef(this.heightBlock, 0), 0L));
-                    }
+            // учтем для эмитента что для него сгорело
+            if (earnedPair.b.signum() != 0) {
+                asset.getMaker().changeBalance(dcSet, asOrphan, false, asset.getKey(),
+                        earnedPair.b, false, false, true);
+                if (!asOrphan && this.txCalculated != null) {
+                    this.txCalculated.add(new RCalculated(asset.getMaker(), asset.getKey(),
+                            earnedPair.b, "Asset Total Burned", Transaction.makeDBRef(this.heightBlock, 0), 0L));
                 }
-
-                // учтем для эмитента что для него сгорело
-                if (earnedPair.b.signum() != 0) {
-                    asset.getMaker().changeBalance(dcSet, asOrphan, false, asset.getKey(),
-                            earnedPair.b, false, false, true);
-                    if (this.txCalculated != null) {
-                        this.txCalculated.add(new RCalculated(asset.getMaker(), asset.getKey(),
-                                earnedPair.b, "Asset Total Burned", Transaction.makeDBRef(this.heightBlock, 0), 0L));
-                    }
-                }
-
             }
 
         }
@@ -2235,8 +2261,11 @@ public class Block implements Closeable, ExplorerJsonLine {
         //PROCESS FEE
         feeProcess(dcSet, false);
 
+        //PROCESS ASSETS FEE
+        assetsFeeProcess(dcSet, false);
+
         if (this.forgingInfoUpdate != null) {
-            // обновить форжинговые данные - один раз для всех трнзакций в блоке
+            // обновить форжинговые данные - один раз для всех транзакций в блоке
             // Обрабатывает данные об измененных форжинговых балансах
             // Для каждого счета берем результирующее изменения по форжинговой инфо
             // и разом в тут блоке изменим
@@ -2287,7 +2316,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             setCOMPUbals(dcSet, this.heightBlock);
         }
 
-        // MAKE CALCULATER TRANSACTIONS
+        // MAKE CALCULATED TRANSACTIONS
         if (this.txCalculated != null && !this.txCalculated.isEmpty()) {
             TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
             RCalculated txCalculated;
@@ -2434,6 +2463,9 @@ public class Block implements Closeable, ExplorerJsonLine {
             long timerFinalMap_set = 0;
             long timerTransFinalMapSinds_set = 0;
 
+            // CLEAR ASSETS FEE
+            earnedAllAssets = new HashMap<>();
+
             int seqNo = 0;
             for (Transaction transaction : this.transactions) {
 
@@ -2548,12 +2580,19 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         long start = System.currentTimeMillis();
 
+        // CLEAR ASSETS FEE
+        earnedAllAssets = new HashMap<>();
+
         //REMOVE FEE
         feeProcess(dcSet, true);
 
         //ORPHAN TRANSACTIONS
+
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
         this.orphanTransactions(dcSet, heightBlock, notStoreTXs);
+
+        //PROCESS ASSETS FEE
+        assetsFeeProcess(dcSet, true);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
 
@@ -2623,7 +2662,12 @@ public class Block implements Closeable, ExplorerJsonLine {
         TransactionsPool pool = Controller.getInstance().transactionsPool;
 
         this.getTransactions();
+
         //ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
+
+        // CLEAR ASSETS FEE
+        earnedAllAssets = new HashMap<>();
+
         int seqNo;
         if (heightBlock == 97856) {
             boolean debug = true;

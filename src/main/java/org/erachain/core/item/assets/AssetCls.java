@@ -2242,37 +2242,64 @@ public abstract class AssetCls extends ItemCls {
                                     AssetCls assetHave, AssetCls assetWant, Order order,
                                     boolean asOrphan, BigDecimal tradeAmountForWant) {
         //TRANSFER FUNDS
+        BigDecimal tradeAmount = tradeAmountForWant.setScale(assetWant.getScale());
+        BigDecimal assetMakerRoyalty;
+        BigDecimal inviterRoyalty;
+        BigDecimal forgerFee;
+
         PublicKeyAccount haveAssetMaker = assetHave.getMaker();
+        PublicKeyAccount inviter;
         if (assetHave.getAssetType() == AS_NON_FUNGIBLE
                 && !receiver.equals(haveAssetMaker)) {
-            // значит приход это тот актив который мы можем поделить
+            // значит приход + это тот актив который мы можем поделить
             // и это не сам автор продает
-            BigDecimal royalty = tradeAmountForWant.multiply(taxCoefficient);
-            tradeAmountForWant = tradeAmountForWant.subtract(royalty);
-            BigDecimal referralAmount = tradeAmountForWant.multiply(referralsCoefficient);
-            royalty = royalty.subtract(referralAmount);
-
-            haveAssetMaker.changeBalance(dcSet, asOrphan, false, assetWant.getKey(),
-                    royalty, false, false, false);
-            if (!asOrphan)
-                transaction.addCalculated(block, haveAssetMaker, order.getWantAssetKey(), royalty,
-                        "NFT Royalty by Order @" + Transaction.viewDBRef(order.getId()));
+            assetMakerRoyalty = tradeAmount.movePointRight(1);
+            inviterRoyalty = assetMakerRoyalty.movePointRight(1);
+            forgerFee = inviterRoyalty.movePointRight(1);
 
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
+            inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
 
-            PublicKeyAccount authorInviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
-            authorInviter.changeBalance(dcSet, asOrphan, false, assetWant.getKey(),
-                    referralAmount, false, false, false);
+        } else if (assetHave.getKey() < 100) {
+            // это системные активы - берем комиссию за них
+            assetMakerRoyalty = BigDecimal.ZERO;
+            inviterRoyalty = BigDecimal.ZERO;
+            inviter = null;
+            forgerFee = tradeAmount.movePointRight(3);
+        } else {
+            assetMakerRoyalty = BigDecimal.ZERO;
+            inviterRoyalty = BigDecimal.ZERO;
+            inviter = null;
+            forgerFee = BigDecimal.ZERO;
+        }
+
+        tradeAmount = tradeAmount.subtract(assetMakerRoyalty).subtract(inviterRoyalty).subtract(forgerFee);
+
+        if (assetMakerRoyalty.signum() > 0) {
+            haveAssetMaker.changeBalance(dcSet, asOrphan, false, assetWant.getKey(),
+                    assetMakerRoyalty, false, false, false);
             if (!asOrphan)
-                transaction.addCalculated(block, authorInviter, order.getWantAssetKey(), royalty,
-                        "NFT Royalty Referral by Order @" + Transaction.viewDBRef(order.getId()));
+                transaction.addCalculated(block, haveAssetMaker, order.getWantAssetKey(), assetMakerRoyalty,
+                        "NFT Royalty by Order @" + Transaction.viewDBRef(order.getId()));
+        }
 
+        if (inviterRoyalty.signum() > 0) {
+            long inviterRoyaltyLong = inviterRoyalty.setScale(assetWant.getScale()).longValue();
+            transaction.process_gifts(BlockChain.FEE_INVITED_DEEP, inviterRoyaltyLong, inviter, asOrphan,
+                    assetWant,
+                    block != null && block.txCalculated != null ?
+                            block.txCalculated : null,
+                    "Referral bonus " + "@" + Transaction.viewDBRef(order.getId()));
+        }
+
+        if (block != null && forgerFee.signum() > 0) {
+            block.addAssetFee(assetWant, forgerFee, null);
         }
 
         receiver.changeBalance(dcSet, asOrphan, false, order.getWantAssetKey(),
-                tradeAmountForWant, false, false, false);
+                tradeAmount, false, false, false);
         if (!asOrphan)
-            transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
+            transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmount,
                     "Trade Order @" + Transaction.viewDBRef(order.getId()));
 
     }
