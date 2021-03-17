@@ -603,7 +603,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return Transaction.INVALID_AMOUNT;
         }
 
-        if (asset.isUnTransferable()) {
+        if (asset.isUnTransferable(asset.getMaker().equals(creator))) {
             return Transaction.NOT_TRANSFERABLE_ASSET;
         }
 

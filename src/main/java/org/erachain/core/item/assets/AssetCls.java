@@ -767,12 +767,12 @@ public abstract class AssetCls extends ItemCls {
         return isUnSpendable(key, assetType);
     }
 
-    public static boolean isUnTransferable(long key, int assetType) {
-        return assetType == AssetCls.AS_NON_FUNGIBLE;
+    public static boolean isUnTransferable(long key, int assetType, boolean senderIsAssetMaker) {
+        return assetType == AssetCls.AS_NON_FUNGIBLE && !senderIsAssetMaker;
     }
 
-    public boolean isUnTransferable() {
-        return isUnTransferable(key, assetType);
+    public boolean isUnTransferable(boolean senderIsAssetMaker) {
+        return isUnTransferable(key, assetType, senderIsAssetMaker);
     }
 
     public static boolean isUnDebtable(long key, int assetType) {
