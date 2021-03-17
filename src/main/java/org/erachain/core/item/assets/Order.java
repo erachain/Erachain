@@ -997,7 +997,7 @@ public class Order implements Comparable<Order> {
                     AssetCls.processTrade(dcSet, block, order.getCreator(),
                             ((CreateOrderTransaction) transaction).getWantAsset(),
                             ((CreateOrderTransaction) transaction).getHaveAsset(),
-                            false, tradeAmountForWant, order.getId());
+                            false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
 
                 } else {
                     order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey,
@@ -1065,7 +1065,7 @@ public class Order implements Comparable<Order> {
                 AssetCls.processTrade(dcSet, block, this.creator,
                         ((CreateOrderTransaction) transaction).getHaveAsset(),
                         ((CreateOrderTransaction) transaction).getWantAsset(),
-                        false, processedAmountFulfilledWant, id);
+                        false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
             } else {
                 this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey,
                         processedAmountFulfilledWant, false, false, false);
@@ -1125,7 +1125,7 @@ public class Order implements Comparable<Order> {
                 if (true) {
                     AssetCls.processTrade(dcSet, block, target.getCreator(),
                             assetWant, assetHave,
-                            true, tradeAmountWant, 0L);
+                            true, tradeAmountWant, Transaction.getTimestampByDBRef(id), 0L);
                 } else {
 
                     target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey,
@@ -1172,7 +1172,7 @@ public class Order implements Comparable<Order> {
         if (true) {
             AssetCls.processTrade(dcSet, block, this.creator,
                     assetHave, assetWant,
-                    true, thisAmountFulfilledWant, 0L);
+                    true, thisAmountFulfilledWant, Transaction.getTimestampByDBRef(id), 0L);
         } else {
             this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey,
                     thisAmountFulfilledWant, false, false, false);

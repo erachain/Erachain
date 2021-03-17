@@ -699,8 +699,9 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             issuer.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
                     false, false, false);
             issuer.changeCOMPUBonusBalances(dcSet, false, issued_FEE_BD, Account.BALANCE_SIDE_DEBIT);
-            block.addCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
-                    "register reward @P:" + this.key, this.dbRef);
+            if (block != null)
+                block.addCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
+                        "register reward @P:" + this.key, this.dbRef);
 
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 

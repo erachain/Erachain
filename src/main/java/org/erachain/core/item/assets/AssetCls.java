@@ -2239,7 +2239,7 @@ public abstract class AssetCls extends ItemCls {
     static BigDecimal referralsCoefficient = new BigDecimal("0.02");
 
     public static void processTrade(DCSet dcSet, Block block, Account receiver,
-                                    AssetCls assetHave, AssetCls assetWant, boolean asOrphan, BigDecimal tradeAmountForWant, Long orderID) {
+                                    AssetCls assetHave, AssetCls assetWant, boolean asOrphan, BigDecimal tradeAmountForWant, long timestamp, Long orderID) {
         //TRANSFER FUNDS
         BigDecimal tradeAmount = tradeAmountForWant.setScale(assetWant.getScale());
         BigDecimal assetMakerRoyalty;
@@ -2291,10 +2291,9 @@ public abstract class AssetCls extends ItemCls {
 
             long inviterRoyaltyLong = inviterRoyalty.setScale(assetWant.getScale()).unscaledValue().longValue();
             Transaction.process_gifts(dcSet, BlockChain.FEE_INVITED_DEEP, inviterRoyaltyLong, inviter, asOrphan,
-                    assetWant,
-                    block != null && block == null ? null : block.getTXCalculated(),
+                    assetWant, block,
                     "NFT Royalty referral bonus " + "@" + Transaction.viewDBRef(orderID),
-                    orderID, block.getTimestamp());
+                    orderID, timestamp);
         }
 
         if (forgerFee.signum() > 0) {

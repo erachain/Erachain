@@ -2170,12 +2170,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static void process_gifts(DCSet dcSet, int level, long fee_gift, Account creator, boolean asOrphan,
                                      AssetCls royaltyAsset,
-                                     List<RCalculated> txCalculated,
+                                     Block block,
                                      String message, long dbRef, long timestamp) {
 
         if (fee_gift <= 0L)
             return;
 
+        List<RCalculated> txCalculated = block == null ? null : block.getTXCalculated();
         long royaltyAssetKey = royaltyAsset.getKey();
         int royaltyAssetScale = royaltyAsset.getScale();
 
@@ -2403,7 +2404,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 long invitedFee = getInvitedFee();
                 if (invitedFee > 0) {
                     process_gifts(dcSet, BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
-                            BlockChain.FEE_ASSET, block == null ? null : block.getTXCalculated(),
+                            BlockChain.FEE_ASSET, block,
                             "Referral bonus " + "@" + this.viewHeightSeq(), dbRef, timestamp);
                 }
             }
@@ -2443,8 +2444,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 long invitedFee = getInvitedFee();
                 if (invitedFee > 0)
                     process_gifts(dcSet, BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
-                            BlockChain.FEE_ASSET,
-                            null, null, dbRef, timestamp);
+                            BlockChain.FEE_ASSET, null, null, dbRef, timestamp);
             }
 
             // UPDATE REFERENCE OF SENDER
