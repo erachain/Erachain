@@ -130,7 +130,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (long_fee == 0)
             return 0L;
 
-        if (haveKey < 100 || wantKey < 100) {
+        if (height > BlockChain.VERS_5_3 && (haveKey < 100 || wantKey < 100)) {
             return 0L;
         }
 
