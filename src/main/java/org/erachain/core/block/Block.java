@@ -2154,8 +2154,6 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         // подсчет наград с ПЕРЕВОДОВ
         Tuple2<BigDecimal, BigDecimal> earnedPair;
-        BigDecimal assetFee;
-        BigDecimal assetFeeBurn;
         for (Transaction transaction : getTransactions()) {
             if (transaction.assetFee == null)
                 continue;
@@ -2294,9 +2292,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                         account.setForgingData(dcSet, this.heightBlock, currentForgingBalance);
                     }
                 }
-
             }
-
         }
         
 		/*
@@ -2580,18 +2576,18 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         long start = System.currentTimeMillis();
 
-        // CLEAR ASSETS FEE
-        earnedAllAssets = new HashMap<>();
-
         //REMOVE FEE
         feeProcess(dcSet, true);
 
-        //ORPHAN TRANSACTIONS
+        /////// ORPHAN TRANSACTIONS
+
+        // CLEAR ASSETS FEE
+        earnedAllAssets = new HashMap<>();
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
         this.orphanTransactions(dcSet, heightBlock, notStoreTXs);
 
-        //PROCESS ASSETS FEE
+        //PROCESS ASSETS FEE - after orphanTransactions!
         assetsFeeProcess(dcSet, true);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
