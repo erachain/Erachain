@@ -994,11 +994,10 @@ public class Order implements Comparable<Order> {
 
                 //TRANSFER FUNDS
                 if (true) {
-                    AssetCls.processTrade(dcSet, block, transaction, order.getCreator(),
+                    AssetCls.processTrade(dcSet, block, order.getCreator(),
                             ((CreateOrderTransaction) transaction).getWantAsset(),
                             ((CreateOrderTransaction) transaction).getHaveAsset(),
-                            order.getId(), false,
-                            tradeAmountForWant);
+                            false, tradeAmountForWant, order.getId());
 
                 } else {
                     order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey,
@@ -1063,11 +1062,10 @@ public class Order implements Comparable<Order> {
         //TRANSFER FUNDS
         if (processedAmountFulfilledWant.signum() > 0) {
             if (true) {
-                AssetCls.processTrade(dcSet, block, transaction, this.creator,
+                AssetCls.processTrade(dcSet, block, this.creator,
                         ((CreateOrderTransaction) transaction).getHaveAsset(),
                         ((CreateOrderTransaction) transaction).getWantAsset(),
-                        id, false,
-                        processedAmountFulfilledWant);
+                        false, processedAmountFulfilledWant, id);
             } else {
                 this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey,
                         processedAmountFulfilledWant, false, false, false);
@@ -1075,7 +1073,6 @@ public class Order implements Comparable<Order> {
                         "Resolve Order @" + Transaction.viewDBRef(this.id));
             }
         }
-
 
     }
 
@@ -1097,6 +1094,9 @@ public class Order implements Comparable<Order> {
         completedMap.delete(this);
 
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
+
+        AssetCls assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
+        AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
 
         //ORPHAN TRADES
         Trade trade;
@@ -1122,9 +1122,15 @@ public class Order implements Comparable<Order> {
                 target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
                 thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
-                target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey,
-                        tradeAmountWant, false, false, false);
+                if (true) {
+                    AssetCls.processTrade(dcSet, block, target.getCreator(),
+                            assetWant, assetHave,
+                            true, tradeAmountWant, 0L);
+                } else {
 
+                    target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey,
+                            tradeAmountWant, false, false, false);
+                }
                 // Учтем что у стороны ордера обновилась форжинговая информация
                 if (target.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
                     block.addForgingInfoUpdate(target.getCreator());
@@ -1161,9 +1167,16 @@ public class Order implements Comparable<Order> {
         //   - если обработка остановлена по достижению порога Инкремента
         this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey,
                 this.getAmountHaveLeft(), false, false, true);
+
         //REVERT WANT
-        this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey,
-                thisAmountFulfilledWant, false, false, false);
+        if (true) {
+            AssetCls.processTrade(dcSet, block, this.creator,
+                    assetHave, assetWant,
+                    true, thisAmountFulfilledWant, 0L);
+        } else {
+            this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey,
+                    thisAmountFulfilledWant, false, false, false);
+        }
     }
 
     @Override

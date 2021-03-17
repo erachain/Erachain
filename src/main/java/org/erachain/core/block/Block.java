@@ -101,7 +101,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     protected long totalFee;
     protected long emittedFee;
     public Block.BlockHead blockHead;
-    public List<RCalculated> txCalculated;
+    protected List<RCalculated> txCalculated;
 
     // BODY
     protected List<Transaction> transactions;
@@ -2075,6 +2075,22 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         earnedPair = new Tuple2(assetFee, assetFeeBurn);
         earnedAllAssets.put(asset, earnedPair);
+    }
+
+    public boolean addCalculated(Account creator, long assetKey, BigDecimal amount,
+                                 String message, long dbRef) {
+
+        if (txCalculated != null) {
+            txCalculated.add(new RCalculated(creator, assetKey, amount,
+                    message, dbRef, 0L));
+            return true;
+        }
+        return false;
+
+    }
+
+    public List<RCalculated> getTXCalculated() {
+        return txCalculated;
     }
 
     public void feeProcess(DCSet dcSet, boolean asOrphan) {

@@ -1350,9 +1350,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (assetFee != null && assetFee.signum() != 0) {
             // учтем что он еще заплатил коэффициент с суммы
             this.creator.changeBalance(db, !backward, backward, absKey, this.assetFee, false, false, !incomeReverse);
-            if (block != null && block.txCalculated != null) {
-                block.txCalculated.add(new RCalculated(this.creator, absKey,
-                        this.assetFee.negate(), "Asset Fee", this.dbRef, 0L));
+            if (block != null) {
+                block.addCalculated(this.creator, absKey,
+                        this.assetFee.negate(), "Asset Fee", this.dbRef);
             }
         }
     }

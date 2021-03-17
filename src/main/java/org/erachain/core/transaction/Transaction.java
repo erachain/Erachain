@@ -1364,9 +1364,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public boolean addCalculated(Block block, Account creator, long assetKey, BigDecimal amount,
                                  String message) {
 
-        if (block != null && block.txCalculated != null) {
-            block.txCalculated.add(new RCalculated(creator, assetKey, amount,
-                    message, this.dbRef, seqNo));
+        if (block != null) {
+            block.addCalculated(creator, assetKey, amount,
+                    message, this.dbRef);
             return true;
         }
         return false;
@@ -2068,10 +2068,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         out.put("value", errorValue);
     }
 
-    public void process_gifts_turn(int level, long fee_gift, Account invitedAccount,
-                                   long invitedPersonKey, boolean asOrphan,
-                                   long royaltyAssetKey, int royaltyAssetScale,
-                                   List<RCalculated> txCalculated, String message) {
+    public static void process_gifts_turn(DCSet dcSet, int level, long fee_gift, Account invitedAccount,
+                                          long invitedPersonKey, boolean asOrphan,
+                                          long royaltyAssetKey, int royaltyAssetScale,
+                                          List<RCalculated> txCalculated, String message, long dbRef, long timestamp) {
 
         if (fee_gift <= 0L)
             return;
@@ -2081,7 +2081,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         // CREATOR is PERSON
         // FIND person
         Account issuerAccount = PersonCls.getIssuer(dcSet, invitedPersonKey);
-        Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(this.dcSet);
+        Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(dcSet);
         long issuerPersonKey;
         if (issuerPersonDuration == null) {
             // в тестовой сети возможно что каждый создает с неудостоверенного
@@ -2096,7 +2096,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         ) {
             // break loop
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, royaltyAssetScale);
-            invitedAccount.changeBalance(this.dcSet, asOrphan, false, royaltyAssetKey,
+            invitedAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey,
                     giftBG, false, false, false);
             // учтем что получили бонусы
             if (royaltyAssetKey == BlockChain.FEE_KEY) {
@@ -2106,19 +2106,19 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " top level";
                 txCalculated.add(new RCalculated(invitedAccount, royaltyAssetKey, giftBG,
-                        messageLevel, this.dbRef, seqNo));
+                        messageLevel, 0L, dbRef));
 
             }
             return;
         }
 
         // IS INVITER ALIVE ???
-        PersonCls issuer = (PersonCls) this.dcSet.getItemPersonMap().get(issuerPersonKey);
-        if (!issuer.isAlive(this.timestamp)) {
+        PersonCls issuer = (PersonCls) dcSet.getItemPersonMap().get(issuerPersonKey);
+        if (!issuer.isAlive(timestamp)) {
             // SKIP this LEVEL for DEAD persons
-            process_gifts_turn(level, fee_gift, issuerAccount, issuerPersonKey, asOrphan,
+            process_gifts_turn(dcSet, level, fee_gift, issuerAccount, issuerPersonKey, asOrphan,
                     royaltyAssetKey, royaltyAssetScale,
-                    txCalculated, message);
+                    txCalculated, message, dbRef, timestamp);
             return;
         }
 
@@ -2128,7 +2128,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             long fee_gift_get = fee_gift - fee_gift_next;
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, royaltyAssetScale);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, false, royaltyAssetKey, giftBG,
+            issuerAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey, giftBG,
                     false, false, false);
 
             // учтем что получили бонусы
@@ -2139,20 +2139,20 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, royaltyAssetKey, giftBG,
-                        messageLevel, this.dbRef, seqNo));
+                        messageLevel, 0L, dbRef));
             }
 
             if (fee_gift_next > 0) {
-                process_gifts_turn(--level, fee_gift_next, issuerAccount, issuerPersonKey, asOrphan,
+                process_gifts_turn(dcSet, --level, fee_gift_next, issuerAccount, issuerPersonKey, asOrphan,
                         royaltyAssetKey, royaltyAssetScale,
-                        txCalculated, message);
+                        txCalculated, message, dbRef, timestamp);
             }
 
         } else {
             // this is END LEVEL
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, royaltyAssetScale);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, false, royaltyAssetKey,
+            issuerAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey,
                     BigDecimal.valueOf(fee_gift, royaltyAssetScale), false, false, false);
 
             // учтем что получили бонусы
@@ -2163,15 +2163,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, royaltyAssetKey, giftBG,
-                        messageLevel, this.dbRef, seqNo));
+                        messageLevel, 0L, dbRef));
             }
         }
     }
 
-
-    public void process_gifts(int level, long fee_gift, Account creator, boolean asOrphan,
-                              AssetCls royaltyAsset,
-                              List<RCalculated> txCalculated, String message) {
+    public static void process_gifts(DCSet dcSet, int level, long fee_gift, Account creator, boolean asOrphan,
+                                     AssetCls royaltyAsset,
+                                     List<RCalculated> txCalculated,
+                                     String message, long dbRef, long timestamp) {
 
         if (fee_gift <= 0L)
             return;
@@ -2179,27 +2179,27 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         long royaltyAssetKey = royaltyAsset.getKey();
         int royaltyAssetScale = royaltyAsset.getScale();
 
-        Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
+        Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(dcSet);
         if (personDuration == null
                 || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
             if (royaltyAssetKey == BlockChain.FEE_KEY) {
-                BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, !asOrphan, false, FEE_KEY,
+                BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, FEE_KEY,
                         BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, false, true);
 
             } else {
                 // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
-                royaltyAsset.getMaker().changeBalance(this.dcSet, !asOrphan, false, royaltyAssetKey,
+                royaltyAsset.getMaker().changeBalance(dcSet, !asOrphan, false, royaltyAssetKey,
                         BigDecimal.valueOf(fee_gift, royaltyAssetScale), false, false, true);
             }
 
             return;
         }
 
-        process_gifts_turn(level, fee_gift, creator, personDuration.a, asOrphan,
+        process_gifts_turn(dcSet, level, fee_gift, creator, personDuration.a, asOrphan,
                 royaltyAssetKey, royaltyAssetScale,
-                txCalculated, message);
+                txCalculated, message, dbRef, timestamp);
 
     }
 
@@ -2317,10 +2317,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         // учтем что получили бонусы
         account.changeCOMPUBonusBalances(dcSet, asOrphan, royaltyBG, Account.BALANCE_SIDE_DEBIT);
 
-        if (block != null && block.txCalculated != null && !asOrphan) {
-            block.txCalculated.add(new RCalculated(account, FEE_KEY, royaltyBG,
-                    "EXO-mining", this.dbRef, 0L));
-
+        if (block != null && !asOrphan) {
+            block.addCalculated(account, FEE_KEY, royaltyBG,
+                    "EXO-mining", this.dbRef);
         }
 
         // учтем эмиссию
@@ -2403,10 +2402,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             if (BlockChain.FEE_INVITED_DEEP > 0) {
                 long invitedFee = getInvitedFee();
                 if (invitedFee > 0) {
-                    process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
-                            BlockChain.FEE_ASSET,
-                            block != null && block.txCalculated != null ?
-                                    block.txCalculated : null, "Referral bonus " + "@" + this.viewHeightSeq());
+                    process_gifts(dcSet, BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
+                            BlockChain.FEE_ASSET, block == null ? null : block.getTXCalculated(),
+                            "Referral bonus " + "@" + this.viewHeightSeq(), dbRef, timestamp);
                 }
             }
 
@@ -2444,9 +2442,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             if (BlockChain.FEE_INVITED_DEEP > 0) {
                 long invitedFee = getInvitedFee();
                 if (invitedFee > 0)
-                    process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
+                    process_gifts(dcSet, BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
                             BlockChain.FEE_ASSET,
-                            null, null);
+                            null, null, dbRef, timestamp);
             }
 
             // UPDATE REFERENCE OF SENDER
