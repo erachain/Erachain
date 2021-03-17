@@ -994,10 +994,10 @@ public class Order implements Comparable<Order> {
 
                 //TRANSFER FUNDS
                 if (true) {
-                    AssetCls.processTrade(dcSet, block, (CreateOrderTransaction) transaction, order.getCreator(),
-                            ((CreateOrderTransaction) transaction).getHaveAsset(),
+                    AssetCls.processTrade(dcSet, block, transaction, order.getCreator(),
                             ((CreateOrderTransaction) transaction).getWantAsset(),
-                            order, false,
+                            ((CreateOrderTransaction) transaction).getHaveAsset(),
+                            order.getId(), false,
                             tradeAmountForWant);
 
                 } else {
@@ -1062,10 +1062,18 @@ public class Order implements Comparable<Order> {
 
         //TRANSFER FUNDS
         if (processedAmountFulfilledWant.signum() > 0) {
-            this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey,
-                    processedAmountFulfilledWant, false, false, false);
-            transaction.addCalculated(block, this.creator, this.wantAssetKey, processedAmountFulfilledWant,
-                    "Resolve Order @" + Transaction.viewDBRef(this.id));
+            if (true) {
+                AssetCls.processTrade(dcSet, block, transaction, this.creator,
+                        ((CreateOrderTransaction) transaction).getHaveAsset(),
+                        ((CreateOrderTransaction) transaction).getWantAsset(),
+                        id, false,
+                        processedAmountFulfilledWant);
+            } else {
+                this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey,
+                        processedAmountFulfilledWant, false, false, false);
+                transaction.addCalculated(block, this.creator, this.wantAssetKey, processedAmountFulfilledWant,
+                        "Resolve Order @" + Transaction.viewDBRef(this.id));
+            }
         }
 
 

@@ -2239,13 +2239,15 @@ public abstract class AssetCls extends ItemCls {
     static BigDecimal referralsCoefficient = new BigDecimal("0.02");
 
     public static void processTrade(DCSet dcSet, Block block, Transaction transaction, Account receiver,
-                                    AssetCls assetHave, AssetCls assetWant, Order order,
+                                    AssetCls assetHave, AssetCls assetWant, Long orderID,
                                     boolean asOrphan, BigDecimal tradeAmountForWant) {
         //TRANSFER FUNDS
         BigDecimal tradeAmount = tradeAmountForWant.setScale(assetWant.getScale());
         BigDecimal assetMakerRoyalty;
         BigDecimal inviterRoyalty;
         BigDecimal forgerFee;
+        int scale = assetWant.getScale();
+        Long assetWantKey = assetWant.getKey();
 
         PublicKeyAccount haveAssetMaker = assetHave.getMaker();
         PublicKeyAccount inviter;
@@ -2253,19 +2255,21 @@ public abstract class AssetCls extends ItemCls {
                 && !receiver.equals(haveAssetMaker)) {
             // значит приход + это тот актив который мы можем поделить
             // и это не сам автор продает
-            assetMakerRoyalty = tradeAmount.movePointRight(1);
-            inviterRoyalty = assetMakerRoyalty.movePointRight(1);
-            forgerFee = inviterRoyalty.movePointRight(1);
+            assetMakerRoyalty = tradeAmount.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+            inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+            forgerFee = inviterRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
 
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
             inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
 
-        } else if (assetHave.getKey() < 100) {
+        } else if (assetWant.getKey() < 100) {
             // это системные активы - берем комиссию за них
             assetMakerRoyalty = BigDecimal.ZERO;
             inviterRoyalty = BigDecimal.ZERO;
+            forgerFee = tradeAmount.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
+
             inviter = null;
-            forgerFee = tradeAmount.movePointRight(3);
+
         } else {
             assetMakerRoyalty = BigDecimal.ZERO;
             inviterRoyalty = BigDecimal.ZERO;
@@ -2273,34 +2277,40 @@ public abstract class AssetCls extends ItemCls {
             forgerFee = BigDecimal.ZERO;
         }
 
-        tradeAmount = tradeAmount.subtract(assetMakerRoyalty).subtract(inviterRoyalty).subtract(forgerFee);
-
         if (assetMakerRoyalty.signum() > 0) {
-            haveAssetMaker.changeBalance(dcSet, asOrphan, false, assetWant.getKey(),
+            tradeAmount = tradeAmount.subtract(assetMakerRoyalty);
+
+            haveAssetMaker.changeBalance(dcSet, asOrphan, false, assetWantKey,
                     assetMakerRoyalty, false, false, false);
             if (!asOrphan)
-                transaction.addCalculated(block, haveAssetMaker, order.getWantAssetKey(), assetMakerRoyalty,
-                        "NFT Royalty by Order @" + Transaction.viewDBRef(order.getId()));
+                transaction.addCalculated(block, haveAssetMaker, assetWantKey, assetMakerRoyalty,
+                        "NFT Royalty by Order @" + Transaction.viewDBRef(orderID));
         }
 
         if (inviterRoyalty.signum() > 0) {
-            long inviterRoyaltyLong = inviterRoyalty.setScale(assetWant.getScale()).longValue();
+            tradeAmount = tradeAmount.subtract(inviterRoyalty);
+
+            long inviterRoyaltyLong = inviterRoyalty.setScale(assetWant.getScale()).unscaledValue().longValue();
             transaction.process_gifts(BlockChain.FEE_INVITED_DEEP, inviterRoyaltyLong, inviter, asOrphan,
                     assetWant,
                     block != null && block.txCalculated != null ?
                             block.txCalculated : null,
-                    "Referral bonus " + "@" + Transaction.viewDBRef(order.getId()));
+                    "NFT Royalty referral bonus " + "@" + Transaction.viewDBRef(orderID));
         }
 
-        if (block != null && forgerFee.signum() > 0) {
-            block.addAssetFee(assetWant, forgerFee, null);
+        if (forgerFee.signum() > 0) {
+            tradeAmount = tradeAmount.subtract(forgerFee);
+
+            if (block != null) {
+                block.addAssetFee(assetWant, forgerFee, null);
+            }
         }
 
-        receiver.changeBalance(dcSet, asOrphan, false, order.getWantAssetKey(),
+        receiver.changeBalance(dcSet, asOrphan, false, assetWantKey,
                 tradeAmount, false, false, false);
         if (!asOrphan)
-            transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmount,
-                    "Trade Order @" + Transaction.viewDBRef(order.getId()));
+            transaction.addCalculated(block, receiver, assetWantKey, tradeAmount,
+                    "Trade Order @" + Transaction.viewDBRef(orderID));
 
     }
 
