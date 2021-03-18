@@ -2239,7 +2239,8 @@ public abstract class AssetCls extends ItemCls {
     static BigDecimal referralsCoefficient = new BigDecimal("0.02");
 
     public static void processTrade(DCSet dcSet, Block block, Account receiver,
-                                    AssetCls assetHave, AssetCls assetWant, boolean asOrphan, BigDecimal tradeAmountForWant, long timestamp, Long orderID) {
+                                    boolean isInitiator, AssetCls assetHave, AssetCls assetWant,
+                                    boolean asOrphan, BigDecimal tradeAmountForWant, long timestamp, Long orderID) {
         //TRANSFER FUNDS
         BigDecimal tradeAmount = tradeAmountForWant.setScale(assetWant.getScale());
         BigDecimal assetMakerRoyalty;
@@ -2261,7 +2262,7 @@ public abstract class AssetCls extends ItemCls {
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
             inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
 
-        } else if (assetWant.getKey() < 100) {
+        } else if (assetWant.getKey() < 100 && !isInitiator) {
             // это системные активы - берем комиссию за них
             assetMakerRoyalty = BigDecimal.ZERO;
             inviterRoyalty = BigDecimal.ZERO;
