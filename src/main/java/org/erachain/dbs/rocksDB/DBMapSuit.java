@@ -163,8 +163,11 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
         return map.getIterator(true, false);
     }
 
+    //public abstract byte[] makeByteKey(T key);
+
+    @Override
     public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
-        return map.getIndexIteratorFilter((byte[]) fromKey, null, descending, false);
+        return map.getIndexIteratorFilter(fromKey, null, descending, false);
     }
 
     @Override

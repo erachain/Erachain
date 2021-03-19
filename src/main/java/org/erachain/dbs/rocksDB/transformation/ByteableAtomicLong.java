@@ -11,6 +11,9 @@ public class ByteableAtomicLong implements Byteable<AtomicLong> {
 
     @Override
     public byte[] toBytesObject(AtomicLong value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return byteableLong.toBytesObject(value.longValue());
     }
 }

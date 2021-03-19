@@ -10,6 +10,9 @@ public class ByteableString implements Byteable<String> {
 
     @Override
     public byte[] toBytesObject(String value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return value.getBytes(StandardCharsets.UTF_8);
     }
 }

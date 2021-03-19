@@ -98,6 +98,11 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     }
 
     @Override
+    public byte[] makeByteKey(Long key) {
+        return Longs.toByteArray(key);
+    }
+
+    @Override
     public void deleteForBlock(Integer height) {
         try (IteratorCloseable<Long> iterator = getBlockIterator(height)) {
             while (iterator.hasNext()) {
@@ -297,7 +302,7 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     }
 
     @Override
-    public IteratorCloseable<Long> getBiDirectionIterator(Long fromSeqNo, boolean descending) {
+    public IteratorCloseable<Long> getBiDirectionIterator_old(Long fromSeqNo, boolean descending) {
         return null;
     }
 

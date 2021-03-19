@@ -194,6 +194,11 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
     }
 
+    @Override
+    public byte[] makeByteKey(Long key) {
+        return Longs.toByteArray(key);
+    }
+
     // TODO  dbCore.deleteRange(beg, end);
     @Override
     public void deleteForBlock(Integer height) {
@@ -514,7 +519,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     }
 
     @Override
-    public IteratorCloseable<Long> getBiDirectionIterator(Long fromSeqNo, boolean descending) {
+    public IteratorCloseable<Long> getBiDirectionIterator_old(Long fromSeqNo, boolean descending) {
         byte[] fromKey;
 
         if (fromSeqNo == null || fromSeqNo == 0) {
@@ -532,7 +537,10 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     public IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
 
         if (addressShort == null)
-            return getBiDirectionIterator(fromSeqNo, descending);
+            if (true)
+                return getIterator(fromSeqNo, descending);
+            else
+                return getBiDirectionIterator_old(fromSeqNo, descending);
 
         byte[] fromKey;
 

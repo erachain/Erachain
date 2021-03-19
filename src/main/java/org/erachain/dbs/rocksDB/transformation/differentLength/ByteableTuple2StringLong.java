@@ -18,6 +18,9 @@ public class ByteableTuple2StringLong implements Byteable<Fun.Tuple2<String, Lon
 
     @Override
     public byte[] toBytesObject(Fun.Tuple2<String, Long> value) {
-        return org.bouncycastle.util.Arrays.concatenate(new ByteableString().toBytesObject(value.a),new ByteableLong().toBytesObject(value.b));
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
+        return org.bouncycastle.util.Arrays.concatenate(new ByteableString().toBytesObject(value.a), new ByteableLong().toBytesObject(value.b));
     }
 }

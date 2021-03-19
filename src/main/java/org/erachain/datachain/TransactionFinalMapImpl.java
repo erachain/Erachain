@@ -873,7 +873,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
                 // и по пути сосздаем список обратный что нашли по обратнму итератору
                 int offsetHere = -(offset + limit);
-                try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionIterator(fromSeqNo, false)) {
+                try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionIterator_old(fromSeqNo, false)) {
                     Transaction item;
                     Long key;
                     int skipped = 0;
@@ -932,7 +932,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
             } else {
 
-                try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionIterator(fromSeqNo, true)) {
+                try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionIterator_old(fromSeqNo, true)) {
                     Transaction item;
                     Long key;
                     int skipped = 0;

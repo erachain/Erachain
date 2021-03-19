@@ -41,6 +41,9 @@ public class ByteableLongItem implements Byteable<Tuple2<Long, ItemCls>> {
 
     @Override
     public byte[] toBytesObject(Tuple2<Long, ItemCls> value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         Tuple2<Long, ItemCls> tuple = value;
         Long aLong = tuple.a;
         ItemCls itemCls = tuple.b;

@@ -52,6 +52,9 @@ public class ByteableStackTuple5DifferentLength implements Byteable<Stack<Tuple5
 
     @Override
     public byte[] toBytesObject(Stack<Tuple5<Long, Long, Integer, Integer, byte[]>> value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         List<byte[]> tempResult = new ArrayList<>();
         for (Tuple5<Long, Long, Integer, Integer, byte[]> tuple5 : value) {
             tempResult.add(byteableLong.toBytesObject(tuple5.a));

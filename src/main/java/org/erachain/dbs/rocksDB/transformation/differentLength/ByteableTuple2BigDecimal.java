@@ -1,7 +1,7 @@
 package org.erachain.dbs.rocksDB.transformation.differentLength;
 
-import org.mapdb.Fun.Tuple2;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
+import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -28,14 +28,17 @@ public class ByteableTuple2BigDecimal implements Byteable<Tuple2<BigDecimal, Big
 
     @Override
     public byte[] toBytesObject(Tuple2<BigDecimal, BigDecimal> value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         byte[] buff1 = value.a.unscaledValue().toByteArray();
         byte[] buff2 = value.b.unscaledValue().toByteArray();
 
         byte[] buff = new byte[3 + buff1.length + buff2.length];
         int length1 = buff1.length;
-        buff[0] = (byte)length1;
-        buff[1] = (byte)value.a.scale();
-        buff[2] = (byte)value.b.scale();
+        buff[0] = (byte) length1;
+        buff[1] = (byte) value.a.scale();
+        buff[2] = (byte) value.b.scale();
 
         System.arraycopy(buff1, 0, buff, 3, length1);
         System.arraycopy(buff2, 0, buff, 3 + length1, buff2.length);

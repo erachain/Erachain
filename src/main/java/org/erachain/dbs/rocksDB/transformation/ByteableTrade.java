@@ -19,6 +19,9 @@ public class ByteableTrade implements Byteable<Trade>{
 
     @Override
     public byte[] toBytesObject(Trade value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return value.toBytes();
     }
 

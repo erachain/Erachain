@@ -19,6 +19,9 @@ public class ByteableCalculated implements Byteable<Calculated> {
 
     @Override
     public byte[] toBytesObject(Calculated value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return value.toBytes();
     }
 }

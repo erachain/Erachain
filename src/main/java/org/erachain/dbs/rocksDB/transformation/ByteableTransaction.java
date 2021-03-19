@@ -24,6 +24,9 @@ public class ByteableTransaction implements Byteable<Transaction> {
 
     @Override
     public byte[] toBytesObject(Transaction value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return value.toBytes(Transaction.FOR_DB_RECORD, true);
     }
 }
