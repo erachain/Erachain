@@ -109,7 +109,7 @@ public class BlockExplorer {
     }
 
     public void makePage(Class type, int start,
-                         Map output, JSONObject langObj, Object[] expArgs) {
+                         int offset, Map output, JSONObject langObj, Object[] expArgs) {
 
         DBTab map = dcSet.getMap(type);
         ExplorerJsonLine element;
@@ -142,14 +142,15 @@ public class BlockExplorer {
      *
      * @param type
      * @param start   LONG
+     * @param offset
      * @param output
      * @param langObj
      * @param expArgs
      */
     public void makePage(Class type, long start,
-                         Map output, JSONObject langObj, Object[] expArgs) {
+                         int offset, Map output, JSONObject langObj, Object[] expArgs) {
 
-        DBTab map = dcSet.getMap(type);
+        ItemMap map = (ItemMap) dcSet.getMap(type);
         ExplorerJsonLine element;
         long size = map.size();
 
@@ -162,20 +163,15 @@ public class BlockExplorer {
         JSONArray array = new JSONArray();
 
         if (true) {
-            try (IteratorCloseable iterator = ((ItemMap) map).getIteratorFrom(start, true)) {
-                int count = 0;
-                while (count++ < pageSize && iterator.hasNext()) {
-                    key = (Long) iterator.next();
-                    element = (ExplorerJsonLine) map.get(key);
-                    if (element != null) {
-                        array.add(element.jsonForExplorerPage(langObj, expArgs));
-                    }
-                }
-            } catch (IOException e) {
+            List<ItemCls> rows = map.getPage(start, offset, pageSize);
+            if (rows.isEmpty()) {
+                //output.put("pageFromKey", 0);
+                //output.put("pageToKey", 0);
+            } else {
+                output.put("pageFromKey", start);
+                output.put("pageToKey", rows.get(rows.size() - 1).getKey());
             }
-            output.put("pageItems", array);
-            output.put("pageFromKey", start);
-            output.put("pageToKey", key);
+            output.put("pageItems", rows);
             output.put("useoffset", 1);
 
 
@@ -236,17 +232,17 @@ public class BlockExplorer {
 
     }
 
-    public Map jsonQueryPages(Class type, int start, int pageSize, Object[] expArgs) {
+    public Map jsonQueryPages(Class type, int start, int offset, Object[] expArgs) {
         Map result = new LinkedHashMap();
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
-        makePage(type, start, result, langObj, expArgs);
+        makePage(type, start, offset, result, langObj, expArgs);
         return result;
     }
 
-    public Map jsonQueryPages(Class type, long start, int pageSize, Object[] expArgs) {
+    public Map jsonQueryPages(Class type, long start, int offset, Object[] expArgs) {
         Map result = new LinkedHashMap();
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
-        makePage(type, start, result, langObj, expArgs);
+        makePage(type, start, offset, result, langObj, expArgs);
         return result;
     }
 
@@ -300,6 +296,7 @@ public class BlockExplorer {
         Stopwatch stopwatchAll = new Stopwatch();
         long start = 0;
         start = checkAndGetLongParam(info, start, "pageKey");
+        Long offset = checkAndGetLongParam(info, 0L, "offset");
         output.put("pageSize", pageSize);
 
         //lang
@@ -409,7 +406,7 @@ public class BlockExplorer {
         // persons list
         else if (info.getQueryParameters().containsKey("persons")) {
             output.put("type", "persons");
-            output.putAll(jsonQueryPages(PersonCls.class, start, pageSize, null));
+            output.putAll(jsonQueryPages(PersonCls.class, start, offset, null));
         }
         // person
         else if (info.getQueryParameters().containsKey("person")) {
@@ -470,7 +467,7 @@ public class BlockExplorer {
             // polls list
         } else if (info.getQueryParameters().containsKey("polls")) {
             output.put("type", "polls");
-            output.putAll(jsonQueryPages(PollCls.class, start, pageSize, null));
+            output.putAll(jsonQueryPages(PollCls.class, start, offset, null));
         } else if (info.getQueryParameters().containsKey("poll")) {
             jsonQueryItemPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
                     info.getQueryParameters().getFirst("asset"));
@@ -485,7 +482,7 @@ public class BlockExplorer {
             Object[] expArgs = new Object[2];
             expArgs[0] = Controller.getInstance().getAsset(ASSET_QUOTE_KEY);
             expArgs[1] = Controller.getInstance().dlSet.getPairMap();
-            output.putAll(jsonQueryPages(AssetCls.class, start, pageSize, expArgs));
+            output.putAll(jsonQueryPages(AssetCls.class, start, offset, expArgs));
 
         } else if (info.getQueryParameters().containsKey("asset")) {
             if (info.getQueryParameters().get("asset").size() == 1) {
@@ -524,7 +521,7 @@ public class BlockExplorer {
             ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
             output.put("type", "blocks");
-            output.putAll(jsonQueryPages(Block.BlockHead.class, (int) start, pageSize, null));
+            output.putAll(jsonQueryPages(Block.BlockHead.class, (int) start, offset, null));
         } else if (info.getQueryParameters().containsKey("block")) {
             jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int) start);
         }
@@ -559,7 +556,7 @@ public class BlockExplorer {
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
             output.put("type", "templates");
-            output.putAll(jsonQueryPages(TemplateCls.class, start, pageSize, null));
+            output.putAll(jsonQueryPages(TemplateCls.class, start, offset, null));
         }
         // template
         else if (info.getQueryParameters().containsKey("template")) {
@@ -570,7 +567,7 @@ public class BlockExplorer {
         // statuses list
         else if (info.getQueryParameters().containsKey("statuses")) {
             output.put("type", "statuses");
-            output.putAll(jsonQueryPages(StatusCls.class, start, pageSize, null));
+            output.putAll(jsonQueryPages(StatusCls.class, start, offset, null));
         }
         // status
         else if (info.getQueryParameters().containsKey("status")) {

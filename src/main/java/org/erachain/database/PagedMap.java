@@ -142,4 +142,101 @@ public class PagedMap<T, U> {
         return rows;
     }
 
+    public List<T> getPageKeysList(T fromKey, int offset, int limit, boolean fillFullPage) {
+
+        timestamp = System.currentTimeMillis();
+
+        List<T> keys = new ArrayList<>();
+        T key;
+
+        if (offset < 0 || limit < 0) {
+            if (limit < 0)
+                limit = -limit;
+
+            // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
+            // и по пути создаем список обратный что нашли по обратному итератору
+            int offsetHere = -(offset + limit);
+            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, false)) {
+                int skipped = 0;
+                int count = 0;
+                while (iterator.hasNext() && (limit <= 0 || count < limit)) {
+                    key = iterator.next();
+
+                    if (offsetHere > 0 && skipped++ < offsetHere) {
+                        continue;
+                    }
+
+                    count++;
+
+                    // обратный отсчет в списке
+                    keys.add(0, key);
+                }
+
+                if (fillFullPage && fromKey != null // && fromKey != 0
+                        && limit > 0 && count < limit) {
+                    // сюда пришло значит не полный список - дополним его
+                    for (T pageKey : getPageKeysList(fromKey, 0, limit - count, false)) {
+                        boolean exist = false;
+                        for (T keyHere : keys) {
+                            if (pageKey.equals(keyHere)) {
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if (!exist) {
+                            keys.add(pageKey);
+                        }
+                    }
+                }
+
+            } catch (IOException e) {
+            }
+
+        } else {
+
+            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, true)) {
+                int skipped = 0;
+                int count = 0;
+                while (iterator.hasNext() && (limit <= 0 || count < limit)) {
+
+                    if (System.currentTimeMillis() - timestamp > 5000) {
+                        break;
+                    }
+
+                    key = iterator.next();
+
+                    if (offset > 0 && skipped++ < offset) {
+                        continue;
+                    }
+
+                    count++;
+
+                    keys.add(key);
+                }
+
+                if (fillFullPage && fromKey != null // && fromKey != 0
+                        && limit > 0 && count < limit) {
+                    // сюда пришло значит не полный список - дополним его
+                    int index = 0;
+                    int limitLeft = limit - count;
+                    for (T pageKey : getPageKeysList(fromKey, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
+                        boolean exist = false;
+                        for (T keyHere : keys) {
+                            if (pageKey.equals(keyHere)) {
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if (!exist) {
+                            keys.add(index++, pageKey);
+                        }
+                    }
+                }
+
+            } catch (IOException e) {
+            }
+        }
+        return keys;
+    }
+
 }

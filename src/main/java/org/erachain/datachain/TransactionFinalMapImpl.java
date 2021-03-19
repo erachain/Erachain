@@ -694,7 +694,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return new ArrayList<>();
         }
 
-        //return getTransactionsByTitle(filter, fromSeqNo, offset, limit, descending);
         return getTransactionsByTitleFromID(filter, fromSeqNo, offset, limit, true);
     }
 
