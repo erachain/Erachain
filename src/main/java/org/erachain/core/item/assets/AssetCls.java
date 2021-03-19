@@ -1184,7 +1184,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE_TOTAL:
                 return "A digital accounting bank guarantee";
             case AS_NON_FUNGIBLE:
-                return "A non fungible token (unique)";
+                return "AS_NON_FUNGIBLE_D";
             case AS_INDEX:
                 return "Index on foreign and domestic assets, for example currencies on FOREX";
             case AS_INSIDE_OTHER_CLAIM:
@@ -1418,6 +1418,12 @@ public abstract class AssetCls extends ItemCls {
                     default:
                         return null;
                 }
+            case AS_NON_FUNGIBLE: {
+                if (actionType == Account.BALANCE_POS_OWN) {
+                    return backward ? null : isCreatorMaker ? "AS_NON_FUNGIBLE_Issue" : null;
+                }
+                return null;
+            }
             case AS_INDEX:
                 break;
             case AS_INSIDE_OTHER_CLAIM:
@@ -1666,28 +1672,6 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorMaker) {
-        switch (assetType) {
-            case AS_BANK_GUARANTEE:
-            case AS_BANK_GUARANTEE_TOTAL:
-            case AS_OUTSIDE_IMMOVABLE:
-            case AS_OUTSIDE_CURRENCY:
-            case AS_OUTSIDE_SERVICE:
-            case AS_OUTSIDE_SHARE:
-            case AS_OUTSIDE_BILL:
-            case AS_OUTSIDE_BILL_EX:
-            case AS_OUTSIDE_OTHER_CLAIM:
-            case AS_INSIDE_ASSETS:
-            case AS_INSIDE_CURRENCY:
-            case AS_INSIDE_UTILITY:
-            case AS_INSIDE_SHARE:
-            case AS_INSIDE_BONUS:
-            case AS_INSIDE_ACCESS:
-            case AS_INSIDE_VOTE:
-            case AS_INDEX:
-            case AS_INSIDE_OTHER_CLAIM:
-            case AS_ACCOUNTING:
-        }
-
         return viewAssetTypeAction(backward, actionType, isCreatorMaker);
     }
 
@@ -1726,6 +1710,11 @@ public abstract class AssetCls extends ItemCls {
                         return backward ? "Beneficiary" : null;
                     case Account.BALANCE_POS_SPEND:
                         return "Spender";
+                }
+            case AS_NON_FUNGIBLE:
+                switch (actionType) {
+                    case Account.BALANCE_POS_OWN:
+                        return backward ? null : isCreatorMaker ? "Author" : null;
                 }
             case AS_SELF_MANAGED_ACCOUNTING:
             case AS_SELF_MANAGED_DIRECT_SEND:
@@ -1824,6 +1813,11 @@ public abstract class AssetCls extends ItemCls {
                     case Account.BALANCE_POS_SPEND:
                         return "Spender";
                 }
+            case AS_NON_FUNGIBLE:
+                switch (actionType) {
+                    case Account.BALANCE_POS_OWN:
+                        return backward ? null : "Recipient";
+                }
             case AS_SELF_MANAGED_ACCOUNTING:
             case AS_SELF_MANAGED_DIRECT_SEND:
             case AS_SELF_MANAGED_SHARE:
@@ -1912,6 +1906,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_VOTE:
             case AS_BANK_GUARANTEE:
             case AS_BANK_GUARANTEE_TOTAL:
+            case AS_NON_FUNGIBLE:
             case AS_INDEX:
             case AS_INSIDE_OTHER_CLAIM:
             case AS_ACCOUNTING:

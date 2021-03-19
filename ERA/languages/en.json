@@ -75,6 +75,8 @@
   "AS_OUTSIDE_CURRENCY_2": "Demand execution of a monetary claim",
   "AS_OUTSIDE_CURRENCY_2B": "Withdraw a request to fulfill a monetary claim",
   "AS_OUTSIDE_CURRENCY_4": "Confirm the execution of the monetary claim",
+  "AS_NON_FUNGIBLE_D": "A non fungible token (NFT). It can only be sold on the exchange and transferred at issue from the Author to the first Owner. Used for collectibles, charity, and accounting for the ownership of a unique entity",
+  "AS_NON_FUNGIBLE_Issue": "Initial send from Author to first Owner",
   "AS_INSIDE_CURRENCY_Issue": "Issuing the currency",
   "AS_INSIDE_CURRENCY_1": "Transfer to the ownership of the currency",
   "AS_INSIDE_UTILITY_Issue": "Issuing the utility",
