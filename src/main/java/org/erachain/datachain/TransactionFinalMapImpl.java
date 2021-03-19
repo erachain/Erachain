@@ -813,6 +813,42 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return txs;
     }
 
+    public class PagedTXMap extends PagedMap<Long, Transaction> {
+        DCSet dcSet;
+        boolean noForge;
+        int forgedCount = 0;
+
+        public PagedTXMap(DCSet dcSet, DBTabImpl mapImpl, boolean noForge) {
+            super(mapImpl);
+            this.dcSet = dcSet;
+            this.noForge = noForge;
+        }
+
+        @Override
+        public void rowCalc() {
+            currentRow.setDC(dcSet);
+        }
+
+        @Override
+        public boolean filerRows() {
+            if (noForge && currentRow.getType() == Transaction.CALCULATED_TRANSACTION) {
+                RCalculated tx = (RCalculated) currentRow;
+                String mess = tx.getMessage();
+                if (mess != null && mess.equals("forging")) {
+                    if (forgedCount < 100) {
+                        // skip all but not 100
+                        forgedCount++;
+                        return true;
+                    } else {
+                        forgedCount = 0;
+                    }
+                }
+            }
+            return false;
+        }
+
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsFromID(Long fromSeqNo, int offset, int limit,
@@ -822,7 +858,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (true) {
-            PagedMap<Long, Transaction> pager = new PagedMap<Long, Transaction>(map, null);
+            PagedMap<Long, Transaction> pager = new PagedTXMap(DCSet.getInstance(), this, noForge);
             return pager.getPageList(fromSeqNo, offset, limit, fillFullPage);
         } else {
 

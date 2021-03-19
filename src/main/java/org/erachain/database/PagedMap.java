@@ -1,6 +1,6 @@
 package org.erachain.database;
 
-import org.erachain.dbs.IMap;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
 
 import java.io.IOException;
@@ -13,13 +13,16 @@ public class PagedMap<T, U> {
         return false;
     }
 
-    Object[] args;
-    IMap map;
-    long timestamp;
+    public void rowCalc() {
+    }
 
-    public PagedMap(IMap map, Object[] args) {
-        this.map = map;
-        this.args = args;
+    DBTabImpl mapImpl;
+    protected long timestamp;
+
+    protected U currentRow;
+
+    public PagedMap(DBTabImpl mapImpl) {
+        this.mapImpl = mapImpl;
     }
 
     public List<U> getPageList(T fromKey, int offset, int limit, boolean fillFullPage) {
@@ -27,7 +30,6 @@ public class PagedMap<T, U> {
         timestamp = System.currentTimeMillis();
 
         List<U> rows = new ArrayList<>();
-        U row;
         T key;
 
         if (offset < 0 || limit < 0) {
@@ -37,12 +39,12 @@ public class PagedMap<T, U> {
             // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути создаем список обратный что нашли по обратному итератору
             int offsetHere = -(offset + limit);
-            try (IteratorCloseable<T> iterator = map.getIterator(fromKey, false)) {
+            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, false)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
                     key = iterator.next();
-                    row = (U) map.get(key);
+                    currentRow = (U) mapImpl.get(key);
                     if (filerRows()) {
                         continue;
                     }
@@ -54,13 +56,15 @@ public class PagedMap<T, U> {
                     count++;
 
                     // обратный отсчет в списке
-                    rows.add(0, row);
+                    rowCalc();
+                    rows.add(0, currentRow);
                 }
 
                 if (fillFullPage && fromKey != null // && fromKey != 0
                         && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
                     for (U pageRow : getPageList(fromKey, 0, limit - count, false)) {
+                        currentRow = pageRow;
                         boolean exist = false;
                         for (U rowHere : rows) {
                             if (pageRow.equals(rowHere)) {
@@ -69,7 +73,11 @@ public class PagedMap<T, U> {
                             }
                         }
                         if (!exist) {
-                            rows.add(pageRow);
+                            if (filerRows()) {
+                                continue;
+                            }
+                            rowCalc();
+                            rows.add(currentRow);
                         }
                     }
                 }
@@ -79,12 +87,17 @@ public class PagedMap<T, U> {
 
         } else {
 
-            try (IteratorCloseable<T> iterator = map.getIterator(fromKey, true)) {
+            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, true)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
+
+                    if (System.currentTimeMillis() - timestamp > 5000) {
+                        break;
+                    }
+
                     key = iterator.next();
-                    row = (U) map.get(key);
+                    currentRow = (U) mapImpl.get(key);
                     if (filerRows()) {
                         continue;
                     }
@@ -95,7 +108,8 @@ public class PagedMap<T, U> {
 
                     count++;
 
-                    rows.add(row);
+                    rowCalc();
+                    rows.add(currentRow);
                 }
 
                 if (fillFullPage && fromKey != null // && fromKey != 0
@@ -104,6 +118,7 @@ public class PagedMap<T, U> {
                     int index = 0;
                     int limitLeft = limit - count;
                     for (U pageRow : getPageList(fromKey, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
+                        currentRow = pageRow;
                         boolean exist = false;
                         for (U rowHere : rows) {
                             if (pageRow.equals(rowHere)) {
@@ -112,7 +127,11 @@ public class PagedMap<T, U> {
                             }
                         }
                         if (!exist) {
-                            rows.add(index++, pageRow);
+                            if (filerRows()) {
+                                continue;
+                            }
+                            rowCalc();
+                            rows.add(index++, currentRow);
                         }
                     }
                 }
