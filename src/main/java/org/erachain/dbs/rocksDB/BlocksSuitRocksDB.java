@@ -1,6 +1,5 @@
 package org.erachain.dbs.rocksDB;
 
-import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.block.Block;
 import org.erachain.database.DBASet;
@@ -45,11 +44,6 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
                     databaseSet, sizeEnable);
         }
 
-    }
-
-    @Override
-    public byte[] makeByteKey(Integer key) {
-        return Ints.toByteArray(key);
     }
 
 }

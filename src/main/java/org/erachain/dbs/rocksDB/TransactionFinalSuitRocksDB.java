@@ -194,11 +194,6 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
     }
 
-    @Override
-    public byte[] makeByteKey(Long key) {
-        return Longs.toByteArray(key);
-    }
-
     // TODO  dbCore.deleteRange(beg, end);
     @Override
     public void deleteForBlock(Integer height) {

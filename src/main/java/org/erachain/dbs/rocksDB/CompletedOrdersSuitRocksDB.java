@@ -1,6 +1,5 @@
 package org.erachain.dbs.rocksDB;
 
-import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBASet;
@@ -31,11 +30,6 @@ public class CompletedOrdersSuitRocksDB extends DBMapSuit<Long, Order> {
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(),
                 databaseSet, sizeEnable);
-    }
-
-    @Override
-    public byte[] makeByteKey(Long key) {
-        return Longs.toByteArray(key);
     }
 
 }
