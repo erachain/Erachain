@@ -29,7 +29,7 @@ function makePageUri(page, linkName) {
     return uri;
 }
 
-function makePageUri2(seqNo, offset) {
+function makePageUri2(pageKey, offset) {
     // parse url
     var urlParams;
     var match,
@@ -44,10 +44,10 @@ function makePageUri2(seqNo, offset) {
     while (match = search.exec(query))
         urlParams[decode(match[1])] = decode(match[2]);
 
-    if (seqNo == 0)
-        urlParams['seqNo'] = null;
+    if (pageKey == 0)
+        urlParams['pageKey'] = null;
     else
-        urlParams['seqNo'] = seqNo;
+        urlParams['pageKey'] = pageKey;
 
     if (offset == 0)
         urlParams['offset'] = null;
@@ -100,19 +100,19 @@ function pagesComponent2(data) {
         // в начало прыгнуть
         output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, 0) + '"><b><span class="glyphicon glyphicon-fast-backward"></span></b></a>';
 
-        var fromSeqNo = data.fromSeqNo;
-        if (fromSeqNo != null) {
+        var pageFromKey = data.pageFromKey;
+        if (pageFromKey != null) {
             // это не самое начало значит можно скакать вверх
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(fromSeqNo, -pageSize - 1) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(pageFromKey, -pageSize - 1) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
         }
 
-        output += '&emsp; [ <input size="10" type="text" value="' + (fromSeqNo == null? 'seqNo' : fromSeqNo) + '" class="" style="font-size: 1em;"'
+        output += '&emsp; [ <input size="10" type="text" value="' + (pageFromKey == null? 'pageKey' : pageFromKey) + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) document.location = makePageUri2(this.value.trim(), 0)"> ] ';
 
-        var toSeqNo = data.toSeqNo;
-        if (toSeqNo != null) {
+        var pageToKey = data.pageToKey;
+        if (pageToKey != null) {
             // листнуть ниже
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(pageToKey, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
         }
 
         // в конец прыгнуть

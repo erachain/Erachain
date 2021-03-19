@@ -108,7 +108,7 @@ public class BlockExplorer {
 
     }
 
-    public void makePage(Class type, int start, int pageSize,
+    public void makePage(Class type, int start,
                          Map output, JSONObject langObj, Object[] expArgs) {
 
         DBTab map = dcSet.getMap(type);
@@ -141,13 +141,12 @@ public class BlockExplorer {
      * Для НУМЕРОВАННЫХ списков с ключом LONG - для сущностей всех например. Без пропуска пустых номеров.
      *
      * @param type
-     * @param start    LONG
-     * @param pageSize
+     * @param start   LONG
      * @param output
      * @param langObj
      * @param expArgs
      */
-    public void makePage(Class type, long start, int pageSize,
+    public void makePage(Class type, long start,
                          Map output, JSONObject langObj, Object[] expArgs) {
 
         DBTab map = dcSet.getMap(type);
@@ -174,6 +173,11 @@ public class BlockExplorer {
                 }
             } catch (IOException e) {
             }
+            output.put("pageItems", array);
+            output.put("pageFromKey", start);
+            output.put("pageToKey", key);
+            output.put("useoffset", 1);
+
 
         } else {
             // старый с пропуском пустых
@@ -183,26 +187,26 @@ public class BlockExplorer {
                     array.add(element.jsonForExplorerPage(langObj, expArgs));
                 }
             }
-        }
 
-        output.put("pageItems", array);
-        output.put("pageSize", pageSize);
-        output.put("listSize", map.size());
-        output.put("lastNumber", key);
+            output.put("pageItems", array);
+            output.put("listSize", map.size());
+            output.put("lastNumber", key);
+
+        }
 
     }
 
     /**
      * Для списков с ключом INT - для блоков. Без пропуска пустых номеров.
-     *  @param type
+     *
+     * @param type
      * @param keys
      * @param start
-     * @param pageSize
      * @param output
      * @param langObj
      * @param expArgs
      */
-    public void makePage(Class type, List keys, int start, int pageSize,
+    public void makePage(Class type, List keys, int start,
                          Map output, JSONObject langObj, Object[] expArgs) {
 
         int size = keys.size();
@@ -228,7 +232,6 @@ public class BlockExplorer {
         }
 
         output.put("pageItems", array);
-        output.put("pageSize", pageSize);
         output.put("listSize", keys.size());
 
     }
@@ -236,18 +239,18 @@ public class BlockExplorer {
     public Map jsonQueryPages(Class type, int start, int pageSize, Object[] expArgs) {
         Map result = new LinkedHashMap();
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
-        makePage(type, start, pageSize, result, langObj, expArgs);
+        makePage(type, start, result, langObj, expArgs);
         return result;
     }
 
     public Map jsonQueryPages(Class type, long start, int pageSize, Object[] expArgs) {
         Map result = new LinkedHashMap();
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
-        makePage(type, start, pageSize, result, langObj, expArgs);
+        makePage(type, start, result, langObj, expArgs);
         return result;
     }
 
-    public LinkedHashMap jsonQuerySearchPages(UriInfo info, Class type, String search, int start, int pageSize, Object[] expArgs) throws WrongSearchException, Exception {
+    public LinkedHashMap jsonQuerySearchPages(UriInfo info, Class type, String search, int start, Object[] expArgs) throws WrongSearchException, Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
         LinkedHashMap result = new LinkedHashMap();
         List<Object> keys = new ArrayList();
@@ -283,7 +286,7 @@ public class BlockExplorer {
             throw new WrongSearchException();
         }
 
-        makePage(type, keys, start, pageSize, result, langObj, expArgs);
+        makePage(type, keys, start, result, langObj, expArgs);
 
         return result;
     }
@@ -296,7 +299,8 @@ public class BlockExplorer {
 
         Stopwatch stopwatchAll = new Stopwatch();
         long start = 0;
-        start = checkAndGetLongParam(info, start, "start");
+        start = checkAndGetLongParam(info, start, "pageKey");
+        output.put("pageSize", pageSize);
 
         //lang
         String langISO;
@@ -363,7 +367,7 @@ public class BlockExplorer {
                         break;
                     case "persons":
                         //search persons
-                        output.putAll(jsonQuerySearchPages(info, PersonCls.class, search, (int) start, pageSize, null));
+                        output.putAll(jsonQuerySearchPages(info, PersonCls.class, search, (int) start, null));
                         break;
                     case "assets":
                         //search assets
@@ -371,24 +375,24 @@ public class BlockExplorer {
                         Object[] expArgs = new Object[2];
                         expArgs[0] = Controller.getInstance().getAsset(ASSET_QUOTE_KEY);
                         expArgs[1] = Controller.getInstance().dlSet.getPairMap();
-                        output.putAll(jsonQuerySearchPages(info, AssetCls.class, search, (int) start, pageSize, expArgs));
+                        output.putAll(jsonQuerySearchPages(info, AssetCls.class, search, (int) start, expArgs));
 
                         break;
                     case "statuses":
                         //search statuses
-                        output.putAll(jsonQuerySearchPages(info, StatusCls.class, search, (int) start, pageSize, null));
+                        output.putAll(jsonQuerySearchPages(info, StatusCls.class, search, (int) start, null));
                         break;
                     case "templates":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(info, TemplateCls.class, search, (int) start, pageSize, null));
+                        output.putAll(jsonQuerySearchPages(info, TemplateCls.class, search, (int) start, null));
                         break;
                     case "polls":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(info, PollCls.class, search, (int) start, pageSize, null));
+                        output.putAll(jsonQuerySearchPages(info, PollCls.class, search, (int) start, null));
                         break;
                     case "blocks":
                         //search block
-                        output.putAll(jsonQuerySearchPages(info, Block.class, search, (int) start, pageSize, null));
+                        output.putAll(jsonQuerySearchPages(info, Block.class, search, (int) start, null));
                         break;
                     case "top":
                         output.putAll(jsonQueryTopRichest100(100, Long.valueOf(search)));
@@ -2395,8 +2399,8 @@ public class BlockExplorer {
                 intOffest = (int) (long) offset;
             }
 
-            String fromSeqNoStr = info.getQueryParameters().getFirst("seqNo");
-            Long fromID = Transaction.parseDBRef(fromSeqNoStr);
+            String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
+            Long fromID = Transaction.parseDBRef(pageFromKeyStr);
             if (fromID != null && fromID.equals(0L) && intOffest < 0) {
                 // это значит нужно скакнуть в самый низ
             }
@@ -2405,10 +2409,10 @@ public class BlockExplorer {
                 Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filterStr, useForge, pageSize, fromID, intOffest, true);
                 transactions = result.c;
                 if (result.a != null) {
-                    output.put("fromSeqNo", Transaction.viewDBRef(result.a));
+                    output.put("pageFromKey", Transaction.viewDBRef(result.a));
                 }
                 if (result.b != null) {
-                    output.put("toSeqNo", Transaction.viewDBRef(result.b));
+                    output.put("pageToKey", Transaction.viewDBRef(result.b));
                 }
             } else {
                 // OLD
@@ -2421,12 +2425,12 @@ public class BlockExplorer {
 
                 if (transactions.isEmpty()) {
                     // возможно вниз вышли за границу
-                    output.put("fromSeqNo", fromSeqNoStr);
+                    output.put("pageFromKey", pageFromKeyStr);
                 } else {
                     // включим ссылки на листание вверх
-                    output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+                    output.put("pageFromKey", transactions.get(0).viewHeightSeq());
                     // это не самый конец - включим листание вниз
-                    output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+                    output.put("pageToKey", transactions.get(transactions.size() - 1).viewHeightSeq());
                 }
             }
         }
@@ -2476,8 +2480,8 @@ public class BlockExplorer {
             intOffest = (int) (long) offset;
         }
 
-        String fromSeqNoStr = info.getQueryParameters().getFirst("seqNo");
-        Long fromID = Transaction.parseDBRef(fromSeqNoStr);
+        String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
+        Long fromID = Transaction.parseDBRef(pageFromKeyStr);
         if (fromID != null && fromID.equals(0L) && intOffest < 0) {
             // это значит нужно скакнуть в самый низ
         }
@@ -2486,16 +2490,16 @@ public class BlockExplorer {
                 fromID, intOffest, pageSize, !useForge, true);
 
         if (transactions.isEmpty()) {
-            output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу
+            output.put("pageFromKey", pageFromKeyStr); // возможно вниз вышли за границу
         } else {
             // включим ссылки на листание вверх
             if (true || intOffest >= 0 || transactions.size() >= pageSize) {
-                output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+                output.put("pageFromKey", transactions.get(0).viewHeightSeq());
             }
 
             if (true || !((fromID == null || fromID.equals(0L)) && intOffest < 0)) {
                 // это не самый конец - включим листание вниз
-                output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+                output.put("pageToKey", transactions.get(transactions.size() - 1).viewHeightSeq());
             }
         }
 
