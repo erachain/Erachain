@@ -138,8 +138,9 @@ public class BlockExplorer {
     }
 
     /**
-     * Для списков с ключом LONG - для сущностей всех например
-     *  @param type
+     * Для НУМЕРОВАННЫХ списков с ключом LONG - для сущностей всех например. Без пропуска пустых номеров.
+     *
+     * @param type
      * @param start    LONG
      * @param pageSize
      * @param output
@@ -161,12 +162,27 @@ public class BlockExplorer {
         long key = start;
         JSONArray array = new JSONArray();
 
-        while (key > start - pageSize && key > 0) {
-            element = (ExplorerJsonLine) map.get(key--);
-            if (element != null) {
-                array.add(element.jsonForExplorerPage(langObj, expArgs));
+        if (true) {
+            try (IteratorCloseable iterator = ((ItemMap) map).getIteratorFrom(start, true)) {
+                int count = 0;
+                while (count++ < pageSize && iterator.hasNext()) {
+                    key = (Long) iterator.next();
+                    element = (ExplorerJsonLine) map.get(key);
+                    if (element != null) {
+                        array.add(element.jsonForExplorerPage(langObj, expArgs));
+                    }
+                }
+            } catch (IOException e) {
             }
 
+        } else {
+            // старый с пропуском пустых
+            while (key > start - pageSize && key > 0) {
+                element = (ExplorerJsonLine) map.get(key--);
+                if (element != null) {
+                    array.add(element.jsonForExplorerPage(langObj, expArgs));
+                }
+            }
         }
 
         output.put("pageItems", array);
@@ -177,7 +193,7 @@ public class BlockExplorer {
     }
 
     /**
-     * Для списков с ключом INT - для блоков
+     * Для списков с ключом INT - для блоков. Без пропуска пустых номеров.
      *  @param type
      * @param keys
      * @param start
