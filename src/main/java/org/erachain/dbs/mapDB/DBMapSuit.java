@@ -185,6 +185,34 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     }
 
+    public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
+        this.addUses();
+
+        if (descending) {
+            IteratorCloseable result =
+                    // делаем закрываемый Итератор
+                    IteratorCloseableImpl.make(
+                            // берем индекс с обратным отсчетом
+                            ((NavigableMap) this.map).descendingMap()
+                                    // задаем границы, так как он обратный границы меняем местами
+                                    .subMap(fromKey == null || fromKey.equals(0L) ? Long.MAX_VALUE : fromKey, 0L).keySet().iterator());
+            return result;
+        }
+
+        IteratorCloseable result =
+                // делаем закрываемый Итератор
+                IteratorCloseableImpl.make(
+                        ((NavigableMap) this.map)
+                                // задаем границы, так как он обратный границы меняем местами
+                                .subMap(fromKey == null || fromKey.equals(0L) ? 0L : fromKey,
+                                        Long.MAX_VALUE).keySet().iterator());
+
+
+        this.outUses();
+        return new IteratorCloseableImpl(result);
+
+    }
+
     public void addUses() {
         if (this.databaseSet != null) {
             this.databaseSet.addUses();
