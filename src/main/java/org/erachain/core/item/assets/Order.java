@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
+import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
@@ -953,7 +954,7 @@ public class Order implements Comparable<Order> {
                 if (tradeAmountForHave.signum() <= 0
                         || tradeAmountForWant.signum() < 0) {
                     Long error = null;
-                    error ++;
+                    error++;
                 }
 
                 trade = new Trade(this.getId(), order.getId(), this.haveAssetKey, this.wantAssetKey,
@@ -963,8 +964,8 @@ public class Order implements Comparable<Order> {
                 //ADD TRADE TO DATABASE
                 tradesMap.put(trade);
 
-                /// так как у нас Индексы высчитываются по плавающей цене для остатков и она сейчас измениится
-                /// то сперва удалим Ордер - до изменения Остатокв и цены по Остаткам
+                /// так как у нас Индексы высчитываются по плавающей цене для остатков и она сейчас изменится
+                /// то сперва удалим Ордер - до изменения Остатков и цены по Остаткам
                 /// тогда можно ключи делать по цене на Остатки
                 //REMOVE FROM ORDERS
                 ordersMap.delete(order);
@@ -992,10 +993,18 @@ public class Order implements Comparable<Order> {
                 }
 
                 //TRANSFER FUNDS
-                order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey,
-                        tradeAmountForWant, false, false, false);
-                transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
-                        "Trade Order @" + Transaction.viewDBRef(order.id));
+                if (height > BlockChain.VERS_5_3) {
+                    AssetCls.processTrade(dcSet, block, order.getCreator(),
+                            false, ((CreateOrderTransaction) transaction).getWantAsset(),
+                            ((CreateOrderTransaction) transaction).getHaveAsset(),
+                            false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
+
+                } else {
+                    order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey,
+                            tradeAmountForWant, false, false, false);
+                    transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
+                            "Trade Order @" + Transaction.viewDBRef(order.id));
+                }
 
                 // Учтем что у стороны ордера обновилась форжинговая информация
                 if (order.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
@@ -1052,16 +1061,25 @@ public class Order implements Comparable<Order> {
 
         //TRANSFER FUNDS
         if (processedAmountFulfilledWant.signum() > 0) {
-            this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey,
-                    processedAmountFulfilledWant, false, false, false);
-            transaction.addCalculated(block, this.creator, this.wantAssetKey, processedAmountFulfilledWant,
-                    "Resolve Order @" + Transaction.viewDBRef(this.id));
+            if (height > BlockChain.VERS_5_3) {
+                AssetCls.processTrade(dcSet, block, this.creator,
+                        true, ((CreateOrderTransaction) transaction).getHaveAsset(),
+                        ((CreateOrderTransaction) transaction).getWantAsset(),
+                        false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
+            } else {
+                this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey,
+                        processedAmountFulfilledWant, false, false, false);
+                transaction.addCalculated(block, this.creator, this.wantAssetKey, processedAmountFulfilledWant,
+                        "Resolve Order @" + Transaction.viewDBRef(this.id));
+            }
         }
-
 
     }
 
     public void orphan(Block block) {
+
+        // GET HEIGHT from ID
+        int height = (int) (this.id >> 32);
 
         if (BlockChain.CHECK_BUGS > 1 &&
                 //Transaction.viewDBRef(id).equals("776446-1")
@@ -1079,6 +1097,9 @@ public class Order implements Comparable<Order> {
         completedMap.delete(this);
 
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
+
+        AssetCls assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
+        AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
 
         //ORPHAN TRADES
         Trade trade;
@@ -1104,9 +1125,15 @@ public class Order implements Comparable<Order> {
                 target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
                 thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
-                target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey,
-                        tradeAmountWant, false, false, false);
+                if (height > BlockChain.VERS_5_3) {
+                    AssetCls.processTrade(dcSet, block, target.getCreator(),
+                            false, assetWant, assetHave,
+                            true, tradeAmountWant, Transaction.getTimestampByDBRef(id), 0L);
+                } else {
 
+                    target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey,
+                            tradeAmountWant, false, false, false);
+                }
                 // Учтем что у стороны ордера обновилась форжинговая информация
                 if (target.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
                     block.addForgingInfoUpdate(target.getCreator());
@@ -1143,9 +1170,16 @@ public class Order implements Comparable<Order> {
         //   - если обработка остановлена по достижению порога Инкремента
         this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey,
                 this.getAmountHaveLeft(), false, false, true);
+
         //REVERT WANT
-        this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey,
-                thisAmountFulfilledWant, false, false, false);
+        if (height > BlockChain.VERS_5_3) {
+            AssetCls.processTrade(dcSet, block, this.creator,
+                    true, assetHave, assetWant,
+                    true, thisAmountFulfilledWant, Transaction.getTimestampByDBRef(id), 0L);
+        } else {
+            this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey,
+                    thisAmountFulfilledWant, false, false, false);
+        }
     }
 
     @Override

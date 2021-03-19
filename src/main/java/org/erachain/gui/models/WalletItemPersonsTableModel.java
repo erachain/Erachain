@@ -39,7 +39,7 @@ public class WalletItemPersonsTableModel extends WalletItemTableModel<PersonCls>
             case COLUMN_NAME:
                 return person;
             case COLUMN_ADDRESS:
-                return person.getOwner().getPersonAsString();
+                return person.getMaker().getPersonAsString();
             case COLUMN_FAVORITE:
                 return person.isFavorite();
         }

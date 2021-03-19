@@ -18,7 +18,7 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
 
     public WalletItemAssetsTableModel() {
         super(Controller.getInstance().wallet.database.getAssetMap(),
-                new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite"},
+                new String[]{"Key", "Name", "Maker", "Type", "Quantity", "Favorite"},
                 new Boolean[]{false, true, true, false, false, false}, true, COLUMN_FAVORITE);
 
     }
@@ -43,7 +43,7 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
                 return asset; // for Icon
 
             case COLUMN_ADDRESS:
-                return asset.getOwner().getPersonAsString();
+                return asset.getMaker().getPersonAsString();
 
             case COLUMN_ASSET_TYPE:
                 return Lang.T(asset.viewAssetType());

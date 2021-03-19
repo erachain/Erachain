@@ -35,11 +35,11 @@ function polls(data){
         output += '<td>' + item.totalVotes + '</td>';
         output += '<td>' + item.optionsCount + '</td>';
 
-        output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+        output += '<td><a href=?address=' + item.maker + get_lang() + '>';
         if (item.hasOwnProperty('person'))
             output += '[' + item.person_key + ']' + escapeHtml(item.person);
         else
-            output += item.owner;
+            output += item.maker;
         output += '</a></td></tr>';
     }
     if (!notDisplayPages) {

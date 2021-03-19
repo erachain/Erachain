@@ -4,30 +4,29 @@ function assets(data) {
     var numberShiftDelta = data.pageSize;
     output += lastBlock(data.lastBlock);
     var start = data.start;
-    if (!notDisplayPages) {
-        //output += pagesComponentBeauty(start, data.Label_Assets, data.lastNumber, data.pageSize, 'start');
-        output += pagesComponent2(data);
-    }
-
 
     output += '<table width="1280" border=0><tr><td align=left><br>';
     output += '<a href="?assets"' + get_lang() + '><h3 style="display:inline;">' + data.Label_Title + '</h3></a>';
-    output += '<br><br>';
+    output += '<br>';
+    for (var key in data.types_abbrevs) {
+        output += ' &nbsp&nbsp<a href=?q=:' + data.types_abbrevs[key] + get_lang() + '&search=assets class="button ll-blue-bgc"<b>' + data.types_abbrevs[key] + '</b></a>';
+    }
+    output += '</table>';
 
-    output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
-        'class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
+    if (!notDisplayPages) {
+        output += pagesComponent2(data);
+    }
+
+    output += '<table BORDER=0 cellpadding=10 cellspacing=0 ' +
+        'class="tiny table table-striped" style="font-size:1.2em; border: 1px solid #ddd;"><tr>';
     output += '<td><b>' + data.Label_table_asset_key + ': <b>' + data.Label_table_asset_name +
-        '<td><b>' + data.Label_table_asset_type + '<td><b>' + data.Label_table_asset_owner;
-    //output += '<td><b>' + data.Label_table_asset_orders + '<td><b>' + data.Label_table_asset_amount
-    //     + '<td><b>' + data.Label_table_asset_scale;
+        '<td><b>' + data.Label_table_asset_type + '<td><b>' + data.Label_table_asset_maker;
     output += '<td><b>' + data.Label_table_asset_quantity + '<td><b>' + data.Label_table_asset_released
          + '<td><b>' + data.Label_table_asset_lastPrice
          + '<td><b>' + data.Label_table_asset_changePrice
          + '<td><b>' + data.Label_table_asset_marketCap;
 
     //Отображение таблицы элементов активов
-    //var length = Object.keys(data.pageItems).length;
-    //for (var i = 0; i < length - 1; i++) {
     for (var i in data.pageItems) {
         var item = data.pageItems[i];
         output += '<tr>';
@@ -39,26 +38,24 @@ function assets(data) {
         output += cutBlank(escapeHtml(item.name), 50);
         output += '</a>';
         output += '<td>' + item.assetTypeNameFull;
-        ////output += '<td>' + escapeHtml(item.description.substr(0, 60));
 
-        output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+        output += '<td><a href=?address=' + item.maker + get_lang() + '>';
         if (item.hasOwnProperty('person'))
             output += '[' + item.person_key + ']' + cutBlank(escapeHtml(item.person), 25);
         else
-            output += item.owner;
+            output += item.maker;
         output += '</a></td>';
 
-        //output += '<td>' + item.orders;
         output += '<td>' + item.quantity;
         output += '<td>' + item.released;
-        output += '<td>' + item.lastPrice.toPrecision(8);
-        output += '<td>' + item.changePrice.toPrecision(4);
-        output += '<td>' + item.marketCap.toPrecision(10);
-
+        output += '<td>' + (item.price == 0? "--" : item.price.toPrecision(6));
+        output += '<td>' + (item.changePrice == 0? "--" : item.changePrice.toPrecision(2));
+        output += '<td>' + (item.marketCap == 0? "--" : item.marketCap.toPrecision(6));
 
     }
+
     if (!notDisplayPages) {
-        output += '</table></td></tr></table>';
+        output += '</table>';
         output += pagesComponent2(data);
     }
     return output;
@@ -108,7 +105,7 @@ function asset(data, forPrint) {
     if (!forPrint)
         output += ', &nbsp&nbsp<a href=?top=all&asset=' + item.key + get_lang() + ' class="button ll-blue-bgc"><b>' + item.Label_Holders + '</b></a>';
 
-    output += '<br>' + item.Label_AssetType + ': <b>' + item.assetTypeNameFull + '</b><br>';
+    output += '<br>' + item.Label_AssetType + ': <a href=?q=%3A' + item.type_abbrev + get_lang() + '&search=assets ><b>' + item.assetTypeNameFull + '</b></a><br>';
     if (item.properties) {
         output += '</p><p style="margin-bottom:0px">';
         output += '<b>' + item.Label_Properties + '</b>: ' + item.properties + '</p>';
@@ -298,7 +295,7 @@ function trades(data) {
 
         output += '<td align=right style="line-height: 150%;">';
 
-        if (trade.initiatorCreator_addr == data.assetWantOwner) {
+        if (trade.initiatorCreator_addr == data.assetWantMaker) {
             if (trade.type != 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
             } else {
@@ -331,7 +328,7 @@ function trades(data) {
         output += '<td style="line-height: 150%;">';
         output += '<a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
 
-        if (trade.targetCreator_addr == data.assetHaveOwner) {
+        if (trade.targetCreator_addr == data.assetHaveMaker) {
             if (trade.type == 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
             } else {

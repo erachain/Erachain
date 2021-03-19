@@ -168,7 +168,7 @@ function transactionLite(urlstart, data, i, item) {
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
 
-        output += '<b>Action</b></td><td width="290"><b>Owner</b></td><td width=100><b>Fee</b></td>';
+        output += '<b>Action</b></td><td width="290"><b>Maker</b></td><td width=100><b>Fee</b></td>';
         output += '<td><b>Name:</b> <a href="?name=' + encodeURIComponent(item.transaction.name) + get_lang() + '">' + escapeHtml(item.transaction.name) + '</a></td>';
         output += '<td><b>Site:</b> <a href=/' + encodeURIComponent(item.transaction.name) + get_lang() + '>http://' + document.location.host + '/' + escapeHtml(item.transaction.name) + '</a></td>';
         if (item.hasOwnProperty('balance')) {
@@ -180,10 +180,10 @@ function transactionLite(urlstart, data, i, item) {
         output += '<img src=img/03_name_registration.png>';
         output += '<br><font size="-2">Name Registration</font></td>';
 
-        if (item.transaction.owner == data.address) {
-            output += '<td><font color="dimgray">' + item.transaction.owner + '</font></td>';
+        if (item.transaction.maker == data.address) {
+            output += '<td><font color="dimgray">' + item.transaction.maker + '</font></td>';
         } else {
-            output += '<td><a href=?address=' + item.transaction.owner + get_lang() + '>' + item.transaction.owner + '</a></td>';
+            output += '<td><a href=?address=' + item.transaction.maker + get_lang() + '>' + item.transaction.maker + '</a></td>';
         }
         output += '<td>' + addCommas(item.transaction.fee) + ' <font size="-2">ERA</font>';
 
@@ -220,7 +220,7 @@ function transactionLite(urlstart, data, i, item) {
 
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
 
-        output += '<b>Action</b></td><td width="290"><b>New Owner</b></td><td width=100><b>Fee</b></td>';
+        output += '<b>Action</b></td><td width="290"><b>New Maker</b></td><td width=100><b>Fee</b></td>';
         output += '<td><b>Name:</b> <a href="?name=' + encodeURIComponent(item.transaction.name) + get_lang() + '">' + htmlFilter(item.transaction.name) + '</a></td>';
         output += '<td><b>Site:</b> <a href=/' + encodeURIComponent(item.transaction.name) + get_lang() + '>http://' + document.location.host + '/' + htmlFilter(item.transaction.name) + '</a></td>';
 
@@ -234,12 +234,12 @@ function transactionLite(urlstart, data, i, item) {
         output += '<img src=img/04_name_update.png>';
         output += '<br><font size="-2">Name Update</font></td>';
 
-        if (item.transaction.newOwner == data.address) {
-            output += '<td><font color="dimgray">' + item.transaction.newOwner + '</font>';
+        if (item.transaction.newMaker == data.address) {
+            output += '<td><font color="dimgray">' + item.transaction.newMaker + '</font>';
         } else {
-            output += '<td><a href=?address=' + item.transaction.newOwner + get_lang() + '>' + item.transaction.newOwner + '</a>';
+            output += '<td><a href=?address=' + item.transaction.newMaker + get_lang() + '>' + item.transaction.newMaker + '</a>';
         }
-        output += '<br><font color="e5e5e5">' + item.transaction.owner + '</font>';
+        output += '<br><font color="e5e5e5">' + item.transaction.maker + '</font>';
 
         output += '<td>' + addCommas(item.transaction.fee) + ' <font size="-2">ERA</font>';
 
@@ -276,7 +276,7 @@ function transactionLite(urlstart, data, i, item) {
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
 
-        output += '<b>Action</b></td><td width="290"><b>Owner</b></td><td width=100><b>Fee</b></td>';
+        output += '<b>Action</b></td><td width="290"><b>Maker</b></td><td width=100><b>Fee</b></td>';
         output += '<td width=200><b>Price</b></td><td><b>Name</b></td>';
         if (item.hasOwnProperty('balance')) {
             output += '<td width=180><b>Balance</b></td>';
@@ -287,10 +287,10 @@ function transactionLite(urlstart, data, i, item) {
         output += '<img src=img/05_name_sale.png>';
         output += '<br><font size="-2">Name to Sale</font></td>';
 
-        if (item.transaction.owner == data.address) {
-            output += '<td><font color="dimgray">' + item.transaction.owner + '</font></td>';
+        if (item.transaction.maker == data.address) {
+            output += '<td><font color="dimgray">' + item.transaction.maker + '</font></td>';
         } else {
-            output += '<td><a href=?address=' + item.transaction.owner + get_lang() + '>' + item.transaction.owner + '</a></td>';
+            output += '<td><a href=?address=' + item.transaction.maker + get_lang() + '>' + item.transaction.maker + '</a></td>';
         }
         output += '<td>' + addCommas(item.transaction.fee) + ' <font size="-2">ERA</font></td>';
 
@@ -325,7 +325,7 @@ function transactionLite(urlstart, data, i, item) {
         output += '<tr><td>';
         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
 
-        output += '<b>Action</b></td><td width="290"><b>Owner</b></td><td width=200><b>Fee</b></td>';
+        output += '<b>Action</b></td><td width="290"><b>Maker</b></td><td width=200><b>Fee</b></td>';
         output += '<td><b>Name</b></td>';
         if (item.hasOwnProperty('balance')) {
             output += '<td width=180><b>Balance</b></td>';
@@ -336,10 +336,10 @@ function transactionLite(urlstart, data, i, item) {
         output += '<img src=img/06_cancel_name_sale.png>';
         output += '<br><font size="-2">Cancel Name Sale</font></td>';
 
-        if (item.transaction.owner == data.address) {
-            output += '<td><font color="dimgray">' + item.transaction.owner + '</font></td>';
+        if (item.transaction.maker == data.address) {
+            output += '<td><font color="dimgray">' + item.transaction.maker + '</font></td>';
         } else {
-            output += '<td><a href=?address=' + item.transaction.owner + get_lang() + '>' + item.transaction.owner + '</a></td>';
+            output += '<td><a href=?address=' + item.transaction.maker + get_lang() + '>' + item.transaction.maker + '</a></td>';
         }
 
         output += '<td>' + addCommas(item.transaction.fee) + ' <font size="-2">ERA</font></td>';

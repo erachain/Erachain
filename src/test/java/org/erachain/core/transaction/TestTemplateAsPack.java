@@ -130,7 +130,7 @@ public class TestTemplateAsPack {
             assertEquals(issueTemplateRecord.getCreator().getAddress(), parsedIssueTemplateTransaction.getCreator().getAddress());
 
             //CHECK OWNER
-            assertEquals(issueTemplateRecord.getItem().getOwner().getAddress(), parsedIssueTemplateTransaction.getItem().getOwner().getAddress());
+            assertEquals(issueTemplateRecord.getItem().getMaker().getAddress(), parsedIssueTemplateTransaction.getItem().getMaker().getAddress());
 
             //CHECK NAME
             assertEquals(issueTemplateRecord.getItem().getName(), parsedIssueTemplateTransaction.getItem().getName());

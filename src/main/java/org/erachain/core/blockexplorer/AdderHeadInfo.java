@@ -11,6 +11,7 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Map;
@@ -106,7 +107,7 @@ public class AdderHeadInfo {
         output.put("Label_Title", Lang.T("Assets", langObj));
         output.put("Label_table_asset_key", Lang.T("Key", langObj));
         output.put("Label_table_asset_name", Lang.T("Name", langObj));
-        output.put("Label_table_asset_owner", Lang.T("Owner", langObj));
+        output.put("Label_table_asset_maker", Lang.T("Maker", langObj));
         output.put("Label_table_asset_type", Lang.T("Type", langObj));
         output.put("Label_table_asset_description", Lang.T("Description", langObj));
         output.put("Label_table_asset_scale", Lang.T("Scale", langObj));
@@ -118,6 +119,15 @@ public class AdderHeadInfo {
         output.put("Label_table_asset_marketCap", Lang.T("Market Cap", langObj));
         output.put("Label_table_asset_lastPrice", Lang.T("Price", langObj));
         output.put("Label_table_asset_changePrice", Lang.T("24h", langObj));
+        output.put("Label_table_asset_changePrice", Lang.T("24h", langObj));
+
+        JSONArray assetTypesAbbrevs = new JSONArray();
+        for (int type : AssetCls.assetTypes()) {
+            assetTypesAbbrevs.add(AssetCls.viewAssetTypeAbbrev(type));
+        }
+        output.put("types_abbrevs", assetTypesAbbrevs);
+
+
         addLaterPrevious(output, langObj);
     }
 

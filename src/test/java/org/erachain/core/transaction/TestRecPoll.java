@@ -216,7 +216,7 @@ public class TestRecPoll {
             fail("Exception while parsing transaction.  : " + e);
         }
         assertEquals(rawPoll.length, poll.getDataLength(false));
-        assertEquals(poll.getOwner().getAddress(), parsedPoll.getOwner().getAddress());
+        assertEquals(poll.getMaker().getAddress(), parsedPoll.getMaker().getAddress());
         assertEquals(poll.getName(), parsedPoll.getName());
         assertEquals(poll.getDescription(), parsedPoll.getDescription());
         assertEquals(poll.getItemTypeName(), parsedPoll.getItemTypeName());
@@ -253,7 +253,7 @@ public class TestRecPoll {
         parsedPoll = (Poll) parsedIssuePollRecord.getItem();
 
         //CHECK OWNER
-        assertEquals(poll.getOwner().getAddress(), parsedPoll.getOwner().getAddress());
+        assertEquals(poll.getMaker().getAddress(), parsedPoll.getMaker().getAddress());
 
         //CHECK NAME
         assertEquals(poll.getName(), parsedPoll.getName());

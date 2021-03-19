@@ -17,21 +17,21 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame {
             isCredit = true;
             //LABEL OWNER
             ++labelGBC.gridy;
-            JLabel ownerLabel = new JLabel(Lang.T("Creditor") + ":");
-            this.add(ownerLabel, labelGBC);
+            JLabel makerLabel = new JLabel(Lang.T("Creditor") + ":");
+            this.add(makerLabel, labelGBC);
 
             //RECIPIENT
             ++detailGBC.gridy;
-            JTextField ownerFld = new JTextField(assetTransfer.getCreator().getAddress());
-            ownerFld.setEditable(false);
-            MenuPopupUtil.installContextMenu(ownerFld);
-            this.add(ownerFld, detailGBC);
+            JTextField makerFld = new JTextField(assetTransfer.getCreator().getAddress());
+            makerFld.setEditable(false);
+            MenuPopupUtil.installContextMenu(makerFld);
+            this.add(makerFld, detailGBC);
 
-            String personOwnerStr = assetTransfer.getCreator().viewPerson();
-            if (personOwnerStr.length() > 0) {
+            String personMakerStr = assetTransfer.getCreator().viewPerson();
+            if (personMakerStr.length() > 0) {
                 ++labelGBC.gridy;
                 ++detailGBC.gridy;
-                this.add(new JLabel(personOwnerStr), detailGBC);
+                this.add(new JLabel(personMakerStr), detailGBC);
             }
         }
 

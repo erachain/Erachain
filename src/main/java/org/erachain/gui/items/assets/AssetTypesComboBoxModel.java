@@ -14,7 +14,7 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
 
         ArrayList<AssetType> list = new ArrayList<AssetType>();
 
-        for (int type : AssetCls.AssetTypes()) {
+        for (int type : AssetCls.assetTypes()) {
             this.addElement(new AssetType(type));
         }
 

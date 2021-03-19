@@ -74,10 +74,10 @@ public abstract class PersonCls extends ItemCls {
     protected String hairСolor; // First Name|Middle Name|Last Name
     protected byte height;
 
-    public PersonCls(byte[] typeBytes, PublicKeyAccount owner, String name, long birthday, long deathday,
+    public PersonCls(byte[] typeBytes, PublicKeyAccount maker, String name, long birthday, long deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
                      String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description) {
-        super(typeBytes, owner, name, icon, image, description);
+        super(typeBytes, maker, name, icon, image, description);
         this.birthday = birthday;
         this.deathday = deathday;
         this.gender = gender;
@@ -90,10 +90,10 @@ public abstract class PersonCls extends ItemCls {
         this.height = height;
     }
 
-    public PersonCls(byte[] typeBytes, PublicKeyAccount owner, String name, String birthday, String deathday,
+    public PersonCls(byte[] typeBytes, PublicKeyAccount maker, String name, String birthday, String deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
                      String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description) {
-        this(typeBytes, owner, name, 0, 0,
+        this(typeBytes, maker, name, 0, 0,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
 
@@ -104,10 +104,10 @@ public abstract class PersonCls extends ItemCls {
         this.deathday = deathday == null ? Long.MIN_VALUE : Timestamp.valueOf(deathday).getTime();
     }
 
-    public PersonCls(int type, PublicKeyAccount owner, String name, long birthday, long deathday,
+    public PersonCls(int type, PublicKeyAccount maker, String name, long birthday, long deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
                      String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description) {
-        this(new byte[]{(byte) type}, owner, name, birthday, deathday,
+        this(new byte[]{(byte) type}, maker, name, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, height, icon, image, description);
     }
@@ -304,6 +304,16 @@ public abstract class PersonCls extends ItemCls {
 
     }
 
+    public static PublicKeyAccount getIssuer(DCSet dcSet, Long personKey) {
+        ItemCls person = dcSet.getItemPersonMap().get(personKey);
+        Long issuerDBRef = dcSet.getTransactionFinalMapSigns().get(person.getReference());
+        Transaction issueRecord = dcSet.getTransactionFinalMap().get(issuerDBRef);
+        return issueRecord.getCreator();
+    }
+
+    public PublicKeyAccount getIssuer(DCSet dcSet) {
+        return getIssuer(dcSet, key);
+    }
 
     // DB
     public ItemMap getDBMap(DCSet db) {
@@ -315,9 +325,9 @@ public abstract class PersonCls extends ItemCls {
     }
 
     // to BYTES
-    public byte[] toBytes(boolean includeReference, boolean forOwnerSign) {
+    public byte[] toBytes(boolean includeReference, boolean forMakerSign) {
 
-        byte[] data = super.toBytes(includeReference, forOwnerSign);
+        byte[] data = super.toBytes(includeReference, forMakerSign);
 
         // WRITE BIRTHDAY
         byte[] birthdayBytes = Longs.toByteArray(this.birthday);

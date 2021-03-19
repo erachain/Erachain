@@ -9,6 +9,8 @@ import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.core.item.unions.UnionCls;
+import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple5;
 
@@ -31,10 +33,12 @@ public class RSetUnionStatusToItem extends Transaction {
     protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
     protected Long key; // UNION KEY
+    protected UnionCls unionItem; // ITEM
     protected Long statusKey; // STATUS KEY
     protected StatusCls status; // STATUS
     protected int itemType; // ITEM TYPE (CAnnot read ITEMS on start DB - need reset ITEM after
     protected Long itemKey; // ITEM KEY
+    protected ItemCls item; // ITEM
     protected long beg_date;
     protected long end_date = Long.MAX_VALUE;
 
@@ -103,6 +107,19 @@ public class RSetUnionStatusToItem extends Transaction {
     }
 
     //GETTERS/SETTERS
+
+    public void setDC(DCSet dcSet, boolean andUpdateFromState) {
+
+        super.setDC(dcSet, false);
+
+        this.unionItem = (UnionCls) dcSet.getItemUnionMap().get(this.key);
+        this.status = (StatusCls) dcSet.getItemStatusMap().get(this.statusKey);
+        item = ItemCls.getItem(dcSet, itemType, this.itemKey);
+
+        if (false && andUpdateFromState && !isWiped())
+            updateFromStateDB();
+
+    }
 
     //public static String getName() { return "Send"; }
 
@@ -362,6 +379,28 @@ public class RSetUnionStatusToItem extends Transaction {
             return Transaction.NOT_ENOUGH_ERA_USE_10;
 
         return Transaction.VALIDATE_OK;
+    }
+
+    @Override
+    public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
+        if (creatorPersonDuration == null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.UNION_TYPE, key, unionItem.getTags()},
+                    new Object[]{ItemCls.STATUS_TYPE, statusKey, status.getTags()},
+                    new Object[]{this.itemType, this.itemKey, item.getTags()}
+            };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                    new Object[]{ItemCls.UNION_TYPE, key, unionItem.getTags()},
+                    new Object[]{ItemCls.STATUS_TYPE, statusKey, status.getTags()},
+                    new Object[]{this.itemType, this.itemKey, item.getTags()}
+            };
+        }
     }
 
     //PROCESS/ORPHAN

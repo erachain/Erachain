@@ -47,7 +47,7 @@ public class FavoriteTemplatesTableModel extends FavoriteItemModelTable {
                 return template;
 
             case COLUMN_ADDRESS:
-                return template.getOwner().getPersonAsString();
+                return template.getMaker().getPersonAsString();
 
             case COLUMN_FAVORITE:
                 return template.isFavorite();

@@ -107,7 +107,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     @Override
     public String getTitle() {
-        return "##" + viewOption() + " > " + ItemCls.getItemTypeChar(ItemCls.POLL_TYPE, key);
+        return "##" + viewOption() + " > " + ItemCls.getItemTypeAndKey(ItemCls.POLL_TYPE, key);
     }
 
     @Override
@@ -282,6 +282,24 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
         return super.isValid(forDeal, flags);
 
+    }
+
+    @Override
+    public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
+        if (creatorPersonDuration == null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.POLL_TYPE, key, poll.getTags()},
+            };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                    new Object[]{ItemCls.POLL_TYPE, key, poll.getTags()},
+            };
+        }
     }
 
     //PROCESS/ORPHAN

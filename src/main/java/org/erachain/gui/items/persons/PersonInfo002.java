@@ -33,7 +33,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
     public StatusesLibraryPanel statuses_Library_Panel;
     public AccountsLibraryPanel accounts_Library_Panel;
     public SignLibraryPanel voush_Library_Panel;
-    public PersonOwnerPanel person_Owner_Panel;
+    public PersonMakerPanel person_Maker_Panel;
     public PersonSignedPanel personSignedPanel;
     /**
      * Creates new form PersonInfo002
@@ -58,10 +58,11 @@ public class PersonInfo002 extends javax.swing.JPanel {
     private javax.swing.JTextField jTextField_Date_Born;
     private javax.swing.JTextField jTextField_Gender;
     private javax.swing.JTextField jTextField_Name;
-    private javax.swing.JLabel jLabel_Owner;
-    private MAccoutnTextField jTextField_Owner;
-    private javax.swing.JLabel jLabel_Owner_Sign;
-    private javax.swing.JTextField jTextField_Owner_Sign;
+    private javax.swing.JLabel jLabel_Maker;
+    private MAccoutnTextField jTextField_Maker;
+    private javax.swing.JLabel jLabel_Maker_Sign;
+    private javax.swing.JTextField jTextField_Maker_Sign;
+
     public PersonInfo002(PersonCls person, boolean full) {
         if (person != null) initComponents(person, full);
     }
@@ -91,14 +92,14 @@ public class PersonInfo002 extends javax.swing.JPanel {
         jTextField1 = new javax.swing.JTextField();
         jPanel_Image = new javax.swing.JPanel();
 
-        jLabel_Owner = new javax.swing.JLabel();
+        jLabel_Maker = new javax.swing.JLabel();
 
-        //	jTextField_Owner = new javax.swing.JTextField();
+        //	jTextField_Maker = new javax.swing.JTextField();
         new javax.swing.JTextField();
-        jLabel_Owner_Sign = new javax.swing.JLabel();
-        jTextField_Owner_Sign = new javax.swing.JTextField();
+        jLabel_Maker_Sign = new javax.swing.JLabel();
+        jTextField_Maker_Sign = new javax.swing.JTextField();
 
-        PublicKeyAccount owner = null;
+        PublicKeyAccount maker = null;
         Transaction issue_record;
         byte[] recordReference = person.getReference();
         if (recordReference != null) {
@@ -114,7 +115,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         if (person instanceof PersonHuman) {
             human = (PersonHuman) person;
             if (human.isMustBeSigned()) {
-                owner = person.getOwner();
+                maker = person.getMaker();
             }
         }
 
@@ -335,18 +336,18 @@ public class PersonInfo002 extends javax.swing.JPanel {
         jPanel3.add(jScrollPane1, gridBagConstraints);
 
         int gridy = 8;
-        if (human.isMustBeSigned() && owner != null && !owner.equals(publisher)) {
+        if (human.isMustBeSigned() && maker != null && !maker.equals(publisher)) {
 
-            jLabel_Owner.setText(Lang.T("Data creator") + ":");
+            jLabel_Maker.setText(Lang.T("Data creator") + ":");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy++;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
             gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
-            jPanel3.add(jLabel_Owner, gridBagConstraints);
+            jPanel3.add(jLabel_Maker, gridBagConstraints);
 
-            jTextField_Owner = new MAccoutnTextField(owner);
-            jTextField_Owner.setEditable(false);
+            jTextField_Maker = new MAccoutnTextField(maker);
+            jTextField_Maker.setEditable(false);
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy++;
@@ -355,7 +356,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
             gridBagConstraints.weightx = 0.2;
             gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
-            jPanel3.add(jTextField_Owner, gridBagConstraints);
+            jPanel3.add(jTextField_Maker, gridBagConstraints);
 
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -367,15 +368,15 @@ public class PersonInfo002 extends javax.swing.JPanel {
             gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
 
 
-            jLabel_Owner_Sign.setText(Lang.T("Owner Sign") + ":");
+            jLabel_Maker_Sign.setText(Lang.T("Maker Sign") + ":");
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy++;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
             gridBagConstraints.insets = new java.awt.Insets(2, 0, 0, 2);
-            //	jPanel3.add(jLabel_Owner_Sign, gridBagConstraints);
+            //	jPanel3.add(jLabel_Maker_Sign, gridBagConstraints);
 
-            jTextField_Owner_Sign.setEditable(false);
+            jTextField_Maker_Sign.setEditable(false);
 
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -386,9 +387,9 @@ public class PersonInfo002 extends javax.swing.JPanel {
             gridBagConstraints.weightx = 0.2;
             gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
 
-            jTextField_Owner_Sign.setText(human.isSignatureValid(DCSet.getInstance()) ? Base58.encode(human.getOwnerSignature())
-                    : Lang.T("Wrong signaryte for data owner"));
-            //	jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
+            jTextField_Maker_Sign.setText(human.isSignatureValid(DCSet.getInstance()) ? Base58.encode(human.getMakerSignature())
+                    : Lang.T("Wrong signature for data maker"));
+            //	jPanel3.add(jTextField_Maker_Sign, gridBagConstraints);
         }
 
         jLabel_Creator.setText(Lang.T("Registrar") + ":");
@@ -499,8 +500,8 @@ public class PersonInfo002 extends javax.swing.JPanel {
 
 
         // created person panel
-        person_Owner_Panel = new PersonOwnerPanel(person);
-        jTabbedPane1.add(person_Owner_Panel);
+        person_Maker_Panel = new PersonMakerPanel(person);
+        jTabbedPane1.add(person_Maker_Panel);
         // vouched person
         personSignedPanel = new PersonSignedPanel(person);
         jTabbedPane1.add(personSignedPanel);
@@ -515,7 +516,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         statuses_Library_Panel.delay_on_close();
         accounts_Library_Panel.delay_on_close();
         voush_Library_Panel.delay_on_close();
-        person_Owner_Panel.delay_on_close();
+        person_Maker_Panel.delay_on_close();
         personSignedPanel.delay_on_close();
 
 

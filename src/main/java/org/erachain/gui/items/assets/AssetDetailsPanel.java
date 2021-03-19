@@ -107,17 +107,17 @@ public class AssetDetailsPanel extends JPanel {
 
         //LABEL OWNER
         labelGBC.gridy = ++gridy;
-        JLabel ownerLabel = new JLabel(Lang.T("Owner") + ":");
-        this.add(ownerLabel, labelGBC);
+        JLabel makerLabel = new JLabel(Lang.T("Maker") + ":");
+        this.add(makerLabel, labelGBC);
 
         //OWNER
-        Account owner = asset.getOwner();
+        Account maker = asset.getMaker();
         detailGBC.gridy = gridy;
-        JTextField ownerTxt = new JTextField(GenesisBlock.CREATOR.equals(owner) ? "GENESIS" : owner.getAddress());
-        ownerTxt.setEditable(false);
-        this.add(ownerTxt, detailGBC);
+        JTextField makerTxt = new JTextField(GenesisBlock.CREATOR.equals(maker) ? "GENESIS" : maker.getAddress());
+        makerTxt.setEditable(false);
+        this.add(makerTxt, detailGBC);
 
-        String personStr = owner.viewPerson();
+        String personStr = maker.viewPerson();
         if (personStr.length() > 0) {
             //LABEL PERSON
             detailGBC.gridy = ++gridy;

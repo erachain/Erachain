@@ -76,7 +76,7 @@ public class PollDetailPanel extends JPanel {
 
         // NAME
         detailGBC.gridy = 2;
-        JTextField creator = new JTextField(poll.getOwner().getPersonAsString());
+        JTextField creator = new JTextField(poll.getMaker().getPersonAsString());
         creator.setEditable(false);
         GridBagConstraints gbc_creator = new GridBagConstraints();
         gbc_creator.fill = GridBagConstraints.HORIZONTAL;

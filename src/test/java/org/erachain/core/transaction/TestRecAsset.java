@@ -263,7 +263,7 @@ public class TestRecAsset {
                     assertEquals(issueAssetTransaction.getCreator().getAddress(), parsedIssueAssetTransaction.getCreator().getAddress());
 
                     //CHECK OWNER
-                    assertEquals(issueAssetTransaction.getItem().getOwner().getAddress(), parsedIssueAssetTransaction.getItem().getOwner().getAddress());
+                    assertEquals(issueAssetTransaction.getItem().getMaker().getAddress(), parsedIssueAssetTransaction.getItem().getMaker().getAddress());
 
                     //CHECK NAME
                     assertEquals(issueAssetTransaction.getItem().getName(), parsedIssueAssetTransaction.getItem().getName());

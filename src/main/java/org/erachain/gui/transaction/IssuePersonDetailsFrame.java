@@ -82,27 +82,27 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
         gender.setEditable(false);
         this.add(gender, fieldGBC);
 
-        //LABEL owner
+        //LABEL maker
         ++labelGBC.gridy;
-        JLabel ownerLabel = new JLabel(Lang.T("Owner") + ":");
-        this.add(ownerLabel, labelGBC);
+        JLabel makerLabel = new JLabel(Lang.T("Maker") + ":");
+        this.add(makerLabel, labelGBC);
 
-        //owner
+        //maker
         ++fieldGBC.gridy;
-        JTextField owner = new JTextField(person.getOwner().getAddress());
-        owner.setEditable(false);
-        this.add(owner, fieldGBC);
+        JTextField maker = new JTextField(person.getMaker().getAddress());
+        maker.setEditable(false);
+        this.add(maker, fieldGBC);
 
-        //LABEL owner Public key
+        //LABEL maker Public key
         ++labelGBC.gridy;
-        JLabel owner_Public_keyLabel = new JLabel(Lang.T("Public key") + ":");
-        this.add(owner_Public_keyLabel, labelGBC);
+        JLabel maker_Public_keyLabel = new JLabel(Lang.T("Public key") + ":");
+        this.add(maker_Public_keyLabel, labelGBC);
 
-        //owner public key
+        //maker public key
         ++fieldGBC.gridy;
-        JTextField owner_Public_Key = new JTextField(person.getOwner().getBase58());
-        owner_Public_Key.setEditable(false);
-        this.add(owner_Public_Key, fieldGBC);
+        JTextField maker_Public_Key = new JTextField(person.getMaker().getBase58());
+        maker_Public_Key.setEditable(false);
+        this.add(maker_Public_Key, fieldGBC);
 
         //PACK
         //	this.pack();

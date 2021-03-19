@@ -40,7 +40,7 @@ public class ImprintsSearchTableModel extends SearchItemsTableModel {
 
             case COLUMN_PUBLISHER:
 
-                return item.getOwner().getPersonAsString();
+                return item.getMaker().getPersonAsString();
 
             case COLUMN_FAVORITE:
 

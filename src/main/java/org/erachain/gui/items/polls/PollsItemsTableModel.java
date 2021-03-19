@@ -36,7 +36,7 @@ public class PollsItemsTableModel extends SearchItemsTableModel {
 
             case COLUMN_ADDRESS:
 
-                return poll.getOwner().getPersonAsString();
+                return poll.getMaker().getPersonAsString();
 
             case COLUMN_TOTAL_VOTES:
 

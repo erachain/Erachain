@@ -600,15 +600,19 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
         if (creatorPersonDuration == null) {
             // Creator is ADMIN
             itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, key}
+                    new Object[]{ItemCls.PERSON_TYPE, key, person.getTags()}
             };
         } else {
             itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, key},
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a}
+                    new Object[]{ItemCls.PERSON_TYPE, key, person.getTags()},
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()}
             };
         }
     }
@@ -675,11 +679,6 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
                     false, false, true);
 
 
-            boolean makeCalculates = false;
-            if (block != null && block.txCalculated != null) {
-                makeCalculates = true;
-            }
-
             // GIVE GIFT for this PUB_KEY - to PERSON
             BigDecimal issued_FEE_BD_total;
             BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
@@ -687,9 +686,9 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
                 pkAccount.changeBalance(dcSet, false, false, FEE_KEY, personBonus,
                         false, false, false);
                 pkAccount.changeCOMPUBonusBalances(dcSet, false, personBonus, Account.BALANCE_SIDE_DEBIT);
-                if (makeCalculates) {
-                    block.txCalculated.add(new RCalculated(pkAccount, FEE_KEY, personBonus,
-                            "enter bonus", this.dbRef, seqNo));
+                if (block != null) {
+                    block.addCalculated(pkAccount, FEE_KEY, personBonus,
+                            "enter bonus", this.dbRef);
                 }
                 issued_FEE_BD_total = personBonus;
             } else {
@@ -700,10 +699,10 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             issuer.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
                     false, false, false);
             issuer.changeCOMPUBonusBalances(dcSet, false, issued_FEE_BD, Account.BALANCE_SIDE_DEBIT);
-            if (makeCalculates) {
-                block.txCalculated.add(new RCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
-                        "register reward @P:" + this.key, this.dbRef, seqNo));
-            }
+            if (block != null)
+                block.addCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
+                        "register reward @P:" + this.key, this.dbRef);
+
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // TO EMITTE FEE (with minus)

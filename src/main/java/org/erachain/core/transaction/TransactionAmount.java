@@ -215,30 +215,34 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
         // запомним что тут две сущности
         if (key != 0) {
             if (creatorPersonDuration != null) {
                 if (recipientPersonDuration != null) {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
                     };
                 } else {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
                     };
                 }
             } else {
                 if (recipientPersonDuration != null) {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
                     };
                 } else {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey()}
+                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
                     };
                 }
             }
@@ -246,18 +250,18 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             if (creatorPersonDuration != null) {
                 if (recipientPersonDuration != null) {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
                     };
                 } else {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a},
+                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
                     };
                 }
             } else {
                 if (recipientPersonDuration != null) {
                     itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a},
+                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
                     };
                 }
             }
@@ -330,7 +334,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (hasAmount() && balancePosition() == ACTION_SEND // только для передачи в собственность!
                 && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
                 && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)
-                && !isInvolved(asset.getOwner())) {
+                && !isInvolved(asset.getMaker())) {
             Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
             assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
             if (assetFee.compareTo(percItem.b) < 0) {
@@ -448,7 +452,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return "Mail";
 
         //return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
-        return asset.viewAssetTypeAction(isBackward(), balancePosition(), creator == null ? false : asset.getOwner().equals(creator));
+        return asset.viewAssetTypeAction(isBackward(), balancePosition(), creator == null ? false : asset.getMaker().equals(creator));
     }
 
     // PARSE/CONVERT
@@ -599,6 +603,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return Transaction.INVALID_AMOUNT;
         }
 
+        if (asset.isUnTransferable(asset.getMaker().equals(creator))) {
+            return Transaction.NOT_TRANSFERABLE_ASSET;
+        }
+
         // CHECK IF AMOUNT AND ASSET
         if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0L
                 && amount != null) {
@@ -684,7 +692,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                     if (asset.isSelfManaged()) {
                         // учетная единица - само контролируемая
-                        if (!creator.equals(asset.getOwner())) {
+                        if (!creator.equals(asset.getMaker())) {
                             return CREATOR_NOT_OWNER;
                         }
                         if (creator.equals(recipient)) {
@@ -757,9 +765,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                                 // CLAIMs DEBT - only for OWNER
                                 if (asset.isOutsideType()) {
-                                    if (!recipient.equals(asset.getOwner())) {
+                                    if (!recipient.equals(asset.getMaker())) {
                                         return Transaction.INVALID_CLAIM_DEBT_RECIPIENT;
-                                    } else if (creator.equals(asset.getOwner())) {
+                                    } else if (creator.equals(asset.getMaker())) {
                                         return Transaction.INVALID_CLAIM_DEBT_CREATOR;
                                     }
                                 }
@@ -857,7 +865,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 }
 
                                 // CLAIMs - invalid for backward to CREATOR - need use SPEND instead
-                                if (asset.isOutsideType() && recipient.equals(asset.getOwner())) {
+                                if (asset.isOutsideType() && recipient.equals(asset.getMaker())) {
                                     // ERROR
                                     return Transaction.INVALID_CLAIM_RECIPIENT;
                                 }
@@ -985,7 +993,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     return INVALID_BACKWARD_ACTION;
                                 } else {
 
-                                    if (asset.isOutsideType() && !recipient.equals(asset.getOwner())) {
+                                    if (asset.isOutsideType() && !recipient.equals(asset.getMaker())) {
                                         return Transaction.INVALID_RECEIVER;
                                     }
 
@@ -1024,10 +1032,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 }
 
                                 if (backward) {
-                                    if (!asset.getOwner().equals(recipient))
+                                    if (!asset.getMaker().equals(recipient))
                                         return INVALID_BACKWARD_ACTION;
                                 } else {
-                                    if (!asset.getOwner().equals(creator))
+                                    if (!asset.getMaker().equals(creator))
                                         return CREATOR_NOT_OWNER;
                                 }
 
@@ -1304,7 +1312,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             debtBalance = debtBalance.max(amount);
 
             if (debtBalance.signum() != 0) {
-                processAction(dcSet, !asOrphan, creator, asset.getOwner(), ACTION_DEBT,
+                processAction(dcSet, !asOrphan, creator, asset.getMaker(), ACTION_DEBT,
                         absKey, asset, key, debtBalance.negate(), backward, incomeReverse);
             }
         }
@@ -1342,9 +1350,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (assetFee != null && assetFee.signum() != 0) {
             // учтем что он еще заплатил коэффициент с суммы
             this.creator.changeBalance(db, !backward, backward, absKey, this.assetFee, false, false, !incomeReverse);
-            if (block != null && block.txCalculated != null) {
-                block.txCalculated.add(new RCalculated(this.creator, absKey,
-                        this.assetFee.negate(), "Asset Fee", this.dbRef, 0L));
+            if (block != null) {
+                block.addCalculated(this.creator, absKey,
+                        this.assetFee.negate(), "Asset Fee", this.dbRef);
             }
         }
     }

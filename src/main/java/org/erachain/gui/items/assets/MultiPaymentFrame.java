@@ -96,7 +96,7 @@ public class MultiPaymentFrame extends JFrame {
 
         //TXT ACCOUNT
         txtGBC.gridy = 0;
-        this.txtAccount = new JTextField(asset.getOwner().getAddress());
+        this.txtAccount = new JTextField(asset.getMaker().getAddress());
         this.txtAccount.setEditable(false);
         this.add(this.txtAccount, txtGBC);
 
@@ -188,7 +188,7 @@ public class MultiPaymentFrame extends JFrame {
             int feePow = Integer.parseInt(txtFeePow.getText());
 
             //CREATE MULTI PAYMENT
-            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(this.asset.getOwner().getAddress());
+            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(this.asset.getMaker().getAddress());
             if (creator == null) {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),

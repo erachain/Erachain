@@ -60,7 +60,7 @@ function exchange(data){
         output += '<td>';
 
         // отобрадает что это создатель актива действует
-        if (trade.initiatorCreator_addr == trade.assetWantOwner) {
+        if (trade.initiatorCreator_addr == trade.assetWantMaker) {
             if (trade.type != 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
             } else {
@@ -96,7 +96,7 @@ function exchange(data){
         output += '<td>';
 
         // отображает что это создатель актива действует
-        if (trade.targetCreator_addr == trade.assetHaveOwner) {
+        if (trade.targetCreator_addr == trade.assetHaveMaker) {
             if (trade.type == 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
             } else {
@@ -182,7 +182,7 @@ function order(data){
         output += '<td><a href=?address=' + trade.initiatorCreator_addr + '>' + cutBlank(trade.initiatorCreator, 20) + '</a>';
 
         // отобрадает что это создатель актива действует
-        if (trade.initiatorCreator_addr == data.assetWantOwner) {
+        if (trade.initiatorCreator_addr == data.assetWantMaker) {
             if (trade.type != 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
             } else {
@@ -213,7 +213,7 @@ function order(data){
         }
 
         // отобрадает что это создатель актива действует
-        if (trade.targetCreator_addr == data.assetWantOwner) {
+        if (trade.targetCreator_addr == data.assetWantMaker) {
             if (trade.type == 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
             } else {

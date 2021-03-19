@@ -37,11 +37,11 @@ function templates(data) {
         output += '<b>' + escapeHtml(item.name) + '</b></a></td>';
         output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
 
-        output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+        output += '<td><a href=?address=' + item.maker + get_lang() + '>';
         if (item.hasOwnProperty('person'))
             output += '[' + item.person_key + ']' + escapeHtml(item.person);
         else
-            output += item.owner;
+            output += item.maker;
         output += '</a></td></tr>';
     }
 

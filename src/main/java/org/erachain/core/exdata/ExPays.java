@@ -236,6 +236,10 @@ public class ExPays {
         return assetKey;
     }
 
+    public AssetCls getAsset() {
+        return asset;
+    }
+
     public int getFilteredAccrualsCount() {
         return filteredAccrualsCount;
     }
@@ -918,7 +922,7 @@ public class ExPays {
 
         HashSet<Long> usedPersons = new HashSet<>();
         PersonCls person;
-        byte[] assetOwner = asset.getOwner().getShortAddressBytes();
+        byte[] assetOwner = asset.getMaker().getShortAddressBytes();
 
         boolean hasAmount = hasAmount();
         boolean hasAssetFilter = hasAssetFilter();
@@ -1263,7 +1267,7 @@ public class ExPays {
 
                 if (!asOrphan && block != null) {
                     rNote.addCalculated(block, recipient, absKey, actionPayAmount,
-                            asset.viewAssetTypeAction(backwardAction, balancePos, asset.getOwner().equals(creator)));
+                            asset.viewAssetTypeAction(backwardAction, balancePos, asset.getMaker().equals(creator)));
                 }
 
                 if (creator.equals(recipient))

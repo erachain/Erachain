@@ -336,7 +336,7 @@ public class TestRecPerson {
                 }
                 assertEquals(rawPerson.length, person.getDataLength(false));
                 assertEquals(parsedPerson.getHeight(), person.getHeight());
-                assertEquals(person.getOwner().getAddress(), parsedPerson.getOwner().getAddress());
+                assertEquals(person.getMaker().getAddress(), parsedPerson.getMaker().getAddress());
                 assertEquals(person.getName(), parsedPerson.getName());
                 assertEquals(person.getDescription(), parsedPerson.getDescription());
                 assertEquals(person.getItemTypeName(), parsedPerson.getItemTypeName());
@@ -383,7 +383,7 @@ public class TestRecPerson {
                 parsedPerson = (PersonHuman) parsedIssuePersonRecord.getItem();
 
                 //CHECK OWNER
-                assertEquals(person.getOwner().getAddress(), parsedPerson.getOwner().getAddress());
+                assertEquals(person.getMaker().getAddress(), parsedPerson.getMaker().getAddress());
 
                 //CHECK NAME
                 assertEquals(person.getName(), parsedPerson.getName());

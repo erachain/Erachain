@@ -76,7 +76,8 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 initatorOrder = Order.getOrder(db, trade.getInitiator());
                 targetOrder = Order.getOrder(db, trade.getTarget());
 
-                type = initatorOrder.getHaveAssetKey() == this.have.getKey() ? -1 : 1;
+                if (initatorOrder != null)
+                    type = initatorOrder.getHaveAssetKey() == this.have.getKey() ? -1 : 1;
 
             }
         }

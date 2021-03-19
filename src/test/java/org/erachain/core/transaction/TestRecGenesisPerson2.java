@@ -157,7 +157,7 @@ public class TestRecGenesisPerson2 {
             assertEquals(true, Arrays.equals(genesisIssuePersonTransaction.getSignature(), parsedGenesisIssuePersonRecord.getSignature()));
 
             //CHECK OWNER
-            assertEquals(genesisIssuePersonTransaction.getItem().getOwner().getAddress(), parsedGenesisIssuePersonRecord.getItem().getOwner().getAddress());
+            assertEquals(genesisIssuePersonTransaction.getItem().getMaker().getAddress(), parsedGenesisIssuePersonRecord.getItem().getMaker().getAddress());
 
             //CHECK NAME
             assertEquals(genesisIssuePersonTransaction.getItem().getName(), parsedGenesisIssuePersonRecord.getItem().getName());

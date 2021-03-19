@@ -93,7 +93,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
-                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), asset);
+                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getMaker(), asset);
                 panel.selectAccruals(null, null);
                 MainPanel.getInstance().insertNewTab(Lang.T("Make Accruals"), panel);
             }
@@ -105,7 +105,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
-                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getOwner(), null);
+                IssueDocumentPanel panel = new IssueDocumentPanel(asset.getMaker(), null);
                 panel.selectAccruals(null, asset);
                 MainPanel.getInstance().insertNewTab(Lang.T("Pay Dividend"), panel);
             }

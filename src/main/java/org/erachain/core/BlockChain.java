@@ -253,6 +253,8 @@ public class BlockChain {
 
     public static final int VERS_5_01_01 = TEST_DB > 0 || !MAIN_MODE ? 0 : 990000;
 
+    public static final int VERS_5_3 = TEST_DB > 0 || !MAIN_MODE ? 0 : 1860000;
+
     /**
      * Новый уровень начальных номеров для всех сущностей
      */
@@ -863,8 +865,7 @@ public class BlockChain {
 
         }
 
-        //lastBlockSignature = dcSet.getBlocksHeadMap().getLastBlockSignature();
-        //HWeight = dcSet.getBlockSignsMap().get(lastBlockSignature);
+        FEE_ASSET = Controller.getInstance().getDCSet().getItemAssetMap().get(AssetCls.FEE_KEY);
 
     }
 
@@ -932,10 +933,8 @@ public class BlockChain {
         }
 
         // FOR CLONES
-        if (FEE_ASSET == null)
-            FEE_ASSET = Controller.getInstance().getDCSet().getItemAssetMap().get(AssetCls.FEE_KEY);
 
-        return FEE_ASSET.getOwner().equals(account);
+        return FEE_ASSET.getMaker().equals(account);
     }
 
 

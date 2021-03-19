@@ -212,7 +212,7 @@ public class TestRecUnion {
             fail("Exception while parsing transaction.  : " + e);
         }
         assertEquals(rawUnion.length, union.getDataLength(false));
-        assertEquals(union.getOwner().getAddress(), parsedUnion.getOwner().getAddress());
+        assertEquals(union.getMaker().getAddress(), parsedUnion.getMaker().getAddress());
         assertEquals(union.getName(), parsedUnion.getName());
         assertEquals(union.getDescription(), parsedUnion.getDescription());
         assertEquals(union.getItemTypeName(), parsedUnion.getItemTypeName());
@@ -251,7 +251,7 @@ public class TestRecUnion {
         parsedUnion = (Union) parsedIssueUnionRecord.getItem();
 
         //CHECK OWNER
-        assertEquals(union.getOwner().getAddress(), parsedUnion.getOwner().getAddress());
+        assertEquals(union.getMaker().getAddress(), parsedUnion.getMaker().getAddress());
 
         //CHECK NAME
         assertEquals(union.getName(), parsedUnion.getName());

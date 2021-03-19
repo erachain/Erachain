@@ -37,7 +37,7 @@ public class StatusesItemsTableModel extends SearchItemsTableModel {
 
             case COLUMN_ADDRESS:
 
-                return status.getOwner().getPersonAsString();
+                return status.getMaker().getPersonAsString();
 
             case COLUMN_FAVORITE:
 

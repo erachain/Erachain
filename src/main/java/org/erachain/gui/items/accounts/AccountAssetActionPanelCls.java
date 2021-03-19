@@ -101,7 +101,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         // поэтому тут только приватную переменную юзаем дальше
         if (title == null) {
             this.title = asset.viewAssetTypeActionTitle(backward, balancePosition,
-                    accountFrom != null && accountFrom.equals(asset.getOwner()));
+                    accountFrom != null && accountFrom.equals(asset.getMaker()));
         }
 
         if (panelName == null) {
@@ -290,12 +290,12 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         if (creator != null) {
             ((AccountRenderer) jComboBoxCreator.getRenderer()).setAsset(asset.getKey());
             jComboBoxCreator.repaint();
-            senderIsOwner = creator.equals(asset.getOwner());
+            senderIsOwner = creator.equals(asset.getMaker());
         }
 
         boolean recipientIsOwner = false;
         if (recipient != null) {
-            recipientIsOwner = recipient.equals(asset.getOwner());
+            recipientIsOwner = recipient.equals(asset.getMaker());
         }
 
         if (asset.viewAssetTypeAction(backward, balancePosition, senderIsOwner) == null) {
@@ -611,7 +611,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(null, true, transaction,
                 Lang.T(asset.viewAssetTypeActionOK(backward, balancePosition,
-                        creator != null && creator.equals(asset.getOwner()))),
+                        creator != null && creator.equals(asset.getMaker()))),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.T("Confirmation Transaction"), !noReceive);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);

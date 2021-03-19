@@ -36,7 +36,7 @@ public class TableModelUnionsItemsTableModel extends SearchItemsTableModel {
 
             case COLUMN_ADDRESS:
 
-                return union.getOwner().getPersonAsString();
+                return union.getMaker().getPersonAsString();
 
             case COLUMN_FAVORITE:
 

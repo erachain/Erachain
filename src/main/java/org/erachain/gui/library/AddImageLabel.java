@@ -16,6 +16,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
 
 
 public class AddImageLabel extends JPanel {
@@ -118,15 +120,31 @@ public class AddImageLabel extends JPanel {
         chooser.setDialogTitle(Lang.T("Open Image") + "...");
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
+
             File file = new File(chooser.getSelectedFile().getPath());
             new ImageCropDialog(file, baseWidth, baseHeight,
                     file.getName().endsWith("jpg") || file.getName().endsWith("jpeg") ?
                             TypeOfImage.JPEG : TypeOfImage.GIF,
                     originalSize) {
                 @Override
-                public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage) {
+                public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage, boolean useOriginal) {
                     if (bufferedImage == null) {
                         logger.error("Image does not setup");
+                        return;
+                    }
+
+                    if (useOriginal) {
+                        URL url;
+                        try {
+                            url = new URL("file", "", chooser.getSelectedFile().getPath());
+                            imgBytes = Files.readAllBytes(chooser.getSelectedFile().toPath());
+                            labelSize.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
+                        } catch (Exception e) {
+                            url = null;
+                        }
+
+                        mainLabel.setIcon(new ImageIcon(url));
+
                         return;
                     }
 
@@ -148,9 +166,10 @@ public class AddImageLabel extends JPanel {
 
                     mainLabel.setIcon(imageIcon);
 
-                    ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
-
                     try {
+
+                        ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
+
                         if (typeOfImage == TypeOfImage.GIF) {
                             ImageIO.write(bufferedImage, "gif", imageStream);
                         } else {

@@ -53,10 +53,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public static final int POLL_TYPE = 8;
     public static final int AUTHOR_TYPE = 41;
 
-    public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
-    public static final int MAX_IMAGE_LENGTH = 1100000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
+    public static final int MAX_ICON_LENGTH = 150000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
+    public static final int MAX_IMAGE_LENGTH = 1500000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
     protected static final int TYPE_LENGTH = 2;
-    protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
+    protected static final int MAKER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int NAME_SIZE_LENGTH = 1;
     //public static final int MIN_NAME_LENGTH = 10;
     public static final int MAX_NAME_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;
@@ -65,7 +65,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected static final int DESCRIPTION_SIZE_LENGTH = 4;
     protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
     protected static final int DBREF_LENGTH = Transaction.DBREF_LENGTH;
-    protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH
+    protected static final int BASE_LENGTH = TYPE_LENGTH + MAKER_LENGTH
             + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
 
     protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
@@ -74,7 +74,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     //protected DCMap dbIssueMap;
     static Logger LOGGER = LoggerFactory.getLogger(ItemCls.class.getName());
     protected byte[] typeBytes;
-    protected PublicKeyAccount owner;
+    protected PublicKeyAccount maker;
     protected String name;
     protected String description;
     protected long key = 0;
@@ -88,9 +88,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public Transaction referenceTx = null;
 
-    public ItemCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
+    public ItemCls(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
         this.typeBytes = typeBytes;
-        this.owner = owner;
+        this.maker = maker;
         this.name = name.trim();
         this.description = description;
         this.icon = icon == null ? new byte[0] : icon;
@@ -98,8 +98,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     }
 
-    public ItemCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
+    public ItemCls(int type, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        this(new byte[TYPE_LENGTH], maker, name, icon, image, description);
         this.typeBytes[0] = (byte) type;
     }
 
@@ -193,8 +193,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         this.typeBytes[1] = props;
     }
 
-    public PublicKeyAccount getOwner() {
-        return this.owner;
+    public PublicKeyAccount getMaker() {
+        return this.maker;
     }
 
     public String getName() {
@@ -221,11 +221,20 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public String getTickerName() {
         String[] words = this.name.split(" ");
         String name = words[0].trim();
-        if (name.length() >6) {
+        if (name.length() > 6) {
             name = name.substring(0, 6);
         }
         return name;
 
+    }
+
+    /**
+     * доп метки для поиска данной сущности или её типа
+     *
+     * @return
+     */
+    public String[] getTags() {
+        return null;
     }
 
     public byte[] getIcon() {
@@ -241,7 +250,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public long getKey() {
-        return this.key; //getKey(DCSet.getInstance());
+        return this.key;
     }
 
     public long getKey(DCSet db) {
@@ -282,7 +291,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      * @param itemType
      * @return
      */
-    public static String getItemTypeChar(int itemType) {
+    public static String getItemTypeAndKey(int itemType) {
         switch (itemType) {
             case ItemCls.ASSET_TYPE:
                 return "A";
@@ -308,12 +317,16 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         }
     }
 
-    public static String getItemTypeChar(int itemType, Object itemKey) {
-        return "@" + getItemTypeChar(itemType) + itemKey.toString();
+    public static String getItemTypeAndKey(int itemType, Object itemKey) {
+        return "@" + getItemTypeAndKey(itemType) + itemKey.toString();
     }
 
-    public String getItemTypeChar() {
-        return getItemTypeChar(getItemType(), key);
+    public static String getItemTypeAndTag(int itemType, Object tag) {
+        return "@" + getItemTypeAndKey(itemType) + tag.toString();
+    }
+
+    public String getItemTypeAndKey() {
+        return getItemTypeAndKey(getItemType(), key);
     }
 
     public static String getItemTypeName(int itemType) {
@@ -453,11 +466,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return false;
     }
 
-    // forOwnerSign - use only DATA needed for making signature
-    public byte[] toBytes(boolean includeReference, boolean forOwnerSign) {
+    // forMakerSign - use only DATA needed for making signature
+    public byte[] toBytes(boolean includeReference, boolean forMakerSign) {
 
         byte[] data = new byte[0];
-        boolean useAll = !forOwnerSign;
+        boolean useAll = !forMakerSign;
 
         if (useAll) {
             //WRITE TYPE
@@ -465,9 +478,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         }
 
         if (useAll) {
-            //WRITE OWNER
+            //WRITE MAKER
             try {
-                data = Bytes.concat(data, this.owner.getPublicKey());
+                data = Bytes.concat(data, this.maker.getPublicKey());
             } catch (Exception e) {
                 //DECODE EXCEPTION
             }
@@ -531,7 +544,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 		out.put("key", this.getKey());
 		out.put("name", this.getName());
 		out.put("description", this.getDescription());
-		out.put("owner", this.getOwner().getAddress());
+		out.put("maker", this.getMaker().getAddress());
 
 		return out;
 	}
@@ -636,12 +649,12 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         else
             itemJSON.put("icon", "");
 
-        itemJSON.put("owner", this.owner.getAddress());
+        itemJSON.put("maker", this.maker.getAddress());
         if (showPerson) {
-            Fun.Tuple2<Integer, PersonCls> person = this.owner.getPerson();
+            Fun.Tuple2<Integer, PersonCls> person = this.maker.getPerson();
             if (person != null) {
-                itemJSON.put("ownerPersonKey", person.b.getKey());
-                itemJSON.put("ownerPersonName", person.b.getName());
+                itemJSON.put("makerPersonKey", person.b.getKey());
+                itemJSON.put("makerPersonName", person.b.getName());
             }
         }
 
@@ -653,10 +666,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         JSONObject itemJSON = toJsonLite(false, false);
 
-        itemJSON.put("charKey", getItemTypeChar());
+        itemJSON.put("charKey", getItemTypeAndKey());
 
         // ADD DATA
-        itemJSON.put("itemCharKey", getItemTypeChar());
+        itemJSON.put("itemCharKey", getItemTypeAndKey());
         itemJSON.put("item_type", this.getItemTypeName());
         //itemJSON.put("itemType", this.getItemTypeName());
         itemJSON.put("item_type_sub", this.getItemSubType());
@@ -664,10 +677,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
         itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
         itemJSON.put("description", this.description);
-        itemJSON.put("creator", this.owner.getAddress()); // @Deprecated
-        itemJSON.put("owner_public_key", this.owner.getBase58());
-        itemJSON.put("owner_publickey", this.owner.getBase58());
-        //itemJSON.put("ownerPubkey", this.owner.getBase58());
+        itemJSON.put("maker", this.maker.getAddress());
+        itemJSON.put("creator", this.maker.getAddress()); // @Deprecated
+        itemJSON.put("maker_public_key", this.maker.getBase58());
+        itemJSON.put("maker_publickey", this.maker.getBase58());
+        //itemJSON.put("makerPubkey", this.maker.getBase58());
         itemJSON.put("isConfirmed", this.isConfirmed());
         itemJSON.put("is_confirmed", this.isConfirmed());
         itemJSON.put("reference", Base58.encode(this.reference));
@@ -737,8 +751,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             json.put("description", "");
         }
 
-        json.put("owner", this.getOwner().getAddress());
-        Fun.Tuple2<Integer, PersonCls> person = this.getOwner().getPerson();
+        json.put("maker", this.getMaker().getAddress());
+        Fun.Tuple2<Integer, PersonCls> person = this.getMaker().getPerson();
         if (person != null) {
             json.put("person", person.b.getName());
             json.put("person_key", person.b.getKey());
@@ -794,7 +808,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             itemJson.put("description", Lang.T(viewDescription(), langObj));
         }
 
-        itemJson.put("Label_Owner", Lang.T("Owner", langObj));
+        itemJson.put("Label_Maker", Lang.T("Maker", langObj));
         itemJson.put("Label_Pubkey", Lang.T("Public Key", langObj));
         itemJson.put("Label_TXCreator", Lang.T("Creator", langObj));
         itemJson.put("Label_Number", Lang.T("Number", langObj));
@@ -808,11 +822,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJson.put("Label_seqNo", Lang.T("Номер", langObj));
         itemJson.put("Label_SourceText", Lang.T("Source Text # исходный текст", langObj));
 
-        itemJson.put("owner", this.getOwner().getAddress());
-        Fun.Tuple2<Integer, PersonCls> person = this.getOwner().getPerson();
+        itemJson.put("maker", this.getMaker().getAddress());
+        Fun.Tuple2<Integer, PersonCls> person = this.getMaker().getPerson();
         if (person != null) {
-            itemJson.put("owner_person", person.b.getName());
-            itemJson.put("owner_person_key", person.b.getKey());
+            itemJson.put("maker_person", person.b.getName());
+            itemJson.put("maker_person_key", person.b.getKey());
         }
 
         if (getIcon() != null && getIcon().length > 0)
@@ -898,7 +912,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         ItemMap dbMap = this.getDBMap(db);
 
         long newKey;
-        long novaKey = this.isNovaAsset(this.owner, db);
+        long novaKey = this.isNovaAsset(this.maker, db);
         if (novaKey > 0) {
 
             // INSERT WITH NOVA KEY

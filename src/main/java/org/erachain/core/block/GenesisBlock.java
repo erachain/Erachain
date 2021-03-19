@@ -625,7 +625,7 @@ public class GenesisBlock extends Block {
             AssetVenture asset = makeAsset(i);
             // MAKE OLD STYLE ASSET with DEVISIBLE:
             // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
-            asset = new AssetVenture((byte) 0, asset.getOwner(), asset.getName(),
+            asset = new AssetVenture((byte) 0, asset.getMaker(), asset.getName(),
                     asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, 8, 0L);
             transactions.add(new GenesisIssueAssetTransaction(asset));
         }

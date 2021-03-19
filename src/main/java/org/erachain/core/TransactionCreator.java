@@ -365,8 +365,8 @@ public class TransactionCreator {
 
         //VALIDATE AND PROCESS
         if (forIssue) {
-            if (person.getOwnerSignature() != null && this.fork.getTransactionFinalMapSigns().contains(person.getOwnerSignature())) {
-                issuePersonRecord.setErrorValue("equal to OwnerSignature " + Base58.encode(person.getOwnerSignature()));
+            if (person.getMakerSignature() != null && this.fork.getTransactionFinalMapSigns().contains(person.getMakerSignature())) {
+                issuePersonRecord.setErrorValue("equal to OwnerSignature " + Base58.encode(person.getMakerSignature()));
                 return new Pair<Transaction, Integer>(issuePersonRecord, Transaction.ITEM_DUPLICATE);
             }
 
@@ -400,7 +400,7 @@ public class TransactionCreator {
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
-        byte[] ownerSign = ((PersonHuman) issuePersonRecord.getItem()).getOwnerSignature();
+        byte[] ownerSign = ((PersonHuman) issuePersonRecord.getItem()).getMakerSignature();
         if (ownerSign != null && this.fork.getTransactionFinalMapSigns().contains(ownerSign)) {
             issuePersonRecord.setErrorValue("equal to OwnerSignature " + Base58.encode(ownerSign));
             return new Pair<Transaction, Integer>(issuePersonRecord, Transaction.ITEM_DUPLICATE);

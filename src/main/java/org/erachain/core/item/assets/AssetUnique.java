@@ -15,22 +15,21 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-//import com.google.common.primitives.Bytes;
-
 public class AssetUnique extends AssetCls {
 
     private static final int TYPE_ID = UNIQUE;
+    private Account owner;
 
-    public AssetUnique(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type) {
-        super(typeBytes, owner, name, icon, image, description, asset_type);
+    public AssetUnique(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        super(typeBytes, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, owner, name, icon, image, description, asset_type);
+    public AssetUnique(int props, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type) {
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, owner, name, icon, image, description, asset_type);
+    public AssetUnique(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, maker, name, icon, image, description, assetType);
     }
 
     //GETTERS/SETTERS
@@ -61,7 +60,7 @@ public class AssetUnique extends AssetCls {
 
     @Override
     public BigDecimal getReleased(DCSet dcSet) {
-        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
+        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> bals = this.getMaker().getBalance(this.getKey(dcSet));
         return BigDecimal.ONE.subtract(bals.a.b).stripTrailingZeros();
     }
 
@@ -79,9 +78,9 @@ public class AssetUnique extends AssetCls {
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
-        position += OWNER_LENGTH;
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
+        position += MAKER_LENGTH;
 
         //READ NAME
         //byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
@@ -154,9 +153,14 @@ public class AssetUnique extends AssetCls {
         //boolean divisible = divisibleBytes[0] == 1;
         position += ASSET_TYPE_LENGTH;
 
+        //READ OWNER
+        //byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        //PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+        //position += MAKER_LENGTH;
+
 
         //RETURN
-        AssetUnique unique = new AssetUnique(typeBytes, owner, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
+        AssetUnique unique = new AssetUnique(typeBytes, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
         if (includeReference) {
             unique.setReference(reference, dbRef);
         }
@@ -165,12 +169,15 @@ public class AssetUnique extends AssetCls {
     }
 
     @Override
-    public byte[] toBytes(boolean includeReference, boolean forOwnerSign) {
+    public byte[] toBytes(boolean includeReference, boolean forMakerSign) {
 
-        byte[] data = super.toBytes(includeReference, forOwnerSign);
+        byte[] data = super.toBytes(includeReference, forMakerSign);
 
         //WRITE ASSET TYPE
         data = Bytes.concat(data, new byte[]{(byte) this.getAssetType()});
+
+        // WRITE OWNER
+        //data = Bytes.concat(data, this.maker.getPublicKey());
 
         return data;
     }

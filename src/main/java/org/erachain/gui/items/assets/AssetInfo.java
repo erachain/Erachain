@@ -10,6 +10,7 @@ import org.erachain.gui.library.HoldersLibraryPanel;
 import org.erachain.gui.library.HyperLinkAccount;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.SignLibraryPanel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.NumberAsString;
@@ -40,7 +41,7 @@ public class AssetInfo extends JTextPane {
     private AssetCls asset;
     private Transaction transaction;
     private AssetInfo th;
-    private PublicKeyAccount owner;
+    private PublicKeyAccount maker;
     private int max_Widht;
     private int max_Height;
     private Image cachedImage;
@@ -57,8 +58,8 @@ public class AssetInfo extends JTextPane {
             //   initComponents();
             th = this;
             this.asset = asset;
-            owner = asset.getOwner();
-            HyperLinkAccount hl_Owner = new HyperLinkAccount(owner);
+            maker = asset.getMaker();
+            HyperLinkAccount hl_Maker = new HyperLinkAccount(maker);
 
             byte[] recordReference = asset.getReference();
             transaction = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
@@ -73,7 +74,7 @@ public class AssetInfo extends JTextPane {
                 int x = image.getIconWidth();
                 max_Height = image.getIconHeight();
 
-                max_Widht = 200;
+                max_Widht = 250;
                 double k = ((double) x / (double) max_Widht);
                 max_Height = (int) (max_Height / k);
 
@@ -88,14 +89,11 @@ public class AssetInfo extends JTextPane {
 
             if (cachedImage == null) {
                 imageByte = asset.getIcon();
-                if (imageByte != null && imageByte.length > 1) {
-                    //if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
+                if (imageByte != null && imageByte.length > 0) {
                     image = new ImageIcon(imageByte);
                     cachedImage = image.getImage().getScaledInstance(40, 40, 1);
                 }
             }
-
-            //   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
 
             String color = "#" + Integer.toHexString(UIManager.getColor("Panel.background").getRGB()).substring(2);
 
@@ -105,7 +103,7 @@ public class AssetInfo extends JTextPane {
             text += "<table><tr valign='top' align = 'left'><td>";
             text += "<DIV  style='float:left'><b>" + Lang.T("Key") + ": </b>" + asset.getKey() + "</DIV>";
 
-            // ADD IMAGE to THML
+            // ADD IMAGE to HTML
             if (cachedImage != null) {
                 text += "<div><a href ='!!img'  style='color: " + color + "' ><img src=\"" + img_Local_URL + "\"></a></div>";
             }
@@ -121,11 +119,11 @@ public class AssetInfo extends JTextPane {
             } else {
                 text += Library.to_HTML(asset.viewDescription()) + "</div>";
             }
-            text += "<div>" + Lang.T("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
+            text += "<div>" + Lang.T("Maker") + ": <a href = '!!Maker'><b>" + hl_Maker.get_Text() + "</b></a></div>";
             text += "<div>" + Lang.T("Class") + ": <b>" + Lang.T(asset.getItemSubType()) + "</b>,";
-            text += " " + Lang.T("Type") + ": <b>" +
+            text += " " + Lang.T("Type") + ": <a href='!!Type'><b>" +
                     asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:"
-                    + Lang.T(asset.viewAssetTypeFull()) + ",";
+                    + Lang.T(asset.viewAssetTypeFull()) + "</a>,";
             text += " " + Lang.T("Accuracy") + ": <b>" + asset.getScale() + "</b>,";
             text += " " + Lang.T("Quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
             text += " " + Lang.T("Released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
@@ -155,18 +153,24 @@ public class AssetInfo extends JTextPane {
                 public void hyperlinkUpdate(HyperlinkEvent arg0) {
                     // TODO Auto-generated method stub
                     if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
-                    if (arg0.getDescription().equals("!!Owner")) {
+                    if (arg0.getDescription().equals("!!Maker")) {
                         Point location = MouseInfo.getPointerInfo().getLocation();
                         int x = location.x - th.getLocationOnScreen().x;
                         int y = location.y - th.getLocationOnScreen().y;
-                        hl_Owner.get_PopupMenu().show(th, x, y);
+                        hl_Maker.get_PopupMenu().show(th, x, y);
                         return;
                     } else if (arg0.getDescription().equals("!!img")) {
-                        new ImageCropDialog(new ImageIcon(asset.getImage())) {
+                        new ImageCropDialog(image) {
                             @Override
-                            public void onFinish(BufferedImage image, TypeOfImage typeOfImage) {
+                            public void onFinish(BufferedImage image, TypeOfImage typeOfImage, boolean useOriginal) {
                             }
                         };
+                    } else if (arg0.getDescription().equals("!!Type")) {
+                        String find = asset.viewAssetTypeAbbrev();
+                        SearchAssetsSplitPanel panel = new SearchAssetsSplitPanel(false);
+                        panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(":" + find);
+                        panel.startSearchName();
+                        MainPanel.getInstance().insertNewTab(Lang.T("Search") + " :" + find, panel);
                     }
                 }
             });

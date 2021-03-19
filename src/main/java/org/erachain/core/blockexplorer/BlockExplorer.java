@@ -74,6 +74,8 @@ public class BlockExplorer {
     JSONObject output;
     private boolean forPrint;
 
+    static long ASSET_QUOTE_KEY = AssetCls.ERA_KEY;
+
     public static BlockExplorer getInstance() {
         if (blockExplorer == null) {
             blockExplorer = new BlockExplorer();
@@ -264,10 +266,6 @@ public class BlockExplorer {
             logger.error("Wrong search while process assets... ", e.getMessage());
             throw new WrongSearchException();
         }
-        if (keys == null || keys.isEmpty()) {
-            logger.info("Wrong search while process assets... ");
-            throw new WrongSearchException();
-        }
 
         makePage(type, keys, start, pageSize, result, langObj, expArgs);
 
@@ -353,8 +351,9 @@ public class BlockExplorer {
                         break;
                     case "assets":
                         //search assets
+                        // use ERA for PRICES
                         Object[] expArgs = new Object[2];
-                        expArgs[0] = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
+                        expArgs[0] = Controller.getInstance().getAsset(ASSET_QUOTE_KEY);
                         expArgs[1] = Controller.getInstance().dlSet.getPairMap();
                         output.putAll(jsonQuerySearchPages(info, AssetCls.class, search, (int) start, pageSize, expArgs));
 
@@ -464,7 +463,7 @@ public class BlockExplorer {
             output.put("type", "assets");
 
             Object[] expArgs = new Object[2];
-            expArgs[0] = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
+            expArgs[0] = Controller.getInstance().getAsset(ASSET_QUOTE_KEY);
             expArgs[1] = Controller.getInstance().dlSet.getPairMap();
             output.putAll(jsonQueryPages(AssetCls.class, start, pageSize, expArgs));
 
@@ -687,7 +686,7 @@ public class BlockExplorer {
             return;
         }
 
-        output.put("charKey", poll.getItemTypeChar());
+        output.put("charKey", poll.getItemTypeAndKey());
         output.put("Label_Actions", Lang.T("Actions", langObj));
         output.put("Label_RAW", Lang.T("Bytecode", langObj));
 
@@ -738,7 +737,7 @@ public class BlockExplorer {
         output.put("Label_Poll", Lang.T("Poll", langObj));
         output.put("Label_Asset", Lang.T("Asset", langObj));
         output.put("Label_Key", Lang.T("Key", langObj));
-        output.put("Label_Owner", Lang.T("Owner", langObj));
+        output.put("Label_Maker", Lang.T("Maker", langObj));
         output.put("Label_Description", Lang.T("Description", langObj));
 
     }
@@ -836,8 +835,8 @@ public class BlockExplorer {
         output.put("creator", transaction.getCreator().getAddress());
         output.put("creator_person", transaction.getCreator().getPersonAsString());
 
-        output.put("assetHaveOwner", assetHave.getOwner().getAddress());
-        output.put("assetWantOwner", assetWant.getOwner().getAddress());
+        output.put("assetHaveMaker", assetHave.getMaker().getAddress());
+        output.put("assetWantMaker", assetWant.getMaker().getAddress());
 
         output.put("assetHaveKey", assetHave.getKey());
         output.put("assetHaveName", assetHave.viewName());
@@ -951,8 +950,8 @@ public class BlockExplorer {
         tradeJSON.put("assetWantKey", pairAssetWant.getKey());
         tradeJSON.put("assetWantName", pairAssetWant.viewName());
 
-        tradeJSON.put("assetHaveOwner", pairAssetHave.getOwner().getAddress());
-        tradeJSON.put("assetWantOwner", pairAssetWant.getOwner().getAddress());
+        tradeJSON.put("assetHaveMaker", pairAssetHave.getMaker().getAddress());
+        tradeJSON.put("assetWantMaker", pairAssetWant.getMaker().getAddress());
 
         tradeJSON.put("realPrice", trade.calcPrice());
 
@@ -1014,8 +1013,8 @@ public class BlockExplorer {
         AssetCls assetHave = Controller.getInstance().getAsset(have);
         AssetCls assetWant = Controller.getInstance().getAsset(want);
 
-        output.put("assetHaveOwner", assetHave.getOwner().getAddress());
-        output.put("assetWantOwner", assetWant.getOwner().getAddress());
+        output.put("assetHaveMaker", assetHave.getMaker().getAddress());
+        output.put("assetWantMaker", assetWant.getMaker().getAddress());
 
         output.put("assetHave", assetHave.getKey());
         output.put("assetHaveName", assetHave.viewName());
@@ -1398,7 +1397,7 @@ public class BlockExplorer {
         } else {
             assetJSON.put("description", asset.viewDescription());
         }
-        assetJSON.put("owner", asset.getOwner().getAddress());
+        assetJSON.put("maker", asset.getMaker().getAddress());
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getQuantity()));
         assetJSON.put("released", NumberAsString.formatAsString(asset.getReleased(dcSet)));
         assetJSON.put("scale", asset.getScale());
@@ -1738,7 +1737,7 @@ public class BlockExplorer {
         output.put("Label_Balance_3", Lang.T("HOLD (3)", langObj));
         output.put("Label_Balance_4", Lang.T("SPEND (4)", langObj));
         output.put("Label_Table_Prop", Lang.T("Prop.", langObj));
-        output.put("Label_Table_person", Lang.T("Owner", langObj));
+        output.put("Label_Table_person", Lang.T("Maker", langObj));
 
         output.put("Label_Released", Lang.T("released", langObj));
         output.put("Label_in_order", Lang.T("in order", langObj));

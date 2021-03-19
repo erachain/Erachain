@@ -51,7 +51,7 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
                 return poll;
 
             case COLUMN_ADDRESS:
-                return poll.getOwner().getPersonAsString();
+                return poll.getMaker().getPersonAsString();
 
             case COLUMN_TOTAL_VOTES:
                 return DCSet.getInstance().getVoteOnItemPollMap().countVotes(poll.getKey());

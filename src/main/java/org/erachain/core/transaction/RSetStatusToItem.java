@@ -177,7 +177,9 @@ public class RSetStatusToItem extends Transaction {
 
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         super.setDC(dcSet, false);
-        status = (StatusCls) ItemCls.getItem(dcSet, ItemCls.STATUS_TYPE, this.key);
+
+        status = (StatusCls) dcSet.getItemStatusMap().get(this.key);
+        item = ItemCls.getItem(dcSet, itemType, this.itemKey);
 
         if (false && andUpdateFromState && !isWiped())
             updateFromStateDB();
@@ -817,10 +819,22 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public void makeItemsKeys() {
-        itemsKeys = new Object[][]{
-                new Object[]{ItemCls.STATUS_TYPE, key},
-                new Object[]{this.itemType, this.itemKey}
-        };
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
+        if (creatorPersonDuration == null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.STATUS_TYPE, key, status.getTags()},
+                    new Object[]{this.itemType, this.itemKey, item.getTags()}
+            };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.STATUS_TYPE, key, status.getTags()},
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                    new Object[]{this.itemType, this.itemKey, item.getTags()}
+            };
+        }
     }
 
     //PROCESS/ORPHAN

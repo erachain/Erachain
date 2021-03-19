@@ -5,7 +5,9 @@ import org.erachain.controller.PairsController;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.PairMap;
@@ -229,6 +231,13 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_BANK_GUARANTEE_TOTAL = 61;
 
     /**
+     * NFT - Non Fungible Token. невзаимозаменяемый токен
+     * === полный аналог AS_INSIDE_ASSETS по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_NON_FUNGIBLE = 65;
+    public static final int AS_RELEASED_FUNGIBLE = 67;
+
+    /**
      * INDEXES (FOREX etc.)
      * +++ требования и обязательства
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
@@ -306,7 +315,7 @@ public abstract class AssetCls extends ItemCls {
 
     public static int[] assetTypes;
 
-    public static int[] AssetTypes() {
+    public static int[] assetTypes() {
 
         if (assetTypes != null)
             return assetTypes;
@@ -335,6 +344,7 @@ public abstract class AssetCls extends ItemCls {
                 AS_INSIDE_VOTE,
                 AS_BANK_GUARANTEE,
                 AS_BANK_GUARANTEE_TOTAL,
+                AS_NON_FUNGIBLE,
                 AS_INDEX,
                 AS_INSIDE_OTHER_CLAIM,
 
@@ -497,12 +507,12 @@ public abstract class AssetCls extends ItemCls {
 
     }
 
-    public PublicKeyAccount getOwner() {
+    public PublicKeyAccount getMaker() {
         if (this.key > 10 && this.key < 100 && BlockChain.ASSET_OWNERS.containsKey(this.key)) {
             return BlockChain.ASSET_OWNERS.get(this.key);
         }
 
-        return this.owner;
+        return this.maker;
     }
 
     @Override
@@ -533,6 +543,11 @@ public abstract class AssetCls extends ItemCls {
         }
 
         return this.description;
+    }
+
+    @Override
+    public String[] getTags() {
+        return new String[]{":" + viewAssetTypeAbbrev().toLowerCase()};
     }
 
     @Override
@@ -752,6 +767,14 @@ public abstract class AssetCls extends ItemCls {
         return isUnSpendable(key, assetType);
     }
 
+    public static boolean isUnTransferable(long key, int assetType, boolean senderIsAssetMaker) {
+        return assetType == AssetCls.AS_NON_FUNGIBLE && !senderIsAssetMaker;
+    }
+
+    public boolean isUnTransferable(boolean senderIsAssetMaker) {
+        return isUnTransferable(key, assetType, senderIsAssetMaker);
+    }
+
     public static boolean isUnDebtable(long key, int assetType) {
         return assetType == AssetCls.AS_INDEX
                 || assetType == AssetCls.AS_INSIDE_BONUS;
@@ -766,6 +789,7 @@ public abstract class AssetCls extends ItemCls {
                 || assetType == AS_OUTSIDE_BILL
                 || assetType == AS_OUTSIDE_BILL_EX
                 || assetType == AS_BANK_GUARANTEE
+                || assetType == AS_NON_FUNGIBLE
         ) {
             return true;
         }
@@ -872,9 +896,10 @@ public abstract class AssetCls extends ItemCls {
     public BigDecimal defaultAmountAssetType() {
         switch (assetType) {
             case AS_BANK_GUARANTEE:
+            case AS_NON_FUNGIBLE:
                 return BigDecimal.ONE;
         }
-        return null;
+        return isUnique() ? BigDecimal.ONE : null;
     }
 
     public PublicKeyAccount defaultRecipient(int actionType, boolean backward) {
@@ -882,7 +907,7 @@ public abstract class AssetCls extends ItemCls {
         if (isOutsideType()) {
             if (actionType == Account.BALANCE_POS_SPEND
                     || actionType == Account.BALANCE_POS_DEBT) {
-                return getOwner();
+                return getMaker();
             }
         }
 
@@ -933,6 +958,8 @@ public abstract class AssetCls extends ItemCls {
                 return "Bank Guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
                 return "Accounting Bank Guarantee";
+            case AS_NON_FUNGIBLE:
+                return "Non Fungible Token";
             case AS_INDEX:
                 return "Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -1004,6 +1031,8 @@ public abstract class AssetCls extends ItemCls {
                 return "Bank Guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
                 return "Accounting Bank Guarantee";
+            case AS_NON_FUNGIBLE:
+                return "Non Fungible Token";
             case AS_INDEX:
                 return "Digital Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -1079,6 +1108,8 @@ public abstract class AssetCls extends ItemCls {
                 return "BGu";
             case AS_BANK_GUARANTEE_TOTAL:
                 return "BGuT";
+            case AS_NON_FUNGIBLE:
+                return "NFT";
             case AS_INDEX:
                 return "Idx";
             case AS_INSIDE_OTHER_CLAIM:
@@ -1152,6 +1183,8 @@ public abstract class AssetCls extends ItemCls {
                 return "A digital bank guarantee";
             case AS_BANK_GUARANTEE_TOTAL:
                 return "A digital accounting bank guarantee";
+            case AS_NON_FUNGIBLE:
+                return "AS_NON_FUNGIBLE_D";
             case AS_INDEX:
                 return "Index on foreign and domestic assets, for example currencies on FOREX";
             case AS_INSIDE_OTHER_CLAIM:
@@ -1175,7 +1208,7 @@ public abstract class AssetCls extends ItemCls {
         return "";
     }
 
-    public static String viewAssetTypeAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
+    public static String viewAssetTypeAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorMaker) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
@@ -1194,14 +1227,14 @@ public abstract class AssetCls extends ItemCls {
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
                         return backward ? null // для формирования списка действия надо выдать НУЛЬ
-                                : isCreatorOwner ? "AS_OUTSIDE_CURRENCY_Issue" : "AS_OUTSIDE_CURRENCY_1";
+                                : isCreatorMaker ? "AS_OUTSIDE_CURRENCY_Issue" : "AS_OUTSIDE_CURRENCY_1";
                     case Account.BALANCE_POS_DEBT:
-                        return isCreatorOwner ? null
+                        return isCreatorMaker ? null
                                 : backward ? "AS_OUTSIDE_CURRENCY_2B" // Отозвать требование об исполнении денежного требования
                                 : "AS_OUTSIDE_CURRENCY_2"; // Потребовать исполнения денежного требования
                     case Account.BALANCE_POS_SPEND:
                         return backward ? null
-                                : isCreatorOwner ? null
+                                : isCreatorMaker ? null
                                 : "AS_OUTSIDE_CURRENCY_4"; // Подтвердить исполнение денежного требования
                     default:
                         return null;
@@ -1273,13 +1306,13 @@ public abstract class AssetCls extends ItemCls {
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
                         return backward ? null
-                                : isCreatorOwner ? "AS_MY_DEBT_Issue" : "AS_MY_DEBT_1";
+                                : isCreatorMaker ? "AS_MY_DEBT_Issue" : "AS_MY_DEBT_1";
                     case Account.BALANCE_POS_DEBT:
-                        return isCreatorOwner ? null // эмитент долга не может делать требования
+                        return isCreatorMaker ? null // эмитент долга не может делать требования
                                 : backward ? "AS_MY_DEBT_2B"
                                 : "AS_MY_DEBT_2";
                     case Account.BALANCE_POS_SPEND:
-                        return isCreatorOwner ? null // эмитент долга не может делать погашения
+                        return isCreatorMaker ? null // эмитент долга не может делать погашения
                                 : backward ? null : "AS_MY_DEBT_4";
                     default:
                         return null;
@@ -1287,7 +1320,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return backward ? null : isCreatorOwner ? "AS_OUTSIDE_OTHER_CLAIM_Issue"
+                        return backward ? null : isCreatorMaker ? "AS_OUTSIDE_OTHER_CLAIM_Issue"
                                 : "AS_OUTSIDE_OTHER_CLAIM_1";
                     case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_OUTSIDE_OTHER_CLAIM_2B"
@@ -1300,7 +1333,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_CURRENCY:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return backward ? null : isCreatorOwner ? "AS_INSIDE_CURRENCY_Issue"
+                        return backward ? null : isCreatorMaker ? "AS_INSIDE_CURRENCY_Issue"
                                 : "AS_INSIDE_CURRENCY_1";
                     default:
                         return null;
@@ -1308,7 +1341,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_UTILITY:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return backward ? null : isCreatorOwner ? "AS_INSIDE_UTILITY_Issue"
+                        return backward ? null : isCreatorMaker ? "AS_INSIDE_UTILITY_Issue"
                                 : "AS_INSIDE_UTILITY_1";
                     default:
                         return null;
@@ -1316,7 +1349,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_SHARE:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return backward ? null : isCreatorOwner ? "AS_INSIDE_SHARE_Issue"
+                        return backward ? null : isCreatorMaker ? "AS_INSIDE_SHARE_Issue"
                                 : "AS_INSIDE_SHARE_1";
                     default:
                         return null;
@@ -1324,7 +1357,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_BONUS:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return backward ? null : isCreatorOwner ? "AS_INSIDE_BONUS_Issue"
+                        return backward ? null : isCreatorMaker ? "AS_INSIDE_BONUS_Issue"
                                 : "AS_INSIDE_BONUS_1";
                     default:
                         return null;
@@ -1332,7 +1365,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_ACCESS:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return backward ? null : isCreatorOwner ? "AS_INSIDE_ACCESS_Issue" : "AS_INSIDE_ACCESS_1";
+                        return backward ? null : isCreatorMaker ? "AS_INSIDE_ACCESS_Issue" : "AS_INSIDE_ACCESS_1";
                     case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_INSIDE_ACCESS_2B"
                                 : "AS_INSIDE_ACCESS_2";
@@ -1346,7 +1379,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_VOTE:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return backward ? null : isCreatorOwner ? "AS_INSIDE_VOTE_Issue" : "AS_INSIDE_VOTE_1";
+                        return backward ? null : isCreatorMaker ? "AS_INSIDE_VOTE_Issue" : "AS_INSIDE_VOTE_1";
                     case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_INSIDE_VOTE_2B"
                                 : "AS_INSIDE_VOTE_2";
@@ -1360,7 +1393,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return backward ? null : isCreatorOwner ? "AS_BANK_GUARANTEE_Issue" : "AS_BANK_GUARANTEE_1";
+                        return backward ? null : isCreatorMaker ? "AS_BANK_GUARANTEE_Issue" : "AS_BANK_GUARANTEE_1";
                     case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_BANK_GUARANTEE_2B" : "AS_BANK_GUARANTEE_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
@@ -1375,7 +1408,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_BANK_GUARANTEE_TOTAL:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return backward ? null : isCreatorOwner ? "AS_BANK_GUARANTEE_TOTAL_Issue" : "AS_BANK_GUARANTEE_TOTAL_1";
+                        return backward ? null : isCreatorMaker ? "AS_BANK_GUARANTEE_TOTAL_Issue" : "AS_BANK_GUARANTEE_TOTAL_1";
                     case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_BANK_GUARANTEE_TOTAL_2B" : "AS_BANK_GUARANTEE_TOTAL_2";
                     case TransactionAmount.ACTION_REPAY_DEBT:
@@ -1385,12 +1418,18 @@ public abstract class AssetCls extends ItemCls {
                     default:
                         return null;
                 }
+            case AS_NON_FUNGIBLE: {
+                if (actionType == Account.BALANCE_POS_OWN) {
+                    return backward ? null : isCreatorMaker ? "AS_NON_FUNGIBLE_Issue" : null;
+                }
+                return null;
+            }
             case AS_INDEX:
                 break;
             case AS_INSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return backward ? null : isCreatorOwner ? "AS_INSIDE_OTHER_CLAIM_Issue" : "AS_INSIDE_OTHER_CLAIM_1";
+                        return backward ? null : isCreatorMaker ? "AS_INSIDE_OTHER_CLAIM_Issue" : "AS_INSIDE_OTHER_CLAIM_1";
                     case Account.BALANCE_POS_DEBT:
                         return backward ? "AS_INSIDE_OTHER_CLAIM_2B"
                                 : "AS_INSIDE_OTHER_CLAIM_2";
@@ -1499,11 +1538,11 @@ public abstract class AssetCls extends ItemCls {
         return null;
     }
 
-    public String viewAssetTypeAction(boolean backward, int actionType, boolean isCreatorOwner) {
-        return viewAssetTypeAction(key, assetType, backward, actionType, isCreatorOwner);
+    public String viewAssetTypeAction(boolean backward, int actionType, boolean isCreatorMaker) {
+        return viewAssetTypeAction(key, assetType, backward, actionType, isCreatorMaker);
     }
 
-    public static String viewAssetTypeAdditionAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
+    public static String viewAssetTypeAdditionAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorMaker) {
         switch (assetType) {
             case AS_SELF_ACCOUNTING_CASH_FUND:
                 switch (actionType) {
@@ -1524,11 +1563,11 @@ public abstract class AssetCls extends ItemCls {
      *
      * @param backward
      * @param actionType
-     * @param isCreatorOwner
+     * @param isCreatorMaker
      * @return
      */
-    public String viewAssetTypeAdditionAction(boolean backward, int actionType, boolean isCreatorOwner) {
-        return viewAssetTypeAdditionAction(key, assetType, backward, actionType, isCreatorOwner);
+    public String viewAssetTypeAdditionAction(boolean backward, int actionType, boolean isCreatorMaker) {
+        return viewAssetTypeAdditionAction(key, assetType, backward, actionType, isCreatorMaker);
     }
 
     /**
@@ -1536,12 +1575,12 @@ public abstract class AssetCls extends ItemCls {
      *
      * @param assetKey
      * @param assetType
-     * @param isCreatorOwner
+     * @param isCreatorMaker
      * @param useAddedActions
      * @return
      */
     public static List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> viewAssetTypeActionsList(long assetKey,
-                                                                                                  int assetType, Boolean isCreatorOwner, boolean useAddedActions) {
+                                                                                                  int assetType, Boolean isCreatorMaker, boolean useAddedActions) {
 
         List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> list = new ArrayList<>();
 
@@ -1553,14 +1592,14 @@ public abstract class AssetCls extends ItemCls {
             boolean backward = !AssetCls.isReverseSend(assetType) || balPos != Account.BALANCE_POS_OWN;
 
             actionStr = viewAssetTypeAction(assetKey, assetType, !backward, balPos,
-                    isCreatorOwner != null ? isCreatorOwner : true);
+                    isCreatorMaker != null ? isCreatorMaker : true);
             if (actionStr != null) {
                 item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, !backward), actionStr);
                 if (!list.contains(item)) {
                     list.add(item);
                     if (useAddedActions) {
                         addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, !backward, balPos,
-                                isCreatorOwner != null ? isCreatorOwner : true);
+                                isCreatorMaker != null ? isCreatorMaker : true);
                         if (addActionStr != null) {
                             item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, !backward), addActionStr);
                             list.add(item);
@@ -1569,7 +1608,7 @@ public abstract class AssetCls extends ItemCls {
                 }
             }
 
-            if (isCreatorOwner == null) {
+            if (isCreatorMaker == null) {
                 actionStr = viewAssetTypeAction(assetKey, assetType, !backward, balPos,
                         false);
                 if (actionStr != null) {
@@ -1589,14 +1628,14 @@ public abstract class AssetCls extends ItemCls {
             }
 
             actionStr = viewAssetTypeAction(assetKey, assetType, backward, balPos,
-                    isCreatorOwner != null ? isCreatorOwner : true);
+                    isCreatorMaker != null ? isCreatorMaker : true);
             if (actionStr != null) {
                 item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, backward), actionStr);
                 if (!list.contains(item)) {
                     list.add(item);
                     if (useAddedActions) {
                         addActionStr = viewAssetTypeAdditionAction(assetKey, assetType, backward, balPos,
-                                isCreatorOwner != null ? isCreatorOwner : true);
+                                isCreatorMaker != null ? isCreatorMaker : true);
                         if (addActionStr != null) {
                             item = new Fun.Tuple2<>(new Fun.Tuple2<>(balPos, backward), addActionStr);
                             list.add(item);
@@ -1605,7 +1644,7 @@ public abstract class AssetCls extends ItemCls {
                 }
             }
 
-            if (isCreatorOwner == null) {
+            if (isCreatorMaker == null) {
                 actionStr = viewAssetTypeAction(assetKey, assetType, backward, balPos,
                         false);
                 if (actionStr != null) {
@@ -1628,45 +1667,23 @@ public abstract class AssetCls extends ItemCls {
         return list;
     }
 
-    public List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> viewAssetTypeActionsList(Boolean isCreatorOwner, boolean useAddedActions) {
-        return viewAssetTypeActionsList(key, assetType, isCreatorOwner, useAddedActions);
+    public List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> viewAssetTypeActionsList(Boolean isCreatorMaker, boolean useAddedActions) {
+        return viewAssetTypeActionsList(key, assetType, isCreatorMaker, useAddedActions);
     }
 
-    public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorOwner) {
-        switch (assetType) {
-            case AS_BANK_GUARANTEE:
-            case AS_BANK_GUARANTEE_TOTAL:
-            case AS_OUTSIDE_IMMOVABLE:
-            case AS_OUTSIDE_CURRENCY:
-            case AS_OUTSIDE_SERVICE:
-            case AS_OUTSIDE_SHARE:
-            case AS_OUTSIDE_BILL:
-            case AS_OUTSIDE_BILL_EX:
-            case AS_OUTSIDE_OTHER_CLAIM:
-            case AS_INSIDE_ASSETS:
-            case AS_INSIDE_CURRENCY:
-            case AS_INSIDE_UTILITY:
-            case AS_INSIDE_SHARE:
-            case AS_INSIDE_BONUS:
-            case AS_INSIDE_ACCESS:
-            case AS_INSIDE_VOTE:
-            case AS_INDEX:
-            case AS_INSIDE_OTHER_CLAIM:
-            case AS_ACCOUNTING:
-        }
-
-        return viewAssetTypeAction(backward, actionType, isCreatorOwner);
+    public String viewAssetTypeActionTitle(boolean backward, int actionType, boolean isCreatorMaker) {
+        return viewAssetTypeAction(backward, actionType, isCreatorMaker);
     }
 
-    public static String viewAssetTypeCreator(int assetType, boolean backward, int actionType, boolean isCreatorOwner) {
+    public static String viewAssetTypeCreator(int assetType, boolean backward, int actionType, boolean isCreatorMaker) {
         switch (assetType) {
             case AS_MY_DEBT:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return isCreatorOwner ? "Debtor" : "Lender";
+                        return isCreatorMaker ? "Debtor" : "Lender";
                     case Account.BALANCE_POS_DEBT:
                     case Account.BALANCE_POS_SPEND:
-                        return isCreatorOwner ? null // эмитент долга не может делать требования
+                        return isCreatorMaker ? null // эмитент долга не может делать требования
                                 : "Debtor";
                     default:
                         return null;
@@ -1694,6 +1711,11 @@ public abstract class AssetCls extends ItemCls {
                     case Account.BALANCE_POS_SPEND:
                         return "Spender";
                 }
+            case AS_NON_FUNGIBLE:
+                switch (actionType) {
+                    case Account.BALANCE_POS_OWN:
+                        return backward ? null : isCreatorMaker ? "Author" : null;
+                }
             case AS_SELF_MANAGED_ACCOUNTING:
             case AS_SELF_MANAGED_DIRECT_SEND:
             case AS_SELF_MANAGED_SHARE:
@@ -1712,10 +1734,10 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return isCreatorOwner ? "Issuer" : "Sender";
+                        return isCreatorMaker ? "Issuer" : "Sender";
                     case Account.BALANCE_POS_DEBT:
                     case Account.BALANCE_POS_SPEND:
-                        return isCreatorOwner ? null : "Issuer";
+                        return isCreatorMaker ? null : "Issuer";
                     default:
                         return null;
                 }
@@ -1747,19 +1769,19 @@ public abstract class AssetCls extends ItemCls {
         return null;
     }
 
-    public String viewAssetTypeCreator(boolean backward, int actionType, boolean isCreatorOwner) {
-        return viewAssetTypeCreator(assetType, backward, actionType, isCreatorOwner);
+    public String viewAssetTypeCreator(boolean backward, int actionType, boolean isCreatorMaker) {
+        return viewAssetTypeCreator(assetType, backward, actionType, isCreatorMaker);
     }
 
-    public static String viewAssetTypeTarget(int assetType, boolean backward, int actionType, boolean isRecipientOwner) {
+    public static String viewAssetTypeTarget(int assetType, boolean backward, int actionType, boolean isRecipientMaker) {
         switch (assetType) {
             case AS_MY_DEBT:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return isRecipientOwner ? null : "Lender"; // Тут может быть начальная эмиссия к Кредитору и переуступка - тоже кредитору по сути
+                        return isRecipientMaker ? null : "Lender"; // Тут может быть начальная эмиссия к Кредитору и переуступка - тоже кредитору по сути
                     case Account.BALANCE_POS_DEBT:
                     case Account.BALANCE_POS_SPEND:
-                        return isRecipientOwner ?
+                        return isRecipientMaker ?
                                 "Debtor"
                                 : null; // реципиент только эмитент долга;
                     default:
@@ -1791,6 +1813,11 @@ public abstract class AssetCls extends ItemCls {
                     case Account.BALANCE_POS_SPEND:
                         return "Spender";
                 }
+            case AS_NON_FUNGIBLE:
+                switch (actionType) {
+                    case Account.BALANCE_POS_OWN:
+                        return backward ? null : "Recipient";
+                }
             case AS_SELF_MANAGED_ACCOUNTING:
             case AS_SELF_MANAGED_DIRECT_SEND:
             case AS_SELF_MANAGED_SHARE:
@@ -1821,10 +1848,10 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case Account.BALANCE_POS_OWN:
-                        return isRecipientOwner ? "Issuer" : "Recipient";
+                        return isRecipientMaker ? "Issuer" : "Recipient";
                     case Account.BALANCE_POS_DEBT:
                     case Account.BALANCE_POS_SPEND:
-                        return isRecipientOwner ? "Issuer" : null;
+                        return isRecipientMaker ? "Issuer" : null;
                     default:
                         return null;
                 }
@@ -1856,12 +1883,12 @@ public abstract class AssetCls extends ItemCls {
         return null;
     }
 
-    public String viewAssetTypeTarget(boolean backward, int actionType, boolean isRecipientOwner) {
-        return viewAssetTypeTarget(assetType, backward, actionType, isRecipientOwner);
+    public String viewAssetTypeTarget(boolean backward, int actionType, boolean isRecipientMaker) {
+        return viewAssetTypeTarget(assetType, backward, actionType, isRecipientMaker);
 
     }
 
-    public String viewAssetTypeActionOK(boolean backward, int actionType, boolean isCreatorOwner) {
+    public String viewAssetTypeActionOK(boolean backward, int actionType, boolean isCreatorMaker) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
             case AS_OUTSIDE_CURRENCY:
@@ -1879,12 +1906,13 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_VOTE:
             case AS_BANK_GUARANTEE:
             case AS_BANK_GUARANTEE_TOTAL:
+            case AS_NON_FUNGIBLE:
             case AS_INDEX:
             case AS_INSIDE_OTHER_CLAIM:
             case AS_ACCOUNTING:
         }
 
-        return viewAssetTypeAction(backward, actionType, isCreatorOwner) + " # to";
+        return viewAssetTypeAction(backward, actionType, isCreatorMaker) + " # to";
 
     }
 
@@ -1957,7 +1985,7 @@ public abstract class AssetCls extends ItemCls {
         for (String iso : Lang.getInstance().getLangListAvailable().keySet()) {
             JSONObject langObj = Lang.getInstance().getLangJson(iso);
             JSONObject langJson = new JSONObject();
-            for (int type : AssetTypes()) {
+            for (int type : assetTypes()) {
                 langJson.put(type, AssetTypeJson(type, langObj));
             }
             assetTypesJson.put(iso, langJson);
@@ -2007,7 +2035,7 @@ public abstract class AssetCls extends ItemCls {
 
         if (isImMovable())
             joiner.add(Lang.T("ImMovable", langObj));
-        if (isUnlimited(owner, false))
+        if (isUnlimited(maker, false))
             joiner.add(Lang.T("Unlimited", langObj));
         if (isAccounting())
             joiner.add(Lang.T("Accounting", langObj));
@@ -2057,7 +2085,7 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("quantity", this.getQuantity());
 
         assetJSON.put("isImMovable", this.isImMovable());
-        assetJSON.put("isUnlimited", this.isUnlimited(owner, false));
+        assetJSON.put("isUnlimited", this.isUnlimited(maker, false));
         assetJSON.put("isAccounting", this.isAccounting());
         assetJSON.put("isUnique", this.isUnique());
         assetJSON.put("isUnHoldable", this.isUnHoldable());
@@ -2083,12 +2111,8 @@ public abstract class AssetCls extends ItemCls {
     public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
 
         JSONObject assetJSON = super.jsonForExplorerPage(langObj, args);
-        //assetJSON.put("assetTypeKey", this.assetType);
         assetJSON.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
 
-        //assetJSON.put("orders", getOperations(DCSet.getInstance()));
-
-        //assetJSON.put("scale", this.getScale());
         assetJSON.put("quantity", this.getQuantity());
 
         BigDecimal released = getReleased();
@@ -2099,19 +2123,19 @@ public abstract class AssetCls extends ItemCls {
             AssetCls quoteAsset = (AssetCls) args[0];
             TradePair tradePair = PairsController.reCalcAndUpdate(this, quoteAsset, (PairMap) args[1], 10);
 
-            BigDecimal price = tradePair.getLower_askPrice();
+            BigDecimal price = tradePair.getLastPrice();
             if (price.signum() == 0) {
-                price = tradePair.getHighest_bidPrice();
+                price = tradePair.getLower_askPrice();
                 if (price.signum() == 0) {
-                    price = tradePair.getLastPrice();
+                    price = tradePair.getHighest_bidPrice();
                 }
             }
             BigDecimal marketCap = released.multiply(price);
             assetJSON.put("marketCap", marketCap);
-            assetJSON.put("lastPrice", tradePair.getLastPrice());
+            assetJSON.put("price", price);
 
             assetJSON.put("changePrice", tradePair.getFirstPrice().signum() > 0 ?
-                    tradePair.getLastPrice().subtract(tradePair.getFirstPrice())
+                    price.subtract(tradePair.getFirstPrice())
                             .movePointRight(2).divide(tradePair.getFirstPrice(), 3, RoundingMode.DOWN)
                     : 0.0);
 
@@ -2206,5 +2230,82 @@ public abstract class AssetCls extends ItemCls {
         return super.getDataLength(includeReference) + ASSET_TYPE_LENGTH;
     }
 
+    static BigDecimal taxCoefficient = new BigDecimal("0.1");
+    static BigDecimal referralsCoefficient = new BigDecimal("0.02");
+
+    public static void processTrade(DCSet dcSet, Block block, Account receiver,
+                                    boolean isInitiator, AssetCls assetHave, AssetCls assetWant,
+                                    boolean asOrphan, BigDecimal tradeAmountForWant, long timestamp, Long orderID) {
+        //TRANSFER FUNDS
+        BigDecimal tradeAmount = tradeAmountForWant.setScale(assetWant.getScale());
+        BigDecimal assetMakerRoyalty;
+        BigDecimal inviterRoyalty;
+        BigDecimal forgerFee;
+        int scale = assetWant.getScale();
+        Long assetWantKey = assetWant.getKey();
+
+        PublicKeyAccount haveAssetMaker = assetHave.getMaker();
+        PublicKeyAccount inviter;
+        if (assetHave.getAssetType() == AS_NON_FUNGIBLE
+                && !receiver.equals(haveAssetMaker)) {
+            // значит приход + это тот актив который мы можем поделить
+            // и это не сам автор продает
+            assetMakerRoyalty = tradeAmount.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+            inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+            forgerFee = inviterRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+
+            Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
+            inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
+
+        } else if (assetWant.getKey() < 100 && !isInitiator) {
+            // это системные активы - берем комиссию за них
+            assetMakerRoyalty = BigDecimal.ZERO;
+            inviterRoyalty = BigDecimal.ZERO;
+            forgerFee = tradeAmount.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
+
+            inviter = null;
+
+        } else {
+            assetMakerRoyalty = BigDecimal.ZERO;
+            inviterRoyalty = BigDecimal.ZERO;
+            inviter = null;
+            forgerFee = BigDecimal.ZERO;
+        }
+
+        if (assetMakerRoyalty.signum() > 0) {
+            tradeAmount = tradeAmount.subtract(assetMakerRoyalty);
+
+            haveAssetMaker.changeBalance(dcSet, asOrphan, false, assetWantKey,
+                    assetMakerRoyalty, false, false, false);
+            if (!asOrphan && block != null)
+                block.addCalculated(haveAssetMaker, assetWantKey, assetMakerRoyalty,
+                        "NFT Royalty by Order @" + Transaction.viewDBRef(orderID), orderID);
+        }
+
+        if (inviterRoyalty.signum() > 0) {
+            tradeAmount = tradeAmount.subtract(inviterRoyalty);
+
+            long inviterRoyaltyLong = inviterRoyalty.setScale(assetWant.getScale()).unscaledValue().longValue();
+            Transaction.process_gifts(dcSet, BlockChain.FEE_INVITED_DEEP, inviterRoyaltyLong, inviter, asOrphan,
+                    assetWant, block,
+                    "NFT Royalty referral bonus " + "@" + Transaction.viewDBRef(orderID),
+                    orderID, timestamp);
+        }
+
+        if (forgerFee.signum() > 0) {
+            tradeAmount = tradeAmount.subtract(forgerFee);
+
+            if (block != null) {
+                block.addAssetFee(assetWant, forgerFee, null);
+            }
+        }
+
+        receiver.changeBalance(dcSet, asOrphan, false, assetWantKey,
+                tradeAmount, false, false, false);
+        if (!asOrphan && block != null)
+            block.addCalculated(receiver, assetWantKey, tradeAmount,
+                    "Trade Order @" + Transaction.viewDBRef(orderID), orderID);
+
+    }
 
 }

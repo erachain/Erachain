@@ -7,6 +7,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.unions.UnionCls;
+import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple5;
 
@@ -28,8 +30,10 @@ public class RSetUnionToItem extends Transaction {
     protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
     protected Long key; // PERSON KEY
+    protected UnionCls unionItem; // ITEM
     protected int itemType; // ITEM TYPE (CAnnot read ITEMS on start DB - need reset ITEM after
     protected Long itemKey; // ITEM KEY
+    protected ItemCls item; // ITEM
     protected Long beg_date;
     protected Long end_date = Long.MAX_VALUE;
 
@@ -96,6 +100,18 @@ public class RSetUnionToItem extends Transaction {
     }
 
     //GETTERS/SETTERS
+
+    public void setDC(DCSet dcSet, boolean andUpdateFromState) {
+
+        super.setDC(dcSet, false);
+
+        this.unionItem = (UnionCls) dcSet.getItemUnionMap().get(this.key);
+        item = ItemCls.getItem(dcSet, itemType, this.itemKey);
+
+        if (false && andUpdateFromState && !isWiped())
+            updateFromStateDB();
+
+    }
 
     //public static String getName() { return "Send"; }
 
@@ -339,6 +355,26 @@ public class RSetUnionToItem extends Transaction {
             return Transaction.NOT_ENOUGH_ERA_USE_10;
 
         return Transaction.VALIDATE_OK;
+    }
+
+    @Override
+    public void makeItemsKeys() {
+        if (isWiped()) {
+            itemsKeys = new Object[][]{};
+        }
+
+        if (creatorPersonDuration == null) {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.UNION_TYPE, key, unionItem.getTags()},
+                    new Object[]{this.itemType, this.itemKey, item.getTags()}
+            };
+        } else {
+            itemsKeys = new Object[][]{
+                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                    new Object[]{ItemCls.UNION_TYPE, key, unionItem.getTags()},
+                    new Object[]{this.itemType, this.itemKey, item.getTags()}
+            };
+        }
     }
 
     //PROCESS/ORPHAN

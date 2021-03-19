@@ -172,7 +172,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         PersonHuman person = (PersonHuman) this.item;
         if (person.isMustBeSigned()) {
             List<byte[]> items = new ArrayList<byte[]>();
-            items.add(person.getOwnerSignature());
+            items.add(person.getMakerSignature());
             return items;
         }
         return null;
@@ -188,7 +188,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         PersonHuman person = (PersonHuman) this.item;
         if (person.isMustBeSigned()) {
             List<PublicKeyAccount> items = new ArrayList<PublicKeyAccount>();
-            items.add(person.getOwner());
+            items.add(person.getMaker());
             return items;
         }
         return null;
@@ -271,9 +271,9 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (person instanceof PersonHuman) {
             PersonHuman human = (PersonHuman) person;
             if (human.isMustBeSigned()) {
-                if (!Arrays.equals(person.getOwner().getPublicKey(), creator.getPublicKey())) {
+                if (!Arrays.equals(person.getMaker().getPublicKey(), creator.getPublicKey())) {
                     // OWNER of personal INFO not is CREATOR
-                    if (human.getOwnerSignature() == null) {
+                    if (human.getMakerSignature() == null) {
                         return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
                     }
                     if (!human.isSignatureValid(dcSet)) {
@@ -281,7 +281,7 @@ public class IssuePersonRecord extends IssueItemRecord {
                     }
 
                 }
-                if (height > BlockChain.START_ITEM_DUPLICATE && dcSet.getTransactionFinalMapSigns().contains(human.getOwnerSignature())) {
+                if (height > BlockChain.START_ITEM_DUPLICATE && dcSet.getTransactionFinalMapSigns().contains(human.getMakerSignature())) {
                     return Transaction.ITEM_DUPLICATE;
                 }
             }
@@ -341,7 +341,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         super.process(block, forDeal);
 
         PersonHuman person = (PersonHuman) this.item;
-        PublicKeyAccount maker = person.getOwner();
+        PublicKeyAccount maker = person.getMaker();
         byte[] makerBytes = maker.getPublicKey();
         // Это нужно для быстрого поиска по публичному ключу создателя персоны,
         // которая еще не удостоверена вообще
@@ -358,7 +358,7 @@ public class IssuePersonRecord extends IssueItemRecord {
             }
 
             // запомним подпись для поиска потом
-            dcSet.getTransactionFinalMapSigns().put(person.getOwnerSignature(), dbRef);
+            dcSet.getTransactionFinalMapSigns().put(person.getMakerSignature(), dbRef);
         }
 
     }
@@ -369,12 +369,12 @@ public class IssuePersonRecord extends IssueItemRecord {
         super.orphan(block, forDeal);
 
         PersonHuman person = (PersonHuman) this.item;
-        PublicKeyAccount maker = person.getOwner();
+        PublicKeyAccount maker = person.getMaker();
         byte[] makerBytes = maker.getPublicKey();
         this.dcSet.getIssuePersonMap().delete(makerBytes);
 
         if (person.isMustBeSigned()) {
-            dcSet.getTransactionFinalMapSigns().delete(person.getOwnerSignature());
+            dcSet.getTransactionFinalMapSigns().delete(person.getMakerSignature());
         }
 
     }

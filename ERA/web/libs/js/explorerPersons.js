@@ -366,7 +366,8 @@ function persons(data) {
 
 
         output += '<tr>';
-        output += ' <td><img src="personimage?key=' + item.key + '" width="100"/>';
+        output += ' <td><a href=?person=' + item.key + get_lang()
+            + '><img src="personimage?key=' + item.key + '" width="100"/></a>';
         output += '<td>' + item.key + '<td><a href=?person=' +
             item.key + get_lang() + '>' + escapeHtml(item.name) + '</a>';
         var dateDiff = new Date(item.birthday);
@@ -374,11 +375,11 @@ function persons(data) {
         //output += '<td>' + convertTimestamp(item.birthday, true) + ' - '
         output += '<td>' + (new Date().getFullYear() - dateDiff.getFullYear());
         //output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
-        output += '<td><a href=?address=' + item.owner + get_lang() + '>';
+        output += '<td><a href=?address=' + item.maker + get_lang() + '>';
         if (item.hasOwnProperty('person'))
             output += '[' + item.person_key + ']' + escapeHtml(item.person);
         else
-            output += item.owner;
+            output += item.maker;
         output += '</a>';
     }
     if (!notDisplayPages) {

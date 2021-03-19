@@ -44,7 +44,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
 
 
                 @SuppressWarnings("unused")
-                PersonCertifyPubKeysDialog fm = new PersonCertifyPubKeysDialog((PersonCls) itemTableSelected, itemTableSelected.getOwner());
+                PersonCertifyPubKeysDialog fm = new PersonCertifyPubKeysDialog((PersonCls) itemTableSelected, itemTableSelected.getMaker());
 
             }
         });

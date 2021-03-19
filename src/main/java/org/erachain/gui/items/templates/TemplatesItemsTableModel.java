@@ -35,7 +35,7 @@ public class TemplatesItemsTableModel extends SearchItemsTableModel {
 
             case COLUMN_ADDRESS:
 
-                return template.getOwner().getPersonAsString();
+                return template.getMaker().getPersonAsString();
 
             case COLUMN_FAVORITE:
 

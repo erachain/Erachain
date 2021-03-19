@@ -141,7 +141,7 @@ public class TestRecStatus {
             assertEquals(issueStatusRecord.getCreator().getAddress(), parsedIssueStatusTransaction.getCreator().getAddress());
 
             //CHECK OWNER
-            assertEquals(issueStatusRecord.getItem().getOwner().getAddress(), parsedIssueStatusTransaction.getItem().getOwner().getAddress());
+            assertEquals(issueStatusRecord.getItem().getMaker().getAddress(), parsedIssueStatusTransaction.getItem().getMaker().getAddress());
 
             //CHECK NAME
             assertEquals(issueStatusRecord.getItem().getName(), parsedIssueStatusTransaction.getItem().getName());

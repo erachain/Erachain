@@ -26,8 +26,8 @@ public class AssetVenture extends AssetCls {
     private static final int TYPE_ID = VENTURE;
 
     /**
-     * 0 - unlimited for owner.
-     * If < 0 - all but not owner may sold it on exchange for owner - as Auction
+     * 0 - unlimited for maker.
+     * If < 0 - all but not maker may sold it on exchange for maker - as Auction
      */
     protected long quantity;
     /**
@@ -35,19 +35,19 @@ public class AssetVenture extends AssetCls {
      */
     protected int scale;
 
-    public AssetVenture(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
-        super(typeBytes, owner, name, icon, image, description, asset_type);
+    public AssetVenture(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+        super(typeBytes, maker, name, icon, image, description, asset_type);
         this.quantity = quantity;
         this.scale = (byte) scale;
     }
 
-    public AssetVenture(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, owner, name, icon, image, description, asset_type, scale, quantity);
+    public AssetVenture(int props, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, maker, name, icon, image, description, asset_type, scale, quantity);
     }
 
-    public AssetVenture(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
-        //this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, owner, name, assetType, icon, image, description, quantity, scale);
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, owner, name, icon, image, description, asset_type, scale, quantity);
+    public AssetVenture(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+        //this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, maker, name, assetType, icon, image, description, quantity, scale);
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, maker, name, icon, image, description, asset_type, scale, quantity);
     }
 
     //GETTERS/SETTERS
@@ -57,7 +57,7 @@ public class AssetVenture extends AssetCls {
     }
 
     /**
-     * 0 - unlimited for owner.
+     * 0 - unlimited for maker.
      * If < 0 - all but not owner may sold it on exchange for owner - as Auction.
      */
     @Override
@@ -83,10 +83,10 @@ public class AssetVenture extends AssetCls {
     public BigDecimal getReleased(DCSet dcSet) {
         if (quantity > 0) {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                    bals = this.getOwner().getBalance(this.getKey(dcSet));
+                    bals = this.getMaker().getBalance(this.getKey(dcSet));
             return new BigDecimal(quantity).subtract(bals.a.b).stripTrailingZeros();
         } else {
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> bals = this.getMaker().getBalance(this.getKey(dcSet));
             return bals.a.b.negate().stripTrailingZeros();
         }
     }
@@ -105,7 +105,7 @@ public class AssetVenture extends AssetCls {
      */
     @Override
     public boolean isUnlimited(Account address, boolean notAccounting) {
-        return !notAccounting && isAccounting() || getQuantity() == 0L && owner.equals(address);
+        return !notAccounting && isAccounting() || getQuantity() == 0L && maker.equals(address);
     }
 
     @Override
@@ -122,9 +122,9 @@ public class AssetVenture extends AssetCls {
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
+        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
         PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
-        position += OWNER_LENGTH;
+        position += MAKER_LENGTH;
 
         //READ NAME
         //byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);

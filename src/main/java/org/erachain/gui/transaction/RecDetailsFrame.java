@@ -289,14 +289,14 @@ public class RecDetailsFrame extends JPanel //JFrame
                             long key = ((TemplateCls) obj).getKey();
                             SearchTemplatesSplitPanel panel = new SearchTemplatesSplitPanel();
                             panel.key_Item.setText("" + key);
-                            panel.startSearch();
+                            panel.startSearchKey();
                             MainPanel.getInstance().insertNewTab(Lang.T("Template"), panel);
 
                         } else if (obj instanceof ExLinkAuthor) {
                             long key = ((ExLinkAuthor) obj).getRef();
                             SearchPersonsSplitPanel panel = new SearchPersonsSplitPanel();
                             panel.key_Item.setText("" + key);
-                            panel.startSearch();
+                            panel.startSearchKey();
                             MainPanel.getInstance().insertNewTab(Lang.T("Author"), panel);
                         }
                     }

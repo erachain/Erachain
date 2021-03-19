@@ -60,7 +60,7 @@ public class PersonListAddPopupMenuItem {
 
 
                 @SuppressWarnings("unused")
-                PersonCertifyPubKeysDialog fm = new PersonCertifyPubKeysDialog((PersonCls) person, person.getOwner());
+                PersonCertifyPubKeysDialog fm = new PersonCertifyPubKeysDialog((PersonCls) person, person.getMaker());
 
             }
         });

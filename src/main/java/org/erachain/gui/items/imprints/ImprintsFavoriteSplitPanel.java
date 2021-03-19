@@ -32,7 +32,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
                 //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
                 MainPanel.getInstance().insertNewTab(Lang.T("Send asset"),
                         new AccountAssetSendPanel(null,
-                                null, itemTableSelected.getOwner(), null, null, false));
+                                null, itemTableSelected.getMaker(), null, null, false));
 
             }
         });
@@ -42,7 +42,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail"), new MailSendPanel(null, itemTableSelected.getOwner(), null));
+                MainPanel.getInstance().insertNewTab(Lang.T("Send Mail"), new MailSendPanel(null, itemTableSelected.getMaker(), null));
             }
         });
 

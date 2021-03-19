@@ -242,9 +242,10 @@ public class WebResource {
         try {
             output = BlockExplorer.getInstance().jsonQueryMain(info);
         } catch (WrongSearchException e) {
-            logger.info("WrongSearchException");
+            logger.info(e.getMessage(), e);
             output = BlockExplorer.getInstance().getOutput();
-            output.put("noSearchedElements","true");
+            output.put("noSearchedElements", "true");
+            output.put("error", e.getMessage());
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")

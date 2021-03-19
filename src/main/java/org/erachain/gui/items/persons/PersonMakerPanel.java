@@ -18,33 +18,33 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class PersonOwnerPanel extends JPanel {
+public class PersonMakerPanel extends JPanel {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
     protected int row;
-    TableModelOwnerPersons person_Accounts_Model;
+    TableModelMakerPersons person_Accounts_Model;
     private JTable jTable_My_Persons;
     private JScrollPane jScrollPane_Tab_My_Persons;
     private GridBagConstraints gridBagConstraints;
 
     @SuppressWarnings("rawtypes")
-    public PersonOwnerPanel(PersonCls person) {
+    public PersonMakerPanel(PersonCls person) {
 
         this.setName(Lang.T("Created person"));
 
-        person_Accounts_Model = new TableModelOwnerPersons(person.getKey());
+        person_Accounts_Model = new TableModelMakerPersons(person.getKey());
         jTable_My_Persons = new MTable(person_Accounts_Model);
 
-        //почемуто перестает показывать вообще всю инфо если включить тут TableColumn favorite_Column = jTable_My_Persons.getColumnModel().getColumn(TableModelOwnerPersons.COLUMN_FAVORITE);
+        //почему-то перестает показывать вообще всю инфо если включить тут TableColumn favorite_Column = jTable_My_Persons.getColumnModel().getColumn(TableModelMakerPersons.COLUMN_FAVORITE);
         //favorite_Column.setCellRenderer(jTable_My_Persons.getDefaultRenderer(Boolean.class));
         //favorite_Column.setMinWidth(50);
         //favorite_Column.setMaxWidth(150);
         //favorite_Column.setPreferredWidth(100);
 
-        TableColumn height_Column = jTable_My_Persons.getColumnModel().getColumn(TableModelOwnerPersons.COLUMN_KEY);
+        TableColumn height_Column = jTable_My_Persons.getColumnModel().getColumn(TableModelMakerPersons.COLUMN_KEY);
         //favoriteColumn.setCellRenderer(new RendererBoolean()); //personsTable.getDefaultRenderer(Boolean.class));
         int rr = (int) (getFontMetrics(UIManager.getFont("Table.font")).stringWidth("0000222"));
         height_Column.setMinWidth(rr + 1);

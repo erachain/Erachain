@@ -35,7 +35,7 @@ public class WalletItemStatusesTableModel extends WalletTableModel<StatusCls> {
                 return status;
 
             case COLUMN_ADDRESS:
-                return status.getOwner().getPersonAsString();
+                return status.getMaker().getPersonAsString();
 
             case COLUMN_CONFIRMED:
                 return status.isConfirmed();

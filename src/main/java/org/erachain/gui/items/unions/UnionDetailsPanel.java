@@ -82,16 +82,16 @@ public class UnionDetailsPanel extends JPanel {
 
         //LABEL CREAtoR
         ++labelGBC.gridy;
-        JLabel ownerLabel = new JLabel(Lang.T("Creator") + ":");
-        this.add(ownerLabel, labelGBC);
+        JLabel makerLabel = new JLabel(Lang.T("Creator") + ":");
+        this.add(makerLabel, labelGBC);
 
         //OWNER
         ++detailGBC.gridy;
-        JTextField owner = new JTextField(union.getOwner().getAddress());
-        owner.setEditable(false);
-        this.add(owner, detailGBC);
+        JTextField maker = new JTextField(union.getMaker().getAddress());
+        maker.setEditable(false);
+        this.add(maker, detailGBC);
 
-        String unionStr = union.getOwner().viewPerson();
+        String unionStr = union.getMaker().viewPerson();
         if (unionStr.length() > 0) {
             //LABEL UNION
             ++labelGBC.gridy;

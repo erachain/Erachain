@@ -47,7 +47,7 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable implement
                 return item;
 
             case COLUMN_ADDRESS:
-                return item.getOwner().getPersonAsString();
+                return item.getMaker().getPersonAsString();
 
             case COLUMN_FAVORITE:
                 return item.isFavorite();

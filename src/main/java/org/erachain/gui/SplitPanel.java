@@ -170,10 +170,10 @@ public class SplitPanel extends IconPanel {
         searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel);
 
         searchTextFieldSearchToolBarLeftPanelDocument.setToolTipText("");
-        searchTextFieldSearchToolBarLeftPanelDocument.setAlignmentX(1.0F);
+        searchTextFieldSearchToolBarLeftPanelDocument.setAlignmentX(2.0F);
         searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
         searchTextFieldSearchToolBarLeftPanelDocument.setName(""); // NOI18N
-        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(400, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
         searchToolBar_LeftPanel.add(searchTextFieldSearchToolBarLeftPanelDocument);
 
         gridBagConstraints = new GridBagConstraints();

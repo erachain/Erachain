@@ -15,6 +15,7 @@ public class ImageCropPanelNavigator2D extends JPanel {
     public JSlider frameSlider;
 
     public JCheckBox asGif = new JCheckBox(Lang.T("As GIF/PNG with transparent background"));
+    public JCheckBox useOrig = new JCheckBox(Lang.T("Use original Source (with animation)"));
 
     private boolean originalSize;
 
@@ -23,6 +24,7 @@ public class ImageCropPanelNavigator2D extends JPanel {
 
         this.originalSize = originalSize;
         this.asGif.setSelected(typeOfImage == TypeOfImage.GIF);
+        this.useOrig.setSelected(typeOfImage == TypeOfImage.GIF);
 
         imageCropDisplayPanelNavigator2D = new ImageCropDisplayPanelNavigator2D(this, imageFile, cropWidth, cropHeight);
 
@@ -46,7 +48,11 @@ public class ImageCropPanelNavigator2D extends JPanel {
         JPanel sliderPanel = new JPanel(new BorderLayout());
         add(sliderPanel, BorderLayout.SOUTH);
 
-        sliderPanel.add(asGif, BorderLayout.NORTH);
+        JPanel checks = new JPanel(new BorderLayout());
+        checks.add(asGif, BorderLayout.NORTH);
+        checks.add(useOrig, BorderLayout.SOUTH);
+        sliderPanel.add(checks, BorderLayout.NORTH);
+
 
         zoomSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
         zoomSlider.setMajorTickSpacing(50);
