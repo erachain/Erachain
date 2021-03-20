@@ -383,16 +383,27 @@ public class ExAccrualsPanel extends IconPanel {
         jPanelMain.setLayout(layout);
         jPanelMain.setVisible(false);
 
+        ImageIcon helpIcon = new ImageIcon("images/icons/tip.png");
+        int x = helpIcon.getIconWidth();
+        int y = helpIcon.getIconHeight();
+        int x1 = headFont.getSize() * 2;
+        double k = ((double) x / (double) x1);
+        y = (int) ((double) y / k);
+        helpIcon = new ImageIcon(helpIcon.getImage().getScaledInstance(x1, y, Image.SCALE_SMOOTH));
+
         jLabelActionAssetTitle.setFont(headFont); // NOI18N
         jLabelActionAssetTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelActionAssetTitle.setText(Lang.T("Action for Asset"));
+
         jPanelMain.add(jLabelActionAssetTitle, headBGC);
 
         jLabelAssetToPay.setText(Lang.T("Asset"));
+        //jLabelAssetToPay.setIcon(helpIcon);
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelAssetToPay, labelGBC);
 
         fieldGBC.gridy = gridy;
+        jComboBoxAccrualAsset.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxAccrualAsset"));
         jPanelMain.add(jComboBoxAccrualAsset, fieldGBC);
 
         jLabelAction.setText(Lang.T("Action"));
@@ -400,6 +411,7 @@ public class ExAccrualsPanel extends IconPanel {
         jPanelMain.add(jLabelAction, labelGBC);
 
         fieldGBC.gridy = gridy;
+        jComboBoxAccrualAction.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxAccrualAction"));
         jPanelMain.add(jComboBoxAccrualAction, fieldGBC);
 
         ////////// PAYMENT METHOD
@@ -420,11 +432,14 @@ public class ExAccrualsPanel extends IconPanel {
         }));
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxMethodPaymentType, fieldGBC);
+        jComboBoxMethodPaymentType.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxMethodPaymentType"));
 
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelAmount, labelGBC);
         fieldGBC.gridy = gridy;
         jPanelMain.add(jTextFieldAmount, fieldGBC);
+        jTextFieldAmount.setToolTipText(Lang.T("ExAccrualsPanel.jTextFieldAmount"));
+
 
         fieldGBC.gridy = ++gridy;
         jPanelMain.add(jLabelMethodPaymentDescription, fieldGBC);
@@ -481,6 +496,7 @@ public class ExAccrualsPanel extends IconPanel {
         jPanelMain.add(jLabel2, labelGBC);
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxFilterAsset, fieldGBC);
+        jComboBoxFilterAsset.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxFilterAsset"));
 
         jPanelFilterBalance.setLayout(jPanelLayout);
 
@@ -566,6 +582,7 @@ public class ExAccrualsPanel extends IconPanel {
 
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxTXTypeFilter, fieldGBC);
+        jComboBoxTXTypeFilter.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxTXTypeFilter"));
 
         jPanelStartEndActions.setLayout(jPanelLayout);
 
@@ -622,6 +639,7 @@ public class ExAccrualsPanel extends IconPanel {
 
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxPersonFilter, fieldGBC);
+        jComboBoxPersonFilter.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxPersonFilter"));
 
         separateBGC.gridy = ++gridy;
         jPanelMain.add(jSeparator5, separateBGC);
