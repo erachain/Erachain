@@ -69,6 +69,9 @@ public class DepositExchange extends IconPanel {
     private JLabel jLabel_Details;
     private JTextField payToAddressField;
     private JLabel jLabel_AreaDetails;
+    /**
+     * for Etherium data
+     */
     private JTextArea payToAddressDetails;
     private JLabel jLabel_DetailsCheck;
     private JLabel payToAddressCheck;
@@ -94,7 +97,7 @@ public class DepositExchange extends IconPanel {
         jButton_getDetails.setEnabled(false);
         payToAddressField.setText("");
         payToAddressDetails.setText("");
-        payToAddressCheck.setText(Lang.T("wait"));
+        payToAddressCheck.setText("<html>" + Lang.T("wait"));
 
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
         //String url_string = "https://api.face2face.cash/apipay/index.json";
@@ -223,7 +226,7 @@ public class DepositExchange extends IconPanel {
             }
 
             if (jsonObject.containsKey("wrong")) {
-                payToAddressCheck.setText("<html><b>" + jsonObject.get("wrong") + "<b></html>");
+                payToAddressCheck.setText("<html><b>" + jsonObject.get("wrong") + "</b></html>");
                 payToAddressField.setText(jsonObject.get("addr_in").toString());
 
                 if (jsonObject.containsKey("addr_out_full") && asset.getKey() == DepositExchange.TEST_ASSET) {
@@ -233,10 +236,8 @@ public class DepositExchange extends IconPanel {
 
             } else {
 
-                String help = "<body style='font-family:" + UIManager.getFont("Label.font").getFamily()
-                        + "; font-size: " + UIManager.getFont("Label.font").getSize() + "pt;"
-                        //+ "background:" + color
-                        + "'>";
+                /// ВНИМАНИЕ - НЕЛЬЗЯ делать setText("") - без HTML - иначе мягкий перенос слов перестанет работать
+                String help = "<html><p>";
 
                 String rate = jsonObject.get("rate").toString();
                 String bal = jsonObject.get("bal").toString();
@@ -262,21 +263,19 @@ public class DepositExchange extends IconPanel {
                 }
 
                 if (jsonObject.containsKey("may_pay")) {
-                    help += "<br>" + Lang.T("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
+                    help += "<p>" + Lang.T("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
                             + assetIncomeABBR;
                 }
 
-                help += "<br>" + Lang.T("Minimal payment in equivalent")
-                        + " <b>" + 0.00025 + " " + assetIncomeABBR + "</b>" + "<br>";
+                help += "<p>" + Lang.T("Minimal payment in equivalent")
+                        + " <b>" + 0.00025 + " " + assetIncomeABBR + "</b>";
 
                 payToAddressField.setText(jsonObject.get("addr_in").toString());
-                payToAddressDetails.setText("");
                 payToAddressCheck.setText(help);
             }
 
         } else {
-            payToAddressField.setText("");
-            payToAddressCheck.setText("<html><h2>" + Lang.T("error") + "</h2>>"
+            payToAddressCheck.setText("<html><h2>" + Lang.T("error") + "</h2>"
                     + inputText);
         }
 
@@ -335,7 +334,11 @@ public class DepositExchange extends IconPanel {
         payToAddressField = new JTextField();
         jLabel_AreaDetails = new JLabel();
         payToAddressDetails = new JTextArea();
-        payToAddressDetails.setWrapStyleWord(true);
+        payToAddressDetails.setLineWrap(true);
+        payToAddressDetails.setRows(3);
+        payToAddressDetails.setEditable(false);
+        payToAddressDetails.setToolTipText("");
+        payToAddressDetails.setText("");
 
 
         jLabel_DetailsCheck = new JLabel();
@@ -471,10 +474,7 @@ public class DepositExchange extends IconPanel {
         jPanelMain.add(jLabel_AreaDetails, labelGBC);
 
         fieldGBC.gridy = gridy;
-        //payToAddressDetails.setMinimumSize(new Dimension(20, jLabel_AreaDetails.getHeight()));
         jPanelMain.add(payToAddressDetails, fieldGBC);
-        payToAddressDetails.setEditable(false);
-        //payToAddressDetails.setToolTipText("");
 
         jButton_copyDetails.setIcon(new ImageIcon(image.getImage().getScaledInstance(x1, y, 1)));
         ++fieldGBC.gridx;
@@ -485,6 +485,7 @@ public class DepositExchange extends IconPanel {
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_DetailsCheck, labelGBC);
         fieldGBC.gridy = gridy;
+        fieldGBC.gridheight = 3;
         jPanelMain.add(payToAddressCheck, fieldGBC);
 
         //////////////////////////
@@ -594,11 +595,10 @@ public class DepositExchange extends IconPanel {
 
     private void reset() {
         AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
-        //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
 
         payToAddressField.setText("");
-        payToAddressDetails.setText("<html>");
-        payToAddressCheck.setText("");
+        payToAddressDetails.setText("");
+        payToAddressCheck.setText("<html>");
 
         switch ((int) asset.getKey()) {
             case 1:
