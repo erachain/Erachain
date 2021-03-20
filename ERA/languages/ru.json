@@ -637,6 +637,7 @@
   "Example": "Пример",
   "Example ROWS Text": "Пример Текста СТРОК",
   "Example SELECTED ROWS Text": "Пример Текста ВЫБРАННЫХ СТРОК",
+  "ExAccrualsPanel_Help": "Вы можете сделать автоматические выплаты множеству получателей отобрав их по балансам на их счетах или по произведенным действиям в <b>блокчейн</b>. При этом, перед отправкой транзакции можете проверить список выплат - кнопками Проверить и настроить фильтр выплат более точно",
   "Exchange": "Биржа",
   "Exchange Order": "Биржевой Заказ",
   "External shares which have to be transferred to an external depository. The depositary can be notified by presenting the claim and then confirm the shares transfer": "Внешние акции, которые необходимо передать во внешнем депозитарии. Депозитарий можно уведомить предъявлением требования и после подтвердить передачу акций",

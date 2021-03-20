@@ -100,6 +100,7 @@ public class ExAccrualsPanel extends IconPanel {
         jCheckBoxAccrualsUse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                jLabel_Help.setVisible(!jCheckBoxAccrualsUse.isSelected());
                 jPanelMain.setVisible(jCheckBoxAccrualsUse.isSelected());
             }
         });
@@ -211,19 +212,6 @@ public class ExAccrualsPanel extends IconPanel {
             }
         });
 
-        /*
-        jCheckBoxUseFilterAsset.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean enabled = jCheckBoxUseFilterAsset.isSelected();
-                jComboBoxFilterAsset.setEnabled(enabled);
-                jComboBoxFilterBalancePosition.setEnabled(enabled);
-                jComboBoxFilterSideBalance.setEnabled(enabled);
-                jTextFieldBQ.setEnabled(enabled);
-                jTextFieldLQ.setEnabled(enabled);
-            }
-        });
-         */
     }
 
     public void updateAction() {
@@ -284,7 +272,6 @@ public class ExAccrualsPanel extends IconPanel {
         jPanelMain = new JPanel();
         jLabel13 = new javax.swing.JLabel();
         jLabelActionAssetTitle = new javax.swing.JLabel();
-        jCheckBoxUseFilterAsset = new javax.swing.JCheckBox();
         jLabelFilterAsset = new javax.swing.JLabel();
         jComboBoxAccrualAsset = new javax.swing.JComboBox<>();
         jComboBoxAccrualAction = new javax.swing.JComboBox<>();
@@ -386,6 +373,13 @@ public class ExAccrualsPanel extends IconPanel {
         jCheckBoxAccrualsUse.setText(Lang.T("Make Accruals"));
         add(jCheckBoxAccrualsUse, fieldGBC);
 
+        jLabel_Help.setText("<html>" + Lang.T("ExAccrualsPanel_Help") + "</html>");
+        fieldGBC.gridy = ++gridy;
+        //JPanel panel1 = new JPanel(new BorderLayout());
+        //panel1.add(jLabel_Help, BorderLayout.CENTER);
+        add(jLabel_Help, fieldGBC);
+        jLabel_Help.setPreferredSize(new Dimension(0, 200));
+
         jPanelMain.setLayout(layout);
         jPanelMain.setVisible(false);
 
@@ -476,7 +470,6 @@ public class ExAccrualsPanel extends IconPanel {
         jPanelMain.add(jSeparator2, separateBGC);
 
         /////////////////////
-        //jCheckBoxUseFilterAsset.setSelected(true);
         jLabelFilterAsset.setFont(headFont); // NOI18N
         jLabelFilterAsset.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelFilterAsset.setText(Lang.T("Filter By Asset and Balance"));
@@ -730,8 +723,8 @@ public class ExAccrualsPanel extends IconPanel {
     private javax.swing.JButton jButtonCalcCompu;
     private javax.swing.JButton jButtonViewResult;
     private javax.swing.JLabel jLabelFilterAsset;
-    private javax.swing.JCheckBox jCheckBoxUseFilterAsset;
     public javax.swing.JCheckBox jCheckBoxAccrualsUse;
+    private javax.swing.JLabel jLabel_Help = new JLabel();
     private javax.swing.JCheckBox jCheckBoxSelfPay;
     private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxAccrualAction;
     public javax.swing.JComboBox<ItemCls> jComboBoxAccrualAsset;
