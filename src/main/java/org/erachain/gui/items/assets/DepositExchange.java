@@ -69,7 +69,7 @@ public class DepositExchange extends IconPanel {
     private JLabel jLabel_Details;
     private JTextField payToAddressField;
     private JLabel jLabel_AreaDetails;
-    private JTextPane payToAddressDetails;
+    private JTextArea payToAddressDetails;
     private JLabel jLabel_DetailsCheck;
     private JLabel payToAddressCheck;
     private JLabel jLabel_YourAddress;
@@ -219,7 +219,7 @@ public class DepositExchange extends IconPanel {
 
         if (jsonObject != null && jsonObject.containsKey("addr_in")) {
             if (false && BlockChain.TEST_MODE) {
-                payToAddressDetails.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+                payToAddressCheck.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
             if (jsonObject.containsKey("wrong")) {
@@ -270,8 +270,8 @@ public class DepositExchange extends IconPanel {
                         + " <b>" + 0.00025 + " " + assetIncomeABBR + "</b>" + "<br>";
 
                 payToAddressField.setText(jsonObject.get("addr_in").toString());
-                payToAddressDetails.setText(help);
-                payToAddressCheck.setText("");
+                payToAddressDetails.setText("");
+                payToAddressCheck.setText(help);
             }
 
         } else {
@@ -334,8 +334,8 @@ public class DepositExchange extends IconPanel {
         detailsHead = new JLabel();
         payToAddressField = new JTextField();
         jLabel_AreaDetails = new JLabel();
-        payToAddressDetails = new JTextPane();
-        payToAddressDetails.setContentType("text/html");
+        payToAddressDetails = new JTextArea();
+        payToAddressDetails.setWrapStyleWord(true);
 
 
         jLabel_DetailsCheck = new JLabel();
