@@ -231,6 +231,10 @@ public class DepositExchange extends IconPanel {
 
                 if (jsonObject.containsKey("addr_out_full") && asset.getKey() == DepositExchange.TEST_ASSET) {
                     String payMess = jsonObject.get("addr_out_full").toString();
+                    jLabel_AreaDetails.setVisible(true);
+                    jButton_copyDetails.setVisible(true);
+                    jButton_copyDetails.setVisible(true);
+
                     payToAddressDetails.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
                 }
 
@@ -259,6 +263,9 @@ public class DepositExchange extends IconPanel {
 
                 if (asset.getKey() == DepositExchange.TEST_ASSET) {
                     String payMess = jsonObject.get("addr_out_full").toString();
+                    jLabel_AreaDetails.setVisible(true);
+                    jButton_copyDetails.setVisible(true);
+                    payToAddressDetails.setVisible(true);
                     payToAddressDetails.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
                 }
 
@@ -481,6 +488,11 @@ public class DepositExchange extends IconPanel {
         jPanelMain.add(jButton_copyDetails, fieldGBC);
         --fieldGBC.gridx;
 
+        jLabel_AreaDetails.setVisible(false);
+        payToAddressDetails.setVisible(false);
+        jButton_copyDetails.setVisible(false);
+
+
         jLabel_DetailsCheck.setText(Lang.T("Status") + ":");
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_DetailsCheck, labelGBC);
@@ -598,7 +610,12 @@ public class DepositExchange extends IconPanel {
 
         payToAddressField.setText("");
         payToAddressDetails.setText("");
-        payToAddressCheck.setText("<html>");
+        payToAddressCheck.setText("<html>"); // только HTML! иначе перенос слов убьется
+
+        jLabel_AreaDetails.setVisible(false);
+        payToAddressDetails.setVisible(false);
+        jButton_copyDetails.setVisible(false);
+
 
         switch ((int) asset.getKey()) {
             case 1:
