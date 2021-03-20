@@ -217,8 +217,6 @@ public class DepositExchange extends IconPanel {
             inputText = "";
         }
 
-        payToAddressDetails.setText("");
-
         if (jsonObject != null && jsonObject.containsKey("addr_in")) {
             if (false && BlockChain.TEST_MODE) {
                 payToAddressDetails.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
@@ -473,11 +471,10 @@ public class DepositExchange extends IconPanel {
         jPanelMain.add(jLabel_AreaDetails, labelGBC);
 
         fieldGBC.gridy = gridy;
-        //payToAddressDetails
+        //payToAddressDetails.setMinimumSize(new Dimension(20, jLabel_AreaDetails.getHeight()));
         jPanelMain.add(payToAddressDetails, fieldGBC);
         payToAddressDetails.setEditable(false);
-        payToAddressDetails.setToolTipText("");
-        payToAddressDetails.setText("");
+        //payToAddressDetails.setToolTipText("");
 
         jButton_copyDetails.setIcon(new ImageIcon(image.getImage().getScaledInstance(x1, y, 1)));
         ++fieldGBC.gridx;
@@ -600,7 +597,7 @@ public class DepositExchange extends IconPanel {
         //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
 
         payToAddressField.setText("");
-        payToAddressDetails.setText("");
+        payToAddressDetails.setText("<html>");
         payToAddressCheck.setText("");
 
         switch ((int) asset.getKey()) {
