@@ -9,9 +9,10 @@ import java.io.File;
 
 public abstract class ImageCropDialog extends JDialog {
 
+    public ImageCropPanelNavigator2D imageCropPanel;
     public ImageCropDialog(File imageFile, int cropWidth, int cropHeight, TypeOfImage typeOfImage, boolean originalSize) {
         JPanel contentPanel = new JPanel(new BorderLayout());
-        ImageCropPanelNavigator2D imageCropPanel = new ImageCropPanelNavigator2D(imageFile, cropWidth, cropHeight, originalSize, typeOfImage);
+        imageCropPanel = new ImageCropPanelNavigator2D(imageFile, cropWidth, cropHeight, originalSize, typeOfImage);
         contentPanel.add(imageCropPanel, BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -43,7 +44,7 @@ public abstract class ImageCropDialog extends JDialog {
     public ImageCropDialog(ImageIcon image) {
         //setTitle();
         JPanel contentPanel = new JPanel(new BorderLayout());
-        ImageCropPanelNavigator2D imageCropPanel = new ImageCropPanelNavigator2D(image);
+        imageCropPanel = new ImageCropPanelNavigator2D(image);
         contentPanel.add(imageCropPanel, BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();

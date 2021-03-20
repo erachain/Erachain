@@ -19,7 +19,10 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -114,11 +117,6 @@ public class AssetInfo extends JTextPane {
             text += "<div><b>" + Lang.T("Name") + ": </b>" + asset.viewName() + "</div>";
             text += "<div   style='word-wrap: break-word; '>";
 
-            if (asset.getKey() > 0 && asset.getKey() < 1000) {
-                text += Library.to_HTML(Lang.T(asset.viewDescription())) + "</div>";
-            } else {
-                text += Library.to_HTML(asset.viewDescription()) + "</div>";
-            }
             text += "<div>" + Lang.T("Maker") + ": <a href = '!!Maker'><b>" + hl_Maker.get_Text() + "</b></a></div>";
             text += "<div>" + Lang.T("Class") + ": <b>" + Lang.T(asset.getItemSubType()) + "</b>,";
             text += " " + Lang.T("Type") + ": <a href='!!Type'><b>" +
@@ -128,16 +126,18 @@ public class AssetInfo extends JTextPane {
             text += " " + Lang.T("Quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
             text += " " + Lang.T("Released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
 
+            text += "<div>" + Lang.T("Description") + ":<br>";
+            if (asset.getKey() > 0 && asset.getKey() < 1000) {
+                text += Library.to_HTML(Lang.T(asset.viewDescription()));
+            } else {
+                text += Library.to_HTML(asset.viewDescription());
+            }
+
             text += "</div><<BR></td></tr></table>";
             text += "<div>";
 
             setContentType("text/html");
             setText(text);
-
-            if (true)
-                HTML_Add_Local_Images();
-            else
-                iii();
 
             this.setEditable(false);
             MenuPopupUtil.installContextMenu(this);
@@ -160,11 +160,12 @@ public class AssetInfo extends JTextPane {
                         hl_Maker.get_PopupMenu().show(th, x, y);
                         return;
                     } else if (arg0.getDescription().equals("!!img")) {
-                        new ImageCropDialog(image) {
+                        ImageCropDialog window = new ImageCropDialog(image) {
                             @Override
                             public void onFinish(BufferedImage image, TypeOfImage typeOfImage, boolean useOriginal) {
                             }
                         };
+
                     } else if (arg0.getDescription().equals("!!Type")) {
                         String find = asset.viewAssetTypeAbbrev();
                         SearchAssetsSplitPanel panel = new SearchAssetsSplitPanel(false);
@@ -211,6 +212,8 @@ public class AssetInfo extends JTextPane {
             LOGGER.error(e.getMessage(), e);
         }
 
+        HTML_Add_Local_Images();
+
     }
 
 
@@ -237,17 +240,6 @@ public class AssetInfo extends JTextPane {
             doc.insertString(doc.getLength(), "ignored text", style);
         } catch (BadLocationException e) {
         }
-    }
-
-    // работает - добавляет в конец после всего текста
-    public void iii() {
-        ///ImageIcon currentIcon = new ImageIcon(manaSymbolImages.get(currentMatch));
-
-        SimpleAttributeSet iconAtts = new SimpleAttributeSet();
-        JLabel iconLabel = new JLabel(image);
-        StyleConstants.setComponent(iconAtts, iconLabel);
-
-        insertIcon(image);
     }
 
     public void HTML_Add_Local_Images() {

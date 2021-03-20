@@ -8,7 +8,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class ImageCropPanelNavigator2D extends JPanel {
-    private ImageCropDisplayPanelNavigator2D imageCropDisplayPanelNavigator2D;
+
+    public ImageCropDisplayPanelNavigator2D imageCropDisplayPanelNavigator2D;
 
     public JSlider sizeSlider;
     public JSlider zoomSlider;
