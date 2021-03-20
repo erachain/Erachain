@@ -23,6 +23,8 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -55,6 +57,8 @@ public class DepositExchange extends IconPanel {
     private JLabel detailsHead;
     private JLabel jText_Help;
     private MButton jButton_getDetails;
+    private JButton jButton_copyAddress = new JButton();
+    private JButton jButton_copyDetails = new JButton();
     private JComboBox<Account> jComboBox_YourAddress;
     public JComboBox<AssetCls> cbxAssets;
     public JComboBox<AssetCls> cbxAssetsInput;
@@ -332,7 +336,6 @@ public class DepositExchange extends IconPanel {
         jLabel_DetailsCheck = new JLabel();
         jTextField_Details_Check = new JLabel();
 
-
         JLabel jText_Title = new JLabel();
 
         jPanelMain.add(jText_Title, titleGBC);
@@ -445,6 +448,19 @@ public class DepositExchange extends IconPanel {
         jTextField_Details.setToolTipText("");
         jTextField_Details.setText("");
 
+        ImageIcon image = new ImageIcon("images/icons/copy.png");
+        int x = image.getIconWidth();
+        int y = image.getIconHeight();
+
+        int x1 = jTextField_Details.getPreferredSize().height;
+        double k = ((double) x / (double) x1);
+        y = (int) ((double) y / k);
+
+        jButton_copyAddress.setIcon(new ImageIcon(image.getImage().getScaledInstance(x1, y, 1)));
+        ++fieldGBC.gridx;
+        jPanelMain.add(jButton_copyAddress, fieldGBC);
+        --fieldGBC.gridx;
+
         jLabel_AreaDetails.setText(Lang.T("Data") + ":");
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_AreaDetails, labelGBC);
@@ -456,6 +472,11 @@ public class DepositExchange extends IconPanel {
         jTextArea_Details.setEditable(false);
         jTextArea_Details.setToolTipText("");
         jTextArea_Details.setText("");
+
+        jButton_copyDetails.setIcon(new ImageIcon(image.getImage().getScaledInstance(x1, y, 1)));
+        ++fieldGBC.gridx;
+        jPanelMain.add(jButton_copyDetails, fieldGBC);
+        --fieldGBC.gridx;
 
         jLabel_DetailsCheck.setText(Lang.T("Status") + ":");
         labelGBC.gridy = ++gridy;
@@ -536,6 +557,26 @@ public class DepositExchange extends IconPanel {
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
         add(jPanelHistory, gridBagConstraints);
+
+        jButton_copyAddress.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringSelection value = new StringSelection(jTextField_Details.getText());
+                clipboard.setContents(value, null);
+
+            }
+        });
+
+        jButton_copyDetails.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringSelection value = new StringSelection(jTextArea_Details.getText());
+                clipboard.setContents(value, null);
+
+            }
+        });
 
         reset();
 
