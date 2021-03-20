@@ -160,14 +160,12 @@ public class BlockExplorer {
 
         Pageable map = (Pageable) dcSet.getMap(type);
 
-        output.put("start", start);
+        if (start != null)
+            output.put("start", start);
 
         List<ItemCls> rows = map.getPage(start, offset, pageSize);
-        if (rows.isEmpty()) {
-            //output.put("pageFromKey", 0);
-            //output.put("pageToKey", 0);
-        } else {
-            output.put("pageFromKey", start);
+        if (!rows.isEmpty()) {
+            output.put("pageFromKey", rows.get(0).getKey());
             output.put("pageToKey", rows.get(rows.size() - 1).getKey());
         }
 

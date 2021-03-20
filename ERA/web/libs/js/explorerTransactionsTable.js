@@ -106,7 +106,7 @@ function pagesComponent2(data) {
             output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(pageFromKey, -pageSize - 1) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
         }
 
-        output += '&emsp; [ <input size="10" type="text" value="' + (pageFromKey == null? 'pageKey' : pageFromKey) + '" class="" style="font-size: 1em;"'
+        output += '&emsp; [ <input size="10" type="text" value="' + (pageFromKey == null? '-' : pageFromKey) + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) document.location = makePageUri2(this.value.trim(), 0)"> ] ';
 
         var pageToKey = data.pageToKey;
