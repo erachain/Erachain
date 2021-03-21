@@ -455,10 +455,10 @@ public class BlockChain {
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10 = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON_4_10, FEE_SCALE);
 
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(
-            !MAIN_MODE ? 0 : 1868367,
+            !MAIN_MODE ? 0 : 235267,
             Base58.decode(
                     !MAIN_MODE ? ""
-                            : "477DogzrKvBGfKUKq1DbiSdGaozPKWM2sM7QXcqD5kboWHAXN5MThtBh7mEnpBTHbo7BPjhm3U9JN5iYCzvDASLh"));
+                            : "2VTp79BBpK5E4aZYV5Tk3dYRS887W1devsrnyJeN6WTBQYQzoe2cTg819DdRs5o9Wh6tsGLsetYTbDu9okgriJce"));
 
     // issue PERSON
     //public static final BigDecimal PERSON_MIN_ERA_BALANCE = BigDecimal.valueOf(10000000);
