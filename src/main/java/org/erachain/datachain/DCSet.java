@@ -41,6 +41,9 @@ import java.util.Random;
 @Slf4j
 public class DCSet extends DBASet implements Closeable {
 
+    /**
+     * New version will auto-rebase DCSet from empty db file
+     */
     final static int CURRENT_VERSION = 530; // vers 5.3
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);

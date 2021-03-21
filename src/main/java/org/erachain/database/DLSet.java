@@ -13,6 +13,9 @@ import java.nio.file.Files;
 @Slf4j
 public class DLSet extends DBASet {
 
+    /**
+     * New version will auto-rebase DLSet from empty db file
+     */
     final static int CURRENT_VERSION = 315;
 
     private PeerMap peerMap;
