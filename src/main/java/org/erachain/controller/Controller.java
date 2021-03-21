@@ -1657,7 +1657,7 @@ public class Controller extends Observable {
                     JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
                     Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
                     if (!blockChain.validageHardCheckPointPeerSign(peerHeight, peerIhfo.get("cps").toString())) {
-                        peer.ban(30, "NOT FOUND CHECKPOINT!");
+                        peer.ban(10, "NOT FOUND CHECKPOINT!");
                         return;
                     }
                     Long peerWeight = Long.parseLong(peerIhfo.get("w").toString());
