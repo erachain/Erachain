@@ -281,6 +281,8 @@ public abstract class IssueItemPanel extends IconPanel {
             labelGBC.gridy = y;
             jPanelMain.add(exLinkTextLabel, labelGBC);
 
+            exLinkText.setToolTipText(Lang.T("IssueItemPanel.exLinkText"));
+
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 8;
             gridBagConstraints.gridy = y;
