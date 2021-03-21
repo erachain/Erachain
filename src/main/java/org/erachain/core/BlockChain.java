@@ -1047,7 +1047,6 @@ public class BlockChain {
             return genesisBlock.getSignature();
         }
     }
-
     public int getMyHardCheckPointHeight() {
         if (CHECKPOINT.a > 1) {
             return CHECKPOINT.a;
