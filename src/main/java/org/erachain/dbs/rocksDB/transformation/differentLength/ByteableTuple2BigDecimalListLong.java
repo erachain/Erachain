@@ -38,6 +38,9 @@ public class ByteableTuple2BigDecimalListLong implements Byteable<Tuple2<BigDeci
 
     @Override
     public byte[] toBytesObject(Tuple2<BigDecimal, List<Long>> value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return org.bouncycastle.util.Arrays.concatenate(byteableBigDecimal.toBytesObject(value.a), byteableListLong.toBytesObject(value.b));
     }
 }

@@ -1208,6 +1208,19 @@ public abstract class AssetCls extends ItemCls {
         return "";
     }
 
+    public static String viewAssetTypeDescriptionDEX(int assetType, long key) {
+        if (key < 100)
+            return "AS_CURRENCY_100_DEX";
+
+        switch (assetType) {
+            case AS_OUTSIDE_CURRENCY:
+            case AS_INSIDE_CURRENCY:
+            case AS_NON_FUNGIBLE:
+                return "AS_NON_FUNGIBLE_DEX";
+        }
+        return null;
+    }
+
     public static String viewAssetTypeAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorMaker) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
@@ -1928,8 +1941,9 @@ public abstract class AssetCls extends ItemCls {
         assetTypeJson.put("name", Lang.T(AssetCls.viewAssetTypeCls(assetType), langObj));
         assetTypeJson.put("nameFull", Lang.T(AssetCls.viewAssetTypeFullCls(assetType), langObj));
 
-        List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(ItemCls.getStartKey(
-                AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD),
+        long startKey = ItemCls.getStartKey(
+                AssetCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD);
+        List<Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>> actions = AssetCls.viewAssetTypeActionsList(startKey,
                 assetType, null, true);
         StringJoiner joiner = new StringJoiner(", ");
         JSONArray actionsArray = new JSONArray();
@@ -1969,6 +1983,11 @@ public abstract class AssetCls extends ItemCls {
         }
         description += "<b>" + Lang.T("Acceptable actions", langObj) + ":</b><br>" + joiner.toString();
 
+        String dexDesc = AssetCls.viewAssetTypeDescriptionDEX(assetType, startKey);
+        if (dexDesc != null) {
+            description += "<br><b>" + Lang.T("DEX rules and taxes", langObj) + ":</b><br>" + Lang.T(dexDesc, langObj);
+        }
+
         assetTypeJson.put("description", description);
 
         return assetTypeJson;
@@ -2005,12 +2024,17 @@ public abstract class AssetCls extends ItemCls {
 
         JSONObject langObj = Lang.getInstance().getLangJson("en");
 
+        long startKey = getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD);
         typeJson.put("key", type);
-        typeJson.put("char", charAssetType(getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD), type));
+        typeJson.put("char", charAssetType(startKey, type));
         typeJson.put("abbrev", viewAssetTypeAbbrev(type));
         typeJson.put("name", Lang.T(assetTypeName, langObj));
         typeJson.put("name_full", Lang.T(viewAssetTypeFullCls(type), langObj));
         typeJson.put("desc", Lang.T(viewAssetTypeDescriptionCls(type), langObj));
+        String dexDesc = AssetCls.viewAssetTypeDescriptionDEX(type, startKey);
+        if (dexDesc != null) {
+            typeJson.put("desc_DEX", Lang.T(dexDesc, langObj));
+        }
 
         return typeJson;
     }
@@ -2069,17 +2093,25 @@ public abstract class AssetCls extends ItemCls {
 
         JSONObject assetJSON = super.toJson();
 
+        JSONObject landObj = Lang.getInstance().getLangJson("en");
+
         // ADD DATA
         assetJSON.put("assetTypeKey", this.assetType);
-        assetJSON.put("assetTypeName", viewAssetType());
-        assetJSON.put("assetTypeDesc", viewAssetTypeDescriptionCls(assetType));
+        assetJSON.put("assetTypeName", Lang.T(viewAssetType(), landObj));
+        assetJSON.put("assetTypeDesc", Lang.T(viewAssetTypeDescriptionCls(assetType), landObj));
+
+        String dexDesc = AssetCls.viewAssetTypeDescriptionDEX(assetType, START_KEY());
+        if (dexDesc != null) {
+            assetJSON.put("type_desc_DEX", Lang.T(dexDesc, landObj));
+        }
+
         assetJSON.put("released", this.getReleased());
         assetJSON.put("type_key", this.assetType);
         assetJSON.put("type_char", charAssetType());
         assetJSON.put("type_abbrev", viewAssetTypeAbbrev());
-        assetJSON.put("type_name", viewAssetType());
-        assetJSON.put("type_name_full", viewAssetTypeFull());
-        assetJSON.put("type_desc", viewAssetTypeDescriptionCls(assetType));
+        assetJSON.put("type_name", Lang.T(viewAssetType(), landObj));
+        assetJSON.put("type_name_full", Lang.T(viewAssetTypeFull(), landObj));
+        assetJSON.put("type_desc", Lang.T(viewAssetTypeDescriptionCls(assetType), landObj));
 
         assetJSON.put("scale", this.getScale());
         assetJSON.put("quantity", this.getQuantity());
@@ -2197,9 +2229,16 @@ public abstract class AssetCls extends ItemCls {
         for (Fun.Tuple2<?, String> item : viewAssetTypeActionsList(null, true)) {
             joiner.add(Lang.T(item.b, langObj));
         }
-        itemJson.put("assetTypeDesc", Lang.T(viewAssetTypeDescriptionCls(getAssetType()), langObj)
-                + ".<br><b>" + Lang.T("Acceptable actions", langObj) + "</b>: " + joiner.toString()
-        );
+
+        String desc = Lang.T(viewAssetTypeDescriptionCls(getAssetType()), langObj)
+                + ".<br><b>" + Lang.T("Acceptable actions", langObj) + "</b>: " + joiner.toString();
+        String dexDesc = AssetCls.viewAssetTypeDescriptionDEX(assetType, START_KEY());
+        if (dexDesc != null) {
+            desc += "<br><b>" + Lang.T("DEX rules and taxes", langObj) + ":</b><br>" + Lang.T(dexDesc, langObj);
+        }
+
+        itemJson.put("assetTypeDesc", desc);
+
 
         itemJson.put("properties", viewProperties(langObj));
 

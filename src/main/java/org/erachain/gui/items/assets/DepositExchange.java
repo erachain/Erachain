@@ -23,6 +23,8 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -55,6 +57,8 @@ public class DepositExchange extends IconPanel {
     private JLabel detailsHead;
     private JLabel jText_Help;
     private MButton jButton_getDetails;
+    private JButton jButton_copyAddress = new JButton();
+    private JButton jButton_copyDetails = new JButton();
     private JComboBox<Account> jComboBox_YourAddress;
     public JComboBox<AssetCls> cbxAssets;
     public JComboBox<AssetCls> cbxAssetsInput;
@@ -63,11 +67,14 @@ public class DepositExchange extends IconPanel {
     private JLabel jLabel_Asset;
     private JLabel jLabel_AssetInput;
     private JLabel jLabel_Details;
-    private JTextField jTextField_Details;
+    private JTextField payToAddressField;
     private JLabel jLabel_AreaDetails;
-    private JTextArea jTextArea_Details;
+    /**
+     * for Etherium data
+     */
+    private JTextArea payToAddressDetails;
     private JLabel jLabel_DetailsCheck;
-    private JLabel jTextField_Details_Check;
+    private JLabel payToAddressCheck;
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
     protected int step = 0;
@@ -88,9 +95,9 @@ public class DepositExchange extends IconPanel {
     public void onGoClick(JLabel jText_Help) {
 
         jButton_getDetails.setEnabled(false);
-        jTextField_Details.setText("");
-        jTextArea_Details.setText("");
-        jTextField_Details_Check.setText(Lang.T("wait"));
+        payToAddressField.setText("");
+        payToAddressDetails.setText("");
+        payToAddressCheck.setText("<html>" + Lang.T("wait"));
 
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
         //String url_string = "https://api.face2face.cash/apipay/index.json";
@@ -213,25 +220,29 @@ public class DepositExchange extends IconPanel {
             inputText = "";
         }
 
-        jTextArea_Details.setText("");
-
         if (jsonObject != null && jsonObject.containsKey("addr_in")) {
             if (false && BlockChain.TEST_MODE) {
-                jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+                payToAddressCheck.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
             if (jsonObject.containsKey("wrong")) {
-                jTextField_Details_Check.setText("<html><b>" + jsonObject.get("wrong") + "<b></html>");
-                jTextField_Details.setText(jsonObject.get("addr_in").toString());
+                payToAddressCheck.setText("<html><b>" + jsonObject.get("wrong") + "</b></html>");
+                payToAddressField.setText(jsonObject.get("addr_in").toString());
 
                 if (jsonObject.containsKey("addr_out_full") && asset.getKey() == DepositExchange.TEST_ASSET) {
                     String payMess = jsonObject.get("addr_out_full").toString();
-                    jTextArea_Details.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
+                    jLabel_AreaDetails.setVisible(true);
+                    jButton_copyDetails.setVisible(true);
+                    jButton_copyDetails.setVisible(true);
+
+                    payToAddressDetails.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
                 }
 
             } else {
 
-                String help;
+                /// ВНИМАНИЕ - НЕЛЬЗЯ делать setText("") - без HTML - иначе мягкий перенос слов перестанет работать
+                String help = "<html><p>";
+
                 String rate = jsonObject.get("rate").toString();
                 String bal = jsonObject.get("bal").toString();
 
@@ -240,37 +251,38 @@ public class DepositExchange extends IconPanel {
                 switch ((int) asset.getKey()) {
                     case 1:
                     case 2:
-                        help = Lang.T("Transfer <b>%1</b> to this address for buy")
+                        help += Lang.T("Transfer <b>%1</b> to this address for buy")
                                 .replace("%1", assetIncomeName) + " <b>" + assetOutputName + "</b>"
                                 + " " + Lang.T("by rate") + ": <b>" + rate + "</b>"
                                 + ", " + Lang.T("max buy amount") + ": <b>" + bal + "</b> " + assetOutputName;
                         break;
                     default:
-                        help = Lang.T("Transfer <b>%1</B> to this address for deposit your account on Exchange")
+                        help += Lang.T("Transfer <b>%1</B> to this address for deposit your account on Exchange")
                                 .replace("%1", assetIncomeName);
                 }
 
                 if (asset.getKey() == DepositExchange.TEST_ASSET) {
                     String payMess = jsonObject.get("addr_out_full").toString();
-                    jTextArea_Details.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
+                    jLabel_AreaDetails.setVisible(true);
+                    jButton_copyDetails.setVisible(true);
+                    payToAddressDetails.setVisible(true);
+                    payToAddressDetails.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
                 }
 
                 if (jsonObject.containsKey("may_pay")) {
-                    help += "<br>" + Lang.T("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
+                    help += "<p>" + Lang.T("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
                             + assetIncomeABBR;
                 }
 
-                help += "<br>" + Lang.T("Minimal payment in equivalent")
-                        + " <b>" + 0.00025 + " " + assetIncomeABBR + "</b>" + "<br>";
+                help += "<p>" + Lang.T("Minimal payment in equivalent")
+                        + " <b>" + 0.00025 + " " + assetIncomeABBR + "</b>";
 
-                jTextField_Details.setText(jsonObject.get("addr_in").toString());
-                jTextField_Details_Check.setText("<html>" + help + "</html>");
+                payToAddressField.setText(jsonObject.get("addr_in").toString());
+                payToAddressCheck.setText(help);
             }
 
         } else {
-            jLabel_Adress_Check.setText("");
-            jTextField_Details.setText("");
-            jTextField_Details_Check.setText("<html><h2>" + Lang.T("error") + "</h2>>"
+            payToAddressCheck.setText("<html><h2>" + Lang.T("error") + "</h2>"
                     + inputText);
         }
 
@@ -326,12 +338,18 @@ public class DepositExchange extends IconPanel {
         jLabel_Adress_Check = new JLabel();
         jLabel_Details = new JLabel();
         detailsHead = new JLabel();
-        jTextField_Details = new JTextField();
+        payToAddressField = new JTextField();
         jLabel_AreaDetails = new JLabel();
-        jTextArea_Details = new JTextArea();
-        jLabel_DetailsCheck = new JLabel();
-        jTextField_Details_Check = new JLabel();
+        payToAddressDetails = new JTextArea();
+        payToAddressDetails.setLineWrap(true);
+        payToAddressDetails.setRows(3);
+        payToAddressDetails.setEditable(false);
+        payToAddressDetails.setToolTipText("");
+        payToAddressDetails.setText("");
 
+
+        jLabel_DetailsCheck = new JLabel();
+        payToAddressCheck = new JLabel();
 
         JLabel jText_Title = new JLabel();
 
@@ -440,28 +458,47 @@ public class DepositExchange extends IconPanel {
         jPanelMain.add(jLabel_Details, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jPanelMain.add(jTextField_Details, fieldGBC);
-        jTextField_Details.setEditable(false);
-        jTextField_Details.setToolTipText("");
-        jTextField_Details.setText("");
+        jPanelMain.add(payToAddressField, fieldGBC);
+        payToAddressField.setEditable(false);
+        payToAddressField.setToolTipText("");
+        payToAddressField.setText("");
+
+        ImageIcon image = new ImageIcon("images/icons/copy.png");
+        int x = image.getIconWidth();
+        int y = image.getIconHeight();
+
+        int x1 = payToAddressField.getPreferredSize().height;
+        double k = ((double) x / (double) x1);
+        y = (int) ((double) y / k);
+
+        jButton_copyAddress.setIcon(new ImageIcon(image.getImage().getScaledInstance(x1, y, 1)));
+        ++fieldGBC.gridx;
+        jPanelMain.add(jButton_copyAddress, fieldGBC);
+        --fieldGBC.gridx;
 
         jLabel_AreaDetails.setText(Lang.T("Data") + ":");
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_AreaDetails, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jTextArea_Details.setLineWrap(true);
-        jTextArea_Details.setRows(3);
-        jPanelMain.add(jTextArea_Details, fieldGBC);
-        jTextArea_Details.setEditable(false);
-        jTextArea_Details.setToolTipText("");
-        jTextArea_Details.setText("");
+        jPanelMain.add(payToAddressDetails, fieldGBC);
+
+        jButton_copyDetails.setIcon(new ImageIcon(image.getImage().getScaledInstance(x1, y, 1)));
+        ++fieldGBC.gridx;
+        jPanelMain.add(jButton_copyDetails, fieldGBC);
+        --fieldGBC.gridx;
+
+        jLabel_AreaDetails.setVisible(false);
+        payToAddressDetails.setVisible(false);
+        jButton_copyDetails.setVisible(false);
+
 
         jLabel_DetailsCheck.setText(Lang.T("Status") + ":");
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_DetailsCheck, labelGBC);
         fieldGBC.gridy = gridy;
-        jPanelMain.add(jTextField_Details_Check, fieldGBC);
+        fieldGBC.gridheight = 3;
+        jPanelMain.add(payToAddressCheck, fieldGBC);
 
         //////////////////////////
         JTextPane jText_History = new JTextPane();
@@ -522,7 +559,7 @@ public class DepositExchange extends IconPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
         add(jPanelMain, gridBagConstraints);
@@ -532,10 +569,37 @@ public class DepositExchange extends IconPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.weightx = 0.4;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
         add(jPanelHistory, gridBagConstraints);
+
+        jButton_copyAddress.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringSelection value = new StringSelection(payToAddressField.getText());
+                clipboard.setContents(value, null);
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.T("Address %1 was copied")
+                                .replace("%1", payToAddressField.getText())
+                                + ".",
+                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        jButton_copyDetails.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringSelection value = new StringSelection(payToAddressDetails.getText());
+                clipboard.setContents(value, null);
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.T("Data was copied"),
+                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+            }
+        });
 
         reset();
 
@@ -543,11 +607,15 @@ public class DepositExchange extends IconPanel {
 
     private void reset() {
         AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
-        //paneAssetInfo.setViewportView(new AssetInfo(asset, false));
 
-        jTextField_Details.setText("");
-        jTextArea_Details.setText("");
-        jTextField_Details_Check.setText("");
+        payToAddressField.setText("");
+        payToAddressDetails.setText("");
+        payToAddressCheck.setText("<html>"); // только HTML! иначе перенос слов убьется
+
+        jLabel_AreaDetails.setVisible(false);
+        payToAddressDetails.setVisible(false);
+        jButton_copyDetails.setVisible(false);
+
 
         switch ((int) asset.getKey()) {
             case 1:

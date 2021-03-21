@@ -7,6 +7,8 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.FilteredByStringArray;
+import org.erachain.database.Pageable;
+import org.erachain.database.PagedMap;
 import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
@@ -24,7 +26,7 @@ import java.util.*;
  * ключ: номер, с самоувеличением
  * Значение: Сущность
  */
-public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredByStringArray<Long> {
+public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredByStringArray<Long>, Pageable<Long, ItemCls> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -421,6 +423,11 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         }
         return IteratorCloseableImpl.make(iterator);
 
+    }
+
+    public List<ItemCls> getPage(Long start, int offset, int pageSize) {
+        PagedMap<Long, ItemCls> pager = new PagedMap(this);
+        return pager.getPageList(start, offset, pageSize, true);
     }
 
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {

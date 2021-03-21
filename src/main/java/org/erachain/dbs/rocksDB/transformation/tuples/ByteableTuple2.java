@@ -22,6 +22,9 @@ public abstract class ByteableTuple2<F0, F1> implements Byteable<Tuple2<F0, F1>>
 
     @Override
     public byte[] toBytesObject(Tuple2<F0,F1> value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return org.bouncycastle.util.Arrays.concatenate(byteables[0].toBytesObject(value.a), byteables[1].toBytesObject(value.b));
     }
 }

@@ -18,6 +18,9 @@ public class ByteableBlockHead implements Byteable<Block.BlockHead> {
 
     @Override
     public byte[] toBytesObject(Block.BlockHead value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return value.toBytes();
     }
 }

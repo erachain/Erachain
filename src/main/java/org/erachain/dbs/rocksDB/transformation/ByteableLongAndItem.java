@@ -33,6 +33,9 @@ public class ByteableLongAndItem implements Byteable<Tuple2<Long, ItemCls>> {
 
     @Override
     public byte[] toBytesObject(Tuple2<Long, ItemCls> value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         Long aLong = value.a;
         ItemCls itemCls = value.b;
         byte[] bytesLong = byteableLong.toBytesObject(aLong);

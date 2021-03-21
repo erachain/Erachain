@@ -29,6 +29,9 @@ public class ByteableLongAndTransaction implements Byteable<Tuple2<Long, Transac
 
     @Override
     public byte[] toBytesObject(Tuple2<Long, Transaction> value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         Long aLong = value.a;
         Transaction transaction = value.b;
         byte[] bytesLong = byteableLong.toBytesObject(aLong);

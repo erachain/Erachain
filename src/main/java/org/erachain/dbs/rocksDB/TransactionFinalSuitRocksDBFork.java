@@ -297,7 +297,7 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     }
 
     @Override
-    public IteratorCloseable<Long> getBiDirectionIterator(Long fromSeqNo, boolean descending) {
+    public IteratorCloseable<Long> getBiDirectionIterator_old(Long fromSeqNo, boolean descending) {
         return null;
     }
 

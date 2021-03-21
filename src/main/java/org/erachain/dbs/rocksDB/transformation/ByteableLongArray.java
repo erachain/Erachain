@@ -18,9 +18,8 @@ public class ByteableLongArray implements Byteable<long[]> {
 
     @Override
     public byte[] toBytesObject(long[] value) {
-        if (value == null) {
-            return new byte[0];
-        }
+        if (value == null)
+            return null; // need for Filter KEYS = null
 
         byte[] result = new byte[value.length << 3];
         for (int i = 0; i < value.length; i++) {

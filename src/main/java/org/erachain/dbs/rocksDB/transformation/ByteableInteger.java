@@ -10,6 +10,9 @@ public class ByteableInteger implements Byteable<Integer> {
 
     @Override
     public byte[] toBytesObject(Integer value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return Ints.toByteArray(value);
     }
 }

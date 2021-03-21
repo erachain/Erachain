@@ -27,6 +27,9 @@ public abstract class ByteableStack<T> implements Byteable<Stack<T>> {
 
     @Override
     public byte[] toBytesObject(Stack<T> value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         byte[] result = new byte[0];
         for (T t : value) {
             result = org.bouncycastle.util.Arrays.concatenate(result, byteableElement.toBytesObject(t));

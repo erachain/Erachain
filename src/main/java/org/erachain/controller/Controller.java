@@ -1181,12 +1181,6 @@ public class Controller extends Observable {
             }
         }
 
-        // CLOSE DATABABASE
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
-        LOGGER.info("Closing database");
-        this.dcSet.close();
-
         if (this.wallet != null) {
             // CLOSE WALLET
             this.setChanged();
@@ -1208,6 +1202,12 @@ public class Controller extends Observable {
             LOGGER.info("Closing telegram");
             this.telegramStore.close();
         }
+
+        // CLOSE DATABABASE
+        this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing database")));
+        LOGGER.info("Closing database");
+        this.dcSet.close();
 
         LOGGER.info("Closed.");
         // FORCE CLOSE

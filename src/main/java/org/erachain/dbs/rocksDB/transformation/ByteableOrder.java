@@ -18,6 +18,9 @@ public class ByteableOrder implements Byteable<Order>{
 
     @Override
     public byte[] toBytesObject(Order value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return value.toBytes();
     }
 }

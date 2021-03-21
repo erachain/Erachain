@@ -31,6 +31,9 @@ public class ByteableLongAndOrder implements Byteable<Tuple2<Long, Order>> {
 
     @Override
     public byte[] toBytesObject(Tuple2<Long, Order> value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         Long aLong = value.a;
         Order order = value.b;
         byte[] bytesLong = byteableLong.toBytesObject(aLong);

@@ -19,6 +19,9 @@ public class ByteableBlock implements Byteable<Block>{
 
     @Override
     public byte[] toBytesObject(Block value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return value.toBytes(true, true);
     }
 }

@@ -25,6 +25,9 @@ public class ByteableTuple2StringString implements Byteable<Tuple2<String, Strin
 
     @Override
     public byte[] toBytesObject(Tuple2<String, String> value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         byte[] bytesValueF0 = byteableString.toBytesObject(value.a);
         byte[] bytesValueF1 = byteableString.toBytesObject(value.b);
         return org.bouncycastle.util.Arrays.concatenate(

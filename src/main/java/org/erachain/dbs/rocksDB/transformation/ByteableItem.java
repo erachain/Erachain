@@ -32,6 +32,9 @@ public class ByteableItem implements Byteable<ItemCls> {
 
     @Override
     public byte[] toBytesObject(ItemCls value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return value.toBytes(true, false);
     }
 }

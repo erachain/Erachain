@@ -324,6 +324,12 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         return map.getDescendingIterator();
     }
 
+    @Override
+    public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
+        return map.getIterator(fromKey, descending);
+    }
+
+
     /**
      * уведомляет только счетчик если он разрешен, иначе Сбросить
      */

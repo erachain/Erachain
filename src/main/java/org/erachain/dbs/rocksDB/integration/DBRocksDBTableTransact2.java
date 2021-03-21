@@ -605,6 +605,13 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
     }
 
     @Override
+    public IteratorCloseable<K> getIndexIteratorFilter(K start, K stop, boolean descending, boolean isIndex) {
+        return new IteratorCloseableImpl(dbSource.indexIteratorFilter(descending,
+                byteableKey.toBytesObject(start),
+                byteableKey.toBytesObject(stop), isIndex), byteableKey);
+    }
+
+    @Override
     public IteratorCloseable<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending, boolean isIndex) {
         return new IteratorCloseableImpl(dbSource.indexIteratorFilter(descending, indexDB, filter, isIndex), byteableKey);
     }

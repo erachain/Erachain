@@ -12,7 +12,7 @@ public class ByteableLong implements Byteable<Long> {
     @Override
     public byte[] toBytesObject(Long value) {
         if (value == null) {
-            return new byte[0];
+            return null; // new byte[0];
         }
         return Longs.toByteArray(value);
     }

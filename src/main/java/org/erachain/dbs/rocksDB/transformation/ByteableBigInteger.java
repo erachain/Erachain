@@ -1,7 +1,6 @@
 package org.erachain.dbs.rocksDB.transformation;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 public class ByteableBigInteger implements Byteable<BigInteger>{
     @Override
@@ -11,6 +10,9 @@ public class ByteableBigInteger implements Byteable<BigInteger>{
 
     @Override
     public byte[] toBytesObject(BigInteger value) {
+        if (value == null)
+            return null; // need for Filter KEYS = null
+
         return value.toByteArray();
     }
 }

@@ -11,6 +11,8 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.items.ImageCropDialog;
+import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.*;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
@@ -20,6 +22,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 
 /**
  * @author РЎР°С€Р°
@@ -41,6 +44,8 @@ public class PersonInfo002 extends javax.swing.JPanel {
 
     private PersonHuman human;
     private PublicKeyAccount publisher;
+    ImageIcon image;
+
     // Variables declaration - do not modify
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -296,31 +301,25 @@ public class PersonInfo002 extends javax.swing.JPanel {
         //jTextArea_Description.setLineWrap(true);
 
 
-        String descript = Lang.T("Gender") + ":";
+        String descript = Lang.T("Gender") + ": <b>";
         if (person.getGender() == 0) {
-            descript = descript + Lang.T("Male");
+            descript += Lang.T("Male");
         } else if (person.getGender() == 1) {
-            descript = descript + Lang.T("Female");
+            descript += Lang.T("Female");
         }
-        long bi = person.getBirthday();
-        long de = person.getDeathday();
+        descript += "</b>, ";
         String biStr = person.getBirthdayStr();
-        if (!person.isAlive(0l)) { //NTP.getTime())) {
-            //descript =descript+"<br>"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
-            descript = descript + "<br>" + biStr + " - " + person.getDeathdayStr();
-
+        if (!person.isAlive(System.currentTimeMillis())) {
+            descript += "<b>" + biStr + " - " + person.getDeathdayStr();
         } else {
-
-            //descript = descript+"<br>" + Lang.T("Birthday") + ":" + new Date(person.getBirthday()) + "";
-            descript = descript + "<br>" + Lang.T("Birthday") + ":" + biStr;
-
+            descript += Lang.T("Birthday") + ":" + "<b>" + biStr;
         }
 
-        descript = descript + "<br>" + Lang.T("Coordinates of Birth") + ": " + ((Float) person.getBirthLatitude()).toString() + "," + ((Float) person.getBirthLongitude()).toString();
-        descript = descript + "<br>" + Lang.T("P.Height") + ": " + person.getHeight();
+        descript += "</b>, " + Lang.T("Coordinates of Birth") + ": <b>" + ((Float) person.getBirthLatitude()).toString() + "," + ((Float) person.getBirthLongitude()).toString() + "</b>, ";
+        descript += Lang.T("P.Height") + ": <b>" + person.getHeight() + "</b>";
 
         descript = descript + "<br>" + Library.to_HTML(person.getDescription());
-        jTextArea_Description.setText(descript);
+        jTextArea_Description.setText("<html>" + descript);
 
         jScrollPane1.setViewportView(jTextArea_Description);
 
@@ -440,22 +439,24 @@ public class PersonInfo002 extends javax.swing.JPanel {
         add(jPanel_Image, gridBagConstraints);
 
         // jLabel2.setText("jLabel2");
-        ImageIcon image = new ImageIcon(person.getImage());
-        int x = image.getIconWidth();
-        int y = image.getIconHeight();
+        byte[] personImageBytes = person.getImage();
+        if (personImageBytes != null && personImageBytes.length > 10) {
+            image = new ImageIcon(personImageBytes);
+            int x = image.getIconWidth();
+            int y = image.getIconHeight();
 
-        int x1 = 250;
-        double k = ((double) x / (double) x1);
-        y = (int) ((double) y / k);
+            int x1 = 250;
+            double k = ((double) x / (double) x1);
+            y = (int) ((double) y / k);
 
+            if (y != 0) {
+                jLabel2.setIcon(new ImageIcon(image.getImage().getScaledInstance(x1, y, 1)));
+            }
 
-        if (y != 0) {
-            Image Im = image.getImage().getScaledInstance(x1, y, 1);
+            jLabel2.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-            jLabel2.setIcon(new ImageIcon(Im));
+            jLabel2.addMouseListener(new imageMouseClick());
         }
-
-        jLabel2.addMouseListener(new Image_mouse_Clikl());
 
 
         // jLabel2.setBorder(javax.swing.BorderFactory.createLineBorder(new
@@ -523,43 +524,15 @@ public class PersonInfo002 extends javax.swing.JPanel {
     }
 
     // End of variables declaration
-    class Image_mouse_Clikl extends MouseAdapter {
+    class imageMouseClick extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
-            //		Point p = e.getPoint();
-            //		int row = search_Table.rowAtPoint(p);
-            if (e.getClickCount() == 2) {
-                //			row = personsTable.convertRowIndexToModel(row);
-                //			PersonCls person = tableModelPersons.getPerson(row);
-                //			new PersonFrame(person);
 
-            }
-
-            //	if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
-            if (e.getButton() == MouseEvent.BUTTON1) {
-
-		/*
-				row = search_Table.convertRowIndexToModel(row);
-				PersonCls person = search_Table_Model.getPerson(row);
-//выводим меню всплывающее
-				if(Controller.getInstance().isItemFavorite(person))
-				{
-					Search_run_menu.jButton3.setText(Lang.T("Remove Favorite"));
-				}
-				else
-				{
-					Search_run_menu.jButton3.setText(Lang.T("Add Favorite"));
-				}
-	//			alpha = 255;
-				alpha_int = 5;
-				Search_run_menu.setBackground(new Color(1,204,102,255));
-			    Search_run_menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
-			    Search_run_menu.repaint();
-		        Search_run_menu.setVisible(true);
-
-		    */
-
-            }
+            new ImageCropDialog(image) {
+                @Override
+                public void onFinish(BufferedImage image, TypeOfImage typeOfImage, boolean useOriginal) {
+                }
+            };
 
         }
     }
