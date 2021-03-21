@@ -51,7 +51,7 @@ public class RecDetailsFrame extends JPanel //JFrame
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-//		this.setIconImages(icons);
+        //this.setIconImages(icons);
 
         //CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -75,9 +75,10 @@ public class RecDetailsFrame extends JPanel //JFrame
         fieldGBC.insets = new Insets(10, 5, 5, 5);
         fieldGBC.fill = GridBagConstraints.HORIZONTAL;
         fieldGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
-        fieldGBC.weightx = 1;
         fieldGBC.gridwidth = 3;
         fieldGBC.gridx = 1;
+        fieldGBC.weightx = 0.1;
+        fieldGBC.weighty = 0.1;
 
 
         int componentLevel = 0;
