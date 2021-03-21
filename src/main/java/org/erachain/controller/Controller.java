@@ -1655,11 +1655,11 @@ public class Controller extends Observable {
                 String infoStr = versionMessage.getStrVersion();
                 try {
                     JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
-                    if (!blockChain.validageHardCheckPointPeerSign(peerIhfo.get("cps").toString())) {
+                    Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
+                    if (!blockChain.validageHardCheckPointPeerSign(peerHeight, peerIhfo.get("cps").toString())) {
                         peer.ban(30, "NOT FOUND CHECKPOINT!");
                         return;
                     }
-                    Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
                     Long peerWeight = Long.parseLong(peerIhfo.get("w").toString());
                     peer.setHWeight(new Tuple2<>(peerHeight, peerWeight));
                     peer.setVersion(peerIhfo.get("v").toString());
