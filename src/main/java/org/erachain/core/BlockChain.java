@@ -1048,7 +1048,15 @@ public class BlockChain {
         }
     }
 
-    public boolean validageHardCheckPointPeerSign(int peerHeight, String peerSignStr) {
+    public int getMyHardCheckPointHeight() {
+        if (CHECKPOINT.a > 1) {
+            return CHECKPOINT.a;
+        } else {
+            return 1;
+        }
+    }
+
+    public boolean validateHardCheckPointPeerSign(Integer peerHeight, String peerSignStr) {
 
         byte[] peerSign = Base58.decode(peerSignStr);
         if (Arrays.equals(getMyHardCheckPointSign(), peerSign))
@@ -1058,7 +1066,8 @@ public class BlockChain {
         if (dcSet.getBlockSignsMap().contains(peerSign))
             return true;
 
-        if (peerHeight > getHeight(dcSet))
+        if (peerHeight == null || // OLD version
+                peerHeight > getHeight(dcSet))
             return true;
 
         return false;

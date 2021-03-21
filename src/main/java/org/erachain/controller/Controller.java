@@ -1439,6 +1439,7 @@ public class Controller extends Observable {
 
         // CheckPointSign
         peerInfo.put("cps", Base58.encode(blockChain.getMyHardCheckPointSign()));
+        peerInfo.put("cph", blockChain.getMyHardCheckPointHeight());
 
         if (!peer.directSendMessage(
                 MessageFactory.getInstance().createVersionMessage(peerInfo.toString(), buildTimestamp))) {
@@ -1656,8 +1657,8 @@ public class Controller extends Observable {
                 try {
                     JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
                     Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
-                    if (!blockChain.validageHardCheckPointPeerSign(peerHeight, peerIhfo.get("cps").toString())) {
-                        peer.ban(10, "NOT FOUND CHECKPOINT!");
+                    if (!blockChain.validateHardCheckPointPeerSign((Integer) peerIhfo.get("cph"), peerIhfo.get("cps").toString())) {
+                        peer.ban(10, "WRONG HARD CHECKPOINT!");
                         return;
                     }
                     Long peerWeight = Long.parseLong(peerIhfo.get("w").toString());
