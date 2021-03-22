@@ -1055,7 +1055,7 @@ public class BlockChain {
         }
     }
 
-    public boolean validateHardCheckPointPeerSign(Integer peerHeight, String peerSignStr) {
+    public boolean validateHardCheckPointPeerSign(Long peerHeight, String peerSignStr) {
 
         byte[] peerSign = Base58.decode(peerSignStr);
         if (Arrays.equals(getMyHardCheckPointSign(), peerSign))

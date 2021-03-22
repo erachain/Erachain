@@ -1654,23 +1654,16 @@ public class Controller extends Observable {
 
                 // ADD TO LIST
                 String infoStr = versionMessage.getStrVersion();
-                try {
-                    JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
-                    Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
-                    if (!blockChain.validateHardCheckPointPeerSign((Integer) peerIhfo.get("cph"), peerIhfo.get("cps").toString())) {
-                        peer.ban(10, "WRONG HARD CHECKPOINT!");
-                        return;
-                    }
-                    Long peerWeight = Long.parseLong(peerIhfo.get("w").toString());
-                    peer.setHWeight(new Tuple2<>(peerHeight, peerWeight));
-                    peer.setVersion(peerIhfo.get("v").toString());
-                    try {
-                        peer.setNodeInfo((JSONObject) JSONValue.parse(peerIhfo.get("i").toString()));
-                    } catch (Exception e) {
-                    }
+                JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
+                Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
+                Long peerWeight = (Long) peerIhfo.get("w");
+                peer.setHWeight(new Tuple2<>(peerHeight, peerWeight));
+                peer.setVersion((String) peerIhfo.get("v"));
+                peer.setNodeInfo((JSONObject) peerIhfo.get("i"));
 
-                } catch (Exception e) {
-                    peer.setVersion(infoStr);
+                if (!blockChain.validateHardCheckPointPeerSign((Long) peerIhfo.get("cph"), (String) peerIhfo.get("cps"))) {
+                    peer.ban(10, "WRONG HARD CHECKPOINT!");
+                    return;
                 }
 
                 break;
