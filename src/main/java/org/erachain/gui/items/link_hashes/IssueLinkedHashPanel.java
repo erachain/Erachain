@@ -3,15 +3,20 @@ package org.erachain.gui.items.link_hashes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.blockexplorer.WebTransactionsHTML;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.ResultDialog;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.FileChooser;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.utils.Pair;
+import org.json.simple.JSONObject;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -207,18 +212,24 @@ public class IssueLinkedHashPanel extends SplitPanel {
             return;
         }
 
-        Pair<Transaction, Integer> result = Controller.getInstance().r_Hashes(creator, feePow, url, description,
+        Transaction transaction = Controller.getInstance().r_Hashes(creator, feePow, url, description,
                 String.join(" ", hashes));
 
-        // CHECK VALIDATE MESSAGE
-        if (result.getB() == Transaction.VALIDATE_OK) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Imprint issue has been sent!"),
-                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
-            // this.dispose();
-        } else {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    Lang.T("Unknown error") + "[" + result.getB() + "]!",
-                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+        WebTransactionsHTML webHTML = new WebTransactionsHTML(DCSet.getInstance(), Lang.getInstance().getLangForNode());
+        JSONObject outJson = webHTML.get_HTML_Body(transaction, "");
+        String htmlDescr = (String) outJson.get("head");
+        htmlDescr += (String) outJson.get("body");
+        htmlDescr = transaction.toJson().toJSONString();
+        htmlDescr = htmlDescr.replace(",", ",<br>");
+
+        IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
+                htmlDescr, (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), "",
+                Lang.T("Linked Imprint issue has been sent!"));
+        confirmDialog.setLocationRelativeTo(this);
+        confirmDialog.setVisible(true);
+
+        if (confirmDialog.isConfirm > 0) {
+            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
         }
 
         // ENABLE

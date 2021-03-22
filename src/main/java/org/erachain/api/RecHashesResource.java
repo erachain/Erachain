@@ -2,10 +2,8 @@ package org.erachain.api;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -103,19 +101,19 @@ public class RecHashesResource {
                 hashes = hashesStr.split(" ");
             }
 
-            Pair<Transaction, Integer> result = Controller.getInstance()
+            Transaction transaction = Controller.getInstance()
                     .r_Hashes(maker, feePow,
                             url, message, hashes);
 
-            if (result.getB() == Transaction.VALIDATE_OK) {
-                //return result.getA().toJson().toJSONString();
-                JSONObject json_result = new JSONObject();
-                String b58 = Base58.encode(result.getA().getSignature());
-                json_result.put("signature", b58);
+            int validate = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);
 
-                return json_result.toJSONString();
-            } else
-                throw ApiErrorFactory.getInstance().createError(result.getB());
+            if (validate == Transaction.VALIDATE_OK)
+                return transaction.toJson().toJSONString();
+            else {
+                JSONObject out = new JSONObject();
+                Transaction.updateMapByErrorSimple(validate, out);
+                return out.toJSONString();
+            }
 
         } catch (NullPointerException | ClassCastException e) {
             // JSON EXCEPTION

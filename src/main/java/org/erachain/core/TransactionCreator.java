@@ -753,12 +753,12 @@ public class TransactionCreator {
         return record;
     }
 
-    public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount creator, int feePow,
-                                               String urlStr, String dataStr, String[] hashes58) {
+    public Transaction r_Hashes(PrivateKeyAccount creator, int feePow,
+                                String urlStr, String dataStr, String[] hashes58) {
 
         this.checkUpdate();
 
-        Transaction messageTx;
+        Transaction transaction;
 
         long timestamp = NTP.getTime();
 
@@ -771,15 +771,15 @@ public class TransactionCreator {
         }
 
         //CREATE MESSAGE TRANSACTION
-        messageTx = new RHashes(creator, (byte) feePow, url, data, hashes, timestamp, 0l);
-        messageTx.sign(creator, Transaction.FOR_NETWORK);
-        messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
+        transaction = new RHashes(creator, (byte) feePow, url, data, hashes, timestamp, 0l);
+        transaction.sign(creator, Transaction.FOR_NETWORK);
+        transaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
-        return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, Transaction.FOR_NETWORK, false, false));
+        return transaction;
     }
 
-    public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount creator, int feePow,
-                                               String urlStr, String dataStr, String hashesStr) {
+    public Transaction r_Hashes(PrivateKeyAccount creator, int feePow,
+                                String urlStr, String dataStr, String hashesStr) {
 
         String[] hashes58;
         if (hashesStr.length() > 0) {
@@ -828,19 +828,19 @@ public class TransactionCreator {
 
         this.checkUpdate();
 
-        Transaction record;
+        Transaction transaction;
 
         long timestamp = NTP.getTime();
 
         //CREATE SERTIFY PERSON TRANSACTION
         //int version = 5; // without user sign
-        record = new RSetStatusToItem(creator, (byte) feePow, key, item.getItemType(), item.getKey(),
+        transaction = new RSetStatusToItem(creator, (byte) feePow, key, item.getItemType(), item.getKey(),
                 beg_date, end_date, value_1, value_2, data_1, data_2, refParent, descr,
                 timestamp, 0l);
-        record.sign(creator, Transaction.FOR_NETWORK);
-        record.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
+        transaction.sign(creator, Transaction.FOR_NETWORK);
+        transaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
-        return record;
+        return transaction;
     }
 
 	/*
