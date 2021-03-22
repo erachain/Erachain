@@ -1047,6 +1047,7 @@ public class BlockChain {
             return genesisBlock.getSignature();
         }
     }
+
     public int getMyHardCheckPointHeight() {
         if (CHECKPOINT.a > 1) {
             return CHECKPOINT.a;
@@ -1055,6 +1056,11 @@ public class BlockChain {
         }
     }
 
+    /**
+     * @param peerHeight  Long чтобы преобразования JSON не делать лоя Нуля
+     * @param peerSignStr
+     * @return
+     */
     public boolean validateHardCheckPointPeerSign(Long peerHeight, String peerSignStr) {
 
         byte[] peerSign = Base58.decode(peerSignStr);
