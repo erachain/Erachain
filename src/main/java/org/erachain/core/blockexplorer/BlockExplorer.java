@@ -118,18 +118,18 @@ public class BlockExplorer {
      * @param langObj
      * @param expArgs
      */
-    public void makeLinerPage(Class type, long start, Map output, JSONObject langObj, Object[] expArgs) {
+    public void makeLinerIntPage(Class type, Integer start, Map output, JSONObject langObj, Object[] expArgs) {
 
         DBTab map = dcSet.getMap(type);
         ExplorerJsonLine element;
         int size = map.size();
 
-        if (start < 1 || start > size && size > 0) {
+        if (start == null || start < 1 || start > size && size > 0) {
             start = size;
         }
         output.put("start", start);
 
-        long key = start;
+        int key = start;
         JSONArray array = new JSONArray();
 
         while (key > start - pageSize && key > 0) {
@@ -226,10 +226,10 @@ public class BlockExplorer {
      * @param expArgs
      * @return
      */
-    public Map jsonQueryLinearPages(Class type, long start, Object[] expArgs) {
+    public Map jsonQueryLinearIntPages(Class type, Integer start, Object[] expArgs) {
         Map result = new LinkedHashMap();
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
-        makeLinerPage(type, start, result, langObj, expArgs);
+        makeLinerIntPage(type, start, result, langObj, expArgs);
         return result;
     }
 
@@ -518,7 +518,8 @@ public class BlockExplorer {
             ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
             output.put("type", "blocks");
-            output.putAll(jsonQueryIteratorPages(Block.BlockHead.class, offset, offset, null));
+            output.putAll(jsonQueryLinearIntPages(Block.BlockHead.class,
+                    checkAndGetLongParam(info, 0L, "start").intValue(), null));
         } else if (info.getQueryParameters().containsKey("block")) {
             jsonQueryBlock(info.getQueryParameters().getFirst("block"), offset);
         }
