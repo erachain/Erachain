@@ -270,7 +270,7 @@ public class BlockExplorer {
                 String fromWord = null; // TODO нужно задавать иначе не найдет
                 keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search,
                         Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
-                        offset, pageSize, true);
+                        offset, 5, true);
             }
         } catch (Exception e) {
             logger.error("Wrong search while process assets... ", e.getMessage());

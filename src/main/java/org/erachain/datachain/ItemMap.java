@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang3.ArrayUtils;
 import org.erachain.controller.Controller;
@@ -13,6 +14,7 @@ import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 import org.slf4j.Logger;
@@ -245,7 +247,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     }
 
 
-    public Pair<Integer, HashSet<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
+    public Pair<Integer, IteratorCloseable<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray, boolean descending) {
 
         Iterable keys;
 
@@ -261,10 +263,16 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                     stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
                 }
 
-                // поиск диаппазона
-                keys = Fun.filter(this.nameKey,
-                        stepFilter, true,
-                        stepFilter + new String(new byte[]{(byte) 254}), true);
+                // поиск диапазона
+                if (descending) {
+                    keys = Fun.filter(this.nameKey.descendingSet(),
+                            stepFilter + new String(new byte[]{(byte) 255}), true,
+                            stepFilter, true);
+                } else {
+                    keys = Fun.filter(this.nameKey,
+                            stepFilter, true,
+                            stepFilter + new String(new byte[]{(byte) 255}), true);
+                }
             }
 
         } else {
@@ -276,45 +284,38 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                 stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
             }
 
-            keys = Fun.filter(this.nameKey, stepFilter);
+            if (descending) {
+                keys = Fun.filter(this.nameKey.descendingSet(), stepFilter);
+            } else {
+                keys = Fun.filter(this.nameKey, stepFilter);
+            }
         }
 
-        if (step > 0) {
+        // в рекурсии все хорошо - соберем ключи
+        IteratorCloseable iterator = IteratorCloseableImpl.make(keys.iterator());
+        if (iterator.hasNext()) {
 
-            // погнали в РЕКУРСИЮ
-            Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
+            if (step > 0) {
 
-            if (result.getA() > 0) {
-                return result;
-            }
+                // погнали в РЕКУРСИЮ
+                Pair<Integer, IteratorCloseable<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray, descending);
 
-            // в рекурсии все хорошо - соберем ключи
-            Iterator iterator = keys.iterator();
-            HashSet<Long> hashSet = result.getB();
-            HashSet<Long> andHashSet = new HashSet<Long>();
-
-            // берем только совпадающие в обоих списках
-            while (iterator.hasNext()) {
-                Long key = (Long) iterator.next();
-                if (hashSet.contains(key)) {
-                    andHashSet.add(key);
+                if (result.getA() > 0) {
+                    // в рекурсии где-то одно слово вообще не найдено - просто выход
+                    return result;
                 }
+
+                return new Pair<>(0, new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR));
+
+            } else {
+
+                // последний шаг - просто возьмем этот
+                return new Pair<Integer, IteratorCloseable<Long>>(0, iterator);
+
             }
-
-            return new Pair<>(0, andHashSet);
-
         } else {
-
-            // последний шаг - просто все добавим
-            Iterator iterator = keys.iterator();
-            HashSet<Long> hashSet = new HashSet<>();
-            while (iterator.hasNext()) {
-                Long key = (Long) iterator.next();
-                hashSet.add(key);
-            }
-
-            return new Pair<Integer, HashSet<Long>>(0, hashSet);
-
+            // нет вообще значений!
+            return new Pair<Integer, IteratorCloseable<Long>>(step + 1, null);
         }
 
     }
@@ -328,15 +329,16 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
      * @param filter
      * @param offset
      * @param limit
+     * @param descending
      * @return
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
+    public Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit, boolean descending) {
 
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(Transaction.SPLIT_CHARS);
 
-        Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
+        Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray, descending);
         if (result.getA() > 0) {
             return new Pair<>("Error: filter key at " + (result.getA() - 1000) + "pos has length < 5", null);
         }
@@ -365,7 +367,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
             return new ArrayList<>();
         }
 
-        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit, descending);
         if (resultKeys.getA() != null) {
             return new ArrayList<>();
         }
@@ -392,7 +394,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
             return new ArrayList<>();
         }
 
-        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit, descending);
         if (resultKeys.getA() != null) {
             return new ArrayList<>();
         }
