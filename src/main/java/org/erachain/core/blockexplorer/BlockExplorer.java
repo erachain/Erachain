@@ -268,7 +268,7 @@ public class BlockExplorer {
             } else {
                 //Поиск элементов по имени
                 String fromWord = null; // TODO нужно задавать иначе не найдет
-                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search, fromWord,
+                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search,
                         Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
                         offset, pageSize, true);
             }

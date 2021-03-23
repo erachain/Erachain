@@ -684,7 +684,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getKeysByFilterAsArray(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean descending) {
+    public List<Transaction> getKeysByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
