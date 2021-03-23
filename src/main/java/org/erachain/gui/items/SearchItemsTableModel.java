@@ -46,9 +46,20 @@ public abstract class SearchItemsTableModel extends WalletItemTableModel<ItemCls
     }
 
     public void findByName(String filter) {
-        Pair<String, Iterable> result = ((ItemMap) map).getKeysIteratorByFilterAsArray(filter, 0, 1000, descending);
-        Iterator iterator = result.getB().iterator();
-        fill(iterator);
+
+        IteratorCloseable iterator = null;
+        try {
+            Pair<String, IteratorCloseable<Long>> result = ((ItemMap) map).getKeysIteratorByFilterAsArray(filter, 0, descending);
+            iterator = result.getB();
+            fill(iterator);
+        } finally {
+            if (iterator != null) {
+                try {
+                    iterator.close();
+                } catch (IOException e) {
+                }
+            }
+        }
     }
 
     public void getLast() {

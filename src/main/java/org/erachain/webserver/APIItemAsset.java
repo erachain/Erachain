@@ -50,7 +50,7 @@ public class APIItemAsset {
         help.put("GET apiasset/last", "Get last ID");
         help.put("GET apiasset/{key}", "Get by ID");
         help.put("GET apiasset/raw/{key}", "Returns RAW in Base58 of asset with the given key.");
-        help.put("GET apiasset/find/{filter_name_string}", "Get by words in Name. Use patterns from 5 chars in words");
+        help.put("GET apiasset/find/{filter_name_string}?offset=0&limit=0", "Get by words in Name. Use patterns from 5 chars in words");
         help.put("Get apiasset/image/{key}", "Get Asset Image");
         help.put("Get apiasset/icon/{key}", "Get Asset Icon");
         help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
@@ -146,7 +146,13 @@ public class APIItemAsset {
 
     @GET
     @Path("find/{filter_name_string}")
-    public static Response find(@PathParam("filter_name_string") String filter) {
+    public static Response find(@PathParam("filter_name_string") String filter,
+                                @QueryParam("offset") int offset,
+                                @QueryParam("limit") int limit) {
+
+        if (limit > 100) {
+            limit = 100;
+        }
 
         if (filter == null || filter.isEmpty()) {
             return Response.status(501)
@@ -157,7 +163,7 @@ public class APIItemAsset {
         }
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
+        List<ItemCls> list = map.getByFilterAsArray(filter, offset, limit, true);
 
         JSONArray array = new JSONArray();
 

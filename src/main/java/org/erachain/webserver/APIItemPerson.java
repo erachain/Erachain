@@ -42,7 +42,7 @@ public class APIItemPerson {
         help.put("GET apiperson/last", "Get last ID");
         help.put("GET apiperson/{key}", "GET by ID");
         help.put("GET apiperson/raw/{key}", "Returns RAW in Base58 of person with the given key.");
-        help.put("GET apiperson/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
+        help.put("GET apiperson/find/{filter_name_string}?offset=0&limit=0", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apiperson/image/{key}", "GET Person Image");
         help.put("Get apiperson/icon/{key}", "GET Person Icon");
         help.put("Get apiperson/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
@@ -205,7 +205,13 @@ public class APIItemPerson {
 
     @GET
     @Path("find/{filter_name_string}")
-    public Response find(@PathParam("filter_name_string") String filter) {
+    public Response find(@PathParam("filter_name_string") String filter,
+                         @QueryParam("offset") int offset,
+                         @QueryParam("limit") int limit) {
+
+        if (limit > 100) {
+            limit = 100;
+        }
 
         if (filter == null || filter.isEmpty()) {
             return Response.status(501)
@@ -216,7 +222,7 @@ public class APIItemPerson {
         }
 
         ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
+        List<ItemCls> list = map.getByFilterAsArray(filter, offset, limit, true);
 
         JSONArray array = new JSONArray();
 

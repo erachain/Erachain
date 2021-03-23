@@ -137,7 +137,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
         list = new ArrayList<>();
         PairMapImpl pairsMap = Controller.getInstance().dlSet.getPairMap();
 
-        List<ItemCls> foundAssets = ((ItemMap) map).getByFilterAsArray(filter_Name, 0, 1000);
+        List<ItemCls> foundAssets = ((ItemMap) map).getByFilterAsArray(filter_Name, 0, 1000, descending);
         for (ItemCls asset : foundAssets) {
             list.add(new Fun.Tuple2<>((AssetCls) asset, PairsController.reCalcAndUpdate((AssetCls) asset, assetPair,
                     pairsMap, 30)));

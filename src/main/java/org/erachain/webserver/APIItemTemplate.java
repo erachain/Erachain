@@ -41,7 +41,7 @@ public class APIItemTemplate {
         help.put("GET apitemplate/last", "Get last ID");
         help.put("GET apitemplate/{key}", "GET by ID");
         help.put("GET apitemplate/raw/{key}", "Returns RAW in Base58 of template with the given key.");
-        help.put("GET apitemplate/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
+        help.put("GET apitemplate/find/{filter_name_string}?offset=0&limit=0", "GET by words in Name. Use patterns from 5 chars in words");
         help.put("Get apitemplate/image/{key}", "GET Template Image");
         help.put("Get apitemplate/icon/{key}", "GET Template Icon");
         help.put("Get apitemplate/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
@@ -110,7 +110,13 @@ public class APIItemTemplate {
 
     @GET
     @Path("find/{filter_name_string}")
-    public Response find(@PathParam("filter_name_string") String filter) {
+    public Response find(@PathParam("filter_name_string") String filter,
+                         @QueryParam("offset") int offset,
+                         @QueryParam("limit") int limit) {
+
+        if (limit > 100) {
+            limit = 100;
+        }
 
         if (filter == null || filter.isEmpty()) {
             return Response.status(501)
@@ -121,7 +127,7 @@ public class APIItemTemplate {
         }
 
         ItemTemplateMap map = DCSet.getInstance().getItemTemplateMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
+        List<ItemCls> list = map.getByFilterAsArray(filter, offset, limit, true);
 
         JSONArray array = new JSONArray();
 

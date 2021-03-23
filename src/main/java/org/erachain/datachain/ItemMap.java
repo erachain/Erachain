@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import org.apache.commons.lang3.ArrayUtils;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -20,6 +20,7 @@ import org.mapdb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -299,7 +300,6 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
                 // погнали в РЕКУРСИЮ
                 Pair<Integer, IteratorCloseable<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray, descending);
-
                 if (result.getA() > 0) {
                     // в рекурсии где-то одно слово вообще не найдено - просто выход
                     return result;
@@ -315,7 +315,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
             }
         } else {
             // нет вообще значений!
-            return new Pair<Integer, IteratorCloseable<Long>>(step + 1, null);
+            return new Pair<>(step + 1, null);
         }
 
     }
@@ -328,34 +328,32 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
      *
      * @param filter
      * @param offset
-     * @param limit
      * @param descending
      * @return
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit, boolean descending) {
+    public Pair<String, IteratorCloseable<Long>> getKeysIteratorByFilterAsArray(String filter, int offset, boolean descending) {
 
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(Transaction.SPLIT_CHARS);
 
-        Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray, descending);
+        Pair<Integer, IteratorCloseable<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray, descending);
         if (result.getA() > 0) {
-            return new Pair<>("Error: filter key at " + (result.getA() - 1000) + "pos has length < 5", null);
+            try {
+                // нужно закрыть то что уже нашлось
+                result.getB().close();
+            } catch (IOException e) {
+            }
+            return new Pair<>("Error: filter key at " + result.getA() + " pos has length < 5",
+                    null);
         }
 
-        HashSet<Long> hashSet = result.getB();
-
-        Iterable iterable;
+        IteratorCloseable<Long> iterator = result.getB();
 
         if (offset > 0)
-            iterable = Iterables.skip(hashSet, offset);
-        else
-            iterable = hashSet;
+            Iterators.advance(iterator, offset);
 
-        if (limit > 0)
-            iterable = Iterables.limit(iterable, limit);
-
-        return new Pair<>(null, iterable);
+        return new Pair<>(null, iterator);
 
     }
 
@@ -367,20 +365,35 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
             return new ArrayList<>();
         }
 
-        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit, descending);
-        if (resultKeys.getA() != null) {
-            return new ArrayList<>();
-        }
-
+        IteratorCloseable<Long> iterator = null;
+        Pair<String, IteratorCloseable<Long>> resultKeys;
         List<Long> result = new ArrayList<>();
+        try {
+            resultKeys = getKeysIteratorByFilterAsArray(filter, offset, descending);
+            if (resultKeys.getA() != null) {
+                return result;
+            }
 
-        Iterator<Long> iterator = resultKeys.getB().iterator();
+            iterator = resultKeys.getB();
 
-        while (iterator.hasNext()) {
-            Long key = iterator.next();
-            ItemCls item = get(key);
-            if (item != null)
-                result.add(key);
+            int count = 0;
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                ItemCls item = get(key);
+                if (item != null) {
+                    result.add(key);
+                    count++;
+                }
+                if (limit > 0 && count >= limit)
+                    break;
+            }
+        } finally {
+            if (iterator != null) {
+                try {
+                    iterator.close();
+                } catch (IOException e) {
+                }
+            }
         }
 
         return result;
@@ -388,24 +401,41 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<ItemCls> getByFilterAsArray(String filter, int offset, int limit) {
+    public List<ItemCls> getByFilterAsArray(String filter, int offset, int limit, boolean descending) {
 
         if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();
         }
 
-        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit, descending);
-        if (resultKeys.getA() != null) {
-            return new ArrayList<>();
-        }
 
+        IteratorCloseable<Long> iterator = null;
+        Pair<String, IteratorCloseable<Long>> resultKeys;
         List<ItemCls> result = new ArrayList<>();
+        try {
 
-        Iterator<Long> iterator = resultKeys.getB().iterator();
+            resultKeys = getKeysIteratorByFilterAsArray(filter, offset, descending);
+            if (resultKeys.getA() != null) {
+                return new ArrayList<>();
+            }
 
-        while (iterator.hasNext()) {
-            ItemCls item = get(iterator.next());
-            result.add(item);
+            iterator = resultKeys.getB();
+
+            int count = 0;
+            while (iterator.hasNext()) {
+                ItemCls item = get(iterator.next());
+                result.add(item);
+
+                if (limit > 0 && ++count >= limit)
+                    break;
+
+            }
+        } finally {
+            if (iterator != null) {
+                try {
+                    iterator.close();
+                } catch (IOException e) {
+                }
+            }
         }
 
         return result;

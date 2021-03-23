@@ -124,7 +124,7 @@ public class API {
         help.put("GET Asset Icon", "asseticon/{key}");
 
         help.put("*** ASSETS ***", "");
-        help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}");
+        help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}?offset=0&limit=0");
 
         help.put("*** EXCHANGE ***", "");
         help.put("GET Exchange Orders", "exchangeorders/{have}/{want}");
@@ -143,7 +143,7 @@ public class API {
         help.put("Get Person Image", "personimage/{key}");
 
         help.put("*** PERSONS ***", "");
-        help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}");
+        help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}?offset=0&limit=0");
 
         help.put("*** TOOLS ***", "");
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
@@ -1315,9 +1315,11 @@ public class API {
 
     @GET
     @Path("assetsfilter/{filter_name_string}")
-    public Response assetsFilter(@PathParam("filter_name_string") String filter) {
+    public Response assetsFilter(@PathParam("filter_name_string") String filter,
+                                 @QueryParam("offset") int offset,
+                                 @QueryParam("limit") int limit) {
 
-        return APIItemAsset.find(filter);
+        return APIItemAsset.find(filter, offset, limit);
 
     }
 
@@ -1846,7 +1848,13 @@ public class API {
 
     @GET
     @Path("personsfilter/{filter_name_string}")
-    public Response personsFilter(@PathParam("filter_name_string") String filter) {
+    public Response personsFilter(@PathParam("filter_name_string") String filter,
+                                  @QueryParam("offset") int offset,
+                                  @QueryParam("limit") int limit) {
+
+        if (limit > 100) {
+            limit = 100;
+        }
 
         if (filter == null || filter.length() < 3) {
             return Response.status(501)
@@ -1858,7 +1866,7 @@ public class API {
 
         ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
         // DOES ASSETID EXIST
-        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
+        List<ItemCls> list = map.getByFilterAsArray(filter, offset, limit, true);
 
         JSONArray array = new JSONArray();
 
