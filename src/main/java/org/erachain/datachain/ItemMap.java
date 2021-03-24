@@ -1,6 +1,5 @@
 package org.erachain.datachain;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import org.apache.commons.lang3.ArrayUtils;
 import org.erachain.controller.Controller;
@@ -249,7 +248,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     }
 
 
-    public Pair<Integer, IteratorCloseable<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray, boolean descending) {
+    public Pair<Integer, List<IteratorCloseableImpl<Long>>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray, boolean descending) {
 
         Iterable keys;
 
@@ -294,25 +293,27 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         }
 
         // в рекурсии все хорошо - соберем ключи
-        IteratorCloseable iterator = IteratorCloseableImpl.make(keys.iterator());
+        IteratorCloseableImpl iterator = IteratorCloseableImpl.make(keys.iterator());
         if (iterator.hasNext()) {
 
             if (step > 0) {
 
                 // погнали в РЕКУРСИЮ
-                Pair<Integer, IteratorCloseable<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray, descending);
+                Pair<Integer, List<IteratorCloseableImpl<Long>>> result = getKeysByFilterAsArrayRecurse(--step, filterArray, descending);
                 if (result.getA() > 0) {
                     // в рекурсии где-то одно слово вообще не найдено - просто выход
                     return result;
                 }
 
-                return new Pair<>(0, new MergeAND_Iterators((Iterable) ImmutableList.of(iterator, result.getB()),
-                        Fun.COMPARATOR, descending));
+                result.getB().add(iterator);
+                return new Pair<>(0, result.getB());
 
             } else {
 
                 // последний шаг - просто возьмем этот
-                return new Pair<Integer, IteratorCloseable<Long>>(0, iterator);
+                List<IteratorCloseable<Long>> result = new ArrayList<>();
+                result.add(iterator);
+                return new Pair(0, result);
 
             }
         } else {
@@ -339,19 +340,22 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(Transaction.SPLIT_CHARS);
 
-        Pair<Integer, IteratorCloseable<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray, descending);
+        Pair<Integer, List<IteratorCloseableImpl<Long>>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray, descending);
         if (result.getA() > 0) {
             try {
                 // нужно закрыть то что уже нашлось
-                if (result.getB() != null)
-                    result.getB().close();
+                if (result.getB() != null) {
+                    for (IteratorCloseable iterator : result.getB()) {
+                        iterator.close();
+                    }
+                }
             } catch (IOException e) {
             }
             return new Pair<>("Error: filter key at " + result.getA() + " pos has length < 5",
                     null);
         }
 
-        IteratorCloseable<Long> iterator = result.getB();
+        IteratorCloseable<Long> iterator = MergeAND_Iterators.make(result.getB(), Fun.COMPARATOR, descending);
 
         if (offset > 0)
             Iterators.advance(iterator, offset);

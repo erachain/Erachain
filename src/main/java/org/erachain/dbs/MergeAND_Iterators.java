@@ -46,6 +46,14 @@ public class MergeAND_Iterators<T> extends IteratorCloseableImpl<T> {
 
     }
 
+    public static <T> IteratorCloseableImpl<T> make(List<IteratorCloseableImpl<T>> iterators,
+                                                    final Comparator<T> itemComparator, boolean descending) {
+        if (iterators.size() > 1) {
+            return new MergeAND_Iterators(iterators, itemComparator, descending);
+        }
+        return iterators.get(0);
+    }
+
     @Override
     public boolean hasNext() {
 
@@ -71,7 +79,7 @@ public class MergeAND_Iterators<T> extends IteratorCloseableImpl<T> {
                     roundtKey = currentKey;
                 } else {
                     int compare = itemComparator.compare(currentKey, roundtKey);
-                    while (compare > 0 ^ descending) {
+                    while (compare < 0 ^ descending) {
                         nextIter.next();
                         currentKey = nextIter.peek();
                         compare = itemComparator.compare(currentKey, roundtKey);
@@ -96,7 +104,7 @@ public class MergeAND_Iterators<T> extends IteratorCloseableImpl<T> {
     @Override
     public T next() {
         // любой из итераторов годится
-        return iterators.get(1).next();
+        return iterators.get(0).next();
     }
 
     @Deprecated
