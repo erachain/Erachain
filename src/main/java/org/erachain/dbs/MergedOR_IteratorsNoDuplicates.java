@@ -12,7 +12,7 @@ import java.util.*;
  * @param <T>
  */
 @Slf4j
-public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
+public class MergedOR_IteratorsNoDuplicates<T> extends IteratorCloseableImpl<T> {
 
     final Queue<PeekingIteratorCloseable<T>> queue;
     protected T lastNext;
@@ -26,8 +26,8 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
      * @param iterators
      * @param itemComparator
      */
-    public MergedIteratorNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
-                                      final Comparator<? super T> itemComparator) {
+    public MergedOR_IteratorsNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
+                                          final Comparator<? super T> itemComparator) {
         // A comparator that's used by the heap, allowing the heap
         // to be sorted based on the top of each iterator.
         Comparator<PeekingIteratorCloseable<T>> heapComparator =

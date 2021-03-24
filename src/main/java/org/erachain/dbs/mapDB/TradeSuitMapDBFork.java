@@ -10,7 +10,7 @@ import org.erachain.datachain.TradeMapImpl;
 import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorParent;
-import org.erachain.dbs.MergedIteratorNoDuplicates;
+import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.mapdb.BTreeMap;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -57,7 +57,7 @@ public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade>
                 Fun.t2(orderID, Long.MAX_VALUE)).keySet().iterator();
 
         // создаем с учетом удаленных
-        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted), iteratorForked), Fun.TUPLE2_COMPARATOR);
 
     }

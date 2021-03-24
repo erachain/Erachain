@@ -101,7 +101,7 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
         for (Long key : keys) {
             Order order = get(key);
             // здесь дубли сами собой схлопнутся но если брать итератор, то нажо использовать
-            // в будущем new MergedIteratorNoDuplicates
+            // в будущем new MergedOR_IteratorsNoDuplicates
             result.put(key, order);
             // сдесь хотя бы одну заявку с неподходящей вроде бы ценой нужно взять
             // причем берем по Остаткам Цену теперь

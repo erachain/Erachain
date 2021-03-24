@@ -149,7 +149,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
                 // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
                 // но тут поидее не должно быть дублей по определению
-                /// тут нет дублей в любом случае iterator = new MergedIteratorNoDuplicates(ImmutableList.of(iterator, ((TradeSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
+                /// тут нет дублей в любом случае iterator = new MergedOR_IteratorsNoDuplicates(ImmutableList.of(iterator, ((TradeSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
                 /// поэтому берем Гуглевский вариант
                 Iterator<Tuple2<Long, Long>> iteratorMerged = Iterators.mergeSorted(ImmutableList.of(iteratorHave, iteratorWant), Fun.COMPARATOR);
 

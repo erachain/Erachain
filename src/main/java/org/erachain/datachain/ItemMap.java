@@ -14,7 +14,7 @@ import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
-import org.erachain.dbs.MergeAndIteratorNoDuplicates;
+import org.erachain.dbs.MergeAND_Iterators;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 import org.slf4j.Logger;
@@ -306,7 +306,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                     return result;
                 }
 
-                return new Pair<>(0, new MergeAndIteratorNoDuplicates((Iterable) ImmutableList.of(iterator, result.getB()),
+                return new Pair<>(0, new MergeAND_Iterators((Iterable) ImmutableList.of(iterator, result.getB()),
                         Fun.COMPARATOR, descending));
 
             } else {

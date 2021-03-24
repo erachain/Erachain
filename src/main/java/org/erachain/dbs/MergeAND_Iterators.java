@@ -15,14 +15,14 @@ import java.util.List;
  * @param <T>
  */
 @Slf4j
-public class MergeAndIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
+public class MergeAND_Iterators<T> extends IteratorCloseableImpl<T> {
 
     boolean descending;
     List<PeekingIteratorCloseable<T>> iterators;
     final Comparator<? super T> itemComparator;
 
-    public MergeAndIteratorNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
-                                        final Comparator<? super T> itemComparator, boolean descending) {
+    public MergeAND_Iterators(Iterable<? extends IteratorCloseable<? extends T>> iterators,
+                              final Comparator<? super T> itemComparator, boolean descending) {
 
         this.descending = descending;
 
