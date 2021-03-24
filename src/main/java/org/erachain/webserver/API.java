@@ -74,7 +74,7 @@ public class API {
         help.put("see /apitelegrams", "Help for telegrams API");
         help.put("see /apiexchange", "Help for exchange API");
         help.put("see /api/tx", "Help for transactions API");
-        //help.put("see /apirecords", "Help for transactions API");
+        //help.put("see /apirecords", "Help for transactions API"); // @Deprecated
         help.put("see /apidocuments", "Help for documents API");
 
         help.put("*** BALANCE SYSTEM ***", "");
@@ -116,15 +116,15 @@ public class API {
         help.put("GET Address Public Key", "addresspublickey/{address}");
         help.put("GET Address Forging Info", "addressforge/{address}");
 
-        help.put("*** ASSET ***", "");
-        help.put("GET Asset Height", "assetheight");
-        help.put("GET Asset", "asset/{key}");
-        help.put("GET Asset Data", "assetdata/{key}");
-        help.put("GET Asset Image", "assetimage/{key}");
-        help.put("GET Asset Icon", "asseticon/{key}");
+        //  deprecated help.put("*** ASSET ***", "");
+        //help.put("GET Asset Height", "assetheight");
+        //help.put("GET Asset", "asset/{key}");
+        //help.put("GET Asset Data", "assetdata/{key}");
+        //help.put("GET Asset Image", "assetimage/{key}");
+        //help.put("GET Asset Icon", "asseticon/{key}");
 
-        help.put("*** ASSETS ***", "");
-        help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}?offset=0&limit=0");
+        //  deprecated help.put("*** ASSETS ***", "");
+        // deprecated help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}?offset=0&limit=0");
 
         help.put("*** EXCHANGE ***", "");
         help.put("GET Exchange Orders", "exchangeorders/{have}/{want}");
@@ -1313,15 +1313,19 @@ public class API {
      * ************* ASSETS **************
      */
 
+    @Deprecated
     @GET
     @Path("assetsfilter/{filter_name_string}")
     public Response assetsFilter(@PathParam("filter_name_string") String filter,
+                                 @QueryParam("from") Long fromID,
                                  @QueryParam("offset") int offset,
                                  @QueryParam("limit") int limit) {
 
-        return APIItemAsset.find(filter, offset, limit);
+        return APIItemAsset.find(filter, fromID, offset, limit);
 
     }
+
+    @GET
 
     /*
      * ************* EXCHANGE **************

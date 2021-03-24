@@ -40,7 +40,7 @@ public class APIItemStatus {
         help.put("GET apistatus/last", "Get last ID");
         help.put("GET apistatus/{key}", "GET by ID");
         help.put("GET apistatus/raw/{key}", "Returns RAW in Base58 of status with the given key.");
-        help.put("GET apistatus/find/{filter_name_string}?offset=0&limit=0", "GET by words in Name. Use patterns from 5 chars in words");
+        help.put("GET apistatus/find?filter={name_string}&offset=0&limit=0", "Get by words in Name. Use patterns from 5 chars in words");
         help.put("Get apistatus/image/{key}", "GET Status Image");
         help.put("Get apistatus/icon/{key}", "GET Status Icon");
         help.put("Get apistatus/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
@@ -107,12 +107,23 @@ public class APIItemStatus {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("find/{filter_name_string}")
-    public Response find(@PathParam("filter_name_string") String filter,
-                         @QueryParam("from") Long fromID,
-                         @QueryParam("offset") int offset,
-                         @QueryParam("limit") int limit) {
+    public static Response findOld(@PathParam("filter_name_string") String filter,
+                                   @QueryParam("from") Long fromID,
+                                   @QueryParam("offset") int offset,
+                                   @QueryParam("limit") int limit) {
+
+        return find(filter, fromID, offset, limit);
+    }
+
+    @GET
+    @Path("find")
+    public static Response find(@QueryParam("filter") String filter,
+                                @QueryParam("from") Long fromID,
+                                @QueryParam("offset") int offset,
+                                @QueryParam("limit") int limit) {
 
         if (limit > 100) {
             limit = 100;

@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
 
+@Deprecated
 @Path("apirecords")
 @Produces(MediaType.APPLICATION_JSON)
 public class APITransactionsResource {
@@ -70,6 +71,7 @@ public class APITransactionsResource {
                 Lang.T("Search Records by Query. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
 
         help.put("apirecords/rawTransactionsByBlock/{height}?param", "Get raw transaction(encoding Base58). By default param is 3(for network)");
+
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(StrJSonFine.convert(help)).build();
