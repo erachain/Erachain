@@ -113,7 +113,6 @@ public class AssetPairSelect extends JDialog {
         pair_Panel.searchToolBar_LeftPanel.setVisible(true);
         pair_Panel.toolBarLeftPanel.add(new JLabel(Lang.T("Find Key") + ":"));
         key_Item = new MDecimalFormatedTextField();
-        key_Item.setMaskType(MDecimalFormatedTextField.MASK_LONG);
         key_Item.setToolTipText("");
         key_Item.setAlignmentX(1.0F);
         key_Item.setMinimumSize(new java.awt.Dimension(100, 20));

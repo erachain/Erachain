@@ -36,7 +36,6 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
         searchToolBar_LeftPanel.setVisible(true);
         searchToolBar_LeftPanel.add(new JLabel(Lang.T("Find Key") + ":"));
         key_Item = new MDecimalFormatedTextField();
-        key_Item.setMaskType(MDecimalFormatedTextField.MASK_LONG);
         key_Item.setToolTipText("");
         key_Item.setAlignmentX(1.0F);
         key_Item.setText("");

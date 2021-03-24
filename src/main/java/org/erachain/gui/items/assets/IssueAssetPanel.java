@@ -48,7 +48,6 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         initComponents();
 
-        textQuantity.setMaskType(MDecimalFormatedTextField.MASK_LONG);
         textQuantity.setText("0");
 
         // select combobox Asset type
