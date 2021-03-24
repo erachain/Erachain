@@ -17,7 +17,7 @@ import java.util.Observable;
 public abstract class SearchItemsTableModel extends WalletItemTableModel<ItemCls> {
 
     public SearchItemsTableModel(DBTabImpl itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
-        super(itemsMap, columnNames, column_AutoHeight, favorite, false);
+        super(itemsMap, columnNames, column_AutoHeight, favorite, true);
     }
 
 

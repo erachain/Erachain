@@ -248,7 +248,7 @@ public class BlockExplorer {
                 String fromWord = null; // TODO нужно задавать иначе не найдет
                 items = ((FilteredByStringArray) map).getByFilterAsArray(search,
                         Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
-                        offset, 5, true);
+                        offset, pageSize, true);
             }
         } catch (Exception e) {
             logger.error("Wrong search while process assets... ", e.getMessage());
