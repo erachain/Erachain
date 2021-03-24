@@ -32,43 +32,46 @@ public class MergeAndIteratorNoDuplicates<T> extends MergedIteratorNoDuplicates<
             return !queue.isEmpty();
         }
 
-        T firstKey = null;
+        T startKey;
+        T roundtKey = null;
+        T currentKey;
 
         do {
 
-            lastNext = null;
+            startKey = roundtKey;
 
             // перебор по каждому итератору
             for (PeekingIteratorCloseable<T> nextIter : queue) {
 
-                if (nextIter.hasNext()) {
-
-                    if (lastNext == null) {
-                        // первое значение - примем сразу
-                        firstKey = lastNext = nextIter.peek();
-                    } else {
-                        int compare = itemComparator.compare(nextIter.peek(), lastNext);
-                        while (compare > 0 ^ descending) {
-                            nextIter.next();
-                            compare = itemComparator.compare(nextIter.peek(), lastNext);
-                            if (compare != 0 && !nextIter.hasNext())
-                                // такого ключа вообще нет в итераторе - значит весь просмотр - кончился
-                                return false;
-                        }
-                        if (compare == 0) {
-                            // успех Нашли такой же ключ
-                            continue;
-                        } else {
-                            // иначе проскочили ниже по ключу - значит его теперь берем за следующее значение
-                            lastNext = nextIter.peek();
-                        }
-                    }
-                } else {
+                if (!nextIter.hasNext()) {
                     // такого ключа вообще нет в итераторе - значит весь просмотр - кончился
                     return false;
                 }
+
+                currentKey = nextIter.peek();
+                if (roundtKey == null) {
+                    // первое значение - примем сразу
+                    roundtKey = currentKey;
+                } else {
+                    int compare = itemComparator.compare(currentKey, roundtKey);
+                    while (compare > 0 ^ descending) {
+                        nextIter.next();
+                        currentKey = nextIter.peek();
+                        compare = itemComparator.compare(currentKey, roundtKey);
+                        if (compare != 0 && !nextIter.hasNext())
+                            // такого ключа вообще нет в итераторе - значит весь просмотр - кончился
+                            return false;
+                    }
+                    if (compare == 0) {
+                        // успех Нашли такой же ключ
+                        continue;
+                    } else {
+                        // иначе проскочили ниже по ключу - значит его теперь берем за следующее значение
+                        roundtKey = currentKey;
+                    }
+                }
             }
-        } while (firstKey != lastNext);
+        } while (startKey != roundtKey);
 
         return true;
     }
@@ -86,11 +89,7 @@ public class MergeAndIteratorNoDuplicates<T> extends MergedIteratorNoDuplicates<
 
         hasNextUsedBefore = false;
 
-        PeekingIteratorCloseable<T> nextIter = queue.remove();
-        lastNext = nextIter.next();
-        if (nextIter.hasNext()) {
-            queue.add(nextIter);
-        }
+        lastNext = queue.peek().next();
         return lastNext;
     }
 
