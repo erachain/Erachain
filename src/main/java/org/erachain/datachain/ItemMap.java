@@ -248,6 +248,12 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     }
 
 
+    /**
+     * @param step
+     * @param filterArray
+     * @param descending  - не рекомендуется использовать, так как все равно результат смешанные ключ первичные, а лишняя суета
+     * @return
+     */
     public Pair<Integer, List<IteratorCloseableImpl<Long>>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray, boolean descending) {
 
         Iterable keys;
@@ -268,7 +274,9 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                 if (descending) {
                     keys = Fun.filter(this.nameKey.descendingSet(),
                             stepFilter + new String(new byte[]{(byte) 255}), true,
-                            stepFilter, true);
+                            stepFilter,
+                            false // ВАЖНО! иначе не ищет
+                    );
                 } else {
                     keys = Fun.filter(this.nameKey,
                             stepFilter, true,
@@ -342,7 +350,11 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
         Pair<Integer, List<IteratorCloseableImpl<Long>>> result = null;
         try {
-            result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray, descending);
+            result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray,
+                    // лучше стнадартно так как все равно на выходе сортировка съедет
+                    // и не надо напрягать обратный поиск
+                    false
+            );
             if (result.getA() > 0) {
                 return new Pair<>("Error: filter key at " + result.getA() + " pos has length < 5",
                         null);
@@ -350,7 +362,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
             if (false) {
                 // надо сначала отсортровать все итераторы - и это медленно
-                IteratorCloseable<Long> iterator = MergeAND_SortedIterators.make(result.getB(), Fun.COMPARATOR, descending);
+                IteratorCloseable<Long> iterator = MergeAND_SortedIterators.make(result.getB(), Fun.COMPARATOR, false);
                 if (offset > 0)
                     Iterators.advance(iterator, offset);
 
@@ -388,7 +400,16 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                         andHashSet.remove(removedKey);
                     }
                 }
-                return new Pair<>(null, IteratorCloseableImpl.make(andHashSet.iterator()));
+
+                TreeSet<Long> treeSet = new TreeSet();
+                for (Long keyResult : andHashSet) {
+                    treeSet.add(keyResult);
+                }
+
+                if (descending) {
+                    return new Pair<>(null, IteratorCloseableImpl.make(treeSet.descendingIterator()));
+                }
+                return new Pair<>(null, IteratorCloseableImpl.make(treeSet.iterator()));
             }
 
         } finally {
