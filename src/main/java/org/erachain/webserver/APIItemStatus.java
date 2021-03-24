@@ -110,6 +110,7 @@ public class APIItemStatus {
     @GET
     @Path("find/{filter_name_string}")
     public Response find(@PathParam("filter_name_string") String filter,
+                         @QueryParam("from") Long fromID,
                          @QueryParam("offset") int offset,
                          @QueryParam("limit") int limit) {
 
@@ -127,7 +128,7 @@ public class APIItemStatus {
         }
 
         ItemStatusMap map = DCSet.getInstance().getItemStatusMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, offset, limit, true);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, true);
 
         JSONArray array = new JSONArray();
 

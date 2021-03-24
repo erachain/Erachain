@@ -1849,6 +1849,7 @@ public class API {
     @GET
     @Path("personsfilter/{filter_name_string}")
     public Response personsFilter(@PathParam("filter_name_string") String filter,
+                                  @QueryParam("from") Long fromID,
                                   @QueryParam("offset") int offset,
                                   @QueryParam("limit") int limit) {
 
@@ -1866,7 +1867,7 @@ public class API {
 
         ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
         // DOES ASSETID EXIST
-        List<ItemCls> list = map.getByFilterAsArray(filter, offset, limit, true);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, true);
 
         JSONArray array = new JSONArray();
 

@@ -29,7 +29,8 @@ import java.util.*;
  * ключ: номер, с самоувеличением
  * Значение: Сущность
  */
-public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredByStringArray<Long>, Pageable<Long, ItemCls> {
+public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredByStringArray<ItemCls>,
+        Pageable<Long, ItemCls> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -359,49 +360,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> getKeysByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
-
-        if (filter == null || filter.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        IteratorCloseable<Long> iterator = null;
-        Pair<String, IteratorCloseable<Long>> resultKeys;
-        List<Long> result = new ArrayList<>();
-        try {
-            resultKeys = getKeysIteratorByFilterAsArray(filter, offset, descending);
-            if (resultKeys.getA() != null) {
-                return result;
-            }
-
-            iterator = resultKeys.getB();
-
-            int count = 0;
-            while (iterator.hasNext()) {
-                Long key = iterator.next();
-                ItemCls item = get(key);
-                if (item != null) {
-                    result.add(key);
-                    count++;
-                }
-                if (limit > 0 && count >= limit)
-                    break;
-            }
-        } finally {
-            if (iterator != null) {
-                try {
-                    iterator.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-
-        return result;
-    }
-
-    // get list items in name substring str
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<ItemCls> getByFilterAsArray(String filter, int offset, int limit, boolean descending) {
+    public List<ItemCls> getByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
 
         if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();
@@ -421,11 +380,14 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
             iterator = resultKeys.getB();
 
             int count = 0;
+            if (limit == 0)
+                limit = 10000; // ограничим что бы ноду не перегрузить случайно
+
             while (iterator.hasNext()) {
                 ItemCls item = get(iterator.next());
                 result.add(item);
 
-                if (limit > 0 && ++count >= limit)
+                if (++count >= limit)
                     break;
 
             }
