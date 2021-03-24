@@ -130,8 +130,8 @@ public class SplitPanel extends IconPanel {
         searchTextFieldSearchToolBarLeftPanelDocument.setToolTipText("");
         searchTextFieldSearchToolBarLeftPanelDocument.setAlignmentX(2.0F);
         searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
-        searchTextFieldSearchToolBarLeftPanelDocument.setName(""); // NOI18N
-        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(400, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchTextFieldSearchToolBarLeftPanelDocument.setMaximumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
         searchToolBar_LeftPanel.add(searchTextFieldSearchToolBarLeftPanelDocument);
 
         button1ToolBarLeftPanel.setText("jButton1");
