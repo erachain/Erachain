@@ -49,8 +49,6 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
         super(NAME, TITLE);
         iconName = "favorite.png";
 
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
-
         // not show buttons
         jToolBarRightPanel.setVisible(false);
         toolBarLeftPanel.setVisible(false);

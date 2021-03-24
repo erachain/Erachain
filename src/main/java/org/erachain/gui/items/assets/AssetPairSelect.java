@@ -108,8 +108,6 @@ public class AssetPairSelect extends JDialog {
         pair_Panel.jButton1_jToolBar_RightPanel.setVisible(false);
         pair_Panel.jButton2_jToolBar_RightPanel.setVisible(false);
 
-        pair_Panel.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
-
         pair_Panel.searchToolBar_LeftPanel.setVisible(true);
         pair_Panel.toolBarLeftPanel.add(new JLabel(Lang.T("Find Key") + ":"));
         key_Item = new MDecimalFormatedTextField();
@@ -286,7 +284,6 @@ public class AssetPairSelect extends JDialog {
         //this.add(label, labelGBC);
 
         pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.jTableJScrollPanelLeftPanel);
-        pair_Panel.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
 
         // UPDATE FILTER ON TEXT CHANGE
         pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {

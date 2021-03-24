@@ -51,7 +51,6 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
     public FavoriteStatementsSplitPanel() {
         super(NAME, TITLE);
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
 
         // not show buttons
         jToolBarRightPanel.setVisible(false);

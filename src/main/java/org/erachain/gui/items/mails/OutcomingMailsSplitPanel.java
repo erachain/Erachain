@@ -41,7 +41,6 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
     public OutcomingMailsSplitPanel() {
         super(NAME, TITLE);
 
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);

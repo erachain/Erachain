@@ -49,7 +49,6 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     public SearchStatementsSplitPanel() {
         super(NAME, TITLE);
 
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         this.searchToolBar_LeftPanel.setVisible(true);
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
 

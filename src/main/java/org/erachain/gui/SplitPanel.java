@@ -51,12 +51,15 @@ public class SplitPanel extends IconPanel {
     public JPanel leftPanel;
     public JPanel rightPanel1;
     public JTextField searchTextFieldSearchToolBarLeftPanelDocument;
-    public JMenuBar  searchToolBar_LeftPanel;
+    public JMenuBar searchToolBar_LeftPanel;
     public JLabel searthLabelSearchToolBarLeftPanel;
     public JPanel toolBarLeftPanel;
     public JCheckBox searchMyJCheckBoxLeftPanel;
     public JCheckBox searchFavoriteJCheckBoxLeftPanel;
     private JSONObject settingsJSONbuf;
+
+    protected GridBagConstraints gridBagConstraints;
+
     /**
      * Creates new form Doma2
      */
@@ -93,8 +96,6 @@ public class SplitPanel extends IconPanel {
         settingsJSONbuf = new JSONObject();
         settingsJSONbuf = Settings.getInstance().Dump();
 
-        GridBagConstraints gridBagConstraints;
-
         jSplitPanel = new MSplitPane(MSplitPane.VERTICAL_SPLIT, true);
         //      jSplitPanel.M_setDividerSize(20);
         leftPanel = new JPanel();
@@ -123,9 +124,12 @@ public class SplitPanel extends IconPanel {
         // toolBarLeftPanel.setFloatable(false);
         //  toolBarLeftPanel.setRollover(true);
 
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ": ");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.insets = new Insets(10, 20, 10, 20);
+
+        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":");
         searthLabelSearchToolBarLeftPanel.setToolTipText("");
-        searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel);
+        searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel, gridBagConstraints);
 
         searchTextFieldSearchToolBarLeftPanelDocument.setToolTipText("");
         searchTextFieldSearchToolBarLeftPanelDocument.setAlignmentX(2.0F);

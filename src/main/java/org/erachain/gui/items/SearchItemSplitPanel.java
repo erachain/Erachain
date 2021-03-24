@@ -23,7 +23,6 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
         super(search_Table_Model1, gui_Name, search_Label_Text);
         this.search_Table_Model = search_Table_Model1;
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
 
         this.toolBarLeftPanel.add(buttonGetLasts);
 
@@ -54,7 +53,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
             }
         });
 
-        searchToolBar_LeftPanel.add(key_Item);
+        searchToolBar_LeftPanel.add(key_Item, gridBagConstraints);
 
         searchToolBar_LeftPanel.add(buttonGetLasts);
         buttonGetLasts.addActionListener(new ActionListener() {
