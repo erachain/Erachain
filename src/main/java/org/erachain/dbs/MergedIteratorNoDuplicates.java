@@ -18,7 +18,7 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
     protected T lastNext;
     final Comparator<? super T> itemComparator;
     protected boolean isClosed;
-    private boolean hasNextUsedBefore = false;
+    protected boolean hasNextUsedBefore = false;
 
     /**
      * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
