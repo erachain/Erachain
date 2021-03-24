@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * !!!! ВНИМАНИЕ - он не пашет так как значение ключа в итераторе - неотсортровано же!
+ * !!!! ВНИМАНИЕ - ТОЛЬКО отсортированные итераторы - например с TreeMap + descending должен соответствовать!!!
  * и поэтому по проходу не получится узнать есть ли И совпадения - нужно перебирать целиком все значения
  * Делает логическое И по итераторам по ключам - так что ключ должен быть вов сех итерторах - тогда он принимается как NEXT
  * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
@@ -18,8 +18,7 @@ import java.util.List;
  */
 @Slf4j
 
-@Deprecated
-public class MergeAND_Iterators<T> extends IteratorCloseableImpl<T> {
+public class MergeAND_SortedIterators<T> extends IteratorCloseableImpl<T> {
 
     boolean descending;
     List<PeekingIteratorCloseable<T>> iterators;
@@ -32,8 +31,8 @@ public class MergeAND_Iterators<T> extends IteratorCloseableImpl<T> {
      * @param itemComparator
      * @param descending
      */
-    public MergeAND_Iterators(Iterable<? extends IteratorCloseable<? extends T>> iterators,
-                              final Comparator<? super T> itemComparator, boolean descending) {
+    public MergeAND_SortedIterators(Iterable<? extends IteratorCloseable<? extends T>> iterators,
+                                    final Comparator<? super T> itemComparator, boolean descending) {
 
         this.descending = descending;
 
@@ -60,7 +59,7 @@ public class MergeAND_Iterators<T> extends IteratorCloseableImpl<T> {
     public static <T> IteratorCloseableImpl<T> make(List<IteratorCloseableImpl<T>> iterators,
                                                     final Comparator<T> itemComparator, boolean descending) {
         if (iterators.size() > 1) {
-            return new MergeAND_Iterators(iterators, itemComparator, descending);
+            return new MergeAND_SortedIterators(iterators, itemComparator, descending);
         }
         return iterators.get(0);
     }

@@ -13,7 +13,7 @@ import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
-import org.erachain.dbs.MergeAND_Iterators;
+import org.erachain.dbs.MergeAND_SortedIterators;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 import org.slf4j.Logger;
@@ -349,12 +349,46 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
             }
 
             if (false) {
-                IteratorCloseable<Long> iterator = MergeAND_Iterators.make(result.getB(), Fun.COMPARATOR, descending);
+                // надо сначала отсортровать все итераторы - и это медленно
+                IteratorCloseable<Long> iterator = MergeAND_SortedIterators.make(result.getB(), Fun.COMPARATOR, descending);
+                if (offset > 0)
+                    Iterators.advance(iterator, offset);
+
+                return new Pair<>(null, iterator);
             } else {
-                for (IteratorCloseable iterator : result.getB()) {
-                    HashSet<Object> items = new HashSet<>();
-                    items.addAll(iterator);
+                Long key;
+                HashSet<Long> andHashSet = null;
+                for (IteratorCloseable<Long> iterator : result.getB()) {
+
+                    if (andHashSet == null) {
+                        // first time - add ALL
+                        andHashSet = new HashSet<>();
+                        while (iterator.hasNext()) {
+                            andHashSet.add(iterator.next());
+                        }
+                        continue;
+                    }
+
+                    // текущий список
+                    HashSet<Long> tempHashSet = new HashSet<>();
+                    while (iterator.hasNext()) {
+                        tempHashSet.add(iterator.next());
+                    }
+
+                    // теперь проверим все значения в списке по И
+                    Iterator<Long> iteratorAND = andHashSet.iterator();
+                    List<Long> toRemove = new ArrayList<>();
+                    while (iteratorAND.hasNext()) {
+                        key = iteratorAND.next();
+                        if (!tempHashSet.contains(key)) {
+                            toRemove.add(key);
+                        }
+                    }
+                    for (Long removedKey : toRemove) {
+                        andHashSet.remove(removedKey);
+                    }
                 }
+                return new Pair<>(null, IteratorCloseableImpl.make(andHashSet.iterator()));
             }
 
         } finally {
@@ -369,11 +403,6 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
             }
 
         }
-
-        if (offset > 0)
-            Iterators.advance(iterator, offset);
-
-        return new Pair<>(null, iterator);
 
     }
 
