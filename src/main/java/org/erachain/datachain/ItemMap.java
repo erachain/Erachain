@@ -340,22 +340,35 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(Transaction.SPLIT_CHARS);
 
-        Pair<Integer, List<IteratorCloseableImpl<Long>>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray, descending);
-        if (result.getA() > 0) {
+        Pair<Integer, List<IteratorCloseableImpl<Long>>> result = null;
+        try {
+            result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray, descending);
+            if (result.getA() > 0) {
+                return new Pair<>("Error: filter key at " + result.getA() + " pos has length < 5",
+                        null);
+            }
+
+            if (false) {
+                IteratorCloseable<Long> iterator = MergeAND_Iterators.make(result.getB(), Fun.COMPARATOR, descending);
+            } else {
+                for (IteratorCloseable iterator : result.getB()) {
+                    HashSet<Object> items = new HashSet<>();
+                    items.addAll(iterator);
+                }
+            }
+
+        } finally {
             try {
                 // нужно закрыть то что уже нашлось
-                if (result.getB() != null) {
+                if (result != null && result.getB() != null) {
                     for (IteratorCloseable iterator : result.getB()) {
                         iterator.close();
                     }
                 }
             } catch (IOException e) {
             }
-            return new Pair<>("Error: filter key at " + result.getA() + " pos has length < 5",
-                    null);
-        }
 
-        IteratorCloseable<Long> iterator = MergeAND_Iterators.make(result.getB(), Fun.COMPARATOR, descending);
+        }
 
         if (offset > 0)
             Iterators.advance(iterator, offset);

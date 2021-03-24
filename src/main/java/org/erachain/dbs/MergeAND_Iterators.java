@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * !!!! ВНИМАНИЕ - он не пашет так как значение ключа в итераторе - неотсортровано же!
+ * и поэтому по проходу не получится узнать есть ли И совпадения - нужно перебирать целиком все значения
  * Делает логическое И по итераторам по ключам - так что ключ должен быть вов сех итерторах - тогда он принимается как NEXT
  * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
  * Правда в теста вылетает ошибка доступа при закрытии - org.erachain.datachain.TradeMapImplTest#getTradesByTimestamp()
@@ -15,12 +17,21 @@ import java.util.List;
  * @param <T>
  */
 @Slf4j
+
+@Deprecated
 public class MergeAND_Iterators<T> extends IteratorCloseableImpl<T> {
 
     boolean descending;
     List<PeekingIteratorCloseable<T>> iterators;
     final Comparator<? super T> itemComparator;
 
+    /**
+     * !!! НЕ ПАШЕТ!
+     *
+     * @param iterators
+     * @param itemComparator
+     * @param descending
+     */
     public MergeAND_Iterators(Iterable<? extends IteratorCloseable<? extends T>> iterators,
                               final Comparator<? super T> itemComparator, boolean descending) {
 
@@ -79,7 +90,7 @@ public class MergeAND_Iterators<T> extends IteratorCloseableImpl<T> {
                     roundtKey = currentKey;
                 } else {
                     int compare = itemComparator.compare(currentKey, roundtKey);
-                    while (compare < 0 ^ descending) {
+                    while (compare > 0 ^ descending) {
                         nextIter.next();
                         currentKey = nextIter.peek();
                         compare = itemComparator.compare(currentKey, roundtKey);
