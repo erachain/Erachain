@@ -1,26 +1,25 @@
 package org.erachain.gui.library;
 
+import javax.swing.*;
+import javax.swing.text.Caret;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JTextField;
-import javax.swing.text.Caret;
-
 public class MDecimalFormatedTextField extends JTextField {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private MDecimalFormatedTextField th;
     private int scale = 8;
     protected int curr_Dot;
-    //  maskType =0 - float (1.02)
-    //   maskType =1 - int  (100)
-    //  maskType =2 - LONG  (1000000000000000000000000000)
-    public int maskType =0;
-    public int maskInteger = 1;
-    public int maskFloat = 0;
-    public int maskLong = 2;
+
+    public static int MASK_FLOAT = 0;
+    public static int MASK_INTEGER = 1;
+    public static int MASK_LONG = 2;
+
+    public int maskType = 0;
+
     public MDecimalFormatedTextField() {
         super();
         th = this;

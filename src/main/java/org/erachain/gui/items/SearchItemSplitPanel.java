@@ -6,6 +6,7 @@ import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -32,16 +33,16 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
         favorite_Column.setMaxWidth(150);
 
         // search Panel
-        this.searchToolBar_LeftPanel.setVisible(true);
-        this.toolBarLeftPanel.add(new JLabel(Lang.T("Find Key") + ":"));
+        searchToolBar_LeftPanel.setVisible(true);
+        searchToolBar_LeftPanel.add(new JLabel(Lang.T("Find Key") + ":"));
         key_Item = new MDecimalFormatedTextField();
-        key_Item.setMaskType(key_Item.maskLong);
+        key_Item.setMaskType(MDecimalFormatedTextField.MASK_LONG);
         key_Item.setToolTipText("");
         key_Item.setAlignmentX(1.0F);
-        key_Item.setMinimumSize(new java.awt.Dimension(100, 20));
-        key_Item.setName(""); // NOI18N
-        key_Item.setPreferredSize(new java.awt.Dimension(100, 20));
-        key_Item.setMaximumSize(new java.awt.Dimension(200, 20));
+        key_Item.setText("");
+        key_Item.setMinimumSize(new Dimension(100, UIManager.getFont("Label.font").getSize()));
+        key_Item.setMinimumSize(new Dimension(100, UIManager.getFont("Label.font").getSize()));
+        key_Item.setPreferredSize(new Dimension(100, UIManager.getFont("Label.font").getSize()));
 
         MenuPopupUtil.installContextMenu(key_Item);
 
@@ -54,10 +55,9 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
             }
         });
 
-        this.toolBarLeftPanel.add(key_Item);
+        searchToolBar_LeftPanel.add(key_Item);
 
-
-        this.toolBarLeftPanel.add(buttonGetLasts);
+        searchToolBar_LeftPanel.add(buttonGetLasts);
         buttonGetLasts.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {

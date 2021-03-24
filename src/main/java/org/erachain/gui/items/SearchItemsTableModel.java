@@ -38,8 +38,10 @@ public abstract class SearchItemsTableModel extends WalletItemTableModel<ItemCls
 
         list = new ArrayList<ItemCls>();
 
-        while (iterator.hasNext()) {
-            list.add(((ItemMap)map).get(iterator.next()));
+        if (iterator != null) {
+            while (iterator.hasNext()) {
+                list.add(((ItemMap) map).get(iterator.next()));
+            }
         }
 
         this.fireTableDataChanged();

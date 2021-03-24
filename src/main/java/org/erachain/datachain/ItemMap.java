@@ -342,7 +342,8 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         if (result.getA() > 0) {
             try {
                 // нужно закрыть то что уже нашлось
-                result.getB().close();
+                if (result.getB() != null)
+                    result.getB().close();
             } catch (IOException e) {
             }
             return new Pair<>("Error: filter key at " + result.getA() + " pos has length < 5",
