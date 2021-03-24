@@ -17,7 +17,6 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
     final Queue<PeekingIteratorCloseable<T>> queue;
     protected T lastNext;
     final Comparator<? super T> itemComparator;
-    protected boolean isClosed;
     protected boolean hasNextUsedBefore = false;
 
     /**
@@ -126,15 +125,6 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
         }
         isClosed = true;
 
-    }
-
-    @Override
-    public void finalize() throws Throwable {
-        if (!isClosed) {
-            close();
-            logger.warn("FINALIZE used queue");
-        }
-        super.finalize();
     }
 
 }
