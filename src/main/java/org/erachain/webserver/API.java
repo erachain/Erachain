@@ -1325,8 +1325,6 @@ public class API {
 
     }
 
-    @GET
-
     /*
      * ************* EXCHANGE **************
      */

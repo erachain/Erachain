@@ -750,6 +750,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             if (limit < 0)
                 limit = -limit;
 
+            if (limit <= 0 || limit > 10000)
+                limit = 10000;
+
+
             // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути сосздаем список обратный что нашли по обратнму итератору
             int offsetHere = -(offset + limit);
@@ -782,6 +786,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             }
 
         } else {
+
+            if (limit <= 0 || limit > 10000)
+                limit = 10000;
 
             txs = getTransactionsByTitleFromBetter(words, betterIndex, fromWord, fromSeqNo, offset, limit, true);
             int count = txs.size();

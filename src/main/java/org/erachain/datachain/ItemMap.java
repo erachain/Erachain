@@ -380,7 +380,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
             iterator = resultKeys.getB();
 
             int count = 0;
-            if (limit == 0)
+            if (limit <= 0 || limit > 10000)
                 limit = 10000; // ограничим что бы ноду не перегрузить случайно
 
             while (iterator.hasNext()) {
