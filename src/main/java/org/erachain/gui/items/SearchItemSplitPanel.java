@@ -24,7 +24,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
         super(search_Table_Model1, gui_Name, search_Label_Text);
         this.search_Table_Model = search_Table_Model1;
 
-        this.toolBarLeftPanel.add(buttonGetLasts);
+        this.toolBarLeftPanel.add(buttonGetLasts, gridBagConstraints);
 
         // CHECKBOX FOR FAVORITE
         TableColumn favorite_Column = jTableJScrollPanelLeftPanel.getColumnModel()
@@ -33,14 +33,14 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
         // search Panel
         searchToolBar_LeftPanel.setVisible(true);
-        searchToolBar_LeftPanel.add(new JLabel(Lang.T("Find Key") + ":"));
+        searchToolBar_LeftPanel.add(new JLabel("  " + Lang.T("Find Key") + ":"));
         key_Item = new MDecimalFormatedTextField();
         key_Item.setToolTipText("");
         key_Item.setAlignmentX(1.0F);
         key_Item.setText("");
-        key_Item.setMinimumSize(new Dimension(100, UIManager.getFont("Label.font").getSize()));
-        key_Item.setMinimumSize(new Dimension(100, UIManager.getFont("Label.font").getSize()));
-        key_Item.setPreferredSize(new Dimension(100, UIManager.getFont("Label.font").getSize()));
+        key_Item.setMinimumSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
+        key_Item.setMinimumSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
+        key_Item.setPreferredSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
 
         MenuPopupUtil.installContextMenu(key_Item);
 

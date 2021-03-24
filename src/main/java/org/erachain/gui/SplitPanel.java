@@ -120,14 +120,11 @@ public class SplitPanel extends IconPanel {
 
         leftPanel.setLayout(new GridBagLayout());
 
-        //   toolBarLeftPanel.setBorderPainted(false);
-        // toolBarLeftPanel.setFloatable(false);
-        //  toolBarLeftPanel.setRollover(true);
-
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.insets = new Insets(10, 20, 10, 20);
+        searchToolBar_LeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":");
+
+        searthLabelSearchToolBarLeftPanel.setText(" " + Lang.T("Search") + ":");
         searthLabelSearchToolBarLeftPanel.setToolTipText("");
         searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel, gridBagConstraints);
 
@@ -155,15 +152,16 @@ public class SplitPanel extends IconPanel {
         button2ToolBarLeftPanel.setVerticalTextPosition(SwingConstants.BOTTOM);
         toolBarLeftPanel.add(button2ToolBarLeftPanel);
         button2ToolBarLeftPanel.getAccessibleContext().setAccessibleDescription("");
-        gridBagConstraints = new GridBagConstraints();
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(5, 8, 0, 0);
         leftPanel.add(toolBarLeftPanel, gridBagConstraints);
 
-       // searchToolBar_LeftPanel.setFloatable(false);
-       // searchToolBar_LeftPanel.setRollover(true);
+        // searchToolBar_LeftPanel.setFloatable(false);
+        // searchToolBar_LeftPanel.setRollover(true);
         searchToolBar_LeftPanel.setVisible(false);
 
 
@@ -181,7 +179,7 @@ public class SplitPanel extends IconPanel {
         gridBagConstraints.gridwidth = GridBagConstraints.RELATIVE;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(5, 0, 0, 10);
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         leftPanel.add(searchToolBar_LeftPanel, gridBagConstraints);
 
         jScrollPanelLeftPanel.setBorder(BorderFactory.createEtchedBorder());

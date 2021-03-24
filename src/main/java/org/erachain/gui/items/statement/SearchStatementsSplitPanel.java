@@ -55,14 +55,13 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         // not show buttons
         jToolBarRightPanel.setVisible(false);
         toolBarLeftPanel.setVisible(false);
-        this.toolBarLeftPanel.add(new JLabel(Lang.T("Find Key") + ":"));
+        this.toolBarLeftPanel.add(new JLabel("  " + Lang.T("Find Key") + ":"));
         key_Item = new JTextField();
         key_Item.setToolTipText("");
         key_Item.setAlignmentX(1.0F);
-        key_Item.setMinimumSize(new java.awt.Dimension(100, 20));
-        key_Item.setName(""); // NOI18N
-        key_Item.setPreferredSize(new java.awt.Dimension(100, 20));
-        key_Item.setMaximumSize(new java.awt.Dimension(2000, 20));
+        key_Item.setMinimumSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
+        key_Item.setMinimumSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
+        key_Item.setPreferredSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
 
         MenuPopupUtil.installContextMenu(key_Item);
 
