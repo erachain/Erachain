@@ -351,7 +351,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         Pair<Integer, List<IteratorCloseableImpl<Long>>> result = null;
         try {
             result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray,
-                    // лучше стнадартно так как все равно на выходе сортировка съедет
+                    // лучше стандартно так как все равно на выходе сортировка съедет
                     // и не надо напрягать обратный поиск
                     false
             );
