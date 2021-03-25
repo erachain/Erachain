@@ -406,10 +406,15 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                     treeSet.add(keyResult);
                 }
 
-                if (descending) {
-                    return new Pair<>(null, IteratorCloseableImpl.make(treeSet.descendingIterator()));
-                }
-                return new Pair<>(null, IteratorCloseableImpl.make(treeSet.iterator()));
+                IteratorCloseable<Long> iterator = IteratorCloseableImpl.make(
+                        descending ? treeSet.descendingIterator() : treeSet.iterator());
+
+
+                if (offset > 0)
+                    Iterators.advance(iterator, offset);
+
+                return new Pair<>(null, IteratorCloseableImpl.make(iterator));
+
             }
 
         } finally {
