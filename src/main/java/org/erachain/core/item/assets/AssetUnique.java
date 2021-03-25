@@ -18,7 +18,6 @@ import java.util.Arrays;
 public class AssetUnique extends AssetCls {
 
     private static final int TYPE_ID = UNIQUE;
-    //private Account owner;
 
     public AssetUnique(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, maker, name, icon, image, description, assetType);
