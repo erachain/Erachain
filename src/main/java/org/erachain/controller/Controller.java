@@ -96,7 +96,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.3";
+    public static String version = "5.3.01";
     public static String buildTime = "2021-03-22 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -3628,13 +3628,6 @@ public class Controller extends Observable {
             return this.transactionCreator.r_Vouch(version, forDeal, creator, feePow, height, seq);
         }
     }
-
-    //public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount sender, int feePow, String url, String data,
-    //                                           String hashes) {
-    //    synchronized (this.transactionCreator) {
-    ///        return this.transactionCreator.r_Hashes(sender, feePow, url, data, hashes);
-    //    }
-    //}
 
     public Transaction r_Hashes(PrivateKeyAccount sender, int feePow, String url, String data,
                                 String hashes) {
