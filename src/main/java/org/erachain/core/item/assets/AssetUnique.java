@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class AssetUnique extends AssetCls {
 
     private static final int TYPE_ID = UNIQUE;
-    private Account owner;
+    //private Account owner;
 
     public AssetUnique(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, maker, name, icon, image, description, assetType);
@@ -150,14 +150,7 @@ public class AssetUnique extends AssetCls {
 
         //READ ASSET TYPE
         byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
-        //boolean divisible = divisibleBytes[0] == 1;
         position += ASSET_TYPE_LENGTH;
-
-        //READ OWNER
-        //byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
-        //PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
-        //position += MAKER_LENGTH;
-
 
         //RETURN
         AssetUnique unique = new AssetUnique(typeBytes, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
@@ -175,9 +168,6 @@ public class AssetUnique extends AssetCls {
 
         //WRITE ASSET TYPE
         data = Bytes.concat(data, new byte[]{(byte) this.getAssetType()});
-
-        // WRITE OWNER
-        //data = Bytes.concat(data, this.maker.getPublicKey());
 
         return data;
     }
