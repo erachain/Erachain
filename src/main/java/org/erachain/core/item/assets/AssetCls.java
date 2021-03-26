@@ -28,7 +28,10 @@ import java.nio.file.Paths;
 import java.util.*;
 
 
-// 1019 - Movable = true; Divisible = NO; Quantity = 1
+/**
+ * flag[0] - profitFeeMin[int] + profitFeeMax[int]
+ * flag[1] - profitTax[int] + loanInterest[int]
+ */
 public abstract class AssetCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
@@ -36,7 +39,6 @@ public abstract class AssetCls extends ItemCls {
     protected static final int ASSET_TYPE_LENGTH = 1;
     //
     protected int assetType;
-
 
     // CORE KEY
     public static final long ERA_KEY = 1L;
