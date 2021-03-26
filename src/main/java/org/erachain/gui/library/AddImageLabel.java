@@ -10,12 +10,15 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 
@@ -66,13 +69,26 @@ public class AddImageLabel extends JPanel {
         setBorder(BorderFactory.createEtchedBorder());
         mainLabel.setVerticalAlignment(SwingConstants.TOP);
         mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        addMouseListener(new MouseAdapter() {
+        mainLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (editable) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
                         addImage(minSize, maxSize, originalSize);
                     }
+                }
+            }
+        });
+
+        externalURLCheck.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                try {
+                    URL url = new URL(externalURL.getText());
+                    ImageIcon image = new ImageIcon(url);
+                    mainLabel.setIcon(image);
+                } catch (MalformedURLException e) {
                 }
             }
         });
