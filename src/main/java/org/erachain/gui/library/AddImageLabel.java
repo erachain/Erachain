@@ -56,7 +56,7 @@ public class AddImageLabel extends JPanel {
         panelCenter.setLayout(new BorderLayout());
         add(panelCenter, BorderLayout.CENTER);
         panelCenter.add(new JLabel(Lang.T("Use external URL") + ":"), BorderLayout.NORTH);
-        externalURL.setToolTipText(Lang.T("Use external source by URL. It not safe by blockchain"));
+        externalURL.setToolTipText(Lang.T("Use external source by URL. It not safe by blockchain. For local example: 'file:images/icons/coin.png'"));
         panelCenter.add(externalURL, BorderLayout.CENTER);
         panelCenter.add(externalURLCheck, BorderLayout.SOUTH);
 
