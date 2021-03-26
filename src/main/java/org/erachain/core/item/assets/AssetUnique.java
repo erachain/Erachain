@@ -19,15 +19,15 @@ public class AssetUnique extends AssetCls {
 
     private static final int TYPE_ID = UNIQUE;
 
-    public AssetUnique(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+    public AssetUnique(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, flags, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(int props, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+    public AssetUnique(int props, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         this(new byte[]{(byte) TYPE_ID, (byte) props}, flags, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+    public AssetUnique(long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         this(new byte[]{(byte) TYPE_ID, (byte) 0}, flags, maker, name, icon, image, description, assetType);
     }
 
@@ -126,12 +126,18 @@ public class AssetUnique extends AssetCls {
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
 
-        long flags;
+        long[] flags;
         if (hasFlags) {
-            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
-            position += FLAGS_LENGTH;
+            byte flagsBytesLen = Arrays.copyOfRange(data, position, ++position)[0];
+            flags = new long[flagsBytesLen];
+
+            for (int i = 0; i < flagsBytesLen; i++) {
+                byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+                flags[i] = Longs.fromByteArray(flagsBytes);
+                position += FLAGS_LENGTH;
+            }
         } else {
-            flags = 0;
+            flags = null;
         }
 
         //READ DESCRIPTION

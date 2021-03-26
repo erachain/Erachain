@@ -35,17 +35,17 @@ public class AssetVenture extends AssetCls {
      */
     protected int scale;
 
-    public AssetVenture(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+    public AssetVenture(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
         super(typeBytes, flags, maker, name, icon, image, description, asset_type);
         this.quantity = quantity;
         this.scale = (byte) scale;
     }
 
-    public AssetVenture(int props, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+    public AssetVenture(int props, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
         this(new byte[]{(byte) TYPE_ID, (byte) props}, flags, maker, name, icon, image, description, asset_type, scale, quantity);
     }
 
-    public AssetVenture(long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+    public AssetVenture(long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
         //this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, maker, name, assetType, icon, image, description, quantity, scale);
         this(new byte[]{(byte) TYPE_ID, (byte) 0}, flags, maker, name, icon, image, description, asset_type, scale, quantity);
     }
@@ -171,12 +171,18 @@ public class AssetVenture extends AssetCls {
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
 
-        long flags;
+        long[] flags;
         if (hasFlags) {
-            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
-            position += FLAGS_LENGTH;
+            byte flagsBytesLen = Arrays.copyOfRange(data, position, ++position)[0];
+            flags = new long[flagsBytesLen];
+
+            for (int i = 0; i < flagsBytesLen; i++) {
+                byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+                flags[i] = Longs.fromByteArray(flagsBytes);
+                position += FLAGS_LENGTH;
+            }
         } else {
-            flags = 0;
+            flags = null;
         }
 
         //READ DESCRIPTION

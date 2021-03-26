@@ -74,7 +74,7 @@ public abstract class PersonCls extends ItemCls {
     protected String hairСolor; // First Name|Middle Name|Last Name
     protected byte height;
 
-    public PersonCls(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, long birthday, long deathday,
+    public PersonCls(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, long birthday, long deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
                      String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description) {
         super(typeBytes, flags, maker, name, icon, image, description);
@@ -90,7 +90,7 @@ public abstract class PersonCls extends ItemCls {
         this.height = height;
     }
 
-    public PersonCls(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, String birthday, String deathday,
+    public PersonCls(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, String birthday, String deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
                      String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description) {
         this(typeBytes, flags, maker, name, 0, 0,
@@ -104,7 +104,7 @@ public abstract class PersonCls extends ItemCls {
         this.deathday = deathday == null ? Long.MIN_VALUE : Timestamp.valueOf(deathday).getTime();
     }
 
-    public PersonCls(int type, long flags, PublicKeyAccount maker, String name, long birthday, long deathday,
+    public PersonCls(int type, long[] flags, PublicKeyAccount maker, String name, long birthday, long deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
                      String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description) {
         this(new byte[]{(byte) type}, flags, maker, name, birthday, deathday,

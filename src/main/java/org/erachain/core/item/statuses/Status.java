@@ -12,11 +12,11 @@ public class Status extends StatusCls {
 
     private static final int TYPE_ID = STATUS;
 
-    public Status(long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, boolean unique) {
+    public Status(long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, boolean unique) {
         super(TYPE_ID, flags, maker, name, icon, image, description, unique);
     }
 
-    public Status(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+    public Status(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
         super(typeBytes, flags, maker, name, icon, image, description);
     }
 
@@ -80,12 +80,18 @@ public class Status extends StatusCls {
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
 
-        long flags;
+        long[] flags;
         if (hasFlags) {
-            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
-            position += FLAGS_LENGTH;
+            byte flagsBytesLen = Arrays.copyOfRange(data, position, ++position)[0];
+            flags = new long[flagsBytesLen];
+
+            for (int i = 0; i < flagsBytesLen; i++) {
+                byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+                flags[i] = Longs.fromByteArray(flagsBytes);
+                position += FLAGS_LENGTH;
+            }
         } else {
-            flags = 0;
+            flags = null;
         }
 
         //READ DESCRIPTION

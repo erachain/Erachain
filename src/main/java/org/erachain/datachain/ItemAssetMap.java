@@ -40,7 +40,7 @@ public class ItemAssetMap extends ItemMap {
 
         AssetCls item;
         if (BlockChain.TEST_MODE && key > 100 && key < 1000) {
-            long flags = 0L;
+            long[] flags = null;
             switch (key.intValue()) {
 
                 case (int) AssetCls.LIA_KEY:
@@ -83,7 +83,7 @@ public class ItemAssetMap extends ItemMap {
             }
         } else {
             if (key.equals(AssetCls.LIA_KEY)) {
-                long flags = 0L;
+                long[] flags = null;
                 item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
                         AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0L);
                 item = null;

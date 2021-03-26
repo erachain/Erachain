@@ -50,7 +50,7 @@ public class OrderTest {
     long timestamp = NTP.getTime();
 
     Random random = new Random();
-    long flags = 0l;
+    long[] itemFlags = null;
     int seqNo = 0;
 
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balanceA;
@@ -109,7 +109,7 @@ public class OrderTest {
         accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false);
         accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false);
 
-        assetA = new AssetVenture(flags, new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
+        assetA = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
@@ -118,7 +118,7 @@ public class OrderTest {
         keyA = issueAssetTransaction.getAssetKey(dcSet);
         balanceA = accountA.getBalance(dcSet, keyA);
 
-        assetB = new AssetVenture(flags, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
+        assetB = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 0L, new byte[64]);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);

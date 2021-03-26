@@ -26,7 +26,7 @@ public class PersonHuman extends PersonCls {
     // for personal data maker - his signature
     protected byte[] makerSignature;
 
-    public PersonHuman(long flags, PublicKeyAccount maker, String fullName, long birthday, long deathday,
+    public PersonHuman(long[] flags, PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
                        byte[] makerSignature) {
@@ -36,7 +36,7 @@ public class PersonHuman extends PersonCls {
         this.makerSignature = makerSignature;
     }
 
-    public PersonHuman(long flags, PublicKeyAccount maker, String fullName, String birthday, String deathday,
+    public PersonHuman(long[] flags, PublicKeyAccount maker, String fullName, String birthday, String deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
                        byte[] makerSignature) {
@@ -46,7 +46,7 @@ public class PersonHuman extends PersonCls {
         this.makerSignature = makerSignature;
     }
 
-    public PersonHuman(byte[] typeBytes, long flags, PublicKeyAccount maker, String fullName, long birthday, long deathday,
+    public PersonHuman(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image,
                        String description, byte[] makerSignature) {
@@ -114,12 +114,18 @@ public class PersonHuman extends PersonCls {
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
 
-        long flags;
+        long[] flags;
         if (hasFlags) {
-            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
-            position += FLAGS_LENGTH;
+            byte flagsBytesLen = Arrays.copyOfRange(data, position, ++position)[0];
+            flags = new long[flagsBytesLen];
+
+            for (int i = 0; i < flagsBytesLen; i++) {
+                byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+                flags[i] = Longs.fromByteArray(flagsBytes);
+                position += FLAGS_LENGTH;
+            }
         } else {
-            flags = 0;
+            flags = null;
         }
 
         //READ DESCRIPTION

@@ -14,11 +14,11 @@ public class Union extends UnionCls {
 
     private static final int TYPE_ID = UNION;
 
-    public Union(long flags, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
+    public Union(long[] flags, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
         super(TYPE_ID, flags, maker, name, birthday, parent, icon, image, description);
     }
 
-    public Union(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
+    public Union(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
         super(typeBytes, flags, maker, name, birthday, parent, icon, image, description);
     }
 
@@ -80,12 +80,18 @@ public class Union extends UnionCls {
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
 
-        long flags;
+        long[] flags;
         if (hasFlags) {
-            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
-            position += FLAGS_LENGTH;
+            byte flagsBytesLen = Arrays.copyOfRange(data, position, ++position)[0];
+            flags = new long[flagsBytesLen];
+
+            for (int i = 0; i < flagsBytesLen; i++) {
+                byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+                flags[i] = Longs.fromByteArray(flagsBytes);
+                position += FLAGS_LENGTH;
+            }
         } else {
-            flags = 0;
+            flags = null;
         }
 
         //READ DESCRIPTION
