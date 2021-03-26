@@ -170,11 +170,11 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         AssetCls asset;
         if (AssetCls.isTypeUnique(assetType, quantity)) {
-            asset = new AssetUnique(creator, textName.getText(), addLogoIconLabel.getImgBytes(),
+            asset = new AssetUnique(creator, textName.getText(), addIconLabel.getImgBytes(),
                     addImageLabel.getImgBytes(), textAreaDescription.getText(),
                     assetType);
         } else {
-            asset = new AssetVenture(creator, textName.getText(), addLogoIconLabel.getImgBytes(),
+            asset = new AssetVenture(creator, textName.getText(), addIconLabel.getImgBytes(),
                     addImageLabel.getImgBytes(), textAreaDescription.getText(),
                     assetType, scale, quantity);
         }

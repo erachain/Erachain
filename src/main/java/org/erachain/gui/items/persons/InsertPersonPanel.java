@@ -246,7 +246,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
         textName.setText(person.viewName());
         addImageLabel.set(person.getImage());
-        addLogoIconLabel.set(person.getIcon());
+        addIconLabel.set(person.getIcon());
 
         // SET ONE TIME ZONE for Birthday
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

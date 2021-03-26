@@ -122,7 +122,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         jLabelRegistrarAddress.setVisible(andBottom);
 
         addImageLabel.setEditable(andBottom);
-        addLogoIconLabel.setEditable(andBottom);
+        addIconLabel.setEditable(andBottom);
 
         // вывод верхней панели
         int gridy = super.initTopArea();
@@ -392,7 +392,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     "", //textPersonNumber.getText(),
                     birthLatitude,
                     birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),
-                    height, addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(), textAreaDescription.getText(),
+                    height, addIconLabel.getImgBytes(), addImageLabel.getImgBytes(), textAreaDescription.getText(),
                     creator, null);
 
             transaction = (IssuePersonRecord) result.getA();

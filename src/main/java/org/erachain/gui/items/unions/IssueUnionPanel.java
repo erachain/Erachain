@@ -83,7 +83,7 @@ public class IssueUnionPanel extends IssueItemPanel {
 
         transaction = (IssueUnionRecord) Controller.getInstance().issueUnion(
                 creator, exLink, this.textName.getText(), birthday, parent, textAreaDescription.getText(),
-                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
+                addIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
                 feePow);
     }
 

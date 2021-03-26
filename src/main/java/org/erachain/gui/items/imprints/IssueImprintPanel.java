@@ -113,7 +113,7 @@ public class IssueImprintPanel extends IssueItemPanel {
 
         transaction = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, exLink, name_total,
                 textAreaDescription.getText(),
-                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
+                addIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
                 feePow);
     }
 

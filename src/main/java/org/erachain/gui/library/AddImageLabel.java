@@ -33,16 +33,29 @@ public class AddImageLabel extends JPanel {
     private JLabel label;
     private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
+    public JTextField externalURL = new JTextField();
+    private JButton externalURLCheck = new JButton(Lang.T("Check URL"));
+
     private boolean editable = true;
 
     public AddImageLabel(String text, int baseWidth, int baseHeight, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
         setLayout(new BorderLayout());
+        JPanel panelTop = new JPanel();
+        panelTop.setLayout(new BorderLayout());
+        add(panelTop, BorderLayout.NORTH);
         this.text = text;
-        label = new JLabel("The Label", SwingConstants.CENTER);
-        label.setText(this.text);
-        add(label, BorderLayout.NORTH);
-        add(mainLabel, BorderLayout.CENTER);
-        add(labelSize, BorderLayout.SOUTH);
+        label = new JLabel(text, SwingConstants.CENTER);
+        panelTop.add(label, BorderLayout.NORTH);
+        panelTop.add(mainLabel, BorderLayout.CENTER);
+        panelTop.add(labelSize, BorderLayout.SOUTH);
+
+        JPanel panelCenter = new JPanel();
+        panelCenter.setLayout(new BorderLayout());
+        add(panelCenter, BorderLayout.CENTER);
+        panelCenter.add(new JLabel(Lang.T("Use external URL") + ":"), BorderLayout.NORTH);
+        externalURL.setToolTipText(Lang.T("Use external source by URL. It not safe by blockchain"));
+        panelCenter.add(externalURL, BorderLayout.CENTER);
+        panelCenter.add(externalURLCheck, BorderLayout.SOUTH);
 
         this.baseWidth = baseWidth;
         this.baseHeight = baseHeight;
