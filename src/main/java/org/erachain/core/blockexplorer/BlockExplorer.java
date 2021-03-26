@@ -1678,10 +1678,10 @@ public class BlockExplorer {
 
             Map balance = new LinkedHashMap();
             balance.put("address", top100.a);
-            balance.put("OWN", top100.b.toPlainString());
-            balance.put("DEBT", top100.c.toPlainString());
-            balance.put("HOLD", top100.d.toPlainString());
-            balance.put("SPEND", top100.e.toPlainString());
+            balance.put("OWN", top100.b.setScale(asset.getScale()).toPlainString());
+            balance.put("DEBT", top100.c.setScale(asset.getScale()).toPlainString());
+            balance.put("HOLD", top100.d.setScale(asset.getScale()).toPlainString());
+            balance.put("SPEND", top100.e.setScale(asset.getScale()).toPlainString());
 
             Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
