@@ -76,6 +76,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     protected byte[] typeBytes;
     protected PublicKeyAccount maker;
+
+    /**
+     * добавочные флаги по знаку из Размер Картинки
+     */
+    protected static final int FLAGS_MASK = 1 << 31;
+    // настройки для данного актива - могут быть использованы в будущем - 64 байта
+    // то есть можно установить 64 разных флагов
+    protected long[] flags;
+
     protected String name;
     protected String description;
     protected long key = 0;
@@ -86,12 +95,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected long dbRef;
     protected byte[] icon;
     protected byte[] image;
-
-    /**
-     * добавочные флаги по знаку из Размер Картинки
-     */
-    protected long[] flags;
-    protected static final int FLAGS_MASK = 1 << 31;
 
     public Transaction referenceTx = null;
 
