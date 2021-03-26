@@ -51,7 +51,7 @@ public abstract class SearchItemsTableModel extends WalletItemTableModel<ItemCls
 
         IteratorCloseable iterator = null;
         try {
-            Pair<String, IteratorCloseable<Long>> result = ((ItemMap) map).getKeysIteratorByFilterAsArray(filter, 0, descending);
+            Pair<String, IteratorCloseable<Long>> result = ((ItemMap) map).getKeysIteratorByFilterAsArray(filter, null, 0, descending);
             iterator = result.getB();
             fill(iterator);
         } finally {

@@ -338,12 +338,13 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
      * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
      *
      * @param filter
+     * @param fromID
      * @param offset
      * @param descending
      * @return
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, IteratorCloseable<Long>> getKeysIteratorByFilterAsArray(String filter, int offset, boolean descending) {
+    public Pair<String, IteratorCloseable<Long>> getKeysIteratorByFilterAsArray(String filter, Long fromID, int offset, boolean descending) {
 
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(Transaction.SPLIT_CHARS);
@@ -401,14 +402,19 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                     }
                 }
 
-                TreeSet<Long> treeSet = new TreeSet();
+                NavigableSet<Long> treeSet = new TreeSet<>();
                 for (Long keyResult : andHashSet) {
                     treeSet.add(keyResult);
                 }
 
-                IteratorCloseable<Long> iterator = IteratorCloseableImpl.make(
-                        descending ? treeSet.descendingIterator() : treeSet.iterator());
+                if (descending)
+                    treeSet = treeSet.descendingSet();
 
+                if (fromID != null) {
+                    treeSet = (NavigableSet<Long>) treeSet.subSet(fromID, descending ? 0L : Long.MAX_VALUE);
+                }
+
+                IteratorCloseable<Long> iterator = IteratorCloseableImpl.make(treeSet.iterator());
 
                 if (offset > 0)
                     Iterators.advance(iterator, offset);
@@ -434,7 +440,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<ItemCls> getByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
+    public List<ItemCls> getByFilterAsArray(String filter, Long fromID, int offset, int limit, boolean descending) {
 
         if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();
@@ -446,7 +452,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         List<ItemCls> result = new ArrayList<>();
         try {
 
-            resultKeys = getKeysIteratorByFilterAsArray(filter, offset, descending);
+            resultKeys = getKeysIteratorByFilterAsArray(filter, fromID, offset, descending);
             if (resultKeys.getA() != null) {
                 return new ArrayList<>();
             }

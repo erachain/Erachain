@@ -1321,7 +1321,7 @@ public class API {
                                  @QueryParam("offset") int offset,
                                  @QueryParam("limit") int limit) {
 
-        return APIItemAsset.find(filter, fromID, offset, limit);
+        return APIItemAsset.find(filter, fromID, offset, limit, true);
 
     }
 

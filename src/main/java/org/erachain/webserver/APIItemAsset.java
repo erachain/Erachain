@@ -50,7 +50,7 @@ public class APIItemAsset {
         help.put("GET apiasset/last", "Get last ID");
         help.put("GET apiasset/{key}", "Get by ID");
         help.put("GET apiasset/raw/{key}", "Returns RAW in Base58 of asset with the given key.");
-        help.put("GET apiasset/find?filter={name_string}&offset=0&limit=0", "Get by words in Name. Use patterns from 5 chars in words");
+        help.put("GET apiasset/find?filter={name_string}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use patterns from 5 chars in words. Default {descending} - true");
         help.put("Get apiasset/image/{key}", "Get Asset Image");
         help.put("Get apiasset/icon/{key}", "Get Asset Icon");
         help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
@@ -151,7 +151,7 @@ public class APIItemAsset {
                                    @QueryParam("offset") int offset,
                                    @QueryParam("limit") int limit) {
 
-        return find(filter, fromID, offset, limit);
+        return find(filter, fromID, offset, limit, true);
     }
 
     @GET
@@ -159,7 +159,8 @@ public class APIItemAsset {
     public static Response find(@QueryParam("filter") String filter,
                                 @QueryParam("from") Long fromID,
                                 @QueryParam("offset") int offset,
-                                @QueryParam("limit") int limit) {
+                                @QueryParam("limit") int limit,
+                                @DefaultValue("true") @QueryParam("desc") boolean descending) {
 
         if (limit > 100) {
             limit = 100;
@@ -174,7 +175,7 @@ public class APIItemAsset {
         }
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, true);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, descending);
 
         JSONArray array = new JSONArray();
 

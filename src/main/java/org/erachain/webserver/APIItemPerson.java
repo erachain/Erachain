@@ -42,7 +42,7 @@ public class APIItemPerson {
         help.put("GET apiperson/last", "Get last ID");
         help.put("GET apiperson/{key}", "GET by ID");
         help.put("GET apiperson/raw/{key}", "Returns RAW in Base58 of person with the given key.");
-        help.put("GET apiperson/find?filter={name_string}&offset=0&limit=0", "Get by words in Name. Use patterns from 5 chars in words");
+        help.put("GET apiperson/find?filter={name_string}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use patterns from 5 chars in words. Default {descending} - true");
         help.put("Get apiperson/image/{key}", "GET Person Image");
         help.put("Get apiperson/icon/{key}", "GET Person Icon");
         help.put("Get apiperson/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
@@ -211,7 +211,7 @@ public class APIItemPerson {
                                    @QueryParam("offset") int offset,
                                    @QueryParam("limit") int limit) {
 
-        return find(filter, fromID, offset, limit);
+        return find(filter, fromID, offset, limit, true);
     }
 
     @GET
@@ -219,7 +219,8 @@ public class APIItemPerson {
     public static Response find(@QueryParam("filter") String filter,
                                 @QueryParam("from") Long fromID,
                                 @QueryParam("offset") int offset,
-                                @QueryParam("limit") int limit) {
+                                @QueryParam("limit") int limit,
+                                @DefaultValue("true") @QueryParam("desc") boolean descending) {
 
         if (limit > 100) {
             limit = 100;
@@ -234,7 +235,7 @@ public class APIItemPerson {
         }
 
         ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, true);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, descending);
 
         JSONArray array = new JSONArray();
 
