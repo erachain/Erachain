@@ -612,7 +612,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public int getDataLength(boolean includeReference) {
         return BASE_LENGTH
-                + (this.flags != 0 ? FLAGS_LENGTH : 0)
+                + (flags == null || flags.length == 0 ? 0 : FLAGS_LENGTH * flags.length)
                 + this.name.getBytes(StandardCharsets.UTF_8).length
                 + this.icon.length
                 + this.image.length
