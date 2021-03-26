@@ -1823,17 +1823,18 @@ public class BlockExplorer {
                     bal.put("asset_key", assetKey);
                     bal.put("asset_name", asset.viewName());
 
-
                     if (BlockChain.ERA_COMPU_ALL_UP && side == Account.BALANCE_SIDE_LEFT) {
                         bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)
-                                .add(account.addDEVAmount(assetKey)));
+                                .add(account.addDEVAmount(assetKey))
+                                .setScale(asset.getScale()).toPlainString());
                     } else {
-                        bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side));
+                        bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)
+                                .setScale(asset.getScale()).toPlainString());
                     }
 
-                    bal.put("balance_2", Account.balanceInPositionAndSide(itemBals, 2, side));
-                    bal.put("balance_3", Account.balanceInPositionAndSide(itemBals, 3, side));
-                    bal.put("balance_4", Account.balanceInPositionAndSide(itemBals, 4, side));
+                    bal.put("balance_2", Account.balanceInPositionAndSide(itemBals, 2, side).setScale(asset.getScale()).toPlainString());
+                    bal.put("balance_3", Account.balanceInPositionAndSide(itemBals, 3, side).setScale(asset.getScale()).toPlainString());
+                    bal.put("balance_4", Account.balanceInPositionAndSide(itemBals, 4, side).setScale(asset.getScale()).toPlainString());
                     balAssets.put("" + assetKey, bal);
                 }
             }
