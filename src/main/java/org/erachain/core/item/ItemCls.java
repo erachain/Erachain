@@ -593,23 +593,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return data;
     }
 
-	/*
-	@SuppressWarnings("unchecked")
-	protected JSONObject getJsonBase()
-	{
-		JSONObject out=new JSONObject();
-
-		out.put("key", this.getKey());
-		out.put("name", this.getName());
-		out.put("description", this.getDescription());
-		out.put("maker", this.getMaker().getAddress());
-
-		return out;
-	}
-
-	public abstract JSONObject toJson();
-	 */
-
     public int getDataLength(boolean includeReference) {
         return BASE_LENGTH
                 + (flags == null || flags.length == 0 ? 0 : FLAGS_LENGTH * flags.length)
