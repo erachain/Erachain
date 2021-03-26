@@ -22,6 +22,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.imprints.ImprintCls;
@@ -3151,8 +3152,13 @@ public class Controller extends Observable {
         APIUtils.askAPICallAllowed(password, "POST issue Asset " + name, request, true);
         PrivateKeyAccount creatorPrivate = getWalletPrivateKeyAccountByAddress(creator);
 
-        return issueAsset(creatorPrivate,
-                linkTo, name, description, icon, image, scale,
+        int profitTaxMin = 0;
+        int profitTaxMax = 0;
+        int profitFee = 0;
+        int loanInterest = 0;
+
+        return issueAsset(null, creatorPrivate, linkTo, profitTaxMin, profitTaxMax, profitFee, loanInterest,
+                name, description, icon, image, scale,
                 assetType, quantity, feePow);
 
     }
@@ -3163,6 +3169,22 @@ public class Controller extends Observable {
             return this.transactionCreator.createIssueAssetTransaction(creator, linkTo, asset, feePow);
         }
     }
+
+    //public Transaction issueAsset(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
+    //                              int scale, int assetType, long quantity, int feePow) {
+    public Transaction issueAsset(long[] flags, PrivateKeyAccount creator, ExLink linkTo, int profitTaxMin, int profitTaxMax,
+                                  int profitFee, long loanInterest,
+                                  String name, String description, byte[] icon, byte[] image,
+                                  int scale, int asset_type, long quantity, int feePow) {
+
+        AssetCls asset = new AssetVenture(flags, creator, name, icon, image, description, asset_type, scale, quantity);
+
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueAssetTransaction(creator, linkTo, asset, feePow);
+        }
+    }
+
 
     public Transaction issueAsset(PrivateKeyAccount creator, ExLink linkTo, String name, String description, byte[] icon, byte[] image,
                                   int scale, int assetType, long quantity, int feePow) {
