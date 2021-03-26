@@ -31,8 +31,8 @@ public class Union extends UnionCls {
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
         position += MAKER_LENGTH;
 
         //READ NAME
@@ -125,7 +125,7 @@ public class Union extends UnionCls {
         }
 
         //RETURN
-        Union union = new Union(typeBytes, flags, owner, name, birthday, parent, icon, image, description);
+        Union union = new Union(typeBytes, flags, maker, name, birthday, parent, icon, image, description);
         if (includeReference) {
             union.setReference(reference, dbRef);
         }

@@ -58,7 +58,7 @@ public class TestRecSetStatusToItem {
     RSetStatusToItem setStatusTransaction;
     private byte[] icon = new byte[]{1, 3, 4, 5, 6, 9}; // default value
     private byte[] image = new byte[]{4, 11, 32, 23, 45, 122, 11, -45}; // default value
-    private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
+    private byte[] makerSignature = new byte[Crypto.SIGNATURE_LENGTH];
     //CREATE EMPTY MEMORY DATABASE
     private DCSet db;
     private GenesisBlock gb;
@@ -85,7 +85,7 @@ public class TestRecSetStatusToItem {
         long birthDay = timestamp - 12345678;
         person = new PersonHuman(flags, maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
                 (byte) 1, "Slav", (float) 128.12345, (float) 33.7777,
-                "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
+                "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", makerSignature);
 
         //CREATE ISSUE PERSON TRANSACTION
         issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0], null);

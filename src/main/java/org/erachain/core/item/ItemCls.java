@@ -90,12 +90,12 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     /**
      * добавочные флаги по знаку из Размер Картинки
      */
-    protected long flags;
+    protected long[] flags;
     protected static final int FLAGS_MASK = 1 << 31;
 
     public Transaction referenceTx = null;
 
-    public ItemCls(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+    public ItemCls(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
         this.typeBytes = typeBytes;
         this.flags = flags;
         this.maker = maker;
@@ -106,7 +106,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     }
 
-    public ItemCls(int type, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+    public ItemCls(int type, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
         this(new byte[TYPE_LENGTH], flags, maker, name, icon, image, description);
         this.typeBytes[0] = (byte) type;
     }

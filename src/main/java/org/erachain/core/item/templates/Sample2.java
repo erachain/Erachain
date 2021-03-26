@@ -14,12 +14,12 @@ public class Sample2 extends TemplateCls {
 
     private static final int TYPE_ID = SAMPLE;
 
-    public Sample2(long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(TYPE_ID, flags, owner, name, icon, image, description);
+    public Sample2(long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(TYPE_ID, flags, maker, name, icon, image, description);
     }
 
-    public Sample2(byte[] typeBytes, long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, flags, owner, name, icon, image, description);
+    public Sample2(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, flags, maker, name, icon, image, description);
     }
 
     //PARSE
@@ -31,8 +31,8 @@ public class Sample2 extends TemplateCls {
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
         position += MAKER_LENGTH;
 
         //READ NAME
@@ -115,7 +115,7 @@ public class Sample2 extends TemplateCls {
         }
 
         //RETURN
-        Sample2 template = new Sample2(typeBytes, flags, owner, name, icon, image, description);
+        Sample2 template = new Sample2(typeBytes, flags, maker, name, icon, image, description);
         if (includeReference) {
             template.setReference(reference, dbRef);
         }

@@ -122,8 +122,8 @@ public class AssetVenture extends AssetCls {
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
         position += MAKER_LENGTH;
 
         //READ NAME
@@ -221,7 +221,7 @@ public class AssetVenture extends AssetCls {
         position += ASSET_TYPE_LENGTH;
 
         //RETURN
-        AssetVenture venture = new AssetVenture(typeBytes, flags, owner, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]), scale, quantity);
+        AssetVenture venture = new AssetVenture(typeBytes, flags, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]), scale, quantity);
         if (includeReference) {
             venture.setReference(reference, dbRef);
         }

@@ -30,12 +30,12 @@ public abstract class StatusCls extends ItemCls {
 
     public static final int INITIAL_FAVORITES = 10;
 
-    public StatusCls(byte[] typeBytes, long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, flags, owner, name, icon, image, description);
+    public StatusCls(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, flags, maker, name, icon, image, description);
     }
 
-    public StatusCls(int type, long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, boolean unique) {
-        this(new byte[TYPE_LENGTH], flags, owner, name, icon, image, description);
+    public StatusCls(int type, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, boolean unique) {
+        this(new byte[TYPE_LENGTH], flags, maker, name, icon, image, description);
         typeBytes[0] = (byte) type;
         typeBytes[1] = unique ? (byte) 1 : (byte) 0;
 

@@ -315,7 +315,7 @@ public class TransactionCreator {
             byte gender, String race, float birthLatitude, float birthLongitude,
             String skinColor, String eyeColor, String hairСolor, int height,
             byte[] icon, byte[] image, String description,
-            PublicKeyAccount owner, byte[] ownerSignature) {
+            PublicKeyAccount maker, byte[] makerSignature) {
 
         this.checkUpdate();
 
@@ -348,9 +348,9 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        PersonHuman person = new PersonHuman(flags, owner, fullName, birthday, deathday,
+        PersonHuman person = new PersonHuman(flags, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
-                skinColor, eyeColor, hairСolor, height, icon, image, description, ownerSignature);
+                skinColor, eyeColor, hairСolor, height, icon, image, description, makerSignature);
 
         long lastReference;
         if (forIssue) {
@@ -401,9 +401,9 @@ public class TransactionCreator {
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
-        byte[] ownerSign = ((PersonHuman) issuePersonRecord.getItem()).getMakerSignature();
-        if (ownerSign != null && this.fork.getTransactionFinalMapSigns().contains(ownerSign)) {
-            issuePersonRecord.setErrorValue("equal to OwnerSignature " + Base58.encode(ownerSign));
+        byte[] makerSign = ((PersonHuman) issuePersonRecord.getItem()).getMakerSignature();
+        if (makerSign != null && this.fork.getTransactionFinalMapSigns().contains(makerSign)) {
+            issuePersonRecord.setErrorValue("equal to OwnerSignature " + Base58.encode(makerSign));
             return new Pair<Transaction, Integer>(issuePersonRecord, Transaction.ITEM_DUPLICATE);
         }
 

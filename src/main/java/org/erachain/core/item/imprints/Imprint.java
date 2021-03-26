@@ -14,12 +14,12 @@ public class Imprint extends ImprintCls {
 
     private static final int TYPE_ID = IMPRINT;
 
-    public Imprint(long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(TYPE_ID, flags, owner, name, icon, image, description);
+    public Imprint(long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(TYPE_ID, flags, maker, name, icon, image, description);
     }
 
-    public Imprint(byte[] typeBytes, long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, flags, owner, name, icon, image, description);
+    public Imprint(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, flags, maker, name, icon, image, description);
     }
 
     //PARSE
@@ -31,8 +31,8 @@ public class Imprint extends ImprintCls {
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
         position += MAKER_LENGTH;
 
         //READ NAME
@@ -112,7 +112,7 @@ public class Imprint extends ImprintCls {
         }
 
         //RETURN
-        Imprint imprint = new Imprint(typeBytes, flags, owner, name, icon, image, description);
+        Imprint imprint = new Imprint(typeBytes, flags, maker, name, icon, image, description);
         if (includeReference) {
             imprint.setReference(reference, dbRef);
         }
