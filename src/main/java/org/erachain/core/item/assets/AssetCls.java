@@ -2291,19 +2291,32 @@ public abstract class AssetCls extends ItemCls {
             // значит приход + это тот актив который мы можем поделить
             // и это не сам автор продает
             assetMakerRoyalty = tradeAmount.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
-            inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
-            forgerFee = inviterRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+            forgerFee = tradeAmount.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
 
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
-            inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
+            if (issuerPersonDuration != null) {
+                inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
+                inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+            } else {
+                inviter = null;
+                inviterRoyalty = BigDecimal.ZERO;
+            }
 
         } else if (assetWant.getKey() < 100 && !isInitiator) {
             // это системные активы - берем комиссию за них
             assetMakerRoyalty = BigDecimal.ZERO;
-            inviterRoyalty = BigDecimal.ZERO;
             forgerFee = tradeAmount.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
 
-            inviter = null;
+            // за рефералку тут тоже
+            Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = receiver.getPersonDuration(dcSet);
+            if (issuerPersonDuration != null) {
+                inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
+                inviterRoyalty = forgerFee;
+            } else {
+                inviter = null;
+                inviterRoyalty = BigDecimal.ZERO;
+            }
+
 
         } else {
             assetMakerRoyalty = BigDecimal.ZERO;
