@@ -5,22 +5,14 @@ package org.erachain.gui.items.link_hashes;
  * and open the template in the editor.
  */
 
-import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
-import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.AuxiliaryToolTip;
 import org.erachain.gui.models.AccountsComboBoxModel;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.utils.Pair;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.util.List;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -91,87 +83,6 @@ public class IssueHashImprint extends javax.swing.JPanel {
 		    }
 		});
  */
-    }
-
-    public void onIssueClick() {
-        //DISABLE
-        this.jButton.setEnabled(false);
-
-        //CHECK IF NETWORK OK
-        if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
-            //NETWORK NOT OK
-            JOptionPane.showMessageDialog(null, Lang.T("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-
-            //ENABLE
-            this.jButton.setEnabled(true);
-
-            return;
-        }
-
-        //CHECK IF WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            //ASK FOR PASSWORD
-            String password = PasswordPane.showUnlockWalletDialog(this);
-            if (!Controller.getInstance().unlockWallet(password)) {
-                //WRONG PASSWORD
-                JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-
-                //ENABLE
-                this.jButton.setEnabled(true);
-
-                return;
-            }
-        }
-
-        //READ CREATOR
-        Account sender = (Account) this.jComboBox_Account.getSelectedItem();
-
-        long parse = 0;
-        try {
-
-            //READ FEE POW
-            int feePow =  Integer.parseInt((String)this.txtFeePow.getSelectedItem());
-            // READ AMOUNT
-            //float amount = Float.parseFloat(this.txtAmount.getText());
-
-            // NAME TOTAL
-            String url = this.jTextField_URL.getText().trim();
-
-            String description = this.jTextArea_Description.getText();
-
-            List<String> hashes = this.table_Model.getValues(0);
-
-            //CREATE IMPRINT
-            PrivateKeyAccount creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress());
-            if (creator == null) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            Pair<Transaction, Integer> result = Controller.getInstance().r_Hashes(creator, feePow, url, description,
-                    String.join(" ", hashes));
-
-            //CHECK VALIDATE MESSAGE
-            if (result.getB() == Transaction.VALIDATE_OK) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Imprint issue has been sent!"), Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
-                //this.dispose();
-            } else {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Unknown error")
-                        + "[" + result.getB() + "]!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-
-        } catch (Exception e) {
-            if (parse == 0) {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid quantity!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-        }
-
-        //ENABLE
-        this.jButton.setEnabled(true);
     }
 
     /**

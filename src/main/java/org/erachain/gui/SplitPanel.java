@@ -51,12 +51,15 @@ public class SplitPanel extends IconPanel {
     public JPanel leftPanel;
     public JPanel rightPanel1;
     public JTextField searchTextFieldSearchToolBarLeftPanelDocument;
-    public JMenuBar  searchToolBar_LeftPanel;
+    public JMenuBar searchToolBar_LeftPanel;
     public JLabel searthLabelSearchToolBarLeftPanel;
     public JPanel toolBarLeftPanel;
     public JCheckBox searchMyJCheckBoxLeftPanel;
     public JCheckBox searchFavoriteJCheckBoxLeftPanel;
     private JSONObject settingsJSONbuf;
+
+    protected GridBagConstraints gridBagConstraints;
+
     /**
      * Creates new form Doma2
      */
@@ -93,8 +96,6 @@ public class SplitPanel extends IconPanel {
         settingsJSONbuf = new JSONObject();
         settingsJSONbuf = Settings.getInstance().Dump();
 
-        GridBagConstraints gridBagConstraints;
-
         jSplitPanel = new MSplitPane(MSplitPane.VERTICAL_SPLIT, true);
         //      jSplitPanel.M_setDividerSize(20);
         leftPanel = new JPanel();
@@ -119,9 +120,20 @@ public class SplitPanel extends IconPanel {
 
         leftPanel.setLayout(new GridBagLayout());
 
-     //   toolBarLeftPanel.setBorderPainted(false);
-       // toolBarLeftPanel.setFloatable(false);
-      //  toolBarLeftPanel.setRollover(true);
+        gridBagConstraints = new GridBagConstraints();
+        searchToolBar_LeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+
+        searthLabelSearchToolBarLeftPanel.setText(" " + Lang.T("Search") + ":");
+        searthLabelSearchToolBarLeftPanel.setToolTipText("");
+        searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel, gridBagConstraints);
+
+        searchTextFieldSearchToolBarLeftPanelDocument.setToolTipText("");
+        searchTextFieldSearchToolBarLeftPanelDocument.setAlignmentX(2.0F);
+        searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchTextFieldSearchToolBarLeftPanelDocument.setMaximumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchToolBar_LeftPanel.add(searchTextFieldSearchToolBarLeftPanelDocument);
 
         button1ToolBarLeftPanel.setText("jButton1");
         button1ToolBarLeftPanel.setFocusable(false);
@@ -140,15 +152,16 @@ public class SplitPanel extends IconPanel {
         button2ToolBarLeftPanel.setVerticalTextPosition(SwingConstants.BOTTOM);
         toolBarLeftPanel.add(button2ToolBarLeftPanel);
         button2ToolBarLeftPanel.getAccessibleContext().setAccessibleDescription("");
-        gridBagConstraints = new GridBagConstraints();
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(5, 8, 0, 0);
         leftPanel.add(toolBarLeftPanel, gridBagConstraints);
 
-       // searchToolBar_LeftPanel.setFloatable(false);
-       // searchToolBar_LeftPanel.setRollover(true);
+        // searchToolBar_LeftPanel.setFloatable(false);
+        // searchToolBar_LeftPanel.setRollover(true);
         searchToolBar_LeftPanel.setVisible(false);
 
 
@@ -160,29 +173,13 @@ public class SplitPanel extends IconPanel {
         searchFavoriteJCheckBoxLeftPanel.setText(Lang.T("Favorite") + " ");
         searchToolBar_LeftPanel.add(searchFavoriteJCheckBoxLeftPanel);
 
-
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ": ");
-        searthLabelSearchToolBarLeftPanel.setToolTipText("");
-        searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel);
-
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ": ");
-        searthLabelSearchToolBarLeftPanel.setToolTipText("");
-        searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel);
-
-        searchTextFieldSearchToolBarLeftPanelDocument.setToolTipText("");
-        searchTextFieldSearchToolBarLeftPanelDocument.setAlignmentX(2.0F);
-        searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
-        searchTextFieldSearchToolBarLeftPanelDocument.setName(""); // NOI18N
-        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(400, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
-        searchToolBar_LeftPanel.add(searchTextFieldSearchToolBarLeftPanelDocument);
-
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = GridBagConstraints.RELATIVE;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(5, 0, 0, 10);
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         leftPanel.add(searchToolBar_LeftPanel, gridBagConstraints);
 
         jScrollPanelLeftPanel.setBorder(BorderFactory.createEtchedBorder());

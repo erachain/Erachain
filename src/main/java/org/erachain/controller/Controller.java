@@ -96,8 +96,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.3 DEV";
-    public static String buildTime = "2021-03-01 12:00:00 UTC";
+    public static String version = "5.3.01";
+    public static String buildTime = "2021-03-22 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -1439,6 +1439,7 @@ public class Controller extends Observable {
 
         // CheckPointSign
         peerInfo.put("cps", Base58.encode(blockChain.getMyHardCheckPointSign()));
+        peerInfo.put("cph", blockChain.getMyHardCheckPointHeight());
 
         if (!peer.directSendMessage(
                 MessageFactory.getInstance().createVersionMessage(peerInfo.toString(), buildTimestamp))) {
@@ -1653,23 +1654,16 @@ public class Controller extends Observable {
 
                 // ADD TO LIST
                 String infoStr = versionMessage.getStrVersion();
-                try {
-                    JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
-                    if (!blockChain.validageHardCheckPointPeerSign(peerIhfo.get("cps").toString())) {
-                        peer.ban(30, "NOT FOUND CHECKPOINT!");
-                        return;
-                    }
-                    Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
-                    Long peerWeight = Long.parseLong(peerIhfo.get("w").toString());
-                    peer.setHWeight(new Tuple2<>(peerHeight, peerWeight));
-                    peer.setVersion(peerIhfo.get("v").toString());
-                    try {
-                        peer.setNodeInfo((JSONObject) JSONValue.parse(peerIhfo.get("i").toString()));
-                    } catch (Exception e) {
-                    }
+                JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
+                Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
+                Long peerWeight = (Long) peerIhfo.get("w");
+                peer.setHWeight(new Tuple2<>(peerHeight, peerWeight));
+                peer.setVersion((String) peerIhfo.get("v"));
+                peer.setNodeInfo((JSONObject) peerIhfo.get("i"));
 
-                } catch (Exception e) {
-                    peer.setVersion(infoStr);
+                if (!blockChain.validateHardCheckPointPeerSign((Long) peerIhfo.get("cph"), (String) peerIhfo.get("cps"))) {
+                    peer.ban(10, "WRONG HARD CHECKPOINT!");
+                    return;
                 }
 
                 break;
@@ -3635,15 +3629,15 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount sender, int feePow, String url, String data,
-                                               String hashes) {
+    public Transaction r_Hashes(PrivateKeyAccount sender, int feePow, String url, String data,
+                                String hashes) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_Hashes(sender, feePow, url, data, hashes);
         }
     }
 
-    public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount sender, int feePow, String url, String data,
-                                               String[] hashes) {
+    public Transaction r_Hashes(PrivateKeyAccount sender, int feePow, String url, String data,
+                                String[] hashes) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_Hashes(sender, feePow, url, data, hashes);
         }

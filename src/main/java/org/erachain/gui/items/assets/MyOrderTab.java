@@ -41,7 +41,6 @@ public class MyOrderTab extends SplitPanel {
     @SuppressWarnings("rawtypes")
     public MyOrderTab() {
         super(NAME, TITLE);
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);

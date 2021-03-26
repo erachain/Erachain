@@ -12,13 +12,12 @@ import java.util.*;
  * @param <T>
  */
 @Slf4j
-public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
+public class MergedOR_IteratorsNoDuplicates<T> extends IteratorCloseableImpl<T> {
 
     final Queue<PeekingIteratorCloseable<T>> queue;
     protected T lastNext;
     final Comparator<? super T> itemComparator;
-    protected boolean isClosed;
-    private boolean hasNextUsedBefore = false;
+    protected boolean hasNextUsedBefore = false;
 
     /**
      * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
@@ -27,8 +26,8 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
      * @param iterators
      * @param itemComparator
      */
-    public MergedIteratorNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
-                                      final Comparator<? super T> itemComparator) {
+    public MergedOR_IteratorsNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
+                                          final Comparator<? super T> itemComparator) {
         // A comparator that's used by the heap, allowing the heap
         // to be sorted based on the top of each iterator.
         Comparator<PeekingIteratorCloseable<T>> heapComparator =
@@ -126,15 +125,6 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
         }
         isClosed = true;
 
-    }
-
-    @Override
-    public void finalize() throws Throwable {
-        if (!isClosed) {
-            close();
-            logger.warn("FINALIZE used queue");
-        }
-        super.finalize();
     }
 
 }

@@ -16,7 +16,7 @@ import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.IteratorParent;
-import org.erachain.dbs.MergedIteratorNoDuplicates;
+import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -166,7 +166,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                 Fun.filter(descending ? this.creatorKey.descendingSet() : this.creatorKey, addressKey).iterator());
 
         IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, descending);
-        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
                 Fun.COMPARATOR);
@@ -188,7 +188,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                         Fun.t2(addressKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
 
         IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, fromSeqNo, descending);
-        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
                 Fun.COMPARATOR);
@@ -214,7 +214,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                         Fun.t2(addressKey, toSeqNo)).iterator()));
 
         IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, fromSeqNo, toSeqNo, descending);
-        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
                 Fun.COMPARATOR);
@@ -251,7 +251,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
 
         IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent)
                 .getIteratorByAddressAndType(addressShort, type, isCreator, descending);
-        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
                 Fun.COMPARATOR);
@@ -276,7 +276,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
 
         IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent)
                 .getIteratorByAddressAndType(addressShort, type, isCreator, fromID, descending);
-        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
                 Fun.COMPARATOR);
@@ -305,7 +305,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
 
         IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent)
                 .getIteratorByAddressAndType(addressShort, type, isCreator, fromID, toID, descending);
-        return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 iterator),
                 Fun.COMPARATOR);

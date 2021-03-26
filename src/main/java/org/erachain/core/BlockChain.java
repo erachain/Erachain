@@ -253,7 +253,7 @@ public class BlockChain {
 
     public static final int VERS_5_01_01 = TEST_DB > 0 || !MAIN_MODE ? 0 : 990000;
 
-    public static final int VERS_5_3 = TEST_DB > 0 || !MAIN_MODE ? 0 : 1860000;
+    public static final int VERS_5_3 = TEST_DB > 0 || !MAIN_MODE ? 0 : 1870000;
 
     /**
      * Новый уровень начальных номеров для всех сущностей
@@ -455,10 +455,10 @@ public class BlockChain {
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD_4_10 = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON_4_10, FEE_SCALE);
 
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(
-            !MAIN_MODE ? 0 : 1865304,
+            !MAIN_MODE ? 0 : 235267,
             Base58.decode(
                     !MAIN_MODE ? ""
-                            : "4Upt5wQmd8dssQrjNQHKMTnHDRRa7fhvxPwhDV3Anha7STwH9sFFggu5C7mqvjmyUaUZg51k6v22ED5RnyPffafv"));
+                            : "2VTp79BBpK5E4aZYV5Tk3dYRS887W1devsrnyJeN6WTBQYQzoe2cTg819DdRs5o9Wh6tsGLsetYTbDu9okgriJce"));
 
     // issue PERSON
     //public static final BigDecimal PERSON_MIN_ERA_BALANCE = BigDecimal.valueOf(10000000);
@@ -1048,8 +1048,34 @@ public class BlockChain {
         }
     }
 
-    public boolean validageHardCheckPointPeerSign(String peerSign) {
-        return Arrays.equals(getMyHardCheckPointSign(), Base58.decode(peerSign));
+    public int getMyHardCheckPointHeight() {
+        if (CHECKPOINT.a > 1) {
+            return CHECKPOINT.a;
+        } else {
+            return 1;
+        }
+    }
+
+    /**
+     * @param peerHeight  Long чтобы преобразования JSON не делать лоя Нуля
+     * @param peerSignStr
+     * @return
+     */
+    public boolean validateHardCheckPointPeerSign(Long peerHeight, String peerSignStr) {
+
+        byte[] peerSign = Base58.decode(peerSignStr);
+        if (Arrays.equals(getMyHardCheckPointSign(), peerSign))
+            return true;
+
+        DCSet dcSet = DCSet.getInstance();
+        if (dcSet.getBlockSignsMap().contains(peerSign))
+            return true;
+
+        if (peerHeight == null || // OLD version
+                peerHeight > getHeight(dcSet))
+            return true;
+
+        return false;
     }
 
     public boolean isPeerTrusted(Peer peer) {

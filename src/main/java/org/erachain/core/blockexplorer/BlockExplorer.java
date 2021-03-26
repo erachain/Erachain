@@ -118,18 +118,18 @@ public class BlockExplorer {
      * @param langObj
      * @param expArgs
      */
-    public void makeLinerPage(Class type, long start, Map output, JSONObject langObj, Object[] expArgs) {
+    public void makeLinerIntPage(Class type, Integer start, Map output, JSONObject langObj, Object[] expArgs) {
 
         DBTab map = dcSet.getMap(type);
         ExplorerJsonLine element;
         int size = map.size();
 
-        if (start < 1 || start > size && size > 0) {
+        if (start == null || start < 1 || start > size && size > 0) {
             start = size;
         }
         output.put("start", start);
 
-        long key = start;
+        int key = start;
         JSONArray array = new JSONArray();
 
         while (key > start - pageSize && key > 0) {
@@ -181,40 +181,18 @@ public class BlockExplorer {
     /**
      * Для списков с ключом INT - для блоков. Без пропуска пустых номеров.
      *
-     * @param type
-     * @param keys
-     * @param start
-     * @param output
-     * @param langObj
+     * @param items
      * @param expArgs
      */
-    public void makePage(Class type, List keys, int start,
-                         Map output, JSONObject langObj, Object[] expArgs) {
+    public void makePage(List items, Object[] expArgs) {
 
-        int size = keys.size();
-
-        if (start < 1 || start > size && size > 0) {
-            start = size;
-        }
-        output.put("start", start);
-
-        int index = start;
         JSONArray array = new JSONArray();
 
-        if (size > 0) {
-            DBTab map = dcSet.getMap(type);
-            ExplorerJsonLine element;
-
-            while (index > start - pageSize && index > 0) {
-                element = (ExplorerJsonLine) map.get(keys.get(--index));
-                if (element != null) {
-                    array.add(element.jsonForExplorerPage(langObj, expArgs));
-                }
-            }
+        for (Object item : items) {
+            array.add(((ExplorerJsonLine) item).jsonForExplorerPage(langObj, expArgs));
         }
 
         output.put("pageItems", array);
-        output.put("listSize", keys.size());
 
     }
 
@@ -226,10 +204,10 @@ public class BlockExplorer {
      * @param expArgs
      * @return
      */
-    public Map jsonQueryLinearPages(Class type, long start, Object[] expArgs) {
+    public Map jsonQueryLinearIntPages(Class type, Integer start, Object[] expArgs) {
         Map result = new LinkedHashMap();
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
-        makeLinerPage(type, start, result, langObj, expArgs);
+        makeLinerIntPage(type, start, result, langObj, expArgs);
         return result;
     }
 
@@ -240,10 +218,10 @@ public class BlockExplorer {
         return result;
     }
 
-    public LinkedHashMap jsonQuerySearchPages(UriInfo info, Class type, String search, int offset, Object[] expArgs) throws WrongSearchException, Exception {
+    public void jsonQuerySearchPages(UriInfo info, Class type, String search, int offset, Object[] expArgs) throws WrongSearchException, Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
         LinkedHashMap result = new LinkedHashMap();
-        List<Object> keys = new ArrayList();
+        List<Object> items = new ArrayList();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
@@ -261,14 +239,14 @@ public class BlockExplorer {
                 }
                 if (map.contains(key)) {
                     //Элемент найден - добавляем его
-                    keys.add(key);
+                    items.add(key);
                     //Не отображать для одного элемента навигацию и пагинацию
                     result.put("notDisplayPages", "true");
                 }
             } else {
                 //Поиск элементов по имени
                 String fromWord = null; // TODO нужно задавать иначе не найдет
-                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search, fromWord,
+                items = ((FilteredByStringArray) map).getByFilterAsArray(search,
                         Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
                         offset, pageSize, true);
             }
@@ -277,9 +255,11 @@ public class BlockExplorer {
             throw new WrongSearchException();
         }
 
-        makePage(type, keys, offset, result, langObj, expArgs);
+        output.put("start", offset);
+        output.put("listSize", items.size());
 
-        return result;
+        makePage(items, expArgs);
+
     }
 
     @SuppressWarnings("static-access")
@@ -361,7 +341,7 @@ public class BlockExplorer {
                         break;
                     case "persons":
                         //search persons
-                        output.putAll(jsonQuerySearchPages(info, PersonCls.class, search, offset, null));
+                        jsonQuerySearchPages(info, PersonCls.class, search, offset, null);
                         break;
                     case "assets":
                         //search assets
@@ -369,24 +349,24 @@ public class BlockExplorer {
                         Object[] expArgs = new Object[2];
                         expArgs[0] = Controller.getInstance().getAsset(ASSET_QUOTE_KEY);
                         expArgs[1] = Controller.getInstance().dlSet.getPairMap();
-                        output.putAll(jsonQuerySearchPages(info, AssetCls.class, search, offset, expArgs));
+                        jsonQuerySearchPages(info, AssetCls.class, search, offset, expArgs);
 
                         break;
                     case "statuses":
                         //search statuses
-                        output.putAll(jsonQuerySearchPages(info, StatusCls.class, search, offset, null));
+                        jsonQuerySearchPages(info, StatusCls.class, search, offset, null);
                         break;
                     case "templates":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(info, TemplateCls.class, search, offset, null));
+                        jsonQuerySearchPages(info, TemplateCls.class, search, offset, null);
                         break;
                     case "polls":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(info, PollCls.class, search, offset, null));
+                        jsonQuerySearchPages(info, PollCls.class, search, offset, null);
                         break;
                     case "blocks":
                         //search block
-                        output.putAll(jsonQuerySearchPages(info, Block.class, search, offset, null));
+                        jsonQuerySearchPages(info, Block.class, search, offset, null);
                         break;
                     case "top":
                         output.putAll(jsonQueryTopRichest100(100, Long.valueOf(search)));
@@ -518,7 +498,8 @@ public class BlockExplorer {
             ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
             output.put("type", "blocks");
-            output.putAll(jsonQueryIteratorPages(Block.BlockHead.class, offset, offset, null));
+            output.putAll(jsonQueryLinearIntPages(Block.BlockHead.class,
+                    checkAndGetLongParam(info, 0L, "start").intValue(), null));
         } else if (info.getQueryParameters().containsKey("block")) {
             jsonQueryBlock(info.getQueryParameters().getFirst("block"), offset);
         }

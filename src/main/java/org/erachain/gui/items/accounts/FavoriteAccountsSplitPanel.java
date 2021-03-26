@@ -68,7 +68,6 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         if (Controller.getInstance().doesWalletDatabaseExists())
             accountsMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
 
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         searthLabelSearchToolBarLeftPanel.setVisible(true);
         // this.searchTextFieldSearchToolBarLeftPanelDocument.setVisible(true);
         // this.searchToolBar_LeftPanel.setVisible(true);

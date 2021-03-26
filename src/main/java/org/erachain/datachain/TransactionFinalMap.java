@@ -9,7 +9,8 @@ import org.erachain.dbs.IteratorCloseable;
 import java.util.Collection;
 import java.util.List;
 
-public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredByStringArray {
+public interface TransactionFinalMap extends DBTab<Long, Transaction>,
+        FilteredByStringArray<Transaction> {
 
     /**
      * Длинна слова до котрого слово рассматриваем как "ПОИСК ПОЛНОСТЬЮ"

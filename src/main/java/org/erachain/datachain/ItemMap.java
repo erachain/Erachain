@@ -1,6 +1,6 @@
 package org.erachain.datachain;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import org.apache.commons.lang3.ArrayUtils;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -13,11 +13,13 @@ import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
+import org.erachain.dbs.MergeAND_SortedIterators;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -26,7 +28,8 @@ import java.util.*;
  * ключ: номер, с самоувеличением
  * Значение: Сущность
  */
-public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredByStringArray<Long>, Pageable<Long, ItemCls> {
+public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredByStringArray<ItemCls>,
+        Pageable<Long, ItemCls> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -245,7 +248,13 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     }
 
 
-    public Pair<Integer, HashSet<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
+    /**
+     * @param step
+     * @param filterArray
+     * @param descending  - не рекомендуется использовать, так как все равно результат смешанные ключ первичные, а лишняя суета
+     * @return
+     */
+    public Pair<Integer, List<IteratorCloseableImpl<Long>>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray, boolean descending) {
 
         Iterable keys;
 
@@ -261,10 +270,18 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                     stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
                 }
 
-                // поиск диаппазона
-                keys = Fun.filter(this.nameKey,
-                        stepFilter, true,
-                        stepFilter + new String(new byte[]{(byte) 254}), true);
+                // поиск диапазона
+                if (descending) {
+                    keys = Fun.filter(this.nameKey.descendingSet(),
+                            stepFilter + new String(new byte[]{(byte) 255}), true,
+                            stepFilter,
+                            false // ВАЖНО! иначе не ищет
+                    );
+                } else {
+                    keys = Fun.filter(this.nameKey,
+                            stepFilter, true,
+                            stepFilter + new String(new byte[]{(byte) 255}), true);
+                }
             }
 
         } else {
@@ -276,45 +293,40 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                 stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
             }
 
-            keys = Fun.filter(this.nameKey, stepFilter);
+            if (descending) {
+                keys = Fun.filter(this.nameKey.descendingSet(), stepFilter);
+            } else {
+                keys = Fun.filter(this.nameKey, stepFilter);
+            }
         }
 
-        if (step > 0) {
+        // в рекурсии все хорошо - соберем ключи
+        IteratorCloseableImpl iterator = IteratorCloseableImpl.make(keys.iterator());
+        if (iterator.hasNext()) {
 
-            // погнали в РЕКУРСИЮ
-            Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
+            if (step > 0) {
 
-            if (result.getA() > 0) {
-                return result;
-            }
-
-            // в рекурсии все хорошо - соберем ключи
-            Iterator iterator = keys.iterator();
-            HashSet<Long> hashSet = result.getB();
-            HashSet<Long> andHashSet = new HashSet<Long>();
-
-            // берем только совпадающие в обоих списках
-            while (iterator.hasNext()) {
-                Long key = (Long) iterator.next();
-                if (hashSet.contains(key)) {
-                    andHashSet.add(key);
+                // погнали в РЕКУРСИЮ
+                Pair<Integer, List<IteratorCloseableImpl<Long>>> result = getKeysByFilterAsArrayRecurse(--step, filterArray, descending);
+                if (result.getA() > 0) {
+                    // в рекурсии где-то одно слово вообще не найдено - просто выход
+                    return result;
                 }
+
+                result.getB().add(iterator);
+                return new Pair<>(0, result.getB());
+
+            } else {
+
+                // последний шаг - просто возьмем этот
+                List<IteratorCloseable<Long>> result = new ArrayList<>();
+                result.add(iterator);
+                return new Pair(0, result);
+
             }
-
-            return new Pair<>(0, andHashSet);
-
         } else {
-
-            // последний шаг - просто все добавим
-            Iterator iterator = keys.iterator();
-            HashSet<Long> hashSet = new HashSet<>();
-            while (iterator.hasNext()) {
-                Long key = (Long) iterator.next();
-                hashSet.add(key);
-            }
-
-            return new Pair<Integer, HashSet<Long>>(0, hashSet);
-
+            // нет вообще значений!
+            return new Pair<>(step + 1, null);
         }
 
     }
@@ -326,84 +338,146 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
      * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
      *
      * @param filter
+     * @param fromID
      * @param offset
-     * @param limit
+     * @param descending
      * @return
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
+    public Pair<String, IteratorCloseable<Long>> getKeysIteratorByFilterAsArray(String filter, Long fromID, int offset, boolean descending) {
 
         String filterLower = filter.toLowerCase();
         String[] filterArray = filterLower.split(Transaction.SPLIT_CHARS);
 
-        Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
-        if (result.getA() > 0) {
-            return new Pair<>("Error: filter key at " + (result.getA() - 1000) + "pos has length < 5", null);
+        Pair<Integer, List<IteratorCloseableImpl<Long>>> result = null;
+        try {
+            result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray,
+                    // лучше стандартно так как все равно на выходе сортировка съедет
+                    // и не надо напрягать обратный поиск
+                    false
+            );
+            if (result.getA() > 0) {
+                return new Pair<>("Error: filter key at " + result.getA() + " pos has length < 5",
+                        null);
+            }
+
+            if (false) {
+                // надо сначала отсортровать все итераторы - и это медленно
+                IteratorCloseable<Long> iterator = MergeAND_SortedIterators.make(result.getB(), Fun.COMPARATOR, false);
+                if (offset > 0)
+                    Iterators.advance(iterator, offset);
+
+                return new Pair<>(null, iterator);
+            } else {
+                Long key;
+                HashSet<Long> andHashSet = null;
+                for (IteratorCloseable<Long> iterator : result.getB()) {
+
+                    if (andHashSet == null) {
+                        // first time - add ALL
+                        andHashSet = new HashSet<>();
+                        while (iterator.hasNext()) {
+                            andHashSet.add(iterator.next());
+                        }
+                        continue;
+                    }
+
+                    // текущий список
+                    HashSet<Long> tempHashSet = new HashSet<>();
+                    while (iterator.hasNext()) {
+                        tempHashSet.add(iterator.next());
+                    }
+
+                    // теперь проверим все значения в списке по И
+                    Iterator<Long> iteratorAND = andHashSet.iterator();
+                    List<Long> toRemove = new ArrayList<>();
+                    while (iteratorAND.hasNext()) {
+                        key = iteratorAND.next();
+                        if (!tempHashSet.contains(key)) {
+                            toRemove.add(key);
+                        }
+                    }
+                    for (Long removedKey : toRemove) {
+                        andHashSet.remove(removedKey);
+                    }
+                }
+
+                NavigableSet<Long> treeSet = new TreeSet<>();
+                for (Long keyResult : andHashSet) {
+                    treeSet.add(keyResult);
+                }
+
+                if (descending)
+                    treeSet = treeSet.descendingSet();
+
+                if (fromID != null) {
+                    treeSet = (NavigableSet<Long>) treeSet.subSet(fromID, descending ? 0L : Long.MAX_VALUE);
+                }
+
+                IteratorCloseable<Long> iterator = IteratorCloseableImpl.make(treeSet.iterator());
+
+                if (offset > 0)
+                    Iterators.advance(iterator, offset);
+
+                return new Pair<>(null, IteratorCloseableImpl.make(iterator));
+
+            }
+
+        } finally {
+            try {
+                // нужно закрыть то что уже нашлось
+                if (result != null && result.getB() != null) {
+                    for (IteratorCloseable iterator : result.getB()) {
+                        iterator.close();
+                    }
+                }
+            } catch (IOException e) {
+            }
+
         }
-
-        HashSet<Long> hashSet = result.getB();
-
-        Iterable iterable;
-
-        if (offset > 0)
-            iterable = Iterables.skip(hashSet, offset);
-        else
-            iterable = hashSet;
-
-        if (limit > 0)
-            iterable = Iterables.limit(iterable, limit);
-
-        return new Pair<>(null, iterable);
 
     }
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> getKeysByFilterAsArray(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean descending) {
+    public List<ItemCls> getByFilterAsArray(String filter, Long fromID, int offset, int limit, boolean descending) {
 
         if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();
         }
 
-        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
-        if (resultKeys.getA() != null) {
-            return new ArrayList<>();
-        }
 
-        List<Long> result = new ArrayList<>();
-
-        Iterator<Long> iterator = resultKeys.getB().iterator();
-
-        while (iterator.hasNext()) {
-            Long key = iterator.next();
-            ItemCls item = get(key);
-            if (item != null)
-                result.add(key);
-        }
-
-        return result;
-    }
-
-    // get list items in name substring str
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<ItemCls> getByFilterAsArray(String filter, int offset, int limit) {
-
-        if (filter == null || filter.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
-        if (resultKeys.getA() != null) {
-            return new ArrayList<>();
-        }
-
+        IteratorCloseable<Long> iterator = null;
+        Pair<String, IteratorCloseable<Long>> resultKeys;
         List<ItemCls> result = new ArrayList<>();
+        try {
 
-        Iterator<Long> iterator = resultKeys.getB().iterator();
+            resultKeys = getKeysIteratorByFilterAsArray(filter, fromID, offset, descending);
+            if (resultKeys.getA() != null) {
+                return new ArrayList<>();
+            }
 
-        while (iterator.hasNext()) {
-            ItemCls item = get(iterator.next());
-            result.add(item);
+            iterator = resultKeys.getB();
+
+            int count = 0;
+            if (limit <= 0 || limit > 10000)
+                limit = 10000; // ограничим что бы ноду не перегрузить случайно
+
+            while (iterator.hasNext()) {
+                ItemCls item = get(iterator.next());
+                result.add(item);
+
+                if (++count >= limit)
+                    break;
+
+            }
+        } finally {
+            if (iterator != null) {
+                try {
+                    iterator.close();
+                } catch (IOException e) {
+                }
+            }
         }
 
         return result;

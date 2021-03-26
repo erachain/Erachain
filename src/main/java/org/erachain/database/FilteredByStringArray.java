@@ -2,8 +2,18 @@ package org.erachain.database;
 
 import java.util.List;
 
-public interface FilteredByStringArray<T> {
+public interface FilteredByStringArray<U> {
 
-    List<T> getKeysByFilterAsArray(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean descending);
+    /**
+     * Можно только список уже по значениям делать - так как в них ищется значения не из поискового запроса
+     *
+     * @param filter
+     * @param fromSeqNo
+     * @param offset
+     * @param limit
+     * @param descending
+     * @return
+     */
+    List<U> getByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending);
 
 }

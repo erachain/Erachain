@@ -35,7 +35,6 @@ public class MyBalanceTab extends SplitPanel {
     public MyBalanceTab() {
         super(NAME, TITLE);
 
-        searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);

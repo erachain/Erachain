@@ -9,7 +9,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
-public class MergedIteratorNoDuplicatesTest {
+public class MergedORIteratorsNoDuplicatesTest {
 
     @Test
     public void hasNext() {
@@ -39,14 +39,14 @@ public class MergedIteratorNoDuplicatesTest {
 
         Iterator<Long> parentIterator = parent.iterator();
         Iterator<Long> forkIterator = fork.iterator();
-        Iterator<Long> merged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
+        Iterator<Long> merged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
 
         assertEquals(Iterators.size(merged), 5);
 
         // refresh
         parentIterator = parent.iterator();
         forkIterator = fork.iterator();
-        merged = new MergedIteratorNoDuplicates<Long>((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
+        merged = new MergedOR_IteratorsNoDuplicates<Long>((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
 
         for (Long item : list) {
             assertEquals(item, merged.next());
@@ -67,14 +67,14 @@ public class MergedIteratorNoDuplicatesTest {
             add(212L);
         }};
         forkIterator = fork.iterator();
-        merged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
+        merged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
 
         assertEquals(Iterators.size(merged), 4);
 
         // refresh
         parentIterator = parent.iterator();
         forkIterator = fork.iterator();
-        merged = new MergedIteratorNoDuplicates<Long>((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
+        merged = new MergedOR_IteratorsNoDuplicates<Long>((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
 
         list = new ArrayList<Long>() {{
             add(10L);

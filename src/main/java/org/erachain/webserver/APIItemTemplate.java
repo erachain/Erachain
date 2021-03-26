@@ -41,7 +41,7 @@ public class APIItemTemplate {
         help.put("GET apitemplate/last", "Get last ID");
         help.put("GET apitemplate/{key}", "GET by ID");
         help.put("GET apitemplate/raw/{key}", "Returns RAW in Base58 of template with the given key.");
-        help.put("GET apitemplate/find/{filter_name_string}", "GET by words in Name. Use patterns from 5 chars in words");
+        help.put("GET apitemplate/find?filter={name_string}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use patterns from 5 chars in words. Default {descending} - true");
         help.put("Get apitemplate/image/{key}", "GET Template Image");
         help.put("Get apitemplate/icon/{key}", "GET Template Icon");
         help.put("Get apitemplate/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
@@ -108,9 +108,28 @@ public class APIItemTemplate {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("find/{filter_name_string}")
-    public Response find(@PathParam("filter_name_string") String filter) {
+    public static Response findOld(@PathParam("filter_name_string") String filter,
+                                   @QueryParam("from") Long fromID,
+                                   @QueryParam("offset") int offset,
+                                   @QueryParam("limit") int limit) {
+
+        return find(filter, fromID, offset, limit, true);
+    }
+
+    @GET
+    @Path("find")
+    public static Response find(@QueryParam("filter") String filter,
+                                @QueryParam("from") Long fromID,
+                                @QueryParam("offset") int offset,
+                                @QueryParam("limit") int limit,
+                                @DefaultValue("true") @QueryParam("desc") boolean descending) {
+
+        if (limit > 100) {
+            limit = 100;
+        }
 
         if (filter == null || filter.isEmpty()) {
             return Response.status(501)
@@ -121,7 +140,7 @@ public class APIItemTemplate {
         }
 
         ItemTemplateMap map = DCSet.getInstance().getItemTemplateMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, descending);
 
         JSONArray array = new JSONArray();
 

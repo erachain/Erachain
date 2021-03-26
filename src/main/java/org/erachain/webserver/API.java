@@ -74,7 +74,7 @@ public class API {
         help.put("see /apitelegrams", "Help for telegrams API");
         help.put("see /apiexchange", "Help for exchange API");
         help.put("see /api/tx", "Help for transactions API");
-        //help.put("see /apirecords", "Help for transactions API");
+        //help.put("see /apirecords", "Help for transactions API"); // @Deprecated
         help.put("see /apidocuments", "Help for documents API");
 
         help.put("*** BALANCE SYSTEM ***", "");
@@ -116,15 +116,15 @@ public class API {
         help.put("GET Address Public Key", "addresspublickey/{address}");
         help.put("GET Address Forging Info", "addressforge/{address}");
 
-        help.put("*** ASSET ***", "");
-        help.put("GET Asset Height", "assetheight");
-        help.put("GET Asset", "asset/{key}");
-        help.put("GET Asset Data", "assetdata/{key}");
-        help.put("GET Asset Image", "assetimage/{key}");
-        help.put("GET Asset Icon", "asseticon/{key}");
+        //  deprecated help.put("*** ASSET ***", "");
+        //help.put("GET Asset Height", "assetheight");
+        //help.put("GET Asset", "asset/{key}");
+        //help.put("GET Asset Data", "assetdata/{key}");
+        //help.put("GET Asset Image", "assetimage/{key}");
+        //help.put("GET Asset Icon", "asseticon/{key}");
 
-        help.put("*** ASSETS ***", "");
-        help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}");
+        //  deprecated help.put("*** ASSETS ***", "");
+        // deprecated help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}?offset=0&limit=0");
 
         help.put("*** EXCHANGE ***", "");
         help.put("GET Exchange Orders", "exchangeorders/{have}/{want}");
@@ -143,7 +143,7 @@ public class API {
         help.put("Get Person Image", "personimage/{key}");
 
         help.put("*** PERSONS ***", "");
-        help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}");
+        help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}?offset=0&limit=0");
 
         help.put("*** TOOLS ***", "");
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
@@ -1313,11 +1313,15 @@ public class API {
      * ************* ASSETS **************
      */
 
+    @Deprecated
     @GET
     @Path("assetsfilter/{filter_name_string}")
-    public Response assetsFilter(@PathParam("filter_name_string") String filter) {
+    public Response assetsFilter(@PathParam("filter_name_string") String filter,
+                                 @QueryParam("from") Long fromID,
+                                 @QueryParam("offset") int offset,
+                                 @QueryParam("limit") int limit) {
 
-        return APIItemAsset.find(filter);
+        return APIItemAsset.find(filter, fromID, offset, limit, true);
 
     }
 
@@ -1846,7 +1850,14 @@ public class API {
 
     @GET
     @Path("personsfilter/{filter_name_string}")
-    public Response personsFilter(@PathParam("filter_name_string") String filter) {
+    public Response personsFilter(@PathParam("filter_name_string") String filter,
+                                  @QueryParam("from") Long fromID,
+                                  @QueryParam("offset") int offset,
+                                  @QueryParam("limit") int limit) {
+
+        if (limit > 100) {
+            limit = 100;
+        }
 
         if (filter == null || filter.length() < 3) {
             return Response.status(501)
@@ -1858,7 +1869,7 @@ public class API {
 
         ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
         // DOES ASSETID EXIST
-        List<ItemCls> list = map.getByFilterAsArray(filter, 0, 100);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, true);
 
         JSONArray array = new JSONArray();
 

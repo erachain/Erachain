@@ -44,7 +44,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
     public AssetPairSelectTableModel(long key) {
         super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "Last Price", "Change % 24h", "Base Volume 24h",
                         "Quote Volume 24h", "Trades 24h"},
-                new Boolean[]{false, true, false, false, false, false, false}, false);
+                new Boolean[]{false, true, false, false, false, false, false}, true);
 
         this.key = key;
 
@@ -137,7 +137,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
         list = new ArrayList<>();
         PairMapImpl pairsMap = Controller.getInstance().dlSet.getPairMap();
 
-        List<ItemCls> foundAssets = ((ItemMap) map).getByFilterAsArray(filter_Name, 0, 1000);
+        List<ItemCls> foundAssets = ((ItemMap) map).getByFilterAsArray(filter_Name, null, 0, 1000, descending);
         for (ItemCls asset : foundAssets) {
             list.add(new Fun.Tuple2<>((AssetCls) asset, PairsController.reCalcAndUpdate((AssetCls) asset, assetPair,
                     pairsMap, 30)));

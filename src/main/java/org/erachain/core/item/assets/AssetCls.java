@@ -826,8 +826,9 @@ public abstract class AssetCls extends ItemCls {
         return isAccounting(assetType);
     }
 
-    public boolean isPersonProtected() {
+    public boolean isSendPersonProtected() {
         return (key <= AssetCls.ERA_KEY || key > getStartKey()) // GATE Assets
+                && assetType != AssetCls.AS_NON_FUNGIBLE
                 && !isAccounting()
                 && assetType != AssetCls.AS_INSIDE_BONUS
                 && assetType != AssetCls.AS_INSIDE_VOTE;

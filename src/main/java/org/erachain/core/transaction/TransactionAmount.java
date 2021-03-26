@@ -573,7 +573,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                                AssetCls asset) {
         if (BlockChain.PERSON_SEND_PROTECT && creatorIsPerson && absKey != FEE_KEY
                 && actionType != ACTION_DEBT && actionType != ACTION_HOLD && actionType != ACTION_SPEND
-                && asset.isPersonProtected()
+                && asset.isSendPersonProtected()
         ) {
             if (!recipient.isPerson(dcSet, height)
                     && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
@@ -1196,7 +1196,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             flags = flags | NOT_VALIDATE_FLAG_FEE;
         }
 
-
+        //////////////////////////////
         // CHECK IF AMOUNT AND ASSET
         if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0L
                 && this.amount != null) {

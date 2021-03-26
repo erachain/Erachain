@@ -17,7 +17,7 @@ import java.util.Observable;
 public abstract class SearchItemsTableModel extends WalletItemTableModel<ItemCls> {
 
     public SearchItemsTableModel(DBTabImpl itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
-        super(itemsMap, columnNames, column_AutoHeight, favorite, false);
+        super(itemsMap, columnNames, column_AutoHeight, favorite, true);
     }
 
 
@@ -38,17 +38,30 @@ public abstract class SearchItemsTableModel extends WalletItemTableModel<ItemCls
 
         list = new ArrayList<ItemCls>();
 
-        while (iterator.hasNext()) {
-            list.add(((ItemMap)map).get(iterator.next()));
+        if (iterator != null) {
+            while (iterator.hasNext()) {
+                list.add(((ItemMap) map).get(iterator.next()));
+            }
         }
 
         this.fireTableDataChanged();
     }
 
     public void findByName(String filter) {
-        Pair<String, Iterable> result = ((ItemMap) map).getKeysIteratorByFilterAsArray(filter, 0, 1000);
-        Iterator iterator = result.getB().iterator();
-        fill(iterator);
+
+        IteratorCloseable iterator = null;
+        try {
+            Pair<String, IteratorCloseable<Long>> result = ((ItemMap) map).getKeysIteratorByFilterAsArray(filter, null, 0, descending);
+            iterator = result.getB();
+            fill(iterator);
+        } finally {
+            if (iterator != null) {
+                try {
+                    iterator.close();
+                } catch (IOException e) {
+                }
+            }
+        }
     }
 
     public void getLast() {

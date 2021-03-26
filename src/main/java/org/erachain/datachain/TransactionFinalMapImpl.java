@@ -682,10 +682,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return result;
     }
 
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getKeysByFilterAsArray(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean descending) {
-
+    public List<Transaction> getByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
@@ -753,6 +750,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             if (limit < 0)
                 limit = -limit;
 
+            if (limit <= 0 || limit > 10000)
+                limit = 10000;
+
+
             // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути сосздаем список обратный что нашли по обратнму итератору
             int offsetHere = -(offset + limit);
@@ -785,6 +786,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             }
 
         } else {
+
+            if (limit <= 0 || limit > 10000)
+                limit = 10000;
 
             txs = getTransactionsByTitleFromBetter(words, betterIndex, fromWord, fromSeqNo, offset, limit, true);
             int count = txs.size();
@@ -1239,7 +1243,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR).iterator();
                 // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
                 // поэтому нужно удалить дубли
-                iterator = new MergedIteratorNoDuplicates(ImmutableList.of(creatorIterator, recipientIterator),
+                iterator = new MergedOR_IteratorsNoDuplicates(ImmutableList.of(creatorIterator, recipientIterator),
                         descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
             } else {
                 iterator = creatorIterator;

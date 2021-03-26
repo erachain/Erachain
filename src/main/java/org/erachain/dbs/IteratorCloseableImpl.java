@@ -29,13 +29,13 @@ public class IteratorCloseableImpl<T> implements IteratorCloseable<T> {
    * @return
    */
   // делаем или без изменений вернем если там уже нужный класс
-  public static <T> IteratorCloseable<T> make(
+  public static <T> IteratorCloseableImpl<T> make(
           Iterator<? extends T> iterator) {
-    if (iterator instanceof IteratorCloseable) {
+    if (iterator instanceof IteratorCloseableImpl) {
       // Safe to cast <? extends T> to <T> because Impl only uses T
       // covariantly (and cannot be subclassed to add non-covariant uses).
       @SuppressWarnings("unchecked")
-      IteratorCloseable<T> closable = (IteratorCloseable<T>) iterator;
+      IteratorCloseableImpl<T> closable = (IteratorCloseableImpl<T>) iterator;
       return closable;
     }
     return new IteratorCloseableImpl<T>(iterator);

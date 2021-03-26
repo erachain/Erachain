@@ -59,7 +59,6 @@ public class StatementsMySplitPanel extends SplitPanel {
     public StatementsMySplitPanel() {
         super(NAME, TITLE);
 
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
