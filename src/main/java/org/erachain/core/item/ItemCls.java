@@ -238,23 +238,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public byte[] getIcon() {
-        if (this.icon != null && this.icon.length > 0 && this.icon.length < 256) {
-            // внешняя ссылка - обработаем ее
-
-        }
         return this.icon;
     }
 
     public byte[] getImage() {
-        if (this.image != null && this.image.length > 0 && this.image.length < 256) {
-            // внешняя ссылка - обработаем ее
-
-        }
         return this.image;
     }
 
     public boolean hasIconURL() {
-        if (this.icon != null && this.icon.length > 0 && this.icon.length < 256) {
+        if (this.icon != null && this.icon.length > 0 && this.icon.length < 400) {
             // внешняя ссылка - обработаем ее
             return true;
         }
@@ -262,7 +254,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public boolean hasImageURL() {
-        if (this.image != null && this.image.length > 0 && this.image.length < 256) {
+        if (this.image != null && this.image.length > 0 && this.image.length < 400) {
             // внешняя ссылка - обработаем ее
             return true;
         }
@@ -270,7 +262,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public String getIconURL() {
-        if (this.icon != null && this.icon.length > 0 && this.icon.length < 256) {
+        if (hasIconURL()) {
             // внешняя ссылка - обработаем ее
             return new String(icon, StandardCharsets.UTF_8);
         }
@@ -278,7 +270,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public String getImageURL() {
-        if (this.image != null && this.image.length > 0 && this.image.length < 256) {
+        if (hasImageURL()) {
             // внешняя ссылка - обработаем ее
             return new String(image, StandardCharsets.UTF_8);
         }
@@ -910,7 +902,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             if (referenceTx.getCreator() != null) {
                 itemJson.put("tx_creator_person", referenceTx.viewCreator());
             }
-
 
             WebTransactionsHTML.getAppLink(itemJson, referenceTx, langObj);
             WebTransactionsHTML.getVouches(itemJson, referenceTx, langObj);
