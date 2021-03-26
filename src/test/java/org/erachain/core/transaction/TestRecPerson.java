@@ -150,7 +150,7 @@ public class TestRecPerson {
 
         ownerSignature = new byte[64];
         ownerSignature[1] = (byte) 1;
-        person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as registrar", birthDay, birthDay - 1,
+        person = new PersonHuman(flags, registrar, "Ermolaev Dmitrii Sergeevich as registrar", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         person.setReference(ownerSignature, dbRef);
@@ -159,7 +159,7 @@ public class TestRecPerson {
 
         ownerSignature = new byte[64];
         ownerSignature[1] = (byte) 2;
-        person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
+        person = new PersonHuman(flags, certifier, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         person.setReference(ownerSignature, dbRef);
@@ -184,7 +184,7 @@ public class TestRecPerson {
         ownerSignature[1] = (byte) -1;
 
         // GET RIGHTS TO CERTIFIER
-        personGeneral = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
+        personGeneral = new PersonHuman(flags, registrar, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         //personGeneral.setKey(genesisPersonKey);
@@ -199,7 +199,7 @@ public class TestRecPerson {
         genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
-        person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
+        person = new PersonHuman(flags, registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
@@ -1140,7 +1140,7 @@ public class TestRecPerson {
 
                 long birthDay = timestamp - 12345678;
 
-                person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
+                person = new PersonHuman(flags, registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                         (byte) 0, "Slav", (float) 28.12345, (float) 133.7777,
                         "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 

@@ -26,7 +26,7 @@ public class PersonHuman extends PersonCls {
     // for personal data maker - his signature
     protected byte[] makerSignature;
 
-    public PersonHuman(PublicKeyAccount maker, String fullName, long birthday, long deathday,
+    public PersonHuman(long flags, PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
                        byte[] makerSignature) {
@@ -36,7 +36,7 @@ public class PersonHuman extends PersonCls {
         this.makerSignature = makerSignature;
     }
 
-    public PersonHuman(PublicKeyAccount maker, String fullName, String birthday, String deathday,
+    public PersonHuman(long flags, PublicKeyAccount maker, String fullName, String birthday, String deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
                        byte[] makerSignature) {
@@ -46,7 +46,7 @@ public class PersonHuman extends PersonCls {
         this.makerSignature = makerSignature;
     }
 
-    public PersonHuman(byte[] typeBytes, PublicKeyAccount maker, String fullName, long birthday, long deathday,
+    public PersonHuman(byte[] typeBytes, long flags, PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image,
                        String description, byte[] makerSignature) {
@@ -233,7 +233,7 @@ public class PersonHuman extends PersonCls {
         }
 
         //RETURN
-        PersonHuman personHuman = new PersonHuman(typeBytes, maker, fullName, birthday, deathday,
+        PersonHuman personHuman = new PersonHuman(typeBytes, flags, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, height, icon, image, description, makerSignature);
 

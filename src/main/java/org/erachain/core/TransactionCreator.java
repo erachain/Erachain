@@ -58,6 +58,7 @@ public class TransactionCreator {
     private int blockHeight;
     private AtomicInteger seqNo = new AtomicInteger();
 
+    static private final long flags = 0L;
     //private byte[] icon = new byte[0]; // default value
     //private byte[] image = new byte[0]; // default value
 
@@ -254,7 +255,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        ImprintCls imprint = new Imprint(creator, name, icon, image, description, flags);
+        ImprintCls imprint = new Imprint(flags, creator, name, icon, image, description);
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, linkTo, imprint, (byte) feePow, time);
@@ -274,7 +275,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        ImprintCls imprint = new Imprint(creator, name, icon, image, description, flags);
+        ImprintCls imprint = new Imprint(flags, creator, name, icon, image, description);
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, linkTo, imprint, (byte) feePow, time);
@@ -347,7 +348,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        PersonHuman person = new PersonHuman(owner, fullName, birthday, deathday,
+        PersonHuman person = new PersonHuman(flags, owner, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, height, icon, image, description, ownerSignature);
 
@@ -452,7 +453,7 @@ public class TransactionCreator {
     public Transaction createIssueStatusTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                     byte[] icon, byte[] image,
                                                     boolean unique, int feePow) {
-        StatusCls status = new Status(creator, name, icon, image, description, unique);
+        StatusCls status = new Status(flags, creator, name, icon, image, description, unique);
         return createIssueStatusTransaction(creator, linkTo, feePow, status);
     }
 
@@ -488,7 +489,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        UnionCls union = new Union(creator, name, birthday, parent, icon, image, description);
+        UnionCls union = new Union(flags, creator, name, birthday, parent, icon, image, description);
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, linkTo, union, (byte) feePow, time, 0l);

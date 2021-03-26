@@ -83,7 +83,7 @@ public class TestRecSetStatusToItem {
         //mapSize = statusMap.size();
 
         long birthDay = timestamp - 12345678;
-        person = new PersonHuman(maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
+        person = new PersonHuman(flags, maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
                 (byte) 1, "Slav", (float) 128.12345, (float) 33.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 

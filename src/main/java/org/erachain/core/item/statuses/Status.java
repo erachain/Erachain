@@ -12,11 +12,11 @@ public class Status extends StatusCls {
 
     private static final int TYPE_ID = STATUS;
 
-    public Status(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, boolean unique) {
+    public Status(long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, boolean unique) {
         super(TYPE_ID, flags, owner, name, icon, image, description, unique);
     }
 
-    public Status(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
+    public Status(byte[] typeBytes, long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
         super(typeBytes, flags, owner, name, icon, image, description);
     }
 
@@ -115,7 +115,7 @@ public class Status extends StatusCls {
         }
 
         //RETURN
-        Status status = new Status(typeBytes, owner, name, icon, image, description);
+        Status status = new Status(typeBytes, flags, owner, name, icon, image, description);
         if (includeReference) {
             status.setReference(reference, dbRef);
         }

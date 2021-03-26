@@ -3321,7 +3321,7 @@ public class Controller extends Observable {
             return out;
         }
 
-        PersonHuman person = new PersonHuman(owner, name, birthday, deathday, gender,
+        PersonHuman person = new PersonHuman(0L, owner, name, birthday, deathday, gender,
                 race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, height, icon, image, description,
                 ownerSignature);

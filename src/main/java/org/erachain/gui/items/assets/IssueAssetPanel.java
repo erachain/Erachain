@@ -168,6 +168,8 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
+        long flags = 0L;
+
         AssetCls asset;
         if (AssetCls.isTypeUnique(assetType, quantity)) {
             asset = new AssetUnique(flags, creator, textName.getText(), addIconLabel.getImgBytes(),

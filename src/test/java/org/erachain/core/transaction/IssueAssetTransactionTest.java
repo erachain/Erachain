@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 public class IssueAssetTransactionTest {
 
     long FEE_KEY = AssetCls.FEE_KEY;
+    long flags = 0L;
 
     int[] TESTED_DBS = new int[]{IDB.DBS_MAP_DB, IDB.DBS_ROCK_DB, IDB.DBS_MAP_DB_IN_MEM};
     DCSet dcSet;

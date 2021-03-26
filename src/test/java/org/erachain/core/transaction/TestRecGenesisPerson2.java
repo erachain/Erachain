@@ -58,7 +58,7 @@ public class TestRecGenesisPerson2 {
         //CREATE PERSON
         //person = GenesisBlock.makePerson(0);
         long bd = -106185600;
-        person = new PersonHuman(maker, "ERMLAEV DMITRII SERGEEVICH", bd, bd - 1,
+        person = new PersonHuman(flags, maker, "ERMLAEV DMITRII SERGEEVICH", bd, bd - 1,
                 (byte) 1, "Slav", (float) 1.1, (float) 1.1,
                 "white", "gray", "dark", (int) 188, icon, image, "icreator", ownerSignature);
         //byte[] rawPerson = person.toBytes(true); // reference is new byte[64]
@@ -126,7 +126,7 @@ public class TestRecGenesisPerson2 {
         }
 
         //CREATE INVALID PERSON TRANSFER INVALID RECIPIENT ADDRESS
-        person = new PersonHuman(maker, "ERMLAEV DMITRII SERGEEVICH", 0L, -1L,
+        person = new PersonHuman(flags, maker, "ERMLAEV DMITRII SERGEEVICH", 0L, -1L,
                 (byte) 1, "Slav", (float) 111.1, (float) 1.1,
                 "white", "gray", "dark", (int) 188, icon, image, "icreator", ownerSignature);
         genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);

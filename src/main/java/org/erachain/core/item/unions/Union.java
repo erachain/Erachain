@@ -14,11 +14,11 @@ public class Union extends UnionCls {
 
     private static final int TYPE_ID = UNION;
 
-    public Union(PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
+    public Union(long flags, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
         super(TYPE_ID, flags, maker, name, birthday, parent, icon, image, description);
     }
 
-    public Union(byte[] typeBytes, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
+    public Union(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
         super(typeBytes, flags, maker, name, birthday, parent, icon, image, description);
     }
 
@@ -125,7 +125,7 @@ public class Union extends UnionCls {
         }
 
         //RETURN
-        Union union = new Union(typeBytes, owner, name, birthday, parent, icon, image, description);
+        Union union = new Union(typeBytes, flags, owner, name, birthday, parent, icon, image, description);
         if (includeReference) {
             union.setReference(reference, dbRef);
         }

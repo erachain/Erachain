@@ -95,7 +95,7 @@ public class TestRecUnion {
         //dbPS = db.getUnionStatusMap();
 
         // GET RIGHTS TO CERTIFIER
-        unionGeneral = new Union(certifier, "СССР", timestamp - 12345678,
+        unionGeneral = new Union(flags, certifier, "СССР", timestamp - 12345678,
                 parent, icon, image, "Союз Совестких Социалистических Республик");
         //GenesisIssueUnionRecord genesis_issue_union = new GenesisIssueUnionRecord(unionGeneral, registrar);
         //genesis_issue_union.process(db, false);
@@ -106,7 +106,7 @@ public class TestRecUnion {
         certifier.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false, false);
         certifier.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
-        union = new Union(certifier, "РСФСР", timestamp - 1234567,
+        union = new Union(flags, certifier, "РСФСР", timestamp - 1234567,
                 parent + 1, icon, image, "Россия");
 
 

@@ -73,7 +73,7 @@ public class BlockExplorerTest {
         Stopwatch stopwatchAll = new Stopwatch();
 
         //ADD ERM ASSET
-        AssetVenture ermAsset = new AssetVenture(flags, block.getCreator(), "ERM", icon, image, ".",
+        AssetVenture ermAsset = new AssetVenture(0L, block.getCreator(), "ERM", icon, image, ".",
                 0, 8, 100000000l);
         databaseSet.getIssueAssetMap().set(block.getSignature(), 0l);
         databaseSet.getItemAssetMap().set(0l, ermAsset);

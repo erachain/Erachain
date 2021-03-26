@@ -47,6 +47,8 @@ public class GenesisBlock extends Block {
     private long genesisTimestamp;
     private String sideSettingString;
 
+    private static final long flags = 0L;
+
     public GenesisBlock() {
 
         super(genesisVersion, genesisReference, CREATOR);
@@ -591,7 +593,7 @@ public class GenesisBlock extends Block {
 
     // make statuses
     public static Status makeStatus(int key) {
-        if (key == StatusCls.MEMBER_KEY) return new Status(CREATOR,
+        if (key == StatusCls.MEMBER_KEY) return new Status(flags, CREATOR,
                 "Членство %1 ур. в объед. %2", icon, image, "Уровень %1 членства в объединении %2", false);
         //else if (key == StatusCls.ALIVE_KEY) return new Status(CREATOR, "Alive", icon, image, "Alive or Dead");
         //else if (key == StatusCls.RANK_KEY) return new Status(CREATOR, "Rank", icon, image, "General, Major or Minor");
@@ -601,7 +603,7 @@ public class GenesisBlock extends Block {
         //else if (key == StatusCls.CERTIFIED_KEY) return new Status(CREATOR, "Certified", icon, image, "Certified, Notarized, Confirmed");
         //else if (key == StatusCls.MARRIED_KEY) return new Status(CREATOR, "Married", icon, image, "Husband, Wife, Spouse");
 
-        return new Status(CREATOR, "Право %1 ур. в объед. %2", icon, image, "Уровень %1 прав (власти) в объединении %2", false);
+        return new Status(flags, CREATOR, "Право %1 ур. в объед. %2", icon, image, "Уровень %1 прав (власти) в объединении %2", false);
     }
 
     private static byte[] generateAccountSeed(byte[] seed, int nonce) {
