@@ -167,6 +167,9 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
     private boolean transParse(Fun.Tuple2<Long, Integer> walletKey, Transaction transaction) {
 
+        if (transaction == null)
+            return false;
+
         transaction.setDC(dcSet, false);
 
         if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
