@@ -48,7 +48,7 @@ public class RCertifyPubKeysTest {
     long timestamp = NTP.getTime();
 
     long dbRef = 0L;
-    long flags = 0l;
+    long[] itemFlags = null;
     Long last_ref;
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -139,7 +139,7 @@ public class RCertifyPubKeysTest {
 
         ownerSignature = new byte[64];
         ownerSignature[1] = (byte) 1;
-        person = new PersonHuman(flags, registrar, "Ermolaev Dmitrii Sergeevich as registrar", birthDay, birthDay - 1,
+        person = new PersonHuman(itemFlags, registrar, "Ermolaev Dmitrii Sergeevich as registrar", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         person.setReference(ownerSignature, dbRef);
@@ -148,7 +148,7 @@ public class RCertifyPubKeysTest {
 
         ownerSignature = new byte[64];
         ownerSignature[1] = (byte) 2;
-        person = new PersonHuman(flags, certifier, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
+        person = new PersonHuman(itemFlags, certifier, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         person.setReference(ownerSignature, dbRef);
@@ -173,7 +173,7 @@ public class RCertifyPubKeysTest {
         ownerSignature[1] = (byte) -1;
 
         // GET RIGHTS TO CERTIFIER
-        personGeneral = new PersonHuman(flags, registrar, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
+        personGeneral = new PersonHuman(itemFlags, registrar, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         //personGeneral.setKey(genesisPersonKey);
@@ -188,7 +188,7 @@ public class RCertifyPubKeysTest {
         genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
-        person = new PersonHuman(flags, registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
+        person = new PersonHuman(itemFlags, registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
@@ -213,7 +213,7 @@ public class RCertifyPubKeysTest {
     public void initPersonalize() {
 
         issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
-        assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, 0L));
 
         issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
 

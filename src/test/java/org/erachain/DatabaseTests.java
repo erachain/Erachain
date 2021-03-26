@@ -31,7 +31,9 @@ public class DatabaseTests {
     static Logger LOGGER = LoggerFactory.getLogger(DatabaseTests.class.getName());
     byte[] assetReference = new byte[Crypto.SIGNATURE_LENGTH];
     Long releaserReference = null;
-    long flags = 0L;
+
+    long[] itemFlags = null;
+    long txFlags = 0L;
 
     BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
     long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -77,7 +79,7 @@ public class DatabaseTests {
         // GET RIGHTS TO CERTIFIER
         byte gender = 1;
         long birthDay = timestamp - 12345678;
-        personGeneral = new PersonHuman(flags, maker, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
+        personGeneral = new PersonHuman(itemFlags, maker, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
@@ -90,7 +92,7 @@ public class DatabaseTests {
         maker.changeBalance(dcSet, true, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
         maker.changeBalance(dcSet, true, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
-        person = new PersonHuman(flags, maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
+        person = new PersonHuman(itemFlags, maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
@@ -229,7 +231,7 @@ public class DatabaseTests {
 
         init();
 
-        AssetCls asset = new AssetVenture(flags, maker, "test", icon, image, "strontje", 0, 8, 50000l);
+        AssetCls asset = new AssetVenture(itemFlags, maker, "test", icon, image, "strontje", 0, 8, 50000l);
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);

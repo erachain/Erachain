@@ -48,7 +48,9 @@ public class TestRecSendOutsideClaims {
     AssetCls assetA;
     long keyA;
 
-    long flags = 0l;
+    long[] itemFlags = null;
+    long txFlags = 0l;
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -92,7 +94,7 @@ public class TestRecSendOutsideClaims {
         recipient.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
         recipient2.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
-        assetA = new AssetVenture(flags, maker, "AAA", icon, image, ".", AssetCls.AS_OUTSIDE_OTHER_CLAIM, 2, 0L);
+        assetA = new AssetVenture(itemFlags, maker, "AAA", icon, image, ".", AssetCls.AS_OUTSIDE_OTHER_CLAIM, 2, 0L);
 
         // set SCALABLE assets ++
         assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
@@ -122,7 +124,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_BACKWARD_ACTION);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.INVALID_BACKWARD_ACTION);
 
         /// invalid CLAIM
         r_SendV3 = new RSend(version,
@@ -132,7 +134,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NO_BALANCE);
 
         /// invalid CLAIM
         r_SendV3 = new RSend(version,
@@ -142,7 +144,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_RECIPIENT);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.INVALID_CLAIM_RECIPIENT);
 
         /////////// PROCESS
         /// CLAIM
@@ -153,7 +155,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
         
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
 
@@ -178,7 +180,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
 
@@ -203,7 +205,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
 
         //////// TRY RE CLAIM to not emitter
         r_SendV3 = new RSend(version,
@@ -213,7 +215,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
 
         //////// TRY IN CLAIM to EMITTER - NO BALANCE
         r_SendV3 = new RSend(version,
@@ -223,7 +225,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NO_BALANCE);
 
         //////// TRY IN CLAIM to EMITTER - VALID
         r_SendV3 = new RSend(version,
@@ -233,7 +235,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
         
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
 
@@ -257,7 +259,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
         
         balanceA = recipientPK.getBalance(db, keyA);
         balanceB = maker.getBalance(db, keyA);
@@ -284,7 +286,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
 
         //////// TRY CLOSE OVER amount CLAIM to EMITTER - INVALID
         r_SendV3 = new RSend(version,
@@ -294,7 +296,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_INCLAIM_BALANCE);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NO_INCLAIM_BALANCE);
 
         //////// TRY CLOSE CLAIM to EMITTER - VALID
         r_SendV3 = new RSend(version,
@@ -304,7 +306,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         balanceA = recipientPK.getBalance(db, keyA);
         balanceB = maker.getBalance(db, keyA);
@@ -335,7 +337,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
 
@@ -350,7 +352,7 @@ public class TestRecSendOutsideClaims {
         balanceA = recipientPK2.getBalance(db, keyA);
         balanceB = maker.getBalance(db, keyA);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
 

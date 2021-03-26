@@ -44,7 +44,10 @@ public class TestRecSend {
 
     ExLink exLink = null;
 
-    long flags = 0l;
+    long[] itemFlags = null;
+    long txFlags = 0l;
+
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -108,7 +111,7 @@ public class TestRecSend {
         BigDecimal amount;
         BigDecimal amount_result;
 
-        AssetCls asset23 = new AssetVenture(flags, maker, "AAA", icon, image, ".", 0, TransactionAmount.maxSCALE, 0L);
+        AssetCls asset23 = new AssetVenture(itemFlags, maker, "AAA", icon, image, ".", 0, TransactionAmount.maxSCALE, 0L);
         asset23.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         long assetKey23 = asset23.getKey(db);
 
@@ -172,7 +175,7 @@ public class TestRecSend {
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
             r_Send.setDC(db, Transaction.FOR_NETWORK, this.gb.heightBlock, 2, true);
-            assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+            assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
             
             raw_r_Send = r_Send.toBytes(Transaction.FOR_NETWORK, true);
 
@@ -199,7 +202,7 @@ public class TestRecSend {
             //r_Send_2.sign(maker, false);
             assertEquals(r_Send_2.isSignatureValid(db), true);
             r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1, true);
-            assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+            assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
             
@@ -225,7 +228,7 @@ public class TestRecSend {
         
         /////////////////////// VALIDATE
         int thisScale = 5;
-        AssetCls assetA = new AssetVenture(flags, maker, "AAA", icon, image, ".", 0, thisScale, 0L);
+        AssetCls assetA = new AssetVenture(itemFlags, maker, "AAA", icon, image, ".", 0, thisScale, 0L);
         assetA.insertToMap(db, 0l);
         long assetKey = assetA.getKey(db);
         head = "";
@@ -261,7 +264,7 @@ public class TestRecSend {
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.ITEM_ASSET_NOT_EXIST);
 
         // INVALID
-        assetA = new AssetVenture(flags, maker, "AAA", icon, image, ".", 0, 30, 0L);
+        assetA = new AssetVenture(itemFlags, maker, "AAA", icon, image, ".", 0, 30, 0L);
         assetA.insertToMap(db, 0l);
         assetKey = assetA.getKey(db);
 
@@ -316,7 +319,7 @@ public class TestRecSend {
         int fromScale = -5;
         int toScale = BlockChain.AMOUNT_DEDAULT_SCALE - TransactionAmount.SCALE_MASK_HALF;
 
-        AssetCls assetBIG = new AssetVenture(flags, maker, "AAA", icon, image, ".", 0, fromScale + 2, 0L);
+        AssetCls assetBIG = new AssetVenture(itemFlags, maker, "AAA", icon, image, ".", 0, fromScale + 2, 0L);
         assetBIG.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         long assetKeyBIG = assetBIG.getKey(db);
 
@@ -373,7 +376,7 @@ public class TestRecSend {
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
             r_Send.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1, true);
-            assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+            assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
             
             raw_r_Send = r_Send.toBytes(Transaction.FOR_NETWORK, true);
 
@@ -400,7 +403,7 @@ public class TestRecSend {
             //r_Send_2.sign(maker, false);
             assertEquals(r_Send_2.isSignatureValid(db), true);
             r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1, true);
-            assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+            assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
             
@@ -426,7 +429,7 @@ public class TestRecSend {
         
         /////////////////////// VALIDATE
         int thisScale = 5;
-        AssetCls assetA = new AssetVenture(flags, maker, "AAA", icon, image, ".", 0, thisScale, 0L);
+        AssetCls assetA = new AssetVenture(itemFlags, maker, "AAA", icon, image, ".", 0, thisScale, 0L);
         assetA.insertToMap(db, 0l);
         long assetKey = assetA.getKey(db);
         head = "";
@@ -518,7 +521,7 @@ public class TestRecSend {
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags),Transaction.VALIDATE_OK ); //);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK); //);
 
         assertEquals((long) maker.getLastTimestamp(db)[0], gb.getTimestamp());
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
@@ -567,7 +570,7 @@ public class TestRecSend {
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK); //Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK); //Transaction.VALIDATE_OK);
 
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
         assertEquals((long) maker.getLastTimestamp(db)[0], timestamp);
@@ -616,7 +619,7 @@ public class TestRecSend {
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
 
@@ -661,7 +664,7 @@ public class TestRecSend {
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
 
@@ -707,7 +710,7 @@ public class TestRecSend {
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
-        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK); //ransaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK); //ransaction.VALIDATE_OK);
 
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
 
@@ -743,7 +746,7 @@ public class TestRecSend {
         init();
 
         //ADD ERM ASSET
-        AssetCls aTFundingAsset = new AssetVenture(flags, new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
+        AssetCls aTFundingAsset = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
                 0, 8, 250000000l);
         aTFundingAsset.setReference(assetReference, dbRef);
         db.getItemAssetMap().set(assetKeyTest, aTFundingAsset);
@@ -789,9 +792,9 @@ public class TestRecSend {
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
-            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NOT_YET_RELEASED);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NOT_YET_RELEASED);
         } else {
-            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
         }
 
         arbitraryTransactionV3.process(gb, Transaction.FOR_NETWORK);
@@ -832,7 +835,7 @@ public class TestRecSend {
 
         init();
 
-        AssetCls aTFundingAsset = new AssetVenture(flags, gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
+        AssetCls aTFundingAsset = new AssetVenture(itemFlags, gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
                 0, 8, 250000000l);
         aTFundingAsset.setReference(gb.getSignature(), dbRef);
         db.getItemAssetMap().set(assetKeyTest, aTFundingAsset);
@@ -862,9 +865,9 @@ public class TestRecSend {
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
-            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NOT_YET_RELEASED);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NOT_YET_RELEASED);
         } else {
-            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
         }
 
         arbitraryTransactionV3.process(gb, Transaction.FOR_NETWORK);

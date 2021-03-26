@@ -41,7 +41,9 @@ public class TransactionTests {
     long last_ref;
     long new_ref;
 
-    long flags = 0l;
+    long[] itemFlags = null;
+    long txFlags = 0L;
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -122,25 +124,25 @@ String  s= "";
 
         //CREATE VALID PAYMENT
         Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0]);
-        assertEquals(Transaction.VALIDATE_OK, payment.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, payment.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID PAYMENT INVALID RECIPIENT ADDRESS
         payment = new RSend(maker, FEE_POWER, new Account("test"), FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0] + 10);
-        assertEquals(Transaction.INVALID_ADDRESS, payment.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_ADDRESS, payment.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID PAYMENT NEGATIVE AMOUNT
         payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0]);
-        assertEquals(Transaction.NEGATIVE_AMOUNT, payment.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.NEGATIVE_AMOUNT, payment.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID PAYMENT WRONG REFERENCE
         payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, -123L, new byte[64]);
-        assertEquals(Transaction.INVALID_REFERENCE, payment.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, payment.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID PAYMENT WRONG TIMESTAMP
         payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db)[0], maker.getLastTimestamp(db)[0]);
-        assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(Transaction.FOR_NETWORK, txFlags));
         payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db)[0] - 10, maker.getLastTimestamp(db)[0]);
-        assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(Transaction.FOR_NETWORK, txFlags));
 
     }
 
@@ -298,7 +300,7 @@ String  s= "";
         pollCreation.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL CREATION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, pollCreation.isValid(Transaction.FOR_NETWORK, txFlags));
         pollCreation.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE INVALID POLL CREATION INVALID NAME LENGTH
@@ -310,7 +312,7 @@ String  s= "";
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, pollCreation.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID POLL CREATION INVALID DESCRIPTION LENGTH
         String longDescription = "";
@@ -321,35 +323,35 @@ String  s= "";
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.INVALID_DESCRIPTION_LENGTH_MAX, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_DESCRIPTION_LENGTH_MAX, pollCreation.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID POLL CREATION NAME ALREADY TAKEN
         poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test")));
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.POLL_ALREADY_CREATED, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.POLL_ALREADY_CREATED, pollCreation.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID POLL CREATION NO OPTIONS
         poll = new Poll(maker, "test2", "this is the value", new ArrayList<PollOption>());
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.INVALID_OPTIONS_LENGTH, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_OPTIONS_LENGTH, pollCreation.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID POLL CREATION INVALID OPTION LENGTH
         poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption(longName)));
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.INVALID_OPTION_LENGTH, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_OPTION_LENGTH, pollCreation.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID POLL CREATION INVALID DUPLICATE OPTIONS
         poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("test")));
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.DUPLICATE_OPTION, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.DUPLICATE_OPTION, pollCreation.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID POLL CREATION NOT ENOUGH BALANCE
         seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -362,12 +364,12 @@ String  s= "";
         pollCreation.sign(invalidOwner, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.NOT_ENOUGH_FEE, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.NOT_ENOUGH_FEE, pollCreation.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE POLL CREATION INVALID REFERENCE
         poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption("test")));
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet)[0]);
-        assertEquals(Transaction.INVALID_REFERENCE, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, pollCreation.isValid(Transaction.FOR_NETWORK, txFlags));
 
     }
 
@@ -479,7 +481,7 @@ String  s= "";
         pollCreation.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL CREATION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, pollCreation.isValid(Transaction.FOR_NETWORK, txFlags));
         pollCreation.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE POLL VOTE
@@ -487,7 +489,7 @@ String  s= "";
         pollVote.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL VOTE IS VALID
-        assertEquals(Transaction.VALIDATE_OK, pollVote.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, pollVote.isValid(Transaction.FOR_NETWORK, txFlags));
         //pollVote.process(databaseSet, false);
 
         //CREATE INVALID POLL VOTE INVALID NAME LENGTH
@@ -498,25 +500,25 @@ String  s= "";
         pollVote = new VoteOnPollTransaction(maker, longName, 0, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, pollVote.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, pollVote.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID POLL VOTE POLL DOES NOT EXIST
         pollVote = new VoteOnPollTransaction(maker, "test2", 0, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.POLL_NOT_EXISTS, pollVote.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.POLL_NOT_EXISTS, pollVote.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID POLL VOTE INVALID OPTION
         pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.POLL_OPTION_NOT_EXISTS, pollVote.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.POLL_OPTION_NOT_EXISTS, pollVote.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID POLL VOTE INVALID OPTION
         pollVote = new VoteOnPollTransaction(maker, "test", -1, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.POLL_OPTION_NOT_EXISTS, pollVote.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.POLL_OPTION_NOT_EXISTS, pollVote.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CRTEATE INVALID POLL VOTE VOTED ALREADY
         pollVote = new VoteOnPollTransaction(maker, "test", 0, FEE_POWER, timestamp, last_ref);
@@ -524,7 +526,7 @@ String  s= "";
         pollVote.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.ALREADY_VOTED_FOR_THAT_OPTION, pollVote.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.ALREADY_VOTED_FOR_THAT_OPTION, pollVote.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID POLL VOTE NOT ENOUGH BALANCE
         seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -541,7 +543,7 @@ String  s= "";
 
         //CREATE POLL CREATION INVALID REFERENCE
         pollVote = new VoteOnPollTransaction(maker, "test", 1, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet)[0] + 1);
-        assertEquals(Transaction.INVALID_REFERENCE, pollVote.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, pollVote.isValid(Transaction.FOR_NETWORK, txFlags));
 
     }
 
@@ -641,7 +643,7 @@ String  s= "";
         arbitraryTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ARBITRARY TRANSACTION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
         arbitraryTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE INVALID ARBITRARY TRANSACTION INVALID data LENGTH
@@ -649,7 +651,7 @@ String  s= "";
         arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, longData, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF ARBITRARY TRANSACTION IS INVALID
-        assertEquals(Transaction.INVALID_DATA_LENGTH, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_DATA_LENGTH, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID ARBITRARY TRANSACTION NOT ENOUGH BALANCE
         seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -658,13 +660,13 @@ String  s= "";
         arbitraryTransaction = new ArbitraryTransactionV3(invalidOwner, null, 4776, data, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF ARBITRARY TRANSACTION IS INVALID
-        assertEquals(Transaction.NO_BALANCE, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.NO_BALANCE, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE ARBITRARY TRANSACTION INVALID REFERENCE
         arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, data, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet)[0]);
 
         //CHECK IF ARBITRARY TRANSACTION IS INVALID
-        assertEquals(Transaction.INVALID_REFERENCE, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
     }
 
@@ -824,7 +826,7 @@ String  s= "";
         init();
 
         //CREATE ASSET
-        AssetCls asset = new AssetVenture(flags, maker, "test", icon, image, "strontje", 0, 0, 50000l);
+        AssetCls asset = new AssetVenture(itemFlags, maker, "test", icon, image, "strontje", 0, 0, 50000l);
         //byte[] data = asset.toBytes(false);
         //Asset asset2 = Asset.parse(data);
 
@@ -855,7 +857,7 @@ String  s= "";
 
         //CREATE SIGNATURE
         long timestamp = NTP.getTime();
-        AssetCls asset = new AssetVenture(flags, maker, "test", icon, image, "strontje", 0, 0, 50000l);
+        AssetCls asset = new AssetVenture(itemFlags, maker, "test", icon, image, "strontje", 0, 0, 50000l);
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -933,14 +935,14 @@ String  s= "";
 
         //CREATE SIGNATURE
         long timestamp = NTP.getTime();
-        AssetCls asset = new AssetVenture(flags, maker, "test", icon, image, "strontje", 0, 0, 50000l);
+        AssetCls asset = new AssetVenture(itemFlags, maker, "test", icon, image, "strontje", 0, 0, 50000l);
 
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
 
-        assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
 
@@ -971,7 +973,7 @@ String  s= "";
 
 
         long timestamp = NTP.getTime();
-        AssetCls asset = new AssetVenture(flags, maker, "test", icon, image, "strontje", 0, 0, 50000l);
+        AssetCls asset = new AssetVenture(itemFlags, maker, "test", icon, image, "strontje", 0, 0, 50000l);
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);

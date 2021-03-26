@@ -42,7 +42,9 @@ public class TransactionV3Tests {
 
     ExLink exLink = null;
 
-    long flags = 0l;
+    long[] itemFlags = null;
+    long txFlags = 0L;
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -96,7 +98,7 @@ public class TransactionV3Tests {
         );
         messageTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 
-        assertEquals(messageTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(messageTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         messageTransactionV3.process(gb,Transaction.FOR_NETWORK);
 
@@ -134,7 +136,7 @@ public class TransactionV3Tests {
         init();
 
         //ADD ERM ASSET
-        AssetCls aTFundingAsset = new AssetVenture(flags, new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
+        AssetCls aTFundingAsset = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
         aTFundingAsset.setReference(assetReference, dbRef);
         db.getItemAssetMap().set(61l, aTFundingAsset);
 
@@ -176,9 +178,9 @@ public class TransactionV3Tests {
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
-            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NOT_YET_RELEASED);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NOT_YET_RELEASED);
         } else {
-            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
         }
 
         arbitraryTransactionV3.process(gb,Transaction.FOR_NETWORK);
@@ -219,7 +221,7 @@ public class TransactionV3Tests {
 
         init();
 
-        AssetCls aTFundingAsset = new AssetVenture(flags, gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
+        AssetCls aTFundingAsset = new AssetVenture(itemFlags, gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
         aTFundingAsset.setReference(gb.getSignature(), dbRef);
         db.getItemAssetMap().set(61l, aTFundingAsset);
 
@@ -247,9 +249,9 @@ public class TransactionV3Tests {
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
-            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NOT_YET_RELEASED);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NOT_YET_RELEASED);
         } else {
-            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
         }
 
         arbitraryTransactionV3.process(gb,Transaction.FOR_NETWORK);

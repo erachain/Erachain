@@ -29,7 +29,9 @@ public class TestRecGenesisPerson2 {
     byte FEE_POWER = (byte) 1;
     byte[] packedReference = new byte[64];
 
-    long flags = 0l;
+    long[] itemFlags = null;
+    long txFlags = 0L;
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -58,7 +60,7 @@ public class TestRecGenesisPerson2 {
         //CREATE PERSON
         //person = GenesisBlock.makePerson(0);
         long bd = -106185600;
-        person = new PersonHuman(flags, maker, "ERMLAEV DMITRII SERGEEVICH", bd, bd - 1,
+        person = new PersonHuman(itemFlags, maker, "ERMLAEV DMITRII SERGEEVICH", bd, bd - 1,
                 (byte) 1, "Slav", (float) 1.1, (float) 1.1,
                 "white", "gray", "dark", (int) 188, icon, image, "icreator", ownerSignature);
         //byte[] rawPerson = person.toBytes(true); // reference is new byte[64]
@@ -82,7 +84,7 @@ public class TestRecGenesisPerson2 {
         //genesisIssuePersonTransaction.sign(creator);
         //CHECK IF ISSUE PERSON TRANSACTION IS VALID
         assertEquals(true, genesisIssuePersonTransaction.isSignatureValid());
-        assertEquals(Transaction.VALIDATE_OK, genesisIssuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, genesisIssuePersonTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CONVERT TO BYTES
         //logger.info("CREATOR: " + genesisIssuePersonTransaction.getCreator().getPublicKey());
@@ -126,11 +128,11 @@ public class TestRecGenesisPerson2 {
         }
 
         //CREATE INVALID PERSON TRANSFER INVALID RECIPIENT ADDRESS
-        person = new PersonHuman(flags, maker, "ERMLAEV DMITRII SERGEEVICH", 0L, -1L,
+        person = new PersonHuman(itemFlags, maker, "ERMLAEV DMITRII SERGEEVICH", 0L, -1L,
                 (byte) 1, "Slav", (float) 111.1, (float) 1.1,
                 "white", "gray", "dark", (int) 188, icon, image, "icreator", ownerSignature);
         genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);
-        assertEquals(Transaction.ITEM_PERSON_LATITUDE_ERROR, genesisIssuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.ITEM_PERSON_LATITUDE_ERROR, genesisIssuePersonTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
     }
 

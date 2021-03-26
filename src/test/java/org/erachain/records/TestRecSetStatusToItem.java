@@ -46,7 +46,9 @@ public class TestRecSetStatusToItem {
     Long to_date = null;
     long personkey;
 
-    long flags = 0l;
+    long[] itemFlags = null;
+    long txFlags = 0L;
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -83,7 +85,7 @@ public class TestRecSetStatusToItem {
         //mapSize = statusMap.size();
 
         long birthDay = timestamp - 12345678;
-        person = new PersonHuman(flags, maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
+        person = new PersonHuman(itemFlags, maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
                 (byte) 1, "Slav", (float) 128.12345, (float) 33.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", makerSignature);
 
@@ -205,7 +207,7 @@ public class TestRecSetStatusToItem {
 
         init();
         setStatusTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, setStatusTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, setStatusTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
         assertEquals(db.getPersonStatusMap().get(person.getKey(db)).size(), 0);
 
         Tuple5<Long, Long, byte[], Integer, Integer> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
