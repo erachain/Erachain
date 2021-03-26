@@ -2296,7 +2296,10 @@ public abstract class AssetCls extends ItemCls {
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
             if (issuerPersonDuration != null) {
                 inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
-                inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+                if (inviter == null)
+                    inviterRoyalty = BigDecimal.ZERO;
+                else
+                    inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
             } else {
                 inviter = null;
                 inviterRoyalty = BigDecimal.ZERO;
@@ -2311,12 +2314,14 @@ public abstract class AssetCls extends ItemCls {
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = receiver.getPersonDuration(dcSet);
             if (issuerPersonDuration != null) {
                 inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
-                inviterRoyalty = forgerFee;
+                if (inviter == null)
+                    inviterRoyalty = BigDecimal.ZERO;
+                else
+                    inviterRoyalty = forgerFee;
             } else {
                 inviter = null;
                 inviterRoyalty = BigDecimal.ZERO;
             }
-
 
         } else {
             assetMakerRoyalty = BigDecimal.ZERO;
