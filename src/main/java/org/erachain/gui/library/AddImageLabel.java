@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 
@@ -45,6 +46,7 @@ public class AddImageLabel extends JPanel {
         setLayout(new BorderLayout());
         JPanel panelTop = new JPanel();
         panelTop.setLayout(new BorderLayout());
+        panelTop.setCursor(new Cursor(Cursor.HAND_CURSOR));
         add(panelTop, BorderLayout.NORTH);
         this.text = text;
         label = new JLabel(text, SwingConstants.CENTER);
@@ -56,7 +58,7 @@ public class AddImageLabel extends JPanel {
         panelCenter.setLayout(new BorderLayout());
         add(panelCenter, BorderLayout.CENTER);
         panelCenter.add(new JLabel(Lang.T("Use external URL") + ":"), BorderLayout.NORTH);
-        externalURL.setToolTipText(Lang.T("Use external source by URL. It not safe by blockchain. For local example: 'file:images/icons/coin.png'"));
+        externalURL.setToolTipText(Lang.T("Use external source by URL. It not safe by blockchain. For local example: 'images/icons/coin.png'"));
         panelCenter.add(externalURL, BorderLayout.CENTER);
         panelCenter.add(externalURLCheck, BorderLayout.SOUTH);
 
@@ -65,11 +67,12 @@ public class AddImageLabel extends JPanel {
         this.initialWidth = initialWidth;
         this.initialHeight = initialHeight;
         mainLabel.setIcon(createEmptyImage(Color.WHITE, this.initialWidth, this.initialHeight));
-        setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         setBorder(BorderFactory.createEtchedBorder());
         mainLabel.setVerticalAlignment(SwingConstants.TOP);
         mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        mainLabel.addMouseListener(new MouseAdapter() {
+
+        panelTop.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (editable) {
@@ -85,7 +88,16 @@ public class AddImageLabel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 try {
-                    URL url = new URL(externalURL.getText());
+                    imgBytes = null;
+                    labelSize.setText("");
+
+                    String urlTxt = externalURL.getText();
+                    if (urlTxt.toLowerCase().startsWith("http") || urlTxt.toLowerCase().startsWith("file:")) {
+                        ;
+                    } else {
+                        urlTxt = "file:" + urlTxt;
+                    }
+                    URL url = new URL(urlTxt);
                     ImageIcon image = new ImageIcon(url);
                     mainLabel.setIcon(image);
                 } catch (MalformedURLException e) {
@@ -161,6 +173,8 @@ public class AddImageLabel extends JPanel {
                         logger.error("Image does not setup");
                         return;
                     }
+
+                    externalURL.setText("");
 
                     if (useOriginal) {
                         URL url;
@@ -272,6 +286,8 @@ public class AddImageLabel extends JPanel {
     }
 
     public byte[] getImgBytes() {
-        return imgBytes;
+        if (externalURL.getText().isEmpty())
+            return imgBytes;
+        return externalURL.getText().getBytes(StandardCharsets.UTF_8);
     }
 }

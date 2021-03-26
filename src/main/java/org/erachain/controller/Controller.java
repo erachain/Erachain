@@ -105,8 +105,6 @@ public class Controller extends Observable {
     public static final long LICENSE_VERS = 107; // version of LICENSE
     public static HashMap<String, Long> LICENSE_LANG_REFS;
 
-    public static TreeMap<String, Tuple2<BigDecimal, String>> COMPU_RATES = new TreeMap();
-
     public final String APP_NAME;
     public final static long MIN_MEMORY_TAIL = 64 * (1 << 20); // Машина Явы вылетает если меньше 50 МБ
 
@@ -864,7 +862,6 @@ public class Controller extends Observable {
         MemoryViewer mamoryViewer = new MemoryViewer(this);
         mamoryViewer.start();
 
-        updateCompuRaes();
     }
 
     // need for TESTS
@@ -3676,16 +3673,6 @@ public class Controller extends Observable {
      *
      * }
      */
-
-    public void updateCompuRaes() {
-        BigDecimal rate = new BigDecimal(Settings.getInstance().getCompuRate());
-        long rateAssetKey = Settings.getInstance().getCompuRateAsset();
-        if (rateAssetKey == 95) {
-            this.COMPU_RATES.put("en", new Tuple2<BigDecimal, String>(rate, "$"));
-        } else if (rateAssetKey == 92){
-            this.COMPU_RATES.put("ru", new Tuple2<BigDecimal, String>(rate, "RUB"));
-        }
-    }
 
     public Block getBlockByHeight(DCSet db, int parseInt) {
         return db.getBlockMap().getAndProcess(parseInt);

@@ -153,7 +153,7 @@ public abstract class IssueItemPanel extends IconPanel {
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
             gridBagConstraints.weightx = 0.1;
-            gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
+            gridBagConstraints.insets = new java.awt.Insets(8, 8, 10, 10);
             jPanelLeft.add(addIconLabel, gridBagConstraints);
         }
 
