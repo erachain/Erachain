@@ -238,11 +238,51 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public byte[] getIcon() {
+        if (this.icon != null && this.icon.length > 0 && this.icon.length < 256) {
+            // внешняя ссылка - обработаем ее
+
+        }
         return this.icon;
     }
 
     public byte[] getImage() {
+        if (this.image != null && this.image.length > 0 && this.image.length < 256) {
+            // внешняя ссылка - обработаем ее
+
+        }
         return this.image;
+    }
+
+    public boolean hasIconURL() {
+        if (this.icon != null && this.icon.length > 0 && this.icon.length < 256) {
+            // внешняя ссылка - обработаем ее
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasImageURL() {
+        if (this.image != null && this.image.length > 0 && this.image.length < 256) {
+            // внешняя ссылка - обработаем ее
+            return true;
+        }
+        return false;
+    }
+
+    public String getIconURL() {
+        if (this.icon != null && this.icon.length > 0 && this.icon.length < 256) {
+            // внешняя ссылка - обработаем ее
+            return new String(icon, StandardCharsets.UTF_8);
+        }
+        return null;
+    }
+
+    public String getImageURL() {
+        if (this.image != null && this.image.length > 0 && this.image.length < 256) {
+            // внешняя ссылка - обработаем ее
+            return new String(image, StandardCharsets.UTF_8);
+        }
+        return null;
     }
 
     public void setKey(long key) {
@@ -641,13 +681,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJSON.put("key", this.getKey());
         itemJSON.put("name", this.name);
 
-        //map.put("icon", Base64.encodeBase64String(item.getIcon()));
-        //map.put("image", Base64.encodeBase64String(item.getImage()));
 
-        if (withIcon && this.getIcon() != null && this.getIcon().length > 0)
-            itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        else
-            itemJSON.put("icon", "");
+        if (hasIconURL()) {
+            itemJSON.put("iconURL", getIconURL());
+        } else {
+            if (withIcon && this.getIcon() != null && this.getIcon().length > 0)
+                itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+            else
+                itemJSON.put("icon", "");
+        }
 
         itemJSON.put("maker", this.maker.getAddress());
         if (showPerson) {
@@ -706,6 +748,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             }
         }
 
+        if (hasIconURL()) {
+            itemJSON.put("iconURL", getIconURL());
+        }
+        if (hasImageURL()) {
+            itemJSON.put("imageURL", getImageURL());
+        }
+
         return itemJSON;
     }
 
@@ -715,15 +764,25 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         JSONObject itemJSON = new JSONObject();
 
         // ADD DATA
-        if (getIcon() != null && getIcon().length > 0)
-            itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        else
+        if (hasIconURL()) {
+            itemJSON.put("iconURL", getIconURL());
             itemJSON.put("icon", "");
+        } else {
+            if (getIcon() != null && getIcon().length > 0)
+                itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+            else
+                itemJSON.put("icon", "");
+        }
 
-        if (getImage() != null && getImage().length > 0)
-            itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
-        else
+        if (hasImageURL()) {
+            itemJSON.put("imageURL", getImageURL());
             itemJSON.put("image", "");
+        } else {
+            if (getImage() != null && getImage().length > 0)
+                itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
+            else
+                itemJSON.put("image", "");
+        }
 
         return itemJSON;
     }
@@ -758,10 +817,14 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             json.put("person_key", person.b.getKey());
         }
 
-        if (getIcon() != null && getIcon().length > 0)
-            json.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        else
-            json.put("icon", "");
+        if (hasIconURL()) {
+            json.put("iconURL", getIconURL());
+        } else {
+            if (getIcon() != null && getIcon().length > 0)
+                json.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+            else
+                json.put("icon", "");
+        }
 
         return json;
     }
@@ -829,11 +892,19 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             itemJson.put("maker_person_key", person.b.getKey());
         }
 
-        if (getIcon() != null && getIcon().length > 0)
-            itemJson.put("icon", java.util.Base64.getEncoder().encodeToString(getIcon()));
+        if (hasIconURL()) {
+            itemJson.put("iconURL", getIconURL());
+        } else {
+            if (getIcon() != null && getIcon().length > 0)
+                itemJson.put("icon", java.util.Base64.getEncoder().encodeToString(getIcon()));
+        }
 
-        if (getImage() != null && getImage().length > 0)
-            itemJson.put("image", java.util.Base64.getEncoder().encodeToString(getImage()));
+        if (hasImageURL()) {
+            itemJson.put("imageURL", getImageURL());
+        } else {
+            if (getImage() != null && getImage().length > 0)
+                itemJson.put("image", java.util.Base64.getEncoder().encodeToString(getImage()));
+        }
 
         if (referenceTx != null) {
             if (referenceTx.getCreator() != null) {
