@@ -40,6 +40,8 @@ import java.util.Map;
 
 public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
+    static Logger LOGGER = LoggerFactory.getLogger(ItemCls.class.getName());
+
     public final static long START_KEY_OLD = 1L << 14;
     public static final long MIN_START_KEY_OLD = 1000L;
 
@@ -53,8 +55,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public static final int POLL_TYPE = 8;
     public static final int AUTHOR_TYPE = 41;
 
-    public static final int MAX_ICON_LENGTH = 150000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
-    public static final int MAX_IMAGE_LENGTH = 1500000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
     protected static final int TYPE_LENGTH = 2;
     protected static final int MAKER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int NAME_SIZE_LENGTH = 1;
@@ -68,11 +68,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected static final int BASE_LENGTH = TYPE_LENGTH + MAKER_LENGTH
             + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
 
+    public static final int MAX_ICON_LENGTH = (int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
+    public static final int MAX_IMAGE_LENGTH = 1500000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
+
     protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
-    //protected DCMap dbMap;
-    //protected DCMap dbIssueMap;
-    static Logger LOGGER = LoggerFactory.getLogger(ItemCls.class.getName());
     protected byte[] typeBytes;
     protected PublicKeyAccount maker;
     protected String name;

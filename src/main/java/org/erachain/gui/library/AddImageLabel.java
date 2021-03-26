@@ -38,7 +38,7 @@ public class AddImageLabel extends JPanel {
     private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
     public JTextField externalURL = new JTextField();
-    public JComboBox externalURLЕнзу = new JComboBox();
+    public JComboBox externalURLType = new JComboBox(new String[]{"image", "video"});
 
     private boolean editable = true;
 
@@ -58,6 +58,7 @@ public class AddImageLabel extends JPanel {
         panelCenter.setLayout(new BorderLayout());
         add(panelCenter, BorderLayout.CENTER);
         panelCenter.add(new JLabel(Lang.T("Use external URL") + ":"), BorderLayout.NORTH);
+        panelCenter.add(externalURLType, BorderLayout.EAST);
         externalURL.setToolTipText(Lang.T("Use external source by URL. It not safe by blockchain. For local example: 'images/icons/coin.png'"));
         panelCenter.add(externalURL, BorderLayout.CENTER);
         JButton externalURLCheck = new JButton(Lang.T("Check URL"));
