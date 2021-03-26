@@ -241,7 +241,7 @@ public class TransactionCreator {
     public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                    byte[] icon, byte[] image,
                                                    int scale, int asset_type, long quantity, int feePow) {
-        AssetCls asset = new AssetVenture(creator, name, icon, image, description, asset_type, scale, quantity);
+        AssetCls asset = new AssetVenture(flags, creator, name, icon, image, description, asset_type, scale, quantity);
         return createIssueAssetTransaction(creator, linkTo, asset, feePow);
     }
 
@@ -254,7 +254,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        ImprintCls imprint = new Imprint(creator, name, icon, image, description);
+        ImprintCls imprint = new Imprint(creator, name, icon, image, description, flags);
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, linkTo, imprint, (byte) feePow, time);
@@ -274,7 +274,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        ImprintCls imprint = new Imprint(creator, name, icon, image, description);
+        ImprintCls imprint = new Imprint(creator, name, icon, image, description, flags);
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, linkTo, imprint, (byte) feePow, time);
@@ -430,7 +430,7 @@ public class TransactionCreator {
     public Transaction createIssuePollTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                   byte[] icon, byte[] image,
                                                   List<String> options, int feePow) {
-        PollCls poll = new org.erachain.core.item.polls.Poll(creator, name, icon, image, description, options);
+        PollCls poll = new org.erachain.core.item.polls.Poll(flags, creator, name, icon, image, description, options);
         return createIssuePollTransaction(creator, linkTo, feePow, poll);
     }
 
@@ -475,7 +475,7 @@ public class TransactionCreator {
     public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                       byte[] icon, byte[] image,
                                                       int feePow) {
-        TemplateCls template = new Template(creator, name, icon, image, description);
+        TemplateCls template = new Template(flags, creator, name, icon, image, description);
         return createIssueTemplateTransaction(creator, linkTo, feePow, template);
     }
 

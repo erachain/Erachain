@@ -62,6 +62,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public static final int MAX_NAME_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;
     protected static final int ICON_SIZE_LENGTH = 2;
     protected static final int IMAGE_SIZE_LENGTH = 4;
+    protected static final int FLAGS_LENGTH = Long.BYTES;
     protected static final int DESCRIPTION_SIZE_LENGTH = 4;
     protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
     protected static final int DBREF_LENGTH = Transaction.DBREF_LENGTH;
@@ -86,10 +87,17 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected byte[] icon;
     protected byte[] image;
 
+    /**
+     * добавочные флаги по знаку из Размер Картинки
+     */
+    protected long flags;
+    protected static final int FLAGS_MASK = 1 << 31;
+
     public Transaction referenceTx = null;
 
-    public ItemCls(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+    public ItemCls(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
         this.typeBytes = typeBytes;
+        this.flags = flags;
         this.maker = maker;
         this.name = name.trim();
         this.description = description;
@@ -98,8 +106,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     }
 
-    public ItemCls(int type, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
-        this(new byte[TYPE_LENGTH], maker, name, icon, image, description);
+    public ItemCls(int type, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        this(new byte[TYPE_LENGTH], flags, maker, name, icon, image, description);
         this.typeBytes[0] = (byte) type;
     }
 
@@ -540,12 +548,21 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         if (useAll) {
             //WRITE IMAGE SIZE
             int imageLength = this.image.length;
+
+            // если флаги подняты - отразим это
+            if (flags != 0)
+                imageLength *= -1;
+
             byte[] imageLengthBytes = Ints.toByteArray(imageLength);
             data = Bytes.concat(data, imageLengthBytes);
         }
 
         //WRITE IMAGE
         data = Bytes.concat(data, this.image);
+
+        if (flags != 0) {
+            data = Bytes.concat(data, Longs.toByteArray(flags));
+        }
 
         byte[] descriptionBytes = this.description.getBytes(StandardCharsets.UTF_8);
         if (useAll) {
@@ -586,6 +603,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public int getDataLength(boolean includeReference) {
         return BASE_LENGTH
+                + (this.flags != 0 ? FLAGS_LENGTH : 0)
                 + this.name.getBytes(StandardCharsets.UTF_8).length
                 + this.icon.length
                 + this.image.length

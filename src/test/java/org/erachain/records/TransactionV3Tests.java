@@ -134,7 +134,7 @@ public class TransactionV3Tests {
         init();
 
         //ADD ERM ASSET
-        AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
+        AssetCls aTFundingAsset = new AssetVenture(flags, new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
         aTFundingAsset.setReference(assetReference, dbRef);
         db.getItemAssetMap().set(61l, aTFundingAsset);
 
@@ -219,7 +219,7 @@ public class TransactionV3Tests {
 
         init();
 
-        AssetCls aTFundingAsset = new AssetVenture(gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
+        AssetCls aTFundingAsset = new AssetVenture(flags, gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
         aTFundingAsset.setReference(gb.getSignature(), dbRef);
         db.getItemAssetMap().set(61l, aTFundingAsset);
 

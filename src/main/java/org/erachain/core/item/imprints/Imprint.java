@@ -14,12 +14,12 @@ public class Imprint extends ImprintCls {
 
     private static final int TYPE_ID = IMPRINT;
 
-    public Imprint(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(TYPE_ID, owner, name, icon, image, description);
+    public Imprint(long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
+        super(TYPE_ID, flags, owner, name, icon, image, description);
     }
 
-    public Imprint(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, owner, name, icon, image, description);
+    public Imprint(byte[] typeBytes, long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, flags, owner, name, icon, image, description);
     }
 
     //PARSE
@@ -36,9 +36,6 @@ public class Imprint extends ImprintCls {
         position += MAKER_LENGTH;
 
         //READ NAME
-        //byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
-        //int nameLength = Ints.fromByteArray(nameLengthBytes);
-        //position += NAME_SIZE_LENGTH;
         int nameLength = Byte.toUnsignedInt(data[position]);
         position++;
 
@@ -67,12 +64,26 @@ public class Imprint extends ImprintCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
+        // TEST FLAGS
+        boolean hasFlags = (imageLength & FLAGS_MASK) != 0;
+        if (hasFlags)
+            // RESET LEN
+            imageLength *= -1;
+
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
-            throw new Exception("Invalid image length");
+            throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        long flags;
+        if (hasFlags) {
+            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
+            position += FLAGS_LENGTH;
+        } else {
+            flags = 0;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
@@ -101,7 +112,7 @@ public class Imprint extends ImprintCls {
         }
 
         //RETURN
-        Imprint imprint = new Imprint(typeBytes, owner, name, icon, image, description);
+        Imprint imprint = new Imprint(typeBytes, flags, owner, name, icon, image, description);
         if (includeReference) {
             imprint.setReference(reference, dbRef);
         }

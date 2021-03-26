@@ -92,7 +92,7 @@ public class TestRecSendOutsideClaims {
         recipient.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
         recipient2.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
-        assetA = new AssetVenture(maker, "AAA", icon, image, ".", AssetCls.AS_OUTSIDE_OTHER_CLAIM, 2, 0L);
+        assetA = new AssetVenture(flags, maker, "AAA", icon, image, ".", AssetCls.AS_OUTSIDE_OTHER_CLAIM, 2, 0L);
 
         // set SCALABLE assets ++
         assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);

@@ -13,11 +13,11 @@ public class Status extends StatusCls {
     private static final int TYPE_ID = STATUS;
 
     public Status(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, boolean unique) {
-        super(TYPE_ID, owner, name, icon, image, description, unique);
+        super(TYPE_ID, flags, owner, name, icon, image, description, unique);
     }
 
     public Status(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, owner, name, icon, image, description);
+        super(typeBytes, flags, owner, name, icon, image, description);
     }
 
     //GETTERS/SETTERS
@@ -67,12 +67,26 @@ public class Status extends StatusCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
+        // TEST FLAGS
+        boolean hasFlags = (imageLength & FLAGS_MASK) != 0;
+        if (hasFlags)
+            // RESET LEN
+            imageLength *= -1;
+
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
-            throw new Exception("Invalid image length");
+            throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        long flags;
+        if (hasFlags) {
+            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
+            position += FLAGS_LENGTH;
+        } else {
+            flags = 0;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);

@@ -10,7 +10,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ByteArrayUtils;
@@ -31,7 +30,7 @@ public class PersonHuman extends PersonCls {
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
                        byte[] makerSignature) {
-        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, maker, fullName, birthday, deathday,
+        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, flags, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
         this.makerSignature = makerSignature;
@@ -41,7 +40,7 @@ public class PersonHuman extends PersonCls {
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
                        byte[] makerSignature) {
-        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, maker, fullName, birthday, deathday,
+        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, flags, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
         this.makerSignature = makerSignature;
@@ -51,7 +50,7 @@ public class PersonHuman extends PersonCls {
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image,
                        String description, byte[] makerSignature) {
-        super(typeBytes, maker, fullName, birthday, deathday,
+        super(typeBytes, flags, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
         this.makerSignature = makerSignature;
@@ -102,12 +101,26 @@ public class PersonHuman extends PersonCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
-        if (imageLength < 0 || imageLength > ItemCls.MAX_IMAGE_LENGTH) {
-            throw new Exception("Invalid image length " + imageLength);
+        // TEST FLAGS
+        boolean hasFlags = (imageLength & FLAGS_MASK) != 0;
+        if (hasFlags)
+            // RESET LEN
+            imageLength *= -1;
+
+        if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
+            throw new Exception("Invalid image length" + fullName + ": " + imageLength);
         }
 
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        long flags;
+        if (hasFlags) {
+            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
+            position += FLAGS_LENGTH;
+        } else {
+            flags = 0;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);

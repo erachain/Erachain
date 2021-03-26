@@ -14,12 +14,12 @@ public class Sample2 extends TemplateCls {
 
     private static final int TYPE_ID = SAMPLE;
 
-    public Sample2(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(TYPE_ID, owner, name, icon, image, description);
+    public Sample2(long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
+        super(TYPE_ID, flags, owner, name, icon, image, description);
     }
 
-    public Sample2(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, owner, name, icon, image, description);
+    public Sample2(byte[] typeBytes, long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, flags, owner, name, icon, image, description);
     }
 
     //PARSE
@@ -67,12 +67,26 @@ public class Sample2 extends TemplateCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
+        // TEST FLAGS
+        boolean hasFlags = (imageLength & FLAGS_MASK) != 0;
+        if (hasFlags)
+            // RESET LEN
+            imageLength *= -1;
+
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
-            throw new Exception("Invalid image length");
+            throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        long flags;
+        if (hasFlags) {
+            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
+            position += FLAGS_LENGTH;
+        } else {
+            flags = 0;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
@@ -101,7 +115,7 @@ public class Sample2 extends TemplateCls {
         }
 
         //RETURN
-        Sample2 template = new Sample2(typeBytes, owner, name, icon, image, description);
+        Sample2 template = new Sample2(typeBytes, flags, owner, name, icon, image, description);
         if (includeReference) {
             template.setReference(reference, dbRef);
         }

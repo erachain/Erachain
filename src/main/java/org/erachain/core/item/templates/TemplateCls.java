@@ -34,13 +34,13 @@ public abstract class TemplateCls extends ItemCls {
     private static Pattern varsPattern = Pattern.compile(Pattern.quote("{{") + "(.+?)" + Pattern.quote("}}"));
     private List<String> variables;
 
-    public TemplateCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, owner, name, icon, image, description);
+    public TemplateCls(byte[] typeBytes, long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, flags, owner, name, icon, image, description);
 
     }
 
-    public TemplateCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
+    public TemplateCls(int type, long flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
+        this(new byte[TYPE_LENGTH], flags, owner, name, icon, image, description);
         this.typeBytes[0] = (byte) type;
     }
 

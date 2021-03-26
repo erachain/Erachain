@@ -86,7 +86,7 @@ public class TestRecTemplate {
 
     private void initTemplate(boolean process) {
 
-        template = new Template(maker, "test132", icon, image, "12345678910strontje");
+        template = new Template(flags, maker, "test132", icon, image, "12345678910strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
         issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -130,7 +130,7 @@ public class TestRecTemplate {
 
         init();
 
-        TemplateCls template = new Template(maker, "test132", icon, image, "12345678910strontje");
+        TemplateCls template = new Template(flags, maker, "test132", icon, image, "12345678910strontje");
         byte[] raw = template.toBytes(false, false);
         assertEquals(raw.length, template.getDataLength(false));
 
@@ -190,7 +190,7 @@ public class TestRecTemplate {
 
         init();
 
-        Template template = new Template(maker, "test", icon, image, "strontje");
+        Template template = new Template(flags, maker, "test", icon, image, "strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -207,7 +207,7 @@ public class TestRecTemplate {
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);
         assertEquals(true, templateMap.contains(key));
 
-        TemplateCls template_2 = new Template(maker, "test132_2", icon, image, "2_12345678910strontje");
+        TemplateCls template_2 = new Template(flags, maker, "test132_2", icon, image, "2_12345678910strontje");
         IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, null, template_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db)[0]);
         issueTemplateTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueTemplateTransaction_2.process(gb, Transaction.FOR_NETWORK);
@@ -231,7 +231,7 @@ public class TestRecTemplate {
 
         init();
 
-        Template template = new Template(maker, "test", icon, image, "strontje");
+        Template template = new Template(flags, maker, "test", icon, image, "strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);

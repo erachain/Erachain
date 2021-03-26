@@ -43,46 +43,46 @@ public class ItemAssetMap extends ItemMap {
             switch (key.intValue()) {
 
                 case (int) AssetCls.LIA_KEY:
-                    item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
+                    item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
                             AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0L);
                     item = null;
 
                     break;
                 case 555:
-                    item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, new String("¤¤¤"), null, null,
+                    item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, new String("¤¤¤"), null, null,
                             "Businessman", AssetCls.AS_ACCOUNTING, 8, 0L);
                     break;
                 case 666:
-                    item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, new String("♠♠♠"), null, null, // ♠♠♠
+                    item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, new String("♠♠♠"), null, null, // ♠♠♠
                             "bad, angry", AssetCls.AS_ACCOUNTING, 8, 0L);
                     break;
                 case 777:
-                    item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, new String("♥♥♥"), null, null,
+                    item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, new String("♥♥♥"), null, null,
                             "Good Shine", AssetCls.AS_ACCOUNTING, 8, 0L);
                     break;
                 case 643:
-                    item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, new String("RUB"), null, null,
+                    item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, new String("RUB"), null, null,
                             "Accounting currency by ISO 4217 standard", AssetCls.AS_ACCOUNTING, 2, 0L);
                     break;
                 case 840:
-                    item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, new String("USD"), null, null,
+                    item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, new String("USD"), null, null,
                             "Accounting currency by ISO 4217 standard", AssetCls.AS_ACCOUNTING, 2, 0L);
                     break;
                 case 978:
-                    item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, new String("EUR"), null, null,
+                    item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, new String("EUR"), null, null,
                             "Accounting currency by ISO 4217 standard", AssetCls.AS_ACCOUNTING, 2, 0L);
                     break;
                 case 959:
-                    item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, new String("XAU"), null, null,
+                    item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, new String("XAU"), null, null,
                             "Accounting currency by ISO 4217 standard", AssetCls.AS_ACCOUNTING, 2, 0L);
                     break;
                 default:
-                    item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, "ISO." + key, null, null,
+                    item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, "ISO." + key, null, null,
                             "Accounting currency by ISO 4217 standard", AssetCls.AS_ACCOUNTING, 2, 0L);
             }
         } else {
             if (key.equals(AssetCls.LIA_KEY)) {
-                item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
+                item = new AssetVenture((byte) 0, flags, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
                         AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0L);
                 item = null;
             } else {

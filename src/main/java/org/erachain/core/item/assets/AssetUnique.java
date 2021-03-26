@@ -19,16 +19,16 @@ public class AssetUnique extends AssetCls {
 
     private static final int TYPE_ID = UNIQUE;
 
-    public AssetUnique(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        super(typeBytes, maker, name, icon, image, description, assetType);
+    public AssetUnique(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        super(typeBytes, flags, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(int props, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, maker, name, icon, image, description, assetType);
+    public AssetUnique(int props, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, flags, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, maker, name, icon, image, description, assetType);
+    public AssetUnique(long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, flags, maker, name, icon, image, description, assetType);
     }
 
     //GETTERS/SETTERS
@@ -113,13 +113,26 @@ public class AssetUnique extends AssetCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
+        // TEST FLAGS
+        boolean hasFlags = (imageLength & FLAGS_MASK) != 0;
+        if (hasFlags)
+            // RESET LEN
+            imageLength *= -1;
+
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
             throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
-
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        long flags;
+        if (hasFlags) {
+            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
+            position += FLAGS_LENGTH;
+        } else {
+            flags = 0;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
@@ -152,7 +165,7 @@ public class AssetUnique extends AssetCls {
         position += ASSET_TYPE_LENGTH;
 
         //RETURN
-        AssetUnique unique = new AssetUnique(typeBytes, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
+        AssetUnique unique = new AssetUnique(typeBytes, flags, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
         if (includeReference) {
             unique.setReference(reference, dbRef);
         }

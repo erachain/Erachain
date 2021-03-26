@@ -35,19 +35,19 @@ public class AssetVenture extends AssetCls {
      */
     protected int scale;
 
-    public AssetVenture(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
-        super(typeBytes, maker, name, icon, image, description, asset_type);
+    public AssetVenture(byte[] typeBytes, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+        super(typeBytes, flags, maker, name, icon, image, description, asset_type);
         this.quantity = quantity;
         this.scale = (byte) scale;
     }
 
-    public AssetVenture(int props, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, maker, name, icon, image, description, asset_type, scale, quantity);
+    public AssetVenture(int props, long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, flags, maker, name, icon, image, description, asset_type, scale, quantity);
     }
 
-    public AssetVenture(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+    public AssetVenture(long flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
         //this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, maker, name, assetType, icon, image, description, quantity, scale);
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, maker, name, icon, image, description, asset_type, scale, quantity);
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, flags, maker, name, icon, image, description, asset_type, scale, quantity);
     }
 
     //GETTERS/SETTERS
@@ -158,13 +158,26 @@ public class AssetVenture extends AssetCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
+        // TEST FLAGS
+        boolean hasFlags = (imageLength & FLAGS_MASK) != 0;
+        if (hasFlags)
+            // RESET LEN
+            imageLength *= -1;
+
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
             throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
-
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        long flags;
+        if (hasFlags) {
+            flags = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + FLAGS_LENGTH));
+            position += FLAGS_LENGTH;
+        } else {
+            flags = 0;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
@@ -208,7 +221,7 @@ public class AssetVenture extends AssetCls {
         position += ASSET_TYPE_LENGTH;
 
         //RETURN
-        AssetVenture venture = new AssetVenture(typeBytes, owner, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]), scale, quantity);
+        AssetVenture venture = new AssetVenture(typeBytes, flags, owner, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]), scale, quantity);
         if (includeReference) {
             venture.setReference(reference, dbRef);
         }

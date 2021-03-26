@@ -516,36 +516,36 @@ public class GenesisBlock extends Block {
     public static AssetVenture makeAsset(long key) {
         switch ((int) key) {
             case (int) AssetCls.ERA_KEY:
-                return new AssetVenture(CREATOR, AssetCls.ERA_NAME, icon, image, AssetCls.ERA_DESCR, 0, 8, 0L);
+                return new AssetVenture(flags, CREATOR, AssetCls.ERA_NAME, icon, image, AssetCls.ERA_DESCR, 0, 8, 0L);
             case (int) AssetCls.FEE_KEY:
-                return new AssetVenture(BlockChain.FEE_ASSET_EMITTER, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 0, 8, 0L);
+                return new AssetVenture(flags, BlockChain.FEE_ASSET_EMITTER, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 0, 8, 0L);
             case (int) AssetCls.TRUST_KEY:
-                return new AssetVenture(CREATOR, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, 0, 8, 0L);
+                return new AssetVenture(flags, CREATOR, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, 0, 8, 0L);
             case (int) AssetCls.REAL_KEY:
-                return new AssetVenture(CREATOR, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, 0, 8, 0L);
+                return new AssetVenture(flags, CREATOR, AssetCls.REAL_NAME, icon, image, AssetCls.REAL_DESCR, 0, 8, 0L);
             case (int) AssetCls.REAL_KEY + 1:
                 return new AssetVenture(
-                        CREATOR,
+                        flags, CREATOR,
                         "РА", icon, image, "Единица Ра",
                         0, 8, 0L);
             case (int) AssetCls.REAL_KEY + 2:
                 return new AssetVenture(
-                        CREATOR,
+                        flags, CREATOR,
                         "RUNEURO", icon, image, "RuNeuro",
                         0, 8, 0L);
             case (int) AssetCls.REAL_KEY + 3:
                 return new AssetVenture(
-                        CREATOR,
+                        flags, CREATOR,
                         "ERG", icon, image, "1 миллион ЕРГ. Основная учётная единица, мера полезного ЭНЕРГОПОТОКА (пользы для ноосферы) управления данной средой - ЭРГ (ERG). Для обеспчения жизни на земле постоянно требуется поток энергии. Из общего потока энергии полезный поток всегда меньше полного. Отношение полезного энергопотока к полному энергопотоку = КПД Системы.",
                         0, 8, 0L);
             case (int) AssetCls.REAL_KEY + 4:
                 return new AssetVenture(
-                        CREATOR,
+                        flags, CREATOR,
                         "LERG", icon, image, "1 миллион потраченных ЕРГ - ПЭРГ (Lost ERG)",
                         0, 8, 0L);
             case (int) AssetCls.REAL_KEY + 5:
                 return new AssetVenture(
-                        new PublicKeyAccount(Base58.decode("5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF")),
+                        flags, new PublicKeyAccount(Base58.decode("5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF")),
                         "A", icon, image, "ARONICLE.COM shares",
                         0, 8, 0L);
         }
@@ -572,21 +572,21 @@ public class GenesisBlock extends Block {
                         return null;
                     }
                 }
-                return new Template(CREATOR, "Пользовательское соглашение на использование данного программного продукта"
+                return new Template(flags, CREATOR, "Пользовательское соглашение на использование данного программного продукта"
                         //+ " \"" + Controller.APP_NAME + "\"", icon, image,
                         + " \"ERM4\"", icon, image,
                         license
                 );
             case (int) TemplateCls.MARRIAGE_KEY:
-                return new Template(CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
+                return new Template(flags, CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
             case (int) TemplateCls.UNMARRIAGE_KEY:
-                return new Template(CREATOR, "Заявление о разводе", icon, image, "Я, %person1%, развожусь с %person2%");
+                return new Template(flags, CREATOR, "Заявление о разводе", icon, image, "Я, %person1%, развожусь с %person2%");
             case (int) TemplateCls.HIRING_KEY:
-                return new Template(CREATOR, "Заявление о приёме на работу", icon, image, "Прошу принять меня в объединение %union%, на должность %job%");
+                return new Template(flags, CREATOR, "Заявление о приёме на работу", icon, image, "Прошу принять меня в объединение %union%, на должность %job%");
             case (int) TemplateCls.UNHIRING_KEY:
-                return new Template(CREATOR, "Заявление об уволнении", icon, image, "Прошу уволить меня из объединения %union% по собственному желанию");
+                return new Template(flags, CREATOR, "Заявление об уволнении", icon, image, "Прошу уволить меня из объединения %union% по собственному желанию");
         }
-        return new Template(CREATOR, "empty", icon, image, "empty");
+        return new Template(flags, CREATOR, "empty", icon, image, "empty");
     }
 
     // make statuses
@@ -625,7 +625,7 @@ public class GenesisBlock extends Block {
             AssetVenture asset = makeAsset(i);
             // MAKE OLD STYLE ASSET with DEVISIBLE:
             // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
-            asset = new AssetVenture((byte) 0, asset.getMaker(), asset.getName(),
+            asset = new AssetVenture((byte) 0, flags, asset.getMaker(), asset.getName(),
                     asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, 8, 0L);
             transactions.add(new GenesisIssueAssetTransaction(asset));
         }

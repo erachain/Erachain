@@ -228,7 +228,7 @@ public class DatabaseTests {
 
         init();
 
-        AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 8, 50000l);
+        AssetCls asset = new AssetVenture(flags, maker, "test", icon, image, "strontje", 0, 8, 50000l);
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);

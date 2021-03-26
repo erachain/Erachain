@@ -108,7 +108,7 @@ public class TestRecSend {
         BigDecimal amount;
         BigDecimal amount_result;
 
-        AssetCls asset23 = new AssetVenture(maker, "AAA", icon, image, ".", 0, TransactionAmount.maxSCALE, 0L);
+        AssetCls asset23 = new AssetVenture(flags, maker, "AAA", icon, image, ".", 0, TransactionAmount.maxSCALE, 0L);
         asset23.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         long assetKey23 = asset23.getKey(db);
 
@@ -225,7 +225,7 @@ public class TestRecSend {
         
         /////////////////////// VALIDATE
         int thisScale = 5;
-        AssetCls assetA = new AssetVenture(maker, "AAA", icon, image, ".", 0, thisScale, 0L);
+        AssetCls assetA = new AssetVenture(flags, maker, "AAA", icon, image, ".", 0, thisScale, 0L);
         assetA.insertToMap(db, 0l);
         long assetKey = assetA.getKey(db);
         head = "";
@@ -261,7 +261,7 @@ public class TestRecSend {
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.ITEM_ASSET_NOT_EXIST);
 
         // INVALID
-        assetA = new AssetVenture(maker, "AAA", icon, image, ".", 0, 30, 0L);
+        assetA = new AssetVenture(flags, maker, "AAA", icon, image, ".", 0, 30, 0L);
         assetA.insertToMap(db, 0l);
         assetKey = assetA.getKey(db);
 
@@ -315,8 +315,8 @@ public class TestRecSend {
         int different_scale;
         int fromScale = -5;
         int toScale = BlockChain.AMOUNT_DEDAULT_SCALE - TransactionAmount.SCALE_MASK_HALF;
-        
-        AssetCls assetBIG = new AssetVenture(maker, "AAA", icon, image, ".", 0, fromScale + 2, 0L);
+
+        AssetCls assetBIG = new AssetVenture(flags, maker, "AAA", icon, image, ".", 0, fromScale + 2, 0L);
         assetBIG.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         long assetKeyBIG = assetBIG.getKey(db);
 
@@ -426,7 +426,7 @@ public class TestRecSend {
         
         /////////////////////// VALIDATE
         int thisScale = 5;
-        AssetCls assetA = new AssetVenture(maker, "AAA", icon, image, ".", 0, thisScale, 0L);
+        AssetCls assetA = new AssetVenture(flags, maker, "AAA", icon, image, ".", 0, thisScale, 0L);
         assetA.insertToMap(db, 0l);
         long assetKey = assetA.getKey(db);
         head = "";
@@ -743,7 +743,7 @@ public class TestRecSend {
         init();
 
         //ADD ERM ASSET
-        AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
+        AssetCls aTFundingAsset = new AssetVenture(flags, new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
                 0, 8, 250000000l);
         aTFundingAsset.setReference(assetReference, dbRef);
         db.getItemAssetMap().set(assetKeyTest, aTFundingAsset);
@@ -832,7 +832,7 @@ public class TestRecSend {
 
         init();
 
-        AssetCls aTFundingAsset = new AssetVenture(gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
+        AssetCls aTFundingAsset = new AssetVenture(flags, gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
                 0, 8, 250000000l);
         aTFundingAsset.setReference(gb.getSignature(), dbRef);
         db.getItemAssetMap().set(assetKeyTest, aTFundingAsset);

@@ -71,7 +71,7 @@ public class TestRecImprint {
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
-        imprint = new Imprint(maker, name_total, icon, image, "");
+        imprint = new Imprint(flags, maker, name_total, icon, image, "");
 
     }
 
@@ -186,7 +186,7 @@ public class TestRecImprint {
         long key = issueImprintRecord.getItem().getKey(db);
         assertEquals(true, db.getItemImprintMap().contains(key));
 
-        ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), icon, image, "e");
+        ImprintCls imprint_2 = new Imprint(flags, maker, Imprint.hashNameToBase58("test132_2"), icon, image, "e");
         IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, exLink, imprint_2, FEE_POWER, timestamp + 10);
         issueImprintTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueImprintTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 2, true);

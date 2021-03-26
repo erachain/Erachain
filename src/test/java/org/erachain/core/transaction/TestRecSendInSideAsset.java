@@ -89,12 +89,12 @@ public class TestRecSendInSideAsset {
         emitter.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         emitter.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
-        asset = new AssetVenture(creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
+        asset = new AssetVenture(flags, creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
         // set SCALABLE assets ++
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(db, 0l);
 
-        assetInSide = new AssetVenture(emitter, "inSide Asset", icon, image, "...", AssetCls.AS_INSIDE_ASSETS, scale, 500l);
+        assetInSide = new AssetVenture(flags, emitter, "inSide Asset", icon, image, "...", AssetCls.AS_INSIDE_ASSETS, scale, 500l);
 
         if (withIssue) {
     
