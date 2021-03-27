@@ -21,6 +21,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
@@ -1472,7 +1473,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public String viewFeeAndFiat() {
 
         String text = fee.toString();
-        BigDecimal compu_rate = new BigDecimal(Settings.getInstance().getCompuRate());
+        boolean useDEX = Settings.getInstance().getCompuRateUseDEX();
+
         AssetCls asset = Controller.getInstance().getAsset(Settings.getInstance().getCompuRateAsset());
         if (asset == null)
             asset = Controller.getInstance().getAsset(840L); // ISO-USD
@@ -1480,8 +1482,21 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         if (asset == null)
             asset = Controller.getInstance().getAsset(1L); // ERA
 
-        if (compu_rate.signum() > 0) {
-            BigDecimal fee_fiat = fee.multiply(compu_rate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
+        BigDecimal compuRate;
+        if (useDEX) {
+            Trade lastTrade = DCSet.getInstance().getTradeMap().getLastTrade(AssetCls.FEE_KEY, asset.getKey());
+            if (lastTrade == null) {
+                compuRate = BigDecimal.ZERO;
+            } else {
+                compuRate = lastTrade.getHaveKey().equals(AssetCls.FEE_KEY) ? lastTrade.calcPriceRevers() : lastTrade.calcPrice();
+            }
+
+        } else {
+            compuRate = new BigDecimal(Settings.getInstance().getCompuRate());
+        }
+
+        if (compuRate.signum() > 0) {
+            BigDecimal fee_fiat = fee.multiply(compuRate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
             text += " " + AssetCls.FEE_NAME;
             if (asset.getKey() != AssetCls.FEE_KEY)
                 text += " (" + fee_fiat.toString() + " " + asset.getTickerName() + ")";
