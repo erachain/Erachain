@@ -16,12 +16,12 @@ public class Poll extends PollCls {
 
     private static final int TYPE_ID = POLL;
 
-    public Poll(long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, List<String> options) {
-        super(TYPE_ID, flags, maker, name, icon, image, description, options);
+    public Poll(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, List<String> options) {
+        super(TYPE_ID, appData, maker, name, icon, image, description, options);
     }
 
-    public Poll(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, List<String> options) {
-        super(typeBytes, flags, maker, name, icon, image, description, options);
+    public Poll(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, List<String> options) {
+        super(typeBytes, appData, maker, name, icon, image, description, options);
     }
 
     //PARSE
@@ -69,9 +69,9 @@ public class Poll extends PollCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
-        // TEST FLAGS
-        boolean hasFlags = (imageLength & FLAGS_MASK) != 0;
-        if (hasFlags)
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
             // RESET LEN
             imageLength *= -1;
 
@@ -82,18 +82,17 @@ public class Poll extends PollCls {
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
 
-        long[] flags;
-        if (hasFlags) {
-            byte flagsBytesLen = Arrays.copyOfRange(data, position, ++position)[0];
-            flags = new long[flagsBytesLen];
+        byte[] appData;
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + APP_DATA_LENGTH));
+            position += APP_DATA_LENGTH;
 
-            for (int i = 0; i < flagsBytesLen; i++) {
-                byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
-                flags[i] = Longs.fromByteArray(flagsBytes);
-                position += FLAGS_LENGTH;
-            }
+            appData = Arrays.copyOfRange(data, position, position + appDataLen);
+            position += imageLength;
+
         } else {
-            flags = null;
+            appData = null;
         }
 
         //READ DESCRIPTION
@@ -142,7 +141,7 @@ public class Poll extends PollCls {
         }
 
         //RETURN
-        Poll poll = new Poll(typeBytes, flags, maker, name, icon, image, description, options);
+        Poll poll = new Poll(typeBytes, appData, maker, name, icon, image, description, options);
         if (includeReference) {
             poll.setReference(reference, dbRef);
         }

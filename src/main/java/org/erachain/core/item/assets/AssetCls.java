@@ -301,14 +301,14 @@ public abstract class AssetCls extends ItemCls {
      */
     public static final int AS_SELF_MANAGED_SHARE = 129;
 
-    protected AssetCls(byte[] typeBytes, long[] flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
-        super(typeBytes, flags, owner, name, icon, image, description);
+    protected AssetCls(byte[] typeBytes, byte[] appData, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
+        super(typeBytes, appData, owner, name, icon, image, description);
         this.assetType = assetType;
 
     }
 
-    public AssetCls(int type, byte pars, long[] flags, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
-        this(new byte[TYPE_LENGTH], flags, owner, name, icon, image, description, assetType);
+    public AssetCls(int type, byte pars, byte[] appData, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[TYPE_LENGTH], appData, owner, name, icon, image, description, assetType);
         this.typeBytes[0] = (byte) type;
         this.typeBytes[1] = pars;
     }

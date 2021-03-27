@@ -26,31 +26,31 @@ public class PersonHuman extends PersonCls {
     // for personal data maker - his signature
     protected byte[] makerSignature;
 
-    public PersonHuman(long[] flags, PublicKeyAccount maker, String fullName, long birthday, long deathday,
+    public PersonHuman(byte[] appData, PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
                        byte[] makerSignature) {
-        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, flags, maker, fullName, birthday, deathday,
+        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, appData, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
         this.makerSignature = makerSignature;
     }
 
-    public PersonHuman(long[] flags, PublicKeyAccount maker, String fullName, String birthday, String deathday,
+    public PersonHuman(byte[] appData, PublicKeyAccount maker, String fullName, String birthday, String deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
                        byte[] makerSignature) {
-        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, flags, maker, fullName, birthday, deathday,
+        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, appData, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
         this.makerSignature = makerSignature;
     }
 
-    public PersonHuman(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String fullName, long birthday, long deathday,
+    public PersonHuman(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image,
                        String description, byte[] makerSignature) {
-        super(typeBytes, flags, maker, fullName, birthday, deathday,
+        super(typeBytes, appData, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
         this.makerSignature = makerSignature;
@@ -81,7 +81,7 @@ public class PersonHuman extends PersonCls {
         }
 
         byte[] fullNameBytes = Arrays.copyOfRange(data, position, position + fullNameLength);
-        String fullName = new String(fullNameBytes, StandardCharsets.UTF_8);
+        String name = new String(fullNameBytes, StandardCharsets.UTF_8);
         position += fullNameLength;
 
         //READ ICON
@@ -101,31 +101,30 @@ public class PersonHuman extends PersonCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
-        // TEST FLAGS
-        boolean hasFlags = (imageLength & FLAGS_MASK) != 0;
-        if (hasFlags)
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
             // RESET LEN
             imageLength *= -1;
 
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
-            throw new Exception("Invalid image length" + fullName + ": " + imageLength);
+            throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
 
-        long[] flags;
-        if (hasFlags) {
-            byte flagsBytesLen = Arrays.copyOfRange(data, position, ++position)[0];
-            flags = new long[flagsBytesLen];
+        byte[] appData;
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + APP_DATA_LENGTH));
+            position += APP_DATA_LENGTH;
 
-            for (int i = 0; i < flagsBytesLen; i++) {
-                byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
-                flags[i] = Longs.fromByteArray(flagsBytes);
-                position += FLAGS_LENGTH;
-            }
+            appData = Arrays.copyOfRange(data, position, position + appDataLen);
+            position += imageLength;
+
         } else {
-            flags = null;
+            appData = null;
         }
 
         //READ DESCRIPTION
@@ -239,7 +238,7 @@ public class PersonHuman extends PersonCls {
         }
 
         //RETURN
-        PersonHuman personHuman = new PersonHuman(typeBytes, flags, maker, fullName, birthday, deathday,
+        PersonHuman personHuman = new PersonHuman(typeBytes, appData, maker, name, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, height, icon, image, description, makerSignature);
 

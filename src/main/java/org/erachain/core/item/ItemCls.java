@@ -62,7 +62,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public static final int MAX_NAME_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;
     protected static final int ICON_SIZE_LENGTH = 2;
     protected static final int IMAGE_SIZE_LENGTH = 4;
-    protected static final int FLAGS_LENGTH = Long.BYTES;
+    protected static final int APP_DATA_LENGTH = Integer.BYTES;
     protected static final int DESCRIPTION_SIZE_LENGTH = 4;
     protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
     protected static final int DBREF_LENGTH = Transaction.DBREF_LENGTH;
@@ -80,10 +80,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     /**
      * добавочные флаги по знаку из Размер Картинки
      */
-    protected static final int FLAGS_MASK = 1 << 31;
-    // настройки для данного актива - могут быть использованы в будущем - 64 байта
-    // то есть можно установить 64 разных флагов
-    protected long[] flags;
+    protected static final int APP_DATA_MASK = 1 << 31;
+
+    protected byte[] appData;
 
     protected String name;
     protected String description;
@@ -98,9 +97,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public Transaction referenceTx = null;
 
-    public ItemCls(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+    public ItemCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
         this.typeBytes = typeBytes;
-        this.flags = flags;
+        this.appData = appData;
         this.maker = maker;
         this.name = name.trim();
         this.description = description;
@@ -109,8 +108,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     }
 
-    public ItemCls(int type, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
-        this(new byte[TYPE_LENGTH], flags, maker, name, icon, image, description);
+    public ItemCls(int type, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        this(new byte[TYPE_LENGTH], appData, maker, name, icon, image, description);
         this.typeBytes[0] = (byte) type;
     }
 
@@ -538,7 +537,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         //WRITE NAME
         data = Bytes.concat(data, nameBytes);
 
-        boolean hasFlags = flags != null && flags.length != 0;
+        boolean hasAppData = appData != null && appData.length > 0;
 
         if (useAll) {
             //WRITE ICON SIZE - 2 bytes = 64kB max
@@ -555,7 +554,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             int imageLength = this.image.length;
 
             // если флаги подняты - отразим это
-            if (hasFlags)
+            if (hasAppData)
                 imageLength *= -1;
 
             byte[] imageLengthBytes = Ints.toByteArray(imageLength);
@@ -565,14 +564,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         //WRITE IMAGE
         data = Bytes.concat(data, this.image);
 
-        /// FLAGS
-        if (hasFlags) {
-            // WRITE FLAGS LENGTH
-            data = Bytes.concat(data, new byte[]{(byte) this.flags.length});
-
-            for (int i = 0; i < flags.length; i++) {
-                data = Bytes.concat(data, Longs.toByteArray(this.flags[i]));
-            }
+        /// APP DATA
+        if (hasAppData) {
+            // WRITE APP DATA LENGTH
+            data = Bytes.concat(data, Ints.toByteArray(this.appData.length));
+            data = Bytes.concat(data, this.appData);
 
         }
 
@@ -598,7 +594,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public int getDataLength(boolean includeReference) {
         return BASE_LENGTH
-                + (flags == null || flags.length == 0 ? 0 : FLAGS_LENGTH * flags.length)
+                + (appData == null || appData.length == 0 ? 0 : APP_DATA_LENGTH + appData.length)
                 + this.name.getBytes(StandardCharsets.UTF_8).length
                 + this.icon.length
                 + this.image.length

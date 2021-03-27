@@ -33,14 +33,14 @@ public abstract class PollCls extends ItemCls {
     protected static final int BASE_LENGTH = OPTIONS_SIZE_LENGTH;
     private List<String> options;
 
-    public PollCls(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, List<String> options) {
-        super(typeBytes, flags, maker, name, icon, image, description);
+    public PollCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, List<String> options) {
+        super(typeBytes, appData, maker, name, icon, image, description);
         this.options = options;
 
     }
 
-    public PollCls(int type, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, List<String> options) {
-        this(new byte[TYPE_LENGTH], flags, maker, name, icon, image, description, options);
+    public PollCls(int type, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, List<String> options) {
+        this(new byte[TYPE_LENGTH], appData, maker, name, icon, image, description, options);
         this.typeBytes[0] = (byte) type;
     }
 

@@ -29,15 +29,15 @@ public abstract class UnionCls extends ItemCls {
     protected long birthday; // timestamp
     protected long parent; // parent union
 
-    public UnionCls(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
-        super(typeBytes, flags, maker, name, icon, image, description);
+    public UnionCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
+        super(typeBytes, appData, maker, name, icon, image, description);
         this.birthday = birthday;
         this.parent = parent;
 
     }
 
-    public UnionCls(int type, long[] flags, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
-        this(new byte[TYPE_LENGTH], flags, maker, name, birthday, parent, icon, image, description);
+    public UnionCls(int type, byte[] appData, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
+        this(new byte[TYPE_LENGTH], appData, maker, name, birthday, parent, icon, image, description);
         this.typeBytes[0] = (byte) type;
     }
 

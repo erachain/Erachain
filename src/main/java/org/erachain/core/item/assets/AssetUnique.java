@@ -19,16 +19,16 @@ public class AssetUnique extends AssetCls {
 
     private static final int TYPE_ID = UNIQUE;
 
-    public AssetUnique(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        super(typeBytes, flags, maker, name, icon, image, description, assetType);
+    public AssetUnique(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        super(typeBytes, appData, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(int props, long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, flags, maker, name, icon, image, description, assetType);
+    public AssetUnique(int props, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, appData, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(long[] flags, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, flags, maker, name, icon, image, description, assetType);
+    public AssetUnique(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, assetType);
     }
 
     //GETTERS/SETTERS
@@ -113,9 +113,9 @@ public class AssetUnique extends AssetCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
-        // TEST FLAGS
-        boolean hasFlags = (imageLength & FLAGS_MASK) != 0;
-        if (hasFlags)
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
             // RESET LEN
             imageLength *= -1;
 
@@ -126,18 +126,17 @@ public class AssetUnique extends AssetCls {
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
 
-        long[] flags;
-        if (hasFlags) {
-            byte flagsBytesLen = Arrays.copyOfRange(data, position, ++position)[0];
-            flags = new long[flagsBytesLen];
+        byte[] appData;
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + APP_DATA_LENGTH));
+            position += APP_DATA_LENGTH;
 
-            for (int i = 0; i < flagsBytesLen; i++) {
-                byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
-                flags[i] = Longs.fromByteArray(flagsBytes);
-                position += FLAGS_LENGTH;
-            }
+            appData = Arrays.copyOfRange(data, position, position + appDataLen);
+            position += imageLength;
+
         } else {
-            flags = null;
+            appData = null;
         }
 
         //READ DESCRIPTION
@@ -171,7 +170,7 @@ public class AssetUnique extends AssetCls {
         position += ASSET_TYPE_LENGTH;
 
         //RETURN
-        AssetUnique unique = new AssetUnique(typeBytes, flags, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
+        AssetUnique unique = new AssetUnique(typeBytes, appData, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
         if (includeReference) {
             unique.setReference(reference, dbRef);
         }

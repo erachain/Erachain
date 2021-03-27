@@ -14,12 +14,12 @@ public class Union extends UnionCls {
 
     private static final int TYPE_ID = UNION;
 
-    public Union(long[] flags, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
-        super(TYPE_ID, flags, maker, name, birthday, parent, icon, image, description);
+    public Union(byte[] appData, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
+        super(TYPE_ID, appData, maker, name, birthday, parent, icon, image, description);
     }
 
-    public Union(byte[] typeBytes, long[] flags, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
-        super(typeBytes, flags, maker, name, birthday, parent, icon, image, description);
+    public Union(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
+        super(typeBytes, appData, maker, name, birthday, parent, icon, image, description);
     }
 
     //PARSE
@@ -67,9 +67,9 @@ public class Union extends UnionCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
-        // TEST FLAGS
-        boolean hasFlags = (imageLength & FLAGS_MASK) != 0;
-        if (hasFlags)
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
             // RESET LEN
             imageLength *= -1;
 
@@ -80,18 +80,17 @@ public class Union extends UnionCls {
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
 
-        long[] flags;
-        if (hasFlags) {
-            byte flagsBytesLen = Arrays.copyOfRange(data, position, ++position)[0];
-            flags = new long[flagsBytesLen];
+        byte[] appData;
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + APP_DATA_LENGTH));
+            position += APP_DATA_LENGTH;
 
-            for (int i = 0; i < flagsBytesLen; i++) {
-                byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
-                flags[i] = Longs.fromByteArray(flagsBytes);
-                position += FLAGS_LENGTH;
-            }
+            appData = Arrays.copyOfRange(data, position, position + appDataLen);
+            position += imageLength;
+
         } else {
-            flags = null;
+            appData = null;
         }
 
         //READ DESCRIPTION
@@ -131,7 +130,7 @@ public class Union extends UnionCls {
         }
 
         //RETURN
-        Union union = new Union(typeBytes, flags, maker, name, birthday, parent, icon, image, description);
+        Union union = new Union(typeBytes, appData, maker, name, birthday, parent, icon, image, description);
         if (includeReference) {
             union.setReference(reference, dbRef);
         }
