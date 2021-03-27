@@ -83,12 +83,17 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected static final int APP_DATA_MASK = 1 << 31;
     protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
     // ITEM_FLAGS[0]
-    protected static final long ITEM_HAS_ICON_URL_MASK = 1L << 63;
-    protected static final long ITEM_HAS_IMAGE_URL_MASK = 1L << 62;
-    protected static final long ITEM_ICON_TYPE_MASK = (4L + 2L + 1L) << 59; // маска Типа на 3 бита - 8 значений разных
-    protected static final long ITEM_IMAGE_TYPE_MASK = (4L + 2L + 1L) << 56; // маска Типа на 3 бита - 8 значений разных
+    //protected static final byte ITEM_HAS_ICON_URL_MASK = (byte) -128;
+    //protected static final byte ITEM_HAS_IMAGE_URL_MASK = (byte) -128;
+    //protected static final long ITEM_ICON_TYPE_MASK = (4L + 2L + 1L) << 59; // маска Типа на 3 бита - 8 значений разных
+    //protected static final long ITEM_IMAGE_TYPE_MASK = (4L + 2L + 1L) << 56; // маска Типа на 3 бита - 8 значений разных
 
+    /**
+     * 0-1 - байты переключателей для включения обработчиков супер-класса и суб-классов
+     * Если супер класс включился - он берет 8 байт на свои флаги и 2 байта на свойства Иконки И картинки
+     */
     protected byte[] appData;
+    protected long flags;
 
     protected String name;
     protected String description;
@@ -129,43 +134,48 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      * @return
      */
     protected int parseAppData() {
-        int pos = 0;
+
+        // пропустим сразу 2 первых байта - там включатели обработчиков
+        int pos = 2;
+
         if ((appData[0] & APP_DATA_ITEM_FLAGS_MASK) != 0) {
             // parse ITEM APP DATA
-            long flags = Longs.fromByteArray(Arrays.copyOfRange(appData, ++pos, pos + Long.BYTES));
+            flags = Longs.fromByteArray(Arrays.copyOfRange(appData, pos, pos + Long.BYTES));
             pos += Long.BYTES;
 
-            if ((flags & ITEM_HAS_ICON_URL_MASK) != 0) {
+            iconType = appData[pos++];
+            if (iconType < 0) {
                 iconAsURL = true;
-            }
-            if ((flags & ITEM_HAS_IMAGE_URL_MASK) != 0) {
-                imageAsURL = true;
+                iconType = -iconType;
             }
 
-            iconType = (int) ((flags & ITEM_ICON_TYPE_MASK) >> 59);
-            imageType = (int) ((flags & ITEM_IMAGE_TYPE_MASK) >> 56);
+            imageType = appData[pos++];
+            if (imageType < 0) {
+                imageType = -imageType;
+                imageAsURL = true;
+            }
 
         }
 
         return pos;
     }
 
-    public static byte[] makeAppData(boolean iconAsURL, boolean imageAsURL, int iconType, int imageType) {
-        if (iconAsURL || imageAsURL || iconType != 0 || imageType != 0) {
-            long flags = 0;
-            if (iconAsURL)
-                flags |= ITEM_HAS_ICON_URL_MASK;
-            if (imageAsURL)
-                flags |= ITEM_HAS_IMAGE_URL_MASK;
-            if (iconType != 0) {
-                flags |= ((long) iconType) << 59;
-            }
-            if (imageType != 0) {
-                flags |= ((long) imageType) << 56;
-            }
-            byte[] appData = new byte[9];
+    public static byte[] makeAppData(long flags, boolean iconAsURL, boolean imageAsURL, int iconType, int imageType) {
+        if (flags != 0 || iconAsURL || imageAsURL || iconType != 0 || imageType != 0) {
+            byte[] appData = new byte[12];
             appData[0] = APP_DATA_ITEM_FLAGS_MASK;
-            System.arraycopy(Longs.toByteArray(flags), 0, appData, 1, Long.BYTES);
+            // 2 байта пропустим, потом флаги
+            System.arraycopy(Longs.toByteArray(flags), 0, appData, 2, Long.BYTES);
+
+            // байт по Иконке
+            appData[10] = (byte) iconType;
+            if (iconAsURL)
+                appData[10] *= -1;
+            // байт по Картинке
+            appData[11] = (byte) imageType;
+            if (imageAsURL)
+                appData[11] *= -1;
+
             return appData;
 
         } else {
@@ -305,6 +315,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      */
     public String[] getTags() {
         return null;
+    }
+
+    public long getFlags() {
+        return flags;
     }
 
     public byte[] getIcon() {

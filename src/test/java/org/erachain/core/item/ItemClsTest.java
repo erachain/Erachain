@@ -20,9 +20,10 @@ public class ItemClsTest {
 
     @Test
     public void parseAppData() {
-        byte[] appData = AssetCls.makeAppData(true, true, 7, 7);
+        byte[] appData = AssetCls.makeAppData(1L, true, true, 7, 7);
         ItemCls item = new AssetUnique(appData, null, "String name", null, null, "String description", 3);
 
+        assertEquals(item.getFlags(), 1L);
         assertEquals(item.hasIconURL(), true);
         assertEquals(item.hasImageURL(), true);
         assertEquals(item.iconType, 7);
@@ -37,15 +38,17 @@ public class ItemClsTest {
         //System.out.println(Long.toString((4L + 2L + 1L) << 59, 2));
         //System.out.println(Long.toString((4L + 2L + 1L) << 56, 2));
 
-        System.out.println(Long.toUnsignedString(ItemCls.ITEM_HAS_ICON_URL_MASK, 2) + " - ITEM_HAS_ICON_URL_MASK");
-        System.out.println("0" + Long.toString(ItemCls.ITEM_HAS_IMAGE_URL_MASK, 2) + " - ITEM_HAS_IMAGE_URL_MASK");
+        //System.out.println(Long.toUnsignedString(ItemCls.ITEM_HAS_ICON_URL_MASK, 2) + " - ITEM_HAS_ICON_URL_MASK");
+        //System.out.println("0" + Long.toString(ItemCls.ITEM_HAS_IMAGE_URL_MASK, 2) + " - ITEM_HAS_IMAGE_URL_MASK");
 
         System.out.println("1234567812345678123456781234567812345678123456781234567812345678");
-        byte[] appdata = AssetCls.makeAppData(false, false, 0, 0);
+        byte[] appdata = AssetCls.makeAppData(0L, false, false, 0, 0);
         assertEquals(appdata, null);
 
-        appdata = AssetCls.makeAppData(true, true, 7, 7);
-        assertEquals("11111111", Integer.toBinaryString(Byte.toUnsignedInt(appdata[1])));
+        appdata = AssetCls.makeAppData(1L, true, false, 7, 7);
+        assertEquals("10000000", Integer.toBinaryString(Byte.toUnsignedInt(appdata[0])));
+        assertEquals("11111001", Integer.toBinaryString(Byte.toUnsignedInt(appdata[10])));
+        assertEquals("111", Integer.toBinaryString(Byte.toUnsignedInt(appdata[11])));
 
         if (true) {
             // for see
