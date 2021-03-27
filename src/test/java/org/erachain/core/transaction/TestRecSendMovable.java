@@ -39,8 +39,8 @@ public class TestRecSendMovable {
 
     ExLink exLink = null;
 
-    long[] itemFlags = null;
-    long txFlags = 0l;
+    byte[] itemAppData = null;
+    long txFlags = 0L;
 
     Controller cntrl;
     //CREATE KNOWN ACCOUNT
@@ -86,12 +86,12 @@ public class TestRecSendMovable {
         producer.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         producer.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
-        asset = new AssetVenture(itemFlags, deliver, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
+        asset = new AssetVenture(itemAppData, deliver, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
         // set SCALABLE assets ++
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(db, 0l);
 
-        assetMovable = new AssetVenture(itemFlags, producer, "movable", icon, image, "...", AssetCls.AS_OUTSIDE_GOODS, scale, 500l);
+        assetMovable = new AssetVenture(itemAppData, producer, "movable", icon, image, "...", AssetCls.AS_OUTSIDE_GOODS, scale, 500l);
 
         if (withIssue) {
     

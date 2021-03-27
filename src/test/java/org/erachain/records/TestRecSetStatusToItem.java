@@ -46,7 +46,7 @@ public class TestRecSetStatusToItem {
     Long to_date = null;
     long personkey;
 
-    long[] itemFlags = null;
+    byte[] itemAppData = null;
     long txFlags = 0L;
 
     //CREATE KNOWN ACCOUNT
@@ -85,7 +85,7 @@ public class TestRecSetStatusToItem {
         //mapSize = statusMap.size();
 
         long birthDay = timestamp - 12345678;
-        person = new PersonHuman(itemFlags, maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
+        person = new PersonHuman(itemAppData, maker, "Ermolaev1 Dmitrii Sergeevich", birthDay, birthDay - 1,
                 (byte) 1, "Slav", (float) 128.12345, (float) 33.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", makerSignature);
 

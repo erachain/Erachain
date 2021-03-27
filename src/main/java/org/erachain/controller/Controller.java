@@ -3172,12 +3172,12 @@ public class Controller extends Observable {
 
     //public Transaction issueAsset(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
     //                              int scale, int assetType, long quantity, int feePow) {
-    public Transaction issueAsset(long[] flags, PrivateKeyAccount creator, ExLink linkTo, int profitTaxMin, int profitTaxMax,
+    public Transaction issueAsset(byte[] appData, PrivateKeyAccount creator, ExLink linkTo, int profitTaxMin, int profitTaxMax,
                                   int profitFee, long loanInterest,
                                   String name, String description, byte[] icon, byte[] image,
                                   int scale, int asset_type, long quantity, int feePow) {
 
-        AssetCls asset = new AssetVenture(flags, creator, name, icon, image, description, asset_type, scale, quantity);
+        AssetCls asset = new AssetVenture(appData, creator, name, icon, image, description, asset_type, scale, quantity);
 
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {

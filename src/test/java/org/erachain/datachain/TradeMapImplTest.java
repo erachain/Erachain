@@ -44,7 +44,7 @@ public class TradeMapImplTest {
 
     Random random = new Random();
 
-    long[] itemFlags = null;
+    byte[] itemAppData = null;
     long txFlags = 0L;
 
     int seqNo = 0;
@@ -102,7 +102,7 @@ public class TradeMapImplTest {
         accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false);
         accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false);
 
-        assetA = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
+        assetA = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo, true);
@@ -111,7 +111,7 @@ public class TradeMapImplTest {
         keyA = issueAssetTransaction.getAssetKey(dcSet);
         balanceA = accountA.getBalance(dcSet, keyA);
 
-        assetB = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
+        assetB = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 0L, new byte[64]);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo, true);

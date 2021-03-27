@@ -168,7 +168,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
-        long[] flags = null;
+        byte[] flags = null;
 
         AssetCls asset;
         if (AssetCls.isTypeUnique(assetType, quantity)) {

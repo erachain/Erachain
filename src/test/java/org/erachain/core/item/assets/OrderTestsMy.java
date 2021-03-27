@@ -55,7 +55,7 @@ public class OrderTestsMy {
     long timestamp = NTP.getTime();
 
     Random random = new Random();
-    long[] itemFlags = null;
+    byte[] itemAppData = null;
     long txFlags = 0L;
     int seqNo = 0;
 
@@ -168,12 +168,12 @@ public class OrderTestsMy {
         accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false);
         accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false);
 
-        assetA = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "START", icon, image, ".", 0, 8, 50000L);
+        assetA = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "START", icon, image, ".", 0, 8, 50000L);
         // сразу зазадим чтобы все активы были уже в версии где учитывается точность
         assetA.setReference(new byte[64], dbRef);
         assetA.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM + 1);
 
-        assetA = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
+        assetA = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
@@ -182,7 +182,7 @@ public class OrderTestsMy {
         keyA = issueAssetTransaction.getAssetKey(dcSet);
         balanceA = accountA.getBalance(dcSet, keyA);
 
-        assetB = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
+        assetB = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(dcSet)[0], new byte[64]);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
@@ -437,7 +437,7 @@ public class OrderTestsMy {
                 }
 
                 int thisScale = 5;
-                assetA = new AssetVenture(itemFlags, accountA, "AAA", icon, image, ".", 0, thisScale, 0L);
+                assetA = new AssetVenture(itemAppData, accountA, "AAA", icon, image, ".", 0, thisScale, 0L);
                 assetA.setReference(new byte[64], dbRef);
                 // Актив с учетом точности создадим
                 assetA.insertToMap(dcSet, 0L);
@@ -460,7 +460,7 @@ public class OrderTestsMy {
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 assertEquals(orderCreation.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
-                assetA = new AssetVenture(itemFlags, accountA, "AAA", icon, image, ".", 0, 30, 0L);
+                assetA = new AssetVenture(itemAppData, accountA, "AAA", icon, image, ".", 0, 30, 0L);
                 assetA.setReference(new byte[64], dbRef);
                 assetA.insertToMap(dcSet, 0l);
 
@@ -517,7 +517,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 int fromScale = 5;
-                assetA = new AssetVenture(itemFlags, accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+                assetA = new AssetVenture(itemAppData, accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
                 byte[] reference = new byte[64];
                 this.random.nextBytes(reference);
                 assetA.setReference(reference, dbRef);
@@ -525,7 +525,7 @@ public class OrderTestsMy {
                 assetA.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
                 int toScale = 0;
-                assetB = new AssetVenture(itemFlags, accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+                assetB = new AssetVenture(itemAppData, accountB, "BBB", icon, image, ".", 0, toScale, 0L);
                 this.random.nextBytes(reference);
                 assetB.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
@@ -633,7 +633,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 int fromScale = 0;
-                assetA = new AssetVenture(itemFlags, accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+                assetA = new AssetVenture(itemAppData, accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
                 byte[] reference = new byte[64];
                 this.random.nextBytes(reference);
                 assetA.setReference(reference, dbRef);
@@ -641,7 +641,7 @@ public class OrderTestsMy {
                 assetA.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
                 int toScale = 0;
-                assetB = new AssetVenture(itemFlags, accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+                assetB = new AssetVenture(itemAppData, accountB, "BBB", icon, image, ".", 0, toScale, 0L);
                 this.random.nextBytes(reference);
                 assetB.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
@@ -711,7 +711,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 int fromScale = 0;
-                assetA = new AssetVenture(itemFlags, accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+                assetA = new AssetVenture(itemAppData, accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
                 byte[] reference = new byte[64];
                 this.random.nextBytes(reference);
                 assetA.setReference(reference, dbRef);
@@ -719,7 +719,7 @@ public class OrderTestsMy {
                 assetA.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
                 int toScale = 0;
-                assetB = new AssetVenture(itemFlags, accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+                assetB = new AssetVenture(itemAppData, accountB, "BBB", icon, image, ".", 0, toScale, 0L);
                 this.random.nextBytes(reference);
                 assetB.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
@@ -807,7 +807,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 int fromScale = 0;
-                assetA = new AssetVenture(itemFlags, accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+                assetA = new AssetVenture(itemAppData, accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
                 byte[] reference = new byte[64];
                 this.random.nextBytes(reference);
                 assetA.setReference(reference, dbRef);
@@ -815,7 +815,7 @@ public class OrderTestsMy {
                 assetA.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
 
                 int toScale = 0;
-                assetB = new AssetVenture(itemFlags, accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+                assetB = new AssetVenture(itemAppData, accountB, "BBB", icon, image, ".", 0, toScale, 0L);
                 this.random.nextBytes(reference);
                 assetB.setReference(reference, dbRef);
                 // чтобы точность сбросить в 0
@@ -958,7 +958,7 @@ public class OrderTestsMy {
                 // CHECK IF ORDER CREATION INVALID
                 assertEquals(Transaction.NEGATIVE_AMOUNT, orderCreation.isValid(Transaction.FOR_NETWORK, txFlags));
 
-                assetA = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "Erachain.org", icon, image,
+                assetA = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "Erachain.org", icon, image,
                         "This is the simulated ERM asset.", 0, 8, 10L);
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, null, assetA, (byte) 0, ++timeStamp, 0l);
                 issueAssetTransaction.sign(accountA, Transaction.FOR_NETWORK);
@@ -1805,7 +1805,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 // CREATE ASSET
-                assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 8, 50000l);
+                assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, null, assetA, (byte) 0, timestamp++, 0l);
@@ -1814,7 +1814,7 @@ public class OrderTestsMy {
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 // CREATE ASSET
-                assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 8, 50000l);
+                assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
@@ -1953,7 +1953,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 // CREATE ASSET
-                assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 8, 50000l);
+                assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
@@ -1962,7 +1962,7 @@ public class OrderTestsMy {
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 // CREATE ASSET
-                assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 8, 50000l);
+                assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
@@ -2108,7 +2108,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 // CREATE ASSET
-                assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 8, 100l);
+                assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 8, 100l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0L, new byte[64]);
@@ -2116,7 +2116,7 @@ public class OrderTestsMy {
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 // CREATE ASSET
-                assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 8, 1000000l);
+                assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 8, 1000000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++, 0L, new byte[64]);
@@ -2325,7 +2325,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 // CREATE ASSET
-                assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 8, 100l);
+                assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 8, 100l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, null, assetA, (byte) 0, timestamp++, 0l);
@@ -2334,7 +2334,7 @@ public class OrderTestsMy {
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 // CREATE ASSET
-                assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 8, 1000000l);
+                assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 8, 1000000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 issueAssetTransaction = new IssueAssetTransaction(accountB, null, assetB, (byte) 0, timestamp++,
@@ -2522,7 +2522,7 @@ public class OrderTestsMy {
     public void init_Sell_noDiv_Div() {
 
         // CREATE ASSET
-        assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 0, 100l);
+        assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 0, 100l);
 
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0L, new byte[64]);
@@ -2530,7 +2530,7 @@ public class OrderTestsMy {
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
         // CREATE ASSET
-        assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 0, 1000000l);
+        assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 0, 1000000l);
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++, 0L, new byte[64]);
@@ -2695,7 +2695,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 // CREATE ASSET
-                AssetCls assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 0, 50000l);
+                AssetCls assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 0, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
@@ -2704,7 +2704,7 @@ public class OrderTestsMy {
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 // CREATE ASSET
-                AssetCls assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 0, 50000l);
+                AssetCls assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 0, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
@@ -2927,7 +2927,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 // CREATE ASSET
-                AssetCls assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 0, 50000l);
+                AssetCls assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 0, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
@@ -2936,7 +2936,7 @@ public class OrderTestsMy {
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 // CREATE ASSET
-                AssetCls assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 0, 50000l);
+                AssetCls assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 0, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
@@ -3025,7 +3025,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 // CREATE ASSET
-                AssetCls assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 0, 50000l);
+                AssetCls assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 0, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
@@ -3034,7 +3034,7 @@ public class OrderTestsMy {
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 // CREATE ASSET
-                AssetCls assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 2, 50000l);
+                AssetCls assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 2, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
@@ -3124,7 +3124,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 // CREATE ASSET
-                AssetCls assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 2, 50000l);
+                AssetCls assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 2, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
@@ -3133,7 +3133,7 @@ public class OrderTestsMy {
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 // CREATE ASSET
-                AssetCls assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 0, 50000l);
+                AssetCls assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 0, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
@@ -3227,7 +3227,7 @@ public class OrderTestsMy {
             try {
                 init(dbs);
                 // CREATE ASSET
-                AssetCls assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 8, 50000l);
+                AssetCls assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
@@ -3238,7 +3238,7 @@ public class OrderTestsMy {
                 accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(assetA.getScale()), false, false, false);
 
                 // CREATE ASSET
-                AssetCls assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 8, 50000l);
+                AssetCls assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
@@ -3386,7 +3386,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 // CREATE ASSET
-                AssetCls assetA = new AssetVenture(itemFlags, accountA, "a", icon, image, "a", 0, 8, 50000l);
+                AssetCls assetA = new AssetVenture(itemAppData, accountA, "a", icon, image, "a", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, null, assetA, (byte) 0, timestamp++, 0l);
@@ -3400,7 +3400,7 @@ public class OrderTestsMy {
                 accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
                 // CREATE ASSET
-                AssetCls assetB = new AssetVenture(itemFlags, accountB, "b", icon, image, "b", 0, 8, 50000l);
+                AssetCls assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 8, 50000l);
 
                 // CREATE ISSUE ASSET TRANSACTION
                 issueAssetTransaction = new IssueAssetTransaction(accountB, null, assetB, (byte) 0, timestamp++,

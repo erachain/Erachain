@@ -58,7 +58,7 @@ public class TransactionCreator {
     private int blockHeight;
     private AtomicInteger seqNo = new AtomicInteger();
 
-    static private final long[] itemFlags = null;
+    static private final byte[] itemAppData = null;
     //private byte[] icon = new byte[0]; // default value
     //private byte[] image = new byte[0]; // default value
 
@@ -242,7 +242,7 @@ public class TransactionCreator {
     public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                    byte[] icon, byte[] image,
                                                    int scale, int asset_type, long quantity, int feePow) {
-        AssetCls asset = new AssetVenture(itemFlags, creator, name, icon, image, description, asset_type, scale, quantity);
+        AssetCls asset = new AssetVenture(itemAppData, creator, name, icon, image, description, asset_type, scale, quantity);
         return createIssueAssetTransaction(creator, linkTo, asset, feePow);
     }
 
@@ -255,7 +255,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        ImprintCls imprint = new Imprint(itemFlags, creator, name, icon, image, description);
+        ImprintCls imprint = new Imprint(itemAppData, creator, name, icon, image, description);
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, linkTo, imprint, (byte) feePow, time);
@@ -275,7 +275,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        ImprintCls imprint = new Imprint(itemFlags, creator, name, icon, image, description);
+        ImprintCls imprint = new Imprint(itemAppData, creator, name, icon, image, description);
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, linkTo, imprint, (byte) feePow, time);
@@ -348,7 +348,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        PersonHuman person = new PersonHuman(itemFlags, maker, fullName, birthday, deathday,
+        PersonHuman person = new PersonHuman(itemAppData, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, height, icon, image, description, makerSignature);
 
@@ -431,7 +431,7 @@ public class TransactionCreator {
     public Transaction createIssuePollTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                   byte[] icon, byte[] image,
                                                   List<String> options, int feePow) {
-        PollCls poll = new org.erachain.core.item.polls.Poll(itemFlags, creator, name, icon, image, description, options);
+        PollCls poll = new org.erachain.core.item.polls.Poll(itemAppData, creator, name, icon, image, description, options);
         return createIssuePollTransaction(creator, linkTo, feePow, poll);
     }
 
@@ -453,7 +453,7 @@ public class TransactionCreator {
     public Transaction createIssueStatusTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                     byte[] icon, byte[] image,
                                                     boolean unique, int feePow) {
-        StatusCls status = new Status(itemFlags, creator, name, icon, image, description, unique);
+        StatusCls status = new Status(itemAppData, creator, name, icon, image, description, unique);
         return createIssueStatusTransaction(creator, linkTo, feePow, status);
     }
 
@@ -476,7 +476,7 @@ public class TransactionCreator {
     public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                       byte[] icon, byte[] image,
                                                       int feePow) {
-        TemplateCls template = new Template(itemFlags, creator, name, icon, image, description);
+        TemplateCls template = new Template(itemAppData, creator, name, icon, image, description);
         return createIssueTemplateTransaction(creator, linkTo, feePow, template);
     }
 
@@ -489,7 +489,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        UnionCls union = new Union(itemFlags, creator, name, birthday, parent, icon, image, description);
+        UnionCls union = new Union(itemAppData, creator, name, birthday, parent, icon, image, description);
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, linkTo, union, (byte) feePow, time, 0l);

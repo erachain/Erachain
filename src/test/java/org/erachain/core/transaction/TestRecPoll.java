@@ -43,7 +43,7 @@ public class TestRecPoll {
     long timestamp = NTP.getTime();
     long dbRef = 0L;
 
-    long[] itemFlags = null;
+    byte[] itemAppData = null;
     long txFlags = 4l;
 
     //CREATE KNOWN ACCOUNT
@@ -111,7 +111,7 @@ public class TestRecPoll {
         options.add("probe probe");
 
         // GET RIGHTS TO CERTIFIER
-        pollGeneral = new Poll(itemFlags, certifier, "СССР", icon, image, "wqeqwe", options);
+        pollGeneral = new Poll(itemAppData, certifier, "СССР", icon, image, "wqeqwe", options);
         //GenesisIssuePollRecord genesis_issue_poll = new GenesisIssuePollRecord(pollGeneral, registrar);
         //genesis_issue_poll.process(db, false);
         //GenesisCertifyPollRecord genesis_certify = new GenesisCertifyPollRecord(registrar, 0L);
@@ -121,7 +121,7 @@ public class TestRecPoll {
         certifier.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false, false);
         certifier.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
-        poll = new Poll(itemFlags, certifier, "РСФСР", icon, image, "Россия", options);
+        poll = new Poll(itemAppData, certifier, "РСФСР", icon, image, "Россия", options);
 
         //CREATE ISSUE POLL TRANSACTION
         issuePollTransaction = new IssuePollRecord(certifier, null, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0]);

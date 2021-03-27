@@ -39,8 +39,8 @@ public class TestTemplateAsPack {
     byte[] templateReference = new byte[64];
     long timestamp = NTP.getTime();
 
-    long[] itemFlags = null;
-    long txFlags = 0l;
+    byte[] itemAppData = null;
+    long txFlags = 0L;
 
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -79,7 +79,7 @@ public class TestTemplateAsPack {
         init();
 
         //CREATE PLATE
-        Template template = new Template(itemFlags, maker, "test", icon, image, "strontje");
+        Template template = new Template(itemAppData, maker, "test", icon, image, "strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
         Transaction issueTemplateTransaction = new IssueTemplateRecord(maker, template);
@@ -102,7 +102,7 @@ public class TestTemplateAsPack {
 
         init();
 
-        TemplateCls template = new Template(itemFlags, maker, "test132", icon, image, "12345678910strontje");
+        TemplateCls template = new Template(itemAppData, maker, "test132", icon, image, "12345678910strontje");
         byte[] raw = template.toBytes(includeReference, false);
         assertEquals(raw.length, template.getDataLength(includeReference));
 
@@ -154,7 +154,7 @@ public class TestTemplateAsPack {
 
         init();
 
-        Template template = new Template(itemFlags, maker, "test", icon, image, "strontje");
+        Template template = new Template(itemAppData, maker, "test", icon, image, "strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
@@ -171,7 +171,7 @@ public class TestTemplateAsPack {
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);
         assertEquals(true, db.getItemTemplateMap().contains(key));
 
-        TemplateCls template_2 = new Template(itemFlags, maker, "test132_2", icon, image, "2_12345678910strontje");
+        TemplateCls template_2 = new Template(itemAppData, maker, "test132_2", icon, image, "2_12345678910strontje");
         IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2);
         issueTemplateTransaction_2.sign(maker, asPack);
         issueTemplateTransaction_2.process(gb, asPack);
@@ -194,7 +194,7 @@ public class TestTemplateAsPack {
 
         init();
 
-        Template template = new Template(itemFlags, maker, "test", icon, image, "strontje");
+        Template template = new Template(itemAppData, maker, "test", icon, image, "strontje");
         Long makerReference = maker.getLastTimestamp(db)[0];
 
         //CREATE ISSUE PLATE TRANSACTION

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 public class IssueAssetTransactionTest {
 
     long FEE_KEY = AssetCls.FEE_KEY;
-    long[] itemFlags = null;
+    byte[] itemAppData = null;
 
     int[] TESTED_DBS = new int[]{IDB.DBS_MAP_DB, IDB.DBS_ROCK_DB, IDB.DBS_MAP_DB_IN_MEM};
     DCSet dcSet;
@@ -82,7 +82,7 @@ public class IssueAssetTransactionTest {
 
             // создадим в базе несколько записей
             do {
-                assetMovable = new AssetVenture(itemFlags, maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
+                assetMovable = new AssetVenture(itemAppData, maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
                 assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)), dbRef);
                 key = assetMovable.insertToMap(dcSet, START_KEY);
                 size = assetMap.size();
@@ -102,7 +102,7 @@ public class IssueAssetTransactionTest {
 
             k = 0;
             do {
-                assetMovable = new AssetVenture(itemFlags, maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
+                assetMovable = new AssetVenture(itemAppData, maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
                 assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)), dbRef);
                 key = assetMovable.insertToMap(dcSet, START_KEY);
                 size = assetMap.size();
@@ -122,7 +122,7 @@ public class IssueAssetTransactionTest {
             k = 0;
             // создадим в базе несколько записей
             do {
-                assetMovable = new AssetVenture(itemFlags, maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
+                assetMovable = new AssetVenture(itemAppData, maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
                 assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)), dbRef);
                 key = assetMovable.insertToMap(forkDC, START_KEY);
                 size = assetMapForked.size();
@@ -141,7 +141,7 @@ public class IssueAssetTransactionTest {
             if (false) {
                 k = 0;
                 do {
-                    assetMovable = new AssetVenture(itemFlags, maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
+                    assetMovable = new AssetVenture(itemAppData, maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
                     assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)), dbRef);
                     key = assetMovable.insertToMap(forkDC, START_KEY);
                     size = assetMapForked.size();
@@ -161,7 +161,7 @@ public class IssueAssetTransactionTest {
             k = 0;
             // создадим в базе несколько записей
             do {
-                assetMovable = new AssetVenture(itemFlags, maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
+                assetMovable = new AssetVenture(itemAppData, maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
                 assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)), dbRef);
                 key = assetMovable.insertToMap(dcSet, START_KEY);
                 size = assetMap.size();

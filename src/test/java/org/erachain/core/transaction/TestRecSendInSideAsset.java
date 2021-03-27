@@ -41,7 +41,7 @@ public class TestRecSendInSideAsset {
     Tuple3<String, Long, String> creditKey;
     Tuple3<String, Long, String> creditKeyReverse;
 
-    long[] itemFlags = null;
+    byte[] itemAppData = null;
     long txFlags = Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT;
 
     Controller cntrl;
@@ -91,12 +91,12 @@ public class TestRecSendInSideAsset {
         emitter.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         emitter.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
-        asset = new AssetVenture(itemFlags, creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
+        asset = new AssetVenture(itemAppData, creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
         // set SCALABLE assets ++
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(db, 0l);
 
-        assetInSide = new AssetVenture(itemFlags, emitter, "inSide Asset", icon, image, "...", AssetCls.AS_INSIDE_ASSETS, scale, 500l);
+        assetInSide = new AssetVenture(itemAppData, emitter, "inSide Asset", icon, image, "...", AssetCls.AS_INSIDE_ASSETS, scale, 500l);
 
         if (withIssue) {
     

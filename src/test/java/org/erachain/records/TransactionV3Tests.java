@@ -42,7 +42,7 @@ public class TransactionV3Tests {
 
     ExLink exLink = null;
 
-    long[] itemFlags = null;
+    byte[] itemAppData = null;
     long txFlags = 0L;
 
     //CREATE KNOWN ACCOUNT
@@ -136,7 +136,7 @@ public class TransactionV3Tests {
         init();
 
         //ADD ERM ASSET
-        AssetCls aTFundingAsset = new AssetVenture(itemFlags, new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
+        AssetCls aTFundingAsset = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
         aTFundingAsset.setReference(assetReference, dbRef);
         db.getItemAssetMap().set(61l, aTFundingAsset);
 
@@ -221,7 +221,7 @@ public class TransactionV3Tests {
 
         init();
 
-        AssetCls aTFundingAsset = new AssetVenture(itemFlags, gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
+        AssetCls aTFundingAsset = new AssetVenture(itemAppData, gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.", 0, 8, 250000000l);
         aTFundingAsset.setReference(gb.getSignature(), dbRef);
         db.getItemAssetMap().set(61l, aTFundingAsset);
 

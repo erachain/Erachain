@@ -40,7 +40,8 @@ public class TestRecStatus {
     long timestamp = NTP.getTime();
 
     long flags = 0L;
-    long[] itemFlags = null;
+    byte[] itemAppData = null;
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -88,7 +89,7 @@ public class TestRecStatus {
         init();
 
         //CREATE STATUS
-        Status status = new Status(itemFlags, maker, "test", icon, image, "strontje", true);
+        Status status = new Status(itemAppData, maker, "test", icon, image, "strontje", true);
 
         //CREATE ISSUE STATUS TRANSACTION
         Transaction issueStatusTransaction = new IssueStatusRecord(maker, null, status, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -111,7 +112,7 @@ public class TestRecStatus {
 
         init();
 
-        StatusCls status = new Status(itemFlags, maker, "test132", icon, image, "12345678910strontje", true);
+        StatusCls status = new Status(itemAppData, maker, "test132", icon, image, "12345678910strontje", true);
         byte[] raw = status.toBytes(false, false);
         assertEquals(raw.length, status.getDataLength(false));
 
@@ -170,7 +171,7 @@ public class TestRecStatus {
 
         init();
 
-        Status status = new Status(itemFlags, maker, "test", icon, image, "strontje", true);
+        Status status = new Status(itemAppData, maker, "test", icon, image, "strontje", true);
 
         //CREATE ISSUE STATUS TRANSACTION
         IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, null, status, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -186,7 +187,7 @@ public class TestRecStatus {
         long key = db.getIssueStatusMap().get(issueStatusRecord);
         assertEquals(true, db.getItemStatusMap().contains(key));
 
-        StatusCls status_2 = new Status(itemFlags, maker, "test132_2", icon, image, "2_12345678910strontje", true);
+        StatusCls status_2 = new Status(itemAppData, maker, "test132_2", icon, image, "2_12345678910strontje", true);
         IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, null, status_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db)[0]);
         issueStatusTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueStatusTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);

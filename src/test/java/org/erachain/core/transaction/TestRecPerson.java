@@ -54,7 +54,7 @@ public class TestRecPerson {
     long timestamp;
     long dbRef = 0L;
 
-    long[] itemFlags = null;
+    byte[] itemAppData = null;
     long txFlags = 0L;
 
     Long last_ref;
@@ -152,7 +152,7 @@ public class TestRecPerson {
 
         makerSignature = new byte[64];
         makerSignature[1] = (byte) 1;
-        person = new PersonHuman(itemFlags, registrar, "Ermolaev Dmitrii Sergeevich as registrar", birthDay, birthDay - 1,
+        person = new PersonHuman(itemAppData, registrar, "Ermolaev Dmitrii Sergeevich as registrar", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", makerSignature);
         person.setReference(makerSignature, dbRef);
@@ -161,7 +161,7 @@ public class TestRecPerson {
 
         makerSignature = new byte[64];
         makerSignature[1] = (byte) 2;
-        person = new PersonHuman(itemFlags, certifier, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
+        person = new PersonHuman(itemAppData, certifier, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", makerSignature);
         person.setReference(makerSignature, dbRef);
@@ -186,7 +186,7 @@ public class TestRecPerson {
         makerSignature[1] = (byte) -1;
 
         // GET RIGHTS TO CERTIFIER
-        personGeneral = new PersonHuman(itemFlags, registrar, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
+        personGeneral = new PersonHuman(itemAppData, registrar, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", makerSignature);
         //personGeneral.setKey(genesisPersonKey);
@@ -201,7 +201,7 @@ public class TestRecPerson {
         genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++, true);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
-        person = new PersonHuman(itemFlags, registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
+        person = new PersonHuman(itemAppData, registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", makerSignature);
 
@@ -1144,7 +1144,7 @@ public class TestRecPerson {
 
                 long birthDay = timestamp - 12345678;
 
-                person = new PersonHuman(itemFlags, registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
+                person = new PersonHuman(itemAppData, registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                         (byte) 0, "Slav", (float) 28.12345, (float) 133.7777,
                         "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", makerSignature);
 
