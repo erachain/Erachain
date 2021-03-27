@@ -1228,7 +1228,7 @@ public class Settings {
         return getLang() + ".json";
     }
 
-    public String get_Font() {
+    public String getFontSize() {
         if (this.settingsJSON.containsKey("font_size")) {
             return this.settingsJSON.get("font_size").toString();
         }

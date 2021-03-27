@@ -1470,9 +1470,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return feePow + ":" + this.fee.unscaledValue().longValue();
     }
 
-    public String viewFeeAndFiat() {
+    public String viewFeeAndFiat(int fontSize) {
 
-        String text = fee.toString();
+        fontSize *= 1.4;
+        String text = "<span style='vertical-align: 10px; font-size: 1.4em' ><b>" + fee.toString() + "</b>"
+                + "<img width=" + fontSize + " height=" + fontSize
+                + " src='file:images\\icons\\assets\\COMPU.png'></span>";
+
         boolean useDEX = Settings.getInstance().getCompuRateUseDEX();
 
         AssetCls asset = Controller.getInstance().getAsset(Settings.getInstance().getCompuRateAsset());
@@ -1497,7 +1501,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if (compuRate.signum() > 0) {
             BigDecimal fee_fiat = fee.multiply(compuRate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
-            text += " " + AssetCls.FEE_NAME;
             if (asset.getKey() != AssetCls.FEE_KEY)
                 text += " (" + fee_fiat.toString() + " " + asset.getTickerName() + ")";
         }

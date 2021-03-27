@@ -200,7 +200,7 @@ public class Library {
         JFrame.setDefaultLookAndFeelDecorated(true);
         JDialog.setDefaultLookAndFeelDecorated(true);
 
-        int size_font = new Integer(Settings.getInstance().get_Font());
+        int size_font = new Integer(Settings.getInstance().getFontSize());
         String name_font = Settings.getInstance().get_Font_Name();
 
         Font font = new Font(name_font, Font.TRUETYPE_FONT, size_font);
