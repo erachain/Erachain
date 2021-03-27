@@ -55,6 +55,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public static final int POLL_TYPE = 8;
     public static final int AUTHOR_TYPE = 41;
 
+    public static final int MEDIA_TYPE_IMG = 0;
+    public static final int MEDIA_TYPE_VIDEO = 1;
+    public static final int MEDIA_TYPE_FRAME = 2;
+
     protected static final int TYPE_LENGTH = 2;
     protected static final int MAKER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int NAME_SIZE_LENGTH = 1;
@@ -83,7 +87,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected static final int APP_DATA_MASK = 1 << 31;
     protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
     // ITEM_FLAGS[0]
-    //protected static final byte ITEM_HAS_ICON_URL_MASK = (byte) -128;
+    protected static final byte ITEM_HAS_URL_MASK = (byte) -128;
     //protected static final byte ITEM_HAS_IMAGE_URL_MASK = (byte) -128;
     //protected static final long ITEM_ICON_TYPE_MASK = (4L + 2L + 1L) << 59; // маска Типа на 3 бита - 8 значений разных
     //protected static final long ITEM_IMAGE_TYPE_MASK = (4L + 2L + 1L) << 56; // маска Типа на 3 бита - 8 значений разных
@@ -135,6 +139,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      */
     protected int parseAppData() {
 
+        if (appData == null)
+            return 0;
+
         // пропустим сразу 2 первых байта - там включатели обработчиков
         int pos = 2;
 
@@ -160,7 +167,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return pos;
     }
 
-    public static byte[] makeAppData(long flags, boolean iconAsURL, boolean imageAsURL, int iconType, int imageType) {
+    public static byte[] makeAppData(long flags, boolean iconAsURL, int iconType, boolean imageAsURL, int imageType) {
         if (flags != 0 || iconAsURL || imageAsURL || iconType != 0 || imageType != 0) {
             byte[] appData = new byte[12];
             appData[0] = APP_DATA_ITEM_FLAGS_MASK;
@@ -170,11 +177,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             // байт по Иконке
             appData[10] = (byte) iconType;
             if (iconAsURL)
-                appData[10] *= -1;
+                appData[10] |= ITEM_HAS_URL_MASK; // *= -1 - wrong?
             // байт по Картинке
             appData[11] = (byte) imageType;
             if (imageAsURL)
-                appData[11] *= -1;
+                appData[11] |= ITEM_HAS_URL_MASK; // *= -1 - wrong?
 
             return appData;
 

@@ -11,7 +11,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
@@ -58,7 +57,7 @@ public class TransactionCreator {
     private int blockHeight;
     private AtomicInteger seqNo = new AtomicInteger();
 
-    static private final byte[] itemAppData = null;
+    //static private final byte[] itemAppData = null;
     //private byte[] icon = new byte[0]; // default value
     //private byte[] image = new byte[0]; // default value
 
@@ -239,34 +238,7 @@ public class TransactionCreator {
         return issueAssetTransaction;
     }
 
-    public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
-                                                   byte[] icon, byte[] image,
-                                                   int scale, int asset_type, long quantity, int feePow) {
-        AssetCls asset = new AssetVenture(itemAppData, creator, name, icon, image, description, asset_type, scale, quantity);
-        return createIssueAssetTransaction(creator, linkTo, asset, feePow);
-    }
-
-    public Pair<Transaction, Integer> createIssueImprintTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
-                                                                    byte[] icon, byte[] image,
-                                                                    int feePow) {
-        //CHECK FOR UPDATES
-        this.checkUpdate();
-
-        //TIME
-        long time = NTP.getTime();
-
-        ImprintCls imprint = new Imprint(itemAppData, creator, name, icon, image, description);
-
-        //CREATE ISSUE IMPRINT TRANSACTION
-        IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, linkTo, imprint, (byte) feePow, time);
-        issueImprintRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueImprintRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
-
-        //VALIDATE AND PROCESS
-        return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, Transaction.FOR_NETWORK, false, false));
-    }
-
-    public Transaction createIssueImprintTransaction1(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
+    public Transaction createIssueImprintTransaction1(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                       byte[] icon, byte[] image,
                                                       int feePow) {
         //CHECK FOR UPDATES
@@ -311,7 +283,7 @@ public class TransactionCreator {
 
     public Pair<Transaction, Integer> createIssuePersonTransaction(
             boolean forIssue,
-            PrivateKeyAccount creator, ExLink linkTo, String fullName, int feePow, long birthday, long deathday,
+            byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String fullName, int feePow, long birthday, long deathday,
             byte gender, String race, float birthLatitude, float birthLongitude,
             String skinColor, String eyeColor, String hairСolor, int height,
             byte[] icon, byte[] image, String description,
@@ -428,7 +400,7 @@ public class TransactionCreator {
         return issueStatusRecord;
     }
 
-    public Transaction createIssuePollTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
+    public Transaction createIssuePollTransaction(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                   byte[] icon, byte[] image,
                                                   List<String> options, int feePow) {
         PollCls poll = new org.erachain.core.item.polls.Poll(itemAppData, creator, name, icon, image, description, options);
@@ -450,7 +422,7 @@ public class TransactionCreator {
         return issueStatusRecord;
     }
 
-    public Transaction createIssueStatusTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
+    public Transaction createIssueStatusTransaction(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                     byte[] icon, byte[] image,
                                                     boolean unique, int feePow) {
         StatusCls status = new Status(itemAppData, creator, name, icon, image, description, unique);
@@ -473,14 +445,14 @@ public class TransactionCreator {
         return issueTemplateRecord;
     }
 
-    public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, String description,
+    public Transaction createIssueTemplateTransaction(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, String description,
                                                       byte[] icon, byte[] image,
                                                       int feePow) {
         TemplateCls template = new Template(itemAppData, creator, name, icon, image, description);
         return createIssueTemplateTransaction(creator, linkTo, feePow, template);
     }
 
-    public Transaction createIssueUnionTransaction(PrivateKeyAccount creator, ExLink linkTo, String name, long birthday, long parent, String description,
+    public Transaction createIssueUnionTransaction(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, long birthday, long parent, String description,
                                                    byte[] icon, byte[] image,
                                                    int feePow) {
         //CHECK FOR UPDATES

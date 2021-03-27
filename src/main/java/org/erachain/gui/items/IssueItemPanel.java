@@ -60,6 +60,8 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JTextField exLinkDescription = new JTextField();
     boolean useIcon;
 
+    protected byte[] itemAppData;
+
     public IssueItemPanel(String name, String title, String issueMess, boolean useIcon, int cropWidth, int cropHeight, boolean originalSize) {
         super(name, title);
 
@@ -238,6 +240,11 @@ public abstract class IssueItemPanel extends IconPanel {
                 issueJButton.setEnabled(true);
                 return;
             }
+
+            // собрем данные общего класса
+            itemAppData = ItemCls.makeAppData(0L,
+                    !addIconLabel.externalURL.getText().isEmpty(), addIconLabel.externalURLType.getSelectedIndex(),
+                    !addImageLabel.externalURL.getText().isEmpty(), addImageLabel.externalURLType.getSelectedIndex());
 
             makeTransaction();
 

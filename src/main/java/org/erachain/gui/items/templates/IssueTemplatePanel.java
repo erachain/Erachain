@@ -29,7 +29,7 @@ public class IssueTemplatePanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
-        transaction = (IssueTemplateRecord) Controller.getInstance().issueTemplate(creator,
+        transaction = (IssueTemplateRecord) Controller.getInstance().issueTemplate(itemAppData, creator,
                 exLink, textName.getText(), textAreaDescription.getText(),
                 addIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
                 feePow);

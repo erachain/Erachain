@@ -3185,41 +3185,22 @@ public class Controller extends Observable {
         }
     }
 
-
-    public Transaction issueAsset(PrivateKeyAccount creator, ExLink linkTo, String name, String description, byte[] icon, byte[] image,
-                                  int scale, int assetType, long quantity, int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueAssetTransaction(creator, linkTo, name, description, icon, image, scale,
-                    assetType, quantity, feePow);
-        }
-    }
-
-    public Pair<Transaction, Integer> issueImprint(PrivateKeyAccount creator, ExLink exLink, String name, String description,
-                                                   byte[] icon, byte[] image, int feePow) {
-        // CREATE ONLY ONE TRANSACTION AT A TIME
-        synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueImprintTransaction(creator, exLink, name, description, icon, image,
-                    feePow);
-        }
-    }
-
-    public Transaction issueImprint1(PrivateKeyAccount creator, ExLink exLink, String name, String description, byte[] icon,
+    public Transaction issueImprint1(byte[] itemAppData, PrivateKeyAccount creator, ExLink exLink, String name, String description, byte[] icon,
                                      byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueImprintTransaction1(creator, exLink, name, description, icon, image,
+            return this.transactionCreator.createIssueImprintTransaction1(itemAppData, creator, exLink, name, description, icon, image,
                     feePow);
         }
     }
 
-    public Pair<Transaction, Integer> issuePerson(boolean forIssue, PrivateKeyAccount creator, ExLink linkTo, String fullName,
+    public Pair<Transaction, Integer> issuePerson(boolean forIssue, byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String fullName,
                                                   int feePow, long birthday, long deathday, byte gender, String race, float birthLatitude,
                                                   float birthLongitude, String skinColor, String eyeColor, String hairСolor, int height, byte[] icon,
                                                   byte[] image, String description, PublicKeyAccount owner, byte[] ownerSignature) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePersonTransaction(forIssue, creator, linkTo, fullName, feePow, birthday,
+            return this.transactionCreator.createIssuePersonTransaction(forIssue, itemAppData, creator, linkTo, fullName, feePow, birthday,
                     deathday, gender, race, birthLatitude, birthLongitude, skinColor, eyeColor, hairСolor, height, icon,
                     image, description, owner, ownerSignature);
         }
@@ -3366,11 +3347,11 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction issuePoll(PrivateKeyAccount creator, ExLink linkTo, String name, String description, List<String> options,
+    public Transaction issuePoll(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, String description, List<String> options,
                                  byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePollTransaction(creator, linkTo, name, description, icon, image, options,
+            return this.transactionCreator.createIssuePollTransaction(itemAppData, creator, linkTo, name, description, icon, image, options,
                     feePow);
         }
     }
@@ -3382,11 +3363,11 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction issueStatus(PrivateKeyAccount creator, ExLink linkTo, String name, String description, boolean unique,
+    public Transaction issueStatus(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, String description, boolean unique,
                                    byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueStatusTransaction(creator, linkTo, name, description, icon, image, unique,
+            return this.transactionCreator.createIssueStatusTransaction(itemAppData, creator, linkTo, name, description, icon, image, unique,
                     feePow);
         }
     }
@@ -3398,20 +3379,20 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction issueTemplate(PrivateKeyAccount creator, ExLink linkTo, String name, String description, byte[] icon,
+    public Transaction issueTemplate(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, String description, byte[] icon,
                                      byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueTemplateTransaction(creator, linkTo, name, description, icon, image,
+            return this.transactionCreator.createIssueTemplateTransaction(itemAppData, creator, linkTo, name, description, icon, image,
                     feePow);
         }
     }
 
-    public Transaction issueUnion(PrivateKeyAccount creator, ExLink linkTo, String name, long birthday, long parent,
+    public Transaction issueUnion(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, long birthday, long parent,
                                   String description, byte[] icon, byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssueUnionTransaction(creator, linkTo, name, birthday, parent, description,
+            return this.transactionCreator.createIssueUnionTransaction(itemAppData, creator, linkTo, name, birthday, parent, description,
                     icon, image, feePow);
         }
     }

@@ -168,15 +168,13 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
-        byte[] flags = null;
-
         AssetCls asset;
         if (AssetCls.isTypeUnique(assetType, quantity)) {
-            asset = new AssetUnique(flags, creator, textName.getText(), addIconLabel.getImgBytes(),
+            asset = new AssetUnique(itemAppData, creator, textName.getText(), addIconLabel.getImgBytes(),
                     addImageLabel.getImgBytes(), textAreaDescription.getText(),
                     assetType);
         } else {
-            asset = new AssetVenture(flags, creator, textName.getText(), addIconLabel.getImgBytes(),
+            asset = new AssetVenture(itemAppData, creator, textName.getText(), addIconLabel.getImgBytes(),
                     addImageLabel.getImgBytes(), textAreaDescription.getText(),
                     assetType, scale, quantity);
         }

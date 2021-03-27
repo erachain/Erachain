@@ -20,7 +20,7 @@ public class ItemClsTest {
 
     @Test
     public void parseAppData() {
-        byte[] appData = AssetCls.makeAppData(1L, true, true, 7, 7);
+        byte[] appData = AssetCls.makeAppData(1L, true, 7, true, 7);
         ItemCls item = new AssetUnique(appData, null, "String name", null, null, "String description", 3);
 
         assertEquals(item.getFlags(), 1L);
@@ -42,10 +42,10 @@ public class ItemClsTest {
         //System.out.println("0" + Long.toString(ItemCls.ITEM_HAS_IMAGE_URL_MASK, 2) + " - ITEM_HAS_IMAGE_URL_MASK");
 
         System.out.println("1234567812345678123456781234567812345678123456781234567812345678");
-        byte[] appdata = AssetCls.makeAppData(0L, false, false, 0, 0);
+        byte[] appdata = AssetCls.makeAppData(0L, false, 0, false, 0);
         assertEquals(appdata, null);
 
-        appdata = AssetCls.makeAppData(1L, true, false, 7, 7);
+        appdata = AssetCls.makeAppData(1L, true, 7, false, 7);
         assertEquals("10000000", Integer.toBinaryString(Byte.toUnsignedInt(appdata[0])));
         assertEquals("11111001", Integer.toBinaryString(Byte.toUnsignedInt(appdata[10])));
         assertEquals("111", Integer.toBinaryString(Byte.toUnsignedInt(appdata[11])));
