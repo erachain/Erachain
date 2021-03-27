@@ -39,7 +39,6 @@ public class AssetVenture extends AssetCls {
         super(typeBytes, appData, maker, name, icon, image, description, asset_type);
         this.quantity = quantity;
         this.scale = (byte) scale;
-        parseAppData();
     }
 
     public AssetVenture(int props, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {

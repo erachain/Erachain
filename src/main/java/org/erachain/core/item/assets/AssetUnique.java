@@ -21,7 +21,6 @@ public class AssetUnique extends AssetCls {
 
     public AssetUnique(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, appData, maker, name, icon, image, description, assetType);
-        parseAppData();
     }
 
     public AssetUnique(int props, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {

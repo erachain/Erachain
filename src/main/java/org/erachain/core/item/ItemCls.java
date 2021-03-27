@@ -125,6 +125,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         this.icon = icon == null ? new byte[0] : icon;
         this.image = image == null ? new byte[0] : image;
 
+        parseAppData();
+
     }
 
     public ItemCls(int type, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
