@@ -81,6 +81,12 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      * добавочные флаги по знаку из Размер Картинки
      */
     protected static final int APP_DATA_MASK = 1 << 31;
+    protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
+    // ITEM_FLAGS[0]
+    protected static final long ITEM_HAS_ICON_URL_MASK = 1 << 63;
+    protected static final long ITEM_HAS_IMAGE_URL_MASK = 1 << 62;
+    protected static final long ITEM_ICON_TYPE_MASK = (4 + 2 + 1) << 59; // маска Типа на 3 бита - 8 значений разных
+    protected static final long ITEM_IMAGE_TYPE_MASK = (4 + 2 + 1) << 56; // маска Типа на 3 бита - 8 значений разных
 
     protected byte[] appData;
 
@@ -93,7 +99,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected byte[] reference = null;
     protected long dbRef;
     protected byte[] icon;
+    protected boolean iconAsURL;
+    protected int iconType;
     protected byte[] image;
+    protected boolean imageAsURL;
+    protected int imageType;
 
     public Transaction referenceTx = null;
 
@@ -111,6 +121,33 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public ItemCls(int type, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
         this(new byte[TYPE_LENGTH], appData, maker, name, icon, image, description);
         this.typeBytes[0] = (byte) type;
+    }
+
+    /**
+     * Должно в конце каждого класса вызываться для распарсивания ДопДанных
+     *
+     * @return
+     */
+    protected int parseAppData() {
+        int pos = 0;
+        if ((appData[0] & APP_DATA_ITEM_FLAGS_MASK) != 0) {
+            // parse ITEM APP DATA
+            long flags = Longs.fromByteArray(Arrays.copyOfRange(appData, ++pos, pos + Long.BYTES));
+            pos += Long.BYTES;
+
+            if ((flags & ITEM_HAS_ICON_URL_MASK) != 0) {
+                iconAsURL = true;
+            }
+            if ((flags & ITEM_HAS_IMAGE_URL_MASK) != 0) {
+                imageAsURL = true;
+            }
+
+            iconType = (int) ((flags & ITEM_ICON_TYPE_MASK) >> 59);
+            imageType = (int) ((flags & ITEM_IMAGE_TYPE_MASK) >> 56);
+
+        }
+
+        return pos;
     }
 
     public static Pair<Integer, Long> resolveDateFromStr(String str, Long defaultVol) {
@@ -251,36 +288,36 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return this.icon;
     }
 
-    public byte[] getImage() {
-        return this.image;
+    public int getIconType() {
+        return iconType;
     }
 
     public boolean hasIconURL() {
-        if (this.icon != null && this.icon.length > 0 && this.icon.length < 400) {
-            // внешняя ссылка - обработаем ее
-            return true;
-        }
-        return false;
-    }
-
-    public boolean hasImageURL() {
-        if (this.image != null && this.image.length > 0 && this.image.length < 400) {
-            // внешняя ссылка - обработаем ее
-            return true;
-        }
-        return false;
+        return iconAsURL;
     }
 
     public String getIconURL() {
-        if (hasIconURL()) {
+        if (iconAsURL) {
             // внешняя ссылка - обработаем ее
             return new String(icon, StandardCharsets.UTF_8);
         }
         return null;
     }
 
+    public byte[] getImage() {
+        return this.image;
+    }
+
+    public int getImageType() {
+        return imageType;
+    }
+
+    public boolean hasImageURL() {
+        return imageAsURL;
+    }
+
     public String getImageURL() {
-        if (hasImageURL()) {
+        if (imageAsURL) {
             // внешняя ссылка - обработаем ее
             return new String(image, StandardCharsets.UTF_8);
         }
