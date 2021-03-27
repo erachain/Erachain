@@ -839,6 +839,14 @@ public class Settings {
         return 95L;
     }
 
+    public boolean getCompuRateUseDEX() {
+        if (this.settingsJSON.containsKey("compuRateUseDEX")) {
+            return Boolean.valueOf(this.settingsJSON.get("compuRateUseDEX").toString());
+        }
+
+        return true;
+    }
+
     public long getDefaultPairAssetKey() {
         if (this.settingsJSON.containsKey("defaultPairAsset")) {
             return Long.valueOf(this.settingsJSON.get("defaultPairAsset").toString());
@@ -1220,7 +1228,7 @@ public class Settings {
         return getLang() + ".json";
     }
 
-    public String get_Font() {
+    public String getFontSize() {
         if (this.settingsJSON.containsKey("font_size")) {
             return this.settingsJSON.get("font_size").toString();
         }

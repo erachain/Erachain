@@ -21,6 +21,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
@@ -1469,10 +1470,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return feePow + ":" + this.fee.unscaledValue().longValue();
     }
 
-    public String viewFeeAndFiat() {
+    public String viewFeeAndFiat(int fontSize) {
 
-        String text = fee.toString();
-        BigDecimal compu_rate = new BigDecimal(Settings.getInstance().getCompuRate());
+        fontSize *= 1.4;
+        String text = "<span style='vertical-align: 10px; font-size: 1.4em' ><b>" + fee.toString() + "</b>"
+                + "<img width=" + fontSize + " height=" + fontSize
+                + " src='file:images\\icons\\assets\\COMPU.png'></span>";
+
+        boolean useDEX = Settings.getInstance().getCompuRateUseDEX();
+
         AssetCls asset = Controller.getInstance().getAsset(Settings.getInstance().getCompuRateAsset());
         if (asset == null)
             asset = Controller.getInstance().getAsset(840L); // ISO-USD
@@ -1480,9 +1486,21 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         if (asset == null)
             asset = Controller.getInstance().getAsset(1L); // ERA
 
-        if (compu_rate.signum() > 0) {
-            BigDecimal fee_fiat = fee.multiply(compu_rate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
-            text += " " + AssetCls.FEE_NAME;
+        BigDecimal compuRate;
+        if (useDEX) {
+            Trade lastTrade = DCSet.getInstance().getTradeMap().getLastTrade(AssetCls.FEE_KEY, asset.getKey());
+            if (lastTrade == null) {
+                compuRate = BigDecimal.ZERO;
+            } else {
+                compuRate = lastTrade.getHaveKey().equals(AssetCls.FEE_KEY) ? lastTrade.calcPriceRevers() : lastTrade.calcPrice();
+            }
+
+        } else {
+            compuRate = new BigDecimal(Settings.getInstance().getCompuRate());
+        }
+
+        if (compuRate.signum() > 0) {
+            BigDecimal fee_fiat = fee.multiply(compuRate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
             if (asset.getKey() != AssetCls.FEE_KEY)
                 text += " (" + fee_fiat.toString() + " " + asset.getTickerName() + ")";
         }

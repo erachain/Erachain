@@ -241,7 +241,7 @@ public class UISettingPanel extends javax.swing.JPanel {
 
         size_Font = new JComboBox<String>();
         size_Font.setModel(new DefaultComboBoxModel<String>(new String[]{"11", "12", "14", "16", "18", "20", "24"}));
-        size_Font.setSelectedItem(Settings.getInstance().get_Font());
+        size_Font.setSelectedItem(Settings.getInstance().getFontSize());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 2;
