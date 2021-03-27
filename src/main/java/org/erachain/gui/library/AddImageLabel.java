@@ -56,7 +56,7 @@ public class AddImageLabel extends JPanel {
 
         JPanel panelCenter = new JPanel();
         panelCenter.setLayout(new BorderLayout());
-        //add(panelCenter, BorderLayout.CENTER);
+        add(panelCenter, BorderLayout.CENTER);
 
         panelCenter.add(new JLabel(Lang.T("Use external URL") + ":"), BorderLayout.NORTH);
         panelCenter.add(externalURLType, BorderLayout.EAST);
