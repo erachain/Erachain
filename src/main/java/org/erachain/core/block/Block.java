@@ -1780,6 +1780,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                 + ":" + transaction.viewFullTypeName()
                                 + " invalid code: " + OnDealClick.resultMess(error) + "[" + error + "]"
+                                + (transaction.errorValue == null ? "" : " {" + transaction.errorValue + "}")
                                 + " " + Base58.encode(transaction.getSignature()));
                         return INVALID_BLOCK_VERSION;
                     }
