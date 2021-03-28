@@ -627,6 +627,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             Transaction transaction;
             boolean txChecked;
             boolean wordChecked;
+            DCSet dcSet = (DCSet) databaseSet;
             while (iterator.hasNext()) {
                 key = iterator.next();
                 transaction = get(key);
@@ -634,6 +635,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     continue;
 
                 // теперь проверим все слова в Заголовке
+                transaction.setDC(dcSet);
                 String[] titleArray = transaction.getTags();
 
                 if (titleArray == null || titleArray.length < words.length)
@@ -706,7 +708,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
         // теперь проверим все слова в Заголовке
-        String[] titleArray = get(fromSeqNo).getTags();
+        txFrom.setDC((DCSet) databaseSet);
+        String[] titleArray = txFrom.getTags();
         if (titleArray == null)
             return null;
 
