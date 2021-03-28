@@ -195,12 +195,25 @@ public abstract class PersonCls extends ItemCls {
         return Byte.toUnsignedInt(this.height);
     }
 
-    public int getMAXimageLenght() {
+    @Override
+    public int getImageMAXLength() {
         return this.MAX_IMAGE_LENGTH;
     }
 
-    public int getMINimageLenght() {
+    public int getImageMINLength() {
         return this.MIN_IMAGE_LENGTH;
+    }
+
+    public int isValid() {
+        if (icon != null && icon.length > getIconMAXLength()) {
+            errorValue = "" + icon.length + " > " + getIconMAXLength();
+            return Transaction.INVALID_IMAGE_LENGTH_MAX;
+        } else if (image != null && image.length > getImageMAXLength()) {
+            errorValue = "" + image.length + " > " + getImageMAXLength();
+            return Transaction.INVALID_IMAGE_LENGTH_MAX;
+        }
+
+        return Transaction.VALIDATE_OK;
     }
 
     public boolean isAlive(long onThisTime) {
