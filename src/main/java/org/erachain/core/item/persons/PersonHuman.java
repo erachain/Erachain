@@ -77,7 +77,8 @@ public class PersonHuman extends PersonCls {
         int fullNameLength = Byte.toUnsignedInt(data[position]);
         position++;
 
-        if (fullNameLength < 1 || fullNameLength > MAX_NAME_LENGTH) {
+        // !!! Проверяем по максимуму протокола - по супер классу ItemCls. Локальные ограничения в isValid тут
+        if (fullNameLength < 1 || fullNameLength > ItemCls.MAX_NAME_LENGTH) {
             throw new Exception("Invalid full name length");
         }
 
