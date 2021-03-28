@@ -57,7 +57,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public static final int MEDIA_TYPE_IMG = 0;
     public static final int MEDIA_TYPE_VIDEO = 1;
-    public static final int MEDIA_TYPE_FRAME = 2;
+    public static final int MEDIA_TYPE_FRAME = 2; // POST
 
     protected static final int TYPE_LENGTH = 2;
     protected static final int MAKER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
@@ -155,13 +155,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             iconType = appData[pos++];
             if (iconType < 0) {
                 iconAsURL = true;
-                iconType *= -1;
+                iconType &= ~ITEM_HAS_URL_MASK;
             }
 
             imageType = appData[pos++];
             if (imageType < 0) {
                 imageAsURL = true;
-                imageType *= -1;
+                imageType &= ~ITEM_HAS_URL_MASK;
             }
 
         }
@@ -179,11 +179,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             // байт по Иконке
             appData[10] = (byte) iconType;
             if (iconAsURL)
-                appData[10] |= ITEM_HAS_URL_MASK; // *= -1 - wrong?
+                appData[10] |= ITEM_HAS_URL_MASK;
             // байт по Картинке
             appData[11] = (byte) imageType;
             if (imageAsURL)
-                appData[11] |= ITEM_HAS_URL_MASK; // *= -1 - wrong?
+                appData[11] |= ITEM_HAS_URL_MASK;
 
             return appData;
 

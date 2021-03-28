@@ -24,10 +24,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 
-//import java.math.BigDecimal;
-//import java.util.Arrays;
-// import org.slf4j.LoggerFactory;
-//import com.google.common.primitives.Ints;
 
 //birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
@@ -35,7 +31,6 @@ public abstract class PersonCls extends ItemCls {
     public static final int TYPE_KEY = ItemCls.PERSON_TYPE;
 
     public static final long MIN_START_KEY_OLD = 0L;
-    //public static final long START_KEY_UP_ITEMS = 1L << 20;
 
     public static int MAX_IMAGE_LENGTH = 28000;
     public static int MIN_IMAGE_LENGTH = 10240;
