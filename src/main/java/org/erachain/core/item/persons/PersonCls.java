@@ -204,18 +204,6 @@ public abstract class PersonCls extends ItemCls {
         return this.MIN_IMAGE_LENGTH;
     }
 
-    public int isValid() {
-        if (icon != null && icon.length > getIconMAXLength()) {
-            errorValue = "" + icon.length + " > " + getIconMAXLength();
-            return Transaction.INVALID_IMAGE_LENGTH_MAX;
-        } else if (image != null && image.length > getImageMAXLength()) {
-            errorValue = "" + image.length + " > " + getImageMAXLength();
-            return Transaction.INVALID_IMAGE_LENGTH_MAX;
-        }
-
-        return Transaction.VALIDATE_OK;
-    }
-
     public boolean isAlive(long onThisTime) {
 
         if (this.deathday == Long.MIN_VALUE

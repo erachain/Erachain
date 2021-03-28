@@ -90,7 +90,7 @@ public class PersonHuman extends PersonCls {
         int iconLength = Ints.fromBytes((byte) 0, (byte) 0, iconLengthBytes[0], iconLengthBytes[1]);
         position += ICON_SIZE_LENGTH;
 
-        if (iconLength < 0 || iconLength > MAX_ICON_LENGTH) {
+        if (iconLength < 0 || iconLength > ItemCls.MAX_ICON_LENGTH) {
             throw new Exception("Invalid icon length - " + iconLength);
         }
 
