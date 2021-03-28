@@ -241,7 +241,7 @@ public abstract class IssueItemPanel extends IconPanel {
                 return;
             }
 
-            // собрем данные общего класса
+            // соберем данные общего класса
             itemAppData = ItemCls.makeAppData(0L,
                     !addIconLabel.externalURL.getText().isEmpty(), addIconLabel.externalURLType.getSelectedIndex(),
                     !addImageLabel.externalURL.getText().isEmpty(), addImageLabel.externalURLType.getSelectedIndex());

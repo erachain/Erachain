@@ -38,7 +38,7 @@ public class AddImageLabel extends JPanel {
     private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
     public JTextField externalURL = new JTextField();
-    public JComboBox externalURLType = new JComboBox(new String[]{"image", "video"});
+    public JComboBox externalURLType = new JComboBox(new String[]{"image", "video", "post"});
 
     private boolean editable = true;
 

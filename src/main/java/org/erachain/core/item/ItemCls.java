@@ -155,13 +155,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             iconType = appData[pos++];
             if (iconType < 0) {
                 iconAsURL = true;
-                iconType = -iconType;
+                iconType *= -1;
             }
 
             imageType = appData[pos++];
             if (imageType < 0) {
-                imageType = -imageType;
                 imageAsURL = true;
+                imageType *= -1;
             }
 
         }
