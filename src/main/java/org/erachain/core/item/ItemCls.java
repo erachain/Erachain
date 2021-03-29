@@ -683,6 +683,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         if (useAll) {
             //WRITE IMAGE SIZE
+            // !!! this.image не может быть равно NULL !!! - чтобы флаги собирать всегда на до Данные
             int imageLength = this.image.length;
 
             // если Appdata exist - поднимем флаг
