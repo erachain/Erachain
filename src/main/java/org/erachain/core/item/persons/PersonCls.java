@@ -331,6 +331,15 @@ public abstract class PersonCls extends ItemCls {
         return db.getIssuePersonMap();
     }
 
+    public int isValid() {
+        if (hasImageURL()) {
+            // нельзя делать ссылку на фотку у Персон
+            return Transaction.INVALID_IMAGE_LENGTH_MIN;
+        }
+
+        return super.isValid();
+    }
+
     // to BYTES
     public byte[] toBytes(boolean includeReference, boolean forMakerSign) {
 
