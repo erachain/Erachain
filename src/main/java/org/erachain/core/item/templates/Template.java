@@ -88,7 +88,7 @@ public class Template extends TemplateCls {
             position += APP_DATA_LENGTH;
 
             appData = Arrays.copyOfRange(data, position, position + appDataLen);
-            position += imageLength;
+            position += appDataLen;
 
         } else {
             appData = null;

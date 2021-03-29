@@ -30,7 +30,7 @@ import java.util.*;
 
 /**
  * flag[0] - profitFeeMin[int] + profitFeeMax[int]
- * flag[1] - profitTax[int] + loanInterest[int]
+ * flag[1] - profitTax[int] + loanInterest[int] // personimage?key=1048601
  */
 public abstract class AssetCls extends ItemCls {
 
