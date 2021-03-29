@@ -12,15 +12,14 @@ function itemHead(item, forPrint) {
 
     if (source) {
         if (item.imageTypeName == 'video') {
-            //output += '<video src="https://storage.opensea.io/files/f5b032939e1bc56cea81915e04a05168.mp4" autoplay="" playsinline="" loop="" class="" style=""></video>';
-            output += '<video src="' + source + '" autoplay="" playsinline="" loop="" class="" style=""></video>';
+            output += '<td><video autoplay playsinline loop width="350"><source src="' + source + '"></video>';
 
         } else {
             output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
-            output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img src="' + source
-                + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
-            output += '<br>';
+            output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
         }
+
+        output += '</td><td style ="width: 70%; padding-left:20px"><br>';
     }
 
 

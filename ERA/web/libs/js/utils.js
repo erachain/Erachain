@@ -133,6 +133,16 @@ function showWindowImage(source) {
   img.style.resizable = 1;
 }
 
+function showWindowVideo(source) {
+  var video = document.getElementById('video-holder');
+  video.src = source;
+  video.style.display = 'block';
+  video.style.resizable = 1;
+  video.autoplay = "";
+  video.playsinline = "";
+  video.loop = "";
+}
+
 
 function makeMediaIcon(item, class1, style1) {
 
@@ -148,7 +158,7 @@ function makeMediaIcon(item, class1, style1) {
         return '';
 
     if (item.iconTypeName == 'video') {
-        out += '<video src="' + source + '" autoplay="" playsinline="" loop="" class="' + class1 + '" style="' + style1 + '"></video>';
+        out += '<video src="' + source + '" autoplay autoplay loop class="' + class1 + '" style="' + style1 + '"></video>';
     } else {
         out += '<img src="' + source + '" class="' + class1 + '" style="' + style1+ '" /> ';
     }
