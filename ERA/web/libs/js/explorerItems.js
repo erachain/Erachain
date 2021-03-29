@@ -3,14 +3,24 @@ function itemHead(item, forPrint) {
     var output = '';
     var type = item.item_type;
 
+    var source;
     if (item.image) {
-        output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
-        output += '<td><a href="#" onclick="showWindowImage(\'data:image/gif;base64,' + item.image + '\')" ><img src="data:image/gif;base64,' + item.image + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
-        output += '<br>';
+        source = 'data:image/gif;base64,' + item.image;
     } else if (item.imageURL) {
-        output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
-        output += '<td><a href="#" onclick="showWindowImage(\'' + item.imageURL + '\')" ><img src="' + item.imageURL + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
-        output += '<br>';
+        source = item.imageURL;
+    }
+
+    if (source) {
+        if (item.imageTypeName == 'video') {
+            //output += '<video src="https://storage.opensea.io/files/f5b032939e1bc56cea81915e04a05168.mp4" autoplay="" playsinline="" loop="" class="" style=""></video>';
+            output += '<video src="' + source + '" autoplay="" playsinline="" loop="" class="" style=""></video>';
+
+        } else {
+            output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
+            output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img src="' + source
+                + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
+            output += '<br>';
+        }
     }
 
 
