@@ -685,9 +685,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             //WRITE IMAGE SIZE
             int imageLength = this.image.length;
 
-            // если флаги подняты - отразим это
+            // если Appdata exist - поднимем флаг
             if (hasAppData)
-                imageLength &= ~APP_DATA_MASK;
+                imageLength |= APP_DATA_MASK;
 
             byte[] imageLengthBytes = Ints.toByteArray(imageLength);
             data = Bytes.concat(data, imageLengthBytes);
