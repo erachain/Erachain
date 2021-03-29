@@ -22,6 +22,8 @@ public class TestRecGenesisPerson2 {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecGenesisPerson2.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     //Long Transaction.FOR_NETWORK = null;
 
     long FEE_KEY = Transaction.FEE_KEY;
@@ -207,7 +209,7 @@ public class TestRecGenesisPerson2 {
         assertEquals(genesisIssuePersonTransaction.getItem().getName(), person.getName());
 
         //CHECK PERSON IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemPersonMap().get(keyPerson).toBytes(true, false), person.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(db.getItemPersonMap().get(keyPerson).toBytes(forDeal, true, false), person.toBytes(forDeal, true, false)));
 
         /////////////////
         ///// ORPHAN ////

@@ -85,6 +85,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      * добавочные флаги по знаку из Размер Картинки
      */
     protected static final int APP_DATA_MASK = 1 << 31;
+    /**
+     * Флаг который показывает что есть еще данные вычисленные для бзы данных
+     */
+    protected static final int DB_DATA_MASK = 1 << 30;
+
     protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
     // ITEM_FLAGS[0]
     protected static final byte ITEM_HAS_URL_MASK = (byte) -128;
@@ -641,7 +646,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     // forMakerSign - use only DATA needed for making signature
-    public byte[] toBytes(boolean includeReference, boolean forMakerSign) {
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean forMakerSign) {
 
         byte[] data = new byte[0];
         boolean useAll = !forMakerSign;
@@ -689,6 +694,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             // если Appdata exist - поднимем флаг
             if (hasAppData)
                 imageLength |= APP_DATA_MASK;
+
+            if (false && forDeal == Transaction.FOR_DB_RECORD) {
+                imageLength |= DB_DATA_MASK;
+            }
 
             byte[] imageLengthBytes = Ints.toByteArray(imageLength);
             data = Bytes.concat(data, imageLengthBytes);

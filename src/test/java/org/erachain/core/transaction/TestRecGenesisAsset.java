@@ -23,6 +23,8 @@ public class TestRecGenesisAsset {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecGenesisAsset.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     //int asPack = Transaction.FOR_NETWORK;
 
     long FEE_KEY = 1l;
@@ -200,7 +202,7 @@ public class TestRecGenesisAsset {
         assertEquals(true, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(forDeal, true, false), asset.toBytes(forDeal, true, false)));
 
         //CHECK ASSET BALANCE SENDER - null
         //assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);

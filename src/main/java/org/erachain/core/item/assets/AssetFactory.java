@@ -16,7 +16,7 @@ public class AssetFactory {
         return instance;
     }
 
-    public AssetCls parse(byte[] data, boolean includeReference) throws Exception {
+    public AssetCls parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
         //READ TYPE
         int type = data[0];
 
@@ -24,12 +24,12 @@ public class AssetFactory {
             case AssetCls.VENTURE:
 
                 //PARSE UPDATE NAME TRANSACTION
-                return AssetVenture.parse(data, includeReference);
+                return AssetVenture.parse(forDeal, data, includeReference);
 
             case AssetCls.UNIQUE:
 
                 //PARSE PAYMENT TRANSACTION
-                return AssetUnique.parse(data, includeReference);
+                return AssetUnique.parse(forDeal, data, includeReference);
 
             case AssetCls.NAME:
 

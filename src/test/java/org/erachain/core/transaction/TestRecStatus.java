@@ -30,6 +30,8 @@ public class TestRecStatus {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecStatus.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     //Long releaserReference = null;
 
     boolean asPack = false;
@@ -113,7 +115,7 @@ public class TestRecStatus {
         init();
 
         StatusCls status = new Status(itemAppData, maker, "test132", icon, image, "12345678910strontje", true);
-        byte[] raw = status.toBytes(false, false);
+        byte[] raw = status.toBytes(forDeal, false, false);
         assertEquals(raw.length, status.getDataLength(false));
 
         //CREATE ISSUE STATUS TRANSACTION
@@ -197,7 +199,7 @@ public class TestRecStatus {
         assertEquals(mapSize + 1, statusMap.size());
 
         //CHECK STATUS IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemStatusMap().get(key).toBytes(true, false), status.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(db.getItemStatusMap().get(key).toBytes(forDeal, true, false), status.toBytes(forDeal, true, false)));
 
         //CHECK REFERENCE SENDER
         assertEquals(issueStatusRecord.getTimestamp(), maker.getLastTimestamp(db));

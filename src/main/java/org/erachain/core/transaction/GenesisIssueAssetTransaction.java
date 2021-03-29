@@ -38,7 +38,7 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
 
         //READ ASSET
         // read without reference
-        AssetCls asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        AssetCls asset = AssetFactory.getInstance().parse(Transaction.FOR_NETWORK, Arrays.copyOfRange(data, position, data.length), false);
         //position += asset.getDataLength(false);
 
         return new GenesisIssueAssetTransaction(asset);

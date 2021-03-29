@@ -111,7 +111,7 @@ public class ItemAssetsResource {
         }
 
         ItemCls item = Controller.getInstance().getAsset(asLong);
-        byte[] issueBytes = item.toBytes(false, false);
+        byte[] issueBytes = item.toBytes(Transaction.FOR_NETWORK, false, false);
         return Base58.encode(issueBytes);
     }
 
@@ -204,7 +204,7 @@ public class ItemAssetsResource {
 
         AssetCls item;
         try {
-            item = AssetFactory.getInstance().parse(resultRaw.b, false);
+            item = AssetFactory.getInstance().parse(Transaction.FOR_NETWORK, resultRaw.b, false);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     e.getMessage());

@@ -36,6 +36,8 @@ public class TestRecAsset {
 
     ExLink exLink = null;
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     int[] TESTED_DBS = new int[]{
             IDB.DBS_MAP_DB,
             IDB.DBS_ROCK_DB};
@@ -101,13 +103,13 @@ public class TestRecAsset {
 
         asset = new AssetVenture(itemAppData, maker, "aasdasd", icon, image, "asdasda", 1, 8, 50000l);
         // set SCALABLE assets ++
-        asset.setReference(Crypto.getInstance().digest(asset.toBytes(false, false)), dbRef);
+        asset.setReference(Crypto.getInstance().digest(asset.toBytes(forDeal, false, false)), dbRef);
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(db, 0l);
         key = asset.getKey(db);
 
         assetMovable = new AssetVenture(itemAppData, maker, "movable", icon, image, "...", 0, 8, 500l);
-        assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)), dbRef);
+        assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(forDeal, false, false)), dbRef);
 
     }
 
@@ -224,19 +226,19 @@ public class TestRecAsset {
                 //CREATE SIGNATURE
                 AssetUnique assetUni = new AssetUnique(itemAppData, maker, "test", icon, image, "strontje", 0);
                 LOGGER.info("asset: " + assetUni.getTypeBytes()[0] + ", " + assetUni.getTypeBytes()[1]);
-                byte[] rawUni = assetUni.toBytes(false, false);
+                byte[] rawUni = assetUni.toBytes(forDeal, false, false);
                 assertEquals(rawUni.length, assetUni.getDataLength(false));
                 assetUni.setReference(new byte[64], dbRef);
-                rawUni = assetUni.toBytes(true, false);
+                rawUni = assetUni.toBytes(forDeal, true, false);
                 assertEquals(rawUni.length, assetUni.getDataLength(true));
 
                 //CREATE SIGNATURE
                 AssetVenture asset = new AssetVenture(itemAppData, maker, "test", icon, image, "strontje", 0, 8, 1000l);
                 LOGGER.info("asset: " + asset.getTypeBytes()[0] + ", " + asset.getTypeBytes()[1]);
-                byte[] raw = asset.toBytes(false, false);
+                byte[] raw = asset.toBytes(forDeal, false, false);
                 assertEquals(raw.length, asset.getDataLength(false));
                 asset.setReference(new byte[64], dbRef);
-                raw = asset.toBytes(true, false);
+                raw = asset.toBytes(forDeal, true, false);
                 assertEquals(raw.length, asset.getDataLength(true));
 
                 //CREATE ISSUE ASSET TRANSACTION
@@ -339,7 +341,7 @@ public class TestRecAsset {
                 assertEquals(true, db.getItemAssetMap().contains(key));
 
                 //CHECK ASSET IS CORRECT
-                assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
+                assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(forDeal, true, false), asset.toBytes(forDeal, true, false)));
 
                 //CHECK ASSET BALANCE SENDER
                 assertEquals(true, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.compareTo(new BigDecimal(asset.getQuantity())) == 0);

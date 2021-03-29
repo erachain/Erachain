@@ -90,9 +90,9 @@ public abstract class UnionCls extends ItemCls {
     }
 
     // PARSE
-    public byte[] toBytes(boolean includeReference, boolean onlyBody) {
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean onlyBody) {
 
-        byte[] data = super.toBytes(includeReference, onlyBody);
+        byte[] data = super.toBytes(forDeal, includeReference, onlyBody);
 
         // WRITE BIRTHDAY
         byte[] birthdayBytes = Longs.toByteArray(this.birthday);

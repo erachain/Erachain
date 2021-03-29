@@ -327,9 +327,9 @@ public abstract class PollCls extends ItemCls {
     }
 
     // PARSE
-    public byte[] toBytes(boolean includeReference, boolean onlyBody) {
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean onlyBody) {
 
-        byte[] data = super.toBytes(includeReference, onlyBody);
+        byte[] data = super.toBytes(forDeal, includeReference, onlyBody);
 
         //WRITE OPTIONS SIZE
         byte[] optionsLengthBytes = Ints.toByteArray(this.options.size());

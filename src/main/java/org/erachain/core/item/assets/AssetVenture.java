@@ -114,7 +114,7 @@ public class AssetVenture extends AssetCls {
 
     //PARSE
     // includeReference - TRUE only for store in local DB
-    public static AssetVenture parse(byte[] data, boolean includeReference) throws Exception {
+    public static AssetVenture parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
 
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
@@ -234,8 +234,8 @@ public class AssetVenture extends AssetCls {
     }
 
     @Override
-    public byte[] toBytes(boolean includeReference, boolean onlyBody) {
-        byte[] data = super.toBytes(includeReference, onlyBody);
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean onlyBody) {
+        byte[] data = super.toBytes(forDeal, includeReference, onlyBody);
 
         //WRITE QUANTITY
         byte[] quantityBytes = Longs.toByteArray(this.quantity);

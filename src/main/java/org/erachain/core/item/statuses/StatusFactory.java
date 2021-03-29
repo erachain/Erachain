@@ -16,7 +16,7 @@ public class StatusFactory {
         return instance;
     }
 
-    public StatusCls parse(byte[] data, boolean includeReference) throws Exception {
+    public StatusCls parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
         //READ TYPE
         int type = data[0];
 
@@ -24,7 +24,7 @@ public class StatusFactory {
             case StatusCls.STATUS:
 
                 //PARSE SIMPLE STATUS
-                return Status.parse(data, includeReference);
+                return Status.parse(forDeal, data, includeReference);
 
             case StatusCls.TITLE:
 

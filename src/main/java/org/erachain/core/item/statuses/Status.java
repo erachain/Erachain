@@ -24,7 +24,7 @@ public class Status extends StatusCls {
 
     //PARSE
     // includeReference - TRUE only for store in local DB
-    public static Status parse(byte[] data, boolean includeReference) throws Exception {
+    public static Status parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
 
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);

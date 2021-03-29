@@ -152,7 +152,7 @@ public class IssueImprintRecord extends IssueItemRecord {
 
         //READ IMPRINT
         // imprint parse without reference - if is = signature
-        ImprintCls imprint = Imprint.parse(Arrays.copyOfRange(data, position, data.length), false);
+        ImprintCls imprint = Imprint.parse(forDeal, Arrays.copyOfRange(data, position, data.length), false);
         position += imprint.getDataLength(false);
 
         if (forDeal == FOR_DB_RECORD) {

@@ -30,6 +30,8 @@ public class TestRecUnion {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecUnion.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     //int releaserReference = null;
 
     BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
@@ -198,18 +200,18 @@ public class TestRecUnion {
 
         // PARSE UNION
 
-        byte[] rawUnion = union.toBytes(false, false);
+        byte[] rawUnion = union.toBytes(forDeal, false, false);
         assertEquals(rawUnion.length, union.getDataLength(false));
         union.setReference(new byte[64], dbRef);
-        rawUnion = union.toBytes(true, false);
+        rawUnion = union.toBytes(forDeal, true, false);
         assertEquals(rawUnion.length, union.getDataLength(true));
 
-        rawUnion = union.toBytes(false, false);
+        rawUnion = union.toBytes(forDeal, false, false);
         UnionCls parsedUnion = null;
         try {
             //PARSE FROM BYTES
             parsedUnion = (UnionCls) ItemFactory.getInstance()
-                    .parse(ItemCls.UNION_TYPE, rawUnion, false);
+                    .parse(forDeal, ItemCls.UNION_TYPE, rawUnion, false);
         } catch (Exception e) {
             fail("Exception while parsing transaction.  : " + e);
         }
@@ -310,7 +312,7 @@ public class TestRecUnion {
         assertEquals(true, db.getItemUnionMap().contains(key));
 
         //CHECK UNION IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemUnionMap().get(key).toBytes(true, false), union.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(db.getItemUnionMap().get(key).toBytes(forDeal, true, false), union.toBytes(forDeal, true, false)));
 
         //CHECK REFERENCE SENDER
         assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastTimestamp(db));

@@ -337,9 +337,9 @@ public abstract class PersonCls extends ItemCls {
     }
 
     // to BYTES
-    public byte[] toBytes(boolean includeReference, boolean forMakerSign) {
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean forMakerSign) {
 
-        byte[] data = super.toBytes(includeReference, forMakerSign);
+        byte[] data = super.toBytes(forDeal, includeReference, forMakerSign);
 
         // WRITE BIRTHDAY
         byte[] birthdayBytes = Longs.toByteArray(this.birthday);

@@ -30,6 +30,8 @@ public class TestRecImprint {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecImprint.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     ExLink exLink = null;
 
     int asPack = Transaction.FOR_NETWORK;
@@ -113,7 +115,7 @@ public class TestRecImprint {
 
         init();
 
-        byte[] raw = imprint.toBytes(false, false);
+        byte[] raw = imprint.toBytes(forDeal, false, false);
         assertEquals(raw.length, imprint.getDataLength(false));
 
         //CREATE ISSUE IMPRINT TRANSACTION
@@ -200,7 +202,7 @@ public class TestRecImprint {
         assertEquals(0, mapSize - 1);
 
         //CHECK IMPRINT IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemImprintMap().get(key).toBytes(true, false), imprint.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(db.getItemImprintMap().get(key).toBytes(forDeal, true, false), imprint.toBytes(forDeal, true, false)));
 
         //CHECK REFERENCE SENDER
         //assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference()));

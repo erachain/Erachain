@@ -116,7 +116,7 @@ public class ItemPollsResource {
         }
 
         ItemCls item = Controller.getInstance().getPoll(asLong);
-        byte[] issueBytes = item.toBytes(false, false);
+        byte[] issueBytes = item.toBytes(Transaction.FOR_NETWORK, false, false);
         return Base58.encode(issueBytes);
     }
 
@@ -370,7 +370,7 @@ public class ItemPollsResource {
 
         PollCls item;
         try {
-            item = PollFactory.getInstance().parse(resultRaw.b, false);
+            item = PollFactory.getInstance().parse(Transaction.FOR_NETWORK, resultRaw.b, false);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     e.getMessage());

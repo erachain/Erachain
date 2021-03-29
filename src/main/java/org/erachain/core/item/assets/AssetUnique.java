@@ -76,7 +76,7 @@ public class AssetUnique extends AssetCls {
 
     //PARSE
     // includeReference - TRUE only for store in local DB
-    public static AssetUnique parse(byte[] data, boolean includeReference) throws Exception {
+    public static AssetUnique parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
 
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
@@ -185,9 +185,9 @@ public class AssetUnique extends AssetCls {
     }
 
     @Override
-    public byte[] toBytes(boolean includeReference, boolean forMakerSign) {
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean forMakerSign) {
 
-        byte[] data = super.toBytes(includeReference, forMakerSign);
+        byte[] data = super.toBytes(forDeal, includeReference, forMakerSign);
 
         //WRITE ASSET TYPE
         data = Bytes.concat(data, new byte[]{(byte) this.getAssetType()});

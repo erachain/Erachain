@@ -32,6 +32,8 @@ public class TestRecPoll {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecPoll.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     //Long Transaction.FOR_NETWORK = null;
 
     BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
@@ -202,18 +204,18 @@ public class TestRecPoll {
 
         // PARSE POLL
 
-        byte[] rawPoll = poll.toBytes(false, false);
+        byte[] rawPoll = poll.toBytes(forDeal, false, false);
         assertEquals(rawPoll.length, poll.getDataLength(false));
         poll.setReference(new byte[64], dbRef);
-        rawPoll = poll.toBytes(true, false);
+        rawPoll = poll.toBytes(forDeal, true, false);
         assertEquals(rawPoll.length, poll.getDataLength(true));
 
-        rawPoll = poll.toBytes(false, false);
+        rawPoll = poll.toBytes(forDeal, false, false);
         PollCls parsedPoll = null;
         try {
             //PARSE FROM BYTES
             parsedPoll = (PollCls) ItemFactory.getInstance()
-                    .parse(ItemCls.POLL_TYPE, rawPoll, false);
+                    .parse(forDeal, ItemCls.POLL_TYPE, rawPoll, false);
         } catch (Exception e) {
             fail("Exception while parsing transaction.  : " + e);
         }
@@ -311,7 +313,7 @@ public class TestRecPoll {
         assertEquals(true, db.getItemPollMap().contains(key));
 
         //CHECK POLL IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemPollMap().get(key).toBytes(true, false), poll.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(db.getItemPollMap().get(key).toBytes(forDeal, true, false), poll.toBytes(forDeal, true, false)));
 
         //CHECK REFERENCE SENDER
         assertEquals(issuePollTransaction.getTimestamp(), certifier.getLastTimestamp(db));

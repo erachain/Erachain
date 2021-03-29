@@ -123,7 +123,7 @@ public class IssueUnionRecord extends IssueItemRecord {
 
         //READ UNION
         // union parse without reference - if is = signature
-        UnionCls union = UnionFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        UnionCls union = UnionFactory.getInstance().parse(forDeal, Arrays.copyOfRange(data, position, data.length), false);
         position += union.getDataLength(false);
 
         if (forDeal == FOR_DB_RECORD) {

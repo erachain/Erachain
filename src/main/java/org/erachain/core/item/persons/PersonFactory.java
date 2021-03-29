@@ -18,7 +18,7 @@ public class PersonFactory {
         return instance;
     }
 
-    public PersonCls parse(byte[] data, boolean includeReference) throws Exception {
+    public PersonCls parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
         //READ TYPE
         int type = data[0];
 
@@ -26,7 +26,7 @@ public class PersonFactory {
             case PersonCls.HUMAN:
 
                 //PARSE SIMPLE PLATE
-                return PersonHuman.parse(data, includeReference);
+                return PersonHuman.parse(data, includeReference, forDeal);
 
             case PersonCls.DOG:
 

@@ -40,6 +40,8 @@ public class TestRecPerson {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecPerson.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     int[] TESTED_DBS = new int[]{
             IDB.DBS_MAP_DB
             , IDB.DBS_ROCK_DB
@@ -321,18 +323,18 @@ public class TestRecPerson {
 
                 // PARSE PERSON
 
-                byte[] rawPerson = person.toBytes(false, false);
+                byte[] rawPerson = person.toBytes(forDeal, false, false);
                 assertEquals(rawPerson.length, person.getDataLength(false));
                 person.setReference(new byte[64], dbRef);
-                rawPerson = person.toBytes(true, false);
+                rawPerson = person.toBytes(forDeal, true, false);
                 assertEquals(rawPerson.length, person.getDataLength(true));
 
-                rawPerson = person.toBytes(false, false);
+                rawPerson = person.toBytes(forDeal, false, false);
                 PersonCls parsedPerson = null;
                 try {
                     //PARSE FROM BYTES
                     parsedPerson = (PersonCls) ItemFactory.getInstance()
-                            .parse(ItemCls.PERSON_TYPE, rawPerson, false);
+                            .parse(forDeal, ItemCls.PERSON_TYPE, rawPerson, false);
                 } catch (Exception e) {
                     fail("Exception while parsing transaction.  : " + e);
                 }
@@ -467,7 +469,7 @@ public class TestRecPerson {
                 assertEquals(true, dcSet.getItemPersonMap().contains(key));
 
                 //CHECK PERSON IS CORRECT
-                assertEquals(true, Arrays.equals(dcSet.getItemPersonMap().get(key).toBytes(true, false), person.toBytes(true, false)));
+                assertEquals(true, Arrays.equals(dcSet.getItemPersonMap().get(key).toBytes(forDeal, true, false), person.toBytes(forDeal, true, false)));
 
                 //CHECK REFERENCE SENDER
                 assertEquals(issuePersonTransaction.getTimestamp(), new Long(registrar.getLastTimestamp(dcSet)[0]));

@@ -41,6 +41,8 @@ public class TransactionTests {
     long last_ref;
     long new_ref;
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     byte[] itemAppData = null;
     long txFlags = 0L;
 
@@ -956,7 +958,7 @@ String  s= "";
         assertEquals(true, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(forDeal, true, false), asset.toBytes(forDeal, true, false)));
 
         //CHECK ASSET BALANCE SENDER
         assertEquals(true, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.compareTo(new BigDecimal(asset.getQuantity())) == 0);

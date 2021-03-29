@@ -144,7 +144,7 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         //READ PERSON
         // person parse without reference - if is = signature
-        PersonCls person = PersonFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        PersonCls person = PersonFactory.getInstance().parse(forDeal, Arrays.copyOfRange(data, position, data.length), false);
         position += person.getDataLength(false);
 
         if (forDeal == FOR_DB_RECORD) {

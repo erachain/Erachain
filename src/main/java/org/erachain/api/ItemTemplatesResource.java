@@ -93,7 +93,7 @@ public class ItemTemplatesResource {
         }
 
         ItemCls item = Controller.getInstance().getTemplate(asLong);
-        byte[] issueBytes = item.toBytes(false, false);
+        byte[] issueBytes = item.toBytes(Transaction.FOR_NETWORK, false, false);
         return Base58.encode(issueBytes);
     }
 
@@ -154,7 +154,7 @@ public class ItemTemplatesResource {
 
         TemplateCls item;
         try {
-            item = TemplateFactory.getInstance().parse(resultRaw.b, false);
+            item = TemplateFactory.getInstance().parse(Transaction.FOR_NETWORK, resultRaw.b, false);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     e.getMessage());

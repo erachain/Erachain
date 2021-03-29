@@ -26,6 +26,8 @@ public class TransactionTests3AssetsAsPack {
     static int asPack = Transaction.FOR_NETWORK;
     //Long Transaction.FOR_NETWORK;
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     long dbRef = 0L;
 
     long FEE_KEY = 1L;
@@ -110,11 +112,11 @@ public class TransactionTests3AssetsAsPack {
         AssetUnique asset = new AssetUnique(itemAppData, maker, "test", icon, image, "strontje", 0);
         LOGGER.info("asset: " + asset.getTypeBytes()[0] + ", " + asset.getTypeBytes()[1]);
         boolean includeReference = false;
-        byte[] raw = asset.toBytes(includeReference, false);
+        byte[] raw = asset.toBytes(forDeal, includeReference, false);
         assertEquals(raw.length, asset.getDataLength(includeReference));
 
         asset.setReference(new byte[64], dbRef);
-        raw = asset.toBytes(true, false);
+        raw = asset.toBytes(forDeal, true, false);
         assertEquals(raw.length, asset.getDataLength(true));
 
         //CREATE ISSUE ASSET TRANSACTION
@@ -214,7 +216,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(true, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(forDeal, true, false), asset.toBytes(forDeal, true, false)));
 
         //CHECK ASSET BALANCE SENDER
         assertEquals(true, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.compareTo(new BigDecimal(asset.getQuantity())) == 0);

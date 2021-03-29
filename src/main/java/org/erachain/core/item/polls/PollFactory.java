@@ -16,7 +16,7 @@ public class PollFactory {
         return instance;
     }
 
-    public PollCls parse(byte[] data, boolean includeReference) throws Exception {
+    public PollCls parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
         //READ TYPE
         int type = data[0];
 

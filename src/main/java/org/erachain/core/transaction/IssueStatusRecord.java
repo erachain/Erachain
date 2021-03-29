@@ -123,7 +123,7 @@ public class IssueStatusRecord extends IssueItemRecord {
 
         //READ STATUS
         // status parse without reference - if is = signature
-        StatusCls status = StatusFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        StatusCls status = StatusFactory.getInstance().parse(forDeal, Arrays.copyOfRange(data, position, data.length), false);
         position += status.getDataLength(false);
 
         if (forDeal == FOR_DB_RECORD) {

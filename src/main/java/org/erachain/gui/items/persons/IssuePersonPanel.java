@@ -403,7 +403,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     PersonHuman personHuman = (PersonHuman) transaction.getItem();
                     // SIGN
                     personHuman.sign(creator);
-                    byte[] issueBytes = personHuman.toBytes(false, false);
+                    byte[] issueBytes = personHuman.toBytes(Transaction.FOR_NETWORK, false, false);
                     String base58str = Base58.encode(issueBytes);
                     if (registrar == null) {
                         // copy to clipBoard

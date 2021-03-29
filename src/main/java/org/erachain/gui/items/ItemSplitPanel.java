@@ -255,7 +255,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         JMenuItem copyRAW = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base58"));
         copyRAW.addActionListener(e -> {
-            StringSelection stringSelection = new StringSelection(Base58.encode(itemTableSelected.toBytes(false, false)));
+            StringSelection stringSelection = new StringSelection(Base58.encode(itemTableSelected.toBytes(Transaction.FOR_NETWORK, false, false)));
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Bytecode of the '%1' has been copy to buffer")
@@ -268,7 +268,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         JMenuItem copyRAW64 = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base64"));
         copyRAW64.addActionListener(e -> {
-            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(itemTableSelected.toBytes(false, false)));
+            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(itemTableSelected.toBytes(Transaction.FOR_NETWORK, false, false)));
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Bytecode of the '%1' has been copy to buffer")
@@ -288,7 +288,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
         saveRAW.addActionListener(e -> {
-            Library.saveAsBase58FileSystem(this, itemTableSelected.toBytes(false, false),
+            Library.saveAsBase58FileSystem(this, itemTableSelected.toBytes(Transaction.FOR_NETWORK, false, false),
                     itemTableSelected.viewName());
 
         });
@@ -296,7 +296,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
         saveRAW64.addActionListener(e -> {
-            Library.saveAsBase64FileSystem(this, itemTableSelected.toBytes(false, false),
+            Library.saveAsBase64FileSystem(this, itemTableSelected.toBytes(Transaction.FOR_NETWORK, false, false),
                     itemTableSelected.viewName());
 
         });

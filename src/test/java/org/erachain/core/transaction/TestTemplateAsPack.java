@@ -28,6 +28,8 @@ public class TestTemplateAsPack {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestTemplateAsPack.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     //Long Transaction.FOR_PACK = null;
 
     //boolean asPack = true;
@@ -103,7 +105,7 @@ public class TestTemplateAsPack {
         init();
 
         TemplateCls template = new Template(itemAppData, maker, "test132", icon, image, "12345678910strontje");
-        byte[] raw = template.toBytes(includeReference, false);
+        byte[] raw = template.toBytes(forDeal, includeReference, false);
         assertEquals(raw.length, template.getDataLength(includeReference));
 
         //CREATE ISSUE PLATE TRANSACTION
@@ -182,7 +184,7 @@ public class TestTemplateAsPack {
         assertEquals(0, mapSize - 4);
 
         //CHECK PLATE IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemTemplateMap().get(key).toBytes(includeReference, false), template.toBytes(includeReference, false)));
+        assertEquals(true, Arrays.equals(db.getItemTemplateMap().get(key).toBytes(forDeal, includeReference, false), template.toBytes(forDeal, includeReference, false)));
 
         //CHECK REFERENCE SENDER
         assertEquals((long) makerReference, (long) maker.getLastTimestamp(db)[0]);

@@ -62,7 +62,7 @@ public class PersonHuman extends PersonCls {
     //PARSE
     // TODO - когда нулевая длдлинна и ошибка - но в ГУИ ошибка нне высветилась и создалась плоая запись и она развалила сеть
     // includeReference - TRUE only for store in local DB
-    public static PersonHuman parse(byte[] data, boolean includeReference) throws Exception {
+    public static PersonHuman parse(byte[] data, boolean includeReference, int forDeal) throws Exception {
 
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
@@ -269,8 +269,8 @@ public class PersonHuman extends PersonCls {
         return typeBytes[1] == (byte) 1;
     }
 
-    public byte[] toBytes(boolean includeReference, boolean onlyBody) {
-        byte[] data = super.toBytes(includeReference, onlyBody);
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean onlyBody) {
+        byte[] data = super.toBytes(forDeal, includeReference, onlyBody);
         if (this.typeBytes[1] == 1) {
             data = Bytes.concat(data, this.makerSignature);
         }
@@ -306,7 +306,7 @@ public class PersonHuman extends PersonCls {
         boolean includeReference = false;
         // not use SIGNATURE here
         boolean forMakerSign = true;
-        byte[] data = super.toBytes(includeReference, forMakerSign);
+        byte[] data = super.toBytes(Transaction.FOR_NETWORK, includeReference, forMakerSign);
         if (data == null) {
             //this.typeBytes[1] = (byte)0;
             return;
@@ -338,7 +338,7 @@ public class PersonHuman extends PersonCls {
         boolean includeReference = false;
         boolean forMakerSign = true;
         // not use SIGNATURE here
-        byte[] data = super.toBytes(includeReference, forMakerSign);
+        byte[] data = super.toBytes(Transaction.FOR_NETWORK, includeReference, forMakerSign);
         if (data == null)
             return false;
 

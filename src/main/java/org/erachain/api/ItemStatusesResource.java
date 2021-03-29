@@ -94,7 +94,7 @@ public class ItemStatusesResource {
         }
 
         ItemCls item = Controller.getInstance().getStatus(asLong);
-        byte[] issueBytes = item.toBytes(false, false);
+        byte[] issueBytes = item.toBytes(Transaction.FOR_NETWORK, false, false);
         return Base58.encode(issueBytes);
     }
 
@@ -155,7 +155,7 @@ public class ItemStatusesResource {
 
         StatusCls item;
         try {
-            item = StatusFactory.getInstance().parse(resultRaw.b, false);
+            item = StatusFactory.getInstance().parse(Transaction.FOR_NETWORK, resultRaw.b, false);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     e.getMessage());

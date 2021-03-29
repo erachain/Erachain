@@ -2,6 +2,7 @@ package org.erachain.database.serializer;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.ItemFactory;
+import org.erachain.core.transaction.Transaction;
 import org.mapdb.Fun;
 import org.mapdb.Serializer;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ public class LongItemSerializer implements Serializer<Fun.Tuple2<Long, ItemCls>>
     public void serialize(DataOutput out, Fun.Tuple2<Long, ItemCls> value) throws IOException {
         out.writeLong(value.a);
         out.writeInt(value.b.getDataLength(true));
-        out.write(value.b.toBytes(true, false));
+        out.write(value.b.toBytes(Transaction.FOR_DB_RECORD, true, false));
     }
 
     @Override
@@ -44,7 +45,7 @@ public class LongItemSerializer implements Serializer<Fun.Tuple2<Long, ItemCls>>
         in.readFully(bytes);
         try {
             return new Fun.Tuple2<Long, ItemCls>(number,
-                    ItemFactory.getInstance().parse(this.type, bytes, true));
+                    ItemFactory.getInstance().parse(Transaction.FOR_DB_RECORD, this.type, bytes, true));
 
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

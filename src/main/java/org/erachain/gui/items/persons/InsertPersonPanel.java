@@ -237,7 +237,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         person = null;
         reset();
         try {
-            person = (PersonHuman) PersonFactory.getInstance().parse(dataPerson, false);
+            person = (PersonHuman) PersonFactory.getInstance().parse(Transaction.FOR_NETWORK, dataPerson, false);
         } catch (Exception ee) {
             JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.T("Error"),
                     JOptionPane.ERROR_MESSAGE);

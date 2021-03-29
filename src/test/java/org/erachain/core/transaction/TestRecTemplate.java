@@ -34,6 +34,8 @@ public class TestRecTemplate {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecTemplate.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     //Long Transaction.FOR_NETWORK = null;
 
     int asPack = Transaction.FOR_NETWORK;
@@ -133,7 +135,7 @@ public class TestRecTemplate {
         init();
 
         TemplateCls template = new Template(itemAppData, maker, "test132", icon, image, "12345678910strontje");
-        byte[] raw = template.toBytes(false, false);
+        byte[] raw = template.toBytes(forDeal, false, false);
         assertEquals(raw.length, template.getDataLength(false));
 
         //CREATE ISSUE PLATE TRANSACTION
@@ -218,7 +220,7 @@ public class TestRecTemplate {
         assertEquals(mapSize, templateMap.size());
 
         //CHECK PLATE IS CORRECT
-        assertEquals(true, Arrays.equals(templateMap.get(key).toBytes(true, false), template.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(templateMap.get(key).toBytes(forDeal, true, false), template.toBytes(forDeal, true, false)));
 
         //CHECK REFERENCE SENDER
         assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));

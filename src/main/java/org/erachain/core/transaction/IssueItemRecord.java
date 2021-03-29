@@ -169,7 +169,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         byte[] data = super.toBytes(forDeal, withSignature);
 
         // without reference
-        data = Bytes.concat(data, this.item.toBytes(false, false));
+        data = Bytes.concat(data, this.item.toBytes(forDeal, false, false));
 
         if (forDeal == FOR_DB_RECORD) {
             if (key == null) {
