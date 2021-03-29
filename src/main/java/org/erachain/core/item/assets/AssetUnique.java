@@ -123,7 +123,7 @@ public class AssetUnique extends AssetCls {
         boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
         if (hasAppData)
             // RESET LEN
-            imageLength *= -1;
+            imageLength &= ~APP_DATA_MASK;
 
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
             throw new Exception("Invalid image length" + name + ": " + imageLength);

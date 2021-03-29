@@ -10,6 +10,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ByteArrayUtils;
@@ -107,10 +108,8 @@ public class PersonHuman extends PersonCls {
         boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
         if (hasAppData)
             // RESET LEN
-            imageLength *= -1;
+            imageLength &= ~APP_DATA_MASK;
 
-        if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
-            throw new Exception("Invalid image length" + name + ": " + imageLength);
         // !!! Проверяем по максимуму протокола - по супер классу ItemCls. Локальные ограничения в isValid тут
         if (imageLength < 0 || imageLength > ItemCls.MAX_IMAGE_LENGTH) {
             throw new Exception("Invalid image length " + imageLength);
