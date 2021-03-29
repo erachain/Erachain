@@ -132,3 +132,46 @@ function showWindowImage(source) {
   img.style.display = 'block';
   img.style.resizable = 1;
 }
+
+
+function makeMediaIcon(item, class1, style1) {
+
+    var out = '';
+    var source;
+    if (item.iconURL) {
+        source = item.iconURL;
+    } else if (item.icon) {
+        source = 'data:image/gif;base64,' + item.icon;
+    }
+
+    if (!source)
+        return '';
+
+    if (item.iconTypeName == 'video') {
+        out += '<video src="' + source + '" autoplay="" playsinline="" loop="" class="' + class1 + '" style="' + style1 + '"></video>';
+    } else {
+        out += '<img src="' + source + '" class="' + class1 + '" style="' + style1+ '" /> ';
+    }
+    return out;
+}
+
+function makeMediaImage(item, class1, style1) {
+
+    var out = '';
+    var source;
+    if (item.imageURL) {
+        source = item.imageURL;
+    } else if (item.image) {
+        source = 'data:image/gif;base64,' + item.image;
+    }
+
+    if (!source)
+        return '';
+
+    if (item.imageTypeName == 'video') {
+        out += '<video src="' + source + '" autoplay="" playsinline="" loop="" class="' + class1 + '" style="' + style1 + '"></video>';
+    } else {
+        out += '<img src="' + source + '" class="' + class1 + '" style="' + style1 + '" /> ';
+    }
+    return out;
+}

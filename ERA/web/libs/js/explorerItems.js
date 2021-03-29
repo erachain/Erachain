@@ -19,10 +19,7 @@ function itemHead(item, forPrint) {
     if (!forPrint)
         output += '<a href="?' + type + '=' + item.key + get_lang() + '">';
 
-    if (item.icon)
-        output += ' <img src="data:image/gif;base64,' + item.icon + '" style="width:50px;" /> ';
-    else if (item.iconURL)
-        output += ' <img src="' + item.iconURL + '" style="width:50px;" /> ';
+    output += makeMediaIcon(item, '', 'width:50px');
 
     output += item.name;
 

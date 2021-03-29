@@ -32,9 +32,15 @@ function templates(data) {
     for (var i in data.pageItems) {
         var item = data.pageItems[i];
         output += '<tr><td><a href="?template=' + item.key + get_lang() + '">' + item.key + ': ';
-        if (item.iconURL)
+        if (item.iconURL) {
+        if () {
             output += '<img src="' + item.iconURL + '"  style="width:2em;" /> ';
-        else if (item.icon.length > 0)
+            } else {
+            '<video src="https://storage.opensea.io/files/f5b032939e1bc56cea81915e04a05168.mp4" autoplay="" playsinline="" loop="" class="tiny" style="
+                 width: 500px;
+             "></video>'
+            }
+        } else if (item.icon.length > 0)
             output += '<img src="data:image/gif;base64,' + item.icon + '" style="width:2em;" /> ';
         output += '<b>' + escapeHtml(item.name) + '</b></a></td>';
         output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
