@@ -30,7 +30,7 @@ import java.util.*;
 
 /**
  * flag[0] - profitFeeMin[int] + profitFeeMax[int]
- * flag[1] - profitTax[int] + loanInterest[int] //  use "/apiasset/image/1048664"
+ * flag[1] - profitTax[int] + loanInterest[int] //  use "/apiasset/image/1048664" "/apiasset/icon/1048664"
  */
 public abstract class AssetCls extends ItemCls {
 
