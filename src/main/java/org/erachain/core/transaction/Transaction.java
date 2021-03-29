@@ -2098,7 +2098,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             issuerPersonKey = issuerPersonDuration.a;
         }
 
-        if (issuerPersonKey < 0 // это возможно только для певой персоны и то если не она сама себя зарегала и в ДЕВЕЛОПЕ так что пусть там и будет
+        if (issuerPersonKey < 0 // это возможно только для первой персоны и то если не она сама себя зарегала и в ДЕВЕЛОПЕ так что пусть там и будет
                 || issuerPersonKey == invitedPersonKey // это возможно только в ДЕВЕЛОПЕ так что пусть там и будет
                 || issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
         ) {
