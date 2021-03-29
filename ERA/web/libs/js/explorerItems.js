@@ -12,7 +12,7 @@ function itemHead(item, forPrint) {
 
     if (source) {
         if (item.imageTypeName == 'video') {
-            output += '<td><video autoplay playsinline loop width="350"><source src="' + source + '"></video>';
+            output += '<td><video autoplay playsinline loop controls width="350"><source src="' + source + '"></video>';
 
         } else {
             output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
