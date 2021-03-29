@@ -152,16 +152,18 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             flags = Longs.fromByteArray(Arrays.copyOfRange(appData, pos, pos + Long.BYTES));
             pos += Long.BYTES;
 
-            iconType = appData[pos++];
-            if (iconType < 0) {
+            byte iconTypeByte = appData[pos++];
+            if (iconTypeByte < 0) {
                 iconAsURL = true;
-                iconType &= ~ITEM_HAS_URL_MASK;
+                iconTypeByte &= ~ITEM_HAS_URL_MASK;
+                iconType = iconTypeByte;
             }
 
-            imageType = appData[pos++];
-            if (imageType < 0) {
+            byte imageTypeByte = appData[pos++];
+            if (imageTypeByte < 0) {
                 imageAsURL = true;
-                imageType &= ~ITEM_HAS_URL_MASK;
+                imageTypeByte &= ~ITEM_HAS_URL_MASK;
+                imageType = imageTypeByte;
             }
 
         }
