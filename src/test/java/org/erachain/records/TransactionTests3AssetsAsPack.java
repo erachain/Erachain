@@ -24,7 +24,6 @@ public class TransactionTests3AssetsAsPack {
 
     static Logger LOGGER = LoggerFactory.getLogger(TransactionTests3AssetsAsPack.class.getName());
     static int asPack = Transaction.FOR_NETWORK;
-    //Long Transaction.FOR_NETWORK;
 
     int forDeal = Transaction.FOR_NETWORK;
 
