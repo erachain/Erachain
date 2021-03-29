@@ -172,10 +172,6 @@ public class AddImageLabel extends JPanel {
                     originalSize) {
                 @Override
                 public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage, boolean useOriginal) {
-                    if (bufferedImage == null) {
-                        logger.error("Image does not setup");
-                        return;
-                    }
 
                     externalURL.setText("");
 
@@ -192,6 +188,12 @@ public class AddImageLabel extends JPanel {
                         mainLabel.setIcon(new ImageIcon(url));
 
                         return;
+
+                    } else {
+                        if (bufferedImage == null) {
+                            logger.error("Image does not setup");
+                            return;
+                        }
                     }
 
                     int bufferedWidth = bufferedImage.getWidth();

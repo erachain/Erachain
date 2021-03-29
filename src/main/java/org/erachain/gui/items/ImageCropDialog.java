@@ -21,8 +21,14 @@ public abstract class ImageCropDialog extends JDialog {
         okButton.addActionListener(e -> {
             TypeOfImage imgType = imageCropPanel.asGif.isSelected() ? TypeOfImage.GIF : TypeOfImage.JPEG;
             boolean useOriginal = imageCropPanel.useOrig.isSelected();
-            BufferedImage snapshot = imageCropPanel.getSnapshot(imgType);
+            BufferedImage snapshot;
+            if (!useOriginal) {
+                snapshot = imageCropPanel.getSnapshot(imgType);
+            } else {
+                snapshot = null;
+            }
             onFinish(snapshot, imgType, useOriginal);
+
             dispose();
         });
         buttonPanel.add(okButton, c);
