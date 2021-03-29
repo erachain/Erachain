@@ -32,8 +32,8 @@ public abstract class PersonCls extends ItemCls {
 
     public static final long MIN_START_KEY_OLD = 0L;
 
-    public static int MAX_IMAGE_LENGTH = 28000;
-    public static int MIN_IMAGE_LENGTH = 10240;
+    public static int MAX_IMAGE_LENGTH = BlockChain.MAIN_MODE ? 1 << 15 : 1 << 17;
+    private static int MIN_IMAGE_LENGTH = BlockChain.MAIN_MODE ? 10240 : 10240 >> 1;
 
     public static final int HUMAN = 1;
     public static final int DOG = 2;
@@ -190,11 +190,12 @@ public abstract class PersonCls extends ItemCls {
         return Byte.toUnsignedInt(this.height);
     }
 
-    public int getMAXimageLenght() {
+    @Override
+    public int getImageMAXLength() {
         return this.MAX_IMAGE_LENGTH;
     }
 
-    public int getMINimageLenght() {
+    public int getImageMINLength() {
         return this.MIN_IMAGE_LENGTH;
     }
 
@@ -299,6 +300,13 @@ public abstract class PersonCls extends ItemCls {
 
     }
 
+    /**
+     * Get person hwo issue this PersonKey
+     *
+     * @param dcSet
+     * @param personKey
+     * @return
+     */
     public static PublicKeyAccount getIssuer(DCSet dcSet, Long personKey) {
         ItemCls person = dcSet.getItemPersonMap().get(personKey);
         Long issuerDBRef = dcSet.getTransactionFinalMapSigns().get(person.getReference());

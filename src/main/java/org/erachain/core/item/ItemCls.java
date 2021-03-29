@@ -235,6 +235,42 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return db.getItem_Map(type).get(key);
     }
 
+    public int getIconMAXLength() {
+        return this.MAX_ICON_LENGTH;
+    }
+
+    public int getImageMAXLength() {
+        return this.MAX_IMAGE_LENGTH;
+    }
+
+    public String errorValue;
+
+    public int isValid() {
+
+        // TEST ALL BYTES for database FIELD
+        if (name.getBytes(StandardCharsets.UTF_8).length > ItemCls.MAX_NAME_LENGTH) {
+            errorValue = "" + name.getBytes(StandardCharsets.UTF_8).length + " > " + ItemCls.MAX_NAME_LENGTH;
+            return Transaction.INVALID_NAME_LENGTH_MAX;
+        }
+
+        if (icon != null && icon.length > getIconMAXLength()) {
+            errorValue = "" + icon.length + " > " + getIconMAXLength();
+            return Transaction.INVALID_ICON_LENGTH_MAX;
+        } else if (image != null && image.length > getImageMAXLength()) {
+            errorValue = "" + image.length + " > " + getImageMAXLength();
+            return Transaction.INVALID_IMAGE_LENGTH_MAX;
+        }
+
+        //CHECK DESCRIPTION LENGTH
+        int descriptionLength = description == null ? 0 : description.getBytes(StandardCharsets.UTF_8).length;
+        if (descriptionLength > Transaction.MAX_DATA_BYTES_LENGTH) {
+            errorValue = "" + descriptionLength + " > " + Transaction.MAX_DATA_BYTES_LENGTH;
+            return Transaction.INVALID_DESCRIPTION_LENGTH_MAX;
+        }
+
+        return Transaction.VALIDATE_OK;
+    }
+
     public abstract int getItemType();
 
     public abstract long START_KEY();

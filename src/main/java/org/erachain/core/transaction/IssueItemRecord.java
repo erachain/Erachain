@@ -13,7 +13,6 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 
 public abstract class IssueItemRecord extends Transaction implements Itemable {
@@ -243,45 +242,15 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         if (nameLen < item.getMinNameLen()) {
             // IF is NEW NOVA
             if (this.item.isNovaAsset(this.creator, this.dcSet) <= 0) {
-                errorValue = "" + nameLen;
+                errorValue = "So short: " + nameLen;
                 return INVALID_NAME_LENGTH_MIN;
             }
         }
 
-        // TEST ALL BYTES for database FIELD
-        if (name.getBytes(StandardCharsets.UTF_8).length > ItemCls.MAX_NAME_LENGTH) {
-            errorValue = "" + nameLen + " > " + ItemCls.MAX_NAME_LENGTH;
-            return INVALID_NAME_LENGTH_MAX;
-        }
-
-        //CHECK ICON LENGTH
-        byte[] icon = this.item.getIcon();
-        if (icon != null) {
-            int iconLength = icon.length;
-            if (iconLength < 0) {
-                return INVALID_ICON_LENGTH_MIN;
-            }
-            if (iconLength > ItemCls.MAX_ICON_LENGTH) {
-                errorValue = "" + iconLength + " > " + ItemCls.MAX_ICON_LENGTH;
-                return INVALID_ICON_LENGTH_MAX;
-            }
-        }
-
-        //CHECK IMAGE LENGTH
-        int imageLength = this.item.getImage().length;
-        if (imageLength < 0) {
-            return INVALID_IMAGE_LENGTH_MIN;
-        }
-        if (imageLength > ItemCls.MAX_IMAGE_LENGTH) {
-            errorValue = "" + imageLength + " > " + ItemCls.MAX_IMAGE_LENGTH;
-            return INVALID_IMAGE_LENGTH_MAX;
-        }
-
-        //CHECK DESCRIPTION LENGTH
-        int descriptionLength = this.item.getDescription().getBytes(StandardCharsets.UTF_8).length;
-        if (descriptionLength > Transaction.MAX_DATA_BYTES_LENGTH) {
-            errorValue = "" + descriptionLength + " > " + Transaction.MAX_DATA_BYTES_LENGTH;
-            return INVALID_DESCRIPTION_LENGTH_MAX;
+        int result = item.isValid();
+        if (result != Transaction.VALIDATE_OK) {
+            errorValue = item.errorValue;
+            return result;
         }
 
         return super.isValid(forDeal, flags);
