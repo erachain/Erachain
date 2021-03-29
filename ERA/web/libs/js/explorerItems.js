@@ -7,6 +7,10 @@ function itemHead(item, forPrint) {
         output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
         output += '<td><a href="#" onclick="showWindowImage(\'data:image/gif;base64,' + item.image + '\')" ><img src="data:image/gif;base64,' + item.image + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
         output += '<br>';
+    } else if (item.iconURL) {
+        output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
+        output += '<td><a href="#" onclick="showWindowImage(\'' + item.imageURL + '\')" ><img src="' + item.imageURL + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
+        output += '<br>';
     }
 
 
@@ -17,6 +21,8 @@ function itemHead(item, forPrint) {
 
     if (item.icon)
         output += ' <img src="data:image/gif;base64,' + item.icon + '" style="width:50px;" /> ';
+    else if (item.iconURL)
+        output += ' <img src="' + item.iconURL + '" style="width:50px;" /> ';
 
     output += item.name;
 
