@@ -140,7 +140,7 @@ public class API {
         help.put("GET Person by Public Key", "personbypublickey/{publickey}");
         help.put("GET Person by Public Key Base32", "personbypublickeybase32/{publickeybase32}");
         help.put("GET Accounts From Person", "getaccountsfromperson/{key}");
-        help.put("Get Person Image", "personimage/{key}");
+        //help.put("Get Person Image", "personimage/{key}");
 
         help.put("*** PERSONS ***", "");
         help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}?offset=0&limit=0");
@@ -1500,6 +1500,7 @@ public class API {
 
     }
 
+    @Deprecated
     @Path("asseticon/{key}")
     @GET
     @Produces({"image/png", "image/jpg"})
@@ -1536,6 +1537,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @Path("personimage/{key}")
     @GET
     @Produces({"image/png", "image/jpg"})

@@ -364,10 +364,9 @@ function persons(data) {
     //for (var i = 0; i < length; i++) {
         var item = data.pageItems[i];
 
-
         output += '<tr>';
         output += ' <td><a href=?person=' + item.key + get_lang()
-            + '><img src="personimage?key=' + item.key + '" width="100"/></a>';
+            + '><img src="/apiperson/image/' + item.key + '" width="100"/></a>';
         output += '<td>' + item.key + '<td><a href=?person=' +
             item.key + get_lang() + '>' + escapeHtml(item.name) + '</a>';
         var dateDiff = new Date(item.birthday);
