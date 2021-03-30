@@ -277,7 +277,7 @@ public class APIItemPerson {
 
         if (person.getImage() != null) {
             // image to byte[] hot scale (param2 =0)
-            //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
             ///return Response.ok(new ByteArrayInputStream(person.getImage())).build();
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")
@@ -314,7 +314,7 @@ public class APIItemPerson {
 
         if (person.getIcon() != null) {
             // image to byte[] hot scale (param2 =0)
-            //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
             //return Response.ok(new ByteArrayInputStream(person.getIcon())).build();
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")

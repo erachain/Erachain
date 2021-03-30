@@ -3,12 +3,13 @@ package org.erachain.gui.library;
 import org.erachain.api.ApiErrorFactory;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class Images_Work {
+public class ImagesTools {
 
     public static byte[] bufferedImageToBytes(final BufferedImage bufferedImage, final String outputFormat)
             throws IOException {
@@ -58,7 +59,7 @@ public class Images_Work {
 
             }
             // input buffer +
-            BufferedImage inputbuffered = Images_Work.imageToBufferedImage(img);
+            BufferedImage inputbuffered = ImagesTools.imageToBufferedImage(img);
             int scaledWidth = x1;
             int scaledHeight = y;
             // creates output image
@@ -70,12 +71,12 @@ public class Images_Work {
         }
         // if not scale
         else {
-            outputImage = Images_Work.imageToBufferedImage(img);
+            outputImage = ImagesTools.imageToBufferedImage(img);
         }
 
         byte[] b;
         try {
-            b = Images_Work.bufferedImageToBytes(outputImage, "jpg");
+            b = ImagesTools.bufferedImageToBytes(outputImage, "jpg");
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -85,4 +86,23 @@ public class Images_Work {
         }
         return b;
     }
+
+    public static ImageIcon resizeMaxWidth(ImageIcon imageIcon, int preferredWidth) {
+        BufferedImage bufferedImage = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+        bufferedImage.getGraphics().drawImage(imageIcon.getImage(), 0, 0, null);
+
+        int bufferedWidth = bufferedImage.getWidth();
+
+        // под размеры поля подгоним чтобы поле не обрезало каритнку
+        if (bufferedWidth > preferredWidth) {
+            float scaleView = (float) preferredWidth / bufferedWidth;
+            Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
+                    (int) (scaleView * bufferedImage.getHeight()),
+                    Image.SCALE_AREA_AVERAGING);
+            return new ImageIcon(imagePack);
+        } else {
+            return new ImageIcon(bufferedImage);
+        }
+    }
 }
+
