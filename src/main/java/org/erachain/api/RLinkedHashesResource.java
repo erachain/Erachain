@@ -38,10 +38,10 @@ public class RLinkedHashesResource {
     @GET
     public String help() {
         Map<String, String> help = new LinkedHashMap<String, String>();
-        help.put("GET r_linkedhashes/{creator}?linkTo=Seq-No&url=<String>&message=<String>&hashes<Strind[,- ]>&feePow<int>&password=<String",
-                "Make and broadcast Linked Hashes transaction");
-        help.put("POST r_linkedhashes/make {\"linkTo\": \"<SeqNo>\", \"creator\": \"<creator>\", \"url\": \"<String>\", \"message\":\"<String>\", \"hashes\":\"<Strind[,- ]>\", \"feePow\": \"<int>\", \"password\": \"<password>\"}",
-                "Make and broadcast Linked Hashes transaction");
+        help.put("GET r_linkedhashes/make/{creator}/{hashes}?linkTo=<Seq-No>&url=<String>&message=<String>&feePow<int>&password=<String",
+                "Make and broadcast Linked Hashes transaction. <Hashes> - delimited by regex [,- ]");
+        help.put("POST r_linkedhashes/make {\"linkTo\": \"<Seq-No>\", \"creator\": \"<creator>\", \"url\": \"<String>\", \"message\":\"<String>\", \"hashes\":\"<Strind[,- ]>\", \"feePow\": \"<int>\", \"password\": \"<password>\"}",
+                "Make and broadcast Linked Hashes transaction. <Hashes> - delimited by regex [,- ]");
 
         return StrJSonFine.convert(help);
     }
@@ -87,8 +87,8 @@ public class RLinkedHashesResource {
     @Path("make/{creator}/{hashes}")
     public String makeGet(@PathParam("creator") String creatorStr, @PathParam("hashes") String hashes,
                           @QueryParam("linkTo") String exLinkRef, @DefaultValue("0") @QueryParam("feePow") Long feePow,
-                          @QueryParam("url") String url,
-                          @QueryParam("message") String message,
+                          @DefaultValue("") @QueryParam("url") String url,
+                          @DefaultValue("") @QueryParam("message") String message,
                           @QueryParam("password") String password) {
 
         // READ CREATOR
