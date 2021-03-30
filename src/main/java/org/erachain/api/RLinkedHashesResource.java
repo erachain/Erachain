@@ -28,31 +28,28 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 public class RLinkedHashesResource {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(RLinkedHashesResource.class);
 
     @Context
     HttpServletRequest request;
 
-    //@GET // from browser - not work X parameters
-    @POST // from curl only
-    @Consumes(MediaType.WILDCARD)
+    //@Consumes(MediaType.WILDCARD)
 
     @GET
     public String help() {
         Map<String, String> help = new LinkedHashMap<String, String>();
-        help.put("GET r_linkedhashes/creator?linkTo=Seq-No&url=<String>&message=<String>&hashes<Strind[,- ]>&feePow<int>&password=<String",
-                "make and broadcast SEND asset amount and mail");
-        help.put("POST r_linkedhashes/raw {\"linkTo\": \"<SeqNo>\", \"creator\": \"<creator>\", \"url\": \"<String>\", \"message\":\"<String>\", \"hashes\":\"<Strind[,- ]>\", \"feePow\": \"<int>\", \"password\": \"<password>\"}",
-                "make RAW for SEND asset amount and mail");
+        help.put("GET r_linkedhashes/{creator}?linkTo=Seq-No&url=<String>&message=<String>&hashes<Strind[,- ]>&feePow<int>&password=<String",
+                "Make and broadcast Linked Hashes transaction");
+        help.put("POST r_linkedhashes/make {\"linkTo\": \"<SeqNo>\", \"creator\": \"<creator>\", \"url\": \"<String>\", \"message\":\"<String>\", \"hashes\":\"<Strind[,- ]>\", \"feePow\": \"<int>\", \"password\": \"<password>\"}",
+                "Make and broadcast Linked Hashes transaction");
 
         return StrJSonFine.convert(help);
     }
 
-    public String make(PrivateKeyAccount creator, String hashes,
-                       String exLinkRef, Long feePow,
-                       String url,
-                       String message) {
+    private String make(PrivateKeyAccount creator, String hashes,
+                        String exLinkRef, Long feePow,
+                        String url,
+                        String message) {
 
         Controller cntr = Controller.getInstance();
 
@@ -87,7 +84,7 @@ public class RLinkedHashesResource {
     }
 
     @GET
-    @Path("{creator}/{hashes}")
+    @Path("make/{creator}/{hashes}")
     public String makeGet(@PathParam("creator") String creatorStr, @PathParam("hashes") String hashes,
                           @QueryParam("linkTo") String exLinkRef, @DefaultValue("0") @QueryParam("feePow") Long feePow,
                           @QueryParam("url") String url,
