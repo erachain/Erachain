@@ -88,20 +88,24 @@ public class ImagesTools {
     }
 
     public static ImageIcon resizeMaxWidth(ImageIcon imageIcon, int preferredWidth) {
-        BufferedImage bufferedImage = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
-        bufferedImage.getGraphics().drawImage(imageIcon.getImage(), 0, 0, null);
+        try {
+            BufferedImage bufferedImage = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+            bufferedImage.getGraphics().drawImage(imageIcon.getImage(), 0, 0, null);
 
-        int bufferedWidth = bufferedImage.getWidth();
+            int bufferedWidth = bufferedImage.getWidth();
 
-        // под размеры поля подгоним чтобы поле не обрезало каритнку
-        if (bufferedWidth > preferredWidth) {
-            float scaleView = (float) preferredWidth / bufferedWidth;
-            Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
-                    (int) (scaleView * bufferedImage.getHeight()),
-                    Image.SCALE_AREA_AVERAGING);
-            return new ImageIcon(imagePack);
-        } else {
-            return new ImageIcon(bufferedImage);
+            // под размеры поля подгоним чтобы поле не обрезало каритнку
+            if (bufferedWidth > preferredWidth) {
+                float scaleView = (float) preferredWidth / bufferedWidth;
+                Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
+                        (int) (scaleView * bufferedImage.getHeight()),
+                        Image.SCALE_AREA_AVERAGING);
+                return new ImageIcon(imagePack);
+            } else {
+                return new ImageIcon(bufferedImage);
+            }
+        } catch (Exception e) {
+            return imageIcon;
         }
     }
 }

@@ -104,7 +104,23 @@ public class AddImageLabel extends JPanel {
 
                     return;
                 }
-                mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
+
+                if (externalURL.getText().toLowerCase().endsWith(".mp4")) {
+                    externalURLType.setSelectedIndex(1);
+                } else {
+                    externalURLType.setSelectedIndex(0);
+                }
+
+                if (externalURLType.getSelectedIndex() == 0) {
+                    if (externalURL.getText().toLowerCase().endsWith(".gif")
+                            || externalURL.getText().toLowerCase().endsWith(".png")) {
+                        mainLabel.setIcon(new ImageIcon(url));
+                    } else {
+                        mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
+                    }
+                } else {
+                    mainLabel.setIcon(createEmptyImage(Color.WHITE, initialWidth, initialHeight));
+                }
             }
         });
 
