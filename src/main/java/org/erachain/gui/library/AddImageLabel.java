@@ -167,8 +167,8 @@ public class AddImageLabel extends JPanel {
 
             File file = new File(chooser.getSelectedFile().getPath());
             new ImageCropDialog(file, baseWidth, baseHeight,
-                    file.getName().endsWith("jpg") || file.getName().endsWith("jpeg") ?
-                            TypeOfImage.JPEG : TypeOfImage.GIF,
+                    file.getName().toLowerCase().endsWith("gif") || file.getName().toLowerCase().endsWith("png") ?
+                            TypeOfImage.GIF : TypeOfImage.JPEG,
                     originalSize) {
                 @Override
                 public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage, boolean useOriginal) {
@@ -185,8 +185,10 @@ public class AddImageLabel extends JPanel {
                             url = null;
                         }
 
-                        if (chooser.getSelectedFile().getPath().toLowerCase().endsWith(".gif")) {
+                        if (chooser.getSelectedFile().getPath().toLowerCase().endsWith(".gif")
+                                || chooser.getSelectedFile().getPath().toLowerCase().endsWith(".png")) {
                             mainLabel.setIcon(new ImageIcon(url));
+                            ///mainLabel.setPreferredSize(new Dimension(100, 100));
                         } else {
                             mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
                         }
