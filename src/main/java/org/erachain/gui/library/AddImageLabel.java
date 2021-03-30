@@ -91,16 +91,6 @@ public class AddImageLabel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 URL url;
-                /*
-                JDialog dialog = new JDialog(MainFrame.getInstance(), Lang.T("asasddas"));
-                dialog.setAlwaysOnTop(true);
-                dialog.add(new JLabel(Lang.T("Wait") + "..."));
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-
-
-                 */
 
                 imgBytes = null;
                 labelSize.setText("");

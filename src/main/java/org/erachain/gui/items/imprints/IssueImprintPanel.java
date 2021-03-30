@@ -120,10 +120,8 @@ public class IssueImprintPanel extends IssueItemPanel {
     protected String makeTransactionView() {
 
         String text = "<HTML><body>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Imprint") + "<br><br><br>";
-        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.T("Hash") + ":&nbsp;" + name_total + "<br>";
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Imprint") + "<br><br><br>"
+                + makeHeadView("Hash");
         text += Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
 
         return text;

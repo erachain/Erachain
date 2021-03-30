@@ -197,6 +197,25 @@ public abstract class IssueItemPanel extends IconPanel {
 
     protected abstract String makeTransactionView();
 
+    protected String makeHeadView(String nameLabel) {
+        ItemCls item = transaction.getItem();
+        String im = "";
+        if (item.hasIconURL())
+            im += "icon: " + ItemCls.viewMediaType(item.getIconType()) + ":" + item.getIconURL();
+        if (item.hasImageURL()) {
+            im += (im.isEmpty() ? "" : ", ") + "image: " + ItemCls.viewMediaType(item.getImageType()) + ":" + item.getImageURL();
+        }
+
+        if (!im.isEmpty())
+            im += "<br>";
+
+        return Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
+                + "[" + item.getKey() + "]" + Lang.T(nameLabel) + ":&nbsp;" + item.viewName() + "<br>"
+                + im;
+
+    }
+
     protected PrivateKeyAccount creator;
     protected ExLink exLink = null;
     protected int feePow;

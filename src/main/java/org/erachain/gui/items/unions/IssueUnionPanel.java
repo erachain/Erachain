@@ -90,10 +90,8 @@ public class IssueUnionPanel extends IssueItemPanel {
     protected String makeTransactionView() {
 
         String text = "<HTML><body>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Union") + "<br><br><br>";
-        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.T("Name") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Union") + "<br><br><br>"
+                + makeHeadView("Union");
         text += Lang.T("Description") + ":<br>" + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
         text += Lang.T("Date") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getBirthday() + "<br>";
         text += Lang.T("Parent") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getParent() + "<br>";
