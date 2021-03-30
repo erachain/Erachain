@@ -90,21 +90,26 @@ public class AddImageLabel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
+                URL url;
                 try {
                     imgBytes = null;
                     labelSize.setText("");
 
                     String urlTxt = externalURL.getText();
-                    if (urlTxt.toLowerCase().startsWith("http") || urlTxt.toLowerCase().startsWith("file:")) {
-                        ;
-                    } else {
-                        urlTxt = "file:" + urlTxt;
+                    if (false) {
+                        if (urlTxt.toLowerCase().startsWith("http") || urlTxt.toLowerCase().startsWith("file:")) {
+                            ;
+                        } else {
+                            urlTxt = "file:" + urlTxt;
+                        }
                     }
-                    URL url = new URL(urlTxt);
-                    ImageIcon image = new ImageIcon(url);
-                    mainLabel.setIcon(image);
+                    url = new URL(urlTxt);
                 } catch (MalformedURLException e) {
+                    reset();
+                    return;
                 }
+                ImageIcon image = new ImageIcon(url);
+                mainLabel.setIcon(image);
             }
         });
 
