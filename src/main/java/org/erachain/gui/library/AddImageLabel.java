@@ -104,8 +104,27 @@ public class AddImageLabel extends JPanel {
 
                     return;
                 }
-                ImageIcon image = new ImageIcon(url);
-                mainLabel.setIcon(image);
+                ImageIcon imageIcon = new ImageIcon(url);
+                BufferedImage bufferedImage = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+                bufferedImage.getGraphics().drawImage(imageIcon.getImage(), 0, 0, null);
+                //ImageIO.write(imageIcon, "gif", imageStream);
+
+                int bufferedWidth = bufferedImage.getWidth();
+                int preferredWidth = mainLabel.getPreferredSize().width;
+                preferredWidth = 250;
+
+                // под размеры поля подгоним чтобы поле не обрезало каритнку
+                if (bufferedWidth > preferredWidth) {
+                    float scaleView = (float) preferredWidth / bufferedWidth;
+                    Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
+                            (int) (scaleView * bufferedImage.getHeight()),
+                            Image.SCALE_AREA_AVERAGING);
+                    imageIcon = new ImageIcon(imagePack);
+                } else {
+                    imageIcon = new ImageIcon(bufferedImage);
+                }
+                mainLabel.setIcon(imageIcon);
+                mainLabel.setSize(new Dimension(initialWidth, initialHeight));
             }
         });
 
