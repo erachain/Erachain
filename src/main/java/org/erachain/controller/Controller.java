@@ -3629,17 +3629,17 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction r_Hashes(PrivateKeyAccount sender, int feePow, String url, String data,
+    public Transaction r_Hashes(PrivateKeyAccount sender, ExLink exLink, int feePow, String url, String data,
                                 String hashes) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Hashes(sender, feePow, url, data, hashes);
+            return this.transactionCreator.r_Hashes(sender, exLink, feePow, url, data, hashes);
         }
     }
 
-    public Transaction r_Hashes(PrivateKeyAccount sender, int feePow, String url, String data,
+    public Transaction r_Hashes(PrivateKeyAccount sender, ExLink exLink, int feePow, String url, String data,
                                 String[] hashes) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Hashes(sender, feePow, url, data, hashes);
+            return this.transactionCreator.r_Hashes(sender, exLink, feePow, url, data, hashes);
         }
     }
 

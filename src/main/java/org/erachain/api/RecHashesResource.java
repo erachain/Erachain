@@ -16,14 +16,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
 
+@Deprecated
 @Path("rec_hashes")
 @Produces(MediaType.APPLICATION_JSON)
 public class RecHashesResource {
 
 
-    private static final Logger LOGGER = LoggerFactory            .getLogger(RecHashesResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RecHashesResource.class);
 
     @Context
     HttpServletRequest request;
@@ -92,17 +92,10 @@ public class RecHashesResource {
 			}
 			*/
 
-            String beginStr = hashesStr.substring(0, 100);
-            List<String> twins;
-            String[] hashes;
-            if (beginStr.contains("-")) {
-                hashes = hashesStr.split("-");
-            } else {
-                hashes = hashesStr.split(" ");
-            }
+            String[] hashes = hashesStr.split("[-, ]");
 
             Transaction transaction = Controller.getInstance()
-                    .r_Hashes(maker, feePow,
+                    .r_Hashes(maker, null, feePow,
                             url, message, hashes);
 
             int validate = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, false, false);

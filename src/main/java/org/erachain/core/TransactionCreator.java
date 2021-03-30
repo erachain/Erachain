@@ -726,7 +726,7 @@ public class TransactionCreator {
         return record;
     }
 
-    public Transaction r_Hashes(PrivateKeyAccount creator, int feePow,
+    public Transaction r_Hashes(PrivateKeyAccount creator, ExLink exLink, int feePow,
                                 String urlStr, String dataStr, String[] hashes58) {
 
         this.checkUpdate();
@@ -744,24 +744,23 @@ public class TransactionCreator {
         }
 
         //CREATE MESSAGE TRANSACTION
-        transaction = new RHashes(creator, (byte) feePow, url, data, hashes, timestamp, 0l);
+        transaction = new RHashes(creator, exLink, (byte) feePow, url, data, hashes, timestamp, 0L);
         transaction.sign(creator, Transaction.FOR_NETWORK);
         transaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
         return transaction;
     }
 
-    public Transaction r_Hashes(PrivateKeyAccount creator, int feePow,
+    public Transaction r_Hashes(PrivateKeyAccount creator, ExLink exLink, int feePow,
                                 String urlStr, String dataStr, String hashesStr) {
 
         String[] hashes58;
         if (hashesStr.length() > 0) {
-            //hashes58 = hashesStr.split(" -");
-            hashes58 = hashesStr.split(" ");
+            hashes58 = hashesStr.split("[-, ]");
         } else {
             hashes58 = new String[0];
         }
-        return r_Hashes(creator, feePow,
+        return r_Hashes(creator, exLink, feePow,
                 urlStr, dataStr, hashes58);
     }
 

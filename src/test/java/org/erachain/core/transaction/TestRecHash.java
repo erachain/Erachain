@@ -4,6 +4,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.HashesSignsMap;
@@ -25,6 +26,7 @@ public class TestRecHash {
 
     Long releaserReference = null;
 
+    ExLink exLink = null;
     boolean asPack = false;
     long FEE_KEY = AssetCls.FEE_KEY;
     long VOTE_KEY = AssetCls.ERA_KEY;
@@ -72,14 +74,14 @@ public class TestRecHash {
 
         init();
 
-        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0]);
+        hashesRecord = new RHashes(maker, exLink, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0]);
         hashesRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE PLATE TRANSACTION IS VALID
         assertEquals(true, hashesRecord.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0], new byte[64]);
+        hashesRecord = new RHashes(maker, exLink, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE PLATE IS INVALID
         assertEquals(false, hashesRecord.isSignatureValid(db));
@@ -92,7 +94,7 @@ public class TestRecHash {
         init();
 
 
-        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0]);
+        hashesRecord = new RHashes(maker, exLink, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0]);
         hashesRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -149,7 +151,7 @@ public class TestRecHash {
         byte[] hash0 = maker.getPublicKey();
         hashes[0] = hash0;
 
-        hashesRecord = new RHashes(maker, FEE_POWER, null, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0]);
+        hashesRecord = new RHashes(maker, exLink, FEE_POWER, null, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0]);
         hashesRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
         assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(Transaction.FOR_NETWORK, flags));

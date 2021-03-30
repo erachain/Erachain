@@ -51,9 +51,9 @@ public class RHashes extends Transaction {
     protected byte[] data;
     protected byte[][] hashes;
 
-    public RHashes(byte[] typeBytes, PublicKeyAccount creator, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
+    public RHashes(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
 
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, exLink, feePow, timestamp, reference);
 
         this.url = url;
         this.data = data;
@@ -61,14 +61,14 @@ public class RHashes extends Transaction {
 
     }
 
-    public RHashes(byte[] typeBytes, PublicKeyAccount creator, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, url, data, hashes, timestamp, reference);
+    public RHashes(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference, byte[] signature) {
+        this(typeBytes, creator, exLink, feePow, url, data, hashes, timestamp, reference);
         this.signature = signature;
     }
 
-    public RHashes(byte[] typeBytes, PublicKeyAccount creator, byte feePow, byte[] url, byte[] data, byte[][] hashes,
+    public RHashes(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes,
                    long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, feePow, url, data, hashes, timestamp, reference);
+        this(typeBytes, creator, exLink, feePow, url, data, hashes, timestamp, reference);
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -77,19 +77,19 @@ public class RHashes extends Transaction {
 
     // asPack
     public RHashes(byte[] typeBytes, PublicKeyAccount creator, byte[] url, byte[] data, byte[][] hashes, Long reference, byte[] signature) {
-        this(typeBytes, creator, (byte) 0, url, data, hashes, 0l, reference);
+        this(typeBytes, creator, null, (byte) 0, url, data, hashes, 0L, reference);
         this.signature = signature;
         // not need this.calcFee();
     }
 
-    public RHashes(PublicKeyAccount creator, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, url, data, hashes, timestamp, reference, signature);
+    public RHashes(PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, feePow, url, data, hashes, timestamp, reference, signature);
         // set props
         this.setTypeBytes();
     }
 
-    public RHashes(PublicKeyAccount creator, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, url, data, hashes, timestamp, reference);
+    public RHashes(PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, feePow, url, data, hashes, timestamp, reference);
         // set props
         this.setTypeBytes();
     }
@@ -217,7 +217,7 @@ public class RHashes extends Transaction {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RHashes(typeBytes, creator, feePow, url, arbitraryData, hashes, timestamp, reference,
+            return new RHashes(typeBytes, creator, exLink, feePow, url, arbitraryData, hashes, timestamp, reference,
                     signatureBytes, seqNo, feeLong);
         } else {
             return new RHashes(typeBytes, creator, url, arbitraryData, hashes, reference, signatureBytes);

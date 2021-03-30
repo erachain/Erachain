@@ -56,6 +56,12 @@ public class ApiClient {
                             "See templates API",
                     },
                     {
+                            "GET r_linkedhashes",
+                            "See linked hashes API",
+                    },
+
+
+                    {
                             "GET core",
                             "Returns info of the application.",
                             "JSON"
