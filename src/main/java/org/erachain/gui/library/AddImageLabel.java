@@ -38,7 +38,7 @@ public class AddImageLabel extends JPanel {
     private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
     public JTextField externalURL = new JTextField();
-    public JComboBox externalURLType = new JComboBox(new String[]{"image", "video", "post"});
+    public JComboBox externalURLType = new JComboBox(new String[]{Lang.T("Image"), Lang.T("Video")});
 
     private boolean editable = true;
 
@@ -58,9 +58,9 @@ public class AddImageLabel extends JPanel {
         panelCenter.setLayout(new BorderLayout());
         add(panelCenter, BorderLayout.CENTER);
 
-        panelCenter.add(new JLabel(Lang.T("Use external URL") + ":"), BorderLayout.NORTH);
+        panelCenter.add(new JLabel(Lang.T("Use URL") + ":"), BorderLayout.NORTH);
         panelCenter.add(externalURLType, BorderLayout.EAST);
-        externalURL.setToolTipText(Lang.T("Use external source by URL. It not safe by blockchain. For local example: 'images/icons/coin.png'"));
+        externalURL.setToolTipText(Lang.T("AddImageLabel.externalURL.tip"));
         panelCenter.add(externalURL, BorderLayout.CENTER);
         JButton externalURLCheck = new JButton(Lang.T("Check URL"));
         panelCenter.add(externalURLCheck, BorderLayout.SOUTH);
@@ -91,21 +91,27 @@ public class AddImageLabel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 URL url;
-                try {
-                    imgBytes = null;
-                    labelSize.setText("");
+                /*
+                JDialog dialog = new JDialog(MainFrame.getInstance(), Lang.T("asasddas"));
+                dialog.setAlwaysOnTop(true);
+                dialog.add(new JLabel(Lang.T("Wait") + "..."));
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
 
-                    String urlTxt = externalURL.getText();
-                    if (false) {
-                        if (urlTxt.toLowerCase().startsWith("http") || urlTxt.toLowerCase().startsWith("file:")) {
-                            ;
-                        } else {
-                            urlTxt = "file:" + urlTxt;
-                        }
-                    }
+
+                 */
+
+                imgBytes = null;
+                labelSize.setText("");
+
+                String urlTxt = externalURL.getText();
+                try {
                     url = new URL(urlTxt);
                 } catch (MalformedURLException e) {
                     reset();
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid URL") + "!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+
                     return;
                 }
                 ImageIcon image = new ImageIcon(url);

@@ -11,7 +11,7 @@ function itemHead(item, forPrint) {
     }
 
     if (source) {
-        if (true || item.imageTypeName == 'video') {
+        if (item.imageTypeName == 'video') {
             output += '<td><video autoplay playsinline loop controls width="350"><source src="' + source + '"></video>';
 
         } else {

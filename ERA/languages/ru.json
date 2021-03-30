@@ -399,6 +399,7 @@
   "Check unique": "Проверить уникальность",
   "Check to pay": "Проверка оплаты",
   "Check person and insert": "Проверить персону и вставить",
+  "Check URL": "Проверить ссылку",
   "Claim": "Требование",
   "Class": "Класс",
   "Claim or Right or Obligation": "Запрос или права или облигации",
@@ -1669,6 +1670,7 @@
   "use DEX": "Использовать биржу",
   "Use original Source (with animation)": "Использовать исходный файл GIF (с анимацией)",
   "Use SSL": "использовать SSL",
+  "Use URL": "Использовать URL",
   "Used template": "Используемый шаблон",
   "Accrual by creator account too": "Учитывать счет создателя так же",
   "user denied api call": "пользователь закрыл api запрос",
@@ -2002,6 +2004,7 @@
   "Invalid data length": "Неверный размер данных",
   "Invalid data": "Неверные данные",
   "Invalid URL length": "Неверная длина URL",
+  "Invalid URL": "Ошибочная ссылка",
   "Invalid parameters length": "Неверная длина параметров",
   "Invalid signature": "Неверная подпись",
   "Transaction does not exist": "Транзакция не существует",
@@ -2069,14 +2072,12 @@
   "Invalid block height": "Неверная высота блока",
   "Invalid block record sequence": "Неверная последовательность записей блока",
   "Key collision, try again": "Коллизия ключей, попробуйте еще раз",
-
   "Person issue has been copy to buffer": "Персона скопирована в буфер",
   "Enter Person": "Ввод персоны",
-  "Public Key was Certified": "Открытый ключ подвержден",
-
+  "Public Key was Certified": "Открытый ключ подтвержден",
   "You changed local peer discovery. You need to restart the wallet for the changes to take effect.": "Вы изменили опцию поиска пиров в локальной сети. Вы должны перезапустить кошелек, чтобы изменения вступили в силу.",
-
   "<b>ERA</b> is an <u>Accounting Unit</u> allowing a User, that has a sufficient amount of such units and with such sufficiency threshold preset in the ERACHAIN Software, to use the ERACHAIN Software for making his Request Entries to the Log, including provision of such service to other Users, receiving it for the COMPU Accounting Units and producing new COMPU Accounting Units as per the ERACHAIN Software rules and operating procedure available on the Erachain.org website. For more information see Erachain Licence Agreement on the <a href=\"http://erachain.org\">Erachain.org</a>.": "<b>ERA</b> - это <u>Учетная единица</u>, дающая право Пользователю, обладающему достаточным количеством этих единиц, порог достаточности которого задан в Программном обеспечении ERACHAIN использовать Программное обеспечение ERACHAIN для внесения своих Записей-заявок в Журнал, в том числе оказывать эту услугу для других Пользователей, получая за это от них Учетные единицы COMPU и производя новые Учетные единицы COMPU в соответствии с правилами и порядком работы Программного обеспечения ERACHAIN, доступными на веб-сайте Erachain.org. Для большей информации смотрите Лицензионное Соглашение Эрачейн на сайте <a href=\"http://erachain.org\">Erachain.org</a>",
   "<b>COMPU</b> is an <u>Accounting Unit</u> allowing a User that has a sufficient amount of such units, with such sufficiency threshold computed in the ERACHAIN Software, to use the ERACHAIN Software for entering that User’s Request Entries on the Log, both on his own and by having such service provided by other Users. The COMPU Accounting Unit operates on the Log as a unit used to pay for the provision of service of making an entry to the Log. For more information see Erachain Licence Agreementon the <a href=\"http://erachain.org\">Erachain.org</a>.": "<b>COMPU</b> - это <u>Учетная единица</u>, дающая право Пользователю, обладающему достаточным количеством этих единиц, порог достаточности которого вычисляется в Программном обеспечении ERACHAIN, использовать Программное обеспечение ERACHAIN для внесения Записей-заявок Пользователя в Журнал как самостоятельно, так и путем получения такой услуги от других Пользователей. Учетная единица COMPU действует в Журнале как единица оплаты за оказание услуги внесения записи в Журнал. Для большей информации смотрите Лицензионное Соглашение Эрачейн на сайте <a href=\"http://erachain.org\">Erachain.org</a>",
+  "AddImageLabel.externalURL.tip": "Задать ссылку на источник. Пример ссылки на блокчейн '/apiasset/image/{key}. Внешний источник не защищён блокчейном",
   "": ""
 }
