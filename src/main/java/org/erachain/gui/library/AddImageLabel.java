@@ -93,15 +93,14 @@ public class AddImageLabel extends JPanel {
                 URL url;
 
                 imgBytes = null;
-                labelSize.setText("");
+                labelSize.setText(Lang.T("Source by URL") + " - 0kB");
+                reset();
 
                 String urlTxt = externalURL.getText();
                 try {
                     url = new URL(urlTxt);
                 } catch (MalformedURLException e) {
-                    reset();
                     JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid URL") + "!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-
                     return;
                 }
 
@@ -111,15 +110,21 @@ public class AddImageLabel extends JPanel {
                     externalURLType.setSelectedIndex(0);
                 }
 
-                if (externalURLType.getSelectedIndex() == 0) {
-                    if (externalURL.getText().toLowerCase().endsWith(".gif")
-                            || externalURL.getText().toLowerCase().endsWith(".png")) {
-                        mainLabel.setIcon(new ImageIcon(url));
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("URL is valid") + ". "
+                        + Lang.T("Please set valid media type"), Lang.T("Message"), JOptionPane.INFORMATION_MESSAGE);
+
+                if (false) {
+                    // иногда ссылка не читается даже у JPG
+                    if (externalURLType.getSelectedIndex() == 0) {
+                        if (externalURL.getText().toLowerCase().endsWith(".gif")
+                                || externalURL.getText().toLowerCase().endsWith(".png")) {
+                            mainLabel.setIcon(new ImageIcon(url));
+                        } else {
+                            mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
+                        }
                     } else {
-                        mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
+                        mainLabel.setIcon(createEmptyImage(Color.WHITE, initialWidth, initialHeight));
                     }
-                } else {
-                    mainLabel.setIcon(createEmptyImage(Color.WHITE, initialWidth, initialHeight));
                 }
             }
         });
