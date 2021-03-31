@@ -724,7 +724,19 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRaw_1(raw, lang).toJSONString())
+                .entity(broadcastFromRawString(raw, false, lang).toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("broadcast64/{raw}")
+    public Response broadcastRaw64(@PathParam("raw") String raw, @QueryParam("lang") String lang) {
+
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, true, lang).toJSONString())
                 .build();
     }
 
@@ -739,7 +751,23 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRaw_1(raw, lang).toJSONString())
+                .entity(broadcastFromRawString(raw, false, lang).toJSONString())
+                .build();
+
+    }
+
+    @POST
+    @Path("broadcastjson64")
+    public Response broadcastFromRaw64JsonPost(@Context HttpServletRequest request,
+                                               MultivaluedMap<String, String> form) {
+
+        String raw = form.getFirst("raw");
+        String lang = form.getFirst("lang");
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, true, lang).toJSONString())
                 .build();
 
     }
@@ -753,20 +781,30 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRaw_1(raw, lang).toJSONString())
+                .entity(broadcastFromRawString(raw, false, lang).toJSONString())
+                .build();
+
+    }
+
+    @POST
+    @Path("broadcast64")
+    public Response broadcastFromRaw64Post(@Context HttpServletRequest request,
+                                           @QueryParam("lang") String lang,
+                                           String raw) {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, true, lang).toJSONString())
                 .build();
 
     }
 
     // http://127.0.0.1:9047/api/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-    public JSONObject broadcastFromRaw_1(String rawDataBase58, String lang) {
+    public JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
         int step = 1;
         JSONObject out = new JSONObject();
         try {
-            //	JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-            //	String rawDataBase58 = (String) jsonObject.get("raw");
-            byte[] transactionBytes = Base58.decode(rawDataBase58);
-
 
             step++;
             Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
@@ -792,17 +830,31 @@ public class API {
         }
     }
 
-    public JSONObject broadcastTelegram_1(String rawDataBase58) {
+    public JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
         JSONObject out = new JSONObject();
         byte[] transactionBytes;
-        Transaction transaction;
-
         try {
-            transactionBytes = Base58.decode(rawDataBase58);
+            if (base64) {
+                transactionBytes = Base64.getDecoder().decode(rawDataStr);
+            } else {
+                transactionBytes = Base58.decode(rawDataStr);
+            }
         } catch (Exception e) {
-            Transaction.updateMapByErrorSimple(-1, e.toString() + " INVALID_RAW_DATA", out);
+            Transaction.updateMapByErrorSimple(-1, "JSON error", out);
             return out;
         }
+
+        if (transactionBytes == null) {
+            Transaction.updateMapByErrorSimple(-1, "JSON error", out);
+            return out;
+        }
+
+        return broadcastFromRawByte(transactionBytes, String lang);
+    }
+
+    public JSONObject broadcastTelegramBytes(byte[] transactionBytes) {
+        JSONObject out = new JSONObject();
+        Transaction transaction;
 
         try {
             transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
@@ -827,6 +879,28 @@ public class API {
         return out;
     }
 
+    public JSONObject broadcastTelegramStr(String rawDataBase58, boolean base64, String lang) {
+        JSONObject out = new JSONObject();
+        byte[] transactionBytes;
+        try {
+            if (base64) {
+                transactionBytes = Base64.getDecoder().decode(rawDataStr);
+            } else {
+                transactionBytes = Base58.decode(rawDataStr);
+            }
+        } catch (Exception e) {
+            Transaction.updateMapByErrorSimple(-1, "JSON error", out);
+            return out;
+        }
+
+        if (transactionBytes == null) {
+            Transaction.updateMapByErrorSimple(-1, "JSON error", out);
+            return out;
+        }
+
+        return broadcastTelegramBytes(transactionBytes, String lang);
+    }
+
     @GET
     //@Path("broadcasttelegram/{raw}")
     @Path("broadcasttelegram/{raw}")
@@ -837,7 +911,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastTelegram_1(raw).toJSONString())
+                .entity(broadcastTelegramStr(raw, false).toJSONString())
                 .build();
     }
 
@@ -851,7 +925,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastTelegram_1(raw).toJSONString())
+                .entity(broadcastTelegramStr(raw, false).toJSONString())
                 .build();
 
     }
@@ -864,7 +938,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastTelegram_1(raw).toJSONString())
+                .entity(broadcastTelegramStr(raw, false).toJSONString())
                 .build();
 
     }
