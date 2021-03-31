@@ -104,10 +104,16 @@ public class AddImageLabel extends JPanel {
                     return;
                 }
 
-                if (externalURL.getText().toLowerCase().endsWith(".mp4")) {
+                if (urlTxt.toLowerCase().endsWith(".mp4")) {
                     externalURLType.setSelectedIndex(1);
-                } else {
+                } else if (urlTxt.toLowerCase().endsWith(".gif")
+                        || urlTxt.toLowerCase().endsWith(".png")
+                        || urlTxt.toLowerCase().endsWith(".jpg")) {
                     externalURLType.setSelectedIndex(0);
+                } else {
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid type") + "! "
+                            + Lang.T("Need # нужно") + ": .jpg, .gif, .png, .mp4", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
 
                 JOptionPane.showMessageDialog(new JFrame(), Lang.T("URL is valid") + ". "
