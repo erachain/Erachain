@@ -151,11 +151,16 @@ public class API {
         help.put("GET benchmark info by node", " GET api/bench");
 
         help.put("GET Broadcast", "/broadcast/{raw(Base58)}?lang=en|ru - lang for localize error message");
+        help.put("GET Broadcast", "/broadcast64/{raw(Base64)}?lang=en|ru - lang for localize error message");
         help.put("POST Broadcast", "/broadcast?lang=en|ru raw(Base58) - lang for localize error message");
-        help.put("POST Broadcastjson", "/broadcastjson JSON - JSON: {raw:raw(Base58), lang:en|ru} - lang for localize error message");
+        help.put("POST Broadcast", "/broadcast64?lang=en|ru raw(Base64) - lang for localize error message");
+        help.put("POST Broadcastjson", "/broadcastjson?lang=en|ru JSON - JSON: {raw:raw(Base58), lang:en|ru} - lang for localize error message");
+        help.put("POST Broadcastjson", "/broadcastjson64?lang=en|ru JSON - JSON: {raw:raw(Base64), lang:en|ru} - lang for localize error message");
 
-        help.put("POST Broadcasttelegram", "/broadcasttelegram JSON {'raw': raw(Base58)}");
-        help.put("GET Broadcasttelegram", "/broadcasttelegram/{raw(Base58)}");
+        help.put("POST Broadcasttelegram", "/broadcasttelegram?lang=en|ru JSON {'raw': raw(Base58)}");
+        help.put("POST Broadcasttelegram64", "/broadcasttelegram64?lang=en|ru JSON {'raw': raw(Base64)}");
+        help.put("GET Broadcasttelegram", "/broadcasttelegram/{raw(Base58)}?lang=en|ru");
+        help.put("GET Broadcasttelegram64", "/broadcasttelegram64/{raw(Base64)}?lang=en|ru");
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -849,10 +854,10 @@ public class API {
             return out;
         }
 
-        return broadcastFromRawByte(transactionBytes, String lang);
+        return broadcastFromRawByte(transactionBytes, lang);
     }
 
-    public JSONObject broadcastTelegramBytes(byte[] transactionBytes) {
+    public JSONObject broadcastTelegramBytes(byte[] transactionBytes, String lang) {
         JSONObject out = new JSONObject();
         Transaction transaction;
 
@@ -879,7 +884,7 @@ public class API {
         return out;
     }
 
-    public JSONObject broadcastTelegramStr(String rawDataBase58, boolean base64, String lang) {
+    public JSONObject broadcastTelegramStr(String rawDataStr, boolean base64, String lang) {
         JSONObject out = new JSONObject();
         byte[] transactionBytes;
         try {
@@ -898,26 +903,43 @@ public class API {
             return out;
         }
 
-        return broadcastTelegramBytes(transactionBytes, String lang);
+        return broadcastTelegramBytes(transactionBytes, lang);
     }
 
     @GET
     //@Path("broadcasttelegram/{raw}")
     @Path("broadcasttelegram/{raw}")
     // http://127.0.0.1:9047/broadcasttelegram/DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-    public Response broadcastTelegram(@PathParam("raw") String raw) {
+    public Response broadcastTelegram(@Context HttpServletRequest request,
+                                      @QueryParam("lang") String lang,
+                                      @PathParam("raw") String raw) {
 
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastTelegramStr(raw, false).toJSONString())
+                .entity(broadcastTelegramStr(raw, false, lang).toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("broadcasttelegram64/{raw}")
+    public Response broadcastTelegram64(@Context HttpServletRequest request,
+                                        @QueryParam("lang") String lang,
+                                        @PathParam("raw") String raw) {
+
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastTelegramStr(raw, true, lang).toJSONString())
                 .build();
     }
 
     @POST
     @Path("broadcasttelegramjson")
     public Response broadcastTelegramPost(@Context HttpServletRequest request,
+                                          @QueryParam("lang") String lang,
                                           MultivaluedMap<String, String> form) {
 
         String raw = form.getFirst("raw");
@@ -925,7 +947,23 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastTelegramStr(raw, false).toJSONString())
+                .entity(broadcastTelegramStr(raw, false, lang).toJSONString())
+                .build();
+
+    }
+
+    @POST
+    @Path("broadcasttelegramjson64")
+    public Response broadcastTelegram64Post(@Context HttpServletRequest request,
+                                            @QueryParam("lang") String lang,
+                                            MultivaluedMap<String, String> form) {
+
+        String raw = form.getFirst("raw");
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastTelegramStr(raw, true, lang).toJSONString())
                 .build();
 
     }
@@ -933,12 +971,28 @@ public class API {
     @POST
     @Path("broadcasttelegram")
     public Response broadcastTelegramPost(@Context HttpServletRequest request,
+                                          @QueryParam("lang") String lang,
                                           String raw) {
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastTelegramStr(raw, false).toJSONString())
+                .entity(broadcastTelegramStr(raw, false, lang).toJSONString())
+                .build();
+
+    }
+
+    @POST
+
+    @Path("broadcasttelegram64")
+    public Response broadcastTelegram64Post(@Context HttpServletRequest request,
+                                            @QueryParam("lang") String lang,
+                                            String raw) {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastTelegramStr(raw, true, lang).toJSONString())
                 .build();
 
     }
