@@ -100,8 +100,8 @@ public class API {
         help.put("*** RECORD ***", "");
         help.put("GET Record Parse from RAW", "recordparse/{RAW}");
         help.put("POST Record Parse from RAW", "recordparse RAW");
-        help.put("GET Record", "record/{signature}");
-        help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
+        //help.put("GET Record", "record/{signature}");
+        //help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
         help.put("GET Record RAW", "recordraw/{signature}");
         help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{block-seqNo]");
         help.put("GET Record RAW by Height and Sequence 2", "recordrawbynumber/{block]/[seqNo]");
@@ -116,23 +116,13 @@ public class API {
         help.put("GET Address Public Key", "addresspublickey/{address}");
         help.put("GET Address Forging Info", "addressforge/{address}");
 
-        //  deprecated help.put("*** ASSET ***", "");
-        //help.put("GET Asset Height", "assetheight");
-        //help.put("GET Asset", "asset/{key}");
-        //help.put("GET Asset Data", "assetdata/{key}");
-        //help.put("GET Asset Image", "assetimage/{key}");
-        //help.put("GET Asset Icon", "asseticon/{key}");
-
-        //  deprecated help.put("*** ASSETS ***", "");
-        // deprecated help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}?offset=0&limit=0");
-
         help.put("*** EXCHANGE ***", "");
         help.put("GET Exchange Orders", "exchangeorders/{have}/{want}");
 
         help.put("*** PERSON ***", "");
-        help.put("GET Person Height", "personheight");
+        //help.put("GET Person Height", "personheight");
         help.put("GET Person Key by PubKey of Owner", "personkeybyownerpublickey/{publickey}");
-        help.put("GET Person", "person/{key}");
+        //help.put("GET Person", "person/{key}");
         help.put("GET Person Data", "persondata/{key}");
         help.put("GET Person Key by Address", "personkeybyaddress/{address}");
         help.put("GET Person by Address", "personbyaddress/{address}");
@@ -140,10 +130,6 @@ public class API {
         help.put("GET Person by Public Key", "personbypublickey/{publickey}");
         help.put("GET Person by Public Key Base32", "personbypublickeybase32/{publickeybase32}");
         help.put("GET Accounts From Person", "getaccountsfromperson/{key}");
-        //help.put("Get Person Image", "personimage/{key}");
-
-        help.put("*** PERSONS ***", "");
-        help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}?offset=0&limit=0");
 
         help.put("*** TOOLS ***", "");
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
