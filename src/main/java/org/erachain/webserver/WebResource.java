@@ -240,7 +240,8 @@ public class WebResource {
     public Response jsonQueryMain(@Context UriInfo info) {
         Map output;
         try {
-            output = BlockExplorer.getInstance().jsonQueryMain(info);
+            output = BlockExplorer.getInstance().
+                    jsonQueryMain(info);
         } catch (WrongSearchException e) {
             logger.info(e.getMessage(), e);
             output = BlockExplorer.getInstance().getOutput();
