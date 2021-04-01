@@ -168,9 +168,22 @@ public class API {
 
     @GET
     @Path("firstblock")
-    public Response getFirstBlock() {
+    public Response getFirstBlock(@Context UriInfo info) {
 
-        JSONObject out = dcSet.getBlockMap().get(1).toJson();
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null || value.isEmpty()) {
+            onlyhead = false;
+        } else {
+            onlyhead = new Boolean(value);
+        }
+
+        JSONObject out;
+        if (onlyhead) {
+            out = dcSet.getBlocksHeadsMap().get(1).toJson();
+        } else {
+            out = dcSet.getBlockMap().get(1).toJson();
+        }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -181,10 +194,22 @@ public class API {
 
     @GET
     @Path("lastblock")
-    public Response lastBlock() {
+    public Response lastBlock(@Context UriInfo info) {
 
-        Block lastBlock = dcSet.getBlockMap().last();
-        JSONObject out = lastBlock.toJson();
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null || value.isEmpty()) {
+            onlyhead = false;
+        } else {
+            onlyhead = new Boolean(value);
+        }
+
+        JSONObject out;
+        if (onlyhead) {
+            out = dcSet.getBlocksHeadsMap().last().toJson();
+        } else {
+            out = dcSet.getBlockMap().last().toJson();
+        }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -245,10 +270,19 @@ public class API {
 
     @GET
     @Path("/childblock/{signature}")
-    public Response getChildBlock(@PathParam("signature") String signature) {
+    public Response getChildBlock(@Context UriInfo info,
+                                  @PathParam("signature") String signature) {
         //DECODE SIGNATURE
         byte[] signatureBytes;
         JSONObject out = new JSONObject();
+
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null || value.isEmpty()) {
+            onlyhead = false;
+        } else {
+            onlyhead = new Boolean(value);
+        }
 
         int step = 1;
         try {
@@ -257,7 +291,10 @@ public class API {
             ++step;
             Integer heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
             if (heightWT != null && heightWT > 0) {
-                out = dcSet.getBlockMap().getAndProcess(heightWT + 1).toJson();
+                if (onlyhead)
+                    out = dcSet.getBlocksHeadsMap().get(heightWT + 1).toJson();
+                else
+                    out = dcSet.getBlockMap().get(heightWT + 1).toJson();
             } else {
                 out.put("message", "signature not found");
             }
@@ -280,7 +317,16 @@ public class API {
 
     @GET
     @Path("block/{signature}")
-    public Response block(@PathParam("signature") String signature) {
+    public Response block(@Context UriInfo info,
+                          @PathParam("signature") String signature) {
+
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null || value.isEmpty()) {
+            onlyhead = false;
+        } else {
+            onlyhead = new Boolean(value);
+        }
 
         JSONObject out = new JSONObject();
 
@@ -290,13 +336,24 @@ public class API {
             byte[] key = Base58.decode(signature);
 
             ++step;
-            Block block = dcSet.getBlockSignsMap().getBlock(key);
-            out.put("block", block.toJson());
+            if (onlyhead) {
+                Integer height = dcSet.getBlockSignsMap().get(key);
+                Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
+                out.put("blockHead", blockHead.toJson());
 
-            ++step;
-            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
-            if (childSign != null)
-                out.put("next", Base58.encode(childSign));
+                ++step;
+                byte[] childSign = dcSet.getBlocksHeadsMap().get(blockHead.heightBlock + 1).signature;
+                if (childSign != null)
+                    out.put("next", Base58.encode(childSign));
+            } else {
+                Block block = dcSet.getBlockSignsMap().getBlock(key);
+                out.put("block", block.toJson());
+
+                ++step;
+                byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
+                if (childSign != null)
+                    out.put("next", Base58.encode(childSign));
+            }
 
         } catch (Exception e) {
 
@@ -318,7 +375,16 @@ public class API {
 
     @GET
     @Path("blockbyheight/{height}")
-    public Response blockByHeight(@PathParam("height") String heightStr) {
+    public Response blockByHeight(@Context UriInfo info,
+                                  @PathParam("height") String heightStr) {
+
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null || value.isEmpty()) {
+            onlyhead = false;
+        } else {
+            onlyhead = new Boolean(value);
+        }
 
         JSONObject out = new JSONObject();
         int step = 1;
@@ -327,13 +393,24 @@ public class API {
             int height = Integer.parseInt(heightStr);
 
             ++step;
-            Block block = cntrl.getBlockByHeight(dcSet, height);
-            out.put("block", block.toJson());
+            if (onlyhead) {
+                Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
+                out.put("blockHead", blockHead.toJson());
 
-            ++step;
-            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
-            if (childSign != null)
-                out.put("next", Base58.encode(childSign));
+                ++step;
+                byte[] childSign = dcSet.getBlocksHeadsMap().get(blockHead.heightBlock + 1).signature;
+                if (childSign != null)
+                    out.put("next", Base58.encode(childSign));
+            } else {
+
+                Block block = cntrl.getBlockByHeight(dcSet, height);
+                out.put("block", block.toJson());
+
+                ++step;
+                byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
+                if (childSign != null)
+                    out.put("next", Base58.encode(childSign));
+            }
 
         } catch (Exception e) {
 
@@ -403,8 +480,17 @@ public class API {
 
     @GET
     @Path("/blocksfromheight/{height}/{limit}")
-    public Response getBlocksFromHeight(@PathParam("height") int height,
+    public Response getBlocksFromHeight(@Context UriInfo info,
+                                        @PathParam("height") int height,
                                         @PathParam("limit") int limit) {
+
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null || value.isEmpty()) {
+            @Context UriInfo info = false;
+        } else {
+            onlyhead = new Boolean(value);
+        }
 
         if (limit > 30)
             limit = 30;
@@ -416,16 +502,30 @@ public class API {
         try {
 
             JSONArray array = new JSONArray();
-            BlockMap blockMap = dcSet.getBlockMap();
-            int max = blockMap.size();
-            for (int i = height; i < height + limit; i++) {
-                if (i > max) {
-                    out.put("end", 1);
-                    break;
+            if (onlyhead) {
+                BlocksHeadsMap blockHeadsMap = dcSet.getBlocksHeadsMap();
+                int max = blockHeadsMap.size();
+                for (int i = height; i < height + limit; i++) {
+                    if (i > max) {
+                        out.put("end", 1);
+                        break;
+                    }
+                    array.add(blockHeadsMap.get(i));
                 }
-                array.add(blockMap.getAndProcess(i));
+                out.put("blockHeads", array);
+
+            } else {
+                BlockMap blockMap = dcSet.getBlockMap();
+                int max = blockMap.size();
+                for (int i = height; i < height + limit; i++) {
+                    if (i > max) {
+                        out.put("end", 1);
+                        break;
+                    }
+                    array.add(blockMap.getAndProcess(i));
+                }
+                out.put("blocks", array);
             }
-            out.put("blocks", array);
 
         } catch (Exception e) {
 
