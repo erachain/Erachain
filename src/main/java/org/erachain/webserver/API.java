@@ -83,18 +83,18 @@ public class API {
 
         help.put("*** CHAIN ***", "");
         help.put("GET Height", "height");
-        help.put("GET First Block", "firstblock");
-        help.put("GET Last Block", "lastblock");
+        help.put("GET First Block or Block.Head", "firstblock[?onlyhead]");
+        help.put("GET Last Block", "lastblock[?onlyhead]");
         help.put("GET Last Block Head", "lastblockhead");
 
         help.put("*** BLOCK ***", "");
-        help.put("GET Block", "block/{signature}");
-        help.put("GET Block by Height", "blockbyheight/{height}");
+        help.put("GET Block", "block/{signature}[?onlyhead]");
+        help.put("GET Block by Height", "blockbyheight/{height}[?onlyhead]");
         help.put("GET Child Block Signature", "childblocksignature/{signature}");
-        help.put("GET Child Block", "childblock/{signature}");
+        help.put("GET Child Block", "childblock/{signature}[?onlyhead]");
 
         help.put("*** BLOCKS ***", "");
-        help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}");
+        help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}[?onlyhead]");
         help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");
 
         help.put("*** RECORD ***", "");
@@ -182,7 +182,7 @@ public class API {
         if (onlyhead) {
             out = dcSet.getBlocksHeadsMap().get(1).toJson();
         } else {
-            out = dcSet.getBlockMap().get(1).toJson();
+            out = dcSet.getBlockMap().getAndProcess(1).toJson();
         }
 
         return Response.status(200)
