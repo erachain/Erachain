@@ -172,10 +172,10 @@ public class API {
 
         boolean onlyhead;
         String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null || value.isEmpty()) {
+        if (value == null) {
             onlyhead = false;
         } else {
-            onlyhead = new Boolean(value);
+            onlyhead = value.isEmpty() || new Boolean(value);
         }
 
         JSONObject out;
@@ -198,10 +198,10 @@ public class API {
 
         boolean onlyhead;
         String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null || value.isEmpty()) {
+        if (value == null) {
             onlyhead = false;
         } else {
-            onlyhead = new Boolean(value);
+            onlyhead = value.isEmpty() || new Boolean(value);
         }
 
         JSONObject out;
@@ -278,10 +278,10 @@ public class API {
 
         boolean onlyhead;
         String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null || value.isEmpty()) {
+        if (value == null) {
             onlyhead = false;
         } else {
-            onlyhead = new Boolean(value);
+            onlyhead = value.isEmpty() || new Boolean(value);
         }
 
         int step = 1;
@@ -322,10 +322,10 @@ public class API {
 
         boolean onlyhead;
         String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null || value.isEmpty()) {
+        if (value == null) {
             onlyhead = false;
         } else {
-            onlyhead = new Boolean(value);
+            onlyhead = value.isEmpty() || new Boolean(value);
         }
 
         JSONObject out = new JSONObject();
@@ -380,10 +380,10 @@ public class API {
 
         boolean onlyhead;
         String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null || value.isEmpty()) {
+        if (value == null) {
             onlyhead = false;
         } else {
-            onlyhead = new Boolean(value);
+            onlyhead = value.isEmpty() || new Boolean(value);
         }
 
         JSONObject out = new JSONObject();
@@ -486,10 +486,10 @@ public class API {
 
         boolean onlyhead;
         String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null || value.isEmpty()) {
+        if (value == null) {
             onlyhead = false;
         } else {
-            onlyhead = new Boolean(value);
+            onlyhead = value.isEmpty() || new Boolean(value);
         }
 
         if (limit > 30)
@@ -510,7 +510,7 @@ public class API {
                         out.put("end", 1);
                         break;
                     }
-                    array.add(blockHeadsMap.get(i));
+                    array.add(blockHeadsMap.get(i).toJson());
                 }
                 out.put("blockHeads", array);
 
@@ -522,7 +522,7 @@ public class API {
                         out.put("end", 1);
                         break;
                     }
-                    array.add(blockMap.getAndProcess(i));
+                    array.add(blockMap.getAndProcess(i).toJson());
                 }
                 out.put("blocks", array);
             }
