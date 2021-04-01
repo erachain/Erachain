@@ -487,7 +487,7 @@ public class API {
         boolean onlyhead;
         String value = info.getQueryParameters().getFirst("onlyhead");
         if (value == null || value.isEmpty()) {
-            @Context UriInfo info = false;
+            onlyhead = false;
         } else {
             onlyhead = new Boolean(value);
         }
