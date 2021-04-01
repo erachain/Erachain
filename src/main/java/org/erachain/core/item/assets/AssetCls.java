@@ -2288,24 +2288,35 @@ public abstract class AssetCls extends ItemCls {
 
         PublicKeyAccount haveAssetMaker = assetHave.getMaker();
         PublicKeyAccount inviter;
-        if (assetHave.getAssetType() == AS_NON_FUNGIBLE
-                && !receiver.equals(haveAssetMaker)) {
+        if (assetHave.getAssetType() == AS_NON_FUNGIBLE) {
             // значит приход + это тот актив который мы можем поделить
-            // и это не сам автор продает
-            assetMakerRoyalty = tradeAmount.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
-            forgerFee = tradeAmount.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
+            if (receiver.equals(haveAssetMaker)) {
+                assetMakerRoyalty = BigDecimal.ZERO;
+            } else {
+                // это не сам автор продает
+                assetMakerRoyalty = tradeAmount.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+            }
 
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
             if (issuerPersonDuration != null) {
                 inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
-                if (inviter == null)
+                if (inviter == null) {
                     inviterRoyalty = BigDecimal.ZERO;
-                else
-                    inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+                } else {
+                    if (receiver.equals(haveAssetMaker)) {
+                        // сам автор продает - 1/100
+                        inviterRoyalty = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
+                    } else {
+                        inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+                    }
+                }
             } else {
                 inviter = null;
                 inviterRoyalty = BigDecimal.ZERO;
             }
+
+            // всегда 1% форжеру
+            forgerFee = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
 
         } else if (assetWant.getKey() < 100 && !isInitiator) {
             // это системные активы - берем комиссию за них
