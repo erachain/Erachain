@@ -137,11 +137,11 @@ public class API {
         help.put("GET benchmark info by node", " GET api/bench");
 
         help.put("GET Broadcast", "/broadcast/{raw(Base58)}?lang=en|ru - lang for localize error message");
-        help.put("GET Broadcast", "/broadcast64/{raw(Base64)}?lang=en|ru - lang for localize error message");
+        help.put("GET Broadcast64", "/broadcast64/{raw(Base64)}?lang=en|ru - lang for localize error message");
         help.put("POST Broadcast", "/broadcast?lang=en|ru raw(Base58) - lang for localize error message");
-        help.put("POST Broadcast", "/broadcast64?lang=en|ru raw(Base64) - lang for localize error message");
+        help.put("POST Broadcast64", "/broadcast64?lang=en|ru raw(Base64) - lang for localize error message");
         help.put("POST Broadcastjson", "/broadcastjson?lang=en|ru JSON - JSON: {raw:raw(Base58), lang:en|ru} - lang for localize error message");
-        help.put("POST Broadcastjson", "/broadcastjson64?lang=en|ru JSON - JSON: {raw:raw(Base64), lang:en|ru} - lang for localize error message");
+        help.put("POST Broadcastjson64", "/broadcastjson64?lang=en|ru JSON - JSON: {raw:raw(Base64), lang:en|ru} - lang for localize error message");
 
         help.put("POST Broadcasttelegram", "/broadcasttelegram?lang=en|ru JSON {'raw': raw(Base58)}");
         help.put("POST Broadcasttelegram64", "/broadcasttelegram64?lang=en|ru JSON {'raw': raw(Base64)}");
