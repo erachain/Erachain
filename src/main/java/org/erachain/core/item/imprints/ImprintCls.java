@@ -20,13 +20,13 @@ public abstract class ImprintCls extends ItemCls {
     protected static final int IMPRINT = 1;
     protected static final int CUTTED_REFERENCE_LENGTH = 20;
 
-    public ImprintCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, owner, name, icon, image, description);
+    public ImprintCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, appData, maker, name, icon, image, description);
 
     }
 
-    public ImprintCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
+    public ImprintCls(int type, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        this(new byte[TYPE_LENGTH], appData, maker, name, icon, image, description);
         this.typeBytes[0] = (byte) type;
     }
 

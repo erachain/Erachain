@@ -11,6 +11,8 @@ import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 
 public class RatesSettingPanel extends javax.swing.JPanel {
@@ -59,17 +61,27 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         //gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
         add(jLabelTitle, gridBagConstraints);
 
+        useDEX.setSelected(Settings.getInstance().getCompuRateUseDEX());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 10);
+        add(useDEX, gridBagConstraints);
+
         //jLabelCOMPU.setHorizontalAlignment(SwingConstants.RIGHT);
         jLabelCOMPU.setText(Lang.T("Rate") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 10);
         add(jLabelCOMPU, gridBagConstraints);
 
         jTextFieldRate.setText(Settings.getInstance().getCompuRate());
+        jTextFieldRate.setEnabled(!useDEX.isSelected());
         jTextFieldRate.setToolTipText(Lang.T("Must be numbers"));
         jTextFieldRate.setPreferredSize(new java.awt.Dimension(100, 30));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -142,23 +154,36 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         cbxFavoritesPair.setPreferredSize(new java.awt.Dimension(200, 30));
         this.add(cbxFavoritesPair, gridBagConstraints);
 
+        useDEX.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jTextFieldRate.setEnabled(!useDEX.isSelected());
+            }
+        });
 
     }// </editor-fold>                        
 
-    public BigDecimal getRate(){
+    public boolean getUseDEX() {
+        return useDEX.isSelected();
+    }
+
+    public BigDecimal getRate() {
         return new BigDecimal(jTextFieldRate.getText());
     }
-    public AssetCls getRateAsset(){
-        return (AssetCls)cbxFavoritesRate.getSelectedItem();
+
+    public AssetCls getRateAsset() {
+        return (AssetCls) cbxFavoritesRate.getSelectedItem();
     }
-    public AssetCls getDefaultPairAsset(){
-        return (AssetCls)cbxFavoritesPair.getSelectedItem();
+
+    public AssetCls getDefaultPairAsset() {
+        return (AssetCls) cbxFavoritesPair.getSelectedItem();
     }
 
     // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabelTitle;
     private javax.swing.JLabel jLabelCOMPU;
     private javax.swing.JLabel jLabelAsset;
+    private JCheckBox useDEX = new JCheckBox(Lang.T("use DEX"));
     public JComboBox<ItemCls> cbxFavoritesRate;
     private MTextFieldOnlyBigDecimal jTextFieldRate;
 

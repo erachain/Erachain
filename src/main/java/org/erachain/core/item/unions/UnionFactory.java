@@ -16,7 +16,7 @@ public class UnionFactory {
         return instance;
     }
 
-    public UnionCls parse(byte[] data, boolean includeReference) throws Exception {
+    public UnionCls parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
         //READ TYPE
         int type = data[0];
 
@@ -24,7 +24,7 @@ public class UnionFactory {
             case UnionCls.UNION:
 
                 //PARSE SIMPLE PLATE
-                return Union.parse(data, includeReference);
+                return Union.parse(forDeal, data, includeReference);
 
         }
 

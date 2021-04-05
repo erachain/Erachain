@@ -24,8 +24,6 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
         super(search_Table_Model1, gui_Name, search_Label_Text);
         this.search_Table_Model = search_Table_Model1;
 
-        this.toolBarLeftPanel.add(buttonGetLasts, gridBagConstraints);
-
         // CHECKBOX FOR FAVORITE
         TableColumn favorite_Column = jTableJScrollPanelLeftPanel.getColumnModel()
                 .getColumn(search_Table_Model.COLUMN_FAVORITE);
@@ -55,6 +53,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
         searchToolBar_LeftPanel.add(key_Item, gridBagConstraints);
 
+        ////toolBarLeftPanel.add(buttonGetLasts, gridBagConstraints);
         searchToolBar_LeftPanel.add(buttonGetLasts);
         buttonGetLasts.addActionListener(new ActionListener() {
             @Override

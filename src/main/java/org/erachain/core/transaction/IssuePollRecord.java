@@ -125,7 +125,7 @@ public class IssuePollRecord extends IssueItemRecord {
 
         //READ POLL
         // poll parse without reference - if is = signature
-        PollCls poll = PollFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        PollCls poll = PollFactory.getInstance().parse(forDeal, Arrays.copyOfRange(data, position, data.length), false);
         position += poll.getDataLength(false);
 
         if (forDeal == FOR_DB_RECORD) {

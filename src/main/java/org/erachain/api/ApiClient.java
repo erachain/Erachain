@@ -56,6 +56,12 @@ public class ApiClient {
                             "See templates API",
                     },
                     {
+                            "GET r_linkedhashes",
+                            "See linked hashes API",
+                    },
+
+
+                    {
                             "GET core",
                             "Returns info of the application.",
                             "JSON"
@@ -545,7 +551,7 @@ public class ApiClient {
                             "Errors: 1 - Json error. 2 - Not enough balance. 102 - Invalid address. 105 - Invalid fee. 108 - Invalid name length. 109 - Invalid value length. 201 - Wallet does not exist. 203 - Wallet is locked. 402 - Name already exists. 404 - Name must be lower case."
                     },
                     {
-                            "POST names/<name> {\"newvalue\":\"<newvalue>\", \"newowner\":\"<newownerAddress>\", \"fee\":\"<fee>\"}",
+                            "POST names/<name> {\"newvalue\":\"<newvalue>\", \"newmaker\":\"<newownerAddress>\", \"fee\":\"<fee>\"}",
                             "Updates an existing name. Returns the transaction in JSON when successful.",
                             "Errors: 1 - Json error. 2 - Not enough balance. 102 - Invalid address. 105 - Invalid fee. 108 - Invalid name length. 109 - Invalid value length. 201 - Wallet does not exist. 203 - Wallet is locked. 401 - Name does not exist. 403 - Name already for sale."
                     },

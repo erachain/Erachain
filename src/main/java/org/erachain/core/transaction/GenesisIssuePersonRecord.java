@@ -40,7 +40,7 @@ public class GenesisIssuePersonRecord extends GenesisIssueItemRecord {
 
         //READ PERSON
         // read without reference
-        PersonCls person = PersonFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        PersonCls person = PersonFactory.getInstance().parse(Transaction.FOR_NETWORK, Arrays.copyOfRange(data, position, data.length), false);
 
         return new GenesisIssuePersonRecord(person);
 

@@ -36,6 +36,8 @@ public class TestRecAsset {
 
     ExLink exLink = null;
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     int[] TESTED_DBS = new int[]{
             IDB.DBS_MAP_DB,
             IDB.DBS_ROCK_DB};
@@ -52,7 +54,9 @@ public class TestRecAsset {
     byte prop2 = 0;
     byte prop1_backward = org.erachain.core.transaction.TransactionAmount.BACKWARD_MASK;
 
-    long flags = 0l;
+    byte[] itemAppData = null;
+    long txFlags = 0L;
+
     Controller cntrl;
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("tes213sdffsdft".getBytes());
@@ -97,15 +101,15 @@ public class TestRecAsset {
 
         maker_1.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
 
-        asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", 1, 8, 50000l);
+        asset = new AssetVenture(itemAppData, maker, "aasdasd", icon, image, "asdasda", 1, 8, 50000l);
         // set SCALABLE assets ++
-        asset.setReference(Crypto.getInstance().digest(asset.toBytes(false, false)), dbRef);
+        asset.setReference(Crypto.getInstance().digest(asset.toBytes(forDeal, false, false)), dbRef);
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(db, 0l);
         key = asset.getKey(db);
 
-        assetMovable = new AssetVenture(maker, "movable", icon, image, "...", 0, 8, 500l);
-        assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)), dbRef);
+        assetMovable = new AssetVenture(itemAppData, maker, "movable", icon, image, "...", 0, 8, 500l);
+        assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(forDeal, false, false)), dbRef);
 
     }
 
@@ -130,7 +134,7 @@ public class TestRecAsset {
 
 
                 //CREATE ASSET
-                AssetVenture asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, scalse_asset, 10000l);
+                AssetVenture asset = new AssetVenture(itemAppData, maker, "test", icon, image, "strontje", 0, scalse_asset, 10000l);
 
                 //CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, 0l);
@@ -190,7 +194,7 @@ public class TestRecAsset {
                 init(dbs);
 
                 //CREATE ASSET
-                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
+                AssetUnique asset = new AssetUnique(itemAppData, maker, "test", icon, image, "strontje", 0);
 
                 //CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, 0l);
@@ -220,21 +224,21 @@ public class TestRecAsset {
                 init(dbs);
 
                 //CREATE SIGNATURE
-                AssetUnique assetUni = new AssetUnique(maker, "test", icon, image, "strontje", 0);
+                AssetUnique assetUni = new AssetUnique(itemAppData, maker, "test", icon, image, "strontje", 0);
                 LOGGER.info("asset: " + assetUni.getTypeBytes()[0] + ", " + assetUni.getTypeBytes()[1]);
-                byte[] rawUni = assetUni.toBytes(false, false);
+                byte[] rawUni = assetUni.toBytes(forDeal, false, false);
                 assertEquals(rawUni.length, assetUni.getDataLength(false));
                 assetUni.setReference(new byte[64], dbRef);
-                rawUni = assetUni.toBytes(true, false);
+                rawUni = assetUni.toBytes(forDeal, true, false);
                 assertEquals(rawUni.length, assetUni.getDataLength(true));
 
                 //CREATE SIGNATURE
-                AssetVenture asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 8, 1000l);
+                AssetVenture asset = new AssetVenture(itemAppData, maker, "test", icon, image, "strontje", 0, 8, 1000l);
                 LOGGER.info("asset: " + asset.getTypeBytes()[0] + ", " + asset.getTypeBytes()[1]);
-                byte[] raw = asset.toBytes(false, false);
+                byte[] raw = asset.toBytes(forDeal, false, false);
                 assertEquals(raw.length, asset.getDataLength(false));
                 asset.setReference(new byte[64], dbRef);
-                raw = asset.toBytes(true, false);
+                raw = asset.toBytes(forDeal, true, false);
                 assertEquals(raw.length, asset.getDataLength(true));
 
                 //CREATE ISSUE ASSET TRANSACTION
@@ -317,13 +321,13 @@ public class TestRecAsset {
 
                 init(dbs);
 
-                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
+                AssetUnique asset = new AssetUnique(itemAppData, maker, "test", icon, image, "strontje", 0);
 
                 //CREATE ISSUE ASSET TRANSACTION
                 IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
                 issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
                 issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-                assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
 
@@ -337,7 +341,7 @@ public class TestRecAsset {
                 assertEquals(true, db.getItemAssetMap().contains(key));
 
                 //CHECK ASSET IS CORRECT
-                assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
+                assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(forDeal, true, false), asset.toBytes(forDeal, true, false)));
 
                 //CHECK ASSET BALANCE SENDER
                 assertEquals(true, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.compareTo(new BigDecimal(asset.getQuantity())) == 0);
@@ -360,7 +364,7 @@ public class TestRecAsset {
 
                 init(dbs);
 
-                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
+                AssetUnique asset = new AssetUnique(itemAppData, maker, "test", icon, image, "strontje", 0);
 
                 //CREATE ISSUE ASSET TRANSACTION
                 IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -401,7 +405,7 @@ public class TestRecAsset {
 
                 init(dbs);
 
-                AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0);
+                AssetUnique asset = new AssetUnique(itemAppData, maker, "test", icon, image, "strontje", 0);
 
                 //CREATE ISSUE ASSET TRANSACTION
                 IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -448,7 +452,8 @@ public class TestRecAsset {
                 IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
                 issueAssetTransaction.setDC(db, true);
                 issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
-                assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags | Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT));
+                assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK,
+                        txFlags | Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT));
 
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
                 long key = asset.getKey(db);
@@ -463,7 +468,7 @@ public class TestRecAsset {
                 assetTransfer.sign(maker, Transaction.FOR_NETWORK);
 
                 //CHECK IF ASSET TRANSFER IS VALID
-                assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 assetTransfer.process(gb, Transaction.FOR_NETWORK);
 
@@ -474,7 +479,7 @@ public class TestRecAsset {
                 assetTransfer.sign(maker, Transaction.FOR_NETWORK);
 
                 //CHECK IF ASSET TRANSFER IS VALID
-                assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 //CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
                 assetTransfer = new RSend(maker, FEE_POWER, recipient, 0, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0]);
@@ -482,7 +487,7 @@ public class TestRecAsset {
                 assetTransfer.sign(maker, Transaction.FOR_NETWORK);
 
                 //CHECK IF ASSET TRANSFER IS INVALID
-                assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, flags));
+                assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, txFlags));
 
             } finally {
                 db.close();
@@ -587,7 +592,7 @@ public class TestRecAsset {
                 Transaction assetTransfer = new RSend(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0]);
                 assetTransfer.sign(maker, Transaction.FOR_NETWORK);
                 assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-                assetTransfer.isValid(Transaction.FOR_NETWORK, flags);
+                assetTransfer.isValid(Transaction.FOR_NETWORK, txFlags);
                 assetTransfer.process(gb, Transaction.FOR_NETWORK);
 
                 //CHECK BALANCE SENDER
@@ -708,7 +713,7 @@ public class TestRecAsset {
 
                 //CREATE ISSUE ASSET TRANSACTION
                 IssueAssetTransaction issueMessageTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp++, maker.getLastTimestamp(db)[0]);
-                assertEquals(Transaction.VALIDATE_OK, issueMessageTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.VALIDATE_OK, issueMessageTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 issueMessageTransaction.sign(maker, Transaction.FOR_NETWORK);
                 issueMessageTransaction.process(gb, Transaction.FOR_NETWORK);
@@ -726,7 +731,7 @@ public class TestRecAsset {
                         timestamp++, maker.getLastTimestamp(db)[0]);
 
                 //CHECK IF ASSET TRANSFER IS VALID
-                assertEquals(Transaction.VALIDATE_OK, messageTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.VALIDATE_OK, messageTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 messageTransaction.sign(maker, Transaction.FOR_NETWORK);
                 messageTransaction.process(gb, Transaction.FOR_NETWORK);
@@ -739,7 +744,7 @@ public class TestRecAsset {
                         timestamp++, maker.getLastTimestamp(db)[0]);
 
                 //CHECK IF ASSET TRANSFER IS VALID
-                assertEquals(Transaction.VALIDATE_OK, messageTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.VALIDATE_OK, messageTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 //CREATE INVALID ASSET TRANSFER INVALID RECIPIENT ADDRESS
                 messageTransaction = new RSend(maker, exLink, FEE_POWER, new Account("test"), key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
@@ -747,7 +752,7 @@ public class TestRecAsset {
                         timestamp++, maker.getLastTimestamp(db)[0]);
 
                 //CHECK IF ASSET TRANSFER IS INVALID
-                assertEquals(Transaction.INVALID_ADDRESS, messageTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.INVALID_ADDRESS, messageTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 //CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
                 messageTransaction = new RSend(maker, exLink, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
@@ -755,7 +760,7 @@ public class TestRecAsset {
                         timestamp++, maker.getLastTimestamp(db)[0]);
 
                 //CHECK IF ASSET TRANSFER IS INVALID
-                assertEquals(Transaction.NOT_MOVABLE_ASSET, messageTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.NOT_MOVABLE_ASSET, messageTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 //CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
                 messageTransaction = new RSend(maker, exLink, FEE_POWER, recipient, 99, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
@@ -763,7 +768,7 @@ public class TestRecAsset {
                         timestamp++, maker.getLastTimestamp(db)[0]);
 
                 //CHECK IF ASSET TRANSFER IS INVALID
-                assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, messageTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, messageTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 //CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
                 messageTransaction = new RSend(maker, exLink, FEE_POWER, recipient, key - 1, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
@@ -771,7 +776,7 @@ public class TestRecAsset {
                         timestamp++, maker.getLastTimestamp(db)[0]);
 
                 //CHECK IF ASSET TRANSFER IS INVALID
-                assertEquals(Transaction.NO_BALANCE, messageTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.NO_BALANCE, messageTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 //CREATE INVALID ASSET TRANSFER WRONG REFERENCE
                 messageTransaction = new RSend(maker, exLink, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
@@ -779,12 +784,12 @@ public class TestRecAsset {
                         timestamp++, -123L);
 
                 //CHECK IF ASSET TRANSFER IS INVALID
-                assertEquals(Transaction.INVALID_REFERENCE, messageTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.INVALID_REFERENCE, messageTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 // NOT DIVISIBLE
-                asset = new AssetVenture(maker, "not divisible", icon, image, "asdasda", 0, 8, 0l);
+                asset = new AssetVenture(itemAppData, maker, "not divisible", icon, image, "asdasda", 0, 8, 0l);
                 IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp++, maker.getLastTimestamp(db)[0]);
-                assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
                 issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
                 Long key_1 = issueAssetTransaction.getAssetKey(db);
@@ -797,7 +802,7 @@ public class TestRecAsset {
                         amo,
                         "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
                         timestamp++, maker.getLastTimestamp(db)[0]);
-                assertEquals(Transaction.VALIDATE_OK, messageTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.VALIDATE_OK, messageTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
                 messageTransaction.process(gb, Transaction.FOR_NETWORK);
 
                 //CHECK IF UNLIMITED ASSET TRANSFERED with no balance
@@ -809,7 +814,7 @@ public class TestRecAsset {
                         amo,
                         "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
                         timestamp++, maker_1.getLastTimestamp(db)[0]);
-                assertEquals(Transaction.NO_BALANCE, messageTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                assertEquals(Transaction.NO_BALANCE, messageTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 //CHECK IF UNLIMITED ASSET TRANSFERED with no balance
                 assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker_1.getBalanceUSE(key_1, db));

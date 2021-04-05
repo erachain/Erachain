@@ -357,10 +357,10 @@ public class APIUtils {
             // PARSE FEE POWER
             int feePow;
             try {
-                feePow = (int) (long) jsonObject.get("feepow");
+                feePow = (int) (long) jsonObject.getOrDefault("feepow", jsonObject.get("feePow"));
             } catch (Exception e0) {
                 try {
-                    String feePowStr = (String) jsonObject.get("feepow");
+                    String feePowStr = (String) jsonObject.getOrDefault("feepow", jsonObject.get("feePow"));
                     feePow = Integer.parseInt(feePowStr);
                 } catch (Exception e) {
                     throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);

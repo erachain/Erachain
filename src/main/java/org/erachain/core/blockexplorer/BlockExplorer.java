@@ -114,11 +114,10 @@ public class BlockExplorer {
      *
      * @param type
      * @param start
-     * @param output
      * @param langObj
      * @param expArgs
      */
-    public void makeLinerIntPage(Class type, Integer start, Map output, JSONObject langObj, Object[] expArgs) {
+    public void makeLinerIntPage(Class type, Integer start, JSONObject langObj, Object[] expArgs) {
 
         DBTab map = dcSet.getMap(type);
         ExplorerJsonLine element;
@@ -152,11 +151,10 @@ public class BlockExplorer {
      * @param type
      * @param start   LONG
      * @param offset
-     * @param output
      * @param langObj
      * @param expArgs
      */
-    public void makeIteratorPage(Class type, Number start, int offset, Map output, JSONObject langObj, Object[] expArgs) {
+    public void makeIteratorPage(Class type, Number start, int offset, JSONObject langObj, Object[] expArgs) {
 
         Pageable map = (Pageable) dcSet.getMap(type);
 
@@ -204,27 +202,24 @@ public class BlockExplorer {
      * @param expArgs
      * @return
      */
-    public Map jsonQueryLinearIntPages(Class type, Integer start, Object[] expArgs) {
-        Map result = new LinkedHashMap();
-        AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
-        makeLinerIntPage(type, start, result, langObj, expArgs);
-        return result;
+    public void jsonQueryLinearIntPages(Class type, Integer start, Object[] expArgs) {
+        AdderHeadInfo.addHeadInfoCap(type, output, dcSet, langObj);
+        makeLinerIntPage(type, start, langObj, expArgs);
     }
 
-    public Map jsonQueryIteratorPages(Class type, Number start, int offset, Object[] expArgs) {
-        Map result = new LinkedHashMap();
-        AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
-        makeIteratorPage(type, start, offset, result, langObj, expArgs);
-        return result;
+    public void jsonQueryIteratorPages(Class type, Number start, int offset, Object[] expArgs) {
+        AdderHeadInfo.addHeadInfoCap(type, output, dcSet, langObj);
+        makeIteratorPage(type, start, offset, langObj, expArgs);
     }
 
     public void jsonQuerySearchPages(UriInfo info, Class type, String search, int offset, Object[] expArgs) throws WrongSearchException, Exception {
+        AdderHeadInfo.addHeadInfoCap(type, output, dcSet, langObj);
+
         //Результирующий сортированный в порядке добавления словарь(map)
-        LinkedHashMap result = new LinkedHashMap();
+        //LinkedHashMap result = new LinkedHashMap();
         List<Object> items = new ArrayList();
         //Добавить шапку в JSON. Для интернационализации названий - происходит перевод соответствующих элементов.
         //В зависимости от выбранного языка(ru,en)
-        AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
 
         DBTab map = dcSet.getMap(type);
 
@@ -239,9 +234,9 @@ public class BlockExplorer {
                 }
                 if (map.contains(key)) {
                     //Элемент найден - добавляем его
-                    items.add(key);
+                    items.add(map.get(key));
                     //Не отображать для одного элемента навигацию и пагинацию
-                    result.put("notDisplayPages", "true");
+                    output.put("notDisplayPages", "true");
                 }
             } else {
                 //Поиск элементов по имени
@@ -383,7 +378,7 @@ public class BlockExplorer {
         // persons list
         else if (info.getQueryParameters().containsKey("persons")) {
             output.put("type", "persons");
-            output.putAll(jsonQueryIteratorPages(PersonCls.class, start, offset, null));
+            jsonQueryIteratorPages(PersonCls.class, start, offset, null);
         }
         // person
         else if (info.getQueryParameters().containsKey("person")) {
@@ -444,7 +439,7 @@ public class BlockExplorer {
             // polls list
         } else if (info.getQueryParameters().containsKey("polls")) {
             output.put("type", "polls");
-            output.putAll(jsonQueryIteratorPages(PollCls.class, start, offset, null));
+            jsonQueryIteratorPages(PollCls.class, start, offset, null);
         } else if (info.getQueryParameters().containsKey("poll")) {
             jsonQueryItemPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
                     info.getQueryParameters().getFirst("asset"));
@@ -459,7 +454,7 @@ public class BlockExplorer {
             Object[] expArgs = new Object[2];
             expArgs[0] = Controller.getInstance().getAsset(ASSET_QUOTE_KEY);
             expArgs[1] = Controller.getInstance().dlSet.getPairMap();
-            output.putAll(jsonQueryIteratorPages(AssetCls.class, start, offset, expArgs));
+            jsonQueryIteratorPages(AssetCls.class, start, offset, expArgs);
 
         } else if (info.getQueryParameters().containsKey("asset")) {
             if (info.getQueryParameters().get("asset").size() == 1) {
@@ -498,8 +493,8 @@ public class BlockExplorer {
             ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
             output.put("type", "blocks");
-            output.putAll(jsonQueryLinearIntPages(Block.BlockHead.class,
-                    checkAndGetLongParam(info, 0L, "start").intValue(), null));
+            jsonQueryLinearIntPages(Block.BlockHead.class,
+                    checkAndGetLongParam(info, 0L, "start").intValue(), null);
         } else if (info.getQueryParameters().containsKey("block")) {
             jsonQueryBlock(info.getQueryParameters().getFirst("block"), offset);
         }
@@ -534,7 +529,7 @@ public class BlockExplorer {
         // templates list
         else if (info.getQueryParameters().containsKey("templates")) {
             output.put("type", "templates");
-            output.putAll(jsonQueryIteratorPages(TemplateCls.class, start, offset, null));
+            jsonQueryIteratorPages(TemplateCls.class, start, offset, null);
         }
         // template
         else if (info.getQueryParameters().containsKey("template")) {
@@ -545,7 +540,7 @@ public class BlockExplorer {
         // statuses list
         else if (info.getQueryParameters().containsKey("statuses")) {
             output.put("type", "statuses");
-            output.putAll(jsonQueryIteratorPages(StatusCls.class, start, offset, null));
+            jsonQueryIteratorPages(StatusCls.class, start, offset, null);
         }
         // status
         else if (info.getQueryParameters().containsKey("status")) {
@@ -1678,10 +1673,10 @@ public class BlockExplorer {
 
             Map balance = new LinkedHashMap();
             balance.put("address", top100.a);
-            balance.put("OWN", top100.b.toPlainString());
-            balance.put("DEBT", top100.c.toPlainString());
-            balance.put("HOLD", top100.d.toPlainString());
-            balance.put("SPEND", top100.e.toPlainString());
+            balance.put("OWN", top100.b.setScale(asset.getScale()).toPlainString());
+            balance.put("DEBT", top100.c.setScale(asset.getScale()).toPlainString());
+            balance.put("HOLD", top100.d.setScale(asset.getScale()).toPlainString());
+            balance.put("SPEND", top100.e.setScale(asset.getScale()).toPlainString());
 
             Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
@@ -1823,17 +1818,18 @@ public class BlockExplorer {
                     bal.put("asset_key", assetKey);
                     bal.put("asset_name", asset.viewName());
 
-
                     if (BlockChain.ERA_COMPU_ALL_UP && side == Account.BALANCE_SIDE_LEFT) {
                         bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)
-                                .add(account.addDEVAmount(assetKey)));
+                                .add(account.addDEVAmount(assetKey))
+                                .setScale(asset.getScale()).toPlainString());
                     } else {
-                        bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side));
+                        bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)
+                                .setScale(asset.getScale()).toPlainString());
                     }
 
-                    bal.put("balance_2", Account.balanceInPositionAndSide(itemBals, 2, side));
-                    bal.put("balance_3", Account.balanceInPositionAndSide(itemBals, 3, side));
-                    bal.put("balance_4", Account.balanceInPositionAndSide(itemBals, 4, side));
+                    bal.put("balance_2", Account.balanceInPositionAndSide(itemBals, 2, side).setScale(asset.getScale()).toPlainString());
+                    bal.put("balance_3", Account.balanceInPositionAndSide(itemBals, 3, side).setScale(asset.getScale()).toPlainString());
+                    bal.put("balance_4", Account.balanceInPositionAndSide(itemBals, 4, side).setScale(asset.getScale()).toPlainString());
                     balAssets.put("" + assetKey, bal);
                 }
             }

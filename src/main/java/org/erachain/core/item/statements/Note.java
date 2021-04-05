@@ -12,12 +12,12 @@ public class Note extends StatementCls {
 
     private static final int TYPE_ID = NOTE;
 
-    public Note(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
-        super(TYPE_ID, maker, name, icon, image, description);
+    public Note(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(TYPE_ID, appData, maker, name, icon, image, description);
     }
 
-    public Note(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, maker, name, icon, image, description);
+    public Note(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, appData, maker, name, icon, image, description);
     }
 
     //GETTERS/SETTERS
@@ -67,12 +67,31 @@ public class Note extends StatementCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
+            // RESET LEN
+            imageLength &= ~APP_DATA_MASK;
+
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
-            throw new Exception("Invalid image length");
+            throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        byte[] appData;
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + APP_DATA_LENGTH));
+            position += APP_DATA_LENGTH;
+
+            appData = Arrays.copyOfRange(data, position, position + appDataLen);
+            position += appDataLen;
+
+        } else {
+            appData = null;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
@@ -101,7 +120,7 @@ public class Note extends StatementCls {
         }
 
         //RETURN
-        Note status = new Note(typeBytes, maker, name, icon, image, description);
+        Note status = new Note(typeBytes, appData, maker, name, icon, image, description);
         if (includeReference) {
             status.setReference(reference, dbRef);
         }

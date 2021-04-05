@@ -38,7 +38,7 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
 
         //READ ASSET
         // read without reference
-        AssetCls asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        AssetCls asset = AssetFactory.getInstance().parse(Transaction.FOR_NETWORK, Arrays.copyOfRange(data, position, data.length), false);
         //position += asset.getDataLength(false);
 
         return new GenesisIssueAssetTransaction(asset);
@@ -79,14 +79,14 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
         AssetCls asset = (AssetCls) item;
         long quantity = asset.getQuantity();
         if (quantity > 0L) {
-            Account owner = item.getMaker();
+            Account maker = item.getMaker();
             Long assetKey = item.getKey(dcSet);
             // надо добавить баланс на счет
-            owner.changeBalance(dcSet, false, false, assetKey,
+            maker.changeBalance(dcSet, false, false, assetKey,
                     new BigDecimal(quantity).setScale(0), false, false, false);
 
             // make HOLD balance
-            owner.changeBalance(dcSet, false, true, assetKey,
+            maker.changeBalance(dcSet, false, true, assetKey,
                     new BigDecimal(-quantity).setScale(0), false, false, false);
         }
     }

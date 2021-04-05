@@ -100,7 +100,7 @@ public class ItemPersonsResource {
         }
 
         ItemCls item = Controller.getInstance().getPerson(asLong);
-        byte[] issueBytes = item.toBytes(false, false);
+        byte[] issueBytes = item.toBytes(Transaction.FOR_NETWORK, false, false);
         return Base58.encode(issueBytes);
     }
 
@@ -193,7 +193,7 @@ public class ItemPersonsResource {
                 creator, password, "issue Person");
         PersonCls item;
         try {
-            item = PersonFactory.getInstance().parse(resultRaw.b, false);
+            item = PersonFactory.getInstance().parse(Transaction.FOR_NETWORK, resultRaw.b, false);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     e.getMessage());

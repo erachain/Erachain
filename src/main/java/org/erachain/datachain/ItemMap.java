@@ -38,7 +38,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     protected Atomic.Long atomicKey;
     protected long key;
 
-    protected BTreeMap ownerKeyMap;
+    protected BTreeMap makerKeyMap;
 
     private static final int NAME_INDEX = 1;
 
@@ -119,12 +119,12 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         }
 
         //PAIR KEY
-        this.ownerKeyMap = database.createTreeMap(TAB_NAME + "_owner_item_key")
+        this.makerKeyMap = database.createTreeMap(TAB_NAME + "_owner_item_key")
                 //.comparator(Fun.TUPLE3_COMPARATOR)
                 .makeOrGet();
 
         //BIND OWNER KEY
-        Bind.secondaryKey((BTreeMap) map, this.ownerKeyMap, new Fun.Function2<String, Long, ItemCls>() {
+        Bind.secondaryKey((BTreeMap) map, this.makerKeyMap, new Fun.Function2<String, Long, ItemCls>() {
             @Override
             public String run(Long key, ItemCls value) {
                 return value.getMaker().getAddress();
@@ -508,8 +508,8 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         return ((BTreeMap) map).subMap(fromKey, toKey).values();
     }
 
-    public NavigableMap<Long, ItemCls> getOwnerItems(String ownerPublicKey) {
-        return this.ownerKeyMap.subMap(ownerPublicKey, ownerPublicKey);
+    public NavigableMap<Long, ItemCls> getOwnerItems(String makerPublicKey) {
+        return this.makerKeyMap.subMap(makerPublicKey, makerPublicKey);
     }
 
     @Override

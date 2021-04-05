@@ -30,6 +30,8 @@ public class TestRecUnion {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecUnion.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     //int releaserReference = null;
 
     BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
@@ -42,7 +44,9 @@ public class TestRecUnion {
     byte[] unionReference = new byte[64];
     long timestamp = NTP.getTime();
 
-    long flags = 0l;
+    byte[] itemAppData = null;
+    long txFlags = 0L;
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -95,7 +99,7 @@ public class TestRecUnion {
         //dbPS = db.getUnionStatusMap();
 
         // GET RIGHTS TO CERTIFIER
-        unionGeneral = new Union(certifier, "СССР", timestamp - 12345678,
+        unionGeneral = new Union(itemAppData, certifier, "СССР", timestamp - 12345678,
                 parent, icon, image, "Союз Совестких Социалистических Республик");
         //GenesisIssueUnionRecord genesis_issue_union = new GenesisIssueUnionRecord(unionGeneral, registrar);
         //genesis_issue_union.process(db, false);
@@ -106,7 +110,7 @@ public class TestRecUnion {
         certifier.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false, false);
         certifier.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
-        union = new Union(certifier, "РСФСР", timestamp - 1234567,
+        union = new Union(itemAppData, certifier, "РСФСР", timestamp - 1234567,
                 parent + 1, icon, image, "Россия");
 
 
@@ -126,7 +130,7 @@ public class TestRecUnion {
     public void initUnionalize() {
 
 
-        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
@@ -167,22 +171,22 @@ public class TestRecUnion {
         issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE UNION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CREATE INVALID ISSUE UNION - INVALID UNIONALIZE
         issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db)[0], new byte[64]);
-        assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
         // ADD FEE
         userAccount1.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
-        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CHECK IF ISSUE UNION IS VALID
         userAccount1.changeBalance(db, false, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false, false, false);
-        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CHECK
         userAccount1.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false, false);
-        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
     }
 
@@ -196,18 +200,18 @@ public class TestRecUnion {
 
         // PARSE UNION
 
-        byte[] rawUnion = union.toBytes(false, false);
+        byte[] rawUnion = union.toBytes(forDeal, false, false);
         assertEquals(rawUnion.length, union.getDataLength(false));
         union.setReference(new byte[64], dbRef);
-        rawUnion = union.toBytes(true, false);
+        rawUnion = union.toBytes(forDeal, true, false);
         assertEquals(rawUnion.length, union.getDataLength(true));
 
-        rawUnion = union.toBytes(false, false);
+        rawUnion = union.toBytes(forDeal, false, false);
         UnionCls parsedUnion = null;
         try {
             //PARSE FROM BYTES
             parsedUnion = (UnionCls) ItemFactory.getInstance()
-                    .parse(ItemCls.UNION_TYPE, rawUnion, false);
+                    .parse(forDeal, ItemCls.UNION_TYPE, rawUnion, false);
         } catch (Exception e) {
             fail("Exception while parsing transaction.  : " + e);
         }
@@ -290,7 +294,7 @@ public class TestRecUnion {
 
         init();
         issueUnionTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
@@ -308,7 +312,7 @@ public class TestRecUnion {
         assertEquals(true, db.getItemUnionMap().contains(key));
 
         //CHECK UNION IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemUnionMap().get(key).toBytes(true, false), union.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(db.getItemUnionMap().get(key).toBytes(forDeal, true, false), union.toBytes(forDeal, true, false)));
 
         //CHECK REFERENCE SENDER
         assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastTimestamp(db));

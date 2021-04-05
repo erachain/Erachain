@@ -267,7 +267,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
         //READ ASSET
         // asset parse without reference - if is = signature
-        AssetCls asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        AssetCls asset = AssetFactory.getInstance().parse(forDeal, Arrays.copyOfRange(data, position, data.length), false);
         position += asset.getDataLength(false);
 
         if (forDeal == FOR_DB_RECORD) {

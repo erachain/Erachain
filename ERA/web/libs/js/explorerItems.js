@@ -3,10 +3,23 @@ function itemHead(item, forPrint) {
     var output = '';
     var type = item.item_type;
 
+    var source;
     if (item.image) {
-        output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
-        output += '<td><a href="#" onclick="showWindowImage(\'data:image/gif;base64,' + item.image + '\')" ><img src="data:image/gif;base64,' + item.image + '" width = "350" /></a></td><td style ="width: 70%; padding-left:20px">';
-        output += '<br>';
+        source = 'data:image/gif;base64,' + item.image;
+    } else if (item.imageURL) {
+        source = item.imageURL;
+    }
+
+    if (source) {
+        if (item.imageTypeName == 'video') {
+            output += '<td><video autoplay playsinline loop controls width="350"><source src="' + source + '"></video>';
+
+        } else {
+            output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
+            output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
+        }
+
+        output += '</td><td style ="width: 70%; padding-left:20px"><br>';
     }
 
 
@@ -15,8 +28,7 @@ function itemHead(item, forPrint) {
     if (!forPrint)
         output += '<a href="?' + type + '=' + item.key + get_lang() + '">';
 
-    if (item.icon)
-        output += ' <img src="data:image/gif;base64,' + item.icon + '" style="width:50px;" /> ';
+    output += makeMediaIcon(item, '', 'width:50px');
 
     output += item.name;
 
@@ -84,7 +96,6 @@ function itemHead(item, forPrint) {
     if (!forPrint) {
         output += ' &nbsp&nbsp<a href=../api'+ type + '/raw/' + item.key + ' class="button ll-blue-bgc"><b>' + item.Label_RAW + '</b></a>';
         output += ' &nbsp&nbsp<a href=?'+ type + '=' + item.key + get_lang() + '&print class="button ll-blue-bgc"><b>' + item.Label_Print + '</b></a></h4>';
-        output += ' &nbsp&nbsp<a href=../api'+ type + '/text/' + item.key + ' class="button ll-blue-bgc"><b>' + item.Label_SourceText + '</b></a></h4>';
     }
 
     return output;
@@ -95,8 +106,11 @@ function itemFoot(item, forPrint) {
     var type = item.item_type;
 
     var output = '';
-    if (item.description)
-        output += '<h3>' + item.Label_Description + '</h3><br>' + fformat(item.description);
+    if (item.description) {
+        output += '<h3>' + item.Label_Description;
+        output += ' &nbsp&nbsp<a href=../api'+ type + '/text/' + item.key + ' class="tiny button ll-blue-bgc" style="font-size:0.7em"><b>' + item.Label_SourceText + '</b></a>';
+        output += '</h3><br>' + fformat(item.description);
+    }
 
     if (item.hasOwnProperty('vouches')) {
         output += '<hr>' + item.vouches;

@@ -15,25 +15,25 @@ public class Template extends TemplateCls {
 
     private static final int TYPE_ID = PLATE;
 
-    public Template(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(TYPE_ID, owner, name, icon, image, description);
+    public Template(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(TYPE_ID, appData, maker, name, icon, image, description);
     }
 
-    public Template(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
-        super(typeBytes, owner, name, icon, image, description);
+    public Template(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        super(typeBytes, appData, maker, name, icon, image, description);
     }
 
     //PARSE
     // includeReference - TRUE only for store in local DB
-    public static Template parse(byte[] data, boolean includeReference) throws Exception {
+    public static Template parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
 
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
         position += MAKER_LENGTH;
 
         //READ NAME
@@ -68,12 +68,31 @@ public class Template extends TemplateCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
+            // RESET LEN
+            imageLength &= ~APP_DATA_MASK;
+
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
-            throw new Exception("Invalid image length");
+            throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        byte[] appData;
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + APP_DATA_LENGTH));
+            position += APP_DATA_LENGTH;
+
+            appData = Arrays.copyOfRange(data, position, position + appDataLen);
+            position += appDataLen;
+
+        } else {
+            appData = null;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
@@ -102,7 +121,7 @@ public class Template extends TemplateCls {
         }
 
         //RETURN
-        Template template = new Template(typeBytes, owner, name, icon, image, description);
+        Template template = new Template(typeBytes, appData, maker, name, icon, image, description);
         if (includeReference) {
             template.setReference(reference, dbRef);
         }

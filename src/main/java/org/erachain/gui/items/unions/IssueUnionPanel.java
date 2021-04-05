@@ -82,18 +82,16 @@ public class IssueUnionPanel extends IssueItemPanel {
     protected void makeTransaction() {
 
         transaction = (IssueUnionRecord) Controller.getInstance().issueUnion(
-                creator, exLink, this.textName.getText(), birthday, parent, textAreaDescription.getText(),
-                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
+                itemAppData, creator, exLink, this.textName.getText(), birthday, parent, textAreaDescription.getText(),
+                addIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
                 feePow);
     }
 
     protected String makeTransactionView() {
 
         String text = "<HTML><body>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Union") + "<br><br><br>";
-        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.T("Name") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Union") + "<br><br><br>"
+                + makeHeadView("Union");
         text += Lang.T("Description") + ":<br>" + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
         text += Lang.T("Date") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getBirthday() + "<br>";
         text += Lang.T("Parent") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getParent() + "<br>";

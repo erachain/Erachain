@@ -16,7 +16,7 @@ public class TemplateFactory {
         return instance;
     }
 
-    public TemplateCls parse(byte[] data, boolean includeReference) throws Exception {
+    public TemplateCls parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
         //READ TYPE
         int type = data[0];
 
@@ -24,7 +24,7 @@ public class TemplateFactory {
             case TemplateCls.PLATE:
 
                 //PARSE SIMPLE PLATE
-                return Template.parse(data, includeReference);
+                return Template.parse(forDeal, data, includeReference);
 
             case TemplateCls.SAMPLE:
 

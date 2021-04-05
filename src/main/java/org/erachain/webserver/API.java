@@ -83,25 +83,25 @@ public class API {
 
         help.put("*** CHAIN ***", "");
         help.put("GET Height", "height");
-        help.put("GET First Block", "firstblock");
-        help.put("GET Last Block", "lastblock");
+        help.put("GET First Block or Block.Head", "firstblock[?onlyhead]");
+        help.put("GET Last Block", "lastblock[?onlyhead]");
         help.put("GET Last Block Head", "lastblockhead");
 
         help.put("*** BLOCK ***", "");
-        help.put("GET Block", "block/{signature}");
-        help.put("GET Block by Height", "blockbyheight/{height}");
+        help.put("GET Block", "block/{signature}[?onlyhead]");
+        help.put("GET Block by Height", "blockbyheight/{height}[?onlyhead]");
         help.put("GET Child Block Signature", "childblocksignature/{signature}");
-        help.put("GET Child Block", "childblock/{signature}");
+        help.put("GET Child Block", "childblock/{signature}[?onlyhead]");
 
         help.put("*** BLOCKS ***", "");
-        help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}");
+        help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}[?onlyhead]");
         help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");
 
         help.put("*** RECORD ***", "");
         help.put("GET Record Parse from RAW", "recordparse/{RAW}");
         help.put("POST Record Parse from RAW", "recordparse RAW");
-        help.put("GET Record", "record/{signature}");
-        help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
+        //help.put("GET Record", "record/{signature}");
+        //help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
         help.put("GET Record RAW", "recordraw/{signature}");
         help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{block-seqNo]");
         help.put("GET Record RAW by Height and Sequence 2", "recordrawbynumber/{block]/[seqNo]");
@@ -116,23 +116,13 @@ public class API {
         help.put("GET Address Public Key", "addresspublickey/{address}");
         help.put("GET Address Forging Info", "addressforge/{address}");
 
-        //  deprecated help.put("*** ASSET ***", "");
-        //help.put("GET Asset Height", "assetheight");
-        //help.put("GET Asset", "asset/{key}");
-        //help.put("GET Asset Data", "assetdata/{key}");
-        //help.put("GET Asset Image", "assetimage/{key}");
-        //help.put("GET Asset Icon", "asseticon/{key}");
-
-        //  deprecated help.put("*** ASSETS ***", "");
-        // deprecated help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}?offset=0&limit=0");
-
         help.put("*** EXCHANGE ***", "");
         help.put("GET Exchange Orders", "exchangeorders/{have}/{want}");
 
         help.put("*** PERSON ***", "");
-        help.put("GET Person Height", "personheight");
+        //help.put("GET Person Height", "personheight");
         help.put("GET Person Key by PubKey of Owner", "personkeybyownerpublickey/{publickey}");
-        help.put("GET Person", "person/{key}");
+        //help.put("GET Person", "person/{key}");
         help.put("GET Person Data", "persondata/{key}");
         help.put("GET Person Key by Address", "personkeybyaddress/{address}");
         help.put("GET Person by Address", "personbyaddress/{address}");
@@ -140,10 +130,6 @@ public class API {
         help.put("GET Person by Public Key", "personbypublickey/{publickey}");
         help.put("GET Person by Public Key Base32", "personbypublickeybase32/{publickeybase32}");
         help.put("GET Accounts From Person", "getaccountsfromperson/{key}");
-        help.put("Get Person Image", "personimage/{key}");
-
-        help.put("*** PERSONS ***", "");
-        help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}?offset=0&limit=0");
 
         help.put("*** TOOLS ***", "");
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
@@ -151,11 +137,16 @@ public class API {
         help.put("GET benchmark info by node", " GET api/bench");
 
         help.put("GET Broadcast", "/broadcast/{raw(Base58)}?lang=en|ru - lang for localize error message");
+        help.put("GET Broadcast64", "/broadcast64/{raw(Base64)}?lang=en|ru - lang for localize error message");
         help.put("POST Broadcast", "/broadcast?lang=en|ru raw(Base58) - lang for localize error message");
-        help.put("POST Broadcastjson", "/broadcastjson JSON - JSON: {raw:raw(Base58), lang:en|ru} - lang for localize error message");
+        help.put("POST Broadcast64", "/broadcast64?lang=en|ru raw(Base64) - lang for localize error message");
+        help.put("POST Broadcastjson", "/broadcastjson?lang=en|ru JSON - JSON: {raw:raw(Base58), lang:en|ru} - lang for localize error message");
+        help.put("POST Broadcastjson64", "/broadcastjson64?lang=en|ru JSON - JSON: {raw:raw(Base64), lang:en|ru} - lang for localize error message");
 
-        help.put("POST Broadcasttelegram", "/broadcasttelegram JSON {'raw': raw(Base58)}");
-        help.put("GET Broadcasttelegram", "/broadcasttelegram/{raw(Base58)}");
+        help.put("POST Broadcasttelegram", "/broadcasttelegram?lang=en|ru JSON {'raw': raw(Base58)}");
+        help.put("POST Broadcasttelegram64", "/broadcasttelegram64?lang=en|ru JSON {'raw': raw(Base64)}");
+        help.put("GET Broadcasttelegram", "/broadcasttelegram/{raw(Base58)}?lang=en|ru");
+        help.put("GET Broadcasttelegram64", "/broadcasttelegram64/{raw(Base64)}?lang=en|ru");
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -177,9 +168,22 @@ public class API {
 
     @GET
     @Path("firstblock")
-    public Response getFirstBlock() {
+    public Response getFirstBlock(@Context UriInfo info) {
 
-        JSONObject out = dcSet.getBlockMap().get(1).toJson();
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null) {
+            onlyhead = false;
+        } else {
+            onlyhead = value.isEmpty() || new Boolean(value);
+        }
+
+        JSONObject out;
+        if (onlyhead) {
+            out = dcSet.getBlocksHeadsMap().get(1).toJson();
+        } else {
+            out = dcSet.getBlockMap().getAndProcess(1).toJson();
+        }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -190,10 +194,22 @@ public class API {
 
     @GET
     @Path("lastblock")
-    public Response lastBlock() {
+    public Response lastBlock(@Context UriInfo info) {
 
-        Block lastBlock = dcSet.getBlockMap().last();
-        JSONObject out = lastBlock.toJson();
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null) {
+            onlyhead = false;
+        } else {
+            onlyhead = value.isEmpty() || new Boolean(value);
+        }
+
+        JSONObject out;
+        if (onlyhead) {
+            out = dcSet.getBlocksHeadsMap().last().toJson();
+        } else {
+            out = dcSet.getBlockMap().last().toJson();
+        }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -254,10 +270,19 @@ public class API {
 
     @GET
     @Path("/childblock/{signature}")
-    public Response getChildBlock(@PathParam("signature") String signature) {
+    public Response getChildBlock(@Context UriInfo info,
+                                  @PathParam("signature") String signature) {
         //DECODE SIGNATURE
         byte[] signatureBytes;
         JSONObject out = new JSONObject();
+
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null) {
+            onlyhead = false;
+        } else {
+            onlyhead = value.isEmpty() || new Boolean(value);
+        }
 
         int step = 1;
         try {
@@ -266,7 +291,10 @@ public class API {
             ++step;
             Integer heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
             if (heightWT != null && heightWT > 0) {
-                out = dcSet.getBlockMap().getAndProcess(heightWT + 1).toJson();
+                if (onlyhead)
+                    out = dcSet.getBlocksHeadsMap().get(heightWT + 1).toJson();
+                else
+                    out = dcSet.getBlockMap().get(heightWT + 1).toJson();
             } else {
                 out.put("message", "signature not found");
             }
@@ -289,7 +317,16 @@ public class API {
 
     @GET
     @Path("block/{signature}")
-    public Response block(@PathParam("signature") String signature) {
+    public Response block(@Context UriInfo info,
+                          @PathParam("signature") String signature) {
+
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null) {
+            onlyhead = false;
+        } else {
+            onlyhead = value.isEmpty() || new Boolean(value);
+        }
 
         JSONObject out = new JSONObject();
 
@@ -299,13 +336,24 @@ public class API {
             byte[] key = Base58.decode(signature);
 
             ++step;
-            Block block = dcSet.getBlockSignsMap().getBlock(key);
-            out.put("block", block.toJson());
+            if (onlyhead) {
+                Integer height = dcSet.getBlockSignsMap().get(key);
+                Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
+                out.put("blockHead", blockHead.toJson());
 
-            ++step;
-            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
-            if (childSign != null)
-                out.put("next", Base58.encode(childSign));
+                ++step;
+                byte[] childSign = dcSet.getBlocksHeadsMap().get(blockHead.heightBlock + 1).signature;
+                if (childSign != null)
+                    out.put("next", Base58.encode(childSign));
+            } else {
+                Block block = dcSet.getBlockSignsMap().getBlock(key);
+                out.put("block", block.toJson());
+
+                ++step;
+                byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
+                if (childSign != null)
+                    out.put("next", Base58.encode(childSign));
+            }
 
         } catch (Exception e) {
 
@@ -327,7 +375,16 @@ public class API {
 
     @GET
     @Path("blockbyheight/{height}")
-    public Response blockByHeight(@PathParam("height") String heightStr) {
+    public Response blockByHeight(@Context UriInfo info,
+                                  @PathParam("height") String heightStr) {
+
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null) {
+            onlyhead = false;
+        } else {
+            onlyhead = value.isEmpty() || new Boolean(value);
+        }
 
         JSONObject out = new JSONObject();
         int step = 1;
@@ -336,13 +393,24 @@ public class API {
             int height = Integer.parseInt(heightStr);
 
             ++step;
-            Block block = cntrl.getBlockByHeight(dcSet, height);
-            out.put("block", block.toJson());
+            if (onlyhead) {
+                Block.BlockHead blockHead = dcSet.getBlocksHeadsMap().get(height);
+                out.put("blockHead", blockHead.toJson());
 
-            ++step;
-            byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
-            if (childSign != null)
-                out.put("next", Base58.encode(childSign));
+                ++step;
+                byte[] childSign = dcSet.getBlocksHeadsMap().get(blockHead.heightBlock + 1).signature;
+                if (childSign != null)
+                    out.put("next", Base58.encode(childSign));
+            } else {
+
+                Block block = cntrl.getBlockByHeight(dcSet, height);
+                out.put("block", block.toJson());
+
+                ++step;
+                byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight() + 1).signature;
+                if (childSign != null)
+                    out.put("next", Base58.encode(childSign));
+            }
 
         } catch (Exception e) {
 
@@ -412,8 +480,17 @@ public class API {
 
     @GET
     @Path("/blocksfromheight/{height}/{limit}")
-    public Response getBlocksFromHeight(@PathParam("height") int height,
+    public Response getBlocksFromHeight(@Context UriInfo info,
+                                        @PathParam("height") int height,
                                         @PathParam("limit") int limit) {
+
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null) {
+            onlyhead = false;
+        } else {
+            onlyhead = value.isEmpty() || new Boolean(value);
+        }
 
         if (limit > 30)
             limit = 30;
@@ -425,16 +502,30 @@ public class API {
         try {
 
             JSONArray array = new JSONArray();
-            BlockMap blockMap = dcSet.getBlockMap();
-            int max = blockMap.size();
-            for (int i = height; i < height + limit; i++) {
-                if (i > max) {
-                    out.put("end", 1);
-                    break;
+            if (onlyhead) {
+                BlocksHeadsMap blockHeadsMap = dcSet.getBlocksHeadsMap();
+                int max = blockHeadsMap.size();
+                for (int i = height; i < height + limit; i++) {
+                    if (i > max) {
+                        out.put("end", 1);
+                        break;
+                    }
+                    array.add(blockHeadsMap.get(i).toJson());
                 }
-                array.add(blockMap.getAndProcess(i));
+                out.put("blockHeads", array);
+
+            } else {
+                BlockMap blockMap = dcSet.getBlockMap();
+                int max = blockMap.size();
+                for (int i = height; i < height + limit; i++) {
+                    if (i > max) {
+                        out.put("end", 1);
+                        break;
+                    }
+                    array.add(blockMap.getAndProcess(i).toJson());
+                }
+                out.put("blocks", array);
             }
-            out.put("blocks", array);
 
         } catch (Exception e) {
 
@@ -724,7 +815,19 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRaw_1(raw, lang).toJSONString())
+                .entity(broadcastFromRawString(raw, false, lang).toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("broadcast64/{raw}")
+    public Response broadcastRaw64(@PathParam("raw") String raw, @QueryParam("lang") String lang) {
+
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, true, lang).toJSONString())
                 .build();
     }
 
@@ -739,7 +842,23 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRaw_1(raw, lang).toJSONString())
+                .entity(broadcastFromRawString(raw, false, lang).toJSONString())
+                .build();
+
+    }
+
+    @POST
+    @Path("broadcastjson64")
+    public Response broadcastFromRaw64JsonPost(@Context HttpServletRequest request,
+                                               MultivaluedMap<String, String> form) {
+
+        String raw = form.getFirst("raw");
+        String lang = form.getFirst("lang");
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, true, lang).toJSONString())
                 .build();
 
     }
@@ -753,20 +872,30 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRaw_1(raw, lang).toJSONString())
+                .entity(broadcastFromRawString(raw, false, lang).toJSONString())
+                .build();
+
+    }
+
+    @POST
+    @Path("broadcast64")
+    public Response broadcastFromRaw64Post(@Context HttpServletRequest request,
+                                           @QueryParam("lang") String lang,
+                                           String raw) {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, true, lang).toJSONString())
                 .build();
 
     }
 
     // http://127.0.0.1:9047/api/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-    public JSONObject broadcastFromRaw_1(String rawDataBase58, String lang) {
+    public JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
         int step = 1;
         JSONObject out = new JSONObject();
         try {
-            //	JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-            //	String rawDataBase58 = (String) jsonObject.get("raw");
-            byte[] transactionBytes = Base58.decode(rawDataBase58);
-
 
             step++;
             Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
@@ -792,17 +921,31 @@ public class API {
         }
     }
 
-    public JSONObject broadcastTelegram_1(String rawDataBase58) {
+    public JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
         JSONObject out = new JSONObject();
         byte[] transactionBytes;
-        Transaction transaction;
-
         try {
-            transactionBytes = Base58.decode(rawDataBase58);
+            if (base64) {
+                transactionBytes = Base64.getDecoder().decode(rawDataStr);
+            } else {
+                transactionBytes = Base58.decode(rawDataStr);
+            }
         } catch (Exception e) {
-            Transaction.updateMapByErrorSimple(-1, e.toString() + " INVALID_RAW_DATA", out);
+            Transaction.updateMapByErrorSimple(-1, "JSON error", out);
             return out;
         }
+
+        if (transactionBytes == null) {
+            Transaction.updateMapByErrorSimple(-1, "JSON error", out);
+            return out;
+        }
+
+        return broadcastFromRawByte(transactionBytes, lang);
+    }
+
+    public JSONObject broadcastTelegramBytes(byte[] transactionBytes, String lang) {
+        JSONObject out = new JSONObject();
+        Transaction transaction;
 
         try {
             transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
@@ -827,23 +970,62 @@ public class API {
         return out;
     }
 
+    public JSONObject broadcastTelegramStr(String rawDataStr, boolean base64, String lang) {
+        JSONObject out = new JSONObject();
+        byte[] transactionBytes;
+        try {
+            if (base64) {
+                transactionBytes = Base64.getDecoder().decode(rawDataStr);
+            } else {
+                transactionBytes = Base58.decode(rawDataStr);
+            }
+        } catch (Exception e) {
+            Transaction.updateMapByErrorSimple(-1, "JSON error", out);
+            return out;
+        }
+
+        if (transactionBytes == null) {
+            Transaction.updateMapByErrorSimple(-1, "JSON error", out);
+            return out;
+        }
+
+        return broadcastTelegramBytes(transactionBytes, lang);
+    }
+
     @GET
     //@Path("broadcasttelegram/{raw}")
     @Path("broadcasttelegram/{raw}")
     // http://127.0.0.1:9047/broadcasttelegram/DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-    public Response broadcastTelegram(@PathParam("raw") String raw) {
+    public Response broadcastTelegram(@Context HttpServletRequest request,
+                                      @QueryParam("lang") String lang,
+                                      @PathParam("raw") String raw) {
 
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastTelegram_1(raw).toJSONString())
+                .entity(broadcastTelegramStr(raw, false, lang).toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("broadcasttelegram64/{raw}")
+    public Response broadcastTelegram64(@Context HttpServletRequest request,
+                                        @QueryParam("lang") String lang,
+                                        @PathParam("raw") String raw) {
+
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastTelegramStr(raw, true, lang).toJSONString())
                 .build();
     }
 
     @POST
     @Path("broadcasttelegramjson")
     public Response broadcastTelegramPost(@Context HttpServletRequest request,
+                                          @QueryParam("lang") String lang,
                                           MultivaluedMap<String, String> form) {
 
         String raw = form.getFirst("raw");
@@ -851,7 +1033,23 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastTelegram_1(raw).toJSONString())
+                .entity(broadcastTelegramStr(raw, false, lang).toJSONString())
+                .build();
+
+    }
+
+    @POST
+    @Path("broadcasttelegramjson64")
+    public Response broadcastTelegram64Post(@Context HttpServletRequest request,
+                                            @QueryParam("lang") String lang,
+                                            MultivaluedMap<String, String> form) {
+
+        String raw = form.getFirst("raw");
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastTelegramStr(raw, true, lang).toJSONString())
                 .build();
 
     }
@@ -859,12 +1057,28 @@ public class API {
     @POST
     @Path("broadcasttelegram")
     public Response broadcastTelegramPost(@Context HttpServletRequest request,
+                                          @QueryParam("lang") String lang,
                                           String raw) {
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastTelegram_1(raw).toJSONString())
+                .entity(broadcastTelegramStr(raw, false, lang).toJSONString())
+                .build();
+
+    }
+
+    @POST
+
+    @Path("broadcasttelegram64")
+    public Response broadcastTelegram64Post(@Context HttpServletRequest request,
+                                            @QueryParam("lang") String lang,
+                                            String raw) {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastTelegramStr(raw, true, lang).toJSONString())
                 .build();
 
     }
@@ -1486,7 +1700,7 @@ public class API {
 
         if (asset.getImage() != null) {
             // image to byte[] hot scale (param2 =0)
-            //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
             ///return Response.ok(new ByteArrayInputStream(asset.getImage())).build();
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")
@@ -1500,6 +1714,7 @@ public class API {
 
     }
 
+    @Deprecated
     @Path("asseticon/{key}")
     @GET
     @Produces({"image/png", "image/jpg"})
@@ -1523,7 +1738,7 @@ public class API {
 
         if (asset.getIcon() != null) {
             // image to byte[] hot scale (param2 =0)
-            //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
             //return Response.ok(new ByteArrayInputStream(asset.getIcon())).build();
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")
@@ -1536,6 +1751,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @Path("personimage/{key}")
     @GET
     @Produces({"image/png", "image/jpg"})
@@ -1559,7 +1775,7 @@ public class API {
         PersonCls person = (PersonCls) map.get(key);
 
         // image to byte[] hot scale (param2 =0)
-        //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+        //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
         //return Response.ok(new ByteArrayInputStream(person.getImage())).build();
         return Response.status(200)
                 .header("Access-Control-Allow-Origin", "*")

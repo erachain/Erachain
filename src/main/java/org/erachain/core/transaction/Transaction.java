@@ -21,6 +21,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
@@ -1469,32 +1470,39 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return feePow + ":" + this.fee.unscaledValue().longValue();
     }
 
-    public String viewFeeAndFiat() {
+    public String viewFeeAndFiat(int fontSize) {
 
-        String text = fee.toString();
-        if (true) {
-            BigDecimal compu_rate = new BigDecimal(Settings.getInstance().getCompuRate());
-            AssetCls asset = Controller.getInstance().getAsset(Settings.getInstance().getCompuRateAsset());
-            if (asset == null)
-                asset = Controller.getInstance().getAsset(840L); // ISO-USD
+        fontSize *= 1.4;
+        String text = "<span style='vertical-align: 10px; font-size: 1.4em' ><b>" + fee.toString() + "</b>"
+                + "<img width=" + fontSize + " height=" + fontSize
+                + " src='file:images\\icons\\assets\\COMPU.png'></span>";
 
-            if (asset == null)
-                asset = Controller.getInstance().getAsset(1L); // ERA
+        boolean useDEX = Settings.getInstance().getCompuRateUseDEX();
 
-            if (compu_rate.signum() > 0) {
-                BigDecimal fee_fiat = fee.multiply(compu_rate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
-                text += " (" + fee_fiat.toString() + asset.getTickerName() + ")";
+        AssetCls asset = Controller.getInstance().getAsset(Settings.getInstance().getCompuRateAsset());
+        if (asset == null)
+            asset = Controller.getInstance().getAsset(840L); // ISO-USD
+
+        if (asset == null)
+            asset = Controller.getInstance().getAsset(1L); // ERA
+
+        BigDecimal compuRate;
+        if (useDEX) {
+            Trade lastTrade = DCSet.getInstance().getTradeMap().getLastTrade(AssetCls.FEE_KEY, asset.getKey());
+            if (lastTrade == null) {
+                compuRate = BigDecimal.ZERO;
+            } else {
+                compuRate = lastTrade.getHaveKey().equals(AssetCls.FEE_KEY) ? lastTrade.calcPriceRevers() : lastTrade.calcPrice();
             }
 
         } else {
-            Fun.Tuple2<BigDecimal, String> compu_rate = Controller.COMPU_RATES.get(Settings.getInstance().getLang());
-            if (compu_rate == null) {
-                compu_rate = Controller.COMPU_RATES.get("en");
-            }
-            if (compu_rate != null && compu_rate.a.signum() > 0) {
-                BigDecimal fee_fiat = fee.multiply(compu_rate.a).setScale(compu_rate.a.scale(), BigDecimal.ROUND_HALF_UP);
-                text += " (" + compu_rate.b + fee_fiat.toString() + ")";
-            }
+            compuRate = new BigDecimal(Settings.getInstance().getCompuRate());
+        }
+
+        if (compuRate.signum() > 0) {
+            BigDecimal fee_fiat = fee.multiply(compuRate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
+            if (asset.getKey() != AssetCls.FEE_KEY)
+                text += " (" + fee_fiat.toString() + " " + asset.getTickerName() + ")";
         }
 
         return text;
@@ -2090,7 +2098,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             issuerPersonKey = issuerPersonDuration.a;
         }
 
-        if (issuerPersonKey < 0 // это возможно только для певой персоны и то если не она сама себя зарегала и в ДЕВЕЛОПЕ так что пусть там и будет
+        if (issuerPersonKey < 0 // это возможно только для первой персоны и то если не она сама себя зарегала и в ДЕВЕЛОПЕ так что пусть там и будет
                 || issuerPersonKey == invitedPersonKey // это возможно только в ДЕВЕЛОПЕ так что пусть там и будет
                 || issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
         ) {

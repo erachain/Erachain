@@ -259,7 +259,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jTextArea_Account_Description.setLineWrap(true);
 
         if (asset instanceof AssetVenture) {
-            jTextField_Amount.setScale(((AssetVenture) asset).getScale());
+            jTextField_Amount.setScale(asset.getScale());
             jTextField_Amount.setVisible(true);
             jLabel_Amount.setVisible(true);
         } else {
@@ -650,7 +650,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jLabel_AssetType = new javax.swing.JLabel();
         jComboBox_Asset = new javax.swing.JComboBox<>();
         jLabel_Amount = new javax.swing.JLabel();
-        jTextField_Amount = new MDecimalFormatedTextField();
+        jTextField_Amount = new MDecimalFormatedTextField(Double.class);
         jLabel_Balances = new javax.swing.JLabel();
         jLabel_Fee = new javax.swing.JLabel();
         jComboBox_Fee = new javax.swing.JComboBox<>();

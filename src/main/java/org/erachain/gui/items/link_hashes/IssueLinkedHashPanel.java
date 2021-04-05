@@ -6,6 +6,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.blockexplorer.WebTransactionsHTML;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
@@ -212,7 +213,8 @@ public class IssueLinkedHashPanel extends SplitPanel {
             return;
         }
 
-        Transaction transaction = Controller.getInstance().r_Hashes(creator, feePow, url, description,
+        ExLink exLink = null;
+        Transaction transaction = Controller.getInstance().r_Hashes(creator, exLink, feePow, url, description,
                 String.join(" ", hashes));
 
         WebTransactionsHTML webHTML = new WebTransactionsHTML(DCSet.getInstance(), Lang.getInstance().getLangForNode());

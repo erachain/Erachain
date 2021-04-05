@@ -45,7 +45,7 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JScrollPane jScrollPane1 = new JScrollPane();
     protected JTextField textName = new JTextField("");
     protected JTextArea textAreaDescription = new JTextArea("");
-    protected AddImageLabel addLogoIconLabel;
+    protected AddImageLabel addIconLabel;
     protected AddImageLabel addImageLabel;
     protected JScrollPane jScrollPane2;
     protected JPanel jPanelMain = new javax.swing.JPanel();
@@ -60,6 +60,8 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JTextField exLinkDescription = new JTextField();
     boolean useIcon;
 
+    protected byte[] itemAppData;
+
     public IssueItemPanel(String name, String title, String issueMess, boolean useIcon, int cropWidth, int cropHeight, boolean originalSize) {
         super(name, title);
 
@@ -69,11 +71,11 @@ public abstract class IssueItemPanel extends IconPanel {
 
         jScrollPane2 = new JScrollPane();
 
-        addLogoIconLabel = new AddImageLabel(Lang.T("Add Logo"),
+        addIconLabel = new AddImageLabel(Lang.T("Add Logo"),
                 WIDTH_LOGO, HEIGHT_LOGO,
                 0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL, false);
-        addLogoIconLabel.setBorder(null);
-        addLogoIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        addIconLabel.setBorder(null);
+        addIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
 
         addImageLabel = new AddImageLabel(
                 Lang.T("Add image"), cropWidth, cropHeight,
@@ -153,8 +155,8 @@ public abstract class IssueItemPanel extends IconPanel {
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
             gridBagConstraints.weightx = 0.1;
-            gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 0);
-            jPanelLeft.add(addLogoIconLabel, gridBagConstraints);
+            gridBagConstraints.insets = new java.awt.Insets(8, 8, 10, 10);
+            jPanelLeft.add(addIconLabel, gridBagConstraints);
         }
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -194,6 +196,25 @@ public abstract class IssueItemPanel extends IconPanel {
     protected abstract void makeTransaction();
 
     protected abstract String makeTransactionView();
+
+    protected String makeHeadView(String nameLabel) {
+        ItemCls item = transaction.getItem();
+        String im = "";
+        if (item.hasIconURL())
+            im += "icon: " + ItemCls.viewMediaType(item.getIconType()) + ":" + item.getIconURL();
+        if (item.hasImageURL()) {
+            im += (im.isEmpty() ? "" : ", ") + "image: " + ItemCls.viewMediaType(item.getImageType()) + ":" + item.getImageURL();
+        }
+
+        if (!im.isEmpty())
+            im += "<br>";
+
+        return Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
+                + "[" + item.getKey() + "]" + Lang.T(nameLabel) + ":&nbsp;" + item.viewName() + "<br>"
+                + im;
+
+    }
 
     protected PrivateKeyAccount creator;
     protected ExLink exLink = null;
@@ -238,6 +259,11 @@ public abstract class IssueItemPanel extends IconPanel {
                 issueJButton.setEnabled(true);
                 return;
             }
+
+            // соберем данные общего класса
+            itemAppData = ItemCls.makeAppData(0L,
+                    !addIconLabel.externalURL.getText().isEmpty(), addIconLabel.externalURLType.getSelectedIndex(),
+                    !addImageLabel.externalURL.getText().isEmpty(), addImageLabel.externalURLType.getSelectedIndex());
 
             makeTransaction();
 

@@ -40,6 +40,8 @@ import java.util.Map;
 
 public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
+    static Logger LOGGER = LoggerFactory.getLogger(ItemCls.class.getName());
+
     public final static long START_KEY_OLD = 1L << 14;
     public static final long MIN_START_KEY_OLD = 1000L;
 
@@ -53,8 +55,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public static final int POLL_TYPE = 8;
     public static final int AUTHOR_TYPE = 41;
 
-    public static final int MAX_ICON_LENGTH = 150000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
-    public static final int MAX_IMAGE_LENGTH = 1500000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
+    public static final int MEDIA_TYPE_IMG = 0;
+    public static final int MEDIA_TYPE_VIDEO = 1;
+    public static final int MEDIA_TYPE_FRAME = 2; // POST
+
     protected static final int TYPE_LENGTH = 2;
     protected static final int MAKER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int NAME_SIZE_LENGTH = 1;
@@ -62,19 +66,44 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public static final int MAX_NAME_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;
     protected static final int ICON_SIZE_LENGTH = 2;
     protected static final int IMAGE_SIZE_LENGTH = 4;
+    protected static final int APP_DATA_LENGTH = Integer.BYTES;
     protected static final int DESCRIPTION_SIZE_LENGTH = 4;
     protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
     protected static final int DBREF_LENGTH = Transaction.DBREF_LENGTH;
     protected static final int BASE_LENGTH = TYPE_LENGTH + MAKER_LENGTH
             + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
 
+    public static final int MAX_ICON_LENGTH = (int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
+    public static final int MAX_IMAGE_LENGTH = 1500000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
+
     protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
-    //protected DCMap dbMap;
-    //protected DCMap dbIssueMap;
-    static Logger LOGGER = LoggerFactory.getLogger(ItemCls.class.getName());
     protected byte[] typeBytes;
     protected PublicKeyAccount maker;
+
+    /**
+     * добавочные флаги по знаку из Размер Картинки
+     */
+    protected static final int APP_DATA_MASK = 1 << 31;
+    /**
+     * Флаг который показывает что есть еще данные вычисленные для бзы данных
+     */
+    protected static final int DB_DATA_MASK = 1 << 30;
+
+    protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
+    // ITEM_FLAGS[0]
+    protected static final byte ITEM_HAS_URL_MASK = (byte) -128;
+    //protected static final byte ITEM_HAS_IMAGE_URL_MASK = (byte) -128;
+    //protected static final long ITEM_ICON_TYPE_MASK = (4L + 2L + 1L) << 59; // маска Типа на 3 бита - 8 значений разных
+    //protected static final long ITEM_IMAGE_TYPE_MASK = (4L + 2L + 1L) << 56; // маска Типа на 3 бита - 8 значений разных
+
+    /**
+     * 0-1 - байты переключателей для включения обработчиков супер-класса и суб-классов
+     * Если супер класс включился - он берет 8 байт на свои флаги и 2 байта на свойства Иконки И картинки
+     */
+    protected byte[] appData;
+    protected long flags;
+
     protected String name;
     protected String description;
     protected long key = 0;
@@ -84,23 +113,90 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected byte[] reference = null;
     protected long dbRef;
     protected byte[] icon;
+    protected boolean iconAsURL;
+    protected int iconType;
     protected byte[] image;
+    protected boolean imageAsURL;
+    protected int imageType;
 
     public Transaction referenceTx = null;
 
-    public ItemCls(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+    public ItemCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
         this.typeBytes = typeBytes;
+        this.appData = appData;
         this.maker = maker;
         this.name = name.trim();
         this.description = description;
         this.icon = icon == null ? new byte[0] : icon;
         this.image = image == null ? new byte[0] : image;
 
+        parseAppData();
+
     }
 
-    public ItemCls(int type, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
-        this(new byte[TYPE_LENGTH], maker, name, icon, image, description);
+    public ItemCls(int type, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
+        this(new byte[TYPE_LENGTH], appData, maker, name, icon, image, description);
         this.typeBytes[0] = (byte) type;
+    }
+
+    /**
+     * Должно в конце каждого класса вызываться для распарсивания ДопДанных
+     *
+     * @return
+     */
+    protected int parseAppData() {
+
+        if (appData == null)
+            return 0;
+
+        // пропустим сразу 2 первых байта - там включатели обработчиков
+        int pos = 2;
+
+        if ((appData[0] & APP_DATA_ITEM_FLAGS_MASK) != 0) {
+            // parse ITEM APP DATA
+            flags = Longs.fromByteArray(Arrays.copyOfRange(appData, pos, pos + Long.BYTES));
+            pos += Long.BYTES;
+
+            byte iconTypeByte = appData[pos++];
+            if (iconTypeByte < 0) {
+                iconAsURL = true;
+                iconTypeByte &= ~ITEM_HAS_URL_MASK;
+                iconType = iconTypeByte;
+            }
+
+            byte imageTypeByte = appData[pos++];
+            if (imageTypeByte < 0) {
+                imageAsURL = true;
+                imageTypeByte &= ~ITEM_HAS_URL_MASK;
+                imageType = imageTypeByte;
+            }
+
+        }
+
+        return pos;
+    }
+
+    public static byte[] makeAppData(long flags, boolean iconAsURL, int iconType, boolean imageAsURL, int imageType) {
+        if (flags != 0 || iconAsURL || imageAsURL || iconType != 0 || imageType != 0) {
+            byte[] appData = new byte[12];
+            appData[0] = APP_DATA_ITEM_FLAGS_MASK;
+            // 2 байта пропустим, потом флаги
+            System.arraycopy(Longs.toByteArray(flags), 0, appData, 2, Long.BYTES);
+
+            // байт по Иконке
+            appData[10] = (byte) iconType;
+            if (iconAsURL)
+                appData[10] |= ITEM_HAS_URL_MASK;
+            // байт по Картинке
+            appData[11] = (byte) imageType;
+            if (imageAsURL)
+                appData[11] |= ITEM_HAS_URL_MASK;
+
+            return appData;
+
+        } else {
+            return null;
+        }
     }
 
     public static Pair<Integer, Long> resolveDateFromStr(String str, Long defaultVol) {
@@ -144,6 +240,42 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public static ItemCls getItem(DCSet db, int type, long key) {
         //return Controller.getInstance().getItem(db, type, key);
         return db.getItem_Map(type).get(key);
+    }
+
+    public int getIconMAXLength() {
+        return this.MAX_ICON_LENGTH;
+    }
+
+    public int getImageMAXLength() {
+        return this.MAX_IMAGE_LENGTH;
+    }
+
+    public String errorValue;
+
+    public int isValid() {
+
+        // TEST ALL BYTES for database FIELD
+        if (name.getBytes(StandardCharsets.UTF_8).length > ItemCls.MAX_NAME_LENGTH) {
+            errorValue = "" + name.getBytes(StandardCharsets.UTF_8).length + " > " + ItemCls.MAX_NAME_LENGTH;
+            return Transaction.INVALID_NAME_LENGTH_MAX;
+        }
+
+        if (icon != null && icon.length > getIconMAXLength()) {
+            errorValue = "" + icon.length + " > " + getIconMAXLength();
+            return Transaction.INVALID_ICON_LENGTH_MAX;
+        } else if (image != null && image.length > getImageMAXLength()) {
+            errorValue = "" + image.length + " > " + getImageMAXLength();
+            return Transaction.INVALID_IMAGE_LENGTH_MAX;
+        }
+
+        //CHECK DESCRIPTION LENGTH
+        int descriptionLength = description == null ? 0 : description.getBytes(StandardCharsets.UTF_8).length;
+        if (descriptionLength > Transaction.MAX_DATA_BYTES_LENGTH) {
+            errorValue = "" + descriptionLength + " > " + Transaction.MAX_DATA_BYTES_LENGTH;
+            return Transaction.INVALID_DESCRIPTION_LENGTH_MAX;
+        }
+
+        return Transaction.VALIDATE_OK;
     }
 
     public abstract int getItemType();
@@ -237,12 +369,59 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return null;
     }
 
+    public long getFlags() {
+        return flags;
+    }
+
     public byte[] getIcon() {
         return this.icon;
     }
 
+    public int getIconType() {
+        return iconType;
+    }
+
+    public static String viewMediaType(int iconType) {
+        switch (iconType) {
+            case MEDIA_TYPE_VIDEO:
+                return "video";
+            case MEDIA_TYPE_FRAME:
+                return "frame";
+            default:
+                return "img";
+        }
+    }
+
+    public boolean hasIconURL() {
+        return iconAsURL;
+    }
+
+    public String getIconURL() {
+        if (iconAsURL) {
+            // внешняя ссылка - обработаем ее
+            return new String(icon, StandardCharsets.UTF_8);
+        }
+        return null;
+    }
+
     public byte[] getImage() {
         return this.image;
+    }
+
+    public int getImageType() {
+        return imageType;
+    }
+
+    public boolean hasImageURL() {
+        return imageAsURL;
+    }
+
+    public String getImageURL() {
+        if (imageAsURL) {
+            // внешняя ссылка - обработаем ее
+            return new String(image, StandardCharsets.UTF_8);
+        }
+        return null;
     }
 
     public void setKey(long key) {
@@ -467,7 +646,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     // forMakerSign - use only DATA needed for making signature
-    public byte[] toBytes(boolean includeReference, boolean forMakerSign) {
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean forMakerSign) {
 
         byte[] data = new byte[0];
         boolean useAll = !forMakerSign;
@@ -495,6 +674,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         //WRITE NAME
         data = Bytes.concat(data, nameBytes);
 
+        boolean hasAppData = appData != null && appData.length > 0;
+
         if (useAll) {
             //WRITE ICON SIZE - 2 bytes = 64kB max
             int iconLength = this.icon.length;
@@ -507,13 +688,31 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         if (useAll) {
             //WRITE IMAGE SIZE
+            // !!! this.image не может быть равно NULL !!! - чтобы флаги собирать всегда на до Данные
             int imageLength = this.image.length;
+
+            // если Appdata exist - поднимем флаг
+            if (hasAppData)
+                imageLength |= APP_DATA_MASK;
+
+            if (false && forDeal == Transaction.FOR_DB_RECORD) {
+                imageLength |= DB_DATA_MASK;
+            }
+
             byte[] imageLengthBytes = Ints.toByteArray(imageLength);
             data = Bytes.concat(data, imageLengthBytes);
         }
 
         //WRITE IMAGE
         data = Bytes.concat(data, this.image);
+
+        /// APP DATA
+        if (hasAppData) {
+            // WRITE APP DATA LENGTH
+            data = Bytes.concat(data, Ints.toByteArray(this.appData.length));
+            data = Bytes.concat(data, this.appData);
+
+        }
 
         byte[] descriptionBytes = this.description.getBytes(StandardCharsets.UTF_8);
         if (useAll) {
@@ -535,25 +734,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return data;
     }
 
-	/*
-	@SuppressWarnings("unchecked")
-	protected JSONObject getJsonBase()
-	{
-		JSONObject out=new JSONObject();
-
-		out.put("key", this.getKey());
-		out.put("name", this.getName());
-		out.put("description", this.getDescription());
-		out.put("maker", this.getMaker().getAddress());
-
-		return out;
-	}
-
-	public abstract JSONObject toJson();
-	 */
-
     public int getDataLength(boolean includeReference) {
         return BASE_LENGTH
+                + (appData == null || appData.length == 0 ? 0 : APP_DATA_LENGTH + appData.length)
                 + this.name.getBytes(StandardCharsets.UTF_8).length
                 + this.icon.length
                 + this.image.length
@@ -641,13 +824,17 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJSON.put("key", this.getKey());
         itemJSON.put("name", this.name);
 
-        //map.put("icon", Base64.encodeBase64String(item.getIcon()));
-        //map.put("image", Base64.encodeBase64String(item.getImage()));
+        itemJSON.put("iconType", getIconType());
+        itemJSON.put("iconTypeName", viewMediaType(iconType));
 
-        if (withIcon && this.getIcon() != null && this.getIcon().length > 0)
-            itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        else
-            itemJSON.put("icon", "");
+        if (hasIconURL()) {
+            itemJSON.put("iconURL", getIconURL());
+        } else {
+            if (withIcon && this.getIcon() != null && this.getIcon().length > 0)
+                itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+            else
+                itemJSON.put("icon", "");
+        }
 
         itemJSON.put("maker", this.maker.getAddress());
         if (showPerson) {
@@ -706,6 +893,20 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             }
         }
 
+        itemJSON.put("iconType", getIconType());
+        itemJSON.put("iconTypeName", viewMediaType(iconType));
+
+        if (hasIconURL()) {
+            itemJSON.put("iconURL", getIconURL());
+        }
+
+        itemJSON.put("imageType", getImageType());
+        itemJSON.put("imageTypeName", viewMediaType(imageType));
+
+        if (hasImageURL()) {
+            itemJSON.put("imageURL", getImageURL());
+        }
+
         return itemJSON;
     }
 
@@ -714,16 +915,32 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         JSONObject itemJSON = new JSONObject();
 
-        // ADD DATA
-        if (getIcon() != null && getIcon().length > 0)
-            itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        else
-            itemJSON.put("icon", "");
+        itemJSON.put("iconType", getIconType());
+        itemJSON.put("iconTypeName", viewMediaType(iconType));
 
-        if (getImage() != null && getImage().length > 0)
-            itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
-        else
+        // ADD DATA
+        if (hasIconURL()) {
+            itemJSON.put("iconURL", getIconURL());
+            itemJSON.put("icon", "");
+        } else {
+            if (getIcon() != null && getIcon().length > 0)
+                itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+            else
+                itemJSON.put("icon", "");
+        }
+
+        itemJSON.put("imageType", getImageType());
+        itemJSON.put("imageTypeName", viewMediaType(imageType));
+
+        if (hasImageURL()) {
+            itemJSON.put("imageURL", getImageURL());
             itemJSON.put("image", "");
+        } else {
+            if (getImage() != null && getImage().length > 0)
+                itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
+            else
+                itemJSON.put("image", "");
+        }
 
         return itemJSON;
     }
@@ -737,33 +954,42 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
         //DCSet dcSet = DCSet.getInstance();
 
-        JSONObject json = new JSONObject();
-        json.put("key", this.getKey());
-        json.put("name", this.viewName());
+        JSONObject itemJSON = new JSONObject();
+        itemJSON.put("key", this.getKey());
+        itemJSON.put("name", this.viewName());
 
         if (description != null && !description.isEmpty()) {
             if (viewDescription().length() > 100) {
-                json.put("description", viewDescription().substring(0, 100));
+                itemJSON.put("description", viewDescription().substring(0, 100));
             } else {
-                json.put("description", viewDescription());
+                itemJSON.put("description", viewDescription());
             }
         } else {
-            json.put("description", "");
+            itemJSON.put("description", "");
         }
 
-        json.put("maker", this.getMaker().getAddress());
+        itemJSON.put("maker", this.getMaker().getAddress());
         Fun.Tuple2<Integer, PersonCls> person = this.getMaker().getPerson();
         if (person != null) {
-            json.put("person", person.b.getName());
-            json.put("person_key", person.b.getKey());
+            itemJSON.put("person", person.b.getName());
+            itemJSON.put("person_key", person.b.getKey());
         }
 
-        if (getIcon() != null && getIcon().length > 0)
-            json.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-        else
-            json.put("icon", "");
 
-        return json;
+        itemJSON.put("iconType", getIconType());
+        itemJSON.put("iconTypeName", viewMediaType(iconType));
+
+        if (hasIconURL()) {
+            itemJSON.put("iconURL", getIconURL());
+            itemJSON.put("icon", "");
+        } else {
+            if (getIcon() != null && getIcon().length > 0)
+                itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+            else
+                itemJSON.put("icon", "");
+        }
+
+        return itemJSON;
     }
 
     public static void makeJsonLitePage(DCSet dcSet, int itemType, long start, int pageSize,
@@ -829,17 +1055,30 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             itemJson.put("maker_person_key", person.b.getKey());
         }
 
-        if (getIcon() != null && getIcon().length > 0)
-            itemJson.put("icon", java.util.Base64.getEncoder().encodeToString(getIcon()));
+        itemJson.put("iconType", getIconType());
+        itemJson.put("iconTypeName", viewMediaType(iconType));
 
-        if (getImage() != null && getImage().length > 0)
-            itemJson.put("image", java.util.Base64.getEncoder().encodeToString(getImage()));
+        if (hasIconURL()) {
+            itemJson.put("iconURL", getIconURL());
+        } else {
+            if (getIcon() != null && getIcon().length > 0)
+                itemJson.put("icon", java.util.Base64.getEncoder().encodeToString(getIcon()));
+        }
+
+        itemJson.put("imageType", getImageType());
+        itemJson.put("imageTypeName", viewMediaType(imageType));
+
+        if (hasImageURL()) {
+            itemJson.put("imageURL", getImageURL());
+        } else {
+            if (getImage() != null && getImage().length > 0)
+                itemJson.put("image", java.util.Base64.getEncoder().encodeToString(getImage()));
+        }
 
         if (referenceTx != null) {
             if (referenceTx.getCreator() != null) {
                 itemJson.put("tx_creator_person", referenceTx.viewCreator());
             }
-
 
             WebTransactionsHTML.getAppLink(itemJson, referenceTx, langObj);
             WebTransactionsHTML.getVouches(itemJson, referenceTx, langObj);

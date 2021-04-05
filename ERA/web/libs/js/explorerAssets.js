@@ -32,8 +32,7 @@ function assets(data) {
         output += '<tr>';
         output += '<td> <a href=?asset=' + item.key + get_lang() + '>';
         output += '<b>' + item.key + '</b>: ';
-        if (item.icon.length > 0)
-            output += '<img src="data:image/gif;base64,' + item.icon + '"  style="width:2em;" /> ';
+        output += makeMediaIcon(item, '', 'width:2em')
 
         output += cutBlank(escapeHtml(item.name), 50);
         output += '</a>';

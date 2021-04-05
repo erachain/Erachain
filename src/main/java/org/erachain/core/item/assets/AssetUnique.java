@@ -19,16 +19,22 @@ public class AssetUnique extends AssetCls {
 
     private static final int TYPE_ID = UNIQUE;
 
-    public AssetUnique(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        super(typeBytes, maker, name, icon, image, description, assetType);
+    public AssetUnique(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        super(typeBytes, appData, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(int props, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, maker, name, icon, image, description, assetType);
+    public AssetUnique(int props, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, appData, maker, name, icon, image, description, assetType);
     }
 
-    public AssetUnique(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, maker, name, icon, image, description, assetType);
+    public AssetUnique(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, assetType);
+    }
+
+    protected int parseAppData() {
+        int pos = super.parseAppData();
+        //
+        return pos;
     }
 
     //GETTERS/SETTERS
@@ -70,7 +76,7 @@ public class AssetUnique extends AssetCls {
 
     //PARSE
     // includeReference - TRUE only for store in local DB
-    public static AssetUnique parse(byte[] data, boolean includeReference) throws Exception {
+    public static AssetUnique parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
 
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
@@ -113,13 +119,31 @@ public class AssetUnique extends AssetCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
+            // RESET LEN
+            imageLength &= ~APP_DATA_MASK;
+
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
             throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
-
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        byte[] appData;
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + APP_DATA_LENGTH));
+            position += APP_DATA_LENGTH;
+
+            appData = Arrays.copyOfRange(data, position, position + appDataLen);
+            position += appDataLen;
+
+        } else {
+            appData = null;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
@@ -152,7 +176,7 @@ public class AssetUnique extends AssetCls {
         position += ASSET_TYPE_LENGTH;
 
         //RETURN
-        AssetUnique unique = new AssetUnique(typeBytes, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
+        AssetUnique unique = new AssetUnique(typeBytes, appData, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
         if (includeReference) {
             unique.setReference(reference, dbRef);
         }
@@ -161,9 +185,9 @@ public class AssetUnique extends AssetCls {
     }
 
     @Override
-    public byte[] toBytes(boolean includeReference, boolean forMakerSign) {
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean forMakerSign) {
 
-        byte[] data = super.toBytes(includeReference, forMakerSign);
+        byte[] data = super.toBytes(forDeal, includeReference, forMakerSign);
 
         //WRITE ASSET TYPE
         data = Bytes.concat(data, new byte[]{(byte) this.getAssetType()});

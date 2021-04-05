@@ -30,6 +30,8 @@ public class TestRecImprint {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecImprint.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     ExLink exLink = null;
 
     int asPack = Transaction.FOR_NETWORK;
@@ -38,7 +40,9 @@ public class TestRecImprint {
     byte[] imprintReference = new byte[64];
     long timestamp = NTP.getTime();
 
-    long flags = 0l;
+    byte[] itemAppData = null;
+    long txFlags = 0L;
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -71,7 +75,7 @@ public class TestRecImprint {
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
-        imprint = new Imprint(maker, name_total, icon, image, "");
+        imprint = new Imprint(itemAppData, maker, name_total, icon, image, "");
 
     }
 
@@ -111,7 +115,7 @@ public class TestRecImprint {
 
         init();
 
-        byte[] raw = imprint.toBytes(false, false);
+        byte[] raw = imprint.toBytes(forDeal, false, false);
         assertEquals(raw.length, imprint.getDataLength(false));
 
         //CREATE ISSUE IMPRINT TRANSACTION
@@ -174,7 +178,7 @@ public class TestRecImprint {
         assertEquals(issueImprintRecord.getItem().getName(), Base58.encode(imprint.getCuttedReference()));
         issueImprintRecord.sign(maker, Transaction.FOR_NETWORK);
 
-        assertEquals(Transaction.VALIDATE_OK, issueImprintRecord.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueImprintRecord.isValid(Transaction.FOR_NETWORK, txFlags));
 
         issueImprintRecord.process(gb, Transaction.FOR_NETWORK);
 
@@ -186,7 +190,7 @@ public class TestRecImprint {
         long key = issueImprintRecord.getItem().getKey(db);
         assertEquals(true, db.getItemImprintMap().contains(key));
 
-        ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), icon, image, "e");
+        ImprintCls imprint_2 = new Imprint(itemAppData, maker, Imprint.hashNameToBase58("test132_2"), icon, image, "e");
         IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, exLink, imprint_2, FEE_POWER, timestamp + 10);
         issueImprintTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueImprintTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 2, true);
@@ -198,7 +202,7 @@ public class TestRecImprint {
         assertEquals(0, mapSize - 1);
 
         //CHECK IMPRINT IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemImprintMap().get(key).toBytes(true, false), imprint.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(db.getItemImprintMap().get(key).toBytes(forDeal, true, false), imprint.toBytes(forDeal, true, false)));
 
         //CHECK REFERENCE SENDER
         //assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference()));

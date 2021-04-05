@@ -2,9 +2,10 @@ package org.erachain.database.serializer;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.ItemFactory;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.core.transaction.Transaction;
 import org.mapdb.Serializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -23,7 +24,7 @@ public class ItemSerializer implements Serializer<ItemCls>, Serializable {
     @Override
     public void serialize(DataOutput out, ItemCls value) throws IOException {
         out.writeInt(value.getDataLength(true));
-        out.write(value.toBytes(true, false));
+        out.write(value.toBytes(Transaction.FOR_DB_RECORD, true, false));
     }
 
     @Override
@@ -33,7 +34,7 @@ public class ItemSerializer implements Serializer<ItemCls>, Serializable {
         in.readFully(bytes);
         try {
 
-            return ItemFactory.getInstance().parse(this.type, bytes, true);
+            return ItemFactory.getInstance().parse(Transaction.FOR_DB_RECORD, this.type, bytes, true);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

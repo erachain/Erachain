@@ -42,6 +42,7 @@ public class ApiService extends Observable {
         //	s.add(Rec_MessageResource.class);
         s.add(RecResource.class);
         s.add(RecHashesResource.class);
+        s.add(RLinkedHashesResource.class);
 
         s.add(ItemAssetsResource.class);
         s.add(ItemPersonsResource.class);

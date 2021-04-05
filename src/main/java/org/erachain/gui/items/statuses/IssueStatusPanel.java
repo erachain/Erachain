@@ -56,9 +56,9 @@ public class IssueStatusPanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
-        transaction = (IssueStatusRecord) Controller.getInstance().issueStatus(creator,
+        transaction = (IssueStatusRecord) Controller.getInstance().issueStatus(itemAppData, creator,
                 exLink, textName.getText(), textAreaDescription.getText(), unique,
-                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
+                addIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
                 feePow);
 
     }
@@ -67,10 +67,8 @@ public class IssueStatusPanel extends IssueItemPanel {
 
         String text = "<HTML><body>";
         text += Lang.T("Confirmation Transaction") + ":&nbsp;"
-                + Lang.T("Create Status") + "<br><br><br>";
-        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.T("Name") + ":&nbsp;" + transaction.getItem().viewName() + "<br>";
+                + Lang.T("Create Status") + "<br><br><br>"
+                + makeHeadView("Name");
         text += Lang.T("Description") + ":<br>"
                 + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
         text += Lang.T("Unique") + ": " + ((StatusCls) transaction.getItem()).isUnique()

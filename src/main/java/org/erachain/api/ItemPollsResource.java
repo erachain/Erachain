@@ -116,7 +116,7 @@ public class ItemPollsResource {
         }
 
         ItemCls item = Controller.getInstance().getPoll(asLong);
-        byte[] issueBytes = item.toBytes(false, false);
+        byte[] issueBytes = item.toBytes(Transaction.FOR_NETWORK, false, false);
         return Base58.encode(issueBytes);
     }
 
@@ -245,7 +245,7 @@ public class ItemPollsResource {
             }
 
             //CREATE POLL
-            IssuePollRecord issue_voiting = (IssuePollRecord) controller.issuePoll(account, linkTo, name, description, options, null, null, feePow);
+            IssuePollRecord issue_voiting = (IssuePollRecord) controller.issuePoll(null, account, linkTo, name, description, options, null, null, feePow);
 
             //VALIDATE AND PROCESS
             int validate = controller.getTransactionCreator().afterCreate(issue_voiting, Transaction.FOR_NETWORK, false, false);
@@ -335,7 +335,7 @@ public class ItemPollsResource {
                 throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 
             //CREATE POLL
-            Controller.getInstance().issuePoll(account, linkTo, name, description, options, null, null, feePow);
+            Controller.getInstance().issuePoll(null, account, linkTo, name, description, options, null, null, feePow);
 
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
@@ -370,7 +370,7 @@ public class ItemPollsResource {
 
         PollCls item;
         try {
-            item = PollFactory.getInstance().parse(resultRaw.b, false);
+            item = PollFactory.getInstance().parse(Transaction.FOR_NETWORK, resultRaw.b, false);
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(
                     e.getMessage());

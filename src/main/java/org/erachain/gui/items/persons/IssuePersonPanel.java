@@ -122,7 +122,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         jLabelRegistrarAddress.setVisible(andBottom);
 
         addImageLabel.setEditable(andBottom);
-        addLogoIconLabel.setEditable(andBottom);
+        addIconLabel.setEditable(andBottom);
 
         // вывод верхней панели
         int gridy = super.initTopArea();
@@ -387,12 +387,12 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                 return;
             }
 
-            Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
+            Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, itemAppData, creator,
                     exLink, textName.getText(), feePow, birthday, deathday, gender,
                     "", //textPersonNumber.getText(),
                     birthLatitude,
                     birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),
-                    height, addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(), textAreaDescription.getText(),
+                    height, addIconLabel.getImgBytes(), addImageLabel.getImgBytes(), textAreaDescription.getText(),
                     creator, null);
 
             transaction = (IssuePersonRecord) result.getA();
@@ -403,7 +403,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     PersonHuman personHuman = (PersonHuman) transaction.getItem();
                     // SIGN
                     personHuman.sign(creator);
-                    byte[] issueBytes = personHuman.toBytes(false, false);
+                    byte[] issueBytes = personHuman.toBytes(Transaction.FOR_NETWORK, false, false);
                     String base58str = Base58.encode(issueBytes);
                     if (registrar == null) {
                         // copy to clipBoard

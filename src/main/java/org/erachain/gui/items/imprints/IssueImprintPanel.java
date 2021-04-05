@@ -111,19 +111,17 @@ public class IssueImprintPanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
-        transaction = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, exLink, name_total,
+        transaction = (IssueImprintRecord) Controller.getInstance().issueImprint1(itemAppData, creator, exLink, name_total,
                 textAreaDescription.getText(),
-                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
+                addIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
                 feePow);
     }
 
     protected String makeTransactionView() {
 
         String text = "<HTML><body>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Imprint") + "<br><br><br>";
-        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.T("Hash") + ":&nbsp;" + name_total + "<br>";
+        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Imprint") + "<br><br><br>"
+                + makeHeadView("Hash");
         text += Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
 
         return text;

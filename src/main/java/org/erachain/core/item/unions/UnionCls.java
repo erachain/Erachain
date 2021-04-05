@@ -29,15 +29,15 @@ public abstract class UnionCls extends ItemCls {
     protected long birthday; // timestamp
     protected long parent; // parent union
 
-    public UnionCls(byte[] typeBytes, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
-        super(typeBytes, maker, name, icon, image, description);
+    public UnionCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
+        super(typeBytes, appData, maker, name, icon, image, description);
         this.birthday = birthday;
         this.parent = parent;
 
     }
 
-    public UnionCls(int type, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
-        this(new byte[TYPE_LENGTH], maker, name, birthday, parent, icon, image, description);
+    public UnionCls(int type, byte[] appData, PublicKeyAccount maker, String name, long birthday, long parent, byte[] icon, byte[] image, String description) {
+        this(new byte[TYPE_LENGTH], appData, maker, name, birthday, parent, icon, image, description);
         this.typeBytes[0] = (byte) type;
     }
 
@@ -90,9 +90,9 @@ public abstract class UnionCls extends ItemCls {
     }
 
     // PARSE
-    public byte[] toBytes(boolean includeReference, boolean onlyBody) {
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean onlyBody) {
 
-        byte[] data = super.toBytes(includeReference, onlyBody);
+        byte[] data = super.toBytes(forDeal, includeReference, onlyBody);
 
         // WRITE BIRTHDAY
         byte[] birthdayBytes = Longs.toByteArray(this.birthday);

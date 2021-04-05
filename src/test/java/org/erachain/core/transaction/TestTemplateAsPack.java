@@ -28,6 +28,8 @@ public class TestTemplateAsPack {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestTemplateAsPack.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     //Long Transaction.FOR_PACK = null;
 
     //boolean asPack = true;
@@ -38,7 +40,10 @@ public class TestTemplateAsPack {
     byte FEE_POWER = (byte) 1;
     byte[] templateReference = new byte[64];
     long timestamp = NTP.getTime();
-    long flags = 0l;
+
+    byte[] itemAppData = null;
+    long txFlags = 0L;
+
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -76,7 +81,7 @@ public class TestTemplateAsPack {
         init();
 
         //CREATE PLATE
-        Template template = new Template(maker, "test", icon, image, "strontje");
+        Template template = new Template(itemAppData, maker, "test", icon, image, "strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
         Transaction issueTemplateTransaction = new IssueTemplateRecord(maker, template);
@@ -99,8 +104,8 @@ public class TestTemplateAsPack {
 
         init();
 
-        TemplateCls template = new Template(maker, "test132", icon, image, "12345678910strontje");
-        byte[] raw = template.toBytes(includeReference, false);
+        TemplateCls template = new Template(itemAppData, maker, "test132", icon, image, "12345678910strontje");
+        byte[] raw = template.toBytes(forDeal, includeReference, false);
         assertEquals(raw.length, template.getDataLength(includeReference));
 
         //CREATE ISSUE PLATE TRANSACTION
@@ -151,14 +156,14 @@ public class TestTemplateAsPack {
 
         init();
 
-        Template template = new Template(maker, "test", icon, image, "strontje");
+        Template template = new Template(itemAppData, maker, "test", icon, image, "strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
         issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
         issueTemplateRecord.sign(maker, asPack);
 
-        assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_PACK, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_PACK, txFlags));
         Long makerReference = maker.getLastTimestamp(db)[0];
         issueTemplateRecord.process(gb, asPack);
 
@@ -168,7 +173,7 @@ public class TestTemplateAsPack {
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);
         assertEquals(true, db.getItemTemplateMap().contains(key));
 
-        TemplateCls template_2 = new Template(maker, "test132_2", icon, image, "2_12345678910strontje");
+        TemplateCls template_2 = new Template(itemAppData, maker, "test132_2", icon, image, "2_12345678910strontje");
         IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2);
         issueTemplateTransaction_2.sign(maker, asPack);
         issueTemplateTransaction_2.process(gb, asPack);
@@ -179,7 +184,7 @@ public class TestTemplateAsPack {
         assertEquals(0, mapSize - 4);
 
         //CHECK PLATE IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemTemplateMap().get(key).toBytes(includeReference, false), template.toBytes(includeReference, false)));
+        assertEquals(true, Arrays.equals(db.getItemTemplateMap().get(key).toBytes(forDeal, includeReference, false), template.toBytes(forDeal, includeReference, false)));
 
         //CHECK REFERENCE SENDER
         assertEquals((long) makerReference, (long) maker.getLastTimestamp(db)[0]);
@@ -191,7 +196,7 @@ public class TestTemplateAsPack {
 
         init();
 
-        Template template = new Template(maker, "test", icon, image, "strontje");
+        Template template = new Template(itemAppData, maker, "test", icon, image, "strontje");
         Long makerReference = maker.getLastTimestamp(db)[0];
 
         //CREATE ISSUE PLATE TRANSACTION

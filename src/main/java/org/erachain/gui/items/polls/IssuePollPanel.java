@@ -78,10 +78,10 @@ public class IssuePollPanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
-        transaction = (IssuePollRecord) Controller.getInstance().issuePoll(creator,
+        transaction = (IssuePollRecord) Controller.getInstance().issuePoll(itemAppData, creator,
                 exLink, textName.getText(), textAreaDescription.getText(),
                 optionsTableModel.getOptions(),
-                addLogoIconLabel.getImgBytes(), addImageLabel.getImgBytes(), feePow);
+                addIconLabel.getImgBytes(), addImageLabel.getImgBytes(), feePow);
 
     }
 
@@ -89,10 +89,8 @@ public class IssuePollPanel extends IssueItemPanel {
 
         String text = "<HTML><body>";
         text += Lang.T("Confirmation Transaction") + ":&nbsp;"
-                + Lang.T("Issue Voting") + "<br><br><br>";
-        text += Lang.T("Creator") + ":&nbsp;" + transaction.getCreator() + "<br>"
-                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-        text += Lang.T("Name") + ":&nbsp;" + this.textName.getText() + "<br>";
+                + Lang.T("Issue Voting") + "<br><br><br>"
+                + makeHeadView("Title");
         text += "<br>" + Lang.T("Description") + ":<br>"
                 + Library.to_HTML(this.textAreaDescription.getText()) + "<br>";
         text += "<br>" + Lang.T("Options") + ":<br>";

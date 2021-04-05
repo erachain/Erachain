@@ -193,11 +193,11 @@ public class SettingsFrame extends JDialog {
         boolean changeLang = false;
 
         // save Rate
-        
+
+        settingsJSONbuf.put("compuRateUseDEX", settingsTabPane.rates_Setting_Panel.getUseDEX());
         settingsJSONbuf.put("compuRate", settingsTabPane.rates_Setting_Panel.getRate().toString());
         settingsJSONbuf.put("compuRateAsset", settingsTabPane.rates_Setting_Panel.getRateAsset().getKey());
         settingsJSONbuf.put("defaultPairAsset", settingsTabPane.rates_Setting_Panel.getDefaultPairAsset().getKey());
-        Controller.getInstance().updateCompuRaes();
 
         // save backup settings
         settingsJSONbuf.put("backupenabled", settingsTabPane.backUp_Setting_Panel.jCheckBox_Enable_BackUp.isSelected());

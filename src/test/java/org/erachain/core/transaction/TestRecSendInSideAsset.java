@@ -41,7 +41,9 @@ public class TestRecSendInSideAsset {
     Tuple3<String, Long, String> creditKey;
     Tuple3<String, Long, String> creditKeyReverse;
 
-    long flags = Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT;
+    byte[] itemAppData = null;
+    long txFlags = Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT;
+
     Controller cntrl;
     //CREATE KNOWN ACCOUNT
     byte[] privateKey_1 = Crypto.getInstance().createKeyPair(Crypto.getInstance().digest("tes213sdffsdft".getBytes())).getA();
@@ -89,12 +91,12 @@ public class TestRecSendInSideAsset {
         emitter.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         emitter.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
-        asset = new AssetVenture(creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
+        asset = new AssetVenture(itemAppData, creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
         // set SCALABLE assets ++
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(db, 0l);
 
-        assetInSide = new AssetVenture(emitter, "inSide Asset", icon, image, "...", AssetCls.AS_INSIDE_ASSETS, scale, 500l);
+        assetInSide = new AssetVenture(itemAppData, emitter, "inSide Asset", icon, image, "...", AssetCls.AS_INSIDE_ASSETS, scale, 500l);
 
         if (withIssue) {
     
@@ -133,13 +135,13 @@ public class TestRecSendInSideAsset {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NO_BALANCE);
 
         r_Send = new RSend(emitter, exLink, FEE_POWER, creditor, assetKey, BigDecimal.valueOf(50),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         r_Send.sign(emitter, Transaction.FOR_NETWORK);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -188,7 +190,7 @@ public class TestRecSendInSideAsset {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NO_BALANCE);
 
         // INVALID
         r_Send = new RSend(
@@ -199,7 +201,7 @@ public class TestRecSendInSideAsset {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_DEBT_BALANCE);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NO_DEBT_BALANCE);
 
         // INVALID
         r_Send = new RSend(
@@ -207,7 +209,7 @@ public class TestRecSendInSideAsset {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NO_BALANCE);
 
         // GET CREDIT - дать в кредит актив
         r_Send = new RSend(
@@ -215,7 +217,7 @@ public class TestRecSendInSideAsset {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         r_Send.sign(emitter, Transaction.FOR_NETWORK);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -281,7 +283,7 @@ public class TestRecSendInSideAsset {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_DEBT_BALANCE);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NO_DEBT_BALANCE);
 
         // INVALID
         r_Send = new RSend(
@@ -292,7 +294,7 @@ public class TestRecSendInSideAsset {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         r_Send.sign(emitter, Transaction.FOR_NETWORK);
         r_Send.process(gb, Transaction.FOR_NETWORK);
@@ -348,7 +350,7 @@ public class TestRecSendInSideAsset {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         r_Send.sign(emitter, Transaction.FOR_NETWORK);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -363,7 +365,7 @@ public class TestRecSendInSideAsset {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
         r_Send.sign(emitter, Transaction.FOR_NETWORK);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -397,7 +399,7 @@ public class TestRecSendInSideAsset {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NO_BALANCE);
 
         r_Send.sign(emitter, Transaction.FOR_NETWORK);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);

@@ -24,23 +24,23 @@ public class ItemFactory {
         return instance;
     }
 
-    public ItemCls parse(int type, byte[] data, boolean includeReference) throws Exception {
+    public ItemCls parse(int forDeal, int type, byte[] data, boolean includeReference) throws Exception {
 
         switch (type) {
             case ItemCls.ASSET_TYPE:
-                return AssetFactory.getInstance().parse(data, includeReference);
+                return AssetFactory.getInstance().parse(forDeal, data, includeReference);
             case ItemCls.IMPRINT_TYPE:
-                return Imprint.parse(data, includeReference);
+                return Imprint.parse(forDeal, data, includeReference);
             case ItemCls.TEMPLATE_TYPE:
-                return TemplateFactory.getInstance().parse(data, includeReference);
+                return TemplateFactory.getInstance().parse(forDeal, data, includeReference);
             case ItemCls.PERSON_TYPE:
-                return PersonFactory.getInstance().parse(data, includeReference);
+                return PersonFactory.getInstance().parse(forDeal, data, includeReference);
             case ItemCls.POLL_TYPE:
-                return PollFactory.getInstance().parse(data, includeReference);
+                return PollFactory.getInstance().parse(forDeal, data, includeReference);
             case ItemCls.STATUS_TYPE:
-                return StatusFactory.getInstance().parse(data, includeReference);
+                return StatusFactory.getInstance().parse(forDeal, data, includeReference);
             case ItemCls.UNION_TYPE:
-                return UnionFactory.getInstance().parse(data, includeReference);
+                return UnionFactory.getInstance().parse(forDeal, data, includeReference);
         }
 
         throw new Exception("Invalid ITEM type: " + type);

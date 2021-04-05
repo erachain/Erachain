@@ -44,11 +44,16 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
     public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, File imageFile, int cropWidth, int cropHeight) {
 
-        this.parent = parent;
-        this.cropWidth = cropWidth;
-
         this.cropWidth = this.originalCropWidth = cropWidth;
         this.cropHeight = this.originalCropHeight = cropHeight;
+
+        if (imageFile.getName().toLowerCase().endsWith(".mp4")) {
+            // VIDEO MP4
+            return;
+        }
+
+        this.parent = parent;
+        this.cropWidth = cropWidth;
 
         try {
             image = ImageIO.read(imageFile);
@@ -57,7 +62,11 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             return;
         }
 
-        init();
+        try {
+            init();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
     }
 
@@ -78,7 +87,12 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
     public void init() {
 
-        setPreferredSize(new Dimension((int) (cropWidth * 2.0f), (int) (cropHeight * 1.5f)));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        Dimension screens = kit.getScreenSize();
+        int h = Integer.min((int) (screens.height * 0.9), (int) (cropWidth * 1.2f));
+        int w = Integer.min((int) (screens.width * 0.9), (int) (cropHeight * 1.2f));
+        setPreferredSize(new Dimension(w, h));
+
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
         cropY = getPreferredSize().height / 2 - cropHeight / 2;
 

@@ -175,7 +175,7 @@ public class CreateOrderPanel extends JPanel {
 
         // AMOUNT
         detailGBC.gridy++;
-        this.txtAmountHave = new MDecimalFormatedTextField();
+        this.txtAmountHave = new MDecimalFormatedTextField(Double.class);
         // set scale
         this.txtAmountHave.setScale(have == null ? 8 : buying ? want.getScale() : have.getScale());
         this.add(this.txtAmountHave, detailGBC);
@@ -194,7 +194,7 @@ public class CreateOrderPanel extends JPanel {
         this.add(priceLabel, labelGBC);
         // PRICE
         detailGBC.gridy++;
-        txtPrice = new MDecimalFormatedTextField();
+        txtPrice = new MDecimalFormatedTextField(Double.class);
         // set scale
 
         txtPrice.setScale(setScale(6, want));
@@ -242,7 +242,7 @@ public class CreateOrderPanel extends JPanel {
 
         // AMOUNT
         detailGBC.gridy++;
-        txtAmountWant = new MDecimalFormatedTextField();
+        txtAmountWant = new MDecimalFormatedTextField(Double.class);
         txtAmountWant.setScale(want == null ? 8 : buying ? have.getScale() : want.getScale());
         txtAmountWant.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 

@@ -27,31 +27,31 @@ public class PersonHuman extends PersonCls {
     // for personal data maker - his signature
     protected byte[] makerSignature;
 
-    public PersonHuman(PublicKeyAccount maker, String fullName, long birthday, long deathday,
+    public PersonHuman(byte[] appData, PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
                        byte[] makerSignature) {
-        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, maker, fullName, birthday, deathday,
+        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, appData, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
         this.makerSignature = makerSignature;
     }
 
-    public PersonHuman(PublicKeyAccount maker, String fullName, String birthday, String deathday,
+    public PersonHuman(byte[] appData, PublicKeyAccount maker, String fullName, String birthday, String deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description,
                        byte[] makerSignature) {
-        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, maker, fullName, birthday, deathday,
+        super(new byte[]{(byte) TYPE_ID, makerSignature == null ? (byte) 0 : (byte) 1}, appData, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
         this.makerSignature = makerSignature;
     }
 
-    public PersonHuman(byte[] typeBytes, PublicKeyAccount maker, String fullName, long birthday, long deathday,
+    public PersonHuman(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
                        String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image,
                        String description, byte[] makerSignature) {
-        super(typeBytes, maker, fullName, birthday, deathday,
+        super(typeBytes, appData, maker, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
         this.makerSignature = makerSignature;
@@ -62,7 +62,7 @@ public class PersonHuman extends PersonCls {
     //PARSE
     // TODO - когда нулевая длдлинна и ошибка - но в ГУИ ошибка нне высветилась и создалась плоая запись и она развалила сеть
     // includeReference - TRUE only for store in local DB
-    public static PersonHuman parse(byte[] data, boolean includeReference) throws Exception {
+    public static PersonHuman parse(byte[] data, boolean includeReference, int forDeal) throws Exception {
 
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
@@ -77,12 +77,13 @@ public class PersonHuman extends PersonCls {
         int fullNameLength = Byte.toUnsignedInt(data[position]);
         position++;
 
-        if (fullNameLength < 1 || fullNameLength > MAX_NAME_LENGTH) {
+        // !!! Проверяем по максимуму протокола - по супер классу ItemCls. Локальные ограничения в isValid тут
+        if (fullNameLength < 1 || fullNameLength > ItemCls.MAX_NAME_LENGTH) {
             throw new Exception("Invalid full name length");
         }
 
         byte[] fullNameBytes = Arrays.copyOfRange(data, position, position + fullNameLength);
-        String fullName = new String(fullNameBytes, StandardCharsets.UTF_8);
+        String name = new String(fullNameBytes, StandardCharsets.UTF_8);
         position += fullNameLength;
 
         //READ ICON
@@ -90,7 +91,8 @@ public class PersonHuman extends PersonCls {
         int iconLength = Ints.fromBytes((byte) 0, (byte) 0, iconLengthBytes[0], iconLengthBytes[1]);
         position += ICON_SIZE_LENGTH;
 
-        if (iconLength < 0 || iconLength > MAX_ICON_LENGTH) {
+        // !!! Проверяем по максимуму протокола - по супер классу ItemCls. Локальные ограничения в isValid тут
+        if (iconLength < 0 || iconLength > ItemCls.MAX_ICON_LENGTH) {
             throw new Exception("Invalid icon length - " + iconLength);
         }
 
@@ -102,12 +104,32 @@ public class PersonHuman extends PersonCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
+            // RESET LEN
+            imageLength &= ~APP_DATA_MASK;
+
+        // !!! Проверяем по максимуму протокола - по супер классу ItemCls. Локальные ограничения в isValid тут
         if (imageLength < 0 || imageLength > ItemCls.MAX_IMAGE_LENGTH) {
             throw new Exception("Invalid image length " + imageLength);
         }
 
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        byte[] appData;
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + APP_DATA_LENGTH));
+            position += APP_DATA_LENGTH;
+
+            appData = Arrays.copyOfRange(data, position, position + appDataLen);
+            position += appDataLen;
+
+        } else {
+            appData = null;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
@@ -220,7 +242,7 @@ public class PersonHuman extends PersonCls {
         }
 
         //RETURN
-        PersonHuman personHuman = new PersonHuman(typeBytes, maker, fullName, birthday, deathday,
+        PersonHuman personHuman = new PersonHuman(typeBytes, appData, maker, name, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, height, icon, image, description, makerSignature);
 
@@ -247,8 +269,8 @@ public class PersonHuman extends PersonCls {
         return typeBytes[1] == (byte) 1;
     }
 
-    public byte[] toBytes(boolean includeReference, boolean onlyBody) {
-        byte[] data = super.toBytes(includeReference, onlyBody);
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean onlyBody) {
+        byte[] data = super.toBytes(forDeal, includeReference, onlyBody);
         if (this.typeBytes[1] == 1) {
             data = Bytes.concat(data, this.makerSignature);
         }
@@ -284,7 +306,7 @@ public class PersonHuman extends PersonCls {
         boolean includeReference = false;
         // not use SIGNATURE here
         boolean forMakerSign = true;
-        byte[] data = super.toBytes(includeReference, forMakerSign);
+        byte[] data = super.toBytes(Transaction.FOR_NETWORK, includeReference, forMakerSign);
         if (data == null) {
             //this.typeBytes[1] = (byte)0;
             return;
@@ -316,7 +338,7 @@ public class PersonHuman extends PersonCls {
         boolean includeReference = false;
         boolean forMakerSign = true;
         // not use SIGNATURE here
-        byte[] data = super.toBytes(includeReference, forMakerSign);
+        byte[] data = super.toBytes(Transaction.FOR_NETWORK, includeReference, forMakerSign);
         if (data == null)
             return false;
 

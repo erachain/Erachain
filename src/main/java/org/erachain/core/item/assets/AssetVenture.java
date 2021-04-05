@@ -35,19 +35,18 @@ public class AssetVenture extends AssetCls {
      */
     protected int scale;
 
-    public AssetVenture(byte[] typeBytes, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
-        super(typeBytes, maker, name, icon, image, description, asset_type);
+    public AssetVenture(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+        super(typeBytes, appData, maker, name, icon, image, description, asset_type);
         this.quantity = quantity;
         this.scale = (byte) scale;
     }
 
-    public AssetVenture(int props, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, maker, name, icon, image, description, asset_type, scale, quantity);
+    public AssetVenture(int props, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, appData, maker, name, icon, image, description, asset_type, scale, quantity);
     }
 
-    public AssetVenture(PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
-        //this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, maker, name, assetType, icon, image, description, quantity, scale);
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, maker, name, icon, image, description, asset_type, scale, quantity);
+    public AssetVenture(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity) {
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, asset_type, scale, quantity);
     }
 
     //GETTERS/SETTERS
@@ -58,7 +57,7 @@ public class AssetVenture extends AssetCls {
 
     /**
      * 0 - unlimited for maker.
-     * If < 0 - all but not owner may sold it on exchange for owner - as Auction.
+     * If < 0 - all but not maker may sold it on exchange for maker - as Auction.
      */
     @Override
     public long getQuantity() {
@@ -115,15 +114,15 @@ public class AssetVenture extends AssetCls {
 
     //PARSE
     // includeReference - TRUE only for store in local DB
-    public static AssetVenture parse(byte[] data, boolean includeReference) throws Exception {
+    public static AssetVenture parse(int forDeal, byte[] data, boolean includeReference) throws Exception {
 
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
         int position = TYPE_LENGTH;
 
         //READ CREATOR
-        byte[] ownerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
-        PublicKeyAccount owner = new PublicKeyAccount(ownerBytes);
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
         position += MAKER_LENGTH;
 
         //READ NAME
@@ -158,13 +157,31 @@ public class AssetVenture extends AssetCls {
         int imageLength = Ints.fromByteArray(imageLengthBytes);
         position += IMAGE_SIZE_LENGTH;
 
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
+            // RESET LEN
+            imageLength &= ~APP_DATA_MASK;
+
         if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
             throw new Exception("Invalid image length" + name + ": " + imageLength);
         }
 
-
         byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
         position += imageLength;
+
+        byte[] appData;
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + APP_DATA_LENGTH));
+            position += APP_DATA_LENGTH;
+
+            appData = Arrays.copyOfRange(data, position, position + appDataLen);
+            position += appDataLen;
+
+        } else {
+            appData = null;
+        }
 
         //READ DESCRIPTION
         byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
@@ -208,7 +225,7 @@ public class AssetVenture extends AssetCls {
         position += ASSET_TYPE_LENGTH;
 
         //RETURN
-        AssetVenture venture = new AssetVenture(typeBytes, owner, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]), scale, quantity);
+        AssetVenture venture = new AssetVenture(typeBytes, appData, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]), scale, quantity);
         if (includeReference) {
             venture.setReference(reference, dbRef);
         }
@@ -217,8 +234,8 @@ public class AssetVenture extends AssetCls {
     }
 
     @Override
-    public byte[] toBytes(boolean includeReference, boolean onlyBody) {
-        byte[] data = super.toBytes(includeReference, onlyBody);
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean onlyBody) {
+        byte[] data = super.toBytes(forDeal, includeReference, onlyBody);
 
         //WRITE QUANTITY
         byte[] quantityBytes = Longs.toByteArray(this.quantity);

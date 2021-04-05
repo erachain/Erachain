@@ -34,6 +34,8 @@ public class TestRecTemplate {
 
     static Logger LOGGER = LoggerFactory.getLogger(TestRecTemplate.class.getName());
 
+    int forDeal = Transaction.FOR_NETWORK;
+
     //Long Transaction.FOR_NETWORK = null;
 
     int asPack = Transaction.FOR_NETWORK;
@@ -43,7 +45,9 @@ public class TestRecTemplate {
     byte[] templateReference = new byte[64];
     long timestamp = NTP.getTime();
 
-    long flags = 0L;
+    byte[] itemAppData = null;
+    long txFlags = 0L;
+
     byte[] data = "test123!".getBytes();
     byte[] dbData = null;
     byte[] isText = new byte[]{1};
@@ -86,7 +90,7 @@ public class TestRecTemplate {
 
     private void initTemplate(boolean process) {
 
-        template = new Template(maker, "test132", icon, image, "12345678910strontje");
+        template = new Template(itemAppData, maker, "test132", icon, image, "12345678910strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
         issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -130,8 +134,8 @@ public class TestRecTemplate {
 
         init();
 
-        TemplateCls template = new Template(maker, "test132", icon, image, "12345678910strontje");
-        byte[] raw = template.toBytes(false, false);
+        TemplateCls template = new Template(itemAppData, maker, "test132", icon, image, "12345678910strontje");
+        byte[] raw = template.toBytes(forDeal, false, false);
         assertEquals(raw.length, template.getDataLength(false));
 
         //CREATE ISSUE PLATE TRANSACTION
@@ -190,12 +194,12 @@ public class TestRecTemplate {
 
         init();
 
-        Template template = new Template(maker, "test", icon, image, "strontje");
+        Template template = new Template(itemAppData, maker, "test", icon, image, "strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueTemplateRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_NETWORK, txFlags));
 
         issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
         issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);
@@ -207,7 +211,7 @@ public class TestRecTemplate {
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);
         assertEquals(true, templateMap.contains(key));
 
-        TemplateCls template_2 = new Template(maker, "test132_2", icon, image, "2_12345678910strontje");
+        TemplateCls template_2 = new Template(itemAppData, maker, "test132_2", icon, image, "2_12345678910strontje");
         IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, null, template_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db)[0]);
         issueTemplateTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueTemplateTransaction_2.process(gb, Transaction.FOR_NETWORK);
@@ -216,7 +220,7 @@ public class TestRecTemplate {
         assertEquals(mapSize, templateMap.size());
 
         //CHECK PLATE IS CORRECT
-        assertEquals(true, Arrays.equals(templateMap.get(key).toBytes(true, false), template.toBytes(true, false)));
+        assertEquals(true, Arrays.equals(templateMap.get(key).toBytes(forDeal, true, false), template.toBytes(forDeal, true, false)));
 
         //CHECK REFERENCE SENDER
         assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
@@ -231,7 +235,7 @@ public class TestRecTemplate {
 
         init();
 
-        Template template = new Template(maker, "test", icon, image, "strontje");
+        Template template = new Template(itemAppData, maker, "test", icon, image, "strontje");
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
@@ -474,7 +478,7 @@ public class TestRecTemplate {
 
         signNoteRecord = new RSignNote(maker, FEE_POWER, templateKey, data, dbData, timestamp + 10, maker.getLastTimestamp(db)[0]);
         signNoteRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(Transaction.FOR_NETWORK, flags));
+        assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(Transaction.FOR_NETWORK, txFlags));
 
         signNoteRecord.sign(maker, Transaction.FOR_NETWORK);
         signNoteRecord.process(gb, Transaction.FOR_NETWORK);

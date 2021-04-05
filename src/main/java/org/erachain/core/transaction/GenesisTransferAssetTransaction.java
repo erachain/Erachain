@@ -86,10 +86,10 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         if (key < 0) {
             //READ OWNER
-            byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
-            Account owner = new Account(ownerBytes);
+            byte[] makerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
+            Account maker = new Account(makerBytes);
             position += OWNER_LENGTH;
-            return new GenesisTransferAssetTransaction(recipient, key, amount, owner);
+            return new GenesisTransferAssetTransaction(recipient, key, amount, maker);
         } else {
             return new GenesisTransferAssetTransaction(recipient, key, amount);
         }
@@ -290,7 +290,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         if (key < 0) {
             // THIS is CREDIT
-            //this.owner.setBalance(key, this.owner.getBalance(db, key).subtract(this.amount), db);
+            //this.maker.setBalance(key, this.owner.getBalance(db, key).subtract(this.amount), db);
             this.creator.changeBalance(this.dcSet, true, false, key, this.amount,
                     false, false, false);
             this.dcSet.getCredit_AddressesMap().add(

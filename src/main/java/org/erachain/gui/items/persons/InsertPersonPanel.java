@@ -237,7 +237,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         person = null;
         reset();
         try {
-            person = (PersonHuman) PersonFactory.getInstance().parse(dataPerson, false);
+            person = (PersonHuman) PersonFactory.getInstance().parse(Transaction.FOR_NETWORK, dataPerson, false);
         } catch (Exception ee) {
             JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.T("Error"),
                     JOptionPane.ERROR_MESSAGE);
@@ -246,7 +246,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
         textName.setText(person.viewName());
         addImageLabel.set(person.getImage());
-        addLogoIconLabel.set(person.getIcon());
+        addIconLabel.set(person.getIcon());
 
         // SET ONE TIME ZONE for Birthday
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

@@ -28,7 +28,10 @@ import java.nio.file.Paths;
 import java.util.*;
 
 
-// 1019 - Movable = true; Divisible = NO; Quantity = 1
+/**
+ * flag[0] - profitFeeMin[int] + profitFeeMax[int]
+ * flag[1] - profitTax[int] + loanInterest[int] //  use "/apiasset/image/1048664" "/apiasset/icon/1048664"
+ */
 public abstract class AssetCls extends ItemCls {
 
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
@@ -36,7 +39,6 @@ public abstract class AssetCls extends ItemCls {
     protected static final int ASSET_TYPE_LENGTH = 1;
     //
     protected int assetType;
-
 
     // CORE KEY
     public static final long ERA_KEY = 1L;
@@ -299,14 +301,14 @@ public abstract class AssetCls extends ItemCls {
      */
     public static final int AS_SELF_MANAGED_SHARE = 129;
 
-    protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
-        super(typeBytes, owner, name, icon, image, description);
+    protected AssetCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        super(typeBytes, appData, maker, name, icon, image, description);
         this.assetType = assetType;
 
     }
 
-    public AssetCls(int type, byte pars, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int assetType) {
-        this(new byte[TYPE_LENGTH], owner, name, icon, image, description, assetType);
+    public AssetCls(int type, byte pars, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+        this(new byte[TYPE_LENGTH], appData, maker, name, icon, image, description, assetType);
         this.typeBytes[0] = (byte) type;
         this.typeBytes[1] = pars;
     }
@@ -2286,24 +2288,53 @@ public abstract class AssetCls extends ItemCls {
 
         PublicKeyAccount haveAssetMaker = assetHave.getMaker();
         PublicKeyAccount inviter;
-        if (assetHave.getAssetType() == AS_NON_FUNGIBLE
-                && !receiver.equals(haveAssetMaker)) {
+        if (assetHave.getAssetType() == AS_NON_FUNGIBLE) {
             // значит приход + это тот актив который мы можем поделить
-            // и это не сам автор продает
-            assetMakerRoyalty = tradeAmount.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
-            inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
-            forgerFee = inviterRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+            if (receiver.equals(haveAssetMaker)) {
+                assetMakerRoyalty = BigDecimal.ZERO;
+            } else {
+                // это не сам автор продает
+                assetMakerRoyalty = tradeAmount.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+            }
 
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
-            inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
+            if (issuerPersonDuration != null) {
+                inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
+                if (inviter == null) {
+                    inviterRoyalty = BigDecimal.ZERO;
+                } else {
+                    if (receiver.equals(haveAssetMaker)) {
+                        // сам автор продает - 1/100
+                        inviterRoyalty = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
+                    } else {
+                        inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
+                    }
+                }
+            } else {
+                inviter = null;
+                inviterRoyalty = BigDecimal.ZERO;
+            }
+
+            // всегда 1% форжеру
+            forgerFee = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
 
         } else if (assetWant.getKey() < 100 && !isInitiator) {
             // это системные активы - берем комиссию за них
             assetMakerRoyalty = BigDecimal.ZERO;
-            inviterRoyalty = BigDecimal.ZERO;
             forgerFee = tradeAmount.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
 
-            inviter = null;
+            // за рефералку тут тоже
+            Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = receiver.getPersonDuration(dcSet);
+            if (issuerPersonDuration != null) {
+                inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
+                if (inviter == null)
+                    inviterRoyalty = BigDecimal.ZERO;
+                else
+                    inviterRoyalty = forgerFee;
+            } else {
+                inviter = null;
+                inviterRoyalty = BigDecimal.ZERO;
+            }
 
         } else {
             assetMakerRoyalty = BigDecimal.ZERO;

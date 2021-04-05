@@ -36,7 +36,7 @@ public class GenesisIssueStatusRecord extends GenesisIssueItemRecord {
 
         //READ STATUS
         // read without reference
-        StatusCls status = StatusFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        StatusCls status = StatusFactory.getInstance().parse(Transaction.FOR_NETWORK, Arrays.copyOfRange(data, position, data.length), false);
         //position += status.getDataLength(false);
 
         return new GenesisIssueStatusRecord(status);

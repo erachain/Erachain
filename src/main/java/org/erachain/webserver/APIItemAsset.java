@@ -116,7 +116,7 @@ public class APIItemAsset {
         }
 
         ItemCls item = Controller.getInstance().getAsset(asLong);
-        byte[] issueBytes = item.toBytes(false, false);
+        byte[] issueBytes = item.toBytes(Transaction.FOR_NETWORK, false, false);
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -217,7 +217,7 @@ public class APIItemAsset {
 
         if (asset.getImage() != null) {
             // image to byte[] hot scale (param2 =0)
-            //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
             ///return Response.ok(new ByteArrayInputStream(asset.getImage())).build();
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")
@@ -254,7 +254,7 @@ public class APIItemAsset {
 
         if (asset.getIcon() != null) {
             // image to byte[] hot scale (param2 =0)
-            //	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
             //return Response.ok(new ByteArrayInputStream(asset.getIcon())).build();
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")

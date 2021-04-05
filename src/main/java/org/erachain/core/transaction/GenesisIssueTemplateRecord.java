@@ -28,7 +28,7 @@ public class GenesisIssueTemplateRecord extends GenesisIssueItemRecord {
 
         //READ PLATE
         // read without reference
-        TemplateCls template = TemplateFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        TemplateCls template = TemplateFactory.getInstance().parse(Transaction.FOR_NETWORK, Arrays.copyOfRange(data, position, data.length), false);
 
         return new GenesisIssueTemplateRecord(template);
     }

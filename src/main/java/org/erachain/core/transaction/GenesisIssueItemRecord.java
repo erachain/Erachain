@@ -69,7 +69,7 @@ public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
 
         //WRITE ITEM
         // without reference
-        data = Bytes.concat(data, this.item.toBytes(false, false));
+        data = Bytes.concat(data, this.item.toBytes(forDeal, false, false));
 
         return data;
     }

@@ -24,10 +24,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 
-//import java.math.BigDecimal;
-//import java.util.Arrays;
-// import org.slf4j.LoggerFactory;
-//import com.google.common.primitives.Ints;
 
 //birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
@@ -35,10 +31,9 @@ public abstract class PersonCls extends ItemCls {
     public static final int TYPE_KEY = ItemCls.PERSON_TYPE;
 
     public static final long MIN_START_KEY_OLD = 0L;
-    //public static final long START_KEY_UP_ITEMS = 1L << 20;
 
-    public static int MAX_IMAGE_LENGTH = 28000;
-    public static int MIN_IMAGE_LENGTH = 10240;
+    public static int MAX_IMAGE_LENGTH = BlockChain.MAIN_MODE ? 1 << 15 : 1 << 17;
+    private static int MIN_IMAGE_LENGTH = BlockChain.MAIN_MODE ? 10240 : 10240 >> 1;
 
     public static final int HUMAN = 1;
     public static final int DOG = 2;
@@ -74,10 +69,10 @@ public abstract class PersonCls extends ItemCls {
     protected String hairСolor; // First Name|Middle Name|Last Name
     protected byte height;
 
-    public PersonCls(byte[] typeBytes, PublicKeyAccount maker, String name, long birthday, long deathday,
+    public PersonCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, long birthday, long deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
                      String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description) {
-        super(typeBytes, maker, name, icon, image, description);
+        super(typeBytes, appData, maker, name, icon, image, description);
         this.birthday = birthday;
         this.deathday = deathday;
         this.gender = gender;
@@ -90,10 +85,10 @@ public abstract class PersonCls extends ItemCls {
         this.height = height;
     }
 
-    public PersonCls(byte[] typeBytes, PublicKeyAccount maker, String name, String birthday, String deathday,
+    public PersonCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, String birthday, String deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
                      String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description) {
-        this(typeBytes, maker, name, 0, 0,
+        this(typeBytes, appData, maker, name, 0, 0,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
 
@@ -104,10 +99,10 @@ public abstract class PersonCls extends ItemCls {
         this.deathday = deathday == null ? Long.MIN_VALUE : Timestamp.valueOf(deathday).getTime();
     }
 
-    public PersonCls(int type, PublicKeyAccount maker, String name, long birthday, long deathday,
+    public PersonCls(int type, byte[] appData, PublicKeyAccount maker, String name, long birthday, long deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
                      String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description) {
-        this(new byte[]{(byte) type}, maker, name, birthday, deathday,
+        this(new byte[]{(byte) type}, appData, maker, name, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, height, icon, image, description);
     }
@@ -195,11 +190,12 @@ public abstract class PersonCls extends ItemCls {
         return Byte.toUnsignedInt(this.height);
     }
 
-    public int getMAXimageLenght() {
+    @Override
+    public int getImageMAXLength() {
         return this.MAX_IMAGE_LENGTH;
     }
 
-    public int getMINimageLenght() {
+    public int getImageMINLength() {
         return this.MIN_IMAGE_LENGTH;
     }
 
@@ -304,6 +300,13 @@ public abstract class PersonCls extends ItemCls {
 
     }
 
+    /**
+     * Get person hwo issue this PersonKey
+     *
+     * @param dcSet
+     * @param personKey
+     * @return
+     */
     public static PublicKeyAccount getIssuer(DCSet dcSet, Long personKey) {
         ItemCls person = dcSet.getItemPersonMap().get(personKey);
         Long issuerDBRef = dcSet.getTransactionFinalMapSigns().get(person.getReference());
@@ -324,10 +327,19 @@ public abstract class PersonCls extends ItemCls {
         return db.getIssuePersonMap();
     }
 
-    // to BYTES
-    public byte[] toBytes(boolean includeReference, boolean forMakerSign) {
+    public int isValid() {
+        if (hasImageURL()) {
+            // нельзя делать ссылку на фотку у Персон
+            return Transaction.INVALID_IMAGE_LENGTH_MIN;
+        }
 
-        byte[] data = super.toBytes(includeReference, forMakerSign);
+        return super.isValid();
+    }
+
+    // to BYTES
+    public byte[] toBytes(int forDeal, boolean includeReference, boolean forMakerSign) {
+
+        byte[] data = super.toBytes(forDeal, includeReference, forMakerSign);
 
         // WRITE BIRTHDAY
         byte[] birthdayBytes = Longs.toByteArray(this.birthday);

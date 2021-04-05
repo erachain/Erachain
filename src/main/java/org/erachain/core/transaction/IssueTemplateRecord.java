@@ -130,7 +130,7 @@ public class IssueTemplateRecord extends IssueItemRecord {
 
         //READ PLATE
         // template parse without reference - if is = signature
-        TemplateCls template = TemplateFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+        TemplateCls template = TemplateFactory.getInstance().parse(forDeal, Arrays.copyOfRange(data, position, data.length), false);
         position += template.getDataLength(false);
 
         if (forDeal == FOR_DB_RECORD) {

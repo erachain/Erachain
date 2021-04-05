@@ -10,13 +10,17 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 
@@ -33,32 +37,99 @@ public class AddImageLabel extends JPanel {
     private JLabel label;
     private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
+    public JTextField externalURL = new JTextField();
+    public JComboBox externalURLType = new JComboBox(new String[]{Lang.T("Image"), Lang.T("Video")});
+
     private boolean editable = true;
 
     public AddImageLabel(String text, int baseWidth, int baseHeight, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
         setLayout(new BorderLayout());
+        JPanel panelTop = new JPanel();
+        panelTop.setLayout(new BorderLayout());
+        panelTop.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        add(panelTop, BorderLayout.NORTH);
         this.text = text;
-        label = new JLabel("The Label", SwingConstants.CENTER);
-        label.setText(this.text);
-        add(label, BorderLayout.NORTH);
-        add(mainLabel, BorderLayout.CENTER);
-        add(labelSize, BorderLayout.SOUTH);
+        label = new JLabel(text, SwingConstants.CENTER);
+        panelTop.add(label, BorderLayout.NORTH);
+        panelTop.add(mainLabel, BorderLayout.CENTER);
+        panelTop.add(labelSize, BorderLayout.SOUTH);
+
+        JPanel panelCenter = new JPanel();
+        panelCenter.setLayout(new BorderLayout());
+        add(panelCenter, BorderLayout.CENTER);
+
+        panelCenter.add(new JLabel(Lang.T("Use URL") + ":"), BorderLayout.NORTH);
+        panelCenter.add(externalURLType, BorderLayout.EAST);
+        externalURL.setToolTipText(Lang.T("AddImageLabel.externalURL.tip"));
+        panelCenter.add(externalURL, BorderLayout.CENTER);
+        JButton externalURLCheck = new JButton(Lang.T("Check URL"));
+        panelCenter.add(externalURLCheck, BorderLayout.SOUTH);
 
         this.baseWidth = baseWidth;
         this.baseHeight = baseHeight;
         this.initialWidth = initialWidth;
         this.initialHeight = initialHeight;
         mainLabel.setIcon(createEmptyImage(Color.WHITE, this.initialWidth, this.initialHeight));
-        setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         setBorder(BorderFactory.createEtchedBorder());
         mainLabel.setVerticalAlignment(SwingConstants.TOP);
         mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        addMouseListener(new MouseAdapter() {
+
+        panelTop.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (editable) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
                         addImage(minSize, maxSize, originalSize);
+                    }
+                }
+            }
+        });
+
+        externalURLCheck.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                URL url;
+
+                imgBytes = null;
+                labelSize.setText(Lang.T("Source by URL") + " - 0kB");
+                reset();
+
+                String urlTxt = externalURL.getText();
+                try {
+                    url = new URL(urlTxt);
+                } catch (MalformedURLException e) {
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid URL") + "!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (urlTxt.toLowerCase().endsWith(".mp4")) {
+                    externalURLType.setSelectedIndex(1);
+                } else if (urlTxt.toLowerCase().endsWith(".gif")
+                        || urlTxt.toLowerCase().endsWith(".png")
+                        || urlTxt.toLowerCase().endsWith(".jpg")) {
+                    externalURLType.setSelectedIndex(0);
+                } else {
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid type") + "! "
+                            + Lang.T("Need # нужно") + ": .jpg, .gif, .png, .mp4", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("URL is valid") + ". "
+                        + Lang.T("Please set valid media type"), Lang.T("Message"), JOptionPane.INFORMATION_MESSAGE);
+
+                if (false) {
+                    // иногда ссылка не читается даже у JPG
+                    if (externalURLType.getSelectedIndex() == 0) {
+                        if (externalURL.getText().toLowerCase().endsWith(".gif")
+                                || externalURL.getText().toLowerCase().endsWith(".png")) {
+                            mainLabel.setIcon(new ImageIcon(url));
+                        } else {
+                            mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
+                        }
+                    } else {
+                        mainLabel.setIcon(createEmptyImage(Color.WHITE, initialWidth, initialHeight));
                     }
                 }
             }
@@ -123,15 +194,13 @@ public class AddImageLabel extends JPanel {
 
             File file = new File(chooser.getSelectedFile().getPath());
             new ImageCropDialog(file, baseWidth, baseHeight,
-                    file.getName().endsWith("jpg") || file.getName().endsWith("jpeg") ?
-                            TypeOfImage.JPEG : TypeOfImage.GIF,
+                    file.getName().toLowerCase().endsWith("gif") || file.getName().toLowerCase().endsWith("png") ?
+                            TypeOfImage.GIF : TypeOfImage.JPEG,
                     originalSize) {
                 @Override
                 public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage, boolean useOriginal) {
-                    if (bufferedImage == null) {
-                        logger.error("Image does not setup");
-                        return;
-                    }
+
+                    externalURL.setText("");
 
                     if (useOriginal) {
                         URL url;
@@ -143,9 +212,20 @@ public class AddImageLabel extends JPanel {
                             url = null;
                         }
 
-                        mainLabel.setIcon(new ImageIcon(url));
-
+                        if (chooser.getSelectedFile().getPath().toLowerCase().endsWith(".gif")
+                                || chooser.getSelectedFile().getPath().toLowerCase().endsWith(".png")) {
+                            mainLabel.setIcon(new ImageIcon(url));
+                            ///mainLabel.setPreferredSize(new Dimension(100, 100));
+                        } else {
+                            mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
+                        }
                         return;
+
+                    } else {
+                        if (bufferedImage == null) {
+                            logger.error("Image does not setup");
+                            return;
+                        }
                     }
 
                     int bufferedWidth = bufferedImage.getWidth();
@@ -243,6 +323,8 @@ public class AddImageLabel extends JPanel {
     }
 
     public byte[] getImgBytes() {
-        return imgBytes;
+        if (externalURL.getText().isEmpty())
+            return imgBytes;
+        return externalURL.getText().getBytes(StandardCharsets.UTF_8);
     }
 }

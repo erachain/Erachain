@@ -170,11 +170,11 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         AssetCls asset;
         if (AssetCls.isTypeUnique(assetType, quantity)) {
-            asset = new AssetUnique(creator, textName.getText(), addLogoIconLabel.getImgBytes(),
+            asset = new AssetUnique(itemAppData, creator, textName.getText(), addIconLabel.getImgBytes(),
                     addImageLabel.getImgBytes(), textAreaDescription.getText(),
                     assetType);
         } else {
-            asset = new AssetVenture(creator, textName.getText(), addLogoIconLabel.getImgBytes(),
+            asset = new AssetVenture(itemAppData, creator, textName.getText(), addIconLabel.getImgBytes(),
                     addImageLabel.getImgBytes(), textAreaDescription.getText(),
                     assetType, scale, quantity);
         }
@@ -190,9 +190,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         String text = "<body><h2>";
         text += Lang.T("Confirmation Transaction") + ":&nbsp;"
                 + Lang.T("Issue Asset") + "</h2>"
-                + Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
-                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
-                + "[" + asset.getKey() + "]" + Lang.T("Name") + ":&nbsp;" + asset.viewName() + "<br>"
+                + makeHeadView("Name")
                 + Lang.T("Asset Class") + ":&nbsp;"
                 + Lang.T(asset.getItemSubType() + "") + "<br>"
                 + Lang.T("Asset Type") + ":&nbsp;"

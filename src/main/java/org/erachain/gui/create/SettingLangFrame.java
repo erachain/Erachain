@@ -87,7 +87,7 @@ public class SettingLangFrame extends JDialog {
 
         size_Font = new javax.swing.JComboBox<String>();
         size_Font.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[]{"11", "12", "14", "16", "18", "20", "24"}));
-        size_Font.setSelectedItem(Settings.getInstance().get_Font());
+        size_Font.setSelectedItem(Settings.getInstance().getFontSize());
         this.add(size_Font, fontGBC);
 
         //BUTTON GBC
