@@ -19,7 +19,10 @@ function itemHead(item, forPrint) {
             output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
         }
 
+        output += '<br><video autoplay playsinline loop controls width="350"><source src="apiasset/image/' + key + '"></video>';
+
         output += '</td><td style ="width: 70%; padding-left:20px"><br>';
+
     }
 
 
