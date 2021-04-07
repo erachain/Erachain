@@ -78,7 +78,11 @@ public class WebResource {
             "17_message_in.png", "17_message_out.png", "asset_trade.png",
             "at_tx_in.png", "at_tx_out.png", "grleft.png", "grright.png",
             "redleft.png", "redright.png", "bar.gif", "bar_left.gif",
-            "bar_right.gif", "locked.png", "unlocked.png", "exchange.png"};
+            "bar_right.gif", "locked.png", "unlocked.png", "exchange.png"
+    };
+    String[] videoArray = {
+            "video01.mp4"
+    };
 
     public static String selectTitleOpt(Document htmlDoc) {
         String title = selectFirstElementOpt(htmlDoc, "title");
@@ -1090,6 +1094,42 @@ public class WebResource {
                 break;
             case "svg":
                 type = "image/svg+xml";
+        }
+
+        if (file.exists()) {
+            return Response.ok(file, type).build();
+        } else {
+            return error404(request, null);
+        }
+    }
+
+    @Path("index/video/{filename}")
+    @GET
+    public Response video(@PathParam("filename") String filename) {
+        ArrayList<String> videos = new ArrayList<String>();
+
+        videos.addAll(Arrays.asList(videoArray));
+
+        int index = videos.indexOf(filename);
+
+        if (index == -1) {
+            return error404(request, null);
+        }
+
+        File file = new File("web/video/" + videos.get(index));
+        String type = "";
+
+        switch (getFileExtention(videos.get(index))) {
+            case "mpeg4":
+            case "mp4":
+                type = "video/mp4";
+                break;
+            case "ogv":
+                type = "video/ogg";
+                break;
+            case "webm":
+                type = "video/webm";
+                break;
         }
 
         if (file.exists()) {
