@@ -57,7 +57,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public static final int MEDIA_TYPE_IMG = 0;
     public static final int MEDIA_TYPE_VIDEO = 1;
-    public static final int MEDIA_TYPE_FRAME = 2; // POST
+    public static final int MEDIA_TYPE_SOUND = 2;
+    public static final int MEDIA_TYPE_FRAME = 10; // POST
 
     protected static final int TYPE_LENGTH = 2;
     protected static final int MAKER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
@@ -385,6 +386,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         switch (iconType) {
             case MEDIA_TYPE_VIDEO:
                 return "video";
+            case MEDIA_TYPE_SOUND:
+                return "sound";
             case MEDIA_TYPE_FRAME:
                 return "frame";
             default:
