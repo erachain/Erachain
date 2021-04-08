@@ -9,7 +9,7 @@ function itemHead(item, forPrint) {
     } else if (item.imageURL) {
         source = item.imageURL;
     } else if (item.imageTypeName == 'video') {
-        source = '/apiasset/image/' + item.key;
+        source = '/api' + item.item_type + '/image/' + item.key;
     }
 
     if (source) {

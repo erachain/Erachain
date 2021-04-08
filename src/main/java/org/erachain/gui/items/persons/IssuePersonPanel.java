@@ -8,6 +8,7 @@ import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
@@ -386,6 +387,11 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                 issueJButton.setEnabled(true);
                 return;
             }
+
+            // соберем данные общего класса
+            itemAppData = ItemCls.makeAppData(0L,
+                    !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
+                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType());
 
             Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, itemAppData, creator,
                     exLink, textName.getText(), feePow, birthday, deathday, gender,

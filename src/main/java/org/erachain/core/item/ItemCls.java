@@ -835,10 +835,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         if (hasIconURL()) {
             itemJSON.put("iconURL", getIconURL());
         } else {
-            if (withIcon && this.getIcon() != null && this.getIcon().length > 0)
+            if (withIcon && getIconType() == ItemCls.MEDIA_TYPE_IMG && this.getIcon() != null && this.getIcon().length > 0)
                 itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-            else
-                itemJSON.put("icon", "");
         }
 
         itemJSON.put("maker", this.maker.getAddress());
@@ -926,12 +924,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         // ADD DATA
         if (hasIconURL()) {
             itemJSON.put("iconURL", getIconURL());
-            itemJSON.put("icon", "");
         } else {
             if (getIcon() != null && getIcon().length > 0)
                 itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-            else
-                itemJSON.put("icon", "");
         }
 
         itemJSON.put("imageType", getImageType());
@@ -939,12 +934,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         if (hasImageURL()) {
             itemJSON.put("imageURL", getImageURL());
-            itemJSON.put("image", "");
         } else {
             if (getImage() != null && getImage().length > 0)
                 itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
-            else
-                itemJSON.put("image", "");
         }
 
         return itemJSON;
@@ -962,6 +954,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         JSONObject itemJSON = new JSONObject();
         itemJSON.put("key", this.getKey());
         itemJSON.put("name", this.viewName());
+        itemJSON.put("item_type", this.getItemTypeName());
 
         if (description != null && !description.isEmpty()) {
             if (viewDescription().length() > 100) {
@@ -988,10 +981,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             itemJSON.put("iconURL", getIconURL());
             itemJSON.put("icon", "");
         } else {
-            if (getIcon() != null && getIcon().length > 0)
+            if (getIconType() == ItemCls.MEDIA_TYPE_IMG && getIcon() != null && getIcon().length > 0)
                 itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-            else
-                itemJSON.put("icon", "");
+            //else
+            //    itemJSON.put("icon", "");
         }
 
         return itemJSON;

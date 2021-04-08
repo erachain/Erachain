@@ -152,6 +152,8 @@ function makeMediaIcon(item, class1, style1) {
         source = item.iconURL;
     } else if (item.icon) {
         source = 'data:image/gif;base64,' + item.icon;
+    } else if (item.iconTypeName == 'video') {
+        source = '/api' + item.item_type + '/icon/' + item.key;
     }
 
     if (!source)
