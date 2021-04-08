@@ -1678,7 +1678,7 @@ public class API {
 
     @Path("assetimage/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"image/png", "image/jpeg"})
     public Response assetImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -1717,7 +1717,7 @@ public class API {
     @Deprecated
     @Path("asseticon/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"image/png", "image/jpeg"})
     public Response assetIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {
@@ -1754,7 +1754,7 @@ public class API {
     @Deprecated
     @Path("personimage/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"image/png", "image/jpeg"})
     public Response getFullImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;

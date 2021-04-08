@@ -1142,7 +1142,7 @@ public class WebResource {
     @Deprecated
     @Path("index/personimage")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"image/png", "image/jpeg"})
     public Response getFullImage() {
 
         long key = new Long(request.getParameter("key"));
@@ -1177,7 +1177,7 @@ public class WebResource {
     @Deprecated
     @Path("index/assetimage")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"image/png", "image/jpeg"})
     public Response getAssetImage() {
 
         long key = new Long(request.getParameter("key"));
