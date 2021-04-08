@@ -195,7 +195,7 @@ public class APIItemAsset {
 
     @Path("image/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"video/mp4", "image/gif, image/png, image/jpg"})
     public Response assetImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -233,7 +233,7 @@ public class APIItemAsset {
 
     @Path("icon/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"video/mp4", "image/gif, image/png, image/jpg"})
     public Response assetIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {

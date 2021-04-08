@@ -135,6 +135,14 @@ function showWindowImage(source) {
 
 function showWindowVideo(source) {
   var video = document.getElementById('video-holder');
+  video.style.display = 'block';
+  video.style.resizable = 1;
+  video.src = source;
+  video.loop = 1;
+}
+
+function showWindowVideo(source) {
+  var video = document.getElementById('video-holder');
   video.src = source;
   video.style.display = 'block';
   video.style.resizable = 1;

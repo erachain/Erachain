@@ -160,7 +160,7 @@ public class APIItemTemplate {
 
     @Path("image/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"video/mp4", "image/gif, image/png, image/jpg"})
     public Response templateImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -198,7 +198,7 @@ public class APIItemTemplate {
 
     @Path("icon/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"video/mp4", "image/gif, image/png, image/jpg"})
     public Response templateIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {
