@@ -8,6 +8,8 @@ function itemHead(item, forPrint) {
         source = 'data:image/gif;base64,' + item.image;
     } else if (item.imageURL) {
         source = item.imageURL;
+    } else if (item.imageTypeName == 'video') {
+        source = '/apiasset/image/' + item.key;
     }
 
     if (source) {
@@ -18,9 +20,6 @@ function itemHead(item, forPrint) {
             output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
             output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
         }
-
-        //output += '<br><br><video autoplay playsinline loop controls width="350"><source src="/index/video/video01.mp4"></video>';
-        output += '<br><br><video autoplay playsinline loop controls width="350"><source src="/apiasset/image/' + item.key + '"></video>';
 
         output += '</td><td style ="width: 70%; padding-left:20px"><br>';
 
