@@ -162,15 +162,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             if (iconTypeByte < 0) {
                 iconAsURL = true;
                 iconTypeByte &= ~ITEM_HAS_URL_MASK;
-                iconType = iconTypeByte;
             }
+            iconType = iconTypeByte;
 
             byte imageTypeByte = appData[pos++];
             if (imageTypeByte < 0) {
                 imageAsURL = true;
                 imageTypeByte &= ~ITEM_HAS_URL_MASK;
-                imageType = imageTypeByte;
             }
+            imageType = imageTypeByte;
 
         }
 
@@ -384,6 +384,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public static String viewMediaType(int iconType) {
         switch (iconType) {
+            case MEDIA_TYPE_IMG:
+                return "img";
             case MEDIA_TYPE_VIDEO:
                 return "video";
             case MEDIA_TYPE_SOUND:
@@ -391,7 +393,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             case MEDIA_TYPE_FRAME:
                 return "frame";
             default:
-                return "img";
+                return "unknown";
         }
     }
 

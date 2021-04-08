@@ -392,7 +392,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     "", //textPersonNumber.getText(),
                     birthLatitude,
                     birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),
-                    height, addIconLabel.getImgBytes(), addImageLabel.getImgBytes(), textAreaDescription.getText(),
+                    height, addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(), textAreaDescription.getText(),
                     creator, null);
 
             transaction = (IssuePersonRecord) result.getA();

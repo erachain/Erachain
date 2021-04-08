@@ -31,7 +31,7 @@ public class IssueTemplatePanel extends IssueItemPanel {
 
         transaction = (IssueTemplateRecord) Controller.getInstance().issueTemplate(itemAppData, creator,
                 exLink, textName.getText(), textAreaDescription.getText(),
-                addIconLabel.getImgBytes(), addImageLabel.getImgBytes(),
+                addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
                 feePow);
     }
 

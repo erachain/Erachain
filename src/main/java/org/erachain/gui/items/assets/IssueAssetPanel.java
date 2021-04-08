@@ -170,12 +170,12 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         AssetCls asset;
         if (AssetCls.isTypeUnique(assetType, quantity)) {
-            asset = new AssetUnique(itemAppData, creator, textName.getText(), addIconLabel.getImgBytes(),
-                    addImageLabel.getImgBytes(), textAreaDescription.getText(),
+            asset = new AssetUnique(itemAppData, creator, textName.getText(), addIconLabel.getMediaBytes(),
+                    addImageLabel.getMediaBytes(), textAreaDescription.getText(),
                     assetType);
         } else {
-            asset = new AssetVenture(itemAppData, creator, textName.getText(), addIconLabel.getImgBytes(),
-                    addImageLabel.getImgBytes(), textAreaDescription.getText(),
+            asset = new AssetVenture(itemAppData, creator, textName.getText(), addIconLabel.getMediaBytes(),
+                    addImageLabel.getMediaBytes(), textAreaDescription.getText(),
                     assetType, scale, quantity);
         }
         transaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
