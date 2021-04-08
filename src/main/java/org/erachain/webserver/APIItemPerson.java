@@ -20,7 +20,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -255,7 +254,7 @@ public class APIItemPerson {
 
     @Path("image/{key}")
     @GET
-    @Produces({"video/mp4", "image/jpeg, image/gif"})
+    //@Produces({"video/mp4", "image/jpeg, image/gif"})
     public Response personImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -273,21 +272,7 @@ public class APIItemPerson {
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
-        PersonCls person = (PersonCls) map.get(key);
-
-        if (person.getImage() != null) {
-            // image to byte[] hot scale (param2 =0)
-            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            ///return Response.ok(new ByteArrayInputStream(person.getImage())).build();
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(person.getImage()))
-                    .build();
-        }
-        return Response.status(200)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity("")
-                .build();
+        return APIItems.getImage(map, key);
 
     }
 
@@ -310,21 +295,8 @@ public class APIItemPerson {
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
-        PersonCls person = (PersonCls) map.get(key);
+        return APIItems.getIcon(map, key);
 
-        if (person.getIcon() != null) {
-            // image to byte[] hot scale (param2 =0)
-            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            //return Response.ok(new ByteArrayInputStream(person.getIcon())).build();
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(person.getIcon()))
-                    .build();
-        }
-        return Response.status(200)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity("")
-                .build();
     }
 
     @GET

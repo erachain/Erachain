@@ -4,7 +4,6 @@ import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemStatusMap;
@@ -17,7 +16,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -178,21 +176,7 @@ public class APIItemStatus {
                     Transaction.ITEM_STATUS_NOT_EXIST);
         }
 
-        StatusCls status = (StatusCls) map.get(key);
-
-        if (status.getImage() != null) {
-            // image to byte[] hot scale (param2 =0)
-            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            ///return Response.ok(new ByteArrayInputStream(status.getImage())).build();
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(status.getImage()))
-                    .build();
-        }
-        return Response.status(200)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity("")
-                .build();
+        return APIItems.getImage(map, key);
 
     }
 
@@ -215,21 +199,8 @@ public class APIItemStatus {
                     Transaction.ITEM_STATUS_NOT_EXIST);
         }
 
-        StatusCls status = (StatusCls) map.get(key);
+        return APIItems.getIcon(map, key);
 
-        if (status.getIcon() != null) {
-            // image to byte[] hot scale (param2 =0)
-            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            //return Response.ok(new ByteArrayInputStream(status.getIcon())).build();
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(status.getIcon()))
-                    .build();
-        }
-        return Response.status(200)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity("")
-                .build();
     }
 
     @GET

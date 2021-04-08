@@ -4,7 +4,6 @@ import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemPollMap;
@@ -17,7 +16,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -181,21 +179,7 @@ public class APIItemPoll {
                     Transaction.ITEM_POLL_NOT_EXIST);
         }
 
-        PollCls poll = (PollCls) map.get(key);
-
-        if (poll.getImage() != null) {
-            // image to byte[] hot scale (param2 =0)
-            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            ///return Response.ok(new ByteArrayInputStream(poll.getImage())).build();
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(poll.getImage()))
-                    .build();
-        }
-        return Response.status(200)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity("")
-                .build();
+        return APIItems.getImage(map, key);
 
     }
 
@@ -218,21 +202,8 @@ public class APIItemPoll {
                     Transaction.ITEM_POLL_NOT_EXIST);
         }
 
-        PollCls poll = (PollCls) map.get(key);
+        return APIItems.getIcon(map, key);
 
-        if (poll.getIcon() != null) {
-            // image to byte[] hot scale (param2 =0)
-            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            //return Response.ok(new ByteArrayInputStream(poll.getIcon())).build();
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(poll.getIcon()))
-                    .build();
-        }
-        return Response.status(200)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity("")
-                .build();
     }
 
     @GET
