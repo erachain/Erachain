@@ -328,6 +328,10 @@ public abstract class PersonCls extends ItemCls {
     }
 
     public int isValid() {
+        if (hasIconURL()) {
+            // нельзя делать ссылку на иконку у Персон
+            return Transaction.INVALID_ICON_LENGTH_MIN;
+        }
         if (hasImageURL()) {
             // нельзя делать ссылку на фотку у Персон
             return Transaction.INVALID_IMAGE_LENGTH_MIN;
