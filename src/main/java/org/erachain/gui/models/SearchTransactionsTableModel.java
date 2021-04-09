@@ -77,7 +77,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
         clear();
 
         if (filter == null || (filter = filter.trim()).isEmpty()) {
-            try (IteratorCloseable<Long> iterator = ((TransactionFinalMap) map).getIterator(0, true)) {
+            try (IteratorCloseable<Long> iterator = ((TransactionFinalMap) map).getIndexIterator(0, true)) {
                 int limit = 100;
                 int countForge = 0;
                 while (iterator.hasNext() && limit > 0) {

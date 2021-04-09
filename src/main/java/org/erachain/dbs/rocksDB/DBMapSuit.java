@@ -143,7 +143,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     }
 
     @Override
-    public IteratorCloseable<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIndexIterator(int index, boolean descending) {
         if (index == 0) {
             // тут берем сами ключи у записей
             return map.getIterator(descending, false);

@@ -363,7 +363,7 @@ public class Account {
         } else {
 
             // здесь нужен протокольный итератор! его нету у балансов поэтому через перебор ключей
-            try (IteratorCloseable<byte[]> iterator = map.getIterator(0, true)) {
+            try (IteratorCloseable<byte[]> iterator = map.getIndexIterator(0, true)) {
 
                 byte[] bytesKey;
                 while (iterator.hasNext()) {
@@ -392,7 +392,7 @@ public class Account {
 
         OrderMapImpl map = dcSet.getOrderMap();
         Order order;
-        try (IteratorCloseable<Long> iterator = map.getIterator(0, true)) {
+        try (IteratorCloseable<Long> iterator = map.getIndexIterator(0, true)) {
             while (iterator.hasNext()) {
                 order = map.get(iterator.next());
                 if (order.getHaveAssetKey() == key) {

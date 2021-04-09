@@ -31,6 +31,9 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     protected DB database;
 
     protected Map<T, U> map;
+    protected T HI;
+    protected T LO;
+
     protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<>();
 
     /**
@@ -138,7 +141,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     }
 
     @Override
-    public IteratorCloseable<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIndexIterator(int index, boolean descending) {
         this.addUses();
 
         // 0 - это главный индекс - он не в списке indexes

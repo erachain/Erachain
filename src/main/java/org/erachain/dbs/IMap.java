@@ -77,7 +77,7 @@ public interface IMap<T, U> {
      * @param descending true if need descending sort
      * @return
      */
-    IteratorCloseable<T> getIterator(int index, boolean descending);
+    IteratorCloseable<T> getIndexIterator(int index, boolean descending);
 
     IteratorCloseable<T> getIterator();
 

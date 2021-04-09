@@ -168,10 +168,10 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     }
 
     @Override
-    public IteratorCloseable<Long> getIterator(int index, boolean descending) {
+    public IteratorCloseable<Long> getIndexIterator(int index, boolean descending) {
         if (database.getEngine().isClosed())
             return new IteratorCloseableImpl(new TreeSet<Long>().iterator());
-        return super.getIterator(index, descending);
+        return super.getIndexIterator(index, descending);
     }
 
     @Override

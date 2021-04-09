@@ -2281,7 +2281,7 @@ public class BlockExplorer {
 
         int count = 25;
 
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = trades.getIterator(0, true)) {
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = trades.getIndexIterator(0, true)) {
             while (count-- > 0 && iterator.hasNext()) {
                 Tuple2<Long, Long> key = iterator.next();
                 Trade trade = trades.get(key);

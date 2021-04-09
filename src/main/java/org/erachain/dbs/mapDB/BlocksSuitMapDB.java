@@ -42,6 +42,9 @@ public class BlocksSuitMapDB extends DBMapSuit<Integer, Block> implements Blocks
                 .valueSerializer(new BlockSerializer())
                 .valuesOutsideNodesEnable()
                 .makeOrGet();
+        HI = Integer.MAX_VALUE;
+        LO = 0;
+
     }
 
 }

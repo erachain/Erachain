@@ -42,7 +42,11 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         map = database.createTreeMap(NAME)
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .valueSerializer(new BlockHeadSerializer())
+                //.comparator(Fun.COMPARATOR) // USE Fun.HI value for map.sub
                 .makeOrGet();
+
+        HI = Integer.MAX_VALUE;
+        LO = 0;
     }
 
     @Override
@@ -66,7 +70,7 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
     public void recalcWeightFull(DCSet dcSet) {
 
         long weightFull = 0l;
-        Iterator<Integer> iterator = this.getIterator(DEFAULT_INDEX, true);
+        Iterator<Integer> iterator = this.getIndexIterator(DEFAULT_INDEX, true);
         while (iterator.hasNext()) {
             Integer key = iterator.next();
             Block.BlockHead item = this.get(key);

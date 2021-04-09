@@ -304,14 +304,13 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     /**
-     *
-     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
+     * @param index      <b>primary Index = 0</b>, secondary index = 1...10000
      * @param descending true if need descending sort
      * @return
      */
     @Override
-    public IteratorCloseable<T> getIterator(int index, boolean descending) {
-        return map.getIterator(index, descending);
+    public IteratorCloseable<T> getIndexIterator(int index, boolean descending) {
+        return map.getIndexIterator(index, descending);
     }
 
     @Override

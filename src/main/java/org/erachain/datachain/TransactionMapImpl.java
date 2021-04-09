@@ -563,7 +563,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         ArrayList<Transaction> values = new ArrayList<Transaction>();
 
         //LOGGER.debug("get ITERATOR");
-        try (IteratorCloseable<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
+        try (IteratorCloseable<Long> iterator = this.getIndexIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
             //LOGGER.debug("get ITERATOR - DONE"); / for merge
 
             Transaction transaction;
@@ -592,7 +592,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     public List<Transaction> getTransactions(Account account, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
+        try (IteratorCloseable<Long> iterator = this.getIndexIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
 
             int i = 0;
             Transaction transaction;
@@ -620,7 +620,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
+        try (IteratorCloseable<Long> iterator = this.getIndexIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
             Account account = new Account(address);
 
             int i = 0;

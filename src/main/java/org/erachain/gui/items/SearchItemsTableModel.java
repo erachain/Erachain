@@ -65,7 +65,7 @@ public abstract class SearchItemsTableModel extends WalletItemTableModel<ItemCls
     }
 
     public void getLast() {
-        try (IteratorCloseable iterator = ((ItemMap) map).getIterator(0, true)) {
+        try (IteratorCloseable iterator = ((ItemMap) map).getIndexIterator(0, true)) {
             fill(Iterators.limit(iterator, 200));
         } catch (IOException e) {
         }

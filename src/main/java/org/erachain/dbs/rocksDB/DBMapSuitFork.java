@@ -238,9 +238,9 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     }
 
     @Override
-    public IteratorCloseable<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIndexIterator(int index, boolean descending) {
 
-        Iterator<T> parentIterator = parent.getIterator(index, descending);
+        Iterator<T> parentIterator = parent.getIndexIterator(index, descending);
         IteratorCloseable<T> iterator;
 
         if (index == 0) {

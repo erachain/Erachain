@@ -317,10 +317,10 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     // TODO надо рекурсию к Родителю по итератору делать
     @Override
-    public IteratorCloseable<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIndexIterator(int index, boolean descending) {
         this.addUses();
 
-        Iterator<T> parentIterator = parent.getIterator(index, descending);
+        Iterator<T> parentIterator = parent.getIndexIterator(index, descending);
         IteratorCloseable<T> iterator;
 
         if (index > 0) {

@@ -45,7 +45,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Clos
         this.index = db.DEFAULT_INDEX;
         this.size = db.size();
         this.descending = false;
-        this.iterator = IteratorCloseableImpl.make(this.filter(db.getIterator(db.DEFAULT_INDEX, this.descending)));
+        this.iterator = IteratorCloseableImpl.make(this.filter(db.getIndexIterator(db.DEFAULT_INDEX, this.descending)));
         this.position = 0;
         additionalFilterFields = new ArrayList<String>();
     }
@@ -68,7 +68,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Clos
         List keys = new ArrayList<Object>();
 
         // обрезаем полный список в базе до 1000
-        try (IteratorCloseable iterator = map.getIterator(map.DEFAULT_INDEX, descending)) {
+        try (IteratorCloseable iterator = map.getIndexIterator(map.DEFAULT_INDEX, descending)) {
 
             int i = 0;
             while (iterator.hasNext() && i++ < limit) {
@@ -113,7 +113,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Clos
                 } catch (IOException e) {
                 }
             } else {
-                try (IteratorCloseable oldIterator = this.iterator; IteratorCloseable newIterator = this.db.getIterator(index, descending)) {
+                try (IteratorCloseable oldIterator = this.iterator; IteratorCloseable newIterator = this.db.getIndexIterator(index, descending)) {
                     this.iterator = IteratorCloseableImpl.make(this.filter(newIterator));
                 } catch (IOException e) {
                 }
@@ -165,7 +165,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Clos
         } else {
             this.size = db.size();
             // старый итератор закроем чтобы освободить память в РоксДБ
-            try (IteratorCloseable oldIterator = this.iterator; IteratorCloseable newIterator = this.db.getIterator(index, descending)) {
+            try (IteratorCloseable oldIterator = this.iterator; IteratorCloseable newIterator = this.db.getIndexIterator(index, descending)) {
                 this.iterator = IteratorCloseableImpl.make(this.filter(newIterator));
             } catch (IOException e) {
             }

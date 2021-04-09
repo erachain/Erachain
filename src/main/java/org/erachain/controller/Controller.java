@@ -1286,7 +1286,7 @@ public class Controller extends Observable {
             return false;
 
         try {
-            try (IteratorCloseable<Long> iterator = map.getIterator(TransactionSuit.TIMESTAMP_INDEX, false)) {
+            try (IteratorCloseable<Long> iterator = map.getIndexIterator(TransactionSuit.TIMESTAMP_INDEX, false)) {
                 long ping = 0;
                 int counter = 0;
                 ///////// big maxCounter freeze network and make bans on response
