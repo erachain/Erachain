@@ -29,6 +29,7 @@ import org.mapdb.Fun.Tuple6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -395,6 +396,34 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             default:
                 return "unknown";
         }
+    }
+
+    public static MediaType getMediaType(int mediaType, byte[] media) {
+        if (mediaType == ItemCls.MEDIA_TYPE_IMG) {
+            byte[] header = new byte[10];
+            System.arraycopy(media, 0, header, 0, 10);
+            String typeName = new String(header).trim();
+            if (typeName.contains("PNG")) {
+                typeName = "png";
+            } else if (typeName.contains("GIF")) {
+                typeName = "gif";
+            } else {
+                typeName = "jpeg";
+            }
+            return new MediaType("image", typeName);
+
+        } else if (mediaType == ItemCls.MEDIA_TYPE_VIDEO) {
+            return new MediaType("video", "mp4");
+        }
+        return null;
+    }
+
+    public MediaType getImageMediaType() {
+        return getMediaType(imageType, image);
+    }
+
+    public MediaType getIconMediaType() {
+        return getMediaType(iconType, icon);
     }
 
     public boolean hasIconURL() {

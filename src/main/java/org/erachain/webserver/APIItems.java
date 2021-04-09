@@ -8,7 +8,6 @@ package org.erachain.webserver;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.ItemMap;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 
@@ -21,26 +20,19 @@ public class APIItems {
 
         ItemCls item = map.get(key);
 
-        if (item.getImage() == null) {
+        byte[] image = item.getImage();
+        if (image == null || image.length == 0) {
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity("")
                     .build();
-
         }
 
-        Response.ResponseBuilder response = Response.status(200)
+        return Response.status(200)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new ByteArrayInputStream(item.getImage()));
-
-        if (item.getImageType() == ItemCls.MEDIA_TYPE_IMG) {
-            response.type(new MediaType("image", "gif"));
-            response.type(new MediaType("image", "jpeg"));
-        } else if (item.getImageType() == ItemCls.MEDIA_TYPE_VIDEO) {
-            response.type(new MediaType("video", "mp4"));
-        }
-
-        return response.build();
+                .entity(new ByteArrayInputStream(image))
+                .type(item.getImageMediaType())
+                .build();
 
     }
 
@@ -48,26 +40,19 @@ public class APIItems {
 
         ItemCls item = map.get(key);
 
-        if (item.getIcon() == null) {
+        byte[] icon = item.getIcon();
+        if (icon == null || icon.length == 0) {
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")
                     .entity("")
                     .build();
-
         }
 
-        Response.ResponseBuilder response = Response.status(200)
+        return Response.status(200)
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(new ByteArrayInputStream(item.getIcon()));
-
-        if (item.getIconType() == ItemCls.MEDIA_TYPE_IMG) {
-            response.type(new MediaType("image", "gif"));
-            response.type(new MediaType("image", "jpeg"));
-        } else if (item.getIconType() == ItemCls.MEDIA_TYPE_VIDEO) {
-            response.type(new MediaType("video", "mp4"));
-        }
-
-        return response.build();
+                .entity(new ByteArrayInputStream(icon))
+                .type(item.getIconMediaType())
+                .build();
 
     }
 
