@@ -1210,7 +1210,7 @@ public class Account {
             return "";
 
         PersonCls person = personRes.b;
-        if (!person.isAlive(0l))
+        if (!person.isAlive(0L))
             return "☗"; // "☗"; ☻
 
         int key = personRes.a;
