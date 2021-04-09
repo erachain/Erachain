@@ -123,7 +123,7 @@ public class API {
         //help.put("GET Person Height", "personheight");
         help.put("GET Person Key by PubKey of Owner", "personkeybyownerpublickey/{publickey}");
         //help.put("GET Person", "person/{key}");
-        help.put("GET Person Data", "persondata/{key}");
+        //help.put("GET Person Data", "persondata/{key}");
         help.put("GET Person Key by Address", "personkeybyaddress/{address}");
         help.put("GET Person by Address", "personbyaddress/{address}");
         help.put("GET Person Key by Public Key", "personkeybypublickey/{publickey}");
@@ -1504,6 +1504,7 @@ public class API {
     }
 
     @GET
+    @Deprecated
     @Path("assetdata/{key}")
     public Response assetData(@PathParam("key") long key) {
 
@@ -1785,6 +1786,7 @@ public class API {
 
 
     @GET
+    @Deprecated
     @Path("persondata/{key}")
     public Response personData(@PathParam("key") long key) {
 

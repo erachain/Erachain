@@ -867,11 +867,19 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJSON.put("iconType", getIconType());
         itemJSON.put("iconTypeName", viewMediaType(iconType));
 
-        if (hasIconURL()) {
-            itemJSON.put("iconURL", getIconURL());
+        if (true) {
+            String iconURL = getIconURL();
+            if (iconURL != null)
+                itemJSON.put("iconURL", iconURL);
+
         } else {
-            if (withIcon && getIconType() == ItemCls.MEDIA_TYPE_IMG && this.getIcon() != null && this.getIcon().length > 0)
-                itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+            // OLD version
+            if (hasIconURL()) {
+                itemJSON.put("iconURL", getIconURL());
+            } else {
+                if (withIcon && getIconType() == ItemCls.MEDIA_TYPE_IMG && this.getIcon() != null && this.getIcon().length > 0)
+                    itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+            }
         }
 
         itemJSON.put("maker", this.maker.getAddress());
