@@ -364,9 +364,24 @@ function persons(data) {
     //for (var i = 0; i < length; i++) {
         var item = data.pageItems[i];
 
+        var source;
+        if (item.imageURL) {
+            source = item.imageURL;
+        } else {
+            source = '/apiperson/image/' + item.key;
+        }
+
         output += '<tr>';
-        output += ' <td><a href=?person=' + item.key + get_lang()
-            + '><img src="/apiperson/image/' + item.key + '" width="100"/></a>';
+        output += ' <td><a href=?person=' + item.key + get_lang();
+
+        if (source) {
+            if (item.imageTypeName == 'video') {
+                output += '><video autoplay playsinline loop controls width="200"><source src="' + source + '"></video></a>';
+            } else {
+                output += '><img width="200" src="' + source + '" /></a>';
+            }
+        }
+
         output += '<td>' + item.key + '<td><a href=?person=' +
             item.key + get_lang() + '>' + escapeHtml(item.name) + '</a>';
         var dateDiff = new Date(item.birthday);

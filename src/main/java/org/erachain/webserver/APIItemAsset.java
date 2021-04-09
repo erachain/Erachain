@@ -24,7 +24,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -195,7 +194,7 @@ public class APIItemAsset {
 
     @Path("image/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response assetImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -213,27 +212,13 @@ public class APIItemAsset {
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
-        AssetCls asset = (AssetCls) map.get(key);
-
-        if (asset.getImage() != null) {
-            // image to byte[] hot scale (param2 =0)
-            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            ///return Response.ok(new ByteArrayInputStream(asset.getImage())).build();
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(asset.getImage()))
-                    .build();
-        }
-        return Response.status(200)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity("")
-                .build();
+        return APIItems.getImage(map, key);
 
     }
 
     @Path("icon/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response assetIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {
@@ -250,21 +235,8 @@ public class APIItemAsset {
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
-        AssetCls asset = (AssetCls) map.get(key);
+        return APIItems.getIcon(map, key);
 
-        if (asset.getIcon() != null) {
-            // image to byte[] hot scale (param2 =0)
-            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            //return Response.ok(new ByteArrayInputStream(asset.getIcon())).build();
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(asset.getIcon()))
-                    .build();
-        }
-        return Response.status(200)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity("")
-                .build();
     }
 
     @GET

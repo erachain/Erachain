@@ -123,7 +123,7 @@ public class API {
         //help.put("GET Person Height", "personheight");
         help.put("GET Person Key by PubKey of Owner", "personkeybyownerpublickey/{publickey}");
         //help.put("GET Person", "person/{key}");
-        help.put("GET Person Data", "persondata/{key}");
+        //help.put("GET Person Data", "persondata/{key}");
         help.put("GET Person Key by Address", "personkeybyaddress/{address}");
         help.put("GET Person by Address", "personbyaddress/{address}");
         help.put("GET Person Key by Public Key", "personkeybypublickey/{publickey}");
@@ -1471,6 +1471,7 @@ public class API {
      * ************* ASSET **************
      */
     @GET
+    @Deprecated
     @Path("assetheight")
     public Response assetHeight() {
 
@@ -1485,6 +1486,7 @@ public class API {
     }
 
     @GET
+    @Deprecated
     @Path("asset/{key}")
     public Response asset(@PathParam("key") long key) {
 
@@ -1504,6 +1506,7 @@ public class API {
     }
 
     @GET
+    @Deprecated
     @Path("assetdata/{key}")
     public Response assetData(@PathParam("key") long key) {
 
@@ -1678,7 +1681,7 @@ public class API {
 
     @Path("assetimage/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"image/png", "image/jpeg"})
     public Response assetImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -1717,7 +1720,7 @@ public class API {
     @Deprecated
     @Path("asseticon/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"image/png", "image/jpeg"})
     public Response assetIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {
@@ -1754,7 +1757,7 @@ public class API {
     @Deprecated
     @Path("personimage/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    @Produces({"image/png", "image/jpeg"})
     public Response getFullImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -1785,6 +1788,7 @@ public class API {
 
 
     @GET
+    @Deprecated
     @Path("persondata/{key}")
     public Response personData(@PathParam("key") long key) {
 

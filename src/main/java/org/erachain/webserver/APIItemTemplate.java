@@ -5,7 +5,6 @@ import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemTemplateMap;
@@ -18,7 +17,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -160,7 +158,7 @@ public class APIItemTemplate {
 
     @Path("image/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response templateImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -178,27 +176,13 @@ public class APIItemTemplate {
                     Transaction.ITEM_TEMPLATE_NOT_EXIST);
         }
 
-        TemplateCls template = (TemplateCls) map.get(key);
-
-        if (template.getImage() != null) {
-            // image to byte[] hot scale (param2 =0)
-            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            ///return Response.ok(new ByteArrayInputStream(template.getImage())).build();
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(template.getImage()))
-                    .build();
-        }
-        return Response.status(200)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity("")
-                .build();
+        return APIItems.getImage(map, key);
 
     }
 
     @Path("icon/{key}")
     @GET
-    @Produces({"image/png", "image/jpg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response templateIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {
@@ -215,21 +199,8 @@ public class APIItemTemplate {
                     Transaction.ITEM_TEMPLATE_NOT_EXIST);
         }
 
-        TemplateCls template = (TemplateCls) map.get(key);
+        return APIItems.getIcon(map, key);
 
-        if (template.getIcon() != null) {
-            // image to byte[] hot scale (param2 =0)
-            //	byte[] b = ImagesTools.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-            //return Response.ok(new ByteArrayInputStream(template.getIcon())).build();
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(new ByteArrayInputStream(template.getIcon()))
-                    .build();
-        }
-        return Response.status(200)
-                .header("Access-Control-Allow-Origin", "*")
-                .entity("")
-                .build();
     }
 
     @GET

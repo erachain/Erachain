@@ -1,5 +1,6 @@
 package org.erachain.gui.library;
 
+import org.erachain.core.item.ItemCls;
 import org.erachain.gui.items.ImageCropDialog;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.lang.Lang;
@@ -30,7 +31,8 @@ public class AddImageLabel extends JPanel {
     private final int initialWidth;
     private final int initialHeight;
     private final String text;
-    private byte[] imgBytes;
+    private byte[] mediaBytes;
+    private int mediaType;
     private int baseWidth;
     private int baseHeight;
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -92,7 +94,7 @@ public class AddImageLabel extends JPanel {
                 // TODO Auto-generated method stub
                 URL url;
 
-                imgBytes = null;
+                mediaBytes = null;
                 labelSize.setText(Lang.T("Source by URL") + " - 0kB");
                 reset();
 
@@ -105,11 +107,11 @@ public class AddImageLabel extends JPanel {
                 }
 
                 if (urlTxt.toLowerCase().endsWith(".mp4")) {
-                    externalURLType.setSelectedIndex(1);
+                    externalURLType.setSelectedIndex(ItemCls.MEDIA_TYPE_VIDEO);
                 } else if (urlTxt.toLowerCase().endsWith(".gif")
                         || urlTxt.toLowerCase().endsWith(".png")
                         || urlTxt.toLowerCase().endsWith(".jpg")) {
-                    externalURLType.setSelectedIndex(0);
+                    externalURLType.setSelectedIndex(ItemCls.MEDIA_TYPE_IMG);
                 } else {
                     JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid type") + "! "
                             + Lang.T("Need # нужно") + ": .jpg, .gif, .png, .mp4", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
@@ -186,145 +188,170 @@ public class AddImageLabel extends JPanel {
         FileChooser chooser = new FileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(false);
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Image", "png", "jpg", "gif");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Media", "mp4", "png", "jpg", "gif");
         chooser.setFileFilter(filter);
-        chooser.setDialogTitle(Lang.T("Open Image") + "...");
+        chooser.setDialogTitle(Lang.T("Open Media") + "...");
         int returnVal = chooser.showOpenDialog(getParent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
 
             File file = new File(chooser.getSelectedFile().getPath());
-            new ImageCropDialog(file, baseWidth, baseHeight,
-                    file.getName().toLowerCase().endsWith("gif") || file.getName().toLowerCase().endsWith("png") ?
-                            TypeOfImage.GIF : TypeOfImage.JPEG,
-                    originalSize) {
-                @Override
-                public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage, boolean useOriginal) {
+            if (file.getName().toLowerCase().endsWith("mp4")) {
+                // VIDEO
+                try {
+                    mediaBytes = Files.readAllBytes(chooser.getSelectedFile().toPath());
+                    mediaType = ItemCls.MEDIA_TYPE_VIDEO;
+                    labelSize.setText(Lang.T("Size") + ": " + (mediaBytes.length >> 10) + " kB");
+                    mainLabel.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("images/icons/video.png")));
+                } catch (Exception e) {
+                }
 
-                    externalURL.setText("");
+            } else {
+                // IMAGE
+                mediaType = ItemCls.MEDIA_TYPE_IMG;
+                new ImageCropDialog(file, baseWidth, baseHeight,
+                        file.getName().toLowerCase().endsWith("gif") || file.getName().toLowerCase().endsWith("png") ?
+                                TypeOfImage.GIF : TypeOfImage.JPEG,
+                        originalSize) {
+                    @Override
+                    public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage, boolean useOriginal) {
 
-                    if (useOriginal) {
-                        URL url;
-                        try {
-                            url = new URL("file", "", chooser.getSelectedFile().getPath());
-                            imgBytes = Files.readAllBytes(chooser.getSelectedFile().toPath());
-                            labelSize.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
-                        } catch (Exception e) {
-                            url = null;
-                        }
+                        externalURL.setText("");
 
-                        if (chooser.getSelectedFile().getPath().toLowerCase().endsWith(".gif")
-                                || chooser.getSelectedFile().getPath().toLowerCase().endsWith(".png")) {
-                            mainLabel.setIcon(new ImageIcon(url));
-                            ///mainLabel.setPreferredSize(new Dimension(100, 100));
-                        } else {
-                            mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
-                        }
-                        return;
+                        if (useOriginal) {
+                            URL url;
+                            try {
+                                url = new URL("file", "", chooser.getSelectedFile().getPath());
+                                mediaBytes = Files.readAllBytes(chooser.getSelectedFile().toPath());
+                                labelSize.setText(Lang.T("Size") + ": " + (mediaBytes.length >> 10) + " kB");
+                            } catch (Exception e) {
+                                url = null;
+                            }
 
-                    } else {
-                        if (bufferedImage == null) {
-                            logger.error("Image does not setup");
+                            if (chooser.getSelectedFile().getPath().toLowerCase().endsWith(".gif")
+                                    || chooser.getSelectedFile().getPath().toLowerCase().endsWith(".png")) {
+                                mainLabel.setIcon(new ImageIcon(url));
+                                ///mainLabel.setPreferredSize(new Dimension(100, 100));
+                            } else {
+                                mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
+                            }
                             return;
-                        }
-                    }
 
-                    int bufferedWidth = bufferedImage.getWidth();
-                    int preferredWidth = mainLabel.getPreferredSize().width;
-                    preferredWidth = 250;
-
-                    ImageIcon imageIcon;
-                    // под размеры поля подгоним чтобы поле не обрезало каритнку
-                    if (bufferedWidth > preferredWidth) {
-                        float scaleView = (float) preferredWidth / bufferedWidth;
-                        Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
-                                (int) (scaleView * bufferedImage.getHeight()),
-                                Image.SCALE_AREA_AVERAGING);
-                        imageIcon = new ImageIcon(imagePack);
-                    } else {
-                        imageIcon = new ImageIcon(bufferedImage);
-                    }
-
-                    mainLabel.setIcon(imageIcon);
-
-                    try {
-
-                        ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
-
-                        if (typeOfImage == TypeOfImage.GIF) {
-                            ImageIO.write(bufferedImage, "gif", imageStream);
                         } else {
-                            ImageIO.write(bufferedImage, "jpeg", imageStream);
+                            if (bufferedImage == null) {
+                                logger.error("Image does not setup");
+                                return;
+                            }
                         }
 
-                        imgBytes = imageStream.toByteArray();
+                        int bufferedWidth = bufferedImage.getWidth();
+                        int preferredWidth = mainLabel.getPreferredSize().width;
+                        preferredWidth = 250;
 
-                        int templWidth = bufferedImage.getWidth();
-                        int templHeight = bufferedImage.getHeight();
-                        int counter = 0;
+                        ImageIcon imageIcon;
+                        // под размеры поля подгоним чтобы поле не обрезало каритнку
+                        if (bufferedWidth > preferredWidth) {
+                            float scaleView = (float) preferredWidth / bufferedWidth;
+                            Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
+                                    (int) (scaleView * bufferedImage.getHeight()),
+                                    Image.SCALE_AREA_AVERAGING);
+                            imageIcon = new ImageIcon(imagePack);
+                        } else {
+                            imageIcon = new ImageIcon(bufferedImage);
+                        }
 
-                        if (false && minSize > 0 && imgBytes.length < minSize) {
-                            while (imgBytes.length < minSize && counter++ < 100) {
-                                imageStream.reset();
-                                templWidth *= 1.2;
-                                templHeight *= 1.2;
+                        mainLabel.setIcon(imageIcon);
+
+                        try {
+
+                            ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
+
+                            if (typeOfImage == TypeOfImage.GIF) {
+                                ImageIO.write(bufferedImage, "gif", imageStream);
+                            } else {
+                                ImageIO.write(bufferedImage, "jpeg", imageStream);
+                            }
+
+                            mediaBytes = imageStream.toByteArray();
+
+                            int templWidth = bufferedImage.getWidth();
+                            int templHeight = bufferedImage.getHeight();
+                            int counter = 0;
+
+                            if (false && minSize > 0 && mediaBytes.length < minSize) {
+                                while (mediaBytes.length < minSize && counter++ < 100) {
+                                    imageStream.reset();
+                                    templWidth *= 1.2;
+                                    templHeight *= 1.2;
+                                    Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
+                                    writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
+                                }
+
+                            } else if (false && maxSize > 0 && mediaBytes.length > maxSize) {
+                                while (mediaBytes.length > maxSize && counter++ < 100) {
+                                    imageStream.reset();
+                                    templWidth /= 1.2;
+                                    templHeight /= 1.2;
+                                    Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
+                                    writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
+                                }
+
+                            } else if (false && typeOfImage == TypeOfImage.JPEG) {
+                                // преобразуем GIF с прозрачным фоном в непрозрачный если надо
+                                // это может понадобиться если Оригинальный размер картинки взяли и не было преобразования в snapshot в ImageCropDisplayPanelNavigator2D.getSnapshot
                                 Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
                                 writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
                             }
 
-                        } else if (false && maxSize > 0 && imgBytes.length > maxSize) {
-                            while (imgBytes.length > maxSize && counter++ < 100) {
-                                imageStream.reset();
-                                templWidth /= 1.2;
-                                templHeight /= 1.2;
-                                Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
-                                writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
-                            }
+                            labelSize.setText(Lang.T("Size") + ": " + (mediaBytes.length >> 10) + " kB");
 
-                        } else if (false && typeOfImage == TypeOfImage.JPEG) {
-                            // преобразуем GIF с прозрачным фоном в непрозрачный если надо
-                            // это может понадобиться если Оригинальный размер картинки взяли и не было преобразования в snapshot в ImageCropDisplayPanelNavigator2D.getSnapshot
-                            Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
-                            writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
+                        } catch (Exception e) {
+                            logger.error("Can not write image in ImageCropDialog dialog onFinish method", e);
                         }
 
-                        labelSize.setText(Lang.T("Size") + ": " + (imgBytes.length >> 10) + " kB");
-
-                    } catch (Exception e) {
-                        logger.error("Can not write image in ImageCropDialog dialog onFinish method", e);
                     }
 
-                }
-
-                private void writeImage(ByteArrayOutputStream imageStream, int templWidth, int templHeight, Image scaledImage, TypeOfImage typeOfImage) throws IOException {
-                    BufferedImage image;
-                    if (typeOfImage == TypeOfImage.GIF) {
-                        image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_ARGB);
-                        image.getGraphics().drawImage(scaledImage, 0, 0, null);
-                        ImageIO.write(image, "gif", imageStream);
-                    } else {
-                        image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_RGB);
-                        image.getGraphics().drawImage(scaledImage, 0, 0, Color.WHITE, null);
-                        ImageIO.write(image, "jpeg", imageStream);
+                    private void writeImage(ByteArrayOutputStream imageStream, int templWidth, int templHeight, Image scaledImage, TypeOfImage typeOfImage) throws IOException {
+                        BufferedImage image;
+                        if (typeOfImage == TypeOfImage.GIF) {
+                            image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_ARGB);
+                            image.getGraphics().drawImage(scaledImage, 0, 0, null);
+                            ImageIO.write(image, "gif", imageStream);
+                        } else {
+                            image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_RGB);
+                            image.getGraphics().drawImage(scaledImage, 0, 0, Color.WHITE, null);
+                            ImageIO.write(image, "jpeg", imageStream);
+                        }
+                        mediaBytes = imageStream.toByteArray();
                     }
-                    imgBytes = imageStream.toByteArray();
-                }
-            };
+                };
+            }
         }
     }
 
     public void reset() {
-        imgBytes = null;
+        mediaBytes = null;
         mainLabel.setIcon(createEmptyImage(Color.WHITE, initialWidth, initialHeight));
     }
 
     public void set(byte[] imgBytes) {
-        this.imgBytes = imgBytes;
+        this.mediaBytes = imgBytes;
         mainLabel.setIcon(new ImageIcon(imgBytes));
     }
 
-    public byte[] getImgBytes() {
-        if (externalURL.getText().isEmpty())
-            return imgBytes;
+    public boolean isInternalMedia() {
+        return externalURL.getText().isEmpty();
+    }
+
+    public byte[] getMediaBytes() {
+        if (isInternalMedia())
+            return mediaBytes;
         return externalURL.getText().getBytes(StandardCharsets.UTF_8);
     }
+
+    public int getMediaType() {
+        if (isInternalMedia())
+            return mediaType;
+        return externalURLType.getSelectedIndex();
+    }
+
 }

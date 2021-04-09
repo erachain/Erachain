@@ -328,6 +328,10 @@ public abstract class PersonCls extends ItemCls {
     }
 
     public int isValid() {
+        if (hasIconURL()) {
+            // нельзя делать ссылку на иконку у Персон
+            return Transaction.INVALID_ICON_LENGTH_MIN;
+        }
         if (hasImageURL()) {
             // нельзя делать ссылку на фотку у Персон
             return Transaction.INVALID_IMAGE_LENGTH_MIN;
@@ -473,6 +477,13 @@ public abstract class PersonCls extends ItemCls {
 
         JSONObject json = super.jsonForExplorerPage(langObj, args);
         json.put("birthday", birthday);
+
+        json.put("imageType", getImageType());
+        json.put("imageTypeName", viewMediaType(imageType));
+
+        if (hasImageURL()) {
+            json.put("imageURL", getImageURL());
+        }
 
         return json;
 

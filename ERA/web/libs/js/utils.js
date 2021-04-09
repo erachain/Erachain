@@ -135,6 +135,14 @@ function showWindowImage(source) {
 
 function showWindowVideo(source) {
   var video = document.getElementById('video-holder');
+  video.style.display = 'block';
+  video.style.resizable = 1;
+  video.src = source;
+  video.loop = 1;
+}
+
+function showWindowVideo(source) {
+  var video = document.getElementById('video-holder');
   video.src = source;
   video.style.display = 'block';
   video.style.resizable = 1;
@@ -152,6 +160,8 @@ function makeMediaIcon(item, class1, style1) {
         source = item.iconURL;
     } else if (item.icon) {
         source = 'data:image/gif;base64,' + item.icon;
+    } else if (item.iconTypeName == 'video') {
+        source = '/api' + item.item_type + '/icon/' + item.key;
     }
 
     if (!source)

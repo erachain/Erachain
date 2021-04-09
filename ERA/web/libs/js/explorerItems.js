@@ -8,18 +8,22 @@ function itemHead(item, forPrint) {
         source = 'data:image/gif;base64,' + item.image;
     } else if (item.imageURL) {
         source = item.imageURL;
+    } else if (item.imageTypeName == 'video') {
+        source = '/api' + item.item_type + '/image/' + item.key;
     }
 
     if (source) {
         if (item.imageTypeName == 'video') {
-            output += '<td><video autoplay playsinline loop controls width="350"><source src="' + source + '"></video>';
+            output += '<video style="display:none;" onclick="style.display=\'none\'" id="video-holder" loop controls >';
+            output += '<td><video autoplay playsinline loop width="350" onclick="showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
 
         } else {
-            output += '<img id="image-holder" alt="" onclick="style.display=\'none\'">';
+            output += '<img id="image-holder" onclick="style.display=\'none\'">';
             output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
         }
 
         output += '</td><td style ="width: 70%; padding-left:20px"><br>';
+
     }
 
 
