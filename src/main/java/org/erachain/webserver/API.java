@@ -95,7 +95,8 @@ public class API {
         help.put("GET Child Block", "childblock/{signature}[?onlyhead]");
 
         help.put("*** BLOCKS ***", "");
-        help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}?onlyhead&desc={false}");
+        help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocks?from={height}&limit=50&onlyhead&desc={false}");
+        help.put("GET Blocks from Height by Limit (end:1 if END is reached) (v2)", "blocksfromheight/{height}/{limit}?onlyhead&desc={false}");
         help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");
 
         help.put("*** RECORD ***", "");
@@ -477,9 +478,9 @@ public class API {
 
     @GET
     @Path("/blocksfromheight/{height}/{limit}")
-    public Response getBlocksFromHeight(@Context UriInfo info,
-                                        @PathParam("height") Integer fromHeight,
-                                        @DefaultValue("10") @PathParam("limit") int limit) {
+    public Response getBlocksFromHeightV2(@Context UriInfo info,
+                                          @PathParam("height") Integer fromHeight,
+                                          @DefaultValue("10") @PathParam("limit") int limit) {
 
         boolean onlyhead;
         String value = info.getQueryParameters().getFirst("onlyhead");
@@ -572,6 +573,14 @@ public class API {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(out.toString())
                 .build();
+    }
+
+    @GET
+    @Path("/blocks")
+    public Response getBlocksFromHeightV1(@Context UriInfo info,
+                                          @QueryParam("from") Integer fromHeight,
+                                          @QueryParam("limit") Integer limit) {
+        return getBlocksFromHeightV2(info, fromHeight, limit);
     }
 
     @GET

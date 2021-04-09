@@ -486,22 +486,6 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         return result;
     }
 
-    public IteratorCloseable<Long> getIteratorFrom_old(long fromKey, boolean descending) {
-
-        Iterator<Long> iterator;
-        if (descending) {
-            iterator = ((NavigableMap) map).descendingKeySet()
-                    .subSet(fromKey, 0L)
-                    .iterator();
-        } else {
-            iterator = ((NavigableSet) map.keySet())
-                    .subSet(fromKey, Long.MAX_VALUE)
-                    .iterator();
-        }
-        return IteratorCloseableImpl.make(iterator);
-
-    }
-
     public List<ItemCls> getPage(Long start, int offset, int pageSize) {
         PagedMap<Long, ItemCls> pager = new PagedMap(this);
         return pager.getPageList(start, offset, pageSize, true);
