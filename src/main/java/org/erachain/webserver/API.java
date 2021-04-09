@@ -1471,6 +1471,7 @@ public class API {
      * ************* ASSET **************
      */
     @GET
+    @Deprecated
     @Path("assetheight")
     public Response assetHeight() {
 
@@ -1485,6 +1486,7 @@ public class API {
     }
 
     @GET
+    @Deprecated
     @Path("asset/{key}")
     public Response asset(@PathParam("key") long key) {
 
