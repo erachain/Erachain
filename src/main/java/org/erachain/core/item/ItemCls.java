@@ -1044,7 +1044,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         JSONArray array = new JSONArray();
 
         long key = 0;
-        try (IteratorCloseable<Long> iterator = map.getIteratorFrom(start, descending)) {
+        try (IteratorCloseable<Long> iterator = map.getIterator(start, descending)) {
             while (iterator.hasNext() && pageSize-- > 0) {
                 key = iterator.next();
                 element = map.get(key);

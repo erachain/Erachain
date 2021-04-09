@@ -647,7 +647,7 @@ public class BlockExplorer {
 
         Map output = new LinkedHashMap();
         ItemMap itemsMap = Controller.getInstance().getItemMap(itemType);
-        try (IteratorCloseable<Long> iterator = itemsMap.getIteratorFrom(fromKey, true)) {
+        try (IteratorCloseable<Long> iterator = itemsMap.getIterator(fromKey, true)) {
             Long key;
             ItemCls item;
             int size = 25;
