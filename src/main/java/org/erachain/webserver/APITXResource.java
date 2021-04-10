@@ -10,6 +10,7 @@ import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
@@ -24,6 +25,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -68,11 +70,14 @@ public class APITXResource {
 
         help.put("api/tx/byblock/{height}", Lang.T("Get all transactions from Block"));
 
+        help.put("api/tx/list?from=[seqNo]&offset={0}&limit={100}&desc",
+                Lang.T("Get list of transactions. Set [seqNo] as 1234-1"));
+
         help.put("api/tx/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={false}&offset={offset}&limit={limit}&unconfirmed=false&count=false",
                 Lang.T("Find transactions. Set [seqNo] as 1234-1"));
 
         help.put("api/tx/search?q={query}&from=[seqNo]&useforge={false}&offset={offset}&limit={limit}&fullpage={false}",
-                Lang.T("Search transactions by Query. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
+                Lang.T("Search transactions by Query via title and tags. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
 
         help.put("api/tx/rawbyblock/{height}?forDeal={DEAL}", "Get raw transaction(encoding Base58). forDeal = 1..5 (FOR_MYPACK, FOR_PACK, FOR_NETWORK, FOR_DB_RECORD). By default forDeal is 3(for network)");
 
@@ -604,6 +609,52 @@ public class APITXResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(array.toString()).build();
 
+    }
+
+    @GET
+    @Path("list")
+    public Response getList(@Context UriInfo info,
+                            @QueryParam("from") String fromSeqNoStr,
+                            @QueryParam("offset") int offset,
+                            @QueryParam("limit") int limit
+    ) {
+
+        Long fromSeqNo = Transaction.parseDBRef(fromSeqNoStr);
+
+        boolean desc;
+        String value = info.getQueryParameters().getFirst("desc");
+        if (value == null) {
+            desc = false;
+        } else {
+            desc = value.isEmpty() || new Boolean(value);
+        }
+
+        int limitMax = ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request)) ? 10000 : 100;
+        if (limit > limitMax || limit == 0)
+            limit = limitMax;
+        if (offset > limitMax)
+            offset = limitMax;
+
+        JSONArray array = new JSONArray();
+
+        TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
+        try {
+            try (IteratorCloseable<Long> iterator = map.getIterator(fromSeqNo, desc)) {
+                while (iterator.hasNext() && limit > 0) {
+                    if (offset-- > 0) {
+                        iterator.next();
+                        continue;
+                    }
+                    limit--;
+                    array.add(map.get(iterator.next()).toJson());
+                }
+            }
+        } catch (IOException e) {
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(array.toJSONString()).build();
     }
 
     @SuppressWarnings("unchecked")

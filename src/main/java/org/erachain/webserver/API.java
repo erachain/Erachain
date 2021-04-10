@@ -95,8 +95,8 @@ public class API {
         help.put("GET Child Block", "childblock/{signature}[?onlyhead]");
 
         help.put("*** BLOCKS ***", "");
-        help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocks?from={height}&limit=50&onlyhead&desc={false}");
-        help.put("GET Blocks from Height by Limit (end:1 if END is reached) (v2)", "blocksfromheight/{height}/{limit}?onlyhead&desc={false}");
+        help.put("GET Blocks from Height by Limit", "blocks?from={height}&offset={0}&limit=50&onlyhead&desc");
+        help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}?onlyhead&desc={false}");
         help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");
 
         help.put("*** RECORD ***", "");
@@ -579,8 +579,75 @@ public class API {
     @Path("/blocks")
     public Response getBlocksFromHeightV1(@Context UriInfo info,
                                           @QueryParam("from") Integer fromHeight,
-                                          @QueryParam("limit") Integer limit) {
-        return getBlocksFromHeightV2(info, fromHeight, limit);
+                                          @QueryParam("offset") int offset,
+                                          @QueryParam("limit") int limit) {
+        boolean onlyhead;
+        String value = info.getQueryParameters().getFirst("onlyhead");
+        if (value == null) {
+            onlyhead = false;
+        } else {
+            onlyhead = value.isEmpty() || new Boolean(value);
+        }
+
+        boolean desc;
+        value = info.getQueryParameters().getFirst("desc");
+        if (value == null) {
+            desc = false;
+        } else {
+            desc = value.isEmpty() || new Boolean(value);
+        }
+
+        int limitMax = onlyhead ? 200 : 50;
+        if (limit > limitMax)
+            limit = limitMax;
+        if (offset > limitMax)
+            offset = limitMax;
+
+        JSONArray array = new JSONArray();
+        if (onlyhead) {
+            BlocksHeadsMap blockHeadsMap = dcSet.getBlocksHeadsMap();
+            try {
+                try (IteratorCloseable<Integer> iterator = blockHeadsMap.getIterator(fromHeight, desc)) {
+                    while (iterator.hasNext() && limit > 0) {
+                        if (offset-- > 0) {
+                            iterator.next();
+                            continue;
+                        }
+                        limit--;
+                        array.add(blockHeadsMap.get(iterator.next()).toJson());
+                    }
+                }
+            } catch (IOException e) {
+            }
+
+        } else {
+            BlockMap blockMap = dcSet.getBlockMap();
+            try {
+                try (IteratorCloseable<Integer> iterator = blockMap.getIterator(fromHeight, desc)) {
+                    int txCount = 0;
+                    while (iterator.hasNext() && limit > 0) {
+                        if (offset-- > 0) {
+                            iterator.next();
+                            continue;
+                        }
+                        limit--;
+                        Block block = blockMap.get(iterator.next());
+                        array.add(block.toJson());
+                        txCount += block.getTransactionCount();
+                        if (txCount > 10000) {
+                            //out.put("broken", "by tx count: " + txCount);
+                            break;
+                        }
+                    }
+                }
+            } catch (IOException e) {
+            }
+        }
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(array.toJSONString())
+                .build();
     }
 
     @GET
