@@ -186,7 +186,7 @@ public class OrderTest {
                     orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                     orderCreation.process(null, Transaction.FOR_NETWORK);
 
-                    iterator = ordersMap.getIterator(0, false);
+                    iterator = ordersMap.getIndexIterator(0, false);
                     count = 0;
                     while (iterator.hasNext()) {
                         Long key = iterator.next();
@@ -199,7 +199,7 @@ public class OrderTest {
                 }
 
                 DBSuit suit = ordersMap.getSuit();
-                iterator = suit.getIterator(1, false);
+                iterator = suit.getIndexIterator(1, false);
 
                 count = 0;
                 while (iterator.hasNext()) {
@@ -208,7 +208,7 @@ public class OrderTest {
                 }
                 assertEquals(count, len);
 
-                iterator = ordersMap.getIterator(0, false);
+                iterator = ordersMap.getIndexIterator(0, false);
                 count = 0;
                 while (iterator.hasNext()) {
                     Long key = iterator.next();
@@ -354,7 +354,7 @@ public class OrderTest {
                 }
                 assertEquals(count, len);
 
-                iterator = ordersMap.getIterator(1, false);
+                iterator = ordersMap.getIndexIterator(1, false);
                 count = 0;
                 while (iterator.hasNext()) {
                     Long key = (Long) iterator.next();
@@ -383,7 +383,7 @@ public class OrderTest {
                 }
                 assertEquals(count, len);
 
-                iterator = ordersMap.getIterator(1, false);
+                iterator = ordersMap.getIndexIterator(1, false);
                 count = 0;
                 while (iterator.hasNext()) {
                     Long key = (Long) iterator.next();

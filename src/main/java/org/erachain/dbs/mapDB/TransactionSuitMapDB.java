@@ -171,7 +171,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
 
     @Override
     public IteratorCloseable<Long> getTimestampIterator(boolean descending) {
-        return getIterator(TIMESTAMP_INDEX, descending);
+        return getIndexIterator(TIMESTAMP_INDEX, descending);
     }
 
     //@Override

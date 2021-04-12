@@ -348,17 +348,22 @@ public class DealsPopupMenu extends JPopupMenu {
         boolean isSelfManaged = asset.isSelfManaged();
         boolean isUnlimited = isSelfManaged || asset.isUnlimited(pubKey, false);
 
-        //this.sendAsset.setEnabled(true);
-        //this.holdAsset.setEnabled(true);
-        //this.debtAsset.setEnabled(true);
-        //this.debtAssetReturn.setEnabled(true);
-        //this.debtAssetBackward.setEnabled(true);
-        //this.spendAsset.setEnabled(true);
+        this.sendAsset.setEnabled(true);
+        this.sendAssetBackward.setEnabled(true);
+        this.debtAsset.setEnabled(true);
+        this.debtAssetBackward.setEnabled(true);
+        this.debtAssetReturn.setEnabled(true);
+        this.holdAsset.setEnabled(true);
+        this.holdAssetBackward.setEnabled(true);
+        this.spendAsset.setEnabled(true);
+        this.spendAssetBackward.setEnabled(true);
 
         /// MAIL
         this.sendMail.setText(Lang.T("Send Mail"));
 
         String actionName;
+
+        /// SET MENU BY ACTION
 
         /// **** SEND
         actionName = asset.viewAssetTypeAction(asset.isReverseSend(), TransactionAmount.ACTION_SEND, isCreatorMaker);
@@ -436,6 +441,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.spendAssetBackward.setVisible(true);
         }
 
+        //// SET ENABLE by BALANCES
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balance = pubKey.getBalance(asset.getKey());
 
@@ -453,6 +459,47 @@ public class DealsPopupMenu extends JPopupMenu {
             this.debtAssetReturn.setEnabled(false);
         }
 
+        // SET by COMMON ASSET TYPE
+
+        // ALL OUTSIDE ASSETS
+        if (asset.isOutsideType()) {
+
+            this.debtAssetReturn.setVisible(false);
+
+            if (pubKey.equals(asset.getMaker())) {
+                this.holdAsset.setEnabled(false);
+                this.debtAsset.setEnabled(false);
+                this.debtAssetBackward.setEnabled(false);
+                this.spendAsset.setEnabled(false);
+            } else {
+                if (balance.a.b.signum() <= 0) {
+                    this.sendAsset.setEnabled(false);
+                    this.debtAsset.setEnabled(false);
+                    this.debtAssetBackward.setEnabled(false);
+                    this.holdAsset.setEnabled(false);
+                    this.spendAsset.setEnabled(false);
+                } else {
+                    this.sendAsset.setEnabled(true);
+                    this.debtAsset.setEnabled(true);
+                    this.debtAssetBackward.setEnabled(balance.b.b.signum() != 0);
+                    this.spendAsset.setEnabled(true);
+                    if (balance.a.b.add(balance.b.b).signum() <= 0) {
+                        this.debtAsset.setEnabled(false);
+                        this.sendAsset.setEnabled(false);
+                    }
+                }
+            }
+        } else if (isSelfManaged) {
+            this.debtAssetReturn.setVisible(false);
+
+            this.sendAsset.setEnabled(isCreatorMaker);
+            this.debtAsset.setEnabled(isCreatorMaker);
+            this.holdAsset.setEnabled(isCreatorMaker);
+            this.spendAsset.setEnabled(isCreatorMaker);
+
+        }
+
+        // SET by this ASSET TYPE etc
         switch (this.asset.getAssetType()) {
 
             case AssetCls.AS_BANK_GUARANTEE:
@@ -495,48 +542,6 @@ public class DealsPopupMenu extends JPopupMenu {
 
                 break;
 
-        }
-
-        // ALL OUTSIDE ASSETS
-        if (asset.isOutsideType()) {
-
-            this.debtAssetReturn.setVisible(false);
-
-            if (pubKey.equals(asset.getMaker())) {
-                this.holdAsset.setEnabled(false);
-                this.debtAsset.setEnabled(false);
-                this.debtAssetBackward.setEnabled(false);
-                this.spendAsset.setEnabled(false);
-            } else {
-                if (balance.a.b.signum() <= 0) {
-                    this.sendAsset.setEnabled(false);
-                    this.debtAsset.setEnabled(false);
-                    this.debtAssetBackward.setEnabled(false);
-                    this.holdAsset.setEnabled(false);
-                    this.spendAsset.setEnabled(false);
-                } else {
-                    this.sendAsset.setEnabled(true);
-                    this.debtAsset.setEnabled(true);
-                    this.debtAssetBackward.setEnabled(balance.b.b.signum() != 0);
-                    this.spendAsset.setEnabled(true);
-                    if (balance.a.b.add(balance.b.b).signum() <= 0) {
-                        this.debtAsset.setEnabled(false);
-                        this.sendAsset.setEnabled(false);
-                    }
-                }
-            }
-        } else if (isSelfManaged) {
-            this.debtAssetReturn.setVisible(false);
-
-            this.sendAsset.setEnabled(isCreatorMaker);
-            this.debtAsset.setEnabled(isCreatorMaker);
-            this.holdAsset.setEnabled(isCreatorMaker);
-            this.spendAsset.setEnabled(isCreatorMaker);
-
-            //this.sendAssetBackward.setVisible(isCreatorMaker);
-            //this.debtAssetBackward.setVisible(isCreatorMaker);
-            //this.holdAssetBackward.setVisible(isCreatorMaker);
-            //this.spendAssetBackward.setVisible(isCreatorMaker);
         }
 
         ownSeparator.setVisible(sendAsset.isVisible() || sendAssetBackward.isVisible());

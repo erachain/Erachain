@@ -97,7 +97,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.3.01";
+    public static String version = "5.3.01 dev";
     public static String buildTime = "2021-03-22 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1286,7 +1286,7 @@ public class Controller extends Observable {
             return false;
 
         try {
-            try (IteratorCloseable<Long> iterator = map.getIterator(TransactionSuit.TIMESTAMP_INDEX, false)) {
+            try (IteratorCloseable<Long> iterator = map.getIndexIterator(TransactionSuit.TIMESTAMP_INDEX, false)) {
                 long ping = 0;
                 int counter = 0;
                 ///////// big maxCounter freeze network and make bans on response

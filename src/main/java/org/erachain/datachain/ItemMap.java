@@ -49,6 +49,9 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     public ItemMap(DCSet databaseSet, DB database, int type) {
         super(databaseSet, database, ItemCls.getItemTypeName(type), new ItemSerializer(type));
 
+        HI = Long.MAX_VALUE;
+        LO = 0L;
+
         atomicKey = database.getAtomicLong(TAB_NAME + "_key");
         key = atomicKey.get();
 
@@ -481,22 +484,6 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         }
 
         return result;
-    }
-
-    public IteratorCloseable<Long> getIteratorFrom(long fromKey, boolean descending) {
-
-        Iterator<Long> iterator;
-        if (descending) {
-            iterator = ((NavigableMap) map).descendingKeySet()
-                    .subSet(fromKey, 0L)
-                    .iterator();
-        } else {
-            iterator = ((NavigableSet) map.keySet())
-                    .subSet(fromKey, Long.MAX_VALUE)
-                    .iterator();
-        }
-        return IteratorCloseableImpl.make(iterator);
-
     }
 
     public List<ItemCls> getPage(Long start, int offset, int pageSize) {

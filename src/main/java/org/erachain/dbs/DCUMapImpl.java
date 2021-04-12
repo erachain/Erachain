@@ -34,6 +34,9 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     protected Boolean EXIST = true;
     protected int shiftSize;
 
+    protected T HI;
+    protected T LO;
+
     int uses = 0;
 
     public DCUMapImpl(DBASet databaseSet) {
@@ -130,12 +133,23 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
      */
     @SuppressWarnings("unchecked")
     protected <V> void createIndexes(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Fun.Function2<V[], T, U> function) {
-        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
+        assert (index > 0 && index < DESCENDING_SHIFT_INDEX);
         Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Fun.Tuple2<V, T>>) indexSet, function);
         this.indexes.put(index, (NavigableSet<Fun.Tuple2<?, T>>) indexSet);
 
         Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Fun.Tuple2<V, T>>) descendingIndexSet, function);
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Fun.Tuple2<?, T>>) descendingIndexSet);
+    }
+
+    /**
+     * Set Hi and LO values for keys for use SUB map Iterators
+     *
+     * @param hi
+     * @param lo
+     */
+    public void setHIandLO(T hi, T lo) {
+        HI = hi;
+        LO = lo;
     }
 
     //@Override
@@ -230,7 +244,8 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                             // берем индекс с обратным отсчетом
                             ((NavigableMap) this.map).descendingMap()
                                     // задаем границы, так как он обратный границы меняем местами
-                                    .subMap(fromKey == null || fromKey.equals(0L) ? Long.MAX_VALUE : fromKey, 0L).keySet().iterator());
+                                    .subMap(fromKey == null ?
+                                            HI : fromKey, LO).keySet().iterator());
             return result;
         }
 
@@ -239,8 +254,8 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                 IteratorCloseableImpl.make(
                         ((NavigableMap) this.map)
                                 // задаем границы, так как он обратный границы меняем местами
-                                .subMap(fromKey == null || fromKey.equals(0L) ? 0L : fromKey,
-                                        Long.MAX_VALUE).keySet().iterator());
+                                .subMap(fromKey == null ? LO : fromKey,
+                                        HI).keySet().iterator());
 
 
         this.outUses();
@@ -256,7 +271,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
      * @return
      */
     @Override
-    public IteratorCloseable<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIndexIterator(int index, boolean descending) {
         this.addUses();
 
         // 0 - это главный индекс - он не в списке indexes

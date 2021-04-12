@@ -647,7 +647,7 @@ public class BlockExplorer {
 
         Map output = new LinkedHashMap();
         ItemMap itemsMap = Controller.getInstance().getItemMap(itemType);
-        try (IteratorCloseable<Long> iterator = itemsMap.getIteratorFrom(fromKey, true)) {
+        try (IteratorCloseable<Long> iterator = itemsMap.getIterator(fromKey, true)) {
             Long key;
             ItemCls item;
             int size = 25;
@@ -2281,7 +2281,7 @@ public class BlockExplorer {
 
         int count = 25;
 
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = trades.getIterator(0, true)) {
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = trades.getIndexIterator(0, true)) {
             while (count-- > 0 && iterator.hasNext()) {
                 Tuple2<Long, Long> key = iterator.next();
                 Trade trade = trades.get(key);

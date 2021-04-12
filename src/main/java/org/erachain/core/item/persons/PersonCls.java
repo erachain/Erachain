@@ -203,7 +203,7 @@ public abstract class PersonCls extends ItemCls {
 
         if (this.deathday == Long.MIN_VALUE
                 || this.deathday == Long.MAX_VALUE
-                || this.deathday < this.birthday)
+                || this.deathday <= this.birthday)
             return true;
 
         if (onThisTime > 0L
