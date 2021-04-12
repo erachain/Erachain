@@ -363,6 +363,8 @@ public class DealsPopupMenu extends JPopupMenu {
 
         String actionName;
 
+        /// SET MENU BY ACTION
+
         /// **** SEND
         actionName = asset.viewAssetTypeAction(asset.isReverseSend(), TransactionAmount.ACTION_SEND, isCreatorMaker);
         if (actionName == null) {
@@ -439,6 +441,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.spendAssetBackward.setVisible(true);
         }
 
+        //// SET ENABLE by BALANCES
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balance = pubKey.getBalance(asset.getKey());
 
@@ -456,6 +459,7 @@ public class DealsPopupMenu extends JPopupMenu {
             this.debtAssetReturn.setEnabled(false);
         }
 
+        // SET by ASSET TYPE etc
         switch (this.asset.getAssetType()) {
 
             case AssetCls.AS_BANK_GUARANTEE:
