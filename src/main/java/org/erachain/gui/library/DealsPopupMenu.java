@@ -537,6 +537,16 @@ public class DealsPopupMenu extends JPopupMenu {
             //this.debtAssetBackward.setVisible(isCreatorMaker);
             //this.holdAssetBackward.setVisible(isCreatorMaker);
             //this.spendAssetBackward.setVisible(isCreatorMaker);
+        } else {
+            this.sendAsset.setEnabled(true);
+            this.sendAssetBackward.setEnabled(true);
+            this.debtAsset.setEnabled(true);
+            this.debtAssetBackward.setEnabled(true);
+            this.holdAsset.setEnabled(true);
+            this.holdAssetBackward.setEnabled(true);
+            this.spendAsset.setEnabled(true);
+            this.spendAssetBackward.setEnabled(true);
+
         }
 
         ownSeparator.setVisible(sendAsset.isVisible() || sendAssetBackward.isVisible());
