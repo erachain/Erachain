@@ -352,6 +352,7 @@ public class DealsPopupMenu extends JPopupMenu {
         this.sendAssetBackward.setEnabled(true);
         this.debtAsset.setEnabled(true);
         this.debtAssetBackward.setEnabled(true);
+        this.debtAssetReturn.setEnabled(true);
         this.holdAsset.setEnabled(true);
         this.holdAssetBackward.setEnabled(true);
         this.spendAsset.setEnabled(true);
@@ -535,10 +536,6 @@ public class DealsPopupMenu extends JPopupMenu {
             this.holdAsset.setEnabled(isCreatorMaker);
             this.spendAsset.setEnabled(isCreatorMaker);
 
-            //this.sendAssetBackward.setVisible(isCreatorMaker);
-            //this.debtAssetBackward.setVisible(isCreatorMaker);
-            //this.holdAssetBackward.setVisible(isCreatorMaker);
-            //this.spendAssetBackward.setVisible(isCreatorMaker);
         }
 
         ownSeparator.setVisible(sendAsset.isVisible() || sendAssetBackward.isVisible());
