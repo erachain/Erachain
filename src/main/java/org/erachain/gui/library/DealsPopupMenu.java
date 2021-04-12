@@ -459,7 +459,47 @@ public class DealsPopupMenu extends JPopupMenu {
             this.debtAssetReturn.setEnabled(false);
         }
 
-        // SET by ASSET TYPE etc
+        // SET by COMMON ASSET TYPE
+
+        // ALL OUTSIDE ASSETS
+        if (asset.isOutsideType()) {
+
+            this.debtAssetReturn.setVisible(false);
+
+            if (pubKey.equals(asset.getMaker())) {
+                this.holdAsset.setEnabled(false);
+                this.debtAsset.setEnabled(false);
+                this.debtAssetBackward.setEnabled(false);
+                this.spendAsset.setEnabled(false);
+            } else {
+                if (balance.a.b.signum() <= 0) {
+                    this.sendAsset.setEnabled(false);
+                    this.debtAsset.setEnabled(false);
+                    this.debtAssetBackward.setEnabled(false);
+                    this.holdAsset.setEnabled(false);
+                    this.spendAsset.setEnabled(false);
+                } else {
+                    this.sendAsset.setEnabled(true);
+                    this.debtAsset.setEnabled(true);
+                    this.debtAssetBackward.setEnabled(balance.b.b.signum() != 0);
+                    this.spendAsset.setEnabled(true);
+                    if (balance.a.b.add(balance.b.b).signum() <= 0) {
+                        this.debtAsset.setEnabled(false);
+                        this.sendAsset.setEnabled(false);
+                    }
+                }
+            }
+        } else if (isSelfManaged) {
+            this.debtAssetReturn.setVisible(false);
+
+            this.sendAsset.setEnabled(isCreatorMaker);
+            this.debtAsset.setEnabled(isCreatorMaker);
+            this.holdAsset.setEnabled(isCreatorMaker);
+            this.spendAsset.setEnabled(isCreatorMaker);
+
+        }
+
+        // SET by this ASSET TYPE etc
         switch (this.asset.getAssetType()) {
 
             case AssetCls.AS_BANK_GUARANTEE:
@@ -501,44 +541,6 @@ public class DealsPopupMenu extends JPopupMenu {
                 }
 
                 break;
-
-        }
-
-        // ALL OUTSIDE ASSETS
-        if (asset.isOutsideType()) {
-
-            this.debtAssetReturn.setVisible(false);
-
-            if (pubKey.equals(asset.getMaker())) {
-                this.holdAsset.setEnabled(false);
-                this.debtAsset.setEnabled(false);
-                this.debtAssetBackward.setEnabled(false);
-                this.spendAsset.setEnabled(false);
-            } else {
-                if (balance.a.b.signum() <= 0) {
-                    this.sendAsset.setEnabled(false);
-                    this.debtAsset.setEnabled(false);
-                    this.debtAssetBackward.setEnabled(false);
-                    this.holdAsset.setEnabled(false);
-                    this.spendAsset.setEnabled(false);
-                } else {
-                    this.sendAsset.setEnabled(true);
-                    this.debtAsset.setEnabled(true);
-                    this.debtAssetBackward.setEnabled(balance.b.b.signum() != 0);
-                    this.spendAsset.setEnabled(true);
-                    if (balance.a.b.add(balance.b.b).signum() <= 0) {
-                        this.debtAsset.setEnabled(false);
-                        this.sendAsset.setEnabled(false);
-                    }
-                }
-            }
-        } else if (isSelfManaged) {
-            this.debtAssetReturn.setVisible(false);
-
-            this.sendAsset.setEnabled(isCreatorMaker);
-            this.debtAsset.setEnabled(isCreatorMaker);
-            this.holdAsset.setEnabled(isCreatorMaker);
-            this.spendAsset.setEnabled(isCreatorMaker);
 
         }
 
