@@ -348,12 +348,14 @@ public class DealsPopupMenu extends JPopupMenu {
         boolean isSelfManaged = asset.isSelfManaged();
         boolean isUnlimited = isSelfManaged || asset.isUnlimited(pubKey, false);
 
-        //this.sendAsset.setEnabled(true);
-        //this.holdAsset.setEnabled(true);
-        //this.debtAsset.setEnabled(true);
-        //this.debtAssetReturn.setEnabled(true);
-        //this.debtAssetBackward.setEnabled(true);
-        //this.spendAsset.setEnabled(true);
+        this.sendAsset.setEnabled(true);
+        this.sendAssetBackward.setEnabled(true);
+        this.debtAsset.setEnabled(true);
+        this.debtAssetBackward.setEnabled(true);
+        this.holdAsset.setEnabled(true);
+        this.holdAssetBackward.setEnabled(true);
+        this.spendAsset.setEnabled(true);
+        this.spendAssetBackward.setEnabled(true);
 
         /// MAIL
         this.sendMail.setText(Lang.T("Send Mail"));
@@ -537,16 +539,6 @@ public class DealsPopupMenu extends JPopupMenu {
             //this.debtAssetBackward.setVisible(isCreatorMaker);
             //this.holdAssetBackward.setVisible(isCreatorMaker);
             //this.spendAssetBackward.setVisible(isCreatorMaker);
-        } else {
-            this.sendAsset.setEnabled(true);
-            this.sendAssetBackward.setEnabled(true);
-            this.debtAsset.setEnabled(true);
-            this.debtAssetBackward.setEnabled(true);
-            this.holdAsset.setEnabled(true);
-            this.holdAssetBackward.setEnabled(true);
-            this.spendAsset.setEnabled(true);
-            this.spendAssetBackward.setEnabled(true);
-
         }
 
         ownSeparator.setVisible(sendAsset.isVisible() || sendAssetBackward.isVisible());
