@@ -7,6 +7,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
@@ -70,8 +71,8 @@ public class APITXResource {
 
         help.put("api/tx/byblock/{height}", Lang.T("Get all transactions from Block"));
 
-        help.put("api/tx/list?from=[seqNo]&offset={0}&limit={100}&desc",
-                Lang.T("Get list of transactions. Set [seqNo] as 1234-1"));
+        help.put("api/tx/list?from=[seqNo]&offset={0}&limit={100}&desc&noforge",
+                Lang.T("Get list of transactions. Set [seqNo] as 1234-1. Use 'noforge' for skip forging transactions"));
 
         help.put("api/tx/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={false}&offset={offset}&limit={limit}&unconfirmed=false&count=false",
                 Lang.T("Find transactions. Set [seqNo] as 1234-1"));
@@ -622,6 +623,7 @@ public class APITXResource {
         Long fromSeqNo = Transaction.parseDBRef(fromSeqNoStr);
 
         boolean desc = API.checkBoolean(info, "desc");
+        boolean noForge = API.checkBoolean(info, "noforge");
 
         int limitMax = ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request)) ? 10000 : 100;
         if (limit > limitMax || limit == 0)
@@ -631,6 +633,9 @@ public class APITXResource {
 
         JSONArray array = new JSONArray();
 
+        Transaction item;
+        int forgedCount = 0;
+        long timeOut = System.currentTimeMillis();
         TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
         try {
             try (IteratorCloseable<Long> iterator = map.getIterator(fromSeqNo, desc)) {
@@ -639,8 +644,27 @@ public class APITXResource {
                         iterator.next();
                         continue;
                     }
+
+                    item = map.get(iterator.next());
+                    if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
+                        RCalculated tx = (RCalculated) item;
+                        String mess = tx.getMessage();
+                        if (mess != null && mess.equals("forging")) {
+                            if (forgedCount < 100) {
+                                // skip all but not 100
+                                forgedCount++;
+                                continue;
+                            } else {
+                                if (System.currentTimeMillis() - timeOut > 5000) {
+                                    break;
+                                }
+                                forgedCount = 0;
+                            }
+                        }
+                    }
+
                     limit--;
-                    array.add(map.get(iterator.next()).toJson());
+                    array.add(item.toJson());
                 }
             }
         } catch (IOException e) {
