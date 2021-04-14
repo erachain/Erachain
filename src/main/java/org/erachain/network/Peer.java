@@ -946,6 +946,8 @@ public class Peer extends MonitoredThread {
             json.put("info", info);
         }
 
+        json.put("hostName", getHostName());
+
         Fun.Tuple2<Integer, Long> res = getHWeight(true);
         if (res == null || res.a == 0) {
             if (isUsed()) {
@@ -953,9 +955,11 @@ public class Peer extends MonitoredThread {
             }
         } else {
             json.put("height", res.a);
-            json.put("height", res.b);
+            json.put("weight", res.b);
         }
 
+        if (banMessage != null)
+            json.put("brokenMessage", banMessage);
 
         if (isUsed()) {
             if (getPing() > 1000000) {
@@ -967,9 +971,13 @@ public class Peer extends MonitoredThread {
         } else {
             int banMinutes = cnt.getDLSet().getPeerMap().getBanMinutes(this);
             if (banMinutes > 0) {
-                json.put("status", "Banned" + " " + banMinutes + "m" + " (" + banMessage + ")");
+                json.put("status", "banned");
+                json.put("period", banMinutes);
+            } else if (mute > 0) {
+                json.put("status", "muted");
+                json.put("period", mute);
             } else {
-                json.put("status", "Broken" + (banMessage == null ? "" : " (" + banMessage + ")"));
+                json.put("status", "broken");
             }
         }
 

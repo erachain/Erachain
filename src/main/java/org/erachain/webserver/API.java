@@ -176,8 +176,7 @@ public class API {
 
         JSONArray array = new JSONArray();
         for (Peer peer : Controller.getInstance().network.getKnownPeers()) {
-            if (peer.isBanned() || peer.isUsed())
-                array.add(peer.toJson());
+            array.add(peer.toJson());
         }
 
         return Response.status(200)
