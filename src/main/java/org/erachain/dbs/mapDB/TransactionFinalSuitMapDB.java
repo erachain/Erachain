@@ -355,9 +355,12 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
-                Fun.t2(Fun.t3(addressKey, type, isCreator), descending ? Long.MAX_VALUE : Long.MIN_VALUE),
                 Fun.t2(Fun.t3(addressKey,
-                        type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
+                        type == null || type == 0 ? descending ? Integer.MAX_VALUE : Integer.MIN_VALUE : type,
+                        isCreator == null ? descending ? Boolean.TRUE : Boolean.FALSE : isCreator
+                ), descending ? Long.MAX_VALUE : Long.MIN_VALUE),
+                Fun.t2(Fun.t3(addressKey,
+                        type == null || type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
                         isCreator == null ? descending ? Boolean.FALSE : Boolean.TRUE : isCreator
                 ), descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
 
@@ -397,7 +400,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         }
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
-                Fun.t2(Fun.t3(addressKey, type, isCreator), fromID),
+                Fun.t2(Fun.t3(addressKey,
+                        type == null || type == 0 ? descending ? Integer.MAX_VALUE : Integer.MIN_VALUE : type,
+                        isCreator == null ? descending ? Boolean.TRUE : Boolean.FALSE : isCreator
+                ), fromID),
                 Fun.t2(Fun.t3(addressKey,
                         type == null || type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
                         isCreator == null ? descending ? Boolean.FALSE : Boolean.TRUE : isCreator
