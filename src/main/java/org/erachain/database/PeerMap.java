@@ -552,5 +552,6 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
 
             return Bytes.concat(this.status, findTimeBytes, whiteConnectTimeBytes, grayConnectTimeBytes, whitePingCounerBytes, banTimeBytes);
         }
+
     }
 }

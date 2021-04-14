@@ -20,6 +20,7 @@ import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.network.Peer;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -84,6 +85,7 @@ public class API {
 
         help.put("*** CHAIN ***", "");
         help.put("GET Height", "height");
+        help.put("GET Node Peers", "peers");
         help.put("GET First Block or Block.Head", "firstblock[?onlyhead]");
         help.put("GET Last Block", "lastblock[?onlyhead]");
         help.put("GET Last Block Head", "lastblockhead");
@@ -165,6 +167,23 @@ public class API {
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(String.valueOf(Controller.getInstance().getMyHeight()))
+                .build();
+    }
+
+    @GET
+    @Path("peers")
+    public static Response getPeers() {
+
+        JSONArray array = new JSONArray();
+        for (Peer peer : Controller.getInstance().network.getKnownPeers()) {
+            if (peer.isBanned() || peer.isUsed())
+                array.add(peer.toJson());
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(array.toJSONString())
                 .build();
     }
 
