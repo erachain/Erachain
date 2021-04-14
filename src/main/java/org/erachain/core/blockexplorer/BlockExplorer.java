@@ -34,6 +34,7 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.M_Integer;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ReverseComparator;
+import org.erachain.webserver.API;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -261,7 +262,8 @@ public class BlockExplorer {
     public Map jsonQueryMain(UriInfo info) throws WrongSearchException, Exception {
 
         output = new JSONObject();
-        forPrint = info.getQueryParameters().getFirst("print") != null;
+
+        forPrint = API.checkBoolean(info, "print");
 
         Stopwatch stopwatchAll = new Stopwatch();
         //Long start = checkAndGetLongParam(info, start, "pageKey");

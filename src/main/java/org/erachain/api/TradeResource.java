@@ -20,6 +20,7 @@ import org.erachain.ntp.NTP;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
+import org.erachain.webserver.API;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
@@ -75,7 +77,10 @@ public class TradeResource {
         help.put("GET trade/ordersbyaddress/[creator]/[amountAssetKey]/[priceAssetKey]?limit=[limit]",
                 "get list of orders in CAP by address for trade pair");
 
-        help.put("GET trade/allordersbyaddress/{address}/{from}?limit=[limit]",
+        help.put("GET trade/allordersbyaddress/{address}/{from}?limit=[20]&desc={false}",
+                "get list of ALL orders (in CAP and completed) by address from OrderID. "
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+        help.put("GET trade/allordersbyaddress/{address}?from={SeqNo}&limit=[20]&desc={false}",
                 "get list of ALL orders (in CAP and completed) by address from OrderID. "
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
 
@@ -574,7 +579,7 @@ public class TradeResource {
         Transaction createOrder;
 
         JSONArray out = new JSONArray();
-        for (Order order : ordersMap.getOrdersForAddress(address, haveKey, priceAssetKey, 0)) {
+        for (Order order : ordersMap.getOrdersForAddress(address, haveKey, priceAssetKey, limit)) {
             JSONObject orderJson = order.toJson();
             Long key = order.getId();
             createOrder = finalMap.get(key);
@@ -592,7 +597,8 @@ public class TradeResource {
 
     @GET
     @Path("allordersbyaddress/{address}/{from}")
-    public static String getAllOrdersByAddress(@PathParam("address") String address,
+    public static String getAllOrdersByAddress(@Context UriInfo info,
+                                               @PathParam("address") String address,
                                                @PathParam("from") String fromOrder,
                                                @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
@@ -604,10 +610,12 @@ public class TradeResource {
             }
         }
 
+        boolean desc = API.checkBoolean(info, "desc");
+
         TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
         CreateOrderTransaction createOrder;
 
-        List<Long> keys = finalMap.getKeysByAddressAndType(Account.makeShortBytes(address), Transaction.CREATE_ORDER_TRANSACTION, Boolean.TRUE, startOrderID, limit, 0);
+        List<Long> keys = finalMap.getKeysByAddressAndType(Account.makeShortBytes(address), Transaction.CREATE_ORDER_TRANSACTION, Boolean.TRUE, startOrderID, limit, 0, desc);
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
         CompletedOrderMap completedOrdersMap = DCSet.getInstance().getCompletedOrderMap();
@@ -644,6 +652,14 @@ public class TradeResource {
 
 
         return out.toJSONString();
+    }
+
+    @Path("allordersbyaddress/{address}")
+    public static String getAllOrdersByAddress2(@Context UriInfo info,
+                                                @PathParam("address") String address,
+                                                @QueryParam("from") String fromOrder,
+                                                @DefaultValue("50") @QueryParam("limit") Integer limit) {
+        return getAllOrdersByAddress(info, address, fromOrder, limit);
     }
 
     /**

@@ -71,7 +71,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
         // TODO ERROR - not use PARENT MAP and DELETED in FORK
     List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, int limit, int offset);
 
-    List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset);
+    List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset, boolean descending);
 
     List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, boolean onlyCreator, Long fromID, int limit, int offset);
 

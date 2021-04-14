@@ -27,6 +27,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +72,8 @@ public class APIExchange {
         help.put("GET apiexchange/ordersbook/[have]/[want]?limit=[limit]",
                 "Get active orders in orderbook for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of orders is limited by input param, default 20.");
-        help.put("GET apiexchange/ordersbyaddress/[address]?limit=[limit]",
-                "Get active orders in orderbook for creator address, "
+        help.put("GET apiexchange/ordersbyaddress/[address]/{amountAssetKey}/{priceAssetKey}?limit=[limit]",
+                "Get active orders in orderbook for creator address and asset pair, "
                         + "limit is count record. The number of orders is limited by input param, default 20.");
         help.put("GET apiexchange/completedordersfrom/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
                 "Get completed orders for amountAssetKey & priceAssetKey, "
@@ -80,6 +81,9 @@ public class APIExchange {
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
 
         help.put("GET apiexchange/allordersbyaddress/{address}/{from}?limit=[limit]",
+                "get list of ALL orders (in CAP and completed) by address from OrderID. "
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+        help.put("GET apiexchange/allordersbyaddress/{address}?from={SeqNo}&limit=[20]&desc={false}",
                 "get list of ALL orders (in CAP and completed) by address from OrderID. "
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
 
@@ -142,7 +146,8 @@ public class APIExchange {
     @GET
     @Path("allordersbyaddress/{address}/{from}")
     // TODO нужно сделать тесты на проверку потерянных ордеров - есть трнзакция создания а его нету ни в одной таблице
-    public Response getAllOrdersByAddress(@PathParam("address") String address,
+    public Response getAllOrdersByAddress(@Context UriInfo info,
+                                          @PathParam("address") String address,
                                           @PathParam("from") String fromOrder,
                                           @DefaultValue("20") @QueryParam("limit") Integer limit) {
 
@@ -153,10 +158,17 @@ public class APIExchange {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(TradeResource.getAllOrdersByAddress(address, fromOrder, limit))
+                .entity(TradeResource.getAllOrdersByAddress(info, address, fromOrder, limit))
                 .build();
     }
 
+    @Path("allordersbyaddress/{address}")
+    public Response getAllOrdersByAddress2(@Context UriInfo info,
+                                           @PathParam("address") String address,
+                                           @QueryParam("from") String fromOrder,
+                                           @DefaultValue("50") @QueryParam("limit") Integer limit) {
+        return getAllOrdersByAddress(info, address, fromOrder, limit);
+    }
 
     @GET
     @Path("completedordersfrom/{have}/{want}")

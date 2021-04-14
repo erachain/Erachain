@@ -172,13 +172,7 @@ public class API {
     @Path("firstblock")
     public Response getFirstBlock(@Context UriInfo info) {
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
 
         JSONObject out;
         if (onlyhead) {
@@ -198,13 +192,7 @@ public class API {
     @Path("lastblock")
     public Response lastBlock(@Context UriInfo info) {
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
 
         JSONObject out;
         if (onlyhead) {
@@ -278,13 +266,7 @@ public class API {
         byte[] signatureBytes;
         JSONObject out = new JSONObject();
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
 
         int step = 1;
         try {
@@ -322,13 +304,7 @@ public class API {
     public Response block(@Context UriInfo info,
                           @PathParam("signature") String signature) {
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
 
         JSONObject out = new JSONObject();
 
@@ -380,13 +356,7 @@ public class API {
     public Response blockByHeight(@Context UriInfo info,
                                   @PathParam("height") String heightStr) {
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
 
         JSONObject out = new JSONObject();
         int step = 1;
@@ -482,21 +452,8 @@ public class API {
                                           @PathParam("height") Integer fromHeight,
                                           @DefaultValue("10") @PathParam("limit") int limit) {
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
-
-        boolean desc;
-        value = info.getQueryParameters().getFirst("desc");
-        if (value == null) {
-            desc = false;
-        } else {
-            desc = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
+        boolean desc = checkBoolean(info, "desc");
 
         int limitTo = onlyhead ? 200 : 50;
         if (limit > limitTo)
@@ -581,21 +538,8 @@ public class API {
                                           @QueryParam("from") Integer fromHeight,
                                           @QueryParam("offset") int offset,
                                           @QueryParam("limit") int limit) {
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
-
-        boolean desc;
-        value = info.getQueryParameters().getFirst("desc");
-        if (value == null) {
-            desc = false;
-        } else {
-            desc = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
+        boolean desc = checkBoolean(info, "desc");
 
         int limitMax = onlyhead ? 200 : 50;
         if (limit > limitMax)
@@ -2302,4 +2246,12 @@ public class API {
                 .build();
     }
 
+    public static boolean checkBoolean(UriInfo info, String param) {
+        String value = info.getQueryParameters().getFirst(param);
+        if (value == null) {
+            return false;
+        } else {
+            return value.isEmpty() || new Boolean(value);
+        }
+    }
 }

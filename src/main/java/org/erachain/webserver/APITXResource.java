@@ -621,13 +621,7 @@ public class APITXResource {
 
         Long fromSeqNo = Transaction.parseDBRef(fromSeqNoStr);
 
-        boolean desc;
-        String value = info.getQueryParameters().getFirst("desc");
-        if (value == null) {
-            desc = false;
-        } else {
-            desc = value.isEmpty() || new Boolean(value);
-        }
+        boolean desc = API.checkBoolean(info, "desc");
 
         int limitMax = ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request)) ? 10000 : 100;
         if (limit > limitMax || limit == 0)
