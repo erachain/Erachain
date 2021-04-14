@@ -1014,7 +1014,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int limit, boolean noForge, boolean descending) {
+    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int offset, int limit, boolean noForge, boolean descending) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
@@ -1046,6 +1046,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     }
                 }
 
+                if (offset > 0) {
+                    --offset;
+                    continue;
+                }
+
                 item.setDC((DCSet) databaseSet, true);
 
                 --limit;
@@ -1055,10 +1060,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         } catch (IOException e) {
         }
         return txs;
-    }
-
-    public List<Transaction> getTransactionsByAddressLimit(String address, int limit, boolean noForge, boolean descending) {
-        return getTransactionsByAddressLimit(Account.makeShortBytes(address), limit, noForge, descending);
     }
 
     @Override

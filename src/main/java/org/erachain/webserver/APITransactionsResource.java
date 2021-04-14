@@ -307,7 +307,7 @@ public class APITransactionsResource {
 
         List<Transaction> result;
 
-        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), 1000, true, false);
+        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), offset, 1000, true, false);
         if (unconfirmed)
             result.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -351,7 +351,7 @@ public class APITransactionsResource {
             limit = 20;
         List<Transaction> transs = new ArrayList<Transaction>();
 
-        List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true, false);
+        List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), offset, 1000, true, false);
         if (unconfirmed)
             trans.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -403,7 +403,7 @@ public class APITransactionsResource {
 
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true, false);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), offset, 1000, true, false);
             // e.printStackTrace();
         }
 

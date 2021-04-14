@@ -8,6 +8,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.blockexplorer.BlockExplorer.Stopwatch;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -177,14 +178,16 @@ public class BlockExplorerTest {
 
         List<Object> all = new ArrayList<Object>();
 
-        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4", 555, true, false));
+        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(
+                Crypto.getInstance().getShortBytesFromAddress("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4"), 0, 555, true, false));
 
         LOGGER.error("getTransactionsByAddress QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4. " + all.size() + " " + stopwatchAll.elapsedTime());
 
         all.clear();
         stopwatchAll = new Stopwatch();
 
-        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU", 555, true, false));
+        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(
+                Crypto.getInstance().getShortBytesFromAddress("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU"), 0, 555, true, false));
 
         LOGGER.error("getTransactionsByAddress QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU. " + all.size() + " " + stopwatchAll.elapsedTime());
 
@@ -257,13 +260,14 @@ public class BlockExplorerTest {
 
         stopwatchAll = new Stopwatch();
 
-        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", 555, true, false));
+        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(
+                Crypto.getInstance().getShortBytesFromAddress("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"), 0, 555, true, false));
 
         LOGGER.error("getTransactionsByAddress QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ. " + all.size() + " " + stopwatchAll.elapsedTime());
 
         stopwatchAll = new Stopwatch();
         all.clear();
-        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByCreator("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", 0 , 0));
+        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByCreator("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", 0, 0));
 
         for (Object transaction : all) {
             LOGGER.error(Base58.encode(((Transaction) transaction).getSignature()));

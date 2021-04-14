@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -359,7 +360,7 @@ public class TransactionsResource {
     @SuppressWarnings("unchecked")
     @POST
     @Path("find")
-    public String getTransactionsFind(String x) {
+    public String getTransactionsFind(@Context UriInfo info, String x) {
         JSONObject jsonObject = null;
         try {
             jsonObject = (JSONObject) JSONValue.parse(x);
@@ -473,20 +474,22 @@ public class TransactionsResource {
             type = Transaction.ARBITRARY_TRANSACTION;
         }
 
-        return getTransactionsFind(address, creator, creator, recipient, fromSeqNo, minHeight, maxHeight, type,
+        return getTransactionsFind(info, address, creator, creator, recipient, fromSeqNo, minHeight, maxHeight, type,
                 desc, offset, limit, unconfirmed, count);
     }
 
     @SuppressWarnings("unchecked")
     @GET
     @Path("find")
-    public static String getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
+    public static String getTransactionsFind(@Context UriInfo info,
+                                             @QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
                                              @QueryParam("recipient") String recipient,
                                              @QueryParam("from") String fromSeqNoStr,
                                              @QueryParam("startblock") int minHeight,
                                              @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
                                              //@QueryParam("timestamp") long timestamp,
                                              @QueryParam("desc") boolean desc,
+                                             @QueryParam("noforge") boolean noforge,
                                              @QueryParam("offset") int offset, @QueryParam("limit") int limit,
                                              @QueryParam("unconfirmed") boolean unconfirmed,
                                              @DefaultValue("false") @QueryParam("count") boolean count

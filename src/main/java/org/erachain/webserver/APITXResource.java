@@ -60,8 +60,10 @@ public class APITXResource {
                 Lang.T("Get all transactions (and Unconfirmed) for Address & Asset Key by transaction type. Here txType is option parameter"));
         help.put("api/tx/lastbyaddress/{address}?timestamp={Timestamp}&limit={Limit}&unconfirmed=true",
                 "Get last transactions (and Unconfirmed) from Unix Timestamp milisec(1512777600000)");
-        help.put("api/tx/byaddressfrom/{address}?asset={asset}&start={start tx}&end={end tx}&type={type Transaction}&sort={des/asc}",
-                Lang.T("Get all transactions for Address & Asset Key from Start to End"));
+        //help.put("api/tx/byaddressfrom/{address}?asset={asset}&start={start tx}&end={end tx}&type={type Transaction}&sort={des/asc}",
+        //        Lang.T("Get all transactions for Address & Asset Key from Start to End"));
+        help.put("api/tx/v2/byaddressfrom/{address}?asset={asset}&fdom={SeqNo}&type={int}&desc&noforge",
+                Lang.T("Get all transactions for Address & Asset Key from SeqNo"));
 
         help.put("api/tx/unconfirmed?address={address}&type={type}&from={from}&count={count}&descending=true",
                 Lang.T("Get all incoming unconfirmed transaction by address, type transaction, timestamp limited by count"));
@@ -354,7 +356,7 @@ public class APITXResource {
 
         List<Transaction> result;
 
-        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), 1000, true, false);
+        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), offset, 1000, true, false);
         if (unconfirmed)
             result.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -398,7 +400,7 @@ public class APITXResource {
             limit = 20;
         List<Transaction> transs = new ArrayList<Transaction>();
 
-        List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true, false);
+        List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), offset, 1000, true, true);
         if (unconfirmed)
             trans.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -417,13 +419,12 @@ public class APITXResource {
             out.put(i, tr.toJson());
             i++;
         }
-        // out =
-        // Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(out.toString()).build();
     }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     @GET
     @Path("byaddressfrom/{address}")
@@ -449,7 +450,7 @@ public class APITXResource {
 
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true, false);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), offset, 1000, true, false);
             // e.printStackTrace();
         }
 
@@ -491,6 +492,53 @@ public class APITXResource {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(new JSONObject(k_Map.subMap(start, end)).toString()).build();
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("v2/byaddressfrom/{address}")
+    public Response getByAddress2(@Context UriInfo info,
+                                  @PathParam("address") String address, @QueryParam("asset") Long asset,
+                                  @QueryParam("from") String fromIDStr, @QueryParam("type") Integer type,
+                                  @QueryParam("limit") int limit, @QueryParam("offset") int offset) {
+
+        boolean desc = API.checkBoolean(info, "desc");
+        boolean noForge = API.checkBoolean(info, "noforge");
+
+        Account account;
+        if (address == null) {
+            account = null;
+        } else {
+            Fun.Tuple2<Account, String> result = Account.tryMakeAccount(address);
+            if (result.a == null) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
+            } else {
+                account = result.a;
+            }
+        }
+
+        int limitMax = ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request)) ? 10000 : 100;
+        if (limit > limitMax || limit == 0)
+            limit = limitMax;
+        if (offset > limitMax)
+            offset = limitMax;
+
+        Long fromID = Transaction.parseDBRef(fromIDStr);
+
+        List<Transaction> result;
+
+        if (type == null) {
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(),
+                    offset, limit, noForge, desc);
+        } else {
+        }
+
+
+        // json.put("transactions", array);
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(.toString()).build();
 
     }
 
@@ -675,10 +723,40 @@ public class APITXResource {
                 .entity(array.toJSONString()).build();
     }
 
+    @GET
+    @Path("find2")
+    public Response getList2(@Context UriInfo info,
+                             @QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
+                             @QueryParam("recipient") String recipient,
+                             @QueryParam("from") String fromSeqNo,
+                             @QueryParam("startblock") int minHeight,
+                             @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
+                             //@QueryParam("timestamp") long timestamp,
+                             @QueryParam("desc") boolean desc,
+                             @QueryParam("offset") int offset,
+                             @QueryParam("limit") int limit,
+                             @QueryParam("unconfirmed") boolean unconfirmed,
+                             @DefaultValue("false") @QueryParam("count") boolean count
+    ) {
+
+        int limitMax = ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request)) ? 10000 : 100;
+        if (limit > limitMax || limit == 0)
+            limit = limitMax;
+        if (offset > limitMax)
+            offset = limitMax;
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(address,
+                        limit, noForge, fromSeqNo, minHeight, maxHeight, type,
+                        desc, offset, limit, unconfirmed, count)).build();
+    }
+
     @SuppressWarnings("unchecked")
     @GET
     @Path("find")
-    public Response getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
+    public Response getTransactionsFind(@Context UriInfo info,
+                                        @QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
                                         @QueryParam("recipient") String recipient,
                                         @QueryParam("from") String fromSeqNo,
                                         @QueryParam("startblock") int minHeight,
