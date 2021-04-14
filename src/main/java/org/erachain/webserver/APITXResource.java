@@ -625,9 +625,7 @@ public class APITXResource {
                             @QueryParam("offset") int offset, @QueryParam("limit") int limit
     ) {
 
-        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(getList(info, null, null, fromSeqNoStr, offset, limit)).build();
+        return getList(info, null, null, fromSeqNoStr, offset, limit);
     }
 
     @GET
@@ -665,7 +663,7 @@ public class APITXResource {
         JSONArray array = new JSONArray();
 
         TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
-        if (account == null && (type != null || type != 0)) {
+        if (account == null && type != null && type != 0) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
         }
 

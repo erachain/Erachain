@@ -373,7 +373,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         }
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
-                Fun.t2(Fun.t3(addressKey, type, isCreator), fromID),
+                Fun.t2(Fun.t3(addressKey,
+                        type == null || type == 0 ? descending ? Integer.MAX_VALUE : Integer.MIN_VALUE : type,
+                        isCreator == null ? descending ? Boolean.TRUE : Boolean.FALSE : isCreator
+                ), fromID),
                 Fun.t2(Fun.t3(addressKey,
                         type == null || type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
                         isCreator == null ? descending ? Boolean.FALSE : Boolean.TRUE : isCreator
