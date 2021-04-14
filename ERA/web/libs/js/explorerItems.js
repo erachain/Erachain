@@ -14,8 +14,8 @@ function itemHead(item, forPrint) {
 
     if (source) {
         if (item.imageTypeName == 'video') {
-            output += '<video style="display:none;" onclick="style.display=\'none\'" id="video-holder" loop controls >';
-            output += '<td><video autoplay playsinline loop width="350" onclick="showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
+            output += '<video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls >';
+            output += '<td><video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
 
         } else {
             output += '<img id="image-holder" onclick="style.display=\'none\'">';
