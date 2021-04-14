@@ -10,6 +10,7 @@ import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.validation.constraints.Null;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,40 +21,27 @@ public class MultipleRoyaltyPanel extends JPanel {
     public final Table_Model recipientsTableModel;
     private final MTable jTableRecipients;
     private JScrollPane jScrollPaneRecipients;
-    private JButton jButtonAddRecipient;
     private JButton jButtonRemoveRecipient;
     private GridBagConstraints gridBagConstraints;
-    private JCheckBox withoutCheckBox;
-    public JCheckBox signCanRecipientsCheckBox;
+    private JCheckBox defaultCheck;
+
+    private static int DESCR_COL = 2;
 
     public MultipleRoyaltyPanel() {
 
         super();
         this.setName(Lang.T("Recipients"));
-        jButtonAddRecipient = new JButton();
         jScrollPaneRecipients = new JScrollPane();
         jButtonRemoveRecipient = new JButton();
 
-        withoutCheckBox = new JCheckBox();
-        withoutCheckBox.setText(Lang.T("Without Recipients"));
-        withoutCheckBox.setSelected(false);
-        withoutCheckBox.setVisible(false);
+        defaultCheck = new JCheckBox();
+        defaultCheck.setText(Lang.T("Use Default Royalty"));
+        defaultCheck.setSelected(true);
 
-        signCanRecipientsCheckBox = new JCheckBox(Lang.T("-"));
-        signCanRecipientsCheckBox.setSelected(true);
-        signCanRecipientsCheckBox.setVisible(true);
-        signCanRecipientsCheckBox.setVisible(false);
-
-        jButtonAddRecipient.setVisible(false);
-        jButtonRemoveRecipient.setVisible(true);
-
-        withoutCheckBox.addActionListener(new ActionListener() {
+        defaultCheck.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                jButtonRemoveRecipient.setVisible(!withoutCheckBox.isSelected());
-                jTableRecipients.setVisible(!withoutCheckBox.isSelected());
-                signCanRecipientsCheckBox.setVisible(!withoutCheckBox.isSelected());
-                jButtonRemoveRecipient.setVisible(!withoutCheckBox.isSelected());
+                reset();
             }
         });
 
@@ -84,25 +72,17 @@ public class MultipleRoyaltyPanel extends JPanel {
 
         recipientsTableModel = new Table_Model(0);
         jTableRecipients = new MTable(recipientsTableModel);
-        jTableRecipients.setVisible(true);
-        jTableRecipients.setMinimumSize(new Dimension(0, 100));
         jScrollPaneRecipients.setViewportView(jTableRecipients);
+        TableColumn columnNo = jTableRecipients.getColumnModel().getColumn(1);
+        columnNo.setMinWidth(80);
+        columnNo.setMaxWidth(120);
+        columnNo.setPreferredWidth(100);
+        columnNo.setWidth(100);
+        columnNo.sizeWidthToFit();
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
-        this.add(withoutCheckBox, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
-        this.add(signCanRecipientsCheckBox, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        ++gridBagConstraints.gridy;
         gridBagConstraints.gridwidth = 9;
         gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -110,23 +90,28 @@ public class MultipleRoyaltyPanel extends JPanel {
         gridBagConstraints.weighty = 0.2;
         this.add(jScrollPaneRecipients, gridBagConstraints);
 
-        jButtonAddRecipient.setText(Lang.T("Add"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
-        this.add(jButtonAddRecipient, gridBagConstraints);
-
         jButtonRemoveRecipient.setText(Lang.T("Remove"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         this.add(jButtonRemoveRecipient, gridBagConstraints);
 
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
+        this.add(defaultCheck, gridBagConstraints);
+
+        reset();
 
     }
 
+    private void reset() {
+        jScrollPaneRecipients.setVisible(!defaultCheck.isSelected());
+        jButtonRemoveRecipient.setVisible(!defaultCheck.isSelected());
+
+        this.setMinimumSize(new Dimension(0, !defaultCheck.isSelected() ? 130 : 30));
+
+    }
 
     // table model class
 
@@ -135,8 +120,7 @@ public class MultipleRoyaltyPanel extends JPanel {
     class Table_Model extends DefaultTableModel {
 
         public Table_Model(int rows) {
-            super(new Object[]{Lang.T("Address"),
-                            Lang.T("Description")
+            super(new Object[]{Lang.T("Address"), Lang.T("Royalty") + " %", Lang.T("Information")
                     },
                     rows);
             this.addEmpty();
@@ -144,12 +128,12 @@ public class MultipleRoyaltyPanel extends JPanel {
         }
 
         private void addEmpty() {
-            this.addRow(new Object[]{"", ""});
+            this.addRow(new Object[]{"", 1.0, ""});
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            if (column == 0)
+            if (column != DESCR_COL)
                 return true;
             return false;
         }
@@ -183,11 +167,11 @@ public class MultipleRoyaltyPanel extends JPanel {
 
                     Fun.Tuple2<Account, String> result = Account.tryMakeAccount(address);
                     if (result.a == null) {
-                        super.setValueAt(Lang.T(result.b), row, column + 1);
+                        super.setValueAt(Lang.T(result.b), row, DESCR_COL);
                     } else {
                         super.setValueAt(
-                                Lang.T(Account.getDetailsForEncrypt(address, AssetCls.FEE_KEY, true, true)),
-                                row, column + 1);
+                                Lang.T(Account.getDetailsForEncrypt(address, AssetCls.FEE_KEY, false, true)),
+                                row, DESCR_COL);
                     }
 
                     super.setValueAt(aValue, row, column);
@@ -216,8 +200,8 @@ public class MultipleRoyaltyPanel extends JPanel {
             }
         }
 
-        public Account[] getRecipients() {
-            if (withoutCheckBox.isSelected() || getRowCount() == 0)
+        public Object[] getRecipients() {
+            if (defaultCheck.isSelected())
                 return null;
 
             ArrayList<Account> temp = new ArrayList<>();
@@ -236,7 +220,11 @@ public class MultipleRoyaltyPanel extends JPanel {
                 }
             }
 
-            return temp.toArray(new Account[0]);
+            Object[] list = new Object[temp.size()];
+            for (int i = 0; i < getRowCount(); i++) {
+                list[i] = new Fun.Tuple2(temp.get(i), this.getValueAt(i, 1));
+            }
+            return list;
         }
 
     }

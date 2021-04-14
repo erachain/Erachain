@@ -105,7 +105,6 @@ public class IssueAssetPanel extends IssueItemPanel {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(textScale, fieldGBC);
 
-        multipleRoyaltyPanel.setMinimumSize(new Dimension(0, 100));
         fieldGBC.gridy = gridy++;
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
