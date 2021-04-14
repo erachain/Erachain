@@ -454,7 +454,8 @@ public class APITXResource {
 
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), type, fromID, offset, 1000, true, false);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), null,
+                    null, 0, 1000, true, false);
             // e.printStackTrace();
         }
 
@@ -678,49 +679,6 @@ public class APITXResource {
                 .entity(array.toJSONString()).build();
     }
 
-    @GET
-    @Path("find2")
-    public Response getList2(@Context UriInfo info,
-                             @QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
-                             @QueryParam("recipient") String recipient,
-                             @QueryParam("from") String fromSeqNo,
-                             @QueryParam("startblock") int minHeight,
-                             @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
-                             //@QueryParam("timestamp") long timestamp,
-                             @QueryParam("offset") int offset,
-                             @QueryParam("limit") int limit
-    ) {
-
-        boolean desc = API.checkBoolean(info, "desc");
-        boolean noForge = API.checkBoolean(info, "noforge");
-        boolean unconfirmed = API.checkBoolean(info, "unconfirmed");
-        boolean count = API.checkBoolean(info, "count");
-
-        int limitMax = ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request)) ? 10000 : 100;
-        if (limit > limitMax || limit <= 0)
-            limit = limitMax;
-        if (offset > limitMax)
-            offset = limitMax;
-
-        Account account;
-        if (address == null) {
-            account = null;
-        } else {
-            Fun.Tuple2<Account, String> result = Account.tryMakeAccount(address);
-            if (result.a == null) {
-                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
-            } else {
-                account = result.a;
-            }
-        }
-
-        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account == null ? null : account.getShortAddressBytes(),
-                        limit, noForge, fromSeqNo, minHeight, maxHeight, type,
-                        desc, offset, limit, unconfirmed, count)).build();
-    }
-
     @SuppressWarnings("unchecked")
     @GET
     @Path("find")
@@ -730,7 +688,6 @@ public class APITXResource {
                                         @QueryParam("from") String fromSeqNo,
                                         @QueryParam("startblock") int minHeight,
                                         @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
-                                        //@QueryParam("timestamp") long timestamp,
                                         @QueryParam("desc") boolean desc,
                                         @QueryParam("offset") int offset,
                                         @QueryParam("limit") int limit,
@@ -745,8 +702,8 @@ public class APITXResource {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(TransactionsResource.getTransactionsFind(address, sender, creator, recipient, fromSeqNo, minHeight, maxHeight, type,
-                        desc, offset, limit, unconfirmed, count)).build();
+                .entity(TransactionsResource.getTransactionsFind(info, address, sender, creator, recipient, fromSeqNo,
+                        minHeight, maxHeight, type, offset, limit)).build();
     }
 
     @SuppressWarnings("unchecked")

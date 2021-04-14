@@ -522,7 +522,7 @@ public class TransactionsResource {
         }
 
         if (unconfirmed) {
-            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, creator, ,
+            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, creator,
                     recipient, type, desc, 0, limit, 0);
             for (Transaction trans : resultUnconfirmed) {
                 array.add(trans.toJson());
@@ -541,8 +541,8 @@ public class TransactionsResource {
                                              @QueryParam("from") String fromSeqNoStr,
                                              @QueryParam("startblock") int minHeight,
                                              @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
-                                             @QueryParam("offset") int offset, @QueryParam("limit") int limit,
-                                             ) {
+                                             @QueryParam("offset") int offset, @QueryParam("limit") int limit
+    ) {
 
         boolean desc = API.checkBoolean(info, "desc");
         boolean noForge = API.checkBoolean(info, "noforge");

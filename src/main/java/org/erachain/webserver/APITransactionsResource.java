@@ -22,6 +22,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
@@ -49,12 +50,14 @@ public class APITransactionsResource {
                 "GET Vouches of Record by Height and Sequence");
         help.put("apirecords/incomingfromblock/{address}/{blockStart}?type={type}",
                 Lang.T("Get Incoming Records for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
-        help.put("apirecords/getbyaddress?address={address}&asset={asset}&recordType={recordType}&unconfirmed=true",
-                Lang.T("Get all Records (and Unconfirmed) for Address & Asset Key by record type. recordType is option parameter"));
-        help.put("apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}&unconfirmed=true",
-                "Get last Records (and Unconfirmed) from Unix Timestamp milisec(1512777600000)");
-        help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
-                Lang.T("Get all Records for Address & Asset Key from Start to End"));
+
+        //help.put("apirecords/getbyaddress?address={address}&asset={asset}&recordType={recordType}&unconfirmed=true",
+        //        Lang.T("Get all Records (and Unconfirmed) for Address & Asset Key by record type. recordType is option parameter"));
+        //help.put("apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}&unconfirmed=true",
+        //        "Get last Records (and Unconfirmed) from Unix Timestamp milisec(1512777600000)");
+
+        //help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
+        //        Lang.T("Get all Records for Address & Asset Key from Start to End"));
 
         help.put("apirecords/unconfirmed?address={address}&type={type}&from={from}&count={count}&descending=true",
                 Lang.T("Get all incoming unconfirmed transaction by address, type transaction, timestamp limited by count"));
@@ -287,6 +290,7 @@ public class APITransactionsResource {
 
     }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     @GET
     @Path("getbyaddress")
@@ -307,7 +311,8 @@ public class APITransactionsResource {
 
         List<Transaction> result;
 
-        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), type, fromID, offset, 1000, true, false);
+        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(),
+                null, null, 0, 1000, true, false);
         if (unconfirmed)
             result.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -340,6 +345,7 @@ public class APITransactionsResource {
     }
 
     // "apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}"
+    @Deprecated
     @GET
     @Path("getlastbyaddress")
     public Response getLastByAddress(@QueryParam("address") String address, @QueryParam("timestamp") Long timestamp,
@@ -351,7 +357,8 @@ public class APITransactionsResource {
             limit = 20;
         List<Transaction> transs = new ArrayList<Transaction>();
 
-        List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), type, fromID, offset, 1000, true, false);
+        List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address),
+                null, null, 0, 1000, true, false);
         if (unconfirmed)
             trans.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -379,6 +386,7 @@ public class APITransactionsResource {
     }
 
     @SuppressWarnings("unchecked")
+    @Deprecated
     @GET
     @Path("getbyaddressfromtransactionlimit")
     public Response getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") Long asset,
@@ -403,7 +411,8 @@ public class APITransactionsResource {
 
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), type, fromID, offset, 1000, true, false);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address),
+                    null, null, 0, 1000, true, false);
             // e.printStackTrace();
         }
 
@@ -569,28 +578,27 @@ public class APITransactionsResource {
     @SuppressWarnings("unchecked")
     @GET
     @Path("find")
-    public Response getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
+    public Response getTransactionsFind(@Context UriInfo info,
+                                        @QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
                                         @QueryParam("recipient") String recipient,
                                         @QueryParam("from") String fromSeqNo,
                                         @QueryParam("startblock") int minHeight,
                                         @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
-                                        //@QueryParam("timestamp") long timestamp,
-                                        @QueryParam("desc") boolean desc,
                                         @QueryParam("offset") int offset,
-                                        @QueryParam("limit") int limit,
-                                        @QueryParam("unconfirmed") boolean unconfirmed,
-                                        @DefaultValue("false") @QueryParam("count") boolean count
+                                        @QueryParam("limit") int limit
     ) {
 
-        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 50 || limit == 0)
-                limit = 50;
-        }
+        boolean desc = API.checkBoolean(info, "desc");
+        boolean noForge = API.checkBoolean(info, "noforge");
+        boolean unconfirmed = API.checkBoolean(info, "unconfirmed");
+        boolean count = API.checkBoolean(info, "count");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(TransactionsResource.getTransactionsFind(address, sender, creator, recipient, fromSeqNo, minHeight, maxHeight, type,
-                        desc, offset, limit, unconfirmed, count)).build();
+                .entity(TransactionsResource.getTransactionsFind_1(address, sender == null ? creator : sender,
+                        recipient, fromSeqNo, minHeight, maxHeight,
+                        type, desc, noForge, offset, limit,
+                        unconfirmed, count)).build();
     }
 
     @SuppressWarnings("unchecked")
