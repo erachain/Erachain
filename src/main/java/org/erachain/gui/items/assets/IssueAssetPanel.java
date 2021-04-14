@@ -11,9 +11,11 @@ import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MDecimalFormatedTextField;
+import org.erachain.gui.library.MultipleRoyaltyPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * @author Саша
@@ -35,6 +37,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     private AssetTypesComboBoxModel assetTypesComboBoxModel;
 
+    private MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel();
 
     public IssueAssetPanel() {
         super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true);
@@ -102,6 +105,19 @@ public class IssueAssetPanel extends IssueItemPanel {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(textScale, fieldGBC);
 
+        multipleRoyaltyPanel.setMinimumSize(new Dimension(0, 100));
+        fieldGBC.gridy = gridy++;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = fieldGBC.gridy;
+        gridBagConstraints.gridwidth = 9;
+        //gridBagConstraints.gridheight = 4;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        jPanelAdd.add(multipleRoyaltyPanel, gridBagConstraints);
+
+
         // вывод подвала
         super.initBottom(gridy);
     }
@@ -128,6 +144,8 @@ public class IssueAssetPanel extends IssueItemPanel {
             textScale.setVisible(true);
             scaleJLabel.setVisible(true);
         }
+
+        multipleRoyaltyPanel.setVisible(true || assetType.getId() == AssetCls.AS_NON_FUNGIBLE);
 
     }
 
