@@ -162,6 +162,7 @@ public class APIExchange {
                 .build();
     }
 
+    @GET
     @Path("allordersbyaddress/{address}")
     public Response getAllOrdersByAddress2(@Context UriInfo info,
                                            @PathParam("address") String address,

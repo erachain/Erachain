@@ -654,6 +654,7 @@ public class TradeResource {
         return out.toJSONString();
     }
 
+    @GET
     @Path("allordersbyaddress/{address}")
     public static String getAllOrdersByAddress2(@Context UriInfo info,
                                                 @PathParam("address") String address,
