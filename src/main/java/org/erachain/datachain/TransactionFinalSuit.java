@@ -52,8 +52,6 @@ public interface TransactionFinalSuit {
 
     IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending);
 
-    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, boolean descending);
-
     IteratorCloseable<Long> getBiDirectionIterator_old(Long fromSeqNo, boolean descending);
 
     IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending);

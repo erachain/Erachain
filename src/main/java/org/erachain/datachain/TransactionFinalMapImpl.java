@@ -1003,18 +1003,19 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable getIteratorByAddress(byte[] addressShort, boolean descending) {
+    public IteratorCloseable getIteratorByAddress(byte[] addressShort, Long fromID, boolean descending) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
-        return ((TransactionFinalSuit) map).getIteratorByAddress(addressShort, descending);
+        return ((TransactionFinalSuit) map).getBiDirectionAddressIterator(addressShort, fromID, descending);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int offset, int limit, boolean noForge, boolean descending) {
+    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, Integer type, Long fromID, int offset,
+                                                           int limit, boolean noForge, boolean descending) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
@@ -1023,7 +1024,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         long timeOut = System.currentTimeMillis();
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = getIteratorByAddress(addressShort, descending)) {
+        try (IteratorCloseable iterator = addressShort == null ?
+                (type == null || type == 0 ?
+                        getIterator(fromID, descending)
+                        : null)
+                : (type == null || type == 0 ?
+                getIteratorByAddress(addressShort, fromID, descending)
+                : getIteratorByAddressAndType(addressShort, type, null, fromID, descending))) {
             Transaction item;
             Long key;
             while (iterator.hasNext() && (limit == -1 || limit > 0)) {
@@ -1038,7 +1045,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                             forgedCount++;
                             continue;
                         } else {
-                            if (System.currentTimeMillis() - timeOut > 5000) {
+                            if (System.currentTimeMillis() - timeOut > 1000) {
                                 break;
                             }
                             forgedCount = 0;
@@ -1060,20 +1067,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         } catch (IOException e) {
         }
         return txs;
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public int getTransactionsByAddressCount(byte[] addressShort) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return 0;
-        }
-        try (IteratorCloseable iterator = getIteratorByAddress(addressShort, false)) {
-            return Iterators.size(iterator);
-        } catch (IOException e) {
-            return 0;
-        }
     }
 
     @Override

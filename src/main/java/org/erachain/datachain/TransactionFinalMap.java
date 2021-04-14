@@ -81,15 +81,11 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
 
     @SuppressWarnings({"unchecked", "rawtypes"})
         // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, boolean descending);
+    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, Long fromID, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
         // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int offset, int limit, boolean noForge, boolean descending);
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    int getTransactionsByAddressCount(byte[] addressShort);
+    List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, Integer type, Long fromID, int offset, int limit, boolean noForge, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
