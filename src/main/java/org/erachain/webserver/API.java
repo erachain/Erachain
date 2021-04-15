@@ -2009,7 +2009,6 @@ public class API {
         // CHECK IF VALID ADDRESS
         if (!PublicKeyAccount.isValidPublicKey(publicKey)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_PUBLIC_KEY);
 
         }
@@ -2061,7 +2060,6 @@ public class API {
         Tuple2<Account, String> result = Account.tryMakeAccount(address);
         if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
 
         }
@@ -2070,7 +2068,6 @@ public class API {
 
         if (personItem == null) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
@@ -2079,7 +2076,6 @@ public class API {
         // DOES EXIST
         if (!map.contains(key)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
@@ -2100,7 +2096,6 @@ public class API {
         // CHECK IF VALID ADDRESS
         if (!PublicKeyAccount.isValidPublicKey(publicKey)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_PUBLIC_KEY);
 
         }
@@ -2108,11 +2103,9 @@ public class API {
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
         Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getShortAddressBytes());
-        //Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
 
         if (personItem == null) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
@@ -2121,7 +2114,6 @@ public class API {
         // DOES EXIST
         if (!map.contains(key)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
