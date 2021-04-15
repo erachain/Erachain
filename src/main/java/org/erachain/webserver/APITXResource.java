@@ -75,8 +75,8 @@ public class APITXResource {
         help.put("api/tx/list?from=[seqNo]&offset={0}&limit={100}&desc&noforge",
                 Lang.T("Get list of transactions. Set [seqNo] as 1234-1. Use 'noforge' for skip forging transactions"));
 
-        help.put("api/tx/listbyaddress/{address}?type={0}&from=[seqNo]&offset={0}&limit={100}&desc&noforge",
-                Lang.T("Get list of transactions for address. Set [seqNo] as 1234-1. Use 'noforge' for skip forging transactions"));
+        help.put("api/tx/listbyaddress/{address}?creator={false|true}&type={0}&from=[seqNo]&offset={0}&limit={100}&desc&noforge",
+                Lang.T("Get list of transactions for address. If [creator]=true - only as creator, if [creator]=false - only recipient, If [creator] not set - for all. Set [seqNo] as 1234-1. Use [noforge] for skip forging transactions"));
 
         help.put("api/tx/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={false}&offset={offset}&limit={limit}&unconfirmed=false&count=false",
                 Lang.T("Find transactions. Set [seqNo] as 1234-1"));
@@ -361,7 +361,7 @@ public class APITXResource {
         List<Transaction> result;
 
         result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), txType,
-                null, 0, 1000, true, false);
+                null, null, 0, 1000, true, false);
         if (unconfirmed) {
             if (txType == null || txType == 0)
                 result.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
@@ -404,7 +404,7 @@ public class APITXResource {
         List<Transaction> transs = new ArrayList<Transaction>();
 
         List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address),
-                null, null, 0, 1000, true, true);
+                null, null, null, 0, 1000, true, true);
         if (unconfirmed)
             trans.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -455,7 +455,7 @@ public class APITXResource {
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), null,
-                    null, 0, 1000, true, false);
+                    null, null, 0, 1000, true, false);
             // e.printStackTrace();
         }
 
@@ -625,7 +625,7 @@ public class APITXResource {
                             @QueryParam("offset") int offset, @QueryParam("limit") int limit
     ) {
 
-        return getList(info, null, null, fromSeqNoStr, offset, limit);
+        return getList(info, null, null, null, fromSeqNoStr, offset, limit);
     }
 
     @GET
@@ -633,6 +633,7 @@ public class APITXResource {
     public Response getList(@Context UriInfo info,
                             @PathParam("address") String address,
                             @QueryParam("type") Integer type,
+                            @QueryParam("creator") Boolean isCreator,
                             @QueryParam("from") String fromSeqNoStr,
                             @QueryParam("offset") int offset, @QueryParam("limit") int limit
     ) {
@@ -648,6 +649,10 @@ public class APITXResource {
         if (offset > limitMax)
             offset = limitMax;
 
+        if (address == null && type != null && type != 0) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
+        }
+
         Account account;
         if (address == null) {
             account = null;
@@ -661,14 +666,10 @@ public class APITXResource {
         }
 
         JSONArray array = new JSONArray();
-
         TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
-        if (account == null && type != null && type != 0) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
-        }
 
         for (Transaction tx : map.getTransactionsByAddressLimit(account == null ? null : account.getShortAddressBytes(),
-                type, fromID, offset, limit, noForge, desc)) {
+                type, isCreator, fromID, offset, limit, noForge, desc)) {
             array.add(tx.toJson());
         }
 

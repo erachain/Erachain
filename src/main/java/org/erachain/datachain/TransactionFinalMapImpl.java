@@ -1011,10 +1011,21 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return ((TransactionFinalSuit) map).getBiDirectionAddressIterator(addressShort, fromID, descending);
     }
 
+    /**
+     * @param addressShort
+     * @param type         if Null - all
+     * @param isCreator    if True - only as creator, if False - only as recipient, if null - all;
+     * @param fromID       if Null - from begin
+     * @param offset
+     * @param limit
+     * @param noForge      if True - skip forging transactions but not each of 100
+     * @param descending
+     * @return
+     */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, Integer type, Long fromID, int offset,
+    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int offset,
                                                            int limit, boolean noForge, boolean descending) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -1030,7 +1041,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         : null)
                 : (type == null || type == 0 ?
                 getIteratorByAddress(addressShort, fromID, descending)
-                : getIteratorByAddressAndType(addressShort, type, null, fromID, descending))) {
+                : getIteratorByAddressAndType(addressShort, type, isCreator, fromID, descending))) {
             Transaction item;
             Long key;
             while (iterator.hasNext() && (limit == -1 || limit > 0)) {
