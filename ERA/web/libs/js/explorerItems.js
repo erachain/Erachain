@@ -127,25 +127,24 @@ function itemFoot(item, forPrint) {
     return output;
 }
 
+function getItemNameMini(item) {
+    return getItemNameMini(item.itemType, item.key, item.name);
+}
+
 function getItemNameMini(itemType, itemKey, itemName) {
     return '<abbr title="' + '[' + itemKey + '] ' + itemName + '"><a  href=?' + itemType + '=' + itemKey + get_lang() + ' ><font size=-2 color=black>' + itemName + '</font></a></abbr>';
 }
 
-function getItemNameMiniGrey(itemType, itemKey, itemName) {
-    if (itemName.length > 4) {
-        return '<abbr title="' + '[' + itemKey + '] ' + itemName + '"><a class=without href=?' + itemType + '=' + itemKey + get_lang() + '><font size=-2 color=#e0e0e0>' + '[' + itemKey + '] ' + itemName + '</font></a></abbr>';
-    } else {
-        return '<a class=without href=?' + itemType + '=' + itemKey + get_lang() + '><font size=-2 color=#e0e0e0>' + getItemName(itemKey, itemName) + '</font></a>';
-    }
+function getItemNameMiniGrey(item) {
+    return '<abbr title="' + '[' + item.key + '] ' + item.name + '"><a class=without href=?' + item.itemType + '=' + item.key + get_lang() + '><font size=-2 color=#e0e0e0>' + item.name + '</font></a></abbr>';
 }
 
-function getItemURL(itemType, itemKeyStart, key, name, icon, imgSize) {
-    var output = '<a href="?' + itemType + '=' + key + get_lang() + '">';
-    if (key > itemKeyStart)
-        output += '<b>[' + key + ']</b>';
+function getItemURL(item, imgSize) {
+    var output = '<a href="?' + item.itemType + '=' + item.key + get_lang() + '">';
+    if (item.key > item.startKey)
+        output += '<b>[' + item.key + ']</b>';
 
-    if (icon && icon.length > 0)
-        output += ' <img src="data:image/gif;base64,' + icon + '" style="width:' + imgSize + 'px;" /> ';
+    output += makeMediaIcon(item, '', 'size:' + imgSize);
 
     output += '<b>' +  escapeHtml(name) + '</b></a>';
 
@@ -161,15 +160,14 @@ function getShortNameBlanked(name) {
     return shortName;
 }
 
-function getShortItemURL(itemType, itemKeyStart, key, name, icon, imgSize) {
-    var output = '<a href="?' + itemType + '=' + key + get_lang() + '">';
-    if (key > itemKeyStart)
-        output += '<b>[' + key + ']</b>';
+function getShortItemURL(item, imgSize) {
+    var output = '<a href="?' + item.itemType + '=' + item.key + get_lang() + '">';
+    if (item.key > item.startKey)
+        output += '<b>[' + item.key + ']</b>';
 
-    if (icon && icon.length > 0)
-        output += ' <img src="data:image/gif;base64,' + icon + '" style="width:' + imgSize + 'px;" /> ';
+    output += makeMediaIcon(item, '', 'size:' + imgSize);
 
-    var shortName = escapeHtml(name).split(' ')[0];
+    var shortName = escapeHtml(item.name).split(' ')[0];
     if (shortName.length > 10)
         shortName = shortName.substr(0, 10);
 
@@ -179,16 +177,16 @@ function getShortItemURL(itemType, itemKeyStart, key, name, icon, imgSize) {
 }
 
 
-function getItemName(itemKeyStart, itemKey, itemName) {
-    if (itemKey < itemKeyStart)
-        return escapeHtml(itemName);
+function getItemName(item) {
+    if (item.key < item.startKey)
+        return escapeHtml(item.name);
 
-    return '[' + itemKey + '] ' + escapeHtml(itemName);
+    return '[' + item.key + '] ' + escapeHtml(item.name);
 }
 
-function getItemName2(itemKeyStart, itemKey, itemName) {
-    if (itemKey < itemKeyStart)
-        return escapeHtml(itemName);
+function getItemName2(item) {
+    if (item.key < item.startKey)
+        return escapeHtml(item.name);
 
-    return '[' + itemKey + '] ' + escapeHtml(itemName);
+    return '[' + item.key + '] ' + escapeHtml(item.name);
 }

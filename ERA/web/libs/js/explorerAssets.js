@@ -234,7 +234,6 @@ function trades(data) {
 
     output += '<tr bgcolor="#f9f9f9">';
     output += '<td><td>' + data.Label_Total_For_Sell;
-    ///output += '<td><b>' + addCommas(data.sellsSumTotalGood) + ' ' + getItemNameMini('asset', data.assetWant, data.assetWantName);
     output += ':<td><b>' + addCommas(data.sellsSumAmountGood) + ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
 
     output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td width=40%><b>'
@@ -242,7 +241,6 @@ function trades(data) {
         + '</b></td><td width=40%><b>' + data.Label_Amount + ' / ' + data.Label_Creator + '</b></td></tr>';
 
     output += '<tr bgcolor="#f9f9f9">';
-    ///output += '<td><b>' + addCommas(data.buysSumTotalGood) + ' ' + getItemNameMini('asset', data.assetWant, data.assetWantName);
     output += '<td><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
     output += '<td>- ' + data.Label_Total_For_Buy + '<td>';
 
