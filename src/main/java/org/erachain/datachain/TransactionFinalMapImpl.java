@@ -1036,11 +1036,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         List<Transaction> txs = new ArrayList<>();
         try (IteratorCloseable iterator = addressShort == null ?
-                (type == null || type == 0 ?
+                type == null || type == 0 ?
                         getIterator(fromID, descending)
-                        : null)
+                        : null
                 : (type == null || type == 0 ?
-                getIteratorByAddress(addressShort, fromID, descending)
+                isCreator == null ?
+                        getIteratorByAddress(addressShort, fromID, descending)
+                        : null
                 : getIteratorByAddressAndType(addressShort, type, isCreator, fromID, descending))) {
             Transaction item;
             Long key;
