@@ -1039,11 +1039,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 type == null || type == 0 ?
                         getIterator(fromID, descending)
                         : null
-                : (type == null || type == 0 ?
+                : type == null || type == 0 ?
                 isCreator == null ?
                         getIteratorByAddress(addressShort, fromID, descending)
                         : null
-                : getIteratorByAddressAndType(addressShort, type, isCreator, fromID, descending))) {
+                : getIteratorByAddressAndType(addressShort, type, isCreator, fromID, descending)) {
             Transaction item;
             Long key;
             while (iterator.hasNext() && (limit == -1 || limit > 0)) {
