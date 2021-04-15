@@ -143,7 +143,7 @@ function asset(data, forPrint) {
 
         output += '<td><b>';
         output += '<a href="?asset=' + pair.quote_id + get_lang() + '">';
-        output += getAssetName2(pair.quote_id, pair.quote_name);
+        output += getItemName2(1000, pair.quote_id, pair.quote_name);
 
 
         output += '<td><a href="?asset=' + pair.base_id + '&asset=' + pair.quote_id  + get_lang() + '"><b>'
@@ -194,8 +194,8 @@ function trades(data) {
         + data.Label_Trades + '</h3> ';
 
     output += '<a href="?asset=' + data.assetHave + '&asset=' + data.assetWant + get_lang() + '"><h3 style="display:inline;">';
-    output += getAssetName2(data.assetHave, data.assetHaveName) + ' / ';
-    output += getAssetName2(data.assetWant, data.assetWantName) + '</h3></a>';
+    output += getItemName2(1000, data.assetHave, data.assetHaveName) + ' / ';
+    output += getItemName2(1000, data.assetWant, data.assetWantName) + '</h3></a>';
 
     output += '<br>';
 
@@ -344,9 +344,9 @@ function trades(data) {
     //output += '<b>' + data.Label_Trade_Volume + ':</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
     //output += '&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeWantAmount) + ' ' + getItemNameMini('asset', data.assetWant, data.assetWantName);
 
-    output += '<br><br><b>' + data.Label_Go_To + ': <a href=?asset=' + data.assetHave + get_lang() + '>' + getAssetName2(data.assetHave, data.assetHaveName) + '</a>';
-    output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + get_lang() + '>' + getAssetName2(data.assetWant, data.assetWantName) + '</a>';
-    output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + '&asset=' + data.assetHave + get_lang() + '>' + getAssetName2(data.assetWant, data.assetWantName) + '/' + getAssetName2(data.assetHave, data.assetHaveName);
+    output += '<br><br><b>' + data.Label_Go_To + ': <a href=?asset=' + data.assetHave + get_lang() + '>' + getItemName2(1000, data.assetHave, data.assetHaveName) + '</a>';
+    output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + get_lang() + '>' + getItemName2(1000, data.assetWant, data.assetWantName) + '</a>';
+    output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + '&asset=' + data.assetHave + get_lang() + '>' + getItemName2(1000, data.assetWant, data.assetWantName) + '/' + getItemName2(1000, data.assetHave, data.assetHaveName);
     output += '</b>';
 
     return output;

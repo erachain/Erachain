@@ -127,20 +127,15 @@ function itemFoot(item, forPrint) {
     return output;
 }
 
-//function getItemNameMini('asset', assetKey, assetName) {
 function getItemNameMini(itemType, itemKey, itemName) {
-    if (itemName.length > 4) {
-        return '<abbr title="' + '(' + itemKey + ') ' + itemName + '"><a  href=?' + itemType + '=' + itemKey + get_lang() + ' ><font size=-2 color=black>' + getitemName(itemKey, itemName.substr(0, 4)) + '</font></a></abbr>';
-    } else {
-        return '<a class=without href=?' + itemType + '=' + itemKey + get_lang() + '><font size=-2 color=black>' + getitemName(itemKey, itemName) + '</font></a>';
-    }
+    return '<abbr title="' + '[' + itemKey + '] ' + itemName + '"><a  href=?' + itemType + '=' + itemKey + get_lang() + ' ><font size=-2 color=black>' + itemName + '</font></a></abbr>';
 }
 
-function getitemNameMiniGrey(itemType, itemKey, itemName) {
+function getItemNameMiniGrey(itemType, itemKey, itemName) {
     if (itemName.length > 4) {
-        return '<abbr title="' + '(' + itemKey + ') ' + itemName + '"><a class=without href=?' + itemType + '=' + itemKey + get_lang() + '><font size=-2 color=#e0e0e0>' + getitemName(itemKey, itemName.substr(0, 4)) + '</font></a></abbr>';
+        return '<abbr title="' + '[' + itemKey + '] ' + itemName + '"><a class=without href=?' + itemType + '=' + itemKey + get_lang() + '><font size=-2 color=#e0e0e0>' + '[' + itemKey + '] ' + itemName + '</font></a></abbr>';
     } else {
-        return '<a class=without href=?' + itemType + '=' + itemKey + get_lang() + '><font size=-2 color=#e0e0e0>' + getitemName(itemKey, itemName) + '</font></a>';
+        return '<a class=without href=?' + itemType + '=' + itemKey + get_lang() + '><font size=-2 color=#e0e0e0>' + getItemName(itemKey, itemName) + '</font></a>';
     }
 }
 
@@ -184,14 +179,14 @@ function getShortItemURL(itemType, itemKeyStart, key, name, icon, imgSize) {
 }
 
 
-function getitemName(itemKeyStart, itemKey, itemName) {
+function getItemName(itemKeyStart, itemKey, itemName) {
     if (itemKey < itemKeyStart)
         return escapeHtml(itemName);
 
-    return '(' + itemKey + ')' + escapeHtml(itemName);
+    return '[' + itemKey + '] ' + escapeHtml(itemName);
 }
 
-function getitemName2(itemKeyStart, itemKey, itemName) {
+function getItemName2(itemKeyStart, itemKey, itemName) {
     if (itemKey < itemKeyStart)
         return escapeHtml(itemName);
 

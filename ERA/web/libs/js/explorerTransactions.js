@@ -706,7 +706,7 @@ function transactionLite(urlstart, data, i, item) {
 
         output += '<br>fee: ' + addCommas(item.transaction.fee) + '</td>';
 
-        output += '<td>' + ' <a href=?asset=' + item.transaction.asset + get_lang() + '>' + getAssetName(item.transaction.asset, item.transaction.assetName) + '</a>';
+        output += '<td>' + ' <a href=?asset=' + item.transaction.asset + get_lang() + '>' + getItemName('asset', 1000, item.transaction.asset, item.transaction.assetName) + '</a>';
 
         if (item.transaction.recipient == data.address) {
             output += '<td><font color="dimgray">' + item.transaction.recipient + '</font></td>';
@@ -858,9 +858,9 @@ function transactionLite(urlstart, data, i, item) {
 
         output += '<td>' + addCommas(item.transaction.fee) + ' <font size="-2">ERA</font></td>';
 
-        output += '<td>' + ' <a href=?asset=' + item.transaction.order.have + get_lang() + '>' + getAssetName(item.transaction.order.have, item.transaction.haveName) + '</a>';
+        output += '<td>' + ' <a href=?asset=' + item.transaction.order.have + get_lang() + '>' + getItemName('asset', 1000, item.transaction.order.have, item.transaction.haveName) + '</a>';
 
-        output += '<td>' + ' <a href=?asset=' + item.transaction.order.want + get_lang() + '>' + getAssetName(item.transaction.order.want, item.transaction.wantName) + '</a>';
+        output += '<td>' + ' <a href=?asset=' + item.transaction.order.want + get_lang() + '>' + getItemName('asset', 1000, item.transaction.order.want, item.transaction.wantName) + '</a>';
 
         output += '<td>' + addCommas(item.transaction.order.price);
 
@@ -918,9 +918,9 @@ function transactionLite(urlstart, data, i, item) {
 
         output += '<td>' + addCommas(item.transaction.fee) + ' <font size="-2">ERA</font></td>';
 
-        output += '<td>' + ' <a href=?asset=' + item.transaction.orderSource.have + get_lang() + '>' + getAssetName(item.transaction.orderSource.have, item.transaction.orderSource.haveName) + '</a>';
+        output += '<td>' + ' <a href=?asset=' + item.transaction.orderSource.have + get_lang() + '>' + getItemName('asset', 1000, item.transaction.orderSource.have, item.transaction.orderSource.haveName) + '</a>';
 
-        output += '<td>' + ' <a href=?asset=' + item.transaction.orderSource.want + get_lang() + '>' + getAssetName(item.transaction.orderSource.want, item.transaction.orderSource.wantName) + '</a>';
+        output += '<td>' + ' <a href=?asset=' + item.transaction.orderSource.want + get_lang() + '>' + getItemName('asset', 1000, item.transaction.orderSource.want, item.transaction.orderSource.wantName) + '</a>';
 
         output += '<td>' + addCommas(item.transaction.orderSource.price);
 

@@ -24,8 +24,8 @@ function exchange(data){
     //Отображение таблицы элементов статусов
     for (var i in data.popularPairs) {
         var item = data.popularPairs[i];
-        output += '<tr><td>' + getShortAssetURL(item.have.key, item.have.name, item.have.icon, 30);
-        output += '<td>' + getShortAssetURL(item.want.key, item.want.name, item.want.icon, 30);;
+        output += '<tr><td>' + getShortItemURL('asset', 1000, item.have.key, item.have.name, item.have.icon, 30);
+        output += '<td>' + getShortItemURL('asset', 1000, item.want.key, item.want.name, item.want.icon, 30);;
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.orders + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key

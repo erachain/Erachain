@@ -1227,9 +1227,9 @@ button.white-bgc[disabled]:focus,
                         output += '</p>';
                         output += '</td>';
 
-                        output += '<td>' + ' <a href=?asset=' + data[i].trade.wantKey + get_lang() + '>' + getAssetName(data[i].trade.wantKey, data[i].trade.wantName) + '</a>';
+                        output += '<td>' + ' <a href=?asset=' + data[i].trade.wantKey + get_lang() + '>' + getItemName(1000, data[i].trade.wantKey, data[i].trade.wantName) + '</a>';
 
-                        output += '<td>' + ' <a href=?asset=' + data[i].trade.haveKey + get_lang() + '>' + getAssetName(data[i].trade.haveKey, data[i].trade.haveName) + '</a>';
+                        output += '<td>' + ' <a href=?asset=' + data[i].trade.haveKey + get_lang() + '>' + getItemName(1000, data[i].trade.haveKey, data[i].trade.haveName) + '</a>';
 
                         output += '<td>' + addCommas(data[i].trade.reversePrice);
                         output += '<br>' + getItemNameMini('asset', data[i].trade.haveKey, data[i].trade.haveName);
