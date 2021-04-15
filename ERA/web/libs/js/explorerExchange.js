@@ -72,7 +72,7 @@ function exchange(data){
 
         if (trade.type == 'sell') {
             output += '<td align=right>' + addCommas(trade.amountHave);
-            //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+            //output += ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
 
             output += '<td align=left>';
             if (trade.unchecked == true) {}

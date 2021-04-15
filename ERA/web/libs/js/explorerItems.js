@@ -126,3 +126,74 @@ function itemFoot(item, forPrint) {
 
     return output;
 }
+
+//function getItemNameMini('asset', assetKey, assetName) {
+function getItemNameMini(itemType, itemKey, itemName) {
+    if (itemName.length > 4) {
+        return '<abbr title="' + '(' + itemKey + ') ' + itemName + '"><a  href=?' + itemType + '=' + itemKey + get_lang() + ' ><font size=-2 color=black>' + getitemName(itemKey, itemName.substr(0, 4)) + '</font></a></abbr>';
+    } else {
+        return '<a class=without href=?' + itemType + '=' + itemKey + get_lang() + '><font size=-2 color=black>' + getitemName(itemKey, itemName) + '</font></a>';
+    }
+}
+
+function getitemNameMiniGrey(itemType, itemKey, itemName) {
+    if (itemName.length > 4) {
+        return '<abbr title="' + '(' + itemKey + ') ' + itemName + '"><a class=without href=?' + itemType + '=' + itemKey + get_lang() + '><font size=-2 color=#e0e0e0>' + getitemName(itemKey, itemName.substr(0, 4)) + '</font></a></abbr>';
+    } else {
+        return '<a class=without href=?' + itemType + '=' + itemKey + get_lang() + '><font size=-2 color=#e0e0e0>' + getitemName(itemKey, itemName) + '</font></a>';
+    }
+}
+
+function getItemURL(itemType, itemKeyStart, key, name, icon, imgSize) {
+    var output = '<a href="?' + itemType + '=' + key + get_lang() + '">';
+    if (key > itemKeyStart)
+        output += '<b>[' + key + ']</b>';
+
+    if (icon && icon.length > 0)
+        output += ' <img src="data:image/gif;base64,' + icon + '" style="width:' + imgSize + 'px;" /> ';
+
+    output += '<b>' +  escapeHtml(name) + '</b></a>';
+
+    return output;
+}
+
+function getShortNameBlanked(name) {
+
+    var shortName = escapeHtml(name).split(' ')[0];
+    if (shortName.length > 12)
+        shortName = shortName.substr(0, 12) + '.';
+
+    return shortName;
+}
+
+function getShortItemURL(itemType, itemKeyStart, key, name, icon, imgSize) {
+    var output = '<a href="?' + itemType + '=' + key + get_lang() + '">';
+    if (key > itemKeyStart)
+        output += '<b>[' + key + ']</b>';
+
+    if (icon && icon.length > 0)
+        output += ' <img src="data:image/gif;base64,' + icon + '" style="width:' + imgSize + 'px;" /> ';
+
+    var shortName = escapeHtml(name).split(' ')[0];
+    if (shortName.length > 10)
+        shortName = shortName.substr(0, 10);
+
+    output += '<b>' +  shortName + '</b></a>';
+
+    return output;
+}
+
+
+function getitemName(itemKeyStart, itemKey, itemName) {
+    if (itemKey < itemKeyStart)
+        return escapeHtml(itemName);
+
+    return '(' + itemKey + ')' + escapeHtml(itemName);
+}
+
+function getitemName2(itemKeyStart, itemKey, itemName) {
+    if (itemKey < itemKeyStart)
+        return escapeHtml(itemName);
+
+    return '[' + itemKey + '] ' + escapeHtml(itemName);
+}

@@ -234,16 +234,16 @@ function trades(data) {
 
     output += '<tr bgcolor="#f9f9f9">';
     output += '<td><td>' + data.Label_Total_For_Sell;
-    ///output += '<td><b>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-    output += ':<td><b>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+    ///output += '<td><b>' + addCommas(data.sellsSumTotalGood) + ' ' + getItemNameMini('asset', data.assetWant, data.assetWantName);
+    output += ':<td><b>' + addCommas(data.sellsSumAmountGood) + ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
 
     output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td width=40%><b>'
         + data.Label_Creator + ' / ' + data.Label_Amount + '<td width=30% style="font-size:1.4em"><b>' + data.Label_Price
         + '</b></td><td width=40%><b>' + data.Label_Amount + ' / ' + data.Label_Creator + '</b></td></tr>';
 
     output += '<tr bgcolor="#f9f9f9">';
-    ///output += '<td><b>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-    output += '<td><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+    ///output += '<td><b>' + addCommas(data.buysSumTotalGood) + ' ' + getItemNameMini('asset', data.assetWant, data.assetWantName);
+    output += '<td><b>' +  addCommas(data.buysSumAmountGood) + ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
     output += '<td>- ' + data.Label_Total_For_Buy + '<td>';
 
     width = 0;
@@ -341,8 +341,8 @@ function trades(data) {
 
     output += '</div></div>';
 
-    //output += '<b>' + data.Label_Trade_Volume + ':</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-    //output += '&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeWantAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+    //output += '<b>' + data.Label_Trade_Volume + ':</b>&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeHaveAmount) + ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
+    //output += '&nbsp;&nbsp;&nbsp;&nbsp;' + addCommas(data.tradeWantAmount) + ' ' + getItemNameMini('asset', data.assetWant, data.assetWantName);
 
     output += '<br><br><b>' + data.Label_Go_To + ': <a href=?asset=' + data.assetHave + get_lang() + '>' + getAssetName2(data.assetHave, data.assetHaveName) + '</a>';
     output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + get_lang() + '>' + getAssetName2(data.assetWant, data.assetWantName) + '</a>';

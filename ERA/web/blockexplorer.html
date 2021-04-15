@@ -486,76 +486,6 @@ button.white-bgc[disabled]:focus,
             return ret;
         }
 
-        function getAssetNameMini(assetKey, assetName) {
-            if (assetName.length > 4) {
-                return '<abbr title="' + '(' + assetKey + ') ' + assetName + '"><a  href=?asset=' + assetKey + get_lang() + ' ><font size=-2 color=black>' + getAssetName(assetKey, assetName.substr(0, 4)) + '</font></a></abbr>';
-            } else {
-                return '<a class=without href=?asset=' + assetKey + get_lang() + '><font size=-2 color=black>' + getAssetName(assetKey, assetName) + '</font></a>';
-            }
-        }
-
-        function getAssetNameMiniGrey(assetKey, assetName) {
-            if (assetName.length > 4) {
-                return '<abbr title="' + '(' + assetKey + ') ' + assetName + '"><a class=without href=?asset=' + assetKey + get_lang() + '><font size=-2 color=#e0e0e0>' + getAssetName(assetKey, assetName.substr(0, 4)) + '</font></a></abbr>';
-            } else {
-                return '<a class=without href=?asset=' + assetKey + get_lang() + '><font size=-2 color=#e0e0e0>' + getAssetName(assetKey, assetName) + '</font></a>';
-            }
-        }
-
-        function getAssetURL(key, name, icon, imgSize) {
-            var output = '<a href="?asset=' + key + get_lang() + '">';
-            if (key > 1000)
-                output += '<b>[' + key + ']</b>';
-
-            if (icon.length > 0)
-                output += ' <img src="data:image/gif;base64,' + icon + '" style="width:' + imgSize + 'px;" /> ';
-
-            output += '<b>' +  escapeHtml(name) + '</b></a>';
-
-            return output;
-        }
-
-        function getShortNameBlanked(name) {
-
-            var shortName = escapeHtml(name).split(' ')[0];
-            if (shortName.length > 12)
-                shortName = shortName.substr(0, 12) + '.';
-
-            return shortName;
-        }
-
-        function getShortAssetURL(key, name, icon, imgSize) {
-            var output = '<a href="?asset=' + key + get_lang() + '">';
-            if (key > 1000)
-                output += '<b>[' + key + ']</b>';
-
-            if (icon.length > 0)
-                output += ' <img src="data:image/gif;base64,' + icon + '" style="width:' + imgSize + 'px;" /> ';
-
-            var shortName = escapeHtml(name).split(' ')[0];
-            if (shortName.length > 10)
-                shortName = shortName.substr(0, 10);
-
-            output += '<b>' +  shortName + '</b></a>';
-
-            return output;
-        }
-
-
-        function getAssetName(assetKey, assetName) {
-            if (assetKey < 1000)
-                return escapeHtml(assetName);
-
-            return '(' + assetKey + ')' + escapeHtml(assetName);
-        }
-
-        function getAssetName2(assetKey, assetName) {
-            if (assetKey < 1000)
-                return escapeHtml(assetName);
-
-            return '[' + assetKey + '] ' + escapeHtml(assetName);
-        }
-
         function addCommas(str) {
             if (str == null) return "";
             strbuf = str.toString();
@@ -1269,7 +1199,7 @@ button.white-bgc[disabled]:focus,
 
                         output += '<p>';
 
-                        output += addCommas(data[i].trade.amountWant) + ' ' + getAssetNameMini(data[i].trade.wantKey, data[i].trade.wantName);
+                        output += addCommas(data[i].trade.amountWant) + ' ' + getItemNameMini('asset', data[i].trade.wantKey, data[i].trade.wantName);
 
                         output += ' <img src=' + img1 + ' style="vertical-align: middle;">';
 
@@ -1292,7 +1222,7 @@ button.white-bgc[disabled]:focus,
                         output += '<p>';
                         output += '<img src=' + img2 + ' style="vertical-align: middle;"> ';
 
-                        output += '' + addCommas(data[i].trade.amountHave) + ' ' + getAssetNameMini(data[i].trade.haveKey, data[i].trade.haveName);
+                        output += '' + addCommas(data[i].trade.amountHave) + ' ' + getItemNameMini('asset', data[i].trade.haveKey, data[i].trade.haveName);
 
                         output += '</p>';
                         output += '</td>';
@@ -1302,8 +1232,8 @@ button.white-bgc[disabled]:focus,
                         output += '<td>' + ' <a href=?asset=' + data[i].trade.haveKey + get_lang() + '>' + getAssetName(data[i].trade.haveKey, data[i].trade.haveName) + '</a>';
 
                         output += '<td>' + addCommas(data[i].trade.reversePrice);
-                        output += '<br>' + getAssetNameMini(data[i].trade.haveKey, data[i].trade.haveName);
-                        output += '/' + getAssetNameMini(data[i].trade.wantKey, data[i].trade.wantName);
+                        output += '<br>' + getItemNameMini('asset', data[i].trade.haveKey, data[i].trade.haveName);
+                        output += '/' + getItemNameMini('asset', data[i].trade.wantKey, data[i].trade.wantName);
 
                         if (data[i].hasOwnProperty('balance')) {
                             output += '<td>' + printBalance(data[i].balance) + '</td>';
@@ -1599,7 +1529,7 @@ button.white-bgc[disabled]:focus,
         function printBalance(balance) {
             var output = '';
             for (key in balance) {
-                output += '' + addCommas(balance[key].amount) + ' ' + getAssetNameMini(key, balance[key].assetName) + '<br>';
+                output += '' + addCommas(balance[key].amount) + ' ' + getItemNameMini('asset', key, balance[key].assetName) + '<br>';
             }
             return output;
         }
