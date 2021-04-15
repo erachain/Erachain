@@ -23,7 +23,7 @@ public interface TransactionFinalSuit {
     /**
      * @param addressShort
      * @param type         - TRANSACTION type
-     * @param isCreator    True - only CREATORS, False - only RECIPIENTS
+     * @param isCreator    True - only CREATORS, False - only RECIPIENTS, None - all
      * @param descending
      * @return
      */
@@ -42,7 +42,7 @@ public interface TransactionFinalSuit {
      *
      * @param addressShort
      * @param type         - TRANSACTION type
-     * @param isCreator    True - only CREATORS, False - only RECIPIENTS
+     * @param isCreator    True - only CREATORS, False - only RECIPIENTS, None - all
      * @param fromID
      * @param descending
      * @return
