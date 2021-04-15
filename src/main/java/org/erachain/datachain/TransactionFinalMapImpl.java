@@ -1012,9 +1012,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     /**
-     * @param addressShort
-     * @param type         if Null - all
-     * @param isCreator    if True - only as creator, if False - only as recipient, if null - all;
+     * @param addressShort if Null - [type] and [isCreator] must be Null too.
+     * @param type         if Null - use all types and [isCreator] must be Null too
+     * @param isCreator    if True - only as creator, if False - only as recipient, if Null - all variants;
      * @param fromID       if Null - from begin
      * @param offset
      * @param limit

@@ -75,8 +75,12 @@ public class APITXResource {
         help.put("api/tx/list?from=[seqNo]&offset={0}&limit={100}&desc&noforge",
                 Lang.T("Get list of transactions. Set [seqNo] as 1234-1. Use 'noforge' for skip forging transactions"));
 
-        help.put("api/tx/listbyaddress/{address}?creator={false|true}&type={0}&from=[seqNo]&offset={0}&limit={100}&desc&noforge",
-                Lang.T("Get list of transactions for address. If [creator]=true - only as creator, if [creator]=false - only recipient, If [creator] not set - for all. Set [seqNo] as 1234-1. Use [noforge] for skip forging transactions"));
+        help.put("api/tx/listbyaddress/{address}?from=[seqNo]&offset={0}&limit={100}&desc&noforge",
+                Lang.T("Get list of transactions for address. Set [seqNo] as 1234-1. Use [noforge] for skip forging transactions"));
+
+        help.put("api/tx/listbyaddressandtype/{address}/{type}?creator={false|true}&from=[seqNo]&offset={0}&limit={100}&desc&noforge",
+                Lang.T("Get list of transactions for address and type. If [creator]=true - only as creator, if [creator]=false - only recipient, Set [seqNo] as 1234-1. Use [noforge] for skip forging transactions"));
+
 
         help.put("api/tx/find?address={address}&creator={creator}&recipient={recipient}&from=[seqNo]&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={false}&offset={offset}&limit={limit}&unconfirmed=false&count=false",
                 Lang.T("Find transactions. Set [seqNo] as 1234-1"));
@@ -632,7 +636,17 @@ public class APITXResource {
     @Path("listbyaddress/{address}")
     public Response getList(@Context UriInfo info,
                             @PathParam("address") String address,
-                            @QueryParam("type") Integer type,
+                            @QueryParam("from") String fromSeqNoStr,
+                            @QueryParam("offset") int offset, @QueryParam("limit") int limit
+    ) {
+        return getList(info, address, null, null, fromSeqNoStr, offset, limit);
+    }
+
+    @GET
+    @Path("listbyaddressandtype/{address}/{type}")
+    public Response getList(@Context UriInfo info,
+                            @PathParam("address") String address,
+                            @PathParam("type") Integer type,
                             @QueryParam("creator") Boolean isCreator,
                             @QueryParam("from") String fromSeqNoStr,
                             @QueryParam("offset") int offset, @QueryParam("limit") int limit
@@ -649,8 +663,12 @@ public class APITXResource {
         if (offset > limitMax)
             offset = limitMax;
 
-        if (address == null && type != null && type != 0) {
+        if (address == null && type != null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
+        }
+
+        if (type == null && isCreator != null) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_TRANSACTION_TYPE);
         }
 
         Account account;
