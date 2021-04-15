@@ -119,6 +119,8 @@ public class API {
         help.put("GET Address Assets", "addressassets/{address}");
         help.put("GET Address Public Key", "addresspublickey/{address}");
         help.put("GET Address Forging Info", "addressforge/{address}");
+        help.put("GET Address Person Info", "addressasperson/{address}");
+        help.put("GET Address Person Name", "addressaspersonlite/{address}");
 
         help.put("*** EXCHANGE ***", "");
         help.put("GET Exchange Orders", "exchangeorders/{have}/{want}");
@@ -1505,6 +1507,72 @@ public class API {
                     .entity("" + personItem.a)
                     .build();
         }
+    }
+
+    @GET
+    @Path("addressasperson/{address}")
+    public Response getAddressAsPerson(@PathParam("address") String address) {
+
+        // CHECK IF VALID ADDRESS
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_ADDRESS);
+
+        }
+
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap()
+                .getItem(result.a.getShortAddressBytes());
+
+        JSONObject out = new JSONObject();
+        if (personItem != null) {
+            PersonCls person = (PersonCls) DCSet.getInstance().getItemPersonMap().get(personItem.a);
+            out.put("person", person.toJson());
+            out.put("endDate", 86400000L * personItem.b); // timestamp
+            out.put("seqNo", personItem.c + "-" + personItem.d);
+
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("addressaspersonlite/{address}")
+    public Response getAddressAsPersonLite(@PathParam("address") String address) {
+
+        // CHECK IF VALID ADDRESS
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_ADDRESS);
+
+        }
+
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap()
+                .getItem(result.a.getShortAddressBytes());
+
+        String outStr;
+        JSONObject out = new JSONObject();
+        if (personItem == null) {
+            outStr = "";
+        } else {
+            PersonCls person = (PersonCls) DCSet.getInstance().getItemPersonMap().get(personItem.a);
+            out.put("name", person.viewName());
+            out.put("key", personItem.a);
+            outStr = out.toJSONString();
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(outStr)
+                .build();
     }
 
     @GET

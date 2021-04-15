@@ -713,7 +713,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
         int add_day = this.add_day < 0? this.add_day : BlockChain.DEFAULT_DURATION;
         // set to time stamp of record
-        int end_day = (int) (this.timestamp / 86400000l) + add_day;
+        int end_day = (int) (this.timestamp / 86400000L) + add_day;
 
         Tuple3<Integer, Integer, Integer> itemP = new Tuple3<Integer, Integer, Integer>(end_day,
                 //Controller.getInstance().getHeight(), this.signature);
