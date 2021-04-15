@@ -160,12 +160,12 @@ function getShortNameBlanked(name) {
     return shortName;
 }
 
-function getShortItemURL(item, imgSize) {
+function getShortItemURL(item, class1, style1) {
     var output = '<a href="?' + item.itemType + '=' + item.key + get_lang() + '">';
     if (item.key > item.startKey)
         output += '<b>[' + item.key + ']</b>';
 
-    output += makeMediaIcon(item, '', 'size:' + imgSize);
+    output += makeMediaIcon(item, class1, style1);
 
     var shortName = escapeHtml(item.name).split(' ')[0];
     if (shortName.length > 10)
@@ -176,17 +176,22 @@ function getShortItemURL(item, imgSize) {
     return output;
 }
 
-
 function getItemName(item) {
-    if (item.key < item.startKey)
-        return escapeHtml(item.name);
+    return getItemName(item.startKey, item.key, item.name);
+}
+function getItemName(startKey, key, name) {
+    if (key < startKey)
+        return escapeHtml(name);
 
-    return '[' + item.key + '] ' + escapeHtml(item.name);
+    return '[' + key + '] ' + escapeHtml(name);
 }
 
 function getItemName2(item) {
-    if (item.key < item.startKey)
-        return escapeHtml(item.name);
+    return getItemName2(item.startKey, item.key, item.name);
+}
+function getItemName2(startKey, key, name) {
+    if (key < startKey)
+        return escapeHtml(name);
 
-    return '[' + item.key + '] ' + escapeHtml(item.name);
+    return '[' + key + '] ' + escapeHtml(name);
 }
