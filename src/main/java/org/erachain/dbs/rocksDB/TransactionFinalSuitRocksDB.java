@@ -310,6 +310,11 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending) {
+
+        if (type == null && isCreator != null) {
+            return null;
+        }
+
         byte[] key;
         if (type != null && type != 0) {
             if (isCreator != null) {
@@ -336,6 +341,10 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
             return getIteratorByAddressAndType(addressShort, type, isCreator, descending);
         }
 
+        if (type == null && isCreator != null) {
+            return null;
+        }
+
         byte[] keyFrom = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2 + Long.BYTES];
         System.arraycopy(addressShort, 0, keyFrom, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
         keyFrom[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
@@ -358,6 +367,10 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, Long toID, boolean descending) {
         if (fromID == null || isCreator == null || type == null) {
             return getIteratorByAddressAndType(addressShort, type, isCreator, descending);
+        }
+
+        if (type == null && isCreator != null) {
+            return null;
         }
 
         byte[] keyFrom = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2 + Long.BYTES];
