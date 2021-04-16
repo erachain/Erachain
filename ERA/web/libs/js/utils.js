@@ -175,6 +175,8 @@ function makeMediaImage(item, class1, style1) {
         source = item.imageURL;
     } else if (item.image) {
         source = 'data:image/gif;base64,' + item.image;
+    } else if (item.imageTypeName == 'video') {
+        source = '/api' + item.item_type + '/image/' + item.key;
     }
 
     if (!source)
