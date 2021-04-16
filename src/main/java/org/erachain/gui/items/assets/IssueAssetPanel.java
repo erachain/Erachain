@@ -40,7 +40,7 @@ public class IssueAssetPanel extends IssueItemPanel {
     private MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel();
 
     public IssueAssetPanel() {
-        super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true);
+        super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true, true);
 
         assetTypesComboBoxModel = new AssetTypesComboBoxModel();
         assetTypeJComboBox.setModel(assetTypesComboBoxModel);

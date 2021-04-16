@@ -62,7 +62,7 @@ public abstract class IssueItemPanel extends IconPanel {
 
     protected byte[] itemAppData;
 
-    public IssueItemPanel(String name, String title, String issueMess, boolean useIcon, int cropWidth, int cropHeight, boolean originalSize) {
+    public IssueItemPanel(String name, String title, String issueMess, boolean useIcon, int cropWidth, int cropHeight, boolean originalSize, boolean useExtURL) {
         super(name, title);
 
         this.useIcon = useIcon;
@@ -73,13 +73,13 @@ public abstract class IssueItemPanel extends IconPanel {
 
         addIconLabel = new AddImageLabel(Lang.T("Add Logo"),
                 WIDTH_LOGO, HEIGHT_LOGO,
-                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL, false);
+                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL, false, useExtURL);
         addIconLabel.setBorder(null);
         addIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
 
         addImageLabel = new AddImageLabel(
                 Lang.T("Add image"), cropWidth, cropHeight,
-                0, ItemCls.MAX_IMAGE_LENGTH, cropWidth >> 1, cropHeight >> 1, originalSize);
+                0, ItemCls.MAX_IMAGE_LENGTH, cropWidth >> 1, cropHeight >> 1, originalSize, useExtURL);
         addImageLabel.setBorder(null);
         addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
 

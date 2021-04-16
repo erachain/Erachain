@@ -69,7 +69,6 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
     private JLabel jLabelGender = new JLabel(Lang.T("Gender") + ":");
     private JLabel jlabelhairColor = new JLabel(Lang.T("Hair color") + ":");
     private JLabel jLabelHeight = new JLabel(Lang.T("Growth") + ":");
-    //private JLabel jLabelPersonNumber = new JLabel(Lang.T("Person number") + ":");
     protected JPanel jPanelHead = new JPanel();
     protected JCheckBox aliveCheckBox = new JCheckBox(Lang.T("Alive"), true);
 
@@ -78,14 +77,14 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
     }
 
     public IssuePersonPanel(String name, String title) {
-        super(name, title, "Person issue has been sent!", false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false);
+        super(name, title, "Person issue has been sent!", false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false, false);
         initComponents(true);
         initLabels();
 
     }
 
     public IssuePersonPanel(String name, String title, String issueMess) {
-        super(name, title, issueMess, false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false);
+        super(name, title, issueMess, false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false, false);
     }
 
     protected void initLabels() {
@@ -176,27 +175,27 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
         //BirthLatitude
         labelGBC.gridy = gridy;
-        jPanelAdd.add(jLabelBirthLatitudeLongtitude, labelGBC);
+        //jPanelAdd.add(jLabelBirthLatitudeLongtitude, labelGBC);
         fieldGBC.gridy = gridy++;
-        jPanelAdd.add(txtBirthLatitude, fieldGBC);
+        //jPanelAdd.add(txtBirthLatitude, fieldGBC);
 
         //HairСolor
         labelGBC.gridy = gridy;
-        jPanelAdd.add(jlabelhairColor, labelGBC);
+        //jPanelAdd.add(jlabelhairColor, labelGBC);
         fieldGBC.gridy = gridy++;
-        jPanelAdd.add(txtHairColor, fieldGBC);
+        //jPanelAdd.add(txtHairColor, fieldGBC);
 
         // EyeColor
         labelGBC.gridy = gridy;
-        jPanelAdd.add(jLabelEyeColor, labelGBC);
+        //jPanelAdd.add(jLabelEyeColor, labelGBC);
         fieldGBC.gridy = gridy++;
-        jPanelAdd.add(txtEyeColor, fieldGBC);
+        //jPanelAdd.add(txtEyeColor, fieldGBC);
 
         // Height
         labelGBC.gridy = gridy;
-        jPanelAdd.add(jLabelHeight, labelGBC);
+        //jPanelAdd.add(jLabelHeight, labelGBC);
         fieldGBC.gridy = gridy++;
-        jPanelAdd.add(txtHeight, fieldGBC);
+        //jPanelAdd.add(txtHeight, fieldGBC);
 
         // registrar address
         labelGBC.gridy = gridy;
