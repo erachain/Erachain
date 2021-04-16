@@ -93,16 +93,14 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         return false;
     }
 
-    int minLen = 200 * 500;
-
     @Override
     public long calcBaseFee(boolean withFreeProtocol) {
 
         int len = getFeeLength();
 
         if (this.height > BlockChain.USE_NEW_ISSUE_FEE) {
-            if (len < minLen)
-                len = minLen;
+            if (len < BlockChain.MINIMAL_ISSUE_FEE)
+                len = BlockChain.MINIMAL_ISSUE_FEE;
         }
 
         return len * BlockChain.FEE_PER_BYTE;
