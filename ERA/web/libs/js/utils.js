@@ -146,7 +146,6 @@ function showWindowVideo(source) {
 
 function makeMediaIcon(item, class1, style1) {
 
-    var out = '';
     var source;
     if (item.iconURL) {
         source = item.iconURL;
@@ -160,16 +159,14 @@ function makeMediaIcon(item, class1, style1) {
         return '';
 
     if (item.iconTypeName == 'video') {
-        out += '<video muted src="' + source + '" autoplay autoplay loop class="' + class1 + '" style="' + style1 + '"></video>';
+        return '<video muted src="' + source + '" autoplay autoplay loop class="' + class1 + '" style="' + style1 + '"></video>';
     } else {
-        out += '<img src="' + source + '" class="' + class1 + '" style="' + style1+ '" /> ';
+        return '<img src="' + source + '" class="' + class1 + '" style="' + style1+ '" /> ';
     }
-    return out;
 }
 
 function makeMediaImage(item, class1, style1) {
 
-    var out = '';
     var source;
     if (item.imageURL) {
         source = item.imageURL;
@@ -183,9 +180,8 @@ function makeMediaImage(item, class1, style1) {
         return '';
 
     if (item.imageTypeName == 'video') {
-        out += '<video muted src="' + source + '" autoplay playsinline loop class="' + class1 + '" style="' + style1 + '"></video>';
+        return '<video muted src="' + source + '" autoplay playsinline loop class="' + class1 + '" style="' + style1 + '"></video>';
     } else {
-        out += '<img src="' + source + '" class="' + class1 + '" style="' + style1 + '" /> ';
+        return '<img src="' + source + '" class="' + class1 + '" style="' + style1 + '" /> ';
     }
-    return out;
 }
