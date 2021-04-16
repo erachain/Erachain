@@ -63,7 +63,7 @@ public class IssueImprintRecord extends IssueItemRecord {
     @Override
     public long calcBaseFee(boolean withFreeProtocol) {
 
-        int len = this.getDataLength(Transaction.FOR_NETWORK, true);
+        int len = getFeeLength();
 
         if (this.height > BlockChain.USE_NEW_ISSUE_FEE) {
             if (len < minLen)

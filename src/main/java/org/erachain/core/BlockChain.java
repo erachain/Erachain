@@ -389,6 +389,9 @@ public class BlockChain {
     public static final int FREE_FEE_TO_SEQNO = DEMO_MODE ? 1 : MAIN_MODE ? 1 : -1;
     public static final int FREE_FEE_FROM_HEIGHT = DEMO_MODE ? 1 : MAIN_MODE ? 1610000 : Integer.MAX_VALUE;
 
+    public static final int ADD_FEE_BYTES_FOR_COMMON_TX = 0;
+
+
     /**
      * FEE_KEY used here
      */

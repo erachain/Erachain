@@ -1168,7 +1168,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     // get fee
     public long calcBaseFee(boolean withFreeProtocol) {
-        int len = this.getDataLength(Transaction.FOR_NETWORK, true);
+        int len = getFeeLength();
         if (withFreeProtocol && height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
                 && len < BlockChain.FREE_FEE_LENGTH) {
             // не учитываем комиссию если размер блока маленький
@@ -1844,6 +1844,19 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         return data;
 
+    }
+
+    /**
+     * Transaction bytes Length for calc FEE
+     *
+     * @return
+     */
+    public int getFeeLength() {
+        int len = getDataLength(Transaction.FOR_NETWORK, true);
+
+        len += BlockChain.ADD_FEE_BYTES_FOR_COMMON_TX;
+
+        return len;
     }
 
     public int getDataLength(int forDeal, boolean withSignature) {
