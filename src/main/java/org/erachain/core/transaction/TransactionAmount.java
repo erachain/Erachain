@@ -46,21 +46,21 @@ if backward - CONFISCATE CREDIT
 ## version 2
 
 #### PROPERTY 1
-typeBytes[2].0 = -128 if NO AMOUNT - check sign
-typeBytes[2].1 = 64 if backward (CONFISCATE CREDIT, ...)
+typeBytes[2].7 = -128 if NO AMOUNT - check sign
+typeBytes[2].6 = 64 if backward (CONFISCATE CREDIT, ...)
 
 #### PROPERTY 2
-typeBytes[3].0 = -128 if NO DATA - check sign
+typeBytes[3].7 = -128 if NO DATA - check sign
 
 ## version 3
 
 #### PROPERTY 1
-typeBytes[2].0 = -128 if NO AMOUNT - check sign
-typeBytes[2].1 = 64 if backward (CONFISCATE CREDIT, ...)
+typeBytes[2].7 = -128 if NO AMOUNT - check sign
+typeBytes[2].6 = 64 if backward (CONFISCATE CREDIT, ...)
 
 #### PROPERTY 2
-typeBytes[3].0 = 128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128)
-typeBytes[3].3-7 = point accuracy: -16..16 = BYTE - 16
+typeBytes[3].7 = 128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128)
+typeBytes[3].4-0 = point accuracy: -16..16 = BYTE - 16
 
  */
 

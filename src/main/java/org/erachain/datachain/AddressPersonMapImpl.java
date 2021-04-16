@@ -15,15 +15,15 @@ import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 /**
- * Хранит Удостоверения персон для заданного публичного ключа.
- * address -> Stack person + end_date + block.height + transaction.reference.
+ * Хранит Удостоверения персон для заданного счета.
+ * addressShort -> Stack person + end_date + block.height + transaction.reference.
  * Тут block.getHeight + transaction index  - это ссылка на транзакцию создавшую данную заметку<br>
  *
- * <b>Ключ:</b> (String)publickKey<br>
+ * <b>Ключ:</b> (byte[])short Address<br>
  *
  * <b>Значение:</b><br>
  * Stack((Long)person key,
- * (Integer)end_date - дата окончания действия удостоврения,<br>
+ * (Integer)period_Days - через сколько дней окончание действия удостоверения,<br>
  * (Integer)block.getHeight - номер блока,<br>
  * (Integer)transaction index - номер транзакции в блоке<br>
  * ))

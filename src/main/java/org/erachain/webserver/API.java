@@ -20,6 +20,7 @@ import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.network.Peer;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -84,6 +85,7 @@ public class API {
 
         help.put("*** CHAIN ***", "");
         help.put("GET Height", "height");
+        help.put("GET Node Peers", "peers");
         help.put("GET First Block or Block.Head", "firstblock[?onlyhead]");
         help.put("GET Last Block", "lastblock[?onlyhead]");
         help.put("GET Last Block Head", "lastblockhead");
@@ -117,6 +119,8 @@ public class API {
         help.put("GET Address Assets", "addressassets/{address}");
         help.put("GET Address Public Key", "addresspublickey/{address}");
         help.put("GET Address Forging Info", "addressforge/{address}");
+        help.put("GET Address Person Info", "addressasperson/{address}");
+        help.put("GET Address Person Name", "addressaspersonlite/{address}");
 
         help.put("*** EXCHANGE ***", "");
         help.put("GET Exchange Orders", "exchangeorders/{have}/{want}");
@@ -169,16 +173,26 @@ public class API {
     }
 
     @GET
+    @Path("peers")
+    public static Response getPeers() {
+
+        JSONArray array = new JSONArray();
+        for (Peer peer : Controller.getInstance().network.getKnownPeers()) {
+            array.add(peer.toJson());
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(array.toJSONString())
+                .build();
+    }
+
+    @GET
     @Path("firstblock")
     public Response getFirstBlock(@Context UriInfo info) {
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
 
         JSONObject out;
         if (onlyhead) {
@@ -198,13 +212,7 @@ public class API {
     @Path("lastblock")
     public Response lastBlock(@Context UriInfo info) {
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
 
         JSONObject out;
         if (onlyhead) {
@@ -278,13 +286,7 @@ public class API {
         byte[] signatureBytes;
         JSONObject out = new JSONObject();
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
 
         int step = 1;
         try {
@@ -322,13 +324,7 @@ public class API {
     public Response block(@Context UriInfo info,
                           @PathParam("signature") String signature) {
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
 
         JSONObject out = new JSONObject();
 
@@ -380,13 +376,7 @@ public class API {
     public Response blockByHeight(@Context UriInfo info,
                                   @PathParam("height") String heightStr) {
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
 
         JSONObject out = new JSONObject();
         int step = 1;
@@ -482,21 +472,8 @@ public class API {
                                           @PathParam("height") Integer fromHeight,
                                           @DefaultValue("10") @PathParam("limit") int limit) {
 
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
-
-        boolean desc;
-        value = info.getQueryParameters().getFirst("desc");
-        if (value == null) {
-            desc = false;
-        } else {
-            desc = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
+        boolean desc = checkBoolean(info, "desc");
 
         int limitTo = onlyhead ? 200 : 50;
         if (limit > limitTo)
@@ -581,21 +558,8 @@ public class API {
                                           @QueryParam("from") Integer fromHeight,
                                           @QueryParam("offset") int offset,
                                           @QueryParam("limit") int limit) {
-        boolean onlyhead;
-        String value = info.getQueryParameters().getFirst("onlyhead");
-        if (value == null) {
-            onlyhead = false;
-        } else {
-            onlyhead = value.isEmpty() || new Boolean(value);
-        }
-
-        boolean desc;
-        value = info.getQueryParameters().getFirst("desc");
-        if (value == null) {
-            desc = false;
-        } else {
-            desc = value.isEmpty() || new Boolean(value);
-        }
+        boolean onlyhead = checkBoolean(info, "onlyhead");
+        boolean desc = checkBoolean(info, "desc");
 
         int limitMax = onlyhead ? 200 : 50;
         if (limit > limitMax)
@@ -1546,6 +1510,72 @@ public class API {
     }
 
     @GET
+    @Path("addressasperson/{address}")
+    public Response getAddressAsPerson(@PathParam("address") String address) {
+
+        // CHECK IF VALID ADDRESS
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_ADDRESS);
+
+        }
+
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap()
+                .getItem(result.a.getShortAddressBytes());
+
+        JSONObject out = new JSONObject();
+        if (personItem != null) {
+            PersonCls person = (PersonCls) DCSet.getInstance().getItemPersonMap().get(personItem.a);
+            out.put("person", person.toJson());
+            out.put("endDate", 86400000L * personItem.b); // timestamp
+            out.put("seqNo", personItem.c + "-" + personItem.d);
+
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("addressaspersonlite/{address}")
+    public Response getAddressAsPersonLite(@PathParam("address") String address) {
+
+        // CHECK IF VALID ADDRESS
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_ADDRESS);
+
+        }
+
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap()
+                .getItem(result.a.getShortAddressBytes());
+
+        String outStr;
+        JSONObject out = new JSONObject();
+        if (personItem == null) {
+            outStr = "";
+        } else {
+            PersonCls person = (PersonCls) DCSet.getInstance().getItemPersonMap().get(personItem.a);
+            out.put("name", person.viewName());
+            out.put("key", personItem.a);
+            outStr = out.toJSONString();
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(outStr)
+                .build();
+    }
+
+    @GET
     @Path("getaccountsfromperson/{key}")
     public Response getAccountsFromPerson(@PathParam("key") String key) {
         JSONObject out = new JSONObject();
@@ -1979,7 +2009,6 @@ public class API {
         // CHECK IF VALID ADDRESS
         if (!PublicKeyAccount.isValidPublicKey(publicKey)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_PUBLIC_KEY);
 
         }
@@ -2031,7 +2060,6 @@ public class API {
         Tuple2<Account, String> result = Account.tryMakeAccount(address);
         if (result.a == null) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
 
         }
@@ -2040,7 +2068,6 @@ public class API {
 
         if (personItem == null) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
@@ -2049,7 +2076,6 @@ public class API {
         // DOES EXIST
         if (!map.contains(key)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
@@ -2070,7 +2096,6 @@ public class API {
         // CHECK IF VALID ADDRESS
         if (!PublicKeyAccount.isValidPublicKey(publicKey)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_PUBLIC_KEY);
 
         }
@@ -2078,11 +2103,9 @@ public class API {
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
         Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getShortAddressBytes());
-        //Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
 
         if (personItem == null) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
@@ -2091,7 +2114,6 @@ public class API {
         // DOES EXIST
         if (!map.contains(key)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
@@ -2302,4 +2324,12 @@ public class API {
                 .build();
     }
 
+    public static boolean checkBoolean(UriInfo info, String param) {
+        String value = info.getQueryParameters().getFirst(param);
+        if (value == null) {
+            return false;
+        } else {
+            return value.isEmpty() || new Boolean(value);
+        }
+    }
 }

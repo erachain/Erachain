@@ -1,7 +1,5 @@
 package org.erachain.dbs.rocksDB;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +11,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.dbs.IteratorCloseableImpl;
-import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
@@ -23,14 +19,12 @@ import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
@@ -316,6 +310,11 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending) {
+
+        if (type == null && isCreator != null) {
+            return null;
+        }
+
         byte[] key;
         if (type != null && type != 0) {
             if (isCreator != null) {
@@ -342,6 +341,10 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
             return getIteratorByAddressAndType(addressShort, type, isCreator, descending);
         }
 
+        if (type == null && isCreator != null) {
+            return null;
+        }
+
         byte[] keyFrom = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2 + Long.BYTES];
         System.arraycopy(addressShort, 0, keyFrom, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
         keyFrom[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
@@ -364,6 +367,10 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, Long toID, boolean descending) {
         if (fromID == null || isCreator == null || type == null) {
             return getIteratorByAddressAndType(addressShort, type, isCreator, descending);
+        }
+
+        if (type == null && isCreator != null) {
+            return null;
         }
 
         byte[] keyFrom = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 2 + Long.BYTES];
@@ -486,31 +493,6 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                         fromKey, toKey, descending, true);
             }
         }
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, boolean descending) {
-        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-
-        if (true) {
-            // это правильно
-            return getBiDirectionAddressIterator(addressShort, null, descending);
-        } else if (false) {
-            // тут уже все адреса есть вкупе
-            return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), addressKey, descending, true);
-        } else {
-            Iterator senderKeys = map.getIndexIteratorFilter(creatorTxs.getColumnFamilyHandle(), addressKey, descending, true);
-            Iterator recipientKeys = map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), addressKey, descending, true);
-
-            // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использовать ак как все перемешается
-            Iterator<Long> mergedIterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-
-            // а тут уже оьбратный порядок дать
-            return new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(mergedIterator)).iterator());
-        }
-
     }
 
     @Override

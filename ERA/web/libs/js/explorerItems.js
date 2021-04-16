@@ -14,8 +14,8 @@ function itemHead(item, forPrint) {
 
     if (source) {
         if (item.imageTypeName == 'video') {
-            output += '<video style="display:none;" onclick="style.display=\'none\'" id="video-holder" loop controls >';
-            output += '<td><video autoplay playsinline loop width="350" onclick="showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
+            output += '<video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls >';
+            output += '<td><video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
 
         } else {
             output += '<img id="image-holder" onclick="style.display=\'none\'">';
@@ -125,4 +125,73 @@ function itemFoot(item, forPrint) {
     }
 
     return output;
+}
+
+function getItemNameMini(item) {
+    return getItemNameMini(item.itemType, item.key, item.name);
+}
+
+function getItemNameMini(itemType, itemKey, itemName) {
+    return '<abbr title="' + '[' + itemKey + '] ' + itemName + '"><a  href=?' + itemType + '=' + itemKey + get_lang() + ' ><font size=-2 color=black>' + itemName + '</font></a></abbr>';
+}
+
+function getItemNameMiniGrey(item) {
+    return '<abbr title="' + '[' + item.key + '] ' + item.name + '"><a class=without href=?' + item.itemType + '=' + item.key + get_lang() + '><font size=-2 color=#e0e0e0>' + item.name + '</font></a></abbr>';
+}
+
+function getItemURL(item, imgSize) {
+    var output = '<a href="?' + item.itemType + '=' + item.key + get_lang() + '">';
+    if (item.key > item.startKey)
+        output += '<b>[' + item.key + ']</b>';
+
+    output += makeMediaIcon(item, '', 'size:' + imgSize);
+
+    output += '<b>' +  escapeHtml(name) + '</b></a>';
+
+    return output;
+}
+
+function getShortNameBlanked(name) {
+
+    var shortName = escapeHtml(name).split(' ')[0];
+    if (shortName.length > 12)
+        shortName = shortName.substr(0, 12) + '.';
+
+    return shortName;
+}
+
+function getShortItemURL(item, class1, style1) {
+    var output = '<a href="?' + item.itemType + '=' + item.key + get_lang() + '">';
+    if (item.key > item.startKey)
+        output += '<b>[' + item.key + ']</b>';
+
+    output += makeMediaIcon(item, class1, style1);
+
+    var shortName = escapeHtml(item.name).split(' ')[0];
+    if (shortName.length > 10)
+        shortName = shortName.substr(0, 10);
+
+    output += '<b>' +  shortName + '</b></a>';
+
+    return output;
+}
+
+function getItemName(item) {
+    return getItemName(item.startKey, item.key, item.name);
+}
+function getItemName(startKey, key, name) {
+    if (key < startKey)
+        return escapeHtml(name);
+
+    return '[' + key + '] ' + escapeHtml(name);
+}
+
+function getItemName2(item) {
+    return getItemName2(item.startKey, item.key, item.name);
+}
+function getItemName2(startKey, key, name) {
+    if (key < startKey)
+        return escapeHtml(name);
+
+    return '[' + key + '] ' + escapeHtml(name);
 }

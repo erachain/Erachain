@@ -2,7 +2,6 @@ package org.erachain.dbs.mapDB;
 
 //04/01 +- 
 
-import com.google.common.collect.*;
 import com.google.common.primitives.SignedBytes;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
@@ -17,7 +16,6 @@ import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
-import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
@@ -353,13 +351,21 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending) {
+
+        if (type == null && isCreator != null) {
+            return null;
+        }
+
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
-                Fun.t2(Fun.t3(addressKey, type, isCreator), descending ? Long.MAX_VALUE : Long.MIN_VALUE),
                 Fun.t2(Fun.t3(addressKey,
-                        type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
+                        type == null || type == 0 ? descending ? Integer.MAX_VALUE : Integer.MIN_VALUE : type,
+                        isCreator == null ? descending ? Boolean.TRUE : Boolean.FALSE : isCreator
+                ), descending ? Long.MAX_VALUE : Long.MIN_VALUE),
+                Fun.t2(Fun.t3(addressKey,
+                        type == null || type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
                         isCreator == null ? descending ? Boolean.FALSE : Boolean.TRUE : isCreator
                 ), descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
 
@@ -367,6 +373,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @Override
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, boolean descending) {
+        if (type == null && isCreator != null) {
+            return null;
+        }
+
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
@@ -375,15 +385,22 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         }
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
-                Fun.t2(Fun.t3(addressKey, type, isCreator), fromID),
                 Fun.t2(Fun.t3(addressKey,
-                        type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
+                        type == null || type == 0 ? descending ? Integer.MAX_VALUE : Integer.MIN_VALUE : type,
+                        isCreator == null ? descending ? Boolean.TRUE : Boolean.FALSE : isCreator
+                ), fromID),
+                Fun.t2(Fun.t3(addressKey,
+                        type == null || type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
                         isCreator == null ? descending ? Boolean.FALSE : Boolean.TRUE : isCreator
                 ), descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
     }
 
     @Override
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, Long toID, boolean descending) {
+        if (type == null && isCreator != null) {
+            return null;
+        }
+
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
@@ -396,9 +413,12 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         }
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey).subSet(
-                Fun.t2(Fun.t3(addressKey, type, isCreator), fromID),
                 Fun.t2(Fun.t3(addressKey,
-                        type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
+                        type == null || type == 0 ? descending ? Integer.MAX_VALUE : Integer.MIN_VALUE : type,
+                        isCreator == null ? descending ? Boolean.TRUE : Boolean.FALSE : isCreator
+                ), fromID),
+                Fun.t2(Fun.t3(addressKey,
+                        type == null || type == 0 ? descending ? Integer.MIN_VALUE : Integer.MAX_VALUE : type,
                         isCreator == null ? descending ? Boolean.FALSE : Boolean.TRUE : isCreator
                 ), toID)).iterator()));
     }
@@ -457,59 +477,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     Fun.t2(filterLowerEnd, Long.MAX_VALUE)).iterator()));
         }
 
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    // скорость сортировки в том или ином случае может быть разная - нужны ТЕСТЫ на 3 варианта работы
-    // TODO need benchmark tests
-    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, boolean descending) {
-        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-
-        if (true) {
-            return getBiDirectionAddressIterator(addressShort, null, descending);
-        } else if (false) {
-            Iterable keys = Fun.filter(descending ? this.addressTypeKey.descendingSet() : this.addressTypeKey, new Tuple3<byte[], Integer, Boolean>(addressKey, 0, null));
-            return IteratorCloseableImpl.make(keys.iterator());
-        } else if (false) {
-            Iterable senderKeys = Fun.filter(this.creatorKey, addressKey);
-            Iterable recipientKeys = Fun.filter(this.recipientKey, addressKey);
-
-            if (true) {
-                Set<Long> treeKeys = new TreeSet<>();
-
-                treeKeys.addAll(Sets.newTreeSet(senderKeys));
-                treeKeys.addAll(Sets.newTreeSet(recipientKeys));
-
-                return new IteratorCloseableImpl(((TreeSet<Long>) treeKeys).descendingIterator());
-            } else {
-                // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
-                Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-                // не удаляет дубли индексов return Lists.newLinkedList(mergedIterable).descendingIterator();
-                // удалит дубли индексов и отсортирует - но тогда нен ужны
-                return new IteratorCloseableImpl(Sets.newTreeSet(mergedIterable).descendingIterator());
-
-            }
-        } else {
-
-            // ТУТ СОРТИООВКА не в ту сторону получается
-
-            Iterable senderKeys = Fun.filter(this.creatorKey, addressKey);
-            Iterator<Long> senderKeysIterator = senderKeys.iterator();
-            Iterable recipientKeys = Fun.filter(this.recipientKey, addressKey);
-            Iterators.removeAll(senderKeysIterator, (Collection) recipientKeys);
-
-            // заново возьмем итератор а тот прошелся весь до конца уже
-            senderKeysIterator = senderKeys.iterator();
-            Iterator<Long> recipientKeysIterator = recipientKeys.iterator();
-
-            // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
-            Iterator<Long> mergedIterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(senderKeysIterator, recipientKeysIterator), Fun.COMPARATOR);
-            return new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(mergedIterator)).iterator());
-
-        }
     }
 
     /**

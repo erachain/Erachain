@@ -240,6 +240,9 @@ public class Order implements Comparable<Order> {
     public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int wantScale) {
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
         int scalePrice = calcPriceScale(amountHave, wantScale, 3);
+        if (amountHave.signum() == 0)
+            return BigDecimal.ONE.negate();
+
         BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
         // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)

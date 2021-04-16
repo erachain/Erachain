@@ -71,7 +71,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
         // TODO ERROR - not use PARENT MAP and DELETED in FORK
     List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, int limit, int offset);
 
-    List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset);
+    List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset, boolean descending);
 
     List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, boolean onlyCreator, Long fromID, int limit, int offset);
 
@@ -81,15 +81,11 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
 
     @SuppressWarnings({"unchecked", "rawtypes"})
         // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, boolean descending);
+    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, Long fromID, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
         // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int limit, boolean noForge, boolean descending);
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    int getTransactionsByAddressCount(byte[] addressShort);
+    List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int offset, int limit, boolean noForge, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK

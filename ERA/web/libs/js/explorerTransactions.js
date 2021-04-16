@@ -576,7 +576,7 @@ function transactionLite(urlstart, data, i, item) {
             output += '<tr><td colspan=2><b>Payments:</b><br>';
             payments = item.transaction.payments;
             for (key in payments) {
-                output += addCommas(payments[key].amount) + ' ' + getAssetNameMini(payments[key].asset,
+                output += addCommas(payments[key].amount) + ' ' + getItemNameMini('asset', payments[key].asset,
                     assetsAmounts[payments[key].asset].name) + ' -> ';
                 if (payments[key].recipient == data.address) {
                     output += '<font color="dimgray">' + payments[key].recipient + '</font>';
@@ -589,7 +589,7 @@ function transactionLite(urlstart, data, i, item) {
             output += '<tr><td colspan=2 height=99%><b>Amount:</b><br>';
 
             for (key in assetsAmounts) {
-                output += addCommas(assetsAmounts[key].amount) + ' ' + getAssetNameMini(key, assetsAmounts[key].name) + '<br>';
+                output += addCommas(assetsAmounts[key].amount) + ' ' + getItemNameMini('asset', key, assetsAmounts[key].name) + '<br>';
             }
         }
 
@@ -702,11 +702,11 @@ function transactionLite(urlstart, data, i, item) {
             output += '<td><a href=?address=' + item.transaction.creator + get_lang() + '>' + item.transaction.creator + '</a></td>';
         }
         output += '<td>' + addCommas(item.transaction.amount);
-        //output += ' ' + getAssetNameMini(item.transaction.asset, item.transaction.assetName);
+        //output += ' ' + getItemNameMini('asset', item.transaction.asset, item.transaction.assetName);
 
         output += '<br>fee: ' + addCommas(item.transaction.fee) + '</td>';
 
-        output += '<td>' + ' <a href=?asset=' + item.transaction.asset + get_lang() + '>' + getAssetName(item.transaction.asset, item.transaction.assetName) + '</a>';
+        output += '<td>' + ' <a href=?asset=' + item.transaction.asset + get_lang() + '>' + getItemName('asset', 1000, item.transaction.asset, item.transaction.assetName) + '</a>';
 
         if (item.transaction.recipient == data.address) {
             output += '<td><font color="dimgray">' + item.transaction.recipient + '</font></td>';
@@ -858,18 +858,18 @@ function transactionLite(urlstart, data, i, item) {
 
         output += '<td>' + addCommas(item.transaction.fee) + ' <font size="-2">ERA</font></td>';
 
-        output += '<td>' + ' <a href=?asset=' + item.transaction.order.have + get_lang() + '>' + getAssetName(item.transaction.order.have, item.transaction.haveName) + '</a>';
+        output += '<td>' + ' <a href=?asset=' + item.transaction.order.have + get_lang() + '>' + getItemName('asset', 1000, item.transaction.order.have, item.transaction.haveName) + '</a>';
 
-        output += '<td>' + ' <a href=?asset=' + item.transaction.order.want + get_lang() + '>' + getAssetName(item.transaction.order.want, item.transaction.wantName) + '</a>';
+        output += '<td>' + ' <a href=?asset=' + item.transaction.order.want + get_lang() + '>' + getItemName('asset', 1000, item.transaction.order.want, item.transaction.wantName) + '</a>';
 
         output += '<td>' + addCommas(item.transaction.order.price);
 
-        output += '<br>' + getAssetNameMini(item.transaction.order.want, item.transaction.wantName);
-        output += '/' + getAssetNameMini(item.transaction.order.have, item.transaction.haveName);
+        output += '<br>' + getItemNameMini('asset', item.transaction.order.want, item.transaction.wantName);
+        output += '/' + getItemNameMini('asset', item.transaction.order.have, item.transaction.haveName);
 
         output += '<td>' + addCommas(item.transaction.order.amount);
 
-        output += ' ' + getAssetNameMini(item.transaction.order.have, item.transaction.haveName);
+        output += ' ' + getItemNameMini('asset', item.transaction.order.have, item.transaction.haveName);
 
         if (item.hasOwnProperty('balance')) {
             output += '<td>' + printBalance(item.balance) + '</td>';
@@ -918,18 +918,18 @@ function transactionLite(urlstart, data, i, item) {
 
         output += '<td>' + addCommas(item.transaction.fee) + ' <font size="-2">ERA</font></td>';
 
-        output += '<td>' + ' <a href=?asset=' + item.transaction.orderSource.have + get_lang() + '>' + getAssetName(item.transaction.orderSource.have, item.transaction.orderSource.haveName) + '</a>';
+        output += '<td>' + ' <a href=?asset=' + item.transaction.orderSource.have + get_lang() + '>' + getItemName('asset', 1000, item.transaction.orderSource.have, item.transaction.orderSource.haveName) + '</a>';
 
-        output += '<td>' + ' <a href=?asset=' + item.transaction.orderSource.want + get_lang() + '>' + getAssetName(item.transaction.orderSource.want, item.transaction.orderSource.wantName) + '</a>';
+        output += '<td>' + ' <a href=?asset=' + item.transaction.orderSource.want + get_lang() + '>' + getItemName('asset', 1000, item.transaction.orderSource.want, item.transaction.orderSource.wantName) + '</a>';
 
         output += '<td>' + addCommas(item.transaction.orderSource.price);
 
-        output += '<br>' + getAssetNameMini(item.transaction.orderSource.want, item.transaction.orderSource.wantName);
-        output += '/' + getAssetNameMini(item.transaction.orderSource.have, item.transaction.orderSource.haveName);
+        output += '<br>' + getItemNameMini('asset', item.transaction.orderSource.want, item.transaction.orderSource.wantName);
+        output += '/' + getItemNameMini('asset', item.transaction.orderSource.have, item.transaction.orderSource.haveName);
 
         output += '<td>' + addCommas(item.transaction.orderSource.amountLeft);
 
-        output += ' ' + getAssetNameMini(item.transaction.orderSource.have, item.transaction.orderSource.haveName);
+        output += ' ' + getItemNameMini('asset', item.transaction.orderSource.have, item.transaction.orderSource.haveName);
 
         if (item.hasOwnProperty('balance')) {
             output += '<td>' + printBalance(item.balance) + '</td>';
@@ -983,7 +983,7 @@ function transactionLite(urlstart, data, i, item) {
 
         assetsAmounts = item.transaction.assetsAmounts;
         for (key in assetsAmounts) {
-            output += addCommas(assetsAmounts[key].amount) + ' ' + getAssetNameMini(key, assetsAmounts[key].name) + '<br>';
+            output += addCommas(assetsAmounts[key].amount) + ' ' + getItemNameMini('asset', key, assetsAmounts[key].name) + '<br>';
         }
 
         output += 'fee: ' + addCommas(item.transaction.fee) + ' <font size="-2">ERA</font></td>';
@@ -991,7 +991,7 @@ function transactionLite(urlstart, data, i, item) {
         output += '<td>';
         payments = item.transaction.payments;
         for (key in payments) {
-            output += addCommas(payments[key].amount) + ' ' + getAssetNameMini(payments[key].asset,
+            output += addCommas(payments[key].amount) + ' ' + getItemNameMini('asset', payments[key].asset,
                 assetsAmounts[payments[key].asset].assetName) + ' -> ';
             if (payments[key].recipient == data.address) {
                 output += '<font color="dimgray">' + payments[key].recipient + '</font>';

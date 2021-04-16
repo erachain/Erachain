@@ -24,8 +24,8 @@ function exchange(data){
     //Отображение таблицы элементов статусов
     for (var i in data.popularPairs) {
         var item = data.popularPairs[i];
-        output += '<tr><td>' + getShortAssetURL(item.have.key, item.have.name, item.have.icon, 30);
-        output += '<td>' + getShortAssetURL(item.want.key, item.want.name, item.want.icon, 30);;
+        output += '<tr><td>' + getShortItemURL(item.have, '', 'width: 30px');
+        output += '<td>' + getShortItemURL(item.want, '', 'width: 30px');
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.orders + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
@@ -72,7 +72,7 @@ function exchange(data){
 
         if (trade.type == 'sell') {
             output += '<td align=right>' + addCommas(trade.amountHave);
-            //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+            //output += ' ' + getItemNameMini('asset', data.assetHave, data.assetHaveName);
 
             output += '<td align=left>';
             if (trade.unchecked == true) {}

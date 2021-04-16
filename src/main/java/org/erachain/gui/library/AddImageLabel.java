@@ -44,7 +44,7 @@ public class AddImageLabel extends JPanel {
 
     private boolean editable = true;
 
-    public AddImageLabel(String text, int baseWidth, int baseHeight, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize) {
+    public AddImageLabel(String text, int baseWidth, int baseHeight, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize, boolean useExtURL) {
         setLayout(new BorderLayout());
         JPanel panelTop = new JPanel();
         panelTop.setLayout(new BorderLayout());
@@ -56,16 +56,18 @@ public class AddImageLabel extends JPanel {
         panelTop.add(mainLabel, BorderLayout.CENTER);
         panelTop.add(labelSize, BorderLayout.SOUTH);
 
-        JPanel panelCenter = new JPanel();
-        panelCenter.setLayout(new BorderLayout());
-        add(panelCenter, BorderLayout.CENTER);
-
-        panelCenter.add(new JLabel(Lang.T("Use URL") + ":"), BorderLayout.NORTH);
-        panelCenter.add(externalURLType, BorderLayout.EAST);
-        externalURL.setToolTipText(Lang.T("AddImageLabel.externalURL.tip"));
-        panelCenter.add(externalURL, BorderLayout.CENTER);
         JButton externalURLCheck = new JButton(Lang.T("Check URL"));
-        panelCenter.add(externalURLCheck, BorderLayout.SOUTH);
+        if (useExtURL) {
+            JPanel panelCenter = new JPanel();
+            panelCenter.setLayout(new BorderLayout());
+            add(panelCenter, BorderLayout.CENTER);
+
+            panelCenter.add(new JLabel(Lang.T("Use URL") + ":"), BorderLayout.NORTH);
+            panelCenter.add(externalURLType, BorderLayout.EAST);
+            externalURL.setToolTipText(Lang.T("AddImageLabel.externalURL.tip"));
+            panelCenter.add(externalURL, BorderLayout.CENTER);
+            panelCenter.add(externalURLCheck, BorderLayout.SOUTH);
+        }
 
         this.baseWidth = baseWidth;
         this.baseHeight = baseHeight;

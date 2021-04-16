@@ -138,23 +138,14 @@ function showWindowVideo(source) {
   video.style.display = 'block';
   video.style.resizable = 1;
   video.src = source;
+  video.autoplay = 1;
+  video.playsinline = 1;
   video.loop = 1;
-}
-
-function showWindowVideo(source) {
-  var video = document.getElementById('video-holder');
-  video.src = source;
-  video.style.display = 'block';
-  video.style.resizable = 1;
-  video.autoplay = "";
-  video.playsinline = "";
-  video.loop = "";
 }
 
 
 function makeMediaIcon(item, class1, style1) {
 
-    var out = '';
     var source;
     if (item.iconURL) {
         source = item.iconURL;
@@ -168,30 +159,29 @@ function makeMediaIcon(item, class1, style1) {
         return '';
 
     if (item.iconTypeName == 'video') {
-        out += '<video src="' + source + '" autoplay autoplay loop class="' + class1 + '" style="' + style1 + '"></video>';
+        return '<video muted src="' + source + '" autoplay autoplay loop class="' + class1 + '" style="' + style1 + '"></video>';
     } else {
-        out += '<img src="' + source + '" class="' + class1 + '" style="' + style1+ '" /> ';
+        return '<img src="' + source + '" class="' + class1 + '" style="' + style1+ '" /> ';
     }
-    return out;
 }
 
 function makeMediaImage(item, class1, style1) {
 
-    var out = '';
     var source;
     if (item.imageURL) {
         source = item.imageURL;
     } else if (item.image) {
         source = 'data:image/gif;base64,' + item.image;
+    } else if (item.imageTypeName == 'video') {
+        source = '/api' + item.item_type + '/image/' + item.key;
     }
 
     if (!source)
         return '';
 
     if (item.imageTypeName == 'video') {
-        out += '<video src="' + source + '" autoplay="" playsinline="" loop="" class="' + class1 + '" style="' + style1 + '"></video>';
+        return '<video muted src="' + source + '" autoplay playsinline loop class="' + class1 + '" style="' + style1 + '"></video>';
     } else {
-        out += '<img src="' + source + '" class="' + class1 + '" style="' + style1 + '" /> ';
+        return '<img src="' + source + '" class="' + class1 + '" style="' + style1 + '" /> ';
     }
-    return out;
 }

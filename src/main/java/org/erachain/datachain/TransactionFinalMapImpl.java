@@ -387,7 +387,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset) {
+    public List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int limit, int offset, boolean descending) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -1003,18 +1003,30 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable getIteratorByAddress(byte[] addressShort, boolean descending) {
+    public IteratorCloseable getIteratorByAddress(byte[] addressShort, Long fromID, boolean descending) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
-        return ((TransactionFinalSuit) map).getIteratorByAddress(addressShort, descending);
+        return ((TransactionFinalSuit) map).getBiDirectionAddressIterator(addressShort, fromID, descending);
     }
 
+    /**
+     * @param addressShort if Null - [type] and [isCreator] must be Null too.
+     * @param type         if Null - use all types and [isCreator] must be Null too
+     * @param isCreator    if True - only as creator, if False - only as recipient, if Null - all variants;
+     * @param fromID       if Null - from begin
+     * @param offset
+     * @param limit
+     * @param noForge      if True - skip forging transactions but not each of 100
+     * @param descending
+     * @return
+     */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int limit, boolean noForge, boolean descending) {
+    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, int offset,
+                                                           int limit, boolean noForge, boolean descending) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
@@ -1023,7 +1035,15 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         long timeOut = System.currentTimeMillis();
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = getIteratorByAddress(addressShort, descending)) {
+        try (IteratorCloseable iterator = addressShort == null ?
+                type == null || type == 0 ?
+                        getIterator(fromID, descending)
+                        : null
+                : type == null || type == 0 ?
+                isCreator == null ?
+                        getIteratorByAddress(addressShort, fromID, descending)
+                        : null
+                : getIteratorByAddressAndType(addressShort, type, isCreator, fromID, descending)) {
             Transaction item;
             Long key;
             while (iterator.hasNext() && (limit == -1 || limit > 0)) {
@@ -1038,12 +1058,17 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                             forgedCount++;
                             continue;
                         } else {
-                            if (System.currentTimeMillis() - timeOut > 5000) {
+                            if (System.currentTimeMillis() - timeOut > 1000) {
                                 break;
                             }
                             forgedCount = 0;
                         }
                     }
+                }
+
+                if (offset > 0) {
+                    --offset;
+                    continue;
                 }
 
                 item.setDC((DCSet) databaseSet, true);
@@ -1055,24 +1080,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         } catch (IOException e) {
         }
         return txs;
-    }
-
-    public List<Transaction> getTransactionsByAddressLimit(String address, int limit, boolean noForge, boolean descending) {
-        return getTransactionsByAddressLimit(Account.makeShortBytes(address), limit, noForge, descending);
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public int getTransactionsByAddressCount(byte[] addressShort) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return 0;
-        }
-        try (IteratorCloseable iterator = getIteratorByAddress(addressShort, false)) {
-            return Iterators.size(iterator);
-        } catch (IOException e) {
-            return 0;
-        }
     }
 
     @Override

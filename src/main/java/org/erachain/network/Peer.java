@@ -4,11 +4,15 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockBuffer;
 import org.erachain.core.BlockChain;
 import org.erachain.database.DLSet;
+import org.erachain.database.PeerMap;
+import org.erachain.lang.Lang;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MonitoredThread;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -925,11 +929,76 @@ public class Peer extends MonitoredThread {
 
     }
 
+    public JSONObject toJson() {
+
+        Controller cnt = Controller.getInstance();
+        PeerMap.PeerInfo peerInfo = cnt.dlSet.getPeerMap().getInfo(getAddress());
+
+        if (peerInfo == null)
+            return null;
+
+        JSONObject json = new JSONObject();
+
+        json.put("ip", getAddress().getHostAddress());
+
+        JSONObject info = getNodeInfo();
+        if (info != null) {
+            json.put("info", info);
+        }
+
+        json.put("hostName", getHostName());
+
+        Fun.Tuple2<Integer, Long> res = getHWeight(true);
+        if (res == null || res.a == 0) {
+            if (isUsed()) {
+                json.put("hw", Lang.T("Waiting..."));
+            }
+        } else {
+            json.put("height", res.a);
+            json.put("weight", res.b);
+        }
+
+        if (banMessage != null)
+            json.put("brokenMessage", banMessage);
+
+        if (isUsed()) {
+            if (getPing() > 1000000) {
+                json.put("status", "Waiting...");
+            } else {
+                json.put("status", "connect");
+                json.put("ping", getPing());
+            }
+        } else {
+            int banMinutes = cnt.getDLSet().getPeerMap().getBanMinutes(this);
+            if (banMinutes > 0) {
+                json.put("status", "banned");
+                json.put("period", banMinutes);
+            } else if (mute > 0) {
+                json.put("status", "muted");
+                json.put("period", mute);
+            } else {
+                json.put("status", "broken");
+            }
+        }
+
+        json.put("pingCounter", peerInfo.getWhitePingCouner());
+        json.put("white", isWhite());
+
+        json.put("findingTime", DateTimeFormat.timeAgo(peerInfo.getFindingTime()));
+        json.put("connectionTime", DateTimeFormat.timeAgo(connectionTime));
+
+        json.put("buildTime", DateTimeFormat.timestamptoString(buildDateTime, "yyyy-MM-dd", "UTC"));
+        json.put("version", version);
+
+        return json;
+
+    }
+
     @Override
     public String toString() {
 
         return this.getName()
-                + (getPing() >= 0 && getPing() < 99999? " " + this.getPing() + "ms" : (getPing() < 0?" try" + getPing() : "")
+                + (getPing() >= 0 && getPing() < 99999 ? " " + this.getPing() + "ms" : (getPing() < 0 ? " try" + getPing() : "")
         );
     }
 }

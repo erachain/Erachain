@@ -318,11 +318,6 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, boolean descending) {
-        return null;
-    }
-
-    @Override
     public IteratorCloseable<Long> getBiDirectionIterator_old(Long fromSeqNo, boolean descending) {
         return null;
     }

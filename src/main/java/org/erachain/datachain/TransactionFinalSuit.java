@@ -23,7 +23,7 @@ public interface TransactionFinalSuit {
     /**
      * @param addressShort
      * @param type         - TRANSACTION type
-     * @param isCreator    True - only CREATORS, False - only RECIPIENTS
+     * @param isCreator    True - only CREATORS, False - only RECIPIENTS, None - all
      * @param descending
      * @return
      */
@@ -42,7 +42,7 @@ public interface TransactionFinalSuit {
      *
      * @param addressShort
      * @param type         - TRANSACTION type
-     * @param isCreator    True - only CREATORS, False - only RECIPIENTS
+     * @param isCreator    True - only CREATORS, False - only RECIPIENTS, None - all
      * @param fromID
      * @param descending
      * @return
@@ -51,8 +51,6 @@ public interface TransactionFinalSuit {
     IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, Long fromID, Long toID, boolean descending);
 
     IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending);
-
-    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort, boolean descending);
 
     IteratorCloseable<Long> getBiDirectionIterator_old(Long fromSeqNo, boolean descending);
 

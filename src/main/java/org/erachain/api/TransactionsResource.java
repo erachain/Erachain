@@ -17,6 +17,7 @@ import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
+import org.erachain.webserver.API;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -359,7 +361,7 @@ public class TransactionsResource {
     @SuppressWarnings("unchecked")
     @POST
     @Path("find")
-    public String getTransactionsFind(String x) {
+    public String getTransactionsFind(@Context UriInfo info, String x) {
         JSONObject jsonObject = null;
         try {
             jsonObject = (JSONObject) JSONValue.parse(x);
@@ -410,6 +412,15 @@ public class TransactionsResource {
         if (jsonObject.containsKey("unconfirmed")) {
             try {
                 unconfirmed = (boolean) jsonObject.get("unconfirmed");
+            } catch (Exception e) {
+                throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+            }
+        }
+
+        boolean noForge = false;
+        if (jsonObject.containsKey("noforge")) {
+            try {
+                noForge = (boolean) jsonObject.get("noforge");
             } catch (Exception e) {
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
             }
@@ -473,23 +484,14 @@ public class TransactionsResource {
             type = Transaction.ARBITRARY_TRANSACTION;
         }
 
-        return getTransactionsFind(address, creator, creator, recipient, fromSeqNo, minHeight, maxHeight, type,
-                desc, offset, limit, unconfirmed, count);
+        return getTransactionsFind_1(address, creator, recipient, fromSeqNo, minHeight, maxHeight, type,
+                desc, noForge, offset, limit, unconfirmed, count);
     }
 
-    @SuppressWarnings("unchecked")
-    @GET
-    @Path("find")
-    public static String getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender, @QueryParam("creator") String creator,
-                                             @QueryParam("recipient") String recipient,
-                                             @QueryParam("from") String fromSeqNoStr,
-                                             @QueryParam("startblock") int minHeight,
-                                             @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
-                                             //@QueryParam("timestamp") long timestamp,
-                                             @QueryParam("desc") boolean desc,
-                                             @QueryParam("offset") int offset, @QueryParam("limit") int limit,
-                                             @QueryParam("unconfirmed") boolean unconfirmed,
-                                             @DefaultValue("false") @QueryParam("count") boolean count
+    public static String getTransactionsFind_1(String address, String creator,
+                                               String recipient, String fromSeqNoStr, int minHeight, int maxHeight,
+                                               int type, boolean desc, boolean noForge, int offset, int limit,
+                                               boolean unconfirmed, boolean count
     ) {
 
         Long fromSeqNo = Transaction.parseDBRef(fromSeqNoStr);
@@ -520,7 +522,7 @@ public class TransactionsResource {
         }
 
         if (unconfirmed) {
-            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, sender == null ? creator : sender,
+            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, creator,
                     recipient, type, desc, 0, limit, 0);
             for (Transaction trans : resultUnconfirmed) {
                 array.add(trans.toJson());
@@ -528,6 +530,29 @@ public class TransactionsResource {
         }
 
         return array.toJSONString();
+    }
+
+    @GET
+    @Path("find")
+    public static String getTransactionsFind(@Context UriInfo info,
+                                             @QueryParam("address") String address, @QueryParam("sender") String sender,
+                                             @QueryParam("creator") String creator,
+                                             @QueryParam("recipient") String recipient,
+                                             @QueryParam("from") String fromSeqNoStr,
+                                             @QueryParam("startblock") int minHeight,
+                                             @QueryParam("endblock") int maxHeight, @QueryParam("type") int type,
+                                             @QueryParam("offset") int offset, @QueryParam("limit") int limit
+    ) {
+
+        boolean desc = API.checkBoolean(info, "desc");
+        boolean noForge = API.checkBoolean(info, "noforge");
+        boolean unconfirmed = API.checkBoolean(info, "unconfirmed");
+        boolean count = API.checkBoolean(info, "count");
+
+        return getTransactionsFind_1(address, sender == null ? creator : sender,
+                recipient, fromSeqNoStr, minHeight, maxHeight,
+                type, desc, noForge, offset, limit,
+                unconfirmed, count);
     }
 
     @SuppressWarnings("unchecked")
