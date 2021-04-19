@@ -4009,6 +4009,7 @@ public class Controller extends Observable {
                 }
                 continue;
             }
+            // * - all
             if (arg.startsWith("-weballowed=") && arg.length() > 12) {
                 JSONArray list = new JSONArray();
                 if (!arg.substring(12).equals("*")) {
@@ -4034,6 +4035,7 @@ public class Controller extends Observable {
                 }
                 continue;
             }
+            // * - all
             if (arg.startsWith("-rpcallowed=") && arg.length() > 12) {
                 JSONArray list = new JSONArray();
                 if (!arg.substring(12).equals("*")) {
