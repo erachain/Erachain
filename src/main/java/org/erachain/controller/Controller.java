@@ -4010,10 +4010,12 @@ public class Controller extends Observable {
                 continue;
             }
             if (arg.startsWith("-weballowed=") && arg.length() > 12) {
-                String[] array = arg.substring(12).split(",");
                 JSONArray list = new JSONArray();
-                for (String ip : array) {
-                    list.add(ip);
+                if (!arg.substring(12).equals("*")) {
+                    String[] array = arg.substring(12).split(",");
+                    for (String ip : array) {
+                        list.add(ip);
+                    }
                 }
                 Settings.getInstance().updateJson("weballowed", list);
                 continue;
@@ -4033,10 +4035,12 @@ public class Controller extends Observable {
                 continue;
             }
             if (arg.startsWith("-rpcallowed=") && arg.length() > 12) {
-                String[] array = arg.substring(12).split(",");
                 JSONArray list = new JSONArray();
-                for (String ip : array) {
-                    list.add(ip);
+                if (!arg.substring(12).equals("*")) {
+                    String[] array = arg.substring(12).split(",");
+                    for (String ip : array) {
+                        list.add(ip);
+                    }
                 }
                 Settings.getInstance().updateJson("rpcallowed", list);
                 continue;
