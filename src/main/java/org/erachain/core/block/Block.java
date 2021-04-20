@@ -1183,6 +1183,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         block.put("winValueTargeted", blockHead.calcWinValueTargeted());
         block.put("creator", this.creator.getAddress());
         block.put("fee", this.viewFeeAsBigDecimal());
+        block.put("transactionsCount", transactionCount);
         block.put("transactionsHash", Base58.encode(this.transactionsHash));
         block.put("signature", Base58.encode(this.signature));
         block.put("height", this.getHeight());
