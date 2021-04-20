@@ -262,6 +262,9 @@ public class BlockChain {
     public static int START_KEY_UP_ITEMS = 1 << 20;
 
     public static final int USE_NEW_ISSUE_FEE = MAIN_MODE ? 1777777 : 0;
+    public static final int MINIMAL_ISSUE_FEE = 200 * 500;
+    public static final int MINIMAL_ISSUE_FEE_ACCOUNTING_ASSET = BlockChain.MINIMAL_ISSUE_FEE / 5;
+    public static final int MINIMAL_ISSUE_FEE_IMPRINT = BlockChain.MINIMAL_ISSUE_FEE / 20;
 
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
@@ -388,6 +391,9 @@ public class BlockChain {
     public static final int FREE_FEE_LENGTH = 1 << 10;
     public static final int FREE_FEE_TO_SEQNO = DEMO_MODE ? 1 : MAIN_MODE ? 1 : -1;
     public static final int FREE_FEE_FROM_HEIGHT = DEMO_MODE ? 1 : MAIN_MODE ? 1610000 : Integer.MAX_VALUE;
+
+    public static final int ADD_FEE_BYTES_FOR_COMMON_TX = 0;
+
 
     /**
      * FEE_KEY used here

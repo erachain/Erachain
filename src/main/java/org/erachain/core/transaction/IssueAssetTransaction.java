@@ -61,20 +61,18 @@ public class IssueAssetTransaction extends IssueItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Asset"; }
 
-    int minLenAccounting = minLen / 5;
-
     @Override
     public long calcBaseFee(boolean withFreeProtocol) {
 
-        int len = this.getDataLength(Transaction.FOR_NETWORK, true);
+        int len = getFeeLength();
 
         if (this.height > BlockChain.USE_NEW_ISSUE_FEE) {
             if (((AssetCls) item).isAccounting()) {
-                if (len < minLenAccounting)
-                    len = minLenAccounting;
+                if (len < BlockChain.MINIMAL_ISSUE_FEE_ACCOUNTING_ASSET)
+                    len = BlockChain.MINIMAL_ISSUE_FEE_ACCOUNTING_ASSET;
             } else {
-                if (len < minLen)
-                    len = minLen;
+                if (len < BlockChain.MINIMAL_ISSUE_FEE)
+                    len = BlockChain.MINIMAL_ISSUE_FEE;
             }
         }
 
