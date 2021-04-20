@@ -410,6 +410,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             head.put("target", this.target);
             head.put("creator", this.creator.getAddress());
             head.put("fee", this.totalFee);
+            head.put("txFee", this.totalFee - this.emittedFee);
             head.put("emittedFee", this.emittedFee);
             head.put("transactionsCount", this.transactionsCount);
             head.put("transactionsHash", Base58.encode(this.transactionsHash));
