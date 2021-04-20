@@ -400,7 +400,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         public JSONObject toJson() {
             JSONObject head = new JSONObject();
 
-            DCSet dcSet = DCSet.getInstance();
             head.put("version", this.version);
             head.put("reference", Base58.encode(this.reference));
             head.put("timestamp", this.getTimestamp());
@@ -410,6 +409,8 @@ public class Block implements Closeable, ExplorerJsonLine {
             head.put("target", this.target);
             head.put("creator", this.creator.getAddress());
             head.put("fee", this.totalFee);
+            head.put("reward", this.totalFee);
+            head.put("txFee", this.totalFee - this.emittedFee);
             head.put("emittedFee", this.emittedFee);
             head.put("transactionsCount", this.transactionsCount);
             head.put("transactionsHash", Base58.encode(this.transactionsHash));
@@ -1183,9 +1184,11 @@ public class Block implements Closeable, ExplorerJsonLine {
         block.put("winValueTargeted", blockHead.calcWinValueTargeted());
         block.put("creator", this.creator.getAddress());
         block.put("fee", this.viewFeeAsBigDecimal());
+        block.put("transactionsCount", transactionCount);
         block.put("transactionsHash", Base58.encode(this.transactionsHash));
         block.put("signature", Base58.encode(this.signature));
         block.put("height", this.getHeight());
+        block.put("size", this.getDataLength(false));
 
         //CREATE TRANSACTIONS
         JSONArray transactionsArray = new JSONArray();
