@@ -400,7 +400,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         public JSONObject toJson() {
             JSONObject head = new JSONObject();
 
-            DCSet dcSet = DCSet.getInstance();
             head.put("version", this.version);
             head.put("reference", Base58.encode(this.reference));
             head.put("timestamp", this.getTimestamp());
