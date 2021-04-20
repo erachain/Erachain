@@ -1188,6 +1188,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         block.put("transactionsHash", Base58.encode(this.transactionsHash));
         block.put("signature", Base58.encode(this.signature));
         block.put("height", this.getHeight());
+        block.put("size", this.getDataLength(false));
 
         //CREATE TRANSACTIONS
         JSONArray transactionsArray = new JSONArray();
