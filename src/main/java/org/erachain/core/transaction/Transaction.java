@@ -1584,11 +1584,19 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         JSONObject transaction = new JSONObject();
 
+        transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
+        transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
+        transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
+
+        transaction.put("confirmations", this.getConfirmations(localDCSet));
         transaction.put("type", getType());
         transaction.put("record_type", this.viewTypeName());
-        transaction.put("confirmations", this.getConfirmations(localDCSet));
         transaction.put("type_name", this.viewTypeName());
         transaction.put("sub_type_name", this.viewSubTypeName());
+
+        if (exLink != null) {
+            transaction.put("exLink", getExLink().toJson());
+        }
 
         int height;
         if (this.creator == null) {
@@ -1596,14 +1604,17 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             transaction.put("signature", "genesis");
             height = 1;
         } else {
+            transaction.put("feePow", getFeePow());
+            transaction.put("forgedFee", getForgedFee());
+            transaction.put("royaltyFee", getRoyaltyFee());
+            transaction.put("invitedFee", getInvitedFee());
+            transaction.put("title", getTitle());
+            transaction.put("deadLine", getDeadline());
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
             transaction.put("creator", this.creator.getAddress());
             transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
             transaction.put("fee", this.fee.toPlainString());
             transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
-            transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
-            transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
-            transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
         }
 
         if (this.height > 0) {
@@ -1616,6 +1627,12 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         transaction.put("size", this.viewSize(Transaction.FOR_NETWORK));
+
+        if (dcSet == null) {
+            setDC(localDCSet, true);
+        }
+        transaction.put("tags", Arrays.asList(this.getTags()));
+
         return transaction;
     }
 

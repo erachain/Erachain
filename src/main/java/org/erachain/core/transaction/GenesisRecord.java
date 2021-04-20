@@ -2,6 +2,7 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.json.simple.JSONObject;
 
@@ -50,6 +51,8 @@ public class GenesisRecord extends Transaction {
     public JSONObject toJson() {
         //GET BASE
         JSONObject transaction = this.getJsonBase();
+
+        transaction.put("signature", Base58.encode(generateSignature()));
 
         return transaction;
     }
