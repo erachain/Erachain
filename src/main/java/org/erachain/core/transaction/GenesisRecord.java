@@ -49,7 +49,6 @@ public class GenesisRecord extends Transaction {
     @Override
     public JSONObject toJson() {
         //GET BASE
-        generateSignature();
         JSONObject transaction = this.getJsonBase();
 
         return transaction;

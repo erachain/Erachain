@@ -1601,7 +1601,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         int height;
         if (this.creator == null) {
             transaction.put("creator", "genesis");
-            transaction.put("signature", "genesis");
             height = 1;
         } else {
             transaction.put("feePow", getFeePow());
