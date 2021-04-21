@@ -1166,11 +1166,9 @@ public class Block implements Closeable, ExplorerJsonLine {
     public String viewTotalFeeAsBigDecimal() {
         return NumberAsString.formatAsString(BigDecimal.valueOf(blockHead.totalFee, BlockChain.FEE_SCALE));
     }
-
     public String viewEmittedFeeAsBigDecimal() {
         return NumberAsString.formatAsString(BigDecimal.valueOf(blockHead.emittedFee, BlockChain.FEE_SCALE));
     }
-
     public String viewTXFeeAsBigDecimal() {
         return NumberAsString.formatAsString(BigDecimal.valueOf(blockHead.totalFee - blockHead.emittedFee, BlockChain.FEE_SCALE));
     }
@@ -1190,10 +1188,10 @@ public class Block implements Closeable, ExplorerJsonLine {
         block.put("target", this.getTarget());
         block.put("winValueTargeted", blockHead.calcWinValueTargeted());
         block.put("creator", this.creator.getAddress());
-        block.put("fee", this.viewTotalFeeAsBigDecimal());
-        block.put("reward", this.viewTotalFeeAsBigDecimal());
-        block.put("emittedFee", this.viewEmittedFeeAsBigDecimal());
-        block.put("txFee", this.viewTXFeeAsBigDecimal());
+        block.put("fee", BigDecimal.valueOf(totalFee, BlockChain.FEE_SCALE));
+        block.put("reward", BigDecimal.valueOf(totalFee, BlockChain.FEE_SCALE));
+        block.put("emittedFee", BigDecimal.valueOf(emittedFee, BlockChain.FEE_SCALE));
+        block.put("txFee", BigDecimal.valueOf(totalFee - emittedFee, BlockChain.FEE_SCALE));
         block.put("transactionsCount", transactionCount);
         block.put("transactionsHash", Base58.encode(this.transactionsHash));
         block.put("signature", Base58.encode(this.signature));
