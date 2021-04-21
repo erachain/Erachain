@@ -30,11 +30,13 @@ example for auto make wallet keys: -seed=3:new:1
 Start without GUI
 
 -web=on
--weballowed=IP1,IP2,..
+-weballowed=*|IP1,IP2,..
+* - all
 -webport=PORT
 
 -rpc=on
--rpcpallowed=IP1,IP2,..
+-rpcpallowed=*|IP1,IP2,..
+* - all
 -rpcpport=PORT
 
 -nousewallet
