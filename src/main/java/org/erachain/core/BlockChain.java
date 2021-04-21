@@ -167,9 +167,9 @@ public class BlockChain {
     public static final int MIN_GENERATING_BALANCE = 100;
     public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 
-    public static final int MIN_REGISTERING_BALANCE_OWN = 100000;
+    public static final int MIN_REGISTERING_BALANCE_OWN = 0;
     public static final BigDecimal MIN_REGISTERING_BALANCE_OWN_BD = new BigDecimal(MIN_REGISTERING_BALANCE_OWN);
-    public static final int MIN_REGISTERING_BALANCE_USE = 100000;
+    public static final int MIN_REGISTERING_BALANCE_USE = 0;
     public static final BigDecimal MIN_REGISTERING_BALANCE_USE_BD = new BigDecimal(MIN_REGISTERING_BALANCE_USE);
 
     public static final int MIN_REGISTERING_BALANCE_10 = 10;
