@@ -457,7 +457,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         blockJSON.put("timestamp", getTimestamp());
 
         ///loadHeadMind(DCSet.getInstance());
-        blockJSON.put("totalFee", viewFeeAsBigDecimal());
+        blockJSON.put("totalFee", viewTotalFeeAsBigDecimal());
         Tuple3<Integer, Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
         if (forgingPoint != null) {
             blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
@@ -1163,9 +1163,16 @@ public class Block implements Closeable, ExplorerJsonLine {
         return BigDecimal.valueOf(this.totalFee, BlockChain.FEE_SCALE);
     }
 
-    public String viewFeeAsBigDecimal() {
-
+    public String viewTotalFeeAsBigDecimal() {
         return NumberAsString.formatAsString(BigDecimal.valueOf(blockHead.totalFee, BlockChain.FEE_SCALE));
+    }
+
+    public String viewEmittedFeeAsBigDecimal() {
+        return NumberAsString.formatAsString(BigDecimal.valueOf(blockHead.emittedFee, BlockChain.FEE_SCALE));
+    }
+
+    public String viewTXFeeAsBigDecimal() {
+        return NumberAsString.formatAsString(BigDecimal.valueOf(blockHead.totalFee - blockHead.emittedFee, BlockChain.FEE_SCALE));
     }
 
     //PARSE/CONVERT
@@ -1183,7 +1190,10 @@ public class Block implements Closeable, ExplorerJsonLine {
         block.put("target", this.getTarget());
         block.put("winValueTargeted", blockHead.calcWinValueTargeted());
         block.put("creator", this.creator.getAddress());
-        block.put("fee", this.viewFeeAsBigDecimal());
+        block.put("fee", this.viewTotalFeeAsBigDecimal());
+        block.put("reward", this.viewTotalFeeAsBigDecimal());
+        block.put("emittedFee", this.viewEmittedFeeAsBigDecimal());
+        block.put("txFee", this.viewTXFeeAsBigDecimal());
         block.put("transactionsCount", transactionCount);
         block.put("transactionsHash", Base58.encode(this.transactionsHash));
         block.put("signature", Base58.encode(this.signature));
