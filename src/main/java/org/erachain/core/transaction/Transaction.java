@@ -1477,7 +1477,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         fontSize *= 1.4;
         String text = "<span style='vertical-align: 10px; font-size: 1.4em' ><b>" + fee.toString() + "</b>"
                 + "<img width=" + fontSize + " height=" + fontSize
-                + " src='file:images\\icons\\assets\\COMPU.png'></span>";
+                + " src='file:images\\icons\\assets\\" + AssetCls.FEE_ABBREV + ".png'></span>";
 
         boolean useDEX = Settings.getInstance().getCompuRateUseDEX();
 
