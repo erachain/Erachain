@@ -1477,7 +1477,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         fontSize *= 1.4;
         String text = "<span style='vertical-align: 10px; font-size: 1.4em' ><b>" + fee.toString() + "</b>"
                 + "<img width=" + fontSize + " height=" + fontSize
-                + " src='file:images\\icons\\assets\\" + AssetCls.FEE_ABBREV + ".png'></span>";
+                + " src='file:images\\icons\\assets\\" + AssetCls.FEE_NAME + ".png'></span>";
 
         boolean useDEX = Settings.getInstance().getCompuRateUseDEX();
 
@@ -1503,8 +1503,18 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if (compuRate.signum() > 0) {
             BigDecimal fee_fiat = fee.multiply(compuRate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
-            if (asset.getKey() != AssetCls.FEE_KEY)
-                text += " (" + fee_fiat.toString() + " " + asset.getTickerName() + ")";
+            if (asset.getKey() != AssetCls.FEE_KEY) {
+                text += " (" + fee_fiat.toString() + " " + asset.getTickerName();
+                byte[] icon = asset.getIcon();
+                if (icon != null) {
+                    text += "<img width=" + fontSize + " height=" + fontSize
+                            //+ " src='data:image/gif;base64," + Base64.encodeBase64String(icon) + "'>";
+                            + " src='file:images\\icons\\assets\\" + asset.getName() + ".png'>";
+                }
+
+                text += ")";
+
+            }
         }
 
         return text;
