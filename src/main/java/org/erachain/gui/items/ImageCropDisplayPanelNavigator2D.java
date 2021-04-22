@@ -88,8 +88,8 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screens = kit.getScreenSize();
-        int h = Integer.min((int) (screens.height * 0.9), (int) (cropWidth * 1.2f) + 200);
-        int w = Integer.min((int) (screens.width * 0.8), (int) (cropHeight * 1.2f));
+        int h = Integer.min((int) (screens.height * 0.9), cropWidth + 150);
+        int w = Integer.min((int) (screens.width * 0.8), cropHeight + 200);
         setPreferredSize(new Dimension(w, h));
 
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
