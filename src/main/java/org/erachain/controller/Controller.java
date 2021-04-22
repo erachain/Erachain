@@ -3749,6 +3749,7 @@ public class Controller extends Observable {
             }
 
             if (transaction.getCreator() != null // если последняя это ГЕНЕСИЗ транзакция - такое тоже бывает
+                    // например дали вдолг на счет. А потом по счету определяем публичный ключ - она не найдет
                     && transaction.getCreator().equals(address))
                 return transaction.getCreator().getPublicKey();
             else {
