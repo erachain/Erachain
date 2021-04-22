@@ -75,7 +75,7 @@ public class ImageCropPanelNavigator2D extends JPanel {
     public ImageCropPanelNavigator2D(ImageIcon image) {
         setLayout(new BorderLayout());
 
-        imageCropDisplayPanelNavigator2D = new ImageCropDisplayPanelNavigator2D(this, image, 400, 500);
+        imageCropDisplayPanelNavigator2D = new ImageCropDisplayPanelNavigator2D(this, image, 600, 500);
 
         add(imageCropDisplayPanelNavigator2D, BorderLayout.CENTER);
 
