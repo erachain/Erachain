@@ -636,7 +636,7 @@ public class TradeResource {
             } else if ((order = completedOrdersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
                 if (false) {
                     // сейчас из Карты уже со статусом берется
-                    if (order.isFulfilled()) {
+                    if (order.isCompleted()) {
                         order.setStatus(Order.COMPLETED);
                     } else {
                         order.setStatus(Order.CANCELED);
