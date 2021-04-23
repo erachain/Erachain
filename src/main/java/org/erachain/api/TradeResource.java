@@ -626,16 +626,22 @@ public class TradeResource {
             createOrder = (CreateOrderTransaction) finalMap.get(key);
 
             if ((order = ordersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
-                if (order.isNotTraded()) {
-                    order.setStatus(Order.ACTIVE);
-                } else {
-                    order.setStatus(Order.FULFILLED);
+                if (false) {
+                    // сейчас из Карты уже со статусом берется
+                    if (order.isNotTraded()) {
+                        order.setStatus(Order.ACTIVE);
+                    } else {
+                        order.setStatus(Order.FULFILLED);
+                    }
                 }
             } else if ((order = completedOrdersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
-                if (order.isFulfilled()) {
-                    order.setStatus(Order.COMPLETED);
-                } else {
-                    order.setStatus(Order.CANCELED);
+                if (false) {
+                    // сейчас из Карты уже со статусом берется
+                    if (order.isFulfilled()) {
+                        order.setStatus(Order.COMPLETED);
+                    } else {
+                        order.setStatus(Order.CANCELED);
+                    }
                 }
             } else {
                 order = createOrder.makeOrder();
