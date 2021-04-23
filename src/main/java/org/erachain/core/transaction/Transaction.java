@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -1504,12 +1505,14 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         if (compuRate.signum() > 0) {
             BigDecimal fee_fiat = fee.multiply(compuRate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
             if (asset.getKey() != AssetCls.FEE_KEY) {
-                text += " (" + fee_fiat.toString() + " " + asset.getTickerName();
-                byte[] icon = asset.getIcon();
-                if (icon != null) {
+                text += " (" + fee_fiat.toString();
+                String fileName = "images" + File.separator + "icons" + File.separator + "assets" + File.separator + asset.getName() + ".png";
+                File file = new File(fileName);
+                if (file.exists()) {
                     text += "<img width=" + fontSize + " height=" + fontSize
-                            //+ " src='data:image/gif;base64," + Base64.encodeBase64String(icon) + "'>";
-                            + " src='file:images\\icons\\assets\\" + asset.getName() + ".png'>";
+                            + " src=file:'" + fileName + "'>";
+                } else {
+                    text += " " + asset.getTickerName();
                 }
 
                 text += ")";

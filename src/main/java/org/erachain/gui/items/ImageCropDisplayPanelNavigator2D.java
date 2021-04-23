@@ -340,8 +340,8 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             cropX = getPreferredSize().width / 2 - cropWidth / 2;
 
             cropHeight = originalCropHeight * 120 / (220 - value);
-            if (cropHeight > originalCropHeight * 1.3)
-                cropHeight = (int) (originalCropHeight * 1.3);
+            if (cropHeight > getPreferredSize().height - 10)
+                cropHeight = getPreferredSize().height - 10;
             cropY = getPreferredSize().height / 2 - cropHeight / 2;
 
         } else {
@@ -349,8 +349,8 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             cropY = getPreferredSize().height / 2 - cropHeight / 2;
 
             cropWidth = originalCropWidth * 120 / (20 + value);
-            if (cropWidth > originalCropWidth * 1.6)
-                cropWidth = (int) (originalCropWidth * 1.6);
+            if (cropWidth > getPreferredSize().width - 10)
+                cropWidth = getPreferredSize().width - 10;
             cropX = getPreferredSize().width / 2 - cropWidth / 2;
 
         }
