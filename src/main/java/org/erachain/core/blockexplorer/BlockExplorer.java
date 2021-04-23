@@ -2148,7 +2148,7 @@ public class BlockExplorer {
 
             // transactionDataJSON.put("fee", balances[size -
             // counter].getTransactionBalance().get(0l).toPlainString());
-            transactionDataJSON.put("fee", block.viewFeeAsBigDecimal());
+            transactionDataJSON.put("fee", block.viewTotalFeeAsBigDecimal());
 
             transactionJSON.put("type", "block");
             transactionJSON.put("block", transactionDataJSON);
@@ -2852,7 +2852,7 @@ public class BlockExplorer {
 
         output.put("countTx", txCountJSON);
 
-        output.put("totalFee", block.viewFeeAsBigDecimal());
+        output.put("totalFee", block.viewTotalFeeAsBigDecimal());
         output.put("version", block.getVersion());
 
         output.put("generatingBalance", block.getForgingValue());
@@ -2881,7 +2881,7 @@ public class BlockExplorer {
             transactionDataJSON.put("generatorSignature", Base58.encode(block.getSignature()));
             transactionDataJSON.put("version", block.getVersion());
 
-            transactionDataJSON.put("fee", block.viewFeeAsBigDecimal());
+            transactionDataJSON.put("fee", block.viewTotalFeeAsBigDecimal());
 
             transactionJSON.put("type", "block");
             transactionJSON.put("block", transactionDataJSON);

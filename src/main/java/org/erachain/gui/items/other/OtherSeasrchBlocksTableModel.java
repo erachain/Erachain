@@ -182,7 +182,7 @@ public class OtherSeasrchBlocksTableModel extends AbstractTableModel {
                         return "-1";
                     }
 
-                    return block.viewFeeAsBigDecimal();
+                    return block.viewTotalFeeAsBigDecimal();
 
             }
 

@@ -44,6 +44,8 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
     public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, File imageFile, int cropWidth, int cropHeight) {
 
+        this.parent = parent;
+
         this.cropWidth = this.originalCropWidth = cropWidth;
         this.cropHeight = this.originalCropHeight = cropHeight;
 
@@ -51,9 +53,6 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             // VIDEO MP4
             return;
         }
-
-        this.parent = parent;
-        this.cropWidth = cropWidth;
 
         try {
             image = ImageIO.read(imageFile);
@@ -89,8 +88,8 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screens = kit.getScreenSize();
-        int h = Integer.min((int) (screens.height * 0.9), (int) (cropWidth * 1.2f));
-        int w = Integer.min((int) (screens.width * 0.9), (int) (cropHeight * 1.2f));
+        int h = Integer.min((int) (screens.height * 0.9), cropWidth + 150);
+        int w = Integer.min((int) (screens.width * 0.8), cropHeight + 200);
         setPreferredSize(new Dimension(w, h));
 
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
@@ -341,8 +340,8 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             cropX = getPreferredSize().width / 2 - cropWidth / 2;
 
             cropHeight = originalCropHeight * 120 / (220 - value);
-            if (cropHeight > originalCropHeight * 1.3)
-                cropHeight = (int) (originalCropHeight * 1.3);
+            if (cropHeight > getPreferredSize().height - 10)
+                cropHeight = getPreferredSize().height - 10;
             cropY = getPreferredSize().height / 2 - cropHeight / 2;
 
         } else {
@@ -350,8 +349,8 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             cropY = getPreferredSize().height / 2 - cropHeight / 2;
 
             cropWidth = originalCropWidth * 120 / (20 + value);
-            if (cropWidth > originalCropWidth * 1.6)
-                cropWidth = (int) (originalCropWidth * 1.6);
+            if (cropWidth > getPreferredSize().width - 10)
+                cropWidth = getPreferredSize().width - 10;
             cropX = getPreferredSize().width / 2 - cropWidth / 2;
 
         }

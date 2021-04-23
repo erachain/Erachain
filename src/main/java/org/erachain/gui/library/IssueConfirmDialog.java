@@ -32,7 +32,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
     public javax.swing.JPanel jPanel1;
     public javax.swing.JScrollPane jScrollPane1;
     public MTextPane jTextPane1;
-    int insest = 0;
+    int fontSize = 0;
     private JLabel jStatus_Label;
     private JLabel jTitle_Label;
 
@@ -66,8 +66,8 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
     public void Init(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
                      int w, int h, String status_Text, String title_Text, boolean receive) {
         // setUndecorated(true);
-        insest = UIManager.getFont("Label.font").getSize();
-        if (insest <= 7) insest = 8;
+        fontSize = UIManager.getFont("Label.font").getSize();
+        if (fontSize <= 7) fontSize = 8;
         initComponents();
         jTitle_Label.setText(title_Text);
         jTextPane1.setText(text);
@@ -79,7 +79,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
             String feeText = "<span style='font-size: 1.2em;'>" + Lang.T("Size") + ":&nbsp;"
                     + transaction.viewSize(Transaction.FOR_NETWORK) + " Bytes";
             if (transaction.getFee().signum() != 0) {
-                feeText += ", " + Lang.T("Fee") + ":&nbsp; " + transaction.viewFeeAndFiat(insest) + "</span>";
+                feeText += ", " + Lang.T("Fee") + ":&nbsp; " + transaction.viewFeeAndFiat(fontSize) + "</span>";
             }
             status_Text += feeText;
 
@@ -130,8 +130,8 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
 
     public void Init(java.awt.Frame parent, boolean modal, Transaction transaction, int w, int h, String status_Text, String title_Text) {
         // setUndecorated(true);
-        insest = UIManager.getFont("Label.font").getSize();
-        if (insest <= 7) insest = 8;
+        fontSize = UIManager.getFont("Label.font").getSize();
+        if (fontSize <= 7) fontSize = 8;
         initComponents();
         jTitle_Label.setText(title_Text);
         JPanel pp = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
@@ -182,7 +182,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         //  gridBagConstraints.weighty = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(insest, insest, insest, insest);
+        gridBagConstraints.insets = new java.awt.Insets(fontSize, fontSize, fontSize, fontSize);
         getContentPane().add(jTitle_Label, gridBagConstraints);
 
         jScrollPane1.setBorder(null);
@@ -197,7 +197,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(insest, insest, insest, insest);
+        gridBagConstraints.insets = new java.awt.Insets(fontSize, fontSize, fontSize, fontSize);
         getContentPane().add(jScrollPane1, gridBagConstraints);
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
@@ -210,7 +210,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         //  gridBagConstraints.weighty = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(insest, insest, insest, insest);
+        gridBagConstraints.insets = new java.awt.Insets(fontSize, fontSize, fontSize, fontSize);
         getContentPane().add(jStatus_Label, gridBagConstraints);
 
         jButton0.setText(Lang.T("Try without Fee"));
@@ -218,7 +218,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
         jPanel1.add(jButton0, gridBagConstraints);
 
 
@@ -227,7 +227,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
         jPanel1.add(jButton1, gridBagConstraints);
 
         jButton2.setText(Lang.T("Cancel"));
@@ -235,13 +235,13 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
         jPanel1.add(jButton2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.insets = new java.awt.Insets(0, insest, insest, insest);
+        gridBagConstraints.insets = new java.awt.Insets(0, fontSize, fontSize, fontSize);
         getContentPane().add(jPanel1, gridBagConstraints);
 
         pack();

@@ -121,10 +121,12 @@ public class GenesisBlock extends Block {
                         continue;
 
                     // DEBTORS
-                    JSONArray debtors = (JSONArray) holder.get(3);
+                    // AS List - for use Arrays.asList() in init debtors in holders
+
+                    List debtors = (List) holder.get(3);
                     BigDecimal totalCredit = BigDecimal.ZERO;
                     for (int j = 0; j < debtors.size(); j++) {
-                        JSONArray debtor = (JSONArray) debtors.get(j);
+                        List debtor = (List) debtors.get(j);
 
                         BigDecimal creditAmount = new BigDecimal(debtor.get(0).toString()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
                         if (totalCredit.add(creditAmount).compareTo(fondAamount) > 0) {

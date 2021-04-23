@@ -584,7 +584,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
                 BigDecimal totalERAOwned = Account.totalForAddresses(dcSet, thisPersonAddresses, AssetCls.ERA_KEY, TransactionAmount.ACTION_SEND);
                 BigDecimal totalLIAOwned = Account.totalForAddresses(dcSet, thisPersonAddresses, AssetCls.LIA_KEY, TransactionAmount.ACTION_DEBT);
 
-                int resultERA = BlockChain.VALID_PERSON_CERT_ERA(height, totalERAOwned, totalLIAOwned);
+                int resultERA = BlockChain.VALID_PERSON_CERT_ERA(this, height, totalERAOwned, totalLIAOwned);
                 if (resultERA > 0) {
                     return resultERA;
                 }
