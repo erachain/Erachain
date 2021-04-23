@@ -772,7 +772,7 @@ public class Account {
     // Добавляем величины для тестовых режимов
     public static BigDecimal addDEVAmount(long key, byte[] shortAddressBytes) {
         if (BlockChain.ERA_COMPU_ALL_UP && key == 1)
-            return BigDecimal.valueOf((512000 + 500 * shortAddressBytes[10]) >> 6);
+            return BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 1000 * (5000 + shortAddressBytes[10]) / 5000);
         else if (BlockChain.ERA_COMPU_ALL_UP && key == 2)
             return new BigDecimal("100.0");
 
