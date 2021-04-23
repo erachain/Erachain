@@ -172,7 +172,7 @@ public class WalletNotifyTimer<U> implements Observer {
                 Object value = ((Pair<?, ?>) event).getB();
                 if (value instanceof Order) {
                     Order order = (Order) value;
-                    head = Lang.T("Order") + " - " + Lang.T(order.state());
+                    head = Lang.T("Order") + " - " + Lang.T(order.viewStatus());
                     message = order.toString();
                     int status = order.getStatus();
                     if (status == Order.FULFILLED || status == Order.COMPLETED) {

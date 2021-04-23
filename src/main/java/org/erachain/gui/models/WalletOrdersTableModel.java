@@ -74,7 +74,7 @@ public class WalletOrdersTableModel extends WalletTableModel<Order> implements O
                 return order.getCreator().getPersonAsString();
 
             case COLUMN_STATUS:
-                return Lang.T(order.state());
+                return Lang.T(order.viewStatus());
 
         }
 

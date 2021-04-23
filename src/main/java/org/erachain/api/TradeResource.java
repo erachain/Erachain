@@ -211,11 +211,10 @@ public class TradeResource {
                 throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
 
             JSONObject out = order.toJson();
-            if (order.isFulfilled()) {
+            if (order.isCompleted())
                 out.put("completed", true);
-            } else {
+            else
                 out.put("canceled", true);
-            }
             return out.toJSONString();
         }
 

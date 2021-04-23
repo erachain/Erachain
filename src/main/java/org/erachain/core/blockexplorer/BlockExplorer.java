@@ -797,18 +797,14 @@ public class BlockExplorer {
 
         Map output = new LinkedHashMap();
 
-        boolean isCompleted;
         Order order = dcSet.getOrderMap().get(orderId);
         if (order == null) {
             order = dcSet.getCompletedOrderMap().get(orderId);
             if (order == null) {
                 output.put("error", "order not found");
                 return output;
-            } else {
-                isCompleted = true;
             }
-        } else {
-            isCompleted = false;
+            output.put("active", true);
         }
 
         output.put("order", order.toJson());
@@ -818,8 +814,8 @@ public class BlockExplorer {
         AssetCls assetHave = Controller.getInstance().getAsset(order.getHaveAssetKey());
         AssetCls assetWant = Controller.getInstance().getAsset(order.getWantAssetKey());
 
-        output.put("completed", isCompleted);
-        output.put("canceled", isCompleted && !order.isFulfilled());
+        output.put("completed", order.isCompleted());
+        output.put("canceled", order.isCanceled());
 
         output.put("txSeqNo", Transaction.viewDBRef(order.getId()));
         Transaction transaction = dcSet.getTransactionFinalMap().get(orderId);
