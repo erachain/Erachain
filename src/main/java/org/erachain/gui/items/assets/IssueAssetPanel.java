@@ -144,7 +144,7 @@ public class IssueAssetPanel extends IssueItemPanel {
             scaleJLabel.setVisible(true);
         }
 
-        multipleRoyaltyPanel.setVisible(true || assetType.getId() == AssetCls.AS_NON_FUNGIBLE);
+        multipleRoyaltyPanel.setVisible(assetType.getId() == AssetCls.AS_NON_FUNGIBLE);
 
     }
 
