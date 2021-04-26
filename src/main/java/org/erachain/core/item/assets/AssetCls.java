@@ -1228,8 +1228,6 @@ public abstract class AssetCls extends ItemCls {
             return "AS_CURRENCY_100_DEX";
 
         switch (assetType) {
-            case AS_OUTSIDE_CURRENCY:
-            case AS_INSIDE_CURRENCY:
             case AS_NON_FUNGIBLE:
                 return "AS_NON_FUNGIBLE_DEX";
         }
