@@ -387,7 +387,7 @@ public class WebTransactionsHTML {
             status = "Active";
         } else if (dcSet.getCompletedOrderMap().contains(refDB)) {
             order = dcSet.getCompletedOrderMap().get(refDB);
-            if (order.isFulfilled()) {
+            if (order.isCompleted()) {
                 status = "Completed";
             } else {
                 status = "Canceled";

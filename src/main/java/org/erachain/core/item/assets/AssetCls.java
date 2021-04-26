@@ -777,6 +777,18 @@ public abstract class AssetCls extends ItemCls {
         return isUnTransferable(key, assetType, senderIsAssetMaker);
     }
 
+    public boolean validPair(long pairAssetKey) {
+        if (assetType == AssetCls.AS_NON_FUNGIBLE) {
+            if (pairAssetKey != AssetCls.ERA_KEY
+                //&& pairAssetKey != AssetCls.FEE_KEY && pairAssetKey != AssetCls.BTC_KEY
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static boolean isUnDebtable(long key, int assetType) {
         return assetType == AssetCls.AS_INDEX
                 || assetType == AssetCls.AS_INSIDE_BONUS;

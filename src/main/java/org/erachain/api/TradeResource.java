@@ -211,11 +211,10 @@ public class TradeResource {
                 throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
 
             JSONObject out = order.toJson();
-            if (order.isFulfilled()) {
+            if (order.isCompleted())
                 out.put("completed", true);
-            } else {
+            else
                 out.put("canceled", true);
-            }
             return out.toJSONString();
         }
 
@@ -626,16 +625,22 @@ public class TradeResource {
             createOrder = (CreateOrderTransaction) finalMap.get(key);
 
             if ((order = ordersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
-                if (order.isNotTraded()) {
-                    order.setStatus(Order.ACTIVE);
-                } else {
-                    order.setStatus(Order.FULFILLED);
+                if (false) {
+                    // сейчас из Карты уже со статусом берется
+                    if (order.isNotTraded()) {
+                        order.setStatus(Order.ACTIVE);
+                    } else {
+                        order.setStatus(Order.FULFILLED);
+                    }
                 }
             } else if ((order = completedOrdersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
-                if (order.isFulfilled()) {
-                    order.setStatus(Order.COMPLETED);
-                } else {
-                    order.setStatus(Order.CANCELED);
+                if (false) {
+                    // сейчас из Карты уже со статусом берется
+                    if (order.isCompleted()) {
+                        order.setStatus(Order.COMPLETED);
+                    } else {
+                        order.setStatus(Order.CANCELED);
+                    }
                 }
             } else {
                 order = createOrder.makeOrder();

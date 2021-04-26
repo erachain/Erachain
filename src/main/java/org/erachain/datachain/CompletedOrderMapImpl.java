@@ -165,7 +165,7 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     public Order get(Long id) {
         Order order = super.get(id);
         if (order != null) {
-            if (order.isFulfilled()) {
+            if (order.isFulfilled() || order.getAmountWantLeft().signum() == 0) {
                 order.setStatus(Order.COMPLETED);
             } else {
                 order.setStatus(Order.CANCELED);
@@ -178,8 +178,8 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     public void put(Order order) {
 
         if (BlockChain.CHECK_BUGS > 3
-                && (Transaction.viewDBRef(order.getId()).equals("178617-18")
-                || Transaction.viewDBRef(order.getId()).equals("125300-1"))
+                && (Transaction.viewDBRef(order.getId()).equals("-178617-18")
+                || Transaction.viewDBRef(order.getId()).equals("-125300-1"))
         ) {
             boolean debug = true;
         }

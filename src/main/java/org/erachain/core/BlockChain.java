@@ -167,14 +167,19 @@ public class BlockChain {
     public static final int MIN_GENERATING_BALANCE = 100;
     public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 
-    public static final int MIN_REGISTRATING_BALANCE_10 = 10;
-    public static final BigDecimal MIN_REGISTRATING_BALANCE_10_BD = new BigDecimal(MIN_REGISTRATING_BALANCE_10);
+    public static final int MIN_REGISTERING_BALANCE_OWN = 0;
+    public static final BigDecimal MIN_REGISTERING_BALANCE_OWN_BD = new BigDecimal(MIN_REGISTERING_BALANCE_OWN);
+    public static final int MIN_REGISTERING_BALANCE_USE = 0;
+    public static final BigDecimal MIN_REGISTERING_BALANCE_USE_BD = new BigDecimal(MIN_REGISTERING_BALANCE_USE);
 
-    public static final int MIN_REGISTRATING_BALANCE_100 = 100;
-    public static final BigDecimal MIN_REGISTRATING_BALANCE_100_BD = new BigDecimal(MIN_REGISTRATING_BALANCE_100);
+    public static final int MIN_REGISTERING_BALANCE_10 = 10;
+    public static final BigDecimal MIN_REGISTERING_BALANCE_10_BD = new BigDecimal(MIN_REGISTERING_BALANCE_10);
 
-    public static final int MIN_REGISTRATING_BALANCE_1000 = 1000;
-    public static final BigDecimal MIN_REGISTRATING_BALANCE_1000_BD = new BigDecimal(MIN_REGISTRATING_BALANCE_1000);
+    public static final int MIN_REGISTERING_BALANCE_100 = 100;
+    public static final BigDecimal MIN_REGISTERING_BALANCE_100_BD = new BigDecimal(MIN_REGISTERING_BALANCE_100);
+
+    public static final int MIN_REGISTERING_BALANCE_1000 = 1000;
+    public static final BigDecimal MIN_REGISTERING_BALANCE_1000_BD = new BigDecimal(MIN_REGISTERING_BALANCE_1000);
 
     //public static final int GENERATING_RETARGET = 10;
     //public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
@@ -961,7 +966,7 @@ public class BlockChain {
         }
     }
 
-    public static int VALID_PERSON_REG_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
+    public static int VALID_PERSON_REG_ERA(Transaction transaction, int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
         if (START_ISSUE_RIGHTS > 0 && height < START_ISSUE_RIGHTS) {
             return 0;
@@ -970,23 +975,32 @@ public class BlockChain {
         if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
         } else if (totalLIA.compareTo(new BigDecimal("20")) < 0) {
-            if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_100_BD) < 0) {
+            if (totalERA.compareTo(MIN_REGISTERING_BALANCE_100_BD) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
         } else {
-            if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_1000_BD) < 0) {
+            if (totalERA.compareTo(MIN_REGISTERING_BALANCE_1000_BD) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_1000;
             }
+        }
+
+        if (MIN_REGISTERING_BALANCE_OWN > 0 && totalERA.compareTo(MIN_REGISTERING_BALANCE_OWN_BD) < 0) {
+            transaction.setErrorValue("balance in OWN less then " + MIN_REGISTERING_BALANCE_OWN);
+            return Transaction.NOT_ENOUGH_ERA_OWN;
+        }
+        if (MIN_REGISTERING_BALANCE_USE > 0 && totalERA.compareTo(MIN_REGISTERING_BALANCE_USE_BD) < 0) {
+            transaction.setErrorValue("balance in USE less then " + MIN_REGISTERING_BALANCE_USE);
+            return Transaction.NOT_ENOUGH_ERA_USE;
         }
 
         return 0;
 
     }
 
-    public static int VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
+    public static int VALID_PERSON_CERT_ERA(Transaction transaction, int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
         if (START_ISSUE_RIGHTS > 0 && height < START_ISSUE_RIGHTS) {
-            if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_100_BD) < 0) {
+            if (totalERA.compareTo(MIN_REGISTERING_BALANCE_100_BD) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
             return 0;
@@ -995,13 +1009,22 @@ public class BlockChain {
         if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
         } else if (totalLIA.compareTo(new BigDecimal("20")) < 0) {
-            if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_100_BD) < 0) {
+            if (totalERA.compareTo(MIN_REGISTERING_BALANCE_100_BD) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
         } else {
-            if (totalERA.compareTo(MIN_REGISTRATING_BALANCE_1000_BD) < 0) {
+            if (totalERA.compareTo(MIN_REGISTERING_BALANCE_1000_BD) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_1000;
             }
+        }
+
+        if (MIN_REGISTERING_BALANCE_OWN > 0 && totalERA.compareTo(MIN_REGISTERING_BALANCE_OWN_BD) < 0) {
+            transaction.setErrorValue("balance in OWN less then " + MIN_REGISTERING_BALANCE_OWN);
+            return Transaction.NOT_ENOUGH_ERA_OWN;
+        }
+        if (MIN_REGISTERING_BALANCE_USE > 0 && totalERA.compareTo(MIN_REGISTERING_BALANCE_USE_BD) < 0) {
+            transaction.setErrorValue("balance in USE less then " + MIN_REGISTERING_BALANCE_USE);
+            return Transaction.NOT_ENOUGH_ERA_USE;
         }
 
         return 0;

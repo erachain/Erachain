@@ -450,8 +450,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 || haveAsset.isSelfManaged() || wantAsset.isSelfManaged()) {
             return INVALID_ACCOUNTING_PAIR;
         }
-        if (wantAsset.isUnTransferable(false) && haveKey != AssetCls.ERA_KEY
-                || haveAsset.isUnTransferable(false) && wantKey != AssetCls.ERA_KEY) {
+        if (!wantAsset.validPair(haveKey)
+                || !haveAsset.validPair(wantKey)) {
             return INVALID_ECXHANGE_PAIR;
         }
 

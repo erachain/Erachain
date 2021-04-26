@@ -369,6 +369,14 @@ public class Order implements Comparable<Order> {
         return this.fulfilledHave.compareTo(this.amountHave) == 0;
     }
 
+    public boolean isCompleted() {
+        return status == COMPLETED;
+    }
+
+    public boolean isCanceled() {
+        return status == CANCELED;
+    }
+
     /**
      * Пока еще не покусали
      *
@@ -414,26 +422,6 @@ public class Order implements Comparable<Order> {
 
     public String viewID() {
         return Transaction.viewDBRef(id);
-    }
-
-    public String state() {
-        if (amountHave.compareTo(fulfilledHave) == 0) {
-            return "Done";
-        } else {
-
-            // сдесь быстрее поисек - меньше записей
-            if (DCSet.getInstance().getOrderMap().contains(id)) {
-                return "Active";
-            }
-
-            // если тут уже нету
-            if (DCSet.getInstance().getCompletedOrderMap().contains(id)) {
-                return "Canceled";
-            }
-
-            return "Orphaned"; //"unconfirmed";
-        }
-
     }
 
     ///////// PRICE

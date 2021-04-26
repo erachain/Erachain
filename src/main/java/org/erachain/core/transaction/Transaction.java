@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -152,12 +153,14 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static final int INVALID_CLAIM_DEBT_CREATOR = 61;
 
-    public static final int NOT_ENOUGH_ERA_OWN_10 = 101;
-    public static final int NOT_ENOUGH_ERA_USE_10 = 102;
-    public static final int NOT_ENOUGH_ERA_OWN_100 = 103;
-    public static final int NOT_ENOUGH_ERA_USE_100 = 104;
-    public static final int NOT_ENOUGH_ERA_OWN_1000 = 105;
-    public static final int NOT_ENOUGH_ERA_USE_1000 = 106;
+    public static final int NOT_ENOUGH_ERA_OWN = 101;
+    public static final int NOT_ENOUGH_ERA_USE = 102;
+    public static final int NOT_ENOUGH_ERA_OWN_10 = 103;
+    public static final int NOT_ENOUGH_ERA_USE_10 = 104;
+    public static final int NOT_ENOUGH_ERA_OWN_100 = 105;
+    public static final int NOT_ENOUGH_ERA_USE_100 = 106;
+    public static final int NOT_ENOUGH_ERA_OWN_1000 = 107;
+    public static final int NOT_ENOUGH_ERA_USE_1000 = 108;
 
     public static final int INVALID_BACKWARD_ACTION = 117;
     public static final int INVALID_PERSONALIZY_ANOTHER_PERSON = 118;
@@ -1475,7 +1478,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         fontSize *= 1.4;
         String text = "<span style='vertical-align: 10px; font-size: 1.4em' ><b>" + fee.toString() + "</b>"
                 + "<img width=" + fontSize + " height=" + fontSize
-                + " src='file:images\\icons\\assets\\COMPU.png'></span>";
+                + " src='file:images\\icons\\assets\\" + AssetCls.FEE_NAME + ".png'></span>";
 
         boolean useDEX = Settings.getInstance().getCompuRateUseDEX();
 
@@ -1501,8 +1504,20 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if (compuRate.signum() > 0) {
             BigDecimal fee_fiat = fee.multiply(compuRate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
-            if (asset.getKey() != AssetCls.FEE_KEY)
-                text += " (" + fee_fiat.toString() + " " + asset.getTickerName() + ")";
+            if (asset.getKey() != AssetCls.FEE_KEY) {
+                text += " (" + fee_fiat.toString();
+                String fileName = "images" + File.separator + "icons" + File.separator + "assets" + File.separator + asset.getName() + ".png";
+                File file = new File(fileName);
+                if (file.exists()) {
+                    text += "<img width=" + fontSize + " height=" + fontSize
+                            + " src=file:'" + fileName + "'>";
+                } else {
+                    text += " " + asset.getTickerName();
+                }
+
+                text += ")";
+
+            }
         }
 
         return text;

@@ -27,8 +27,6 @@ public class ImageCropPanelNavigator2D extends JPanel {
         this.asGif.setSelected(typeOfImage == TypeOfImage.GIF);
         this.useOrig.setSelected(typeOfImage == TypeOfImage.GIF);
 
-        imageCropDisplayPanelNavigator2D = new ImageCropDisplayPanelNavigator2D(this, imageFile, cropWidth, cropHeight);
-
         if (originalSize) {
             JPanel sliderPanelLeft = new JPanel(new BorderLayout());
             add(sliderPanelLeft, BorderLayout.WEST);
@@ -44,8 +42,6 @@ public class ImageCropPanelNavigator2D extends JPanel {
 
         }
 
-        add(imageCropDisplayPanelNavigator2D, BorderLayout.CENTER);
-
         JPanel sliderPanel = new JPanel(new BorderLayout());
         add(sliderPanel, BorderLayout.SOUTH);
 
@@ -54,13 +50,11 @@ public class ImageCropPanelNavigator2D extends JPanel {
         checks.add(useOrig, BorderLayout.SOUTH);
         sliderPanel.add(checks, BorderLayout.NORTH);
 
-
         zoomSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
         zoomSlider.setMajorTickSpacing(50);
         zoomSlider.setMinorTickSpacing(10);
         zoomSlider.setPaintTicks(true);
         zoomSlider.addChangeListener(e -> imageCropDisplayPanelNavigator2D.setZoom(zoomSlider.getValue() / 100d));
-        imageCropDisplayPanelNavigator2D.addListener(e -> zoomSlider.setValue((int) (imageCropDisplayPanelNavigator2D.getZoom() * 100)));
         sliderPanel.add(zoomSlider, BorderLayout.CENTER);
 
         frameSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 100);
@@ -70,12 +64,18 @@ public class ImageCropPanelNavigator2D extends JPanel {
         frameSlider.addChangeListener(e -> imageCropDisplayPanelNavigator2D.setFrameRate(frameSlider.getValue()));
         sliderPanel.add(frameSlider, BorderLayout.SOUTH);
 
+        imageCropDisplayPanelNavigator2D = new ImageCropDisplayPanelNavigator2D(this, imageFile,
+                cropWidth,
+                cropHeight);
+        imageCropDisplayPanelNavigator2D.addListener(e -> zoomSlider.setValue((int) (imageCropDisplayPanelNavigator2D.getZoom() * 100)));
+        add(imageCropDisplayPanelNavigator2D, BorderLayout.CENTER);
+
     }
 
     public ImageCropPanelNavigator2D(ImageIcon image) {
         setLayout(new BorderLayout());
 
-        imageCropDisplayPanelNavigator2D = new ImageCropDisplayPanelNavigator2D(this, image, 400, 500);
+        imageCropDisplayPanelNavigator2D = new ImageCropDisplayPanelNavigator2D(this, image, 600, 500);
 
         add(imageCropDisplayPanelNavigator2D, BorderLayout.CENTER);
 
