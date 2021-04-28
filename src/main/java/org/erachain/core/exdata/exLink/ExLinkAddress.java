@@ -66,6 +66,16 @@ public class ExLinkAddress {
         this.memoBytes = memoBytes;
     }
 
+    public ExLinkAddress(Account account, int value, String memo) {
+        this.type = 0;
+        this.flags = 0;
+        this.value1 = value;
+        value2 = 0;
+        this.account = account;
+        this.memo = memo;
+        this.memoBytes = memo.getBytes(StandardCharsets.UTF_8);
+    }
+
     public ExLinkAddress(byte type, Account account, byte[] memoBytes) {
         this.type = type;
         flags = 0;

@@ -6,6 +6,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
@@ -642,6 +643,13 @@ public abstract class AssetCls extends ItemCls {
     public abstract long getQuantity();
 
     public abstract int getScale();
+
+    public static ExLinkAddress[] getDefaultAwards(int type, Account owner) {
+        if (type == AS_NON_FUNGIBLE) {
+            return new ExLinkAddress[]{new ExLinkAddress(owner, 10000, "Author royalty")};
+        }
+        return null;
+    }
 
     @Override
     public HashMap getNovaItems() {

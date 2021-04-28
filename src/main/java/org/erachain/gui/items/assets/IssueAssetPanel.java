@@ -37,7 +37,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     private AssetTypesComboBoxModel assetTypesComboBoxModel;
 
-    private MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel();
+    private MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel(fromJComboBox);
 
     public IssueAssetPanel() {
         super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true);

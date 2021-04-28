@@ -1,9 +1,11 @@
 package org.erachain.gui.library;
 
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun;
@@ -25,19 +27,25 @@ public class MultipleRoyaltyPanel extends JPanel {
     private GridBagConstraints gridBagConstraints;
     private JCheckBox defaultCheck;
 
-    private static int DESCR_COL = 2;
+    protected JComboBox<Account> ownerComboBox;
 
-    public MultipleRoyaltyPanel() {
+    private static int DESCR_COL = 1;
+
+    public MultipleRoyaltyPanel(JComboBox<Account> ownerComboBox) {
 
         super();
-        this.setName(Lang.T("Recipients"));
+
+        this.setName(Lang.T("Awards"));
+
+        this.ownerComboBox = ownerComboBox;
+
         jScrollPaneRecipients = new JScrollPane();
         jButtonRemoveRecipient = new JButton();
 
         defaultCheck = new JCheckBox();
         defaultCheck.setText(Lang.T("Use Default Royalty: author's award is %1").replace("%1", "10%"));
         defaultCheck.setSelected(true);
-        defaultCheck.setEnabled(false);
+        defaultCheck.setEnabled(BlockChain.TEST_MODE);
 
         defaultCheck.addActionListener(new ActionListener() {
             @Override
@@ -74,7 +82,7 @@ public class MultipleRoyaltyPanel extends JPanel {
         recipientsTableModel = new Table_Model(0);
         jTableRecipients = new MTable(recipientsTableModel);
         jScrollPaneRecipients.setViewportView(jTableRecipients);
-        TableColumn columnNo = jTableRecipients.getColumnModel().getColumn(1);
+        TableColumn columnNo = jTableRecipients.getColumnModel().getColumn(DESCR_COL + 1);
         columnNo.setMinWidth(80);
         columnNo.setMaxWidth(120);
         columnNo.setPreferredWidth(100);
@@ -110,6 +118,13 @@ public class MultipleRoyaltyPanel extends JPanel {
         jScrollPaneRecipients.setVisible(!defaultCheck.isSelected());
         jButtonRemoveRecipient.setVisible(!defaultCheck.isSelected());
 
+        if (isVisible() && !defaultCheck.isSelected()) {
+            ExLinkAddress[] items = AssetCls.getDefaultAwards(AssetCls.AS_NON_FUNGIBLE, (Account) ownerComboBox.getSelectedItem());
+            if (items != null) {
+                recipientsTableModel.setRecipients(items);
+            }
+        }
+
         this.setMinimumSize(new Dimension(0, !defaultCheck.isSelected() ? 130 : 30));
 
     }
@@ -121,7 +136,8 @@ public class MultipleRoyaltyPanel extends JPanel {
     class Table_Model extends DefaultTableModel {
 
         public Table_Model(int rows) {
-            super(new Object[]{Lang.T("Address"), Lang.T("Royalty") + " %", Lang.T("Information")
+            super(new Object[]{Lang.T("Address"), Lang.T("Information"), Lang.T("Royalty") + " %",
+                            Lang.T("Memo")
                     },
                     rows);
             this.addEmpty();
@@ -129,7 +145,7 @@ public class MultipleRoyaltyPanel extends JPanel {
         }
 
         private void addEmpty() {
-            this.addRow(new Object[]{"", 1.0, ""});
+            this.addRow(new Object[]{"", "", 1.0, ""});
         }
 
         @Override
@@ -187,12 +203,15 @@ public class MultipleRoyaltyPanel extends JPanel {
             }
         }
 
-        public void setRecipients(Object[][] items) {
+        public void setRecipients(ExLinkAddress[] items) {
             clearRecipients();
 
             for (int i = 0; i < items.length; ++i) {
-                addRow(items[i]);
+                addRow(new Object[]{items[i].getAccount().getAddress(),
+                        Lang.T(Account.getDetailsForEncrypt(items[i].getAccount().getAddress(), AssetCls.FEE_KEY, false, true)),
+                        items[i].getValue1() / 1000d, items[i].getMemo()});
             }
+            addEmpty();
         }
 
         public void clearRecipients() {
