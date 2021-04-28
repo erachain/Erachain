@@ -187,11 +187,11 @@ public class MultipleRoyaltyPanel extends JPanel {
             }
         }
 
-        public void setRecipients(Account[] recipients) {
+        public void setRecipients(Object[][] items) {
             clearRecipients();
 
-            for (int i = 0; i < recipients.length; ++i) {
-                addRow(new Object[]{recipients[i].getAddress(), ""});
+            for (int i = 0; i < items.length; ++i) {
+                addRow(items[i]);
             }
         }
 
