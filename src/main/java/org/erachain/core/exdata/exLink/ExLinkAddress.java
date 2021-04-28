@@ -2,14 +2,19 @@ package org.erachain.core.exdata.exLink;
 
 import com.google.common.primitives.Ints;
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Base58;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
+
+import java.nio.charset.StandardCharsets;
 
 public class ExLinkAddress {
 
     public static final byte SIMPLE_TYPE = 0;
 
-    public static final byte BASE_LENGTH = 30;
+    public static final byte BASE_LENGTH = 30 + 1;
 
     /**
      * 0 - дополнение, см. LINK_APPENDIX_TYPE...
@@ -22,44 +27,51 @@ public class ExLinkAddress {
     protected final byte flags;
 
     /**
-     * Ссылка на основной документ или сущность
-     */
-    protected final Account account;
-
-    /**
      * Уровень связи. Например для Отзыва-Оценки - оценка, для Поручительство - доля поручительства
      */
     protected final int value1;
     protected final int value2;
 
-    public ExLinkAddress(byte type, byte flags, int value1, int value2, Account account) {
+    /**
+     * Ссылка на основной документ или сущность
+     */
+    protected final Account account;
+
+    protected final byte[] memoBytes;
+    protected String memo;
+
+    public ExLinkAddress(byte type, byte flags, int value1, int value2, Account account, byte[] memoBytes) {
         this.type = type;
         this.flags = flags;
         this.value1 = value1;
         this.value2 = value2;
         this.account = account;
+        this.memoBytes = memoBytes;
     }
 
-    public ExLinkAddress(byte type, byte flags, byte value, Account account) {
+    public ExLinkAddress(byte type, byte flags, byte value, Account account, byte[] memoBytes) {
         this.type = type;
         this.flags = flags;
         this.value1 = value;
         value2 = 0;
         this.account = account;
+        this.memoBytes = memoBytes;
     }
 
-    public ExLinkAddress(byte type, byte flags, Account account) {
+    public ExLinkAddress(byte type, byte flags, Account account, byte[] memoBytes) {
         this.type = type;
         this.flags = flags;
         this.value1 = value2 = 0;
         this.account = account;
+        this.memoBytes = memoBytes;
     }
 
-    public ExLinkAddress(byte type, Account account) {
+    public ExLinkAddress(byte type, Account account, byte[] memoBytes) {
         this.type = type;
         flags = 0;
         value1 = value2 = 0;
         this.account = account;
+        this.memoBytes = memoBytes;
     }
 
     public ExLinkAddress(byte[] data) {
@@ -70,6 +82,14 @@ public class ExLinkAddress {
         byte[] accBuf = new byte[Account.ADDRESS_SHORT_LENGTH];
         System.arraycopy(data, 10, accBuf, 0, Account.ADDRESS_SHORT_LENGTH);
         account = new Account(accBuf);
+
+        int memoSize = data[BASE_LENGTH - 1];
+        if (memoSize > 0) {
+            this.memoBytes = new byte[memoSize];
+            System.arraycopy(data, BASE_LENGTH, memoBytes, 0, memoSize);
+        } else {
+            memoBytes = null;
+        }
     }
 
     public ExLinkAddress(byte[] data, int position) {
@@ -80,14 +100,23 @@ public class ExLinkAddress {
         byte[] accBuf = new byte[Account.ADDRESS_SHORT_LENGTH];
         System.arraycopy(data, position + 10, accBuf, 0, Account.ADDRESS_SHORT_LENGTH);
         account = new Account(accBuf);
+
+        int memoSize = data[position + BASE_LENGTH - 1];
+        if (memoSize > 0) {
+            this.memoBytes = new byte[memoSize];
+            System.arraycopy(data, position + BASE_LENGTH, memoBytes, 0, memoSize);
+        } else {
+            memoBytes = null;
+        }
     }
 
-    public ExLinkAddress(byte[] data, Account account) {
+    public ExLinkAddress(byte[] data, Account account, byte[] memoBytes) {
         this.type = data[0];
         this.flags = data[1];
         this.value1 = Ints.fromBytes(data[2], data[3], data[4], data[5]);
         this.value2 = Ints.fromBytes(data[6], data[7], data[8], data[9]);
         this.account = account;
+        this.memoBytes = memoBytes;
     }
 
     public byte getFlags() {
@@ -110,6 +139,16 @@ public class ExLinkAddress {
         return value2;
     }
 
+    public String getMemo() {
+        if (memo == null) {
+            if (memoBytes == null || memoBytes.length == 0)
+                return null;
+            else
+                memo = new String(this.memoBytes, StandardCharsets.UTF_8);
+        }
+        return memo;
+    }
+
     public String viewTypeName() {
         return viewTypeName(type);
     }
@@ -130,16 +169,26 @@ public class ExLinkAddress {
         json.put("value2", value2);
         json.put("account", account.getAddress());
 
+        if (getMemo() != null) {
+            json.put("memoBytes", Base58.encode(memoBytes));
+            json.put("memo", memo);
+        }
+
         return json;
     }
 
     public byte[] toBytes() {
-        byte[] data = new byte[BASE_LENGTH];
+        int memoSize = memoBytes == null ? 0 : memoBytes.length;
+        byte[] data = new byte[BASE_LENGTH + memoSize];
         data[0] = type;
         data[1] = flags;
         System.arraycopy(Ints.toByteArray(value1), 0, data, 2, Integer.BYTES);
         System.arraycopy(Ints.toByteArray(value2), 0, data, 6, Integer.BYTES);
         System.arraycopy(account.getShortAddressBytes(), 0, data, 10, Account.ADDRESS_SHORT_LENGTH);
+
+        data[BASE_LENGTH - 1] = (byte) memoSize;
+        if (memoSize > 0)
+            System.arraycopy(memoBytes, 0, data, BASE_LENGTH, memoSize);
 
         return data;
     }
@@ -147,11 +196,27 @@ public class ExLinkAddress {
     // TODO доледать из JSON
     public static ExLinkAddress parse(JSONObject json) throws Exception {
         int type = (int) (long) (Long) json.get("type");
+
+        String memoStr = (String) json.get("memo");
+        byte[] memo;
+        if (memoStr == null) {
+            memoStr = (String) json.get("memoBytes");
+            if (memoStr == null) {
+                memo = null;
+            } else {
+                memo = Base58.decode(memoStr);
+            }
+        } else {
+            memo = memoStr.getBytes(StandardCharsets.UTF_8);
+        }
+
         switch (type) {
             case SIMPLE_TYPE:
                 return new ExLinkAddress((byte) type, (byte) (long) json.get("flags"),
                         (int) (long) json.get("value1"), (int) (long) json.get("value2"),
-                        new Account(json.get("account").toString()));
+                        new Account(json.get("account").toString()),
+                        memo
+                );
         }
         throw new Exception("wrong type: " + type);
     }
@@ -166,7 +231,14 @@ public class ExLinkAddress {
     }
 
     public int length() {
-        return BASE_LENGTH;
+        return BASE_LENGTH + (memoBytes == null ? 0 : memoBytes.length);
+    }
+
+    public int isValid(DCSet dcSet) {
+        if (memoBytes != null && memoBytes.length > 255)
+            return Transaction.INVALID_DATA_LENGTH;
+
+        return Transaction.VALIDATE_OK;
     }
 
 }
