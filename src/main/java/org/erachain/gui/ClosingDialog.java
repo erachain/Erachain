@@ -8,16 +8,18 @@ public class ClosingDialog  {
 
        AboutFrame.getInstance().setUserClose(false);
        AboutFrame.getInstance().setModal(false);
+
+       AboutFrame.getInstance().console_Text.setVisible(true);
        AboutFrame.getInstance().setVisible(true);
 
-        new Thread() {
-            @Override
-            public void run() {
-                Controller.getInstance().deleteObservers();
-                Controller.getInstance().addSingleObserver(AboutFrame.getInstance());
-                Controller.getInstance().stopAll(0);
-         //       aa.setVisible(false);
-            }
-        }.start();
-    }
+       new Thread() {
+           @Override
+           public void run() {
+               Controller.getInstance().deleteObservers();
+               Controller.getInstance().addSingleObserver(AboutFrame.getInstance());
+               Controller.getInstance().stopAll(0);
+               //       aa.setVisible(false);
+           }
+       }.start();
+   }
 }

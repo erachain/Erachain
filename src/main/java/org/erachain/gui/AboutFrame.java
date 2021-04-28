@@ -23,7 +23,8 @@ public class AboutFrame extends JDialog implements Observer {
     private static AboutFrame instance;
     protected boolean user_close = true;
     private AboutPanel aboutPanel;
-    private JTextField console_Text;
+    public JTextField console_Text;
+    public JLabel lblAuthorsLabel;
 
     public AboutFrame() {
         //CREATE FRAME
@@ -49,8 +50,8 @@ public class AboutFrame extends JDialog implements Observer {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (user_close) {
-                   setVisible(false);
-     //              dispose();
+                    setVisible(false);
+                    //              dispose();
                 }
             }
         });
@@ -59,7 +60,7 @@ public class AboutFrame extends JDialog implements Observer {
             public void keyPressed(KeyEvent e) {
                 if (user_close) {
                     setVisible(false);
-     //              dispose();
+                    //              dispose();
                 }
             }
         });
@@ -67,25 +68,30 @@ public class AboutFrame extends JDialog implements Observer {
         //ADD GENERAL TABPANE TO FRAME
         getContentPane().add(this.aboutPanel);
         GridBagLayout gbl_aboutPanel = new GridBagLayout();
-        gbl_aboutPanel.columnWidths = new int[]{310, 181, 70, 200};
+        //gbl_aboutPanel.columnWidths = new int[]{310, 181, 70, 200};
         gbl_aboutPanel.rowHeights = new int[]{252, 0, 0, 0, 0, 0};
         gbl_aboutPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
         gbl_aboutPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         aboutPanel.setLayout(gbl_aboutPanel);
 
-        JLabel lblAuthorsLabel = new JLabel(//Lang.T("Author") + ": " +
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 10, 5, 10);
+        //gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.gridwidth = 4;
+
+        lblAuthorsLabel = new JLabel(//Lang.T("Author") + ": " +
                 //+ "Ермолаев Дмитрий Сергеевич");
                 Lang.T("ERACHAIN WORLD PTE LTD.")); //"Dmitrii Ermolaev"));
         lblAuthorsLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblAuthorsLabel.setForeground(Color.RED);
         lblAuthorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        GridBagConstraints gbc_lblAuthorsLabel = new GridBagConstraints();
-        gbc_lblAuthorsLabel.fill = GridBagConstraints.BOTH;
-        gbc_lblAuthorsLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_lblAuthorsLabel.anchor = GridBagConstraints.NORTHWEST;
-        gbc_lblAuthorsLabel.gridx = 1;
-        gbc_lblAuthorsLabel.gridy = 1;
-        aboutPanel.add(lblAuthorsLabel, gbc_lblAuthorsLabel);
+        lblAuthorsLabel.setVisible(true);
+        aboutPanel.add(lblAuthorsLabel, gbc);
 
         int gridy = 2;
         if (BlockChain.CLONE_MODE) {
@@ -94,13 +100,8 @@ public class AboutFrame extends JDialog implements Observer {
             appNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
             appNameLabel.setForeground(Color.RED);
             appNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            GridBagConstraints gbc_lbllAppNameLabel = new GridBagConstraints();
-            gbc_lbllAppNameLabel.fill = GridBagConstraints.BOTH;
-            gbc_lbllAppNameLabel.insets = new Insets(0, 0, 5, 5);
-            gbc_lbllAppNameLabel.anchor = GridBagConstraints.NORTHWEST;
-            gbc_lbllAppNameLabel.gridx = 1;
-            gbc_lbllAppNameLabel.gridy = gridy++;
-            aboutPanel.add(appNameLabel, gbc_lbllAppNameLabel);
+            ++gbc.gridy;
+            aboutPanel.add(appNameLabel, gbc);
         }
 
         JLabel lblversionLabel = new JLabel(
@@ -108,27 +109,18 @@ public class AboutFrame extends JDialog implements Observer {
         lblversionLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblversionLabel.setForeground(Color.RED);
         lblversionLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        GridBagConstraints gbc_lbllversionLabel = new GridBagConstraints();
-        gbc_lbllversionLabel.fill = GridBagConstraints.BOTH;
-        gbc_lbllversionLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_lbllversionLabel.anchor = GridBagConstraints.NORTHWEST;
-        gbc_lbllversionLabel.gridx = 1;
-        gbc_lbllversionLabel.gridy = gridy++;
-        aboutPanel.add(lblversionLabel, gbc_lbllversionLabel);
+        ++gbc.gridy;
+        aboutPanel.add(lblversionLabel, gbc);
 
         JLabel label = new JLabel(
                 Controller.version + " " + Lang.T("build") + " "
                         + Controller.buildTime);
 
-        label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Color.RED);
         label.setFont(new Font("Tahoma", Font.PLAIN, 13));
-        GridBagConstraints gbc_label = new GridBagConstraints();
-        gbc_label.insets = new Insets(0, 0, 5, 5);
-        gbc_label.gridx = 1;
-        gbc_label.gridy = gridy++;
-        aboutPanel.add(label, gbc_label);
-
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        ++gbc.gridy;
+        aboutPanel.add(label, gbc);
 
         console_Text = new JTextField();
         console_Text.setEditable(false);
@@ -136,14 +128,8 @@ public class AboutFrame extends JDialog implements Observer {
         //  console_Text.setSize(100,26);
         console_Text.setForeground(Color.BLUE);
         console_Text.setFont(new Font("Tahoma", Font.PLAIN, 13));
-        GridBagConstraints gbc_Console = new GridBagConstraints();
-        gbc_Console.insets = new Insets(5, 5, 5, 5);
-        gbc_Console.gridx = 0;
-        gbc_Console.gridy = gridy++;
-        gbc_Console.fill = GridBagConstraints.HORIZONTAL;
-        gbc_Console.weightx = 1.0;
-        gbc_Console.gridwidth = 3;
-        aboutPanel.add(console_Text, gbc_Console);
+        ++gbc.gridy;
+        aboutPanel.add(console_Text, gbc);
 
         //SHOW FRAME
         this.pack();
@@ -171,8 +157,6 @@ public class AboutFrame extends JDialog implements Observer {
         console_Text.setText(str);
 
     }
-
-
 
     @Override
     public void update(Observable o, Object arg) {
