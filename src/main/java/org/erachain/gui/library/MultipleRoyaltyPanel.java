@@ -35,8 +35,9 @@ public class MultipleRoyaltyPanel extends JPanel {
         jButtonRemoveRecipient = new JButton();
 
         defaultCheck = new JCheckBox();
-        defaultCheck.setText(Lang.T("Use Default Royalty"));
+        defaultCheck.setText(Lang.T("Use Default Royalty: author's award is %1").replace("%1", "10%"));
         defaultCheck.setSelected(true);
+        defaultCheck.setEnabled(false);
 
         defaultCheck.addActionListener(new ActionListener() {
             @Override

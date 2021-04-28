@@ -1677,7 +1677,7 @@
   "URL is valid": "Ссылка правильная",
   "Usage": "Использования",
   "use DEX": "Использовать биржу",
-  "Use Default Royalty": "Награды по Умолчанию",
+  "Use Default Royalty: author's award is %1": "Использовать награду по Умолчанию: %1 автору",
   "Use original Source (with animation)": "Использовать исходный файл GIF (с анимацией)",
   "Use SSL": "использовать SSL",
   "Use URL": "Использовать URL",
