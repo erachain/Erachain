@@ -480,6 +480,7 @@ public class MainFrame extends JFrame implements Observer {
             try {
                 if (status == Controller.STATUS_NO_CONNECTIONS) {
                     List<Image> icons = new ArrayList<Image>();
+                    // URL - не зависит от слеша в ОС
                     icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon16_No.png")));
                     icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon32_No.png")));
                     icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon32_No.png")));
