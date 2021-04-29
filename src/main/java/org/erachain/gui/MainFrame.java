@@ -30,6 +30,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.*;
 
@@ -475,31 +477,34 @@ public class MainFrame extends JFrame implements Observer {
         if (message.getType() == ObserverMessage.NETWORK_STATUS) {
             int status = (int) message.getValue();
 
-            if (status == Controller.STATUS_NO_CONNECTIONS) {
-                List<Image> icons = new ArrayList<Image>();
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16_No.png"));
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
-                this.setIconImages(icons);
+            try {
+                if (status == Controller.STATUS_NO_CONNECTIONS) {
+                    List<Image> icons = new ArrayList<Image>();
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon16_No.png")));
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon32_No.png")));
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon32_No.png")));
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon32_No.png")));
+                    this.setIconImages(icons);
 
-            }
-            if (status == Controller.STATUS_SYNCHRONIZING) {
-                List<Image> icons = new ArrayList<Image>();
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16_Se.png"));
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
-                this.setIconImages(icons);
-            }
-            if (status == Controller.STATUS_OK) {
-                // ICON
-                List<Image> icons = new ArrayList<Image>();
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-                icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-                this.setIconImages(icons);
+                }
+                if (status == Controller.STATUS_SYNCHRONIZING) {
+                    List<Image> icons = new ArrayList<Image>();
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon16_Se.png")));
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon32_Se.png")));
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon32_Se.png")));
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon32_Se.png")));
+                    this.setIconImages(icons);
+                }
+                if (status == Controller.STATUS_OK) {
+                    // ICON
+                    List<Image> icons = new ArrayList<Image>();
+                    icons.add(Toolkit.getDefaultToolkit().getImage("file:images/icons/icon16.png"));
+                    icons.add(Toolkit.getDefaultToolkit().getImage("file:images/icons/icon32.png"));
+                    icons.add(Toolkit.getDefaultToolkit().getImage("file:images/icons/icon64.png"));
+                    icons.add(Toolkit.getDefaultToolkit().getImage("file:images/icons/icon128.png"));
+                    this.setIconImages(icons);
+                }
+            } catch (MalformedURLException e) {
             }
         }
 
