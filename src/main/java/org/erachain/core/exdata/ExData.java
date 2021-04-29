@@ -1280,7 +1280,8 @@ public class ExData {
             // случайный парольmake и его для всех шифруем
             flags[1] = (byte) (flags[1] | ENCRYPT_FLAG_MASK);
 
-            byte[][] secrets = new byte[recipients.length + 1][];
+            int recipientsLen = recipients == null ? 0 : recipients.length;
+            byte[][] secrets = new byte[recipientsLen + 1][];
 
             byte[] password = Crypto.getInstance().createSeed(Crypto.HASH_LENGTH);
 
@@ -1295,30 +1296,33 @@ public class ExData {
             }
 
             byte[] privateKey = creator.getPrivateKey();
-            for (int i = 0; i < recipients.length; i++) {
 
-                //recipient
-                Account recipient = recipients[i];
-                byte[] publicKey;
-                if (recipient instanceof PublicKeyAccount) {
-                    publicKey = ((PublicKeyAccount) recipient).getPublicKey();
-                } else {
-                    publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+            if (recipients != null) {
+                for (int i = 0; i < recipientsLen; i++) {
+
+                    //recipient
+                    Account recipient = recipients[i];
+                    byte[] publicKey;
+                    if (recipient instanceof PublicKeyAccount) {
+                        publicKey = ((PublicKeyAccount) recipient).getPublicKey();
+                    } else {
+                        publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+                    }
+
+                    if (publicKey == null) {
+                        JOptionPane.showMessageDialog(new JFrame(), Lang.T(recipient.toString() + " : " +
+                                        ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
+                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+
+                        return null;
+                    }
+
+                    secrets[i] = AEScrypto.dataEncrypt(password, privateKey, publicKey);
+
                 }
-
-                if (publicKey == null) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.T(recipient.toString() + " : " +
-                                    ApiErrorFactory.getInstance().messageError(ApiErrorFactory.ERROR_NO_PUBLIC_KEY)),
-                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-
-                    return null;
-                }
-
-                secrets[i] = AEScrypto.dataEncrypt(password, privateKey, publicKey);
-
             }
 
-            secrets[recipients.length] = AEScrypto.dataEncrypt(password, privateKey, creator.getPublicKey());
+            secrets[recipientsLen] = AEScrypto.dataEncrypt(password, privateKey, creator.getPublicKey());
 
             return new ExData(flags, exLink, exPays, title, recipientsFlags, recipients, authorsFlags, authors,
                     sourcesFlags, sources, tags, (byte) 0, secrets, encryptedData).toByte();
