@@ -499,10 +499,10 @@ public class MainFrame extends JFrame implements Observer {
                 if (status == Controller.STATUS_OK) {
                     // ICON
                     List<Image> icons = new ArrayList<Image>();
-                    icons.add(Toolkit.getDefaultToolkit().getImage("file:images/icons/icon16.png"));
-                    icons.add(Toolkit.getDefaultToolkit().getImage("file:images/icons/icon32.png"));
-                    icons.add(Toolkit.getDefaultToolkit().getImage("file:images/icons/icon64.png"));
-                    icons.add(Toolkit.getDefaultToolkit().getImage("file:images/icons/icon128.png"));
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon16.png")));
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon32.png")));
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon64.png")));
+                    icons.add(Toolkit.getDefaultToolkit().getImage(new URL("file:images/icons/icon64.png")));
                     this.setIconImages(icons);
                 }
             } catch (MalformedURLException e) {
