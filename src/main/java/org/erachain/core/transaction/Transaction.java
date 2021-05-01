@@ -1475,10 +1475,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public String viewFeeAndFiat(int fontSize) {
 
-        fontSize *= 1.4;
+        int imgSize = (int) (1.4 * fontSize);
+        String fileName = "images" + File.separator + "icons" + File.separator + "assets" + File.separator + AssetCls.FEE_NAME + ".png";
         String text = "<span style='vertical-align: 10px; font-size: 1.4em' ><b>" + fee.toString() + "</b>"
-                + "<img width=" + fontSize + " height=" + fontSize
-                + " src='file:images\\icons\\assets\\" + AssetCls.FEE_NAME + ".png'></span>";
+                + "<img width=" + imgSize + " height=" + imgSize
+                + " src='file:" + fileName + "'></span>";
 
         boolean useDEX = Settings.getInstance().getCompuRateUseDEX();
 
@@ -1506,11 +1507,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             BigDecimal fee_fiat = fee.multiply(compuRate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
             if (asset.getKey() != AssetCls.FEE_KEY) {
                 text += " (" + fee_fiat.toString();
-                String fileName = "images" + File.separator + "icons" + File.separator + "assets" + File.separator + asset.getName() + ".png";
+                fileName = "images" + File.separator + "icons" + File.separator + "assets" + File.separator + asset.getName() + ".png";
                 File file = new File(fileName);
                 if (file.exists()) {
-                    text += "<img width=" + fontSize + " height=" + fontSize
-                            + " src=file:'" + fileName + "'>";
+                    text += "<img width=" + imgSize + " height=" + imgSize
+                            + " src='file:" + fileName + "'>";
                 } else {
                     text += " " + asset.getTickerName();
                 }

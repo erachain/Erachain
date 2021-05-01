@@ -179,7 +179,7 @@ public class MenuFiles extends JMenu {
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 AboutFrame.getInstance().setCursor(new Cursor(Cursor.HAND_CURSOR));
-                AboutFrame.getInstance().set_console_Text("");
+                AboutFrame.getInstance().console_Text.setVisible(false);
                 AboutFrame.getInstance().setUserClose(true);
                 AboutFrame.getInstance().setModal(true);
                 AboutFrame.getInstance().setVisible(true);
