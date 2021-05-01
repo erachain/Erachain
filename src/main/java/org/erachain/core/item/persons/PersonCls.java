@@ -36,8 +36,8 @@ public abstract class PersonCls extends ItemCls {
     private static int MIN_IMAGE_LENGTH = BlockChain.MAIN_MODE ? 10240 : 10240 >> 1;
 
     public static final int HUMAN = 1;
-    public static final int DOG = 2;
-    public static final int CAT = 3;
+    public static final int UNION = 2;
+    //public static final int CAT = 3;
     public static final int GENDER_LENGTH = 1;
     public static final int HEIGHT_LENGTH = 1;
     protected static final int BIRTHDAY_LENGTH = ItemCls.TIMESTAMP_LENGTH;
@@ -340,6 +340,14 @@ public abstract class PersonCls extends ItemCls {
         return super.isValid();
     }
 
+    public boolean isHuman() {
+        return typeBytes[0] == HUMAN;
+    }
+
+    public boolean isUnion() {
+        return typeBytes[0] == UNION;
+    }
+
     // to BYTES
     public byte[] toBytes(int forDeal, boolean includeReference, boolean forMakerSign) {
 
@@ -417,7 +425,7 @@ public abstract class PersonCls extends ItemCls {
     @Override
     public String toString(DCSet db) {
         long key = this.getKey(db);
-        return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : ("." + this.typeBytes[0])) + "]"
+        return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : "U") + "]"
                 + this.name // + "♥"
                 ///+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC")
                 ;
@@ -446,7 +454,7 @@ public abstract class PersonCls extends ItemCls {
     @Override
     public String getShort(DCSet db) {
         long key = this.getKey(db);
-        return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : ("." + this.typeBytes[0])) + "]"
+        return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : "U") + "]"
                 + this.name.substring(0, Math.min(this.name.length(), 20)) //"♥"
                 //+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC")
                 ;

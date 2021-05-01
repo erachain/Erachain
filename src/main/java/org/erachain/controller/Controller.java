@@ -28,6 +28,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
+import org.erachain.core.item.persons.PersonsUnion;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
@@ -3337,6 +3338,13 @@ public class Controller extends Observable {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createIssuePersonTransaction(creator, linkTo, feePow, person);
+        }
+    }
+
+    public Transaction issuePersonUnion(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonsUnion union) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssuePersonsUnionTransaction(creator, linkTo, feePow, union);
         }
     }
 

@@ -16,6 +16,7 @@ import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
+import org.erachain.core.item.persons.PersonsUnion;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.Status;
 import org.erachain.core.item.statuses.StatusCls;
@@ -385,6 +386,21 @@ public class TransactionCreator {
 
     }
 
+    public Transaction createIssuePersonsUnionTransaction(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonsUnion union) {
+        //CHECK FOR UPDATES
+        this.checkUpdate();
+
+        //TIME
+        long time = NTP.getTime();
+
+        //CREATE ISSUE PLATE TRANSACTION
+        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, union, (byte) feePow, time, 0L);
+        issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
+        issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
+
+        return issuePersonRecord;
+    }
+
     public Transaction createIssuePollTransaction(PrivateKeyAccount creator, ExLink linkTo, int feePow, PollCls poll) {
         //CHECK FOR UPDATES
         this.checkUpdate();
@@ -393,11 +409,11 @@ public class TransactionCreator {
         long time = NTP.getTime();
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssuePollRecord issueStatusRecord = new IssuePollRecord(creator, linkTo, poll, (byte) feePow, time, 0L);
-        issueStatusRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueStatusRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
+        IssuePollRecord issuePollRecord = new IssuePollRecord(creator, linkTo, poll, (byte) feePow, time, 0L);
+        issuePollRecord.sign(creator, Transaction.FOR_NETWORK);
+        issuePollRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
-        return issueStatusRecord;
+        return issuePollRecord;
     }
 
     public Transaction createIssuePollTransaction(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, String description,

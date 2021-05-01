@@ -570,7 +570,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
                 }
             } else {
                 if (this.add_day < 0) {
-                    // нельзя снять удостоврение со счета который еще не удостоверен
+                    // нельзя снять удостоверение со счета который еще не удостоверен
                     return PUB_KEY_NOT_PERSONALIZED;
                 }
             }

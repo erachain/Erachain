@@ -24,16 +24,10 @@ public class PersonFactory {
 
         switch (type) {
             case PersonCls.HUMAN:
-
-                //PARSE SIMPLE PLATE
                 return PersonHuman.parse(data, includeReference, forDeal);
 
-            case PersonCls.DOG:
-
-                //
-                //return Person.parse(data, includeReference);
-            case PersonCls.CAT:
-                //
+            case PersonCls.UNION:
+                return PersonsUnion.parse(data, includeReference, forDeal);
         }
 
         throw new Exception("Invalid Person type: " + type);
