@@ -13,7 +13,7 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame {
         super(assetTransfer);
 
         boolean isCredit = false;
-        if (assetTransfer.getCreator() != null) {
+        if (assetTransfer.getSender() != null) {
             isCredit = true;
             //LABEL OWNER
             ++labelGBC.gridy;
@@ -27,7 +27,7 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame {
             MenuPopupUtil.installContextMenu(makerFld);
             this.add(makerFld, detailGBC);
 
-            String personMakerStr = assetTransfer.getCreator().viewPerson();
+            String personMakerStr = assetTransfer.getSender().viewPerson();
             if (personMakerStr.length() > 0) {
                 ++labelGBC.gridy;
                 ++detailGBC.gridy;
