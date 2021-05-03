@@ -1614,7 +1614,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             transaction.put("exLink", getExLink().toJson());
         }
 
-        transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
+        // getSignature - make in GENEIS
+        transaction.put("signature", this.getSignature() == null ? "null" : Base58.encode(this.signature));
 
         int height;
         if (this.creator == null) {

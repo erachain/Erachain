@@ -47,6 +47,14 @@ public class GenesisRecord extends Transaction {
     }
 
     @Override
+    public byte[] getSignature() {
+        if (this.signature == null)
+            generateSignature();
+
+        return this.signature;
+    }
+
+    @Override
     public Long getTimestamp() {
         return Controller.getInstance().blockChain.getGenesisTimestamp();
     }
@@ -55,7 +63,6 @@ public class GenesisRecord extends Transaction {
     @Override
     public JSONObject toJson() {
         //GET BASE
-        generateSignature();
         JSONObject transaction = this.getJsonBase();
 
         return transaction;

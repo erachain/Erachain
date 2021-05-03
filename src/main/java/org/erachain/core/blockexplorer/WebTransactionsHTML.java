@@ -183,7 +183,8 @@ public class WebTransactionsHTML {
 
         JSONObject tras_json = transaction.toJson();
 
-        String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ": </b>" + tras_json.get("type");
+        String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ":</b>";
+        out += " [" + tras_json.get("type") + "]" + tras_json.get("type_name");
         out += " (" + Lang.T("Block", langObj) + ": </b><a href=?block=" + tras_json.get("height") + get_Lang() + ">" + tras_json.get("height") + "</a>";
         out += ", " + Lang.T("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("seqNo") + get_Lang() + ">" + tras_json.get("seqNo") + "</a> ) </font><br>";
 
