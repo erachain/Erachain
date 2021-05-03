@@ -1,6 +1,7 @@
 package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.json.simple.JSONObject;
@@ -45,10 +46,16 @@ public class GenesisRecord extends Transaction {
 
     }
 
+    @Override
+    public Long getTimestamp() {
+        return Controller.getInstance().blockChain.getGenesisTimestamp();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public JSONObject toJson() {
         //GET BASE
+        generateSignature();
         JSONObject transaction = this.getJsonBase();
 
         return transaction;

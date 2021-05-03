@@ -96,6 +96,10 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
     }
 
+    public Account getSender() {
+        return this.creator;
+    }
+
     public Account getRecipient() {
         return this.recipient;
     }

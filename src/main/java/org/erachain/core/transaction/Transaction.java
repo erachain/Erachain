@@ -1614,6 +1614,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             transaction.put("exLink", getExLink().toJson());
         }
 
+        transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
+
         int height;
         if (this.creator == null) {
             transaction.put("creator", "genesis");
@@ -1627,7 +1629,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             transaction.put("deadLine", getDeadline());
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
             transaction.put("creator", this.creator.getAddress());
-            transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
             transaction.put("fee", this.fee.toPlainString());
             transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
         }
