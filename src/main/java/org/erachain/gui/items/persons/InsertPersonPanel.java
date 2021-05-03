@@ -184,7 +184,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
                 exLink = new ExLinkAppendix(linkRef);
             }
 
-            Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(creator, exLink, feePow, person);
+            Pair<Transaction, Integer> result = Controller.getInstance().issuePersonHuman(creator, exLink, feePow, person);
 
             // CHECK VALIDATE MESSAGE
             if (result.getB() == Transaction.VALIDATE_OK) {

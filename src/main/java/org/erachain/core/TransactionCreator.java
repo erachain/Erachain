@@ -16,7 +16,6 @@ import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
-import org.erachain.core.item.persons.PersonsUnion;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.item.statuses.Status;
 import org.erachain.core.item.statuses.StatusCls;
@@ -282,7 +281,7 @@ public class TransactionCreator {
 	}
 */
 
-    public Pair<Transaction, Integer> createIssuePersonTransaction(
+    public Pair<Transaction, Integer> createIssuePersonHumanTransaction(
             boolean forIssue,
             byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String fullName, int feePow, long birthday, long deathday,
             byte gender, String race, float birthLatitude, float birthLongitude,
@@ -358,7 +357,7 @@ public class TransactionCreator {
         }
     }
 
-    public Pair<Transaction, Integer> createIssuePersonTransaction(
+    public Pair<Transaction, Integer> createIssuePersonHumanTransaction(
             PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
         //CHECK FOR UPDATES
         this.checkUpdate();
@@ -386,15 +385,15 @@ public class TransactionCreator {
 
     }
 
-    public Transaction createIssuePersonsUnionTransaction(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonsUnion union) {
+    public Transaction createIssuePersonTransaction(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 
         //TIME
         long time = NTP.getTime();
 
-        //CREATE ISSUE PLATE TRANSACTION
-        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, union, (byte) feePow, time, 0L);
+        //CREATE ISSUE TRANSACTION
+        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, person, (byte) feePow, time, 0L);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 

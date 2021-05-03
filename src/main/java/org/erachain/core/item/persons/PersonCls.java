@@ -69,6 +69,25 @@ public abstract class PersonCls extends ItemCls {
     protected String hairСolor; // First Name|Middle Name|Last Name
     protected byte height;
 
+    public PersonCls(byte[] data, boolean includeReference, int forDeal) throws Exception {
+        super(data, includeReference, forDeal);
+    }
+
+    public PersonCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image,
+                     String description) {
+        super(typeBytes, appData, maker, name, icon, image, description);
+    }
+
+    public PersonCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, long birthday, long deathday,
+                     byte personType, byte flags, byte[] icon, byte[] image, String description) {
+        super(typeBytes, appData, maker, name, icon, image, description);
+        this.birthday = birthday;
+        this.deathday = deathday;
+        this.gender = personType;
+        this.height = flags;
+
+    }
+
     public PersonCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, long birthday, long deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
                      String skinColor, String eyeColor, String hairСolor, byte height, byte[] icon, byte[] image, String description) {

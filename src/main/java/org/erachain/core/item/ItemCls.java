@@ -92,7 +92,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      */
     protected static final int DB_DATA_MASK = 1 << 30;
 
-    protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
+    //protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
+    protected static final byte APP_DATA_ITEM_START_MASK = (byte) 64;
+    protected static final byte APP_DATA_ITEM_STOP_MASK = (byte) 32;
     // ITEM_FLAGS[0]
     protected static final byte ITEM_HAS_URL_MASK = (byte) -128;
     //protected static final byte ITEM_HAS_IMAGE_URL_MASK = (byte) -128;
@@ -121,7 +123,16 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected boolean imageAsURL;
     protected int imageType;
 
+    protected Long startDate;
+    protected Long stopDate;
+
     public Transaction referenceTx = null;
+
+    protected int parsedPos;
+
+    public ItemCls(byte[] data, boolean includeReference, int forDeal) throws Exception {
+        parseHead(data, includeReference, forDeal);
+    }
 
     public ItemCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
         this.typeBytes = typeBytes;
@@ -141,6 +152,100 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         this.typeBytes[0] = (byte) type;
     }
 
+    public void parseHead(byte[] data, boolean includeReference, int forDeal) throws Exception {
+
+        // READ TYPE
+        typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+        parsedPos = TYPE_LENGTH;
+
+        //READ CREATOR
+        byte[] makerBytes = Arrays.copyOfRange(data, parsedPos, parsedPos + MAKER_LENGTH);
+        maker = new PublicKeyAccount(makerBytes);
+        parsedPos += MAKER_LENGTH;
+
+        //READ FULL NAME
+        int fullNameLength = Byte.toUnsignedInt(data[parsedPos]);
+        parsedPos++;
+
+        // !!! Проверяем по максимуму протокола - по супер классу ItemCls. Локальные ограничения в isValid тут
+        if (fullNameLength < 1 || fullNameLength > ItemCls.MAX_NAME_LENGTH) {
+            throw new Exception("Invalid full name length");
+        }
+
+        byte[] fullNameBytes = Arrays.copyOfRange(data, parsedPos, parsedPos + fullNameLength);
+        name = new String(fullNameBytes, StandardCharsets.UTF_8);
+        parsedPos += fullNameLength;
+
+        //READ ICON
+        byte[] iconLengthBytes = Arrays.copyOfRange(data, parsedPos, parsedPos + ICON_SIZE_LENGTH);
+        int iconLength = Ints.fromBytes((byte) 0, (byte) 0, iconLengthBytes[0], iconLengthBytes[1]);
+        parsedPos += ICON_SIZE_LENGTH;
+
+        // !!! Проверяем по максимуму протокола - по супер классу ItemCls. Локальные ограничения в isValid тут
+        if (iconLength < 0 || iconLength > ItemCls.MAX_ICON_LENGTH) {
+            throw new Exception("Invalid icon length - " + iconLength);
+        }
+
+        icon = Arrays.copyOfRange(data, parsedPos, parsedPos + iconLength);
+        parsedPos += iconLength;
+
+        //READ IMAGE
+        byte[] imageLengthBytes = Arrays.copyOfRange(data, parsedPos, parsedPos + IMAGE_SIZE_LENGTH);
+        int imageLength = Ints.fromByteArray(imageLengthBytes);
+        parsedPos += IMAGE_SIZE_LENGTH;
+
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
+            // RESET LEN
+            imageLength &= ~APP_DATA_MASK;
+
+        // !!! Проверяем по максимуму протокола - по супер классу ItemCls. Локальные ограничения в isValid тут
+        if (imageLength < 0 || imageLength > ItemCls.MAX_IMAGE_LENGTH) {
+            throw new Exception("Invalid image length " + imageLength);
+        }
+
+        image = Arrays.copyOfRange(data, parsedPos, parsedPos + imageLength);
+        parsedPos += imageLength;
+
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, parsedPos, parsedPos + APP_DATA_LENGTH));
+            parsedPos += APP_DATA_LENGTH;
+
+            appData = Arrays.copyOfRange(data, parsedPos, parsedPos + appDataLen);
+            parsedPos += appDataLen;
+
+        } else {
+            appData = null;
+        }
+
+        //READ DESCRIPTION
+        byte[] descriptionLengthBytes = Arrays.copyOfRange(data, parsedPos, parsedPos + DESCRIPTION_SIZE_LENGTH);
+        int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
+        parsedPos += DESCRIPTION_SIZE_LENGTH;
+
+        if (descriptionLength < 0 || descriptionLength > BlockChain.MAX_REC_DATA_BYTES) {
+            throw new Exception("Invalid description length");
+        }
+
+        byte[] descriptionBytes = Arrays.copyOfRange(data, parsedPos, parsedPos + descriptionLength);
+        description = new String(descriptionBytes, StandardCharsets.UTF_8);
+        parsedPos += descriptionLength;
+
+        if (includeReference) {
+            //READ REFERENCE
+            reference = Arrays.copyOfRange(data, parsedPos, parsedPos + REFERENCE_LENGTH);
+            parsedPos += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] dbRefBytes = Arrays.copyOfRange(data, parsedPos, parsedPos + DBREF_LENGTH);
+            dbRef = Longs.fromByteArray(dbRefBytes);
+            parsedPos += DBREF_LENGTH;
+        }
+
+    }
+
     /**
      * Должно в конце каждого класса вызываться для распарсивания ДопДанных
      *
@@ -154,34 +259,41 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         // пропустим сразу 2 первых байта - там включатели обработчиков
         int pos = 2;
 
-        if ((appData[0] & APP_DATA_ITEM_FLAGS_MASK) != 0) {
-            // parse ITEM APP DATA
-            flags = Longs.fromByteArray(Arrays.copyOfRange(appData, pos, pos + Long.BYTES));
+        // parse ITEM APP DATA
+        flags = Longs.fromByteArray(Arrays.copyOfRange(appData, pos, pos + Long.BYTES));
+        pos += Long.BYTES;
+
+        byte iconTypeByte = appData[pos++];
+        if (iconTypeByte < 0) {
+            iconAsURL = true;
+            iconTypeByte &= ~ITEM_HAS_URL_MASK;
+        }
+        iconType = iconTypeByte;
+
+        byte imageTypeByte = appData[pos++];
+        if (imageTypeByte < 0) {
+            imageAsURL = true;
+            imageTypeByte &= ~ITEM_HAS_URL_MASK;
+        }
+        imageType = imageTypeByte;
+
+        if ((appData[0] & APP_DATA_ITEM_START_MASK) != 0) {
+            startDate = Longs.fromByteArray(Arrays.copyOfRange(appData, pos, pos + Long.BYTES));
             pos += Long.BYTES;
-
-            byte iconTypeByte = appData[pos++];
-            if (iconTypeByte < 0) {
-                iconAsURL = true;
-                iconTypeByte &= ~ITEM_HAS_URL_MASK;
-            }
-            iconType = iconTypeByte;
-
-            byte imageTypeByte = appData[pos++];
-            if (imageTypeByte < 0) {
-                imageAsURL = true;
-                imageTypeByte &= ~ITEM_HAS_URL_MASK;
-            }
-            imageType = imageTypeByte;
-
+        }
+        if ((appData[0] & APP_DATA_ITEM_STOP_MASK) != 0) {
+            stopDate = Longs.fromByteArray(Arrays.copyOfRange(appData, pos, pos + Long.BYTES));
+            pos += Long.BYTES;
         }
 
         return pos;
     }
 
-    public static byte[] makeAppData(long flags, boolean iconAsURL, int iconType, boolean imageAsURL, int imageType) {
-        if (flags != 0 || iconAsURL || imageAsURL || iconType != 0 || imageType != 0) {
+    public static byte[] makeAppData(long flags, boolean iconAsURL, int iconType, boolean imageAsURL, int imageType, Long startDate, Long stopDate) {
+        if (flags != 0 || iconAsURL || imageAsURL || iconType != 0 || imageType != 0
+                || startDate != null || stopDate != null) {
             byte[] appData = new byte[12];
-            appData[0] = APP_DATA_ITEM_FLAGS_MASK;
+
             // 2 байта пропустим, потом флаги
             System.arraycopy(Longs.toByteArray(flags), 0, appData, 2, Long.BYTES);
 
@@ -193,6 +305,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             appData[11] = (byte) imageType;
             if (imageAsURL)
                 appData[11] |= ITEM_HAS_URL_MASK;
+
+            if (startDate != null) {
+                appData[0] |= APP_DATA_ITEM_START_MASK;
+                appData = Bytes.concat(appData, Longs.toByteArray(startDate));
+            }
+            if (stopDate != null) {
+                appData[0] |= APP_DATA_ITEM_STOP_MASK;
+                appData = Bytes.concat(appData, Longs.toByteArray(stopDate));
+            }
 
             return appData;
 

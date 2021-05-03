@@ -27,7 +27,7 @@ public class PersonFactory {
                 return PersonHuman.parse(data, includeReference, forDeal);
 
             case PersonCls.UNION:
-                return PersonsUnion.parse(data, includeReference, forDeal);
+                return new PersonsUnion(data, includeReference, forDeal);
         }
 
         throw new Exception("Invalid Person type: " + type);

@@ -263,7 +263,7 @@ public abstract class IssueItemPanel extends IconPanel {
             // соберем данные общего класса
             itemAppData = ItemCls.makeAppData(0L,
                     !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType());
+                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(), null, null);
 
             makeTransaction();
 
