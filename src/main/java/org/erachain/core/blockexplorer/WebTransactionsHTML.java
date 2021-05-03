@@ -256,9 +256,11 @@ public class WebTransactionsHTML {
         String out = "";
         GenesisTransferAssetTransaction assetTransfer = (GenesisTransferAssetTransaction) transaction;
 
-        out += "<br>" + Lang.T("Sender", langObj) + ": <a href=?address="
-                + assetTransfer.getSender().getAddress() + get_Lang() + "><b>" + assetTransfer.getSender().getPersonAsString()
-                + "</b></a>";
+        if (assetTransfer.getSender() != null) {
+            out += "<br>" + Lang.T("Sender", langObj) + ": <a href=?address="
+                    + assetTransfer.getSender().getAddress() + get_Lang() + "><b>" + assetTransfer.getSender().getPersonAsString()
+                    + "</b></a>";
+        }
 
         out += "<br>" + Lang.T("Recipient", langObj) + ": <a href=?address="
                 + assetTransfer.getRecipient().getAddress() + get_Lang() + "><b>" + assetTransfer.getRecipient().getPersonAsString()
