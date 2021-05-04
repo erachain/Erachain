@@ -3372,6 +3372,22 @@ public class WebResource {
         }
     }
 
+    public String miniIndex() {
+        try {
+            return readFile("web/main.mini.html", StandardCharsets.UTF_8);
+
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            return "ERROR";
+        }
+    }
+
+    @Path("/index/{html}")
+    @GET
+    public Response getHtml(@PathParam("html") String html) {
+        return error404(request, null);
+    }
+
     @SuppressWarnings("unchecked")
     @Path("namestorage:{name}")
     @GET
@@ -3412,23 +3428,7 @@ public class WebResource {
 
     }
 
-    public String miniIndex() {
-        try {
-            return readFile("web/main.mini.html", StandardCharsets.UTF_8);
-
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            return "ERROR";
-        }
-    }
-
-    @Path("/index/{html}")
-    @GET
-    public Response getHtml(@PathParam("html") String html) {
-        return error404(request, null);
-    }
-
-    @Path("{name}/{key}")
+    @Path("ns/{name}/{key}")
     @GET
     public Response getKeyAsWebsite(@PathParam("name") String nameName,
                                     @PathParam("key") String key) {
@@ -3456,7 +3456,7 @@ public class WebResource {
         }
     }
 
-    @Path("{name}")
+    @Path("ns/{name}")
     @GET
     public Response getNames(@PathParam("name") String nameName) {
 
