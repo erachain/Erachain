@@ -373,6 +373,7 @@
   "Additional Fee": "Дополнительная плата",
   "Bytecode": "Байт-код",
   "Bytecode of the '%1' has been copy to buffer": "Байт-код от '%1' скопирован в буфер",
+  "Bytecode has been copy to buffer": "Байт-код скопирован в буфер",
   "Calculate fee": "Рассчитать комиссию",
   "Cashier": "Кассир",
   "Cancel name sale has been sent": "Отмена продажи имени отправлена",

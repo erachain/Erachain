@@ -13,8 +13,10 @@ import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Base64;
 
 /**
  * @author Саша
@@ -24,11 +26,13 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
     public static final int CANCEL = 0;
     public static final int CONFIRM = 1;
     public static final int TRY_FREE = 2;
+    public static final int GER_RAW = -1;
 
     public int isConfirm = 0;
-    public javax.swing.JButton jButton0;
-    public javax.swing.JButton jButton1;
-    public javax.swing.JButton jButton2;
+    public javax.swing.JButton jButtonRAW;
+    public javax.swing.JButton jButtonFREE;
+    public javax.swing.JButton jButtonGO;
+    public javax.swing.JButton jButtonCancel;
     public javax.swing.JPanel jPanel1;
     public javax.swing.JScrollPane jScrollPane1;
     public MTextPane jTextPane1;
@@ -46,9 +50,9 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
     }
 
     public IssueConfirmDialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
-                              int w, int h, String status_Text, String title_Text, boolean receive) {
+                              int w, int h, String status_Text, String title_Text, boolean useSave) {
         super(parent, modal);
-        Init(parent, modal, transaction, text, w, h, status_Text, title_Text, receive);
+        Init(parent, modal, transaction, text, w, h, status_Text, title_Text, useSave);
     }
 
     public IssueConfirmDialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
@@ -64,7 +68,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
     }
 
     public void Init(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
-                     int w, int h, String status_Text, String title_Text, boolean receive) {
+                     int w, int h, String status_Text, String title_Text, boolean useSave) {
         // setUndecorated(true);
         fontSize = UIManager.getFont("Label.font").getSize();
         if (fontSize <= 7) fontSize = 8;
@@ -83,12 +87,12 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
             }
             status_Text += feeText;
 
-            if (!receive) {
-                jButton0.setVisible(false);
-                jButton1.setText(Lang.T("Save"));
+            if (useSave) {
+                jButtonFREE.setVisible(false);
+                jButtonGO.setVisible(false);
             } else {
                 // проверим а вообще такая транзакция может быть бесплатна?
-                jButton0.setVisible(BlockChain.FREE_FEE_TO_SEQNO > 0
+                jButtonFREE.setVisible(BlockChain.FREE_FEE_TO_SEQNO > 0
                         && transaction.isFreeFee()
                         && BlockChain.FREE_FEE_FROM_HEIGHT < Controller.getInstance().getMyHeight()
                         && transaction.getDataLength(Transaction.FOR_NETWORK, true) < BlockChain.FREE_FEE_LENGTH);
@@ -101,7 +105,22 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
             setSize(w, h);
         }
 
-        jButton0.addActionListener(new ActionListener() {
+        jButtonRAW.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                isConfirm = GER_RAW;
+                StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(
+                        transaction.toBytes(Transaction.FOR_NETWORK, true)));
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.T("Bytecode has been copy to buffer") + ".",
+                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            }
+        });
+
+        jButtonFREE.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
@@ -110,7 +129,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
             }
         });
 
-        jButton1.addActionListener(new ActionListener() {
+        jButtonGO.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
@@ -119,7 +138,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
             }
         });
 
-        jButton2.addActionListener(new ActionListener() {
+        jButtonCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
@@ -139,10 +158,25 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jStatus_Label.setText(status_Text);
         //  setMaximumSize(new Dimension(350,200));
         setSize(w, h);
-        jButton0.setVisible(false);
-        jButton1.setVisible(false);
+        jButtonFREE.setVisible(false);
+        jButtonGO.setVisible(false);
 
-        jButton2.addActionListener(new ActionListener() {
+        jButtonRAW.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                isConfirm = GER_RAW;
+                StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(
+                        transaction.toBytes(Transaction.FOR_NETWORK, true)));
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.T("Bytecode has been copy to buffer") + ".",
+                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            }
+        });
+
+        jButtonCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
@@ -164,9 +198,10 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextPane1 = new MTextPane();
         jPanel1 = new javax.swing.JPanel();
-        jButton0 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jButtonRAW = new javax.swing.JButton();
+        jButtonFREE = new javax.swing.JButton();
+        jButtonGO = new javax.swing.JButton();
+        jButtonCancel = new javax.swing.JButton();
         jStatus_Label = new JLabel();
         jTitle_Label = new JLabel();
 
@@ -213,30 +248,37 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(fontSize, fontSize, fontSize, fontSize);
         getContentPane().add(jStatus_Label, gridBagConstraints);
 
-        jButton0.setText(Lang.T("Try without Fee"));
+        jButtonRAW.setText(Lang.T("Bytecode"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
-        jPanel1.add(jButton0, gridBagConstraints);
+        jPanel1.add(jButtonRAW, gridBagConstraints);
 
-
-        jButton1.setText(Lang.T("Confirm"));
+        jButtonFREE.setText(Lang.T("Try without Fee"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
-        jPanel1.add(jButton1, gridBagConstraints);
+        jPanel1.add(jButtonFREE, gridBagConstraints);
 
-        jButton2.setText(Lang.T("Cancel"));
+        jButtonGO.setText(Lang.T("Confirm"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
+        jPanel1.add(jButtonGO, gridBagConstraints);
+
+        jButtonCancel.setText(Lang.T("Cancel"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
-        jPanel1.add(jButton2, gridBagConstraints);
+        jPanel1.add(jButtonCancel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

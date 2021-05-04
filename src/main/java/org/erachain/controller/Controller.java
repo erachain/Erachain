@@ -4180,9 +4180,9 @@ public class Controller extends Observable {
                         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
                                 Lang.T("STARTUP ERROR") + ": "
                                         + errorMsg, 600, 400, Lang.T(" "));
-                        dd.jButton0.setVisible(false);
-                        dd.jButton1.setVisible(false);
-                        dd.jButton2.setText(Lang.T("Cancel"));
+                        dd.jButtonRAW.setVisible(false);
+                        dd.jButtonFREE.setVisible(false);
+                        dd.jButtonGO.setText(Lang.T("Cancel"));
                         dd.setLocationRelativeTo(null);
                         dd.setVisible(true);
                     }
