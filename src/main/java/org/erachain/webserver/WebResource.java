@@ -3459,12 +3459,13 @@ public class WebResource {
     @Path("{name}")
     @GET
     public Response getNames(@PathParam("name") String nameName) {
-        Account name = new Account(nameName);
 
         try {
 
+            Tuple2<Account, String> result = Account.tryMakeAccount(nameName);
+
             // CHECK IF NAME EXISTS
-            if (name == null) {
+            if (result.a == null) {
                 return error404(request, null);
             }
 

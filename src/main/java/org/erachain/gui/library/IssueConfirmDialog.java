@@ -62,9 +62,9 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
     }
 
     public IssueConfirmDialog(java.awt.Frame parent, boolean modal, Transaction transaction,
-                              int w, int h, String status_Text) {
+                              int w, int h, String title) {
         super(parent, modal);
-        Init(parent, modal, transaction, w, h, status_Text, "");
+        Init(parent, modal, transaction, w, h, null, title);
     }
 
     public void Init(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
@@ -155,7 +155,11 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jTitle_Label.setText(title_Text);
         JPanel pp = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
         jScrollPane1.setViewportView(pp);
-        jStatus_Label.setText(status_Text);
+        if (status_Text == null || status_Text.isEmpty()) {
+            jStatus_Label.setVisible(false);
+        } else {
+            jStatus_Label.setText(status_Text);
+        }
         //  setMaximumSize(new Dimension(350,200));
         setSize(w, h);
         jButtonFREE.setVisible(false);
@@ -216,7 +220,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
-        //  gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.insets = new java.awt.Insets(fontSize, fontSize, fontSize, fontSize);
         getContentPane().add(jTitle_Label, gridBagConstraints);
 
@@ -235,23 +239,21 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(fontSize, fontSize, fontSize, fontSize);
         getContentPane().add(jScrollPane1, gridBagConstraints);
 
-        jPanel1.setLayout(new java.awt.GridBagLayout());
-
         jStatus_Label.setText(Lang.T("Status"));
         jStatus_Label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        //  gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(fontSize, fontSize, fontSize, fontSize);
         getContentPane().add(jStatus_Label, gridBagConstraints);
+
+        // BUTTONS PANEL
+        jPanel1.setLayout(new java.awt.GridBagLayout());
 
         jButtonRAW.setText(Lang.T("Bytecode"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
         jPanel1.add(jButtonRAW, gridBagConstraints);
@@ -259,7 +261,6 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jButtonFREE.setText(Lang.T("Try without Fee"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
         jPanel1.add(jButtonFREE, gridBagConstraints);
@@ -267,7 +268,6 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jButtonGO.setText(Lang.T("Confirm"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
         jPanel1.add(jButtonGO, gridBagConstraints);
@@ -275,7 +275,6 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jButtonCancel.setText(Lang.T("Cancel"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, fontSize, 0, 0);
         jPanel1.add(jButtonCancel, gridBagConstraints);
@@ -283,6 +282,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.insets = new java.awt.Insets(0, fontSize, fontSize, fontSize);
         getContentPane().add(jPanel1, gridBagConstraints);
 
