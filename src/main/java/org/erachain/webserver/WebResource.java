@@ -3372,6 +3372,35 @@ public class WebResource {
         }
     }
 
+    public String miniIndex() {
+        try {
+            return readFile("web/main.mini.html", StandardCharsets.UTF_8);
+
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            return "ERROR";
+        }
+    }
+
+    @Path("/index/{html}")
+    @GET
+    public Response getHtml(@PathParam("html") String html) {
+        return error404(request, null);
+    }
+
+    @GET
+    @Path("robots.txt")
+    public Response robotsTxt() {
+        File file = new File("web/blockexplorer/robots.txt");
+        try {
+            BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
+            String type = URLConnection.guessContentTypeFromStream(is);
+            return Response.ok(file, type).build();
+        } catch (Exception e) {
+            return Response.status(200).entity("index.html").build();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Path("namestorage:{name}")
     @GET
@@ -3412,23 +3441,7 @@ public class WebResource {
 
     }
 
-    public String miniIndex() {
-        try {
-            return readFile("web/main.mini.html", StandardCharsets.UTF_8);
-
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            return "ERROR";
-        }
-    }
-
-    @Path("/index/{html}")
-    @GET
-    public Response getHtml(@PathParam("html") String html) {
-        return error404(request, null);
-    }
-
-    @Path("{name}/{key}")
+    @Path("ns/{name}/{key}")
     @GET
     public Response getKeyAsWebsite(@PathParam("name") String nameName,
                                     @PathParam("key") String key) {
@@ -3456,15 +3469,16 @@ public class WebResource {
         }
     }
 
-    @Path("{name}")
+    @Path("ns/{name}")
     @GET
     public Response getNames(@PathParam("name") String nameName) {
-        Account name = new Account(nameName);
 
         try {
 
+            Tuple2<Account, String> result = Account.tryMakeAccount(nameName);
+
             // CHECK IF NAME EXISTS
-            if (name == null) {
+            if (result.a == null) {
                 return error404(request, null);
             }
 

@@ -315,13 +315,13 @@ public class SettingsBasicPanel extends JPanel {
                         Certificate cetrtyficatemy = result.b;
 
                         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
-                                Lang.T("SSL is OK "), MainFrame.getInstance().getWidth()-100, MainFrame.getInstance().getHeight()-100, Lang.T(""));
+                                Lang.T("SSL is OK "), MainFrame.getInstance().getWidth() - 100, MainFrame.getInstance().getHeight() - 100, Lang.T(""));
 
                         dd.setTitle(Lang.T("SSL is OK."));
                         dd.jTextPane1.setText("Certificate: \n " + cetrtyficatemy.toString());
-                        dd.jButton0.setVisible(false);
-                        dd.jButton1.setVisible(false);
-                        dd.jButton2.setText(Lang.T("OK"));
+                        dd.jButtonRAW.setVisible(false);
+                        dd.jButtonFREE.setVisible(false);
+                        dd.jButtonGO.setText(Lang.T("OK"));
                         dd.setLocationRelativeTo(null);
                         dd.setVisible(true);
 

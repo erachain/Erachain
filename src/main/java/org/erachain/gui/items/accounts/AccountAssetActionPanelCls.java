@@ -75,7 +75,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     public int balancePosition;
 
-    public boolean noReceive;
+    public boolean useSave;
 
     public boolean showAssetForm = false;
 
@@ -613,7 +613,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                 Lang.T(asset.viewAssetTypeActionOK(backward, balancePosition,
                         creator != null && creator.equals(asset.getMaker()))),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
-                Lang.T("Confirmation Transaction"), !noReceive);
+                Lang.T("Confirmation Transaction"), useSave);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((RSend) transaction);
 
         confirmDialog.jScrollPane1.setViewportView(ww);

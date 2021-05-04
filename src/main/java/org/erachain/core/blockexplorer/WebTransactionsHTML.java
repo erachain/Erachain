@@ -183,7 +183,8 @@ public class WebTransactionsHTML {
 
         JSONObject tras_json = transaction.toJson();
 
-        String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ": </b>" + tras_json.get("type");
+        String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ":</b>";
+        out += " [" + tras_json.get("type") + "]" + tras_json.get("type_name");
         out += " (" + Lang.T("Block", langObj) + ": </b><a href=?block=" + tras_json.get("height") + get_Lang() + ">" + tras_json.get("height") + "</a>";
         out += ", " + Lang.T("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("seqNo") + get_Lang() + ">" + tras_json.get("seqNo") + "</a> ) </font><br>";
 
@@ -193,18 +194,20 @@ public class WebTransactionsHTML {
 
         if (!(transaction instanceof RCalculated)) {
             out += "<br><b>" + Lang.T("Size", langObj) + ": </b>" + tras_json.get("size");
-            out += "<br><b>" + Lang.T("Public Key", langObj) + ": </b><a href=?address="
-                    + tras_json.get("publickey") + get_Lang() + ">" + tras_json.get("publickey") + "</a>";
-            out += "<br><b>" + Lang.T("Signature", langObj) + ": </b>" + tras_json.get("signature");
-            out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + tras_json.get("fee");
+            out += "<br><b>" + Lang.T("Signature", langObj) + ": </b>" + tras_json.get("signature") + "<br>";
+            if (transaction.getCreator() == null) {
+                // GENESIS
+                out += "<b>" + Lang.T("Creator", langObj) + ":</b> GENESIS";
+            } else {
+                out += "<b>" + Lang.T("Creator", langObj)
+                        + ":</b> <a href=?address=" + transaction.getCreator().getAddress() + get_Lang() + ">"
+                        + transaction.getCreator().getPersonAsString() + "</a>";
+                out += "<br><b>" + Lang.T("Public Key", langObj) + ": </b><a href=?address="
+                        + tras_json.get("publickey") + get_Lang() + ">" + tras_json.get("publickey") + "</a>";
+                out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + tras_json.get("fee");
+            }
             if (transaction.isWiped()) {
                 out += "<BR><b>" + Lang.T("WIPED", langObj) + ": </b>" + "true";
-            }
-            out += "<br> ";
-            if (transaction.getCreator() != null) {
-                out += "<b>" + Lang.T("Creator", langObj)
-                        + ": </b><a href=?address=" + tras_json.get("creator") + get_Lang() + ">"
-                        + transaction.getCreator().getPersonAsString() + "</a>";
             }
         }
 
@@ -252,17 +255,16 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         GenesisTransferAssetTransaction assetTransfer = (GenesisTransferAssetTransaction) transaction;
-        if (assetTransfer.getCreator() != null) {
-            out += Lang.T("Creator", langObj) + ": <a href=?address="
-                    + assetTransfer.getCreator().getAddress() + get_Lang() + "><b>" + assetTransfer.getCreator().getPersonAsString()
+
+        if (assetTransfer.getSender() != null) {
+            out += "<br>" + Lang.T("Sender", langObj) + ": <a href=?address="
+                    + assetTransfer.getSender().getAddress() + get_Lang() + "><b>" + assetTransfer.getSender().getPersonAsString()
                     + "</b></a>";
-        } else {
-            out += "<b>" + Lang.T("Creator", langObj) + ": GENESIS";
         }
 
         out += "<br>" + Lang.T("Recipient", langObj) + ": <a href=?address="
                 + assetTransfer.getRecipient().getAddress() + get_Lang() + "><b>" + assetTransfer.getRecipient().getPersonAsString()
-                + "</b></a><br>";
+                + "</b></a>";
 
         out += "<br>" + Lang.T(assetTransfer.viewActionType(), langObj)
                 + ": <b>" + assetTransfer.getAmount().toPlainString() + " x "

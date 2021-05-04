@@ -1376,6 +1376,10 @@ public class BlockChain {
 	}
 	 */
 
+    public long getGenesisTimestamp() {
+        return this.genesisTimestamp;
+    }
+
     public long getTimestamp(int height) {
         if (VERS_30SEC == 0 || height <= VERS_30SEC) {
             return this.genesisTimestamp + (long) height * (long) GENERATING_MIN_BLOCK_TIME_MS(height);
