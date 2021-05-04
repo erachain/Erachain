@@ -3388,6 +3388,19 @@ public class WebResource {
         return error404(request, null);
     }
 
+    @GET
+    @Path("robots.txt")
+    public Response robotsTxt() {
+        File file = new File("web/blockexplorer/robots.txt");
+        try {
+            BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
+            String type = URLConnection.guessContentTypeFromStream(is);
+            return Response.ok(file, type).build();
+        } catch (Exception e) {
+            return Response.status(200).entity("index.html").build();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Path("namestorage:{name}")
     @GET
