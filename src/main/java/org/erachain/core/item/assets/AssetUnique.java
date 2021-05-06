@@ -31,12 +31,6 @@ public class AssetUnique extends AssetCls {
         this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, assetType);
     }
 
-    protected int parseAppData() {
-        int pos = super.parseAppData();
-        //
-        return pos;
-    }
-
     //GETTERS/SETTERS
     @Override
     public String getItemSubType() {

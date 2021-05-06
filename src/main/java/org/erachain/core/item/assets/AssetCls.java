@@ -1,6 +1,7 @@
 package org.erachain.core.item.assets;
 
 
+import com.google.common.primitives.Bytes;
 import org.erachain.controller.PairsController;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -38,8 +39,12 @@ public abstract class AssetCls extends ItemCls {
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
 
     protected static final int ASSET_TYPE_LENGTH = 1;
+
+    protected static final long APP_DATA_DEX_AWARDS_MASK = 1;
+
     //
     protected int assetType;
+    protected ExLinkAddress[] dexAwards;
 
     // CORE KEY
     public static final long ERA_KEY = 1L;
@@ -305,13 +310,47 @@ public abstract class AssetCls extends ItemCls {
     protected AssetCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, appData, maker, name, icon, image, description);
         this.assetType = assetType;
-
     }
 
     public AssetCls(int type, byte pars, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         this(new byte[TYPE_LENGTH], appData, maker, name, icon, image, description, assetType);
         this.typeBytes[0] = (byte) type;
         this.typeBytes[1] = pars;
+    }
+
+    protected AssetCls(byte[] typeBytes, byte[] appDataIn, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType,
+                       ExLinkAddress[] dexAwards) {
+        this(typeBytes, appDataIn, maker, name, icon, image, description, assetType);
+        this.dexAwards = dexAwards;
+    }
+
+    protected int parseAppData() {
+        int pos = super.parseAppData();
+        if ((flags & APP_DATA_DEX_AWARDS_MASK) != 0) {
+            int dexAwardsLen = appData[pos++];
+            dexAwards = new ExLinkAddress[dexAwardsLen];
+            for (int i = 0; i < dexAwardsLen; i++) {
+                dexAwards[i] = new ExLinkAddress(appData, pos);
+                pos += dexAwards[i].length();
+            }
+        }
+        return pos;
+    }
+
+    public static byte[] makeAppData(boolean iconAsURL, int iconType, boolean imageAsURL, int imageType,
+                                     ExLinkAddress[] dexAwards) {
+        byte[] appData = super.makeAppData(dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK,
+                iconAsURL, iconType, imageAsURL, imageType);
+
+        if (dexAwards == null)
+            return appData;
+
+        appData = Bytes.concat(appData, new byte[]{(byte) dexAwards.length});
+        for (ExLinkAddress exAddress : dexAwards) {
+            appData = Bytes.concat(appData, exAddress.toBytes());
+        }
+
+        return appData;
     }
 
     //GETTERS/SETTERS
@@ -644,11 +683,18 @@ public abstract class AssetCls extends ItemCls {
 
     public abstract int getScale();
 
-    public static ExLinkAddress[] getDefaultAwards(int type, Account owner) {
+    public static ExLinkAddress[] getDefaultDEXAwards(int type, Account owner) {
         if (type == AS_NON_FUNGIBLE) {
             return new ExLinkAddress[]{new ExLinkAddress(owner, 10000, "Author royalty")};
         }
         return null;
+    }
+
+    public ExLinkAddress[] getDEXAwards() {
+        if ((flags & APP_DATA_DEX_AWARDS_MASK) == 0) {
+            return getDefaultDEXAwards(assetType, maker);
+        }
+        return dexAwards;
     }
 
     @Override

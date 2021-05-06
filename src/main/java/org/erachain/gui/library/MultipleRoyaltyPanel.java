@@ -3,7 +3,6 @@ package org.erachain.gui.library;
 
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.assets.AssetCls;
@@ -17,15 +16,14 @@ import javax.validation.constraints.Null;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class MultipleRoyaltyPanel extends JPanel {
-    public final Table_Model recipientsTableModel;
+    public final TableModel recipientsTableModel;
     private final MTable jTableRecipients;
     private JScrollPane jScrollPaneRecipients;
     private JButton jButtonRemoveRecipient;
     private GridBagConstraints gridBagConstraints;
-    private JCheckBox defaultCheck;
+    public JCheckBox defaultCheck;
 
     protected JComboBox<Account> ownerComboBox;
 
@@ -79,7 +77,7 @@ public class MultipleRoyaltyPanel extends JPanel {
         });
         this.setLayout(new GridBagLayout());
 
-        recipientsTableModel = new Table_Model(0);
+        recipientsTableModel = new TableModel(0);
         jTableRecipients = new MTable(recipientsTableModel);
         jScrollPaneRecipients.setViewportView(jTableRecipients);
         TableColumn columnNo = jTableRecipients.getColumnModel().getColumn(DESCR_COL + 1);
@@ -119,7 +117,7 @@ public class MultipleRoyaltyPanel extends JPanel {
         jButtonRemoveRecipient.setVisible(!defaultCheck.isSelected());
 
         if (isVisible() && !defaultCheck.isSelected()) {
-            ExLinkAddress[] items = AssetCls.getDefaultAwards(AssetCls.AS_NON_FUNGIBLE, (Account) ownerComboBox.getSelectedItem());
+            ExLinkAddress[] items = AssetCls.getDefaultDEXAwards(AssetCls.AS_NON_FUNGIBLE, (Account) ownerComboBox.getSelectedItem());
             if (items != null) {
                 recipientsTableModel.setRecipients(items);
             }
@@ -133,9 +131,9 @@ public class MultipleRoyaltyPanel extends JPanel {
 
     @SuppressWarnings("serial")
     public
-    class Table_Model extends DefaultTableModel {
+    class TableModel extends DefaultTableModel {
 
-        public Table_Model(int rows) {
+        public TableModel(int rows) {
             super(new Object[]{Lang.T("Address"), Lang.T("Information"), Lang.T("Royalty") + " %",
                             Lang.T("Memo")
                     },
@@ -220,30 +218,24 @@ public class MultipleRoyaltyPanel extends JPanel {
             }
         }
 
-        public Object[] getRecipients() {
+        public ExLinkAddress[] getRecipients() {
             if (defaultCheck.isSelected())
                 return null;
 
-            ArrayList<Account> temp = new ArrayList<>();
+            ExLinkAddress[] list = new ExLinkAddress[getRowCount()];
             for (int i = 0; i < getRowCount(); i++) {
                 try {
                     //ORDINARY RECIPIENT
                     String recipientAddress = this.getValueAt(i, 0).toString();
                     if (Crypto.getInstance().isValidAddress(recipientAddress)) {
-                        temp.add(new Account(recipientAddress));
-                    } else {
-                        if (PublicKeyAccount.isValidPublicKey(recipientAddress)) {
-                            temp.add(new PublicKeyAccount(recipientAddress));
-                        }
+                        list[i] = new ExLinkAddress(new Account(recipientAddress),
+                                (int) ((double) this.getValueAt(i, 2) * 1000),
+                                (String) this.getValueAt(i, 3));
                     }
                 } catch (Exception e) {
                 }
             }
 
-            Object[] list = new Object[temp.size()];
-            for (int i = 0; i < getRowCount(); i++) {
-                list[i] = new Fun.Tuple2(temp.get(i), this.getValueAt(i, 1));
-            }
             return list;
         }
 
