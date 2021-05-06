@@ -985,10 +985,11 @@ public class Order implements Comparable<Order> {
 
                 //TRANSFER FUNDS
                 if (height > BlockChain.VERS_5_3) {
+                    AssetCls assetWant = ((CreateOrderTransaction) transaction).getWantAsset();
                     AssetCls.processTrade(dcSet, block, order.getCreator(),
-                            false, ((CreateOrderTransaction) transaction).getWantAsset(),
+                            false, assetWant,
                             ((CreateOrderTransaction) transaction).getHaveAsset(),
-                            false, tradeAmountForWant, transaction.getTimestamp(), order.getId(), wantDEXAwards);
+                            false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
 
                 } else {
                     order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey,
@@ -1056,7 +1057,7 @@ public class Order implements Comparable<Order> {
                 AssetCls.processTrade(dcSet, block, this.creator,
                         true, ((CreateOrderTransaction) transaction).getHaveAsset(),
                         ((CreateOrderTransaction) transaction).getWantAsset(),
-                        false, processedAmountFulfilledWant, transaction.getTimestamp(), id, wantDEXAwards);
+                        false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
             } else {
                 this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey,
                         processedAmountFulfilledWant, false, false, false);
@@ -1119,7 +1120,7 @@ public class Order implements Comparable<Order> {
                 if (height > BlockChain.VERS_5_3) {
                     AssetCls.processTrade(dcSet, block, target.getCreator(),
                             false, assetWant, assetHave,
-                            true, tradeAmountWant, Transaction.getTimestampByDBRef(id), 0L, wantDEXAwards);
+                            true, tradeAmountWant, Transaction.getTimestampByDBRef(id), 0L);
                 } else {
 
                     target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey,
@@ -1166,7 +1167,7 @@ public class Order implements Comparable<Order> {
         if (height > BlockChain.VERS_5_3) {
             AssetCls.processTrade(dcSet, block, this.creator,
                     true, assetHave, assetWant,
-                    true, thisAmountFulfilledWant, Transaction.getTimestampByDBRef(id), 0L, wantDEXAwards);
+                    true, thisAmountFulfilledWant, Transaction.getTimestampByDBRef(id), 0L);
         } else {
             this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey,
                     thisAmountFulfilledWant, false, false, false);

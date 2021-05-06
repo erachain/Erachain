@@ -2361,8 +2361,7 @@ public abstract class AssetCls extends ItemCls {
 
     public static void processTrade(DCSet dcSet, Block block, Account receiver,
                                     boolean isInitiator, AssetCls assetHave, AssetCls assetWant,
-                                    boolean asOrphan, BigDecimal tradeAmountForWant, long timestamp, Long orderID,
-                                    ExLinkAddress[] wantDEXAwards) {
+                                    boolean asOrphan, BigDecimal tradeAmountForWant, long timestamp, Long orderID) {
         //TRANSFER FUNDS
         BigDecimal tradeAmount = tradeAmountForWant.setScale(assetWant.getScale());
         BigDecimal assetMakerRoyalty;
@@ -2372,6 +2371,29 @@ public abstract class AssetCls extends ItemCls {
         Long assetWantKey = assetWant.getKey();
 
         PublicKeyAccount haveAssetMaker = assetHave.getMaker();
+        ExLinkAddress[] dexAwards = assetHave.getDEXAwards();
+        if (dexAwards != null) {
+            for (ExLinkAddress dexAward : dexAwards) {
+                if (receiver.equals(dexAward.getAccount())) {
+                    // fo mySelf not pay
+                    continue;
+                }
+
+                assetMakerRoyalty = tradeAmount.multiply(new BigDecimal(dexAward.getValue1()))
+                        .setScale(scale, RoundingMode.DOWN);
+                if (assetMakerRoyalty.signum() > 0) {
+                    tradeAmount = tradeAmount.subtract(assetMakerRoyalty);
+
+                    haveAssetMaker.changeBalance(dcSet, asOrphan, false, assetWantKey,
+                            assetMakerRoyalty, false, false, false);
+                    if (!asOrphan && block != null)
+                        block.addCalculated(haveAssetMaker, assetWantKey, assetMakerRoyalty,
+                                "NFT Royalty by Order @" + Transaction.viewDBRef(orderID), orderID);
+                }
+
+            }
+        }
+
         PublicKeyAccount inviter;
         if (assetHave.getAssetType() == AS_NON_FUNGIBLE) {
             // значит приход + это тот актив который мы можем поделить
