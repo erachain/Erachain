@@ -2359,12 +2359,10 @@ public abstract class AssetCls extends ItemCls {
         return super.getDataLength(includeReference) + ASSET_TYPE_LENGTH;
     }
 
-    static BigDecimal taxCoefficient = new BigDecimal("0.1");
-    static BigDecimal referralsCoefficient = new BigDecimal("0.02");
-
     public static void processTrade(DCSet dcSet, Block block, Account receiver,
                                     boolean isInitiator, AssetCls assetHave, AssetCls assetWant,
-                                    boolean asOrphan, BigDecimal tradeAmountForWant, long timestamp, Long orderID) {
+                                    boolean asOrphan, BigDecimal tradeAmountForWant, long timestamp, Long orderID,
+                                    ExLinkAddress[] wantDEXAwards) {
         //TRANSFER FUNDS
         BigDecimal tradeAmount = tradeAmountForWant.setScale(assetWant.getScale());
         BigDecimal assetMakerRoyalty;
@@ -2405,7 +2403,9 @@ public abstract class AssetCls extends ItemCls {
             // всегда 1% форжеру
             forgerFee = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
 
-        } else if (assetWant.getKey() < 100 && !isInitiator) {
+        } else if (!assetWant.isAccounting()
+                && assetWant.getKey() < getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD)
+                && !isInitiator) {
             // это системные активы - берем комиссию за них
             assetMakerRoyalty = BigDecimal.ZERO;
             forgerFee = tradeAmount.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
