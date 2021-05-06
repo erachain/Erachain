@@ -1,7 +1,6 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.item.assets.AssetUnique;
@@ -184,15 +183,15 @@ public class IssueAssetPanel extends IssueItemPanel {
         return true;
     }
 
-    protected void makeTransaction() {
+    @Override
+    protected void makeAppData() {
+        itemAppData = AssetCls.makeAppData(!addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
+                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
+                multipleRoyaltyPanel.recipientsTableModel.getRecipients());
 
-        if (true || assetType == AssetCls.AS_NON_FUNGIBLE && !multipleRoyaltyPanel.defaultCheck.isSelected()) {
-            // update  itemAppData
-            ExLinkAddress[] royalty = multipleRoyaltyPanel.recipientsTableModel.getRecipients();
-            //itemAppData = ItemCls.updateAppData(0L,
-            //        !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-            //        !addImageLabel.isInternalMedia(), addImageLabel.getMediaType());
-        }
+    }
+
+    protected void makeTransaction() {
 
         AssetCls asset;
         if (AssetCls.isTypeUnique(assetType, quantity)) {

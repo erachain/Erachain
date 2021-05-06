@@ -153,6 +153,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static final int INVALID_CLAIM_DEBT_CREATOR = 61;
 
+    public static final int INVALID_AWARD = 81;
+
     public static final int NOT_ENOUGH_ERA_OWN = 101;
     public static final int NOT_ENOUGH_ERA_USE = 102;
     public static final int NOT_ENOUGH_ERA_OWN_10 = 103;

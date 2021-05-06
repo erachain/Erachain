@@ -324,6 +324,7 @@ public abstract class AssetCls extends ItemCls {
         this.dexAwards = dexAwards;
     }
 
+    @Override
     protected int parseAppData() {
         int pos = super.parseAppData();
         if ((flags & APP_DATA_DEX_AWARDS_MASK) != 0) {
@@ -339,7 +340,7 @@ public abstract class AssetCls extends ItemCls {
 
     public static byte[] makeAppData(boolean iconAsURL, int iconType, boolean imageAsURL, int imageType,
                                      ExLinkAddress[] dexAwards) {
-        byte[] appData = super.makeAppData(dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK,
+        byte[] appData = ItemCls.makeAppData(dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK,
                 iconAsURL, iconType, imageAsURL, imageType);
 
         if (dexAwards == null)
@@ -700,6 +701,10 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public HashMap getNovaItems() {
         return BlockChain.NOVA_ASSETS;
+    }
+
+    public boolean hasDEXAwards() {
+        return (flags & APP_DATA_DEX_AWARDS_MASK) != 0;
     }
 
     public boolean isMovable() {
@@ -2152,6 +2157,24 @@ public abstract class AssetCls extends ItemCls {
             joiner.add(Lang.T("isReverseSend", langObj));
 
         return joiner.toString();
+    }
+
+    public int isValid() {
+        if (hasDEXAwards()) {
+            // нельзя делать ссылку на иконку у Персон
+            for (int i = 0; i < dexAwards.length; ++i) {
+                ExLinkAddress exAddress = dexAwards[i];
+                if (exAddress.getValue1() <= 0) {
+                    errorValue = "Award[" + i + "] percent is so small";
+                    return Transaction.INVALID_AWARD;
+                } else if (exAddress.getValue1() > 50000) {
+                    errorValue = "Award[" + i + "] percent is so big";
+                    return Transaction.INVALID_AWARD;
+                }
+            }
+        }
+
+        return super.isValid();
     }
 
     @Override

@@ -16,6 +16,7 @@ import javax.validation.constraints.Null;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class MultipleRoyaltyPanel extends JPanel {
     public final TableModel recipientsTableModel;
@@ -143,7 +144,7 @@ public class MultipleRoyaltyPanel extends JPanel {
         }
 
         private void addEmpty() {
-            this.addRow(new Object[]{"", "", 1.0, ""});
+            this.addRow(new Object[]{"", "", 1.000d, ""});
         }
 
         @Override
@@ -222,21 +223,23 @@ public class MultipleRoyaltyPanel extends JPanel {
             if (defaultCheck.isSelected())
                 return null;
 
-            ExLinkAddress[] list = new ExLinkAddress[getRowCount()];
+            ArrayList<ExLinkAddress> list = new ArrayList<>();
             for (int i = 0; i < getRowCount(); i++) {
+                String address = (String) this.getValueAt(i, 0);
+                if (address == null || address.isEmpty())
+                    continue;
                 try {
                     //ORDINARY RECIPIENT
-                    String recipientAddress = this.getValueAt(i, 0).toString();
-                    if (Crypto.getInstance().isValidAddress(recipientAddress)) {
-                        list[i] = new ExLinkAddress(new Account(recipientAddress),
-                                (int) ((double) this.getValueAt(i, 2) * 1000),
-                                (String) this.getValueAt(i, 3));
+                    if (Crypto.getInstance().isValidAddress(address)) {
+                        list.add(new ExLinkAddress(new Account(address),
+                                (int) ((double) this.getValueAt(i, 2) * 1000.0d),
+                                (String) this.getValueAt(i, 3)));
                     }
                 } catch (Exception e) {
                 }
             }
 
-            return list;
+            return list.toArray(new ExLinkAddress[0]);
         }
 
     }

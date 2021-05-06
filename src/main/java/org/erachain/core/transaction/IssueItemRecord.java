@@ -232,6 +232,12 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
             }
         }
 
+        int result = item.isValid();
+        if (result != Transaction.VALIDATE_OK) {
+            errorValue = item.errorValue;
+            return result;
+        }
+
         //CHECK NAME LENGTH
         String name = this.item.getName();
         // TEST ONLY CHARS
@@ -243,12 +249,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
                 errorValue = "So short: " + nameLen;
                 return INVALID_NAME_LENGTH_MIN;
             }
-        }
-
-        int result = item.isValid();
-        if (result != Transaction.VALIDATE_OK) {
-            errorValue = item.errorValue;
-            return result;
         }
 
         return super.isValid(forDeal, flags);
