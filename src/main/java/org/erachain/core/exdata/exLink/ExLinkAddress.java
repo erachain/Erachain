@@ -251,4 +251,19 @@ public class ExLinkAddress {
         return Transaction.VALIDATE_OK;
     }
 
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("type", type);
+        //json.put("typeName", viewTypeName(type, hasRecipients));
+        json.put("flags", flags);
+        json.put("value1", value1);
+        json.put("value2", value2);
+        json.put("account", account.getAddress());
+        json.put("account", account.getAddress());
+        json.put("memoBytes", Base58.encode(memoBytes));
+        json.put("memo", memo);
+
+        return json;
+    }
+
 }
