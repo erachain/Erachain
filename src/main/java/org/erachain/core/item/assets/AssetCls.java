@@ -2364,45 +2364,37 @@ public abstract class AssetCls extends ItemCls {
                                     boolean asOrphan, BigDecimal tradeAmountForWant, long timestamp, Long orderID) {
         //TRANSFER FUNDS
         BigDecimal tradeAmount = tradeAmountForWant.setScale(assetWant.getScale());
-        BigDecimal assetMakerRoyalty;
+        BigDecimal assetRoyaltyTotal = BigDecimal.ZERO;
         BigDecimal inviterRoyalty;
         BigDecimal forgerFee;
         int scale = assetWant.getScale();
         Long assetWantKey = assetWant.getKey();
 
-        PublicKeyAccount haveAssetMaker = assetHave.getMaker();
         ExLinkAddress[] dexAwards = assetHave.getDEXAwards();
         if (dexAwards != null) {
             for (ExLinkAddress dexAward : dexAwards) {
                 if (receiver.equals(dexAward.getAccount())) {
-                    // fo mySelf not pay
+                    // to mySelf not pay
                     continue;
                 }
 
-                assetMakerRoyalty = tradeAmount.multiply(new BigDecimal(dexAward.getValue1()))
+                BigDecimal assetRoyalty = tradeAmount.multiply(new BigDecimal(dexAward.getValue1()))
+                        .movePointLeft(5) // in ExLinkAddress is x1000 and x100 as percent
                         .setScale(scale, RoundingMode.DOWN);
-                if (assetMakerRoyalty.signum() > 0) {
-                    tradeAmount = tradeAmount.subtract(assetMakerRoyalty);
-
-                    haveAssetMaker.changeBalance(dcSet, asOrphan, false, assetWantKey,
-                            assetMakerRoyalty, false, false, false);
+                if (assetRoyalty.signum() > 0) {
+                    assetRoyaltyTotal = assetRoyaltyTotal.add(assetRoyalty);
+                    dexAward.getAccount().changeBalance(dcSet, asOrphan, false, assetWantKey,
+                            assetRoyalty, false, false, false);
                     if (!asOrphan && block != null)
-                        block.addCalculated(haveAssetMaker, assetWantKey, assetMakerRoyalty,
+                        block.addCalculated(dexAward.getAccount(), assetWantKey, assetRoyalty,
                                 "NFT Royalty by Order @" + Transaction.viewDBRef(orderID), orderID);
                 }
-
             }
         }
 
+        PublicKeyAccount haveAssetMaker = assetHave.getMaker();
         PublicKeyAccount inviter;
         if (assetHave.getAssetType() == AS_NON_FUNGIBLE) {
-            // значит приход + это тот актив который мы можем поделить
-            if (receiver.equals(haveAssetMaker)) {
-                assetMakerRoyalty = BigDecimal.ZERO;
-            } else {
-                // это не сам автор продает
-                assetMakerRoyalty = tradeAmount.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
-            }
 
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
             if (issuerPersonDuration != null) {
