@@ -225,9 +225,9 @@ public class IssueAssetPanel extends IssueItemPanel {
                 + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>";
 
         if (asset.getDEXAwards() != null) {
-            text += Lang.T("DEX Awards" + ":<br>");
+            text += Lang.T("DEX Awards" + ":");
             for (ExLinkAddress award : asset.getDEXAwards()) {
-                text += "&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " " + award.getValue1() * 0.001d + "%"
+                text += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
                         + (award.getMemo() == null || award.getMemo().isEmpty() ? "" : " - " + award.getMemo());
             }
             text += "<br>";
