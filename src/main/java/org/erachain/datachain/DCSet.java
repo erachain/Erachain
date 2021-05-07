@@ -162,7 +162,7 @@ public class DCSet extends DBASet implements Closeable {
     private ItemAssetMap itemAssetMap;
     private IssueAssetMap issueAssetMap;
     private OrderMapImpl orderMap;
-    private CompletedOrderMap completedOrderMap;
+    private CompletedOrderMapImpl completedOrderMap;
     private TradeMapImpl tradeMap;
     private ItemStatusMap itemStatusMap;
     private IssueStatusMap issueStatusMap;
@@ -1359,7 +1359,7 @@ public class DCSet extends DBASet implements Closeable {
      * Ключ: ссылка на запись создания заказа<br>
      * Значение: заказ<br>
      */
-    public CompletedOrderMap getCompletedOrderMap() {
+    public CompletedOrderMapImpl getCompletedOrderMap() {
         return this.completedOrderMap;
     }
 

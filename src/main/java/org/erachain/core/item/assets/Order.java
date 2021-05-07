@@ -353,7 +353,8 @@ public class Order implements Comparable<Order> {
     public BigDecimal getAmountWantLeft() {
         // надо округлять до точности актива, иначе из-за более точной цены может точность лишу дать в isUnResolved
         //return this.getAmountHaveLeft().multiply(this.price, rounding).setScale(this.wantAssetScale, RoundingMode.HALF_DOWN);
-        return this.getAmountHaveLeft().multiply(this.price).setScale(this.wantAssetScale, RoundingMode.HALF_DOWN);
+        return this.getAmountHaveLeft().multiply(this.price).setScale(this.wantAssetScale,
+                RoundingMode.DOWN); // DOWN - only!
     }
 
     //////// FULFILLED

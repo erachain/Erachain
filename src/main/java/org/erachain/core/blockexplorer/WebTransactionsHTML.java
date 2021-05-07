@@ -382,20 +382,18 @@ public class WebTransactionsHTML {
         CreateOrderTransaction orderCreation = (CreateOrderTransaction) transaction;
 
         Long refDB = orderCreation.getDBRef();
+        //
         Order order = null;
         String status;
         if (dcSet.getOrderMap().contains(refDB)) {
             order = dcSet.getOrderMap().get(refDB);
-            status = "Active";
         } else if (dcSet.getCompletedOrderMap().contains(refDB)) {
             order = dcSet.getCompletedOrderMap().get(refDB);
-            if (order.isCompleted()) {
-                status = "Completed";
-            } else {
-                status = "Canceled";
-            }
-        } else {
+        }
+        if (order == null) {
             status = "Unknown";
+        } else {
+            status = order.viewStatus();
         }
 
         out += "<h4><a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";

@@ -2402,12 +2402,7 @@ public abstract class AssetCls extends ItemCls {
                 if (inviter == null) {
                     inviterRoyalty = BigDecimal.ZERO;
                 } else {
-                    if (receiver.equals(haveAssetMaker)) {
-                        // сам автор продает - 1/100
-                        inviterRoyalty = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
-                    } else {
-                        inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
-                    }
+                    inviterRoyalty = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
                 }
             } else {
                 inviter = null;
@@ -2421,7 +2416,6 @@ public abstract class AssetCls extends ItemCls {
                 && assetWant.getKey() < getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD)
                 && !isInitiator) {
             // это системные активы - берем комиссию за них
-            assetMakerRoyalty = BigDecimal.ZERO;
             forgerFee = tradeAmount.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
 
             // за рефералку тут тоже
@@ -2438,20 +2432,13 @@ public abstract class AssetCls extends ItemCls {
             }
 
         } else {
-            assetMakerRoyalty = BigDecimal.ZERO;
             inviterRoyalty = BigDecimal.ZERO;
             inviter = null;
             forgerFee = BigDecimal.ZERO;
         }
 
-        if (assetMakerRoyalty.signum() > 0) {
-            tradeAmount = tradeAmount.subtract(assetMakerRoyalty);
-
-            haveAssetMaker.changeBalance(dcSet, asOrphan, false, assetWantKey,
-                    assetMakerRoyalty, false, false, false);
-            if (!asOrphan && block != null)
-                block.addCalculated(haveAssetMaker, assetWantKey, assetMakerRoyalty,
-                        "NFT Royalty by Order @" + Transaction.viewDBRef(orderID), orderID);
+        if (assetRoyaltyTotal.signum() > 0) {
+            tradeAmount = tradeAmount.subtract(assetRoyaltyTotal);
         }
 
         if (inviterRoyalty.signum() > 0) {
