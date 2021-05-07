@@ -258,10 +258,11 @@ public class ExLinkAddress {
         json.put("flags", flags);
         json.put("value1", value1);
         json.put("value2", value2);
-        json.put("account", account.getAddress());
-        json.put("account", account.getAddress());
-        json.put("memoBytes", Base58.encode(memoBytes));
-        json.put("memo", memo);
+        json.put("address", account.getAddress());
+        if (memoBytes != null && memoBytes.length > 0) {
+            json.put("memoBytes", Base58.encode(memoBytes));
+            json.put("memo", getMemo());
+        }
 
         return json;
     }

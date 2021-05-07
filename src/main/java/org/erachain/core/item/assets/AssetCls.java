@@ -2300,6 +2300,7 @@ public abstract class AssetCls extends ItemCls {
         itemJson.put("Label_isOutsideOtherClaim", Lang.T("isOutsideOtherClaim", langObj));
         itemJson.put("Label_isReverseSend", Lang.T("isReverseSend", langObj));
         itemJson.put("Label_Properties", Lang.T("Properties", langObj));
+        itemJson.put("Label_DEX_Awards", Lang.T("DEX Awards", langObj));
 
         itemJson.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
         itemJson.put("released", getReleased());

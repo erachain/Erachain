@@ -112,6 +112,18 @@ function asset(data, forPrint) {
 
     output += '<p style="margin-bottom:0px"><b>' + item.Label_AssetType_Desc + '</b>: ' + item.assetTypeDesc + '</p>';
 
+    if (item.DEXAwards) {
+        output += '<p style="margin-bottom:0px"><b>' + item.Label_DEX_Awards + '</b>:<br>';
+        for (key in item.DEXAwards) {
+            output += '&nbsp;&nbsp;&nbsp;&nbsp;' + item.DEXAwards[key].address + ' <b>x' + item.DEXAwards[key].value1 * 0.001 + '%</b>';
+            if (item.DEXAwards[key].memo) {
+                output += ' - ' + item.DEXAwards[key].memo;
+            }
+            output += '<br>';
+        }
+        output += '</p>';
+    }
+
     output += itemFoot(item, forPrint);
 
     if (forPrint)
