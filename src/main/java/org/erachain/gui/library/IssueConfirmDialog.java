@@ -58,7 +58,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
     public IssueConfirmDialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
                               int w, int h, String status_Text) {
         super(parent, modal);
-        Init(parent, modal, transaction, text, w, h, status_Text, "", true);
+        Init(parent, modal, transaction, text, w, h, status_Text, "", false);
     }
 
     public IssueConfirmDialog(java.awt.Frame parent, boolean modal, Transaction transaction,

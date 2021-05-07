@@ -279,7 +279,7 @@ function person(data, forPrint) {
 
         for (key in data.statuses) {
 
-            output += '<tr ><td ><a href ="?person=' + data.key + '&status=' + data.statuses[key].status_key + get_lang() + '">';
+            output += '<tr ><td ><a href ="?person=' + item.key + '&status=' + data.statuses[key].status_key + get_lang() + '">';
             if (data.statuses[key].status_icon) {
                 output += '<img src="data:image/gif;base64,' + data.statuses[key].status_icon + '" style="width:3em;"/> ';
             }
