@@ -121,7 +121,13 @@ function asset(data, forPrint) {
     if (item.DEXAwards) {
         output += '<p style="margin-bottom:0px"><b>' + item.Label_DEX_Awards + '</b>:<br>';
         for (key in item.DEXAwards) {
-            output += '&nbsp;&nbsp;&nbsp;&nbsp;' + item.DEXAwards[key].address + ' <b>x' + item.DEXAwards[key].value1 * 0.001 + '%</b>';
+            output += '&nbsp;&nbsp;&nbsp;&nbsp;';
+            if (forPrint) {
+                output += item.DEXAwards[key].address;
+            } else {
+                output += '<a href ="?address=' + item.DEXAwards[key].address + get_lang() + '">' + item.DEXAwards[key].address + '</a>';
+            }
+            output += ' <b>x' + item.DEXAwards[key].value1 * 0.001 + '%</b>';
             if (item.DEXAwards[key].memo) {
                 output += ' - ' + item.DEXAwards[key].memo;
             }
