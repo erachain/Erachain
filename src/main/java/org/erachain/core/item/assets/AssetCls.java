@@ -2226,15 +2226,13 @@ public abstract class AssetCls extends ItemCls {
         }
         assetJSON.put("reversedBalPos", revPos);
 
-        if (appData != null) {
-            ExLinkAddress[] listDEXAwards = getDEXAwards();
-            if (listDEXAwards != null) {
-                JSONArray array = new JSONArray();
-                for (ExLinkAddress award : listDEXAwards) {
-                    array.add(award.toJson());
-                }
-                assetJSON.put("DEXAwards", array);
+        ExLinkAddress[] listDEXAwards = getDEXAwards();
+        if (listDEXAwards != null) {
+            JSONArray array = new JSONArray();
+            for (ExLinkAddress award : listDEXAwards) {
+                array.add(award.toJson());
             }
+            assetJSON.put("DEXAwards", array);
         }
 
         return assetJSON;
