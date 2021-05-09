@@ -145,8 +145,6 @@ public class IssueAssetPanel extends IssueItemPanel {
             scaleJLabel.setVisible(true);
         }
 
-        //multipleRoyaltyPanel.setVisible(false);
-
     }
 
     protected boolean checkValues() {
