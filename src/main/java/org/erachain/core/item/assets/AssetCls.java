@@ -2422,7 +2422,7 @@ public abstract class AssetCls extends ItemCls {
             forgerFee = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
 
         } else if (!assetWant.isAccounting()
-                && assetWant.getKey() < getStartKey(ItemCls.ASSET_TYPE, AssetCls.START_KEY_OLD, AssetCls.MIN_START_KEY_OLD)
+                && assetWant.getKey() < assetWant.getStartKey()
                 && !isInitiator) {
             // это системные активы - берем комиссию за них
             forgerFee = tradeAmount.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
