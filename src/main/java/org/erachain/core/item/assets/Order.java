@@ -354,7 +354,9 @@ public class Order implements Comparable<Order> {
         // надо округлять до точности актива, иначе из-за более точной цены может точность лишу дать в isUnResolved
         //return this.getAmountHaveLeft().multiply(this.price, rounding).setScale(this.wantAssetScale, RoundingMode.HALF_DOWN);
         return this.getAmountHaveLeft().multiply(this.price).setScale(this.wantAssetScale,
-                RoundingMode.DOWN); // DOWN - only!
+                //RoundingMode.DOWN); // DOWN - only!
+                RoundingMode.HALF_DOWN); // HALF_DOWN - only!
+
     }
 
     //////// FULFILLED
@@ -885,7 +887,10 @@ public class Order implements Comparable<Order> {
                             if (Order.isPricesClose(orderPrice, priceUpdateTrade, false)
                                     || orderAmountHaveLeft.subtract(tradeAmountForHave)
                                     .divide(orderAmountHaveLeft,
-                                            BlockChain.TRADE_PRICE_DIFF_LIMIT.scale(), RoundingMode.DOWN)
+                                            BlockChain.TRADE_PRICE_DIFF_LIMIT.scale(),
+                                            ///RoundingMode.DOWN)
+                                            RoundingMode.HALF_DOWN)
+
                                     .compareTo(BlockChain.TRADE_PRICE_DIFF_LIMIT) < 0) {
 
                                 tradeAmountForHave = orderAmountHaveLeft;
