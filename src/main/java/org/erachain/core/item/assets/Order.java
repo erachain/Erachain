@@ -881,15 +881,15 @@ public class Order implements Comparable<Order> {
                             BigDecimal priceUpdateTrade = calcPrice(orderAmountHaveLeft,
                                     // this.haveSacel for order.WANT
                                     tradeAmountForWant, haveAssetScale);
-                            // если цена такущей сделки не сильно изменится
-                            // или если остаток у ордера стенкт уже очень маленький по сравнению с текущей сделкой
+                            // если цена текущей сделки не сильно изменится
+                            // или если остаток у ордера стенки уже очень маленький по сравнению с текущей сделкой
                             // то весь ордер в сделку сольем
                             if (Order.isPricesClose(orderPrice, priceUpdateTrade, false)
                                     || orderAmountHaveLeft.subtract(tradeAmountForHave)
                                     .divide(orderAmountHaveLeft,
                                             BlockChain.TRADE_PRICE_DIFF_LIMIT.scale(),
-                                            ///RoundingMode.DOWN)
-                                            RoundingMode.HALF_DOWN)
+                                            RoundingMode.DOWN) // FOR compare!
+                                    ///RoundingMode.HALF_DOWN)
 
                                     .compareTo(BlockChain.TRADE_PRICE_DIFF_LIMIT) < 0) {
 
