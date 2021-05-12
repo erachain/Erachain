@@ -665,8 +665,8 @@ public class Order implements Comparable<Order> {
                 //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
                 //// 	255979-3	255992-1
                 //|| height == 255992
-                ///Transaction.viewDBRef(id).equals("15057-1")
-                id == 3644468729217028L
+                Transaction.viewDBRef(id).equals("727923-1")
+            //id == 3644468729217028L
 
 
             //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
@@ -788,8 +788,8 @@ public class Order implements Comparable<Order> {
             index++;
 
             if (debug ||
-                    //Transaction.viewDBRef(id).equals("776446-1")
-                    id == 3644468729217028L
+                    Transaction.viewDBRef(id).equals("727923-1")
+                //id == 3644468729217028L
             ) {
                 debug = true;
             }

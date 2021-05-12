@@ -131,11 +131,9 @@ function order(data){
 
     var status;
     if (data.completed) {
-        if (data.canceled) {
-            status = data.Label_Canceled;
-        } else {
-            status = data.Label_Completed;
-        }
+        status = data.Label_Completed;
+    } else if (data.canceled) {
+        status = data.Label_Canceled;
     } else {
         status = data.Label_Active;
     }

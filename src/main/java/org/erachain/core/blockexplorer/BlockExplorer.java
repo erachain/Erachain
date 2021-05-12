@@ -804,7 +804,6 @@ public class BlockExplorer {
                 output.put("error", "order not found");
                 return output;
             }
-            output.put("active", true);
         }
 
         output.put("order", order.toJson());

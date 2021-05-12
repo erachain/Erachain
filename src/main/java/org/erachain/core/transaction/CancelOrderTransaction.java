@@ -10,8 +10,10 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -325,6 +327,13 @@ public class CancelOrderTransaction extends Transaction {
         //SET ORPHAN DATA
         dcSet.getCompletedOrderMap().put(order.getId(), order);
 
+        // ADD CANCEL as TRADE
+        Trade trade = new Trade(dbRef, order.getId(), order.getHaveAssetKey(), order.getWantAssetKey(),
+                BigDecimal.ZERO, BigDecimal.ZERO,
+                0, 0, Integer.MAX_VALUE);
+        //ADD TRADE TO DATABASE
+        dcSet.getTradeMap().put(trade);
+
         //UPDATE BALANCE OF CREATOR
         BigDecimal left = order.getAmountHaveLeft();
         order.getCreator().changeBalance(dcSet, false, false, order.getHaveAssetKey(), left,
@@ -362,6 +371,9 @@ public class CancelOrderTransaction extends Transaction {
         if (Transaction.viewDBRef(this.orderID).equals("776446-1")) {
             boolean debug = true;
         }
+
+        // ROLLBACK CANCEL as TRADE
+        dcSet.getTradeMap().delete(new Fun.Tuple2<Long, Long>(dbRef, order.getId()));
 
         //DELETE ORPHAN DATA FIRST - иначе ошибка будет при добавлении в таблицу ордеров
         dcSet.getCompletedOrderMap().delete(order.getId());
