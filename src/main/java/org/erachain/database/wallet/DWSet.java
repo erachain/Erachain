@@ -1,6 +1,7 @@
 package org.erachain.database.wallet;
 // 30/03 ++
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -13,15 +14,27 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.json.simple.JSONObject;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Files;
 
+@Slf4j
 public class DWSet extends DBASet {
+
+    /**
+     * New version will auto-rebase DCSet from empty db file
+     */
+    final static int CURRENT_VERSION = 531; // vers 5.3.02 (trade.type)
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DWSet.class);
 
     private static final String LAST_BLOCK = "lastBlock";
 
@@ -84,15 +97,22 @@ public class DWSet extends DBASet {
         this.statusFavoritesSet = new FavoriteItemMapStatus(this, this.database);
         this.unionFavoritesSet = new FavoriteItemMapUnion(this, this.database);
         this.statementFavoritesSet = new FavoriteDocument(this, this.database);
-        this.telegramsMap = new TelegramsMap(this,this.database);
+        this.telegramsMap = new TelegramsMap(this, this.database);
 
     }
 
-    public synchronized static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
+    /**
+     * Создание файла для основной базы данных
+     *
+     * @param dbFile
+     * @return
+     */
+    public static DB makeFileDB(File dbFile) {
 
-        //OPEN WALLET
-        File dbFile = new File(Settings.getInstance().getDataWalletPath(), "wallet.dat");
-        dbFile.getParentFile().mkdirs();
+        boolean isNew = !dbFile.exists();
+        if (isNew) {
+            dbFile.getParentFile().mkdirs();
+        }
 
         //DELETE TRANSACTIONS
         //File transactionFile = new File(Settings.getInstance().getWalletDir(), "wallet.dat.t");
@@ -132,6 +152,46 @@ public class DWSet extends DBASet {
                 //.compressionEnable()
 
                 .make();
+
+        if (isNew)
+            DBASet.setVersion(database, CURRENT_VERSION);
+
+        return database;
+
+    }
+
+    public synchronized static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
+
+        //OPEN DB
+        File dbFile = new File(Settings.getInstance().getDataChainPath(), "chain.dat");
+
+        DB database = null;
+        try {
+            database = makeFileDB(dbFile);
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+            try {
+                Files.walkFileTree(dbFile.getParentFile().toPath(),
+                        new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (Throwable e1) {
+                logger.error(e1.getMessage(), e1);
+            }
+            database = makeFileDB(dbFile);
+        }
+
+        if (DBASet.getVersion(database) < CURRENT_VERSION) {
+            database.close();
+            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake datachain Set " + dbFile.getParentFile().toPath());
+            try {
+                Files.walkFileTree(dbFile.getParentFile().toPath(),
+                        new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (Throwable e) {
+                logger.error(e.getMessage(), e);
+            }
+            database = makeFileDB(dbFile);
+
+        }
+
 
         return new DWSet(dbFile, database, withObserver, dynamicGUI);
 
