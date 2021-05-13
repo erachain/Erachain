@@ -774,6 +774,7 @@ public class Order implements Comparable<Order> {
         }
 
         boolean completedOrder = false;
+        // используется для порядка отражения ордеров при поиске
         int index = 0;
 
         while (!completedOrder && index < orders.size()) {

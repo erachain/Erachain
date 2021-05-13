@@ -33,6 +33,10 @@ public class Trade {
     private BigDecimal amountWant;
     private int haveAssetScale;
     private int wantAssetScale;
+
+    /**
+     * Used only for inintiator Order - for make sorted secondary INDEX
+     */
     private int sequence;
 
     public static final byte TYPE_TRADE = 0;
@@ -64,6 +68,16 @@ public class Trade {
         this.wantAssetScale = wantAssetScale;
 
         this.sequence = sequence;
+    }
+
+    public String viewType() {
+        switch (type) {
+            case TYPE_TRADE:
+                return "trade";
+            case TYPE_CANCEL:
+                return "cancel";
+        }
+        return "unknown";
     }
 
     public String viewID() {
@@ -139,6 +153,7 @@ public class Trade {
 
         JSONObject trade = new JSONObject();
         trade.put("type", type);
+        trade.put("typeName", viewType());
         trade.put("id", viewID());
         trade.put("initiator", Transaction.viewDBRef(initiator));
         trade.put("target", Transaction.viewDBRef(target));
