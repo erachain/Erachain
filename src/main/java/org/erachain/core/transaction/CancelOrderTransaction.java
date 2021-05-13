@@ -332,9 +332,9 @@ public class CancelOrderTransaction extends Transaction {
         AssetCls assetWant = dcSet.getItemAssetMap().get(order.getWantAssetKey());
 
         // ADD CANCEL as TRADE
-        Trade trade = new Trade(dbRef, order.getId(), order.getHaveAssetKey(), order.getWantAssetKey(),
-                order.getAmountWantLeft(), order.getAmountHaveLeft().negate(),
-                assetWant.getScale(), assetHave.getScale(), Integer.MAX_VALUE);
+        Trade trade = new Trade(Trade.TYPE_CANCEL, dbRef, order.getId(), order.getHaveAssetKey(), order.getWantAssetKey(),
+                order.getAmountWantLeft(), order.getAmountHaveLeft(),
+                assetWant.getScale(), assetHave.getScale(), -1);
         //ADD TRADE TO DATABASE
         dcSet.getTradeMap().put(trade);
 
