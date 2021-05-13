@@ -853,6 +853,7 @@ public class BlockExplorer {
         output.put("Label_Active", Lang.T("Active", langObj));
         output.put("Label_Completed", Lang.T("Completed", langObj));
         output.put("Label_Canceled", Lang.T("Canceled", langObj));
+        output.put("Label_Cancel", Lang.T("Cancel", langObj));
 
         output.put("Label_Fulfilled", Lang.T("Fulfilled", langObj));
         output.put("Label_LeftHave", Lang.T("Left Have", langObj));
@@ -885,7 +886,13 @@ public class BlockExplorer {
         AssetCls pairAssetHave;
         AssetCls pairAssetWant;
 
-        Order orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
+        Order orderInitiator = null;
+        Transaction cancelTX = null;
+        if (trade.isCancel()) {
+            cancelTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+        } else {
+            orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
+        }
 
         long pairHaveKey;
         long pairWantKey;
@@ -944,10 +951,8 @@ public class BlockExplorer {
 
         tradeJSON.put("realReversePrice", trade.calcPriceRevers());
 
-        Transaction cancelTX = null;
         if (orderInitiator == null) {
             // CANCEL
-            cancelTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
             if (cancelTX == null) {
                 if (BlockChain.CHECK_BUGS > 5) {
                     // show ERROR

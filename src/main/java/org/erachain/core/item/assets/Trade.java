@@ -80,6 +80,10 @@ public class Trade {
         return "unknown";
     }
 
+    public boolean isCancel() {
+        return type == TYPE_CANCEL;
+    }
+
     public String viewID() {
         return Transaction.viewDBRef(initiator) + "/" + Transaction.viewDBRef(target);
     }

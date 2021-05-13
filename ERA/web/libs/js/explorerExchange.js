@@ -216,7 +216,8 @@ function order(data){
             output += '<td align=right>' + addCommas(trade.amountHave);
 
             output += '<td align=left>';
-            output += '<span class="glyphicon glyphicon-remove" style="color:crimson; font-size:1.2em"></span>';
+            output += '<span class="glyphicon glyphicon-remove" style="color:crimson; font-size:1.0em"></span>';
+            output += '<span style="color:crimson">' + data.Label_Cancel + '</span>';
 
         }
 
