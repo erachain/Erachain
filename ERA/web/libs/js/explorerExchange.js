@@ -172,8 +172,12 @@ function order(data){
         var trade = data.lastTrades[key];
         output += '<tr>';
 
-        output += '<td align=center><a href=?trade=' + trade.initiatorTx + '/' + trade.targetTx + get_lang()
-        output += '>' + convertTimestamp( trade.timestamp, false);
+        if (trade.type == 'cancel') {
+            output += '<td align=center><a href=?tx=' + trade.initiatorTx + get_lang()
+        } else {
+            output += '<td align=center><a href=?trade=' + trade.initiatorTx + '/' + trade.targetTx + get_lang()
+        }
+        output += '>' + convertTimestamp(trade.timestamp, false);
 
         output += '<td><a href=?asset=' + trade.assetHaveKey + '&asset=' + trade.assetWantKey + '>' + getShortNameBlanked(trade.assetHaveName) + '/' + getShortNameBlanked(trade.assetWantName) + '</a>';
 
@@ -181,9 +185,9 @@ function order(data){
 
         // отобрадает что это создатель актива действует
         if (trade.initiatorCreator_addr == data.assetWantMaker) {
-            if (trade.type != 'sell') {
+            if (trade.type == 'buy') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
-            } else {
+            } else if (trade.type == 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson"></span>';
             }
         }
@@ -198,7 +202,7 @@ function order(data){
             }
             output += '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice) + '</span>';
 
-        } else {
+        } else if (trade.type == 'buy') {
             output += '<td align=right>' + addCommas(trade.amountHave);
 
             output += '<td align=left>';
@@ -208,13 +212,19 @@ function order(data){
             }
             output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
 
+        } else if (trade.type == 'cancel') {
+            output += '<td align=right>' + addCommas(trade.amountHave);
+
+            output += '<td align=left>';
+            output += '<span class="glyphicon glyphicon-remove" style="color:crimson; font-size:1.2em"></span>';
+
         }
 
-        // отобрадает что это создатель актива действует
+        // отображает что это создатель актива действует
         if (trade.targetCreator_addr == data.assetWantMaker) {
             if (trade.type == 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
-            } else {
+            } else if (trade.type == 'buy') {
                 output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson"></span>';
             }
         }

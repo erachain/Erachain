@@ -9,6 +9,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.DCSet;
@@ -327,10 +328,13 @@ public class CancelOrderTransaction extends Transaction {
         //SET ORPHAN DATA
         dcSet.getCompletedOrderMap().put(order.getId(), order);
 
+        AssetCls assetHave = dcSet.getItemAssetMap().get(order.getHaveAssetKey());
+        AssetCls assetWant = dcSet.getItemAssetMap().get(order.getWantAssetKey());
+
         // ADD CANCEL as TRADE
         Trade trade = new Trade(dbRef, order.getId(), order.getHaveAssetKey(), order.getWantAssetKey(),
-                BigDecimal.ZERO, BigDecimal.ZERO,
-                0, 0, Integer.MAX_VALUE);
+                order.getAmountWantLeft(), order.getAmountHaveLeft().negate(),
+                assetWant.getScale(), assetHave.getScale(), Integer.MAX_VALUE);
         //ADD TRADE TO DATABASE
         dcSet.getTradeMap().put(trade);
 
