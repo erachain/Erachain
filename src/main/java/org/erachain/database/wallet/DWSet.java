@@ -163,7 +163,7 @@ public class DWSet extends DBASet {
     public synchronized static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
 
         //OPEN DB
-        File dbFile = new File(Settings.getInstance().getDataChainPath(), "chain.dat");
+        File dbFile = new File(Settings.getInstance().getDataWalletPath(), "wallet.dat");
 
         DB database = null;
         try {
@@ -191,7 +191,6 @@ public class DWSet extends DBASet {
             database = makeFileDB(dbFile);
 
         }
-
 
         return new DWSet(dbFile, database, withObserver, dynamicGUI);
 

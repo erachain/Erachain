@@ -1498,7 +1498,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             if (lastTrade == null) {
                 compuRate = BigDecimal.ZERO;
             } else {
-                compuRate = lastTrade.getHaveKey().equals(AssetCls.FEE_KEY) ? lastTrade.calcPriceRevers() : lastTrade.calcPrice();
+                compuRate = lastTrade.getHaveKey() == AssetCls.FEE_KEY ? lastTrade.calcPriceRevers() : lastTrade.calcPrice();
             }
 
         } else {

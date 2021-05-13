@@ -144,8 +144,8 @@ public class PairsController {
      */
     public static TradePair reCalc(AssetCls asset1, AssetCls asset2, TradePair currentPair) {
         TradeMapImpl tradesMap = DCSet.getInstance().getTradeMap();
-        Long key1 = asset1.getKey();
-        Long key2 = asset2.getKey();
+        long key1 = asset1.getKey();
+        long key2 = asset2.getKey();
 
         int heightStart = Controller.getInstance().getMyHeight();
         int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
@@ -172,7 +172,7 @@ public class PairsController {
                     }
                     if (currentPair != null && lastTrade == null) {
                         // изменений не было
-                        if (trade.getTimestamp().equals(currentPair.getLastTime())) {
+                        if (trade.getTimestamp() == currentPair.getLastTime()) {
                             currentPair.setUpdateTime(Block.getTimestamp(heightStart));
                             return currentPair;
                         }
@@ -181,7 +181,7 @@ public class PairsController {
 
                     count24++;
 
-                    reversed = trade.getHaveKey().equals(key2);
+                    reversed = trade.getHaveKey() == key2;
 
                     // у сделки обратные Have Want
                     price = reversed ? trade.calcPrice() : trade.calcPriceRevers();
@@ -205,7 +205,7 @@ public class PairsController {
                 // за последние сутки не было сделок, значит смотрим просто последнюю цену
                 trade = tradesMap.getLastTrade(key1, key2);
                 if (trade != null) {
-                    reversed = trade.getHaveKey().equals(key2);
+                    reversed = trade.getHaveKey() == key2;
                     price = lastPrice = maxPrice = minPrice = reversed ? trade.calcPrice() : trade.calcPriceRevers();
                 } else {
                     price = lastPrice = maxPrice = minPrice = BigDecimal.ZERO;
