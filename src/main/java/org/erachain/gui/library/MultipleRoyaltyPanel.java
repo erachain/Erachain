@@ -1,11 +1,11 @@
 package org.erachain.gui.library;
 
 
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetType;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun;
 
@@ -27,16 +27,18 @@ public class MultipleRoyaltyPanel extends JPanel {
     public JCheckBox defaultCheck;
 
     protected JComboBox<Account> ownerComboBox;
+    protected JComboBox<AssetType> assetTypeJComboBox;
 
     private static int DESCR_COL = 1;
 
-    public MultipleRoyaltyPanel(JComboBox<Account> ownerComboBox) {
+    public MultipleRoyaltyPanel(JComboBox<Account> ownerComboBox, JComboBox<AssetType> assetTypeJComboBox) {
 
         super();
 
         this.setName(Lang.T("Awards"));
 
         this.ownerComboBox = ownerComboBox;
+        this.assetTypeJComboBox = assetTypeJComboBox;
 
         jScrollPaneRecipients = new JScrollPane();
         jButtonRemoveRecipient = new JButton();
@@ -44,7 +46,6 @@ public class MultipleRoyaltyPanel extends JPanel {
         defaultCheck = new JCheckBox();
         defaultCheck.setText(Lang.T("Use Default Royalty: author's award is %1").replace("%1", "10%"));
         defaultCheck.setSelected(true);
-        defaultCheck.setEnabled(BlockChain.TEST_MODE);
 
         defaultCheck.addActionListener(new ActionListener() {
             @Override
@@ -116,15 +117,17 @@ public class MultipleRoyaltyPanel extends JPanel {
     private void reset() {
         jScrollPaneRecipients.setVisible(!defaultCheck.isSelected());
         jButtonRemoveRecipient.setVisible(!defaultCheck.isSelected());
+        this.setMinimumSize(new Dimension(0, !defaultCheck.isSelected() ? 130 : 30));
 
-        if (isVisible() && !defaultCheck.isSelected()) {
-            ExLinkAddress[] items = AssetCls.getDefaultDEXAwards(AssetCls.AS_NON_FUNGIBLE, (Account) ownerComboBox.getSelectedItem());
-            if (items != null) {
+        if (!defaultCheck.isSelected()) {
+            ExLinkAddress[] items = AssetCls.getDefaultDEXAwards(((AssetType) assetTypeJComboBox.getSelectedItem()).getId(),
+                    (Account) ownerComboBox.getSelectedItem());
+            if (items == null) {
+                recipientsTableModel.clearRecipients(true);
+            } else {
                 recipientsTableModel.setRecipients(items);
             }
         }
-
-        this.setMinimumSize(new Dimension(0, !defaultCheck.isSelected() ? 130 : 30));
 
     }
 
@@ -203,7 +206,7 @@ public class MultipleRoyaltyPanel extends JPanel {
         }
 
         public void setRecipients(ExLinkAddress[] items) {
-            clearRecipients();
+            clearRecipients(false);
 
             for (int i = 0; i < items.length; ++i) {
                 addRow(new Object[]{items[i].getAccount().getAddress(),
@@ -213,10 +216,14 @@ public class MultipleRoyaltyPanel extends JPanel {
             addEmpty();
         }
 
-        public void clearRecipients() {
+        public void clearRecipients(boolean addEmpty) {
             while (getRowCount() > 0) {
                 this.removeRow(getRowCount() - 1);
             }
+
+            if (addEmpty)
+                addEmpty();
+
         }
 
         public ExLinkAddress[] getRecipients() {
