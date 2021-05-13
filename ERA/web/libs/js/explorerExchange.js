@@ -145,13 +145,13 @@ function order(data){
     output += data.Label_Order + ': <a href="?tx=' + data.txSeqNo + get_lang() + '"><b>' + data.txSeqNo + '</b></a><br>';
     output += data.Label_table_have + '</b>: <a href=?asset=' + data.assetHaveKey + get_lang() + '><b>' + data.assetHaveName + '</b></a><br>';
     output += data.Label_Volume + ': <b>' + addCommas(data.order.amountHave) + '</b><br>';
-    output += data.Label_Price + ': <b>' + addCommas(data.order.price) + '</b><br>';
+    output += data.Label_Price + ': <b>' + addCommas(data.order.price) + ' / ' + addCommas(data.order.priceReverse) + '</b><br>';
     output += data.Label_Total_Cost + ': <b>' + addCommas(data.order.amountWant) + '</b><br>';
     output += data.Label_table_want + ': <a href=?asset=' + data.assetWantKey + get_lang() + '><b>' + data.assetWantName + '</b></a><br>';
     output += data.Label_Creator + ': <a href="?address=' + data.creator + '">' + data.creator_person + '</a><br>';
     //output += data.Label_Fulfilled + ': <b>' + addCommas(data.order.fulfilledHave) + '</b><br>';
-    output += data.Label_LeftHave + ': <b>' + addCommas(data.order.leftHave) + '</b><br>';
-    output += data.Label_LeftPrice + ': <b>' + addCommas(data.order.leftPrice) + '</b><br>';
+    output += data.Label_LeftHave + ': <b>' + addCommas(data.order.leftHave) + ' / ' + addCommas(data.order.leftWant) + '</b><br>';
+    output += data.Label_LeftPrice + ': <b>' + addCommas(data.order.leftPrice) + ' / ' + addCommas(data.order.leftPriceReverse) + '</b><br>';
 
     output += '</p>';
 

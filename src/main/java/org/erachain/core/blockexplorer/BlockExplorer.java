@@ -944,13 +944,24 @@ public class BlockExplorer {
 
         tradeJSON.put("realReversePrice", trade.calcPriceRevers());
 
+        Transaction cancelTX = null;
         if (orderInitiator == null) {
-            if (BlockChain.CHECK_BUGS > 7) {
-                // show ERROR
-                tradeJSON.put("initiatorTx", "--");
-                tradeJSON.put("initiatorCreator_addr", "--"); // viewCreator
-                tradeJSON.put("initiatorCreator", "--");
-                tradeJSON.put("initiatorAmount", "--");
+            // CANCEL
+            cancelTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+            if (cancelTX == null) {
+                if (BlockChain.CHECK_BUGS > 5) {
+                    // show ERROR
+                    tradeJSON.put("initiatorTx", "--");
+                    tradeJSON.put("initiatorCreator_addr", "--"); // viewCreator
+                    tradeJSON.put("initiatorCreator", "--");
+                    tradeJSON.put("initiatorAmount", "--");
+                }
+            } else {
+                // show CANCEL
+                tradeJSON.put("initiatorTx", cancelTX.viewHeightSeq());
+                tradeJSON.put("initiatorCreator_addr", cancelTX.getCreator().getAddress()); // viewCreator
+                tradeJSON.put("initiatorCreator", cancelTX.getCreator().getPersonOrShortAddress(12));
+                tradeJSON.put("initiatorAmount", trade.getAmountHave().toPlainString());
             }
         } else {
             tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
@@ -968,7 +979,13 @@ public class BlockExplorer {
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
-        if (orderInitiator == null && BlockChain.CHECK_BUGS > 7 || pairHaveKey == orderInitiator.getHaveAssetKey()) {
+        if (cancelTX != null) {
+            tradeJSON.put("type", "cancel");
+
+            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+
+        } else if (orderInitiator == null && BlockChain.CHECK_BUGS > -1 || pairHaveKey == orderInitiator.getHaveAssetKey()) {
             tradeJSON.put("type", "sell");
 
             tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());

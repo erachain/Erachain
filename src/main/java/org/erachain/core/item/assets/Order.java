@@ -617,6 +617,7 @@ public class Order implements Comparable<Order> {
 
         order.put("fulfilledHave", this.fulfilledHave.toPlainString());
         order.put("leftHave", amountHave.subtract(fulfilledHave).toPlainString());
+        order.put("leftWant", getAmountWantLeft().toPlainString());
 
         order.put("leftPrice", calcLeftPrice().toPlainString());
         order.put("leftPriceReverse", calcLeftPriceReverse().toPlainString());
