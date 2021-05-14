@@ -829,7 +829,7 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static boolean isUnTransferable(long key, int assetType, boolean senderIsAssetMaker) {
-        return assetType == AssetCls.AS_NON_FUNGIBLE && !senderIsAssetMaker;
+        return false && assetType == AssetCls.AS_NON_FUNGIBLE && !senderIsAssetMaker;
     }
 
     public boolean isUnTransferable(boolean senderIsAssetMaker) {
