@@ -1,6 +1,7 @@
 package org.erachain.core.item.assets;
 
 
+import com.google.common.primitives.Bytes;
 import org.erachain.controller.PairsController;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -38,8 +39,12 @@ public abstract class AssetCls extends ItemCls {
     public static final int TYPE_KEY = ItemCls.ASSET_TYPE;
 
     protected static final int ASSET_TYPE_LENGTH = 1;
+
+    protected static final long APP_DATA_DEX_AWARDS_MASK = 1;
+
     //
     protected int assetType;
+    protected ExLinkAddress[] dexAwards;
 
     // CORE KEY
     public static final long ERA_KEY = 1L;
@@ -305,13 +310,48 @@ public abstract class AssetCls extends ItemCls {
     protected AssetCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, appData, maker, name, icon, image, description);
         this.assetType = assetType;
-
     }
 
     public AssetCls(int type, byte pars, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         this(new byte[TYPE_LENGTH], appData, maker, name, icon, image, description, assetType);
         this.typeBytes[0] = (byte) type;
         this.typeBytes[1] = pars;
+    }
+
+    protected AssetCls(byte[] typeBytes, byte[] appDataIn, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType,
+                       ExLinkAddress[] dexAwards) {
+        this(typeBytes, appDataIn, maker, name, icon, image, description, assetType);
+        this.dexAwards = dexAwards;
+    }
+
+    @Override
+    protected int parseAppData() {
+        int pos = super.parseAppData();
+        if ((flags & APP_DATA_DEX_AWARDS_MASK) != 0) {
+            int dexAwardsLen = appData[pos++];
+            dexAwards = new ExLinkAddress[dexAwardsLen];
+            for (int i = 0; i < dexAwardsLen; i++) {
+                dexAwards[i] = new ExLinkAddress(appData, pos);
+                pos += dexAwards[i].length();
+            }
+        }
+        return pos;
+    }
+
+    public static byte[] makeAppData(boolean iconAsURL, int iconType, boolean imageAsURL, int imageType,
+                                     ExLinkAddress[] dexAwards) {
+        byte[] appData = ItemCls.makeAppData(dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK,
+                iconAsURL, iconType, imageAsURL, imageType);
+
+        if (dexAwards == null)
+            return appData;
+
+        appData = Bytes.concat(appData, new byte[]{(byte) dexAwards.length});
+        for (ExLinkAddress exAddress : dexAwards) {
+            appData = Bytes.concat(appData, exAddress.toBytes());
+        }
+
+        return appData;
     }
 
     //GETTERS/SETTERS
@@ -644,16 +684,27 @@ public abstract class AssetCls extends ItemCls {
 
     public abstract int getScale();
 
-    public static ExLinkAddress[] getDefaultAwards(int type, Account owner) {
+    public static ExLinkAddress[] getDefaultDEXAwards(int type, Account owner) {
         if (type == AS_NON_FUNGIBLE) {
             return new ExLinkAddress[]{new ExLinkAddress(owner, 10000, "Author royalty")};
         }
         return null;
     }
 
+    public ExLinkAddress[] getDEXAwards() {
+        if ((flags & APP_DATA_DEX_AWARDS_MASK) == 0) {
+            return getDefaultDEXAwards(assetType, maker);
+        }
+        return dexAwards;
+    }
+
     @Override
     public HashMap getNovaItems() {
         return BlockChain.NOVA_ASSETS;
+    }
+
+    public boolean hasDEXAwards() {
+        return (flags & APP_DATA_DEX_AWARDS_MASK) != 0;
     }
 
     public boolean isMovable() {
@@ -2108,6 +2159,24 @@ public abstract class AssetCls extends ItemCls {
         return joiner.toString();
     }
 
+    public int isValid() {
+        if (hasDEXAwards()) {
+            // нельзя делать ссылку на иконку у Персон
+            for (int i = 0; i < dexAwards.length; ++i) {
+                ExLinkAddress exAddress = dexAwards[i];
+                if (exAddress.getValue1() <= 0) {
+                    errorValue = "Award[" + i + "] percent is so small";
+                    return Transaction.INVALID_AWARD;
+                } else if (exAddress.getValue1() > 50000) {
+                    errorValue = "Award[" + i + "] percent is so big";
+                    return Transaction.INVALID_AWARD;
+                }
+            }
+        }
+
+        return super.isValid();
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public JSONObject toJson() {
@@ -2157,6 +2226,14 @@ public abstract class AssetCls extends ItemCls {
         }
         assetJSON.put("reversedBalPos", revPos);
 
+        ExLinkAddress[] listDEXAwards = getDEXAwards();
+        if (listDEXAwards != null) {
+            JSONArray array = new JSONArray();
+            for (ExLinkAddress award : listDEXAwards) {
+                array.add(award.toJson());
+            }
+            assetJSON.put("DEXAwards", array);
+        }
 
         return assetJSON;
     }
@@ -2221,6 +2298,7 @@ public abstract class AssetCls extends ItemCls {
         itemJson.put("Label_isOutsideOtherClaim", Lang.T("isOutsideOtherClaim", langObj));
         itemJson.put("Label_isReverseSend", Lang.T("isReverseSend", langObj));
         itemJson.put("Label_Properties", Lang.T("Properties", langObj));
+        itemJson.put("Label_DEX_Awards", Lang.T("DEX Awards", langObj));
 
         itemJson.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
         itemJson.put("released", getReleased());
@@ -2290,30 +2368,42 @@ public abstract class AssetCls extends ItemCls {
         return super.getDataLength(includeReference) + ASSET_TYPE_LENGTH;
     }
 
-    static BigDecimal taxCoefficient = new BigDecimal("0.1");
-    static BigDecimal referralsCoefficient = new BigDecimal("0.02");
-
     public static void processTrade(DCSet dcSet, Block block, Account receiver,
                                     boolean isInitiator, AssetCls assetHave, AssetCls assetWant,
                                     boolean asOrphan, BigDecimal tradeAmountForWant, long timestamp, Long orderID) {
         //TRANSFER FUNDS
         BigDecimal tradeAmount = tradeAmountForWant.setScale(assetWant.getScale());
-        BigDecimal assetMakerRoyalty;
+        BigDecimal assetRoyaltyTotal = BigDecimal.ZERO;
         BigDecimal inviterRoyalty;
         BigDecimal forgerFee;
         int scale = assetWant.getScale();
         Long assetWantKey = assetWant.getKey();
 
+        ExLinkAddress[] dexAwards = assetHave.getDEXAwards();
+        if (dexAwards != null) {
+            for (ExLinkAddress dexAward : dexAwards) {
+                if (receiver.equals(dexAward.getAccount())) {
+                    // to mySelf not pay
+                    continue;
+                }
+
+                BigDecimal assetRoyalty = tradeAmount.multiply(new BigDecimal(dexAward.getValue1()))
+                        .movePointLeft(5) // in ExLinkAddress is x1000 and x100 as percent
+                        .setScale(scale, RoundingMode.DOWN);
+                if (assetRoyalty.signum() > 0) {
+                    assetRoyaltyTotal = assetRoyaltyTotal.add(assetRoyalty);
+                    dexAward.getAccount().changeBalance(dcSet, asOrphan, false, assetWantKey,
+                            assetRoyalty, false, false, false);
+                    if (!asOrphan && block != null)
+                        block.addCalculated(dexAward.getAccount(), assetWantKey, assetRoyalty,
+                                "NFT Royalty by Order @" + Transaction.viewDBRef(orderID), orderID);
+                }
+            }
+        }
+
         PublicKeyAccount haveAssetMaker = assetHave.getMaker();
         PublicKeyAccount inviter;
         if (assetHave.getAssetType() == AS_NON_FUNGIBLE) {
-            // значит приход + это тот актив который мы можем поделить
-            if (receiver.equals(haveAssetMaker)) {
-                assetMakerRoyalty = BigDecimal.ZERO;
-            } else {
-                // это не сам автор продает
-                assetMakerRoyalty = tradeAmount.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
-            }
 
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
             if (issuerPersonDuration != null) {
@@ -2321,12 +2411,7 @@ public abstract class AssetCls extends ItemCls {
                 if (inviter == null) {
                     inviterRoyalty = BigDecimal.ZERO;
                 } else {
-                    if (receiver.equals(haveAssetMaker)) {
-                        // сам автор продает - 1/100
-                        inviterRoyalty = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
-                    } else {
-                        inviterRoyalty = assetMakerRoyalty.movePointLeft(1).setScale(scale, RoundingMode.DOWN);
-                    }
+                    inviterRoyalty = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
                 }
             } else {
                 inviter = null;
@@ -2336,9 +2421,10 @@ public abstract class AssetCls extends ItemCls {
             // всегда 1% форжеру
             forgerFee = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
 
-        } else if (assetWant.getKey() < 100 && !isInitiator) {
+        } else if (!assetWant.isAccounting()
+                && assetWant.getKey() < assetWant.getStartKey()
+                && !isInitiator) {
             // это системные активы - берем комиссию за них
-            assetMakerRoyalty = BigDecimal.ZERO;
             forgerFee = tradeAmount.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
 
             // за рефералку тут тоже
@@ -2355,20 +2441,13 @@ public abstract class AssetCls extends ItemCls {
             }
 
         } else {
-            assetMakerRoyalty = BigDecimal.ZERO;
             inviterRoyalty = BigDecimal.ZERO;
             inviter = null;
             forgerFee = BigDecimal.ZERO;
         }
 
-        if (assetMakerRoyalty.signum() > 0) {
-            tradeAmount = tradeAmount.subtract(assetMakerRoyalty);
-
-            haveAssetMaker.changeBalance(dcSet, asOrphan, false, assetWantKey,
-                    assetMakerRoyalty, false, false, false);
-            if (!asOrphan && block != null)
-                block.addCalculated(haveAssetMaker, assetWantKey, assetMakerRoyalty,
-                        "NFT Royalty by Order @" + Transaction.viewDBRef(orderID), orderID);
+        if (assetRoyaltyTotal.signum() > 0) {
+            tradeAmount = tradeAmount.subtract(assetRoyaltyTotal);
         }
 
         if (inviterRoyalty.signum() > 0) {

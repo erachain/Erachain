@@ -353,7 +353,10 @@ public class Order implements Comparable<Order> {
     public BigDecimal getAmountWantLeft() {
         // надо округлять до точности актива, иначе из-за более точной цены может точность лишу дать в isUnResolved
         //return this.getAmountHaveLeft().multiply(this.price, rounding).setScale(this.wantAssetScale, RoundingMode.HALF_DOWN);
-        return this.getAmountHaveLeft().multiply(this.price).setScale(this.wantAssetScale, RoundingMode.HALF_DOWN);
+        return this.getAmountHaveLeft().multiply(this.price).setScale(this.wantAssetScale,
+                //RoundingMode.DOWN); // DOWN - only!
+                RoundingMode.HALF_DOWN); // HALF_DOWN - only!
+
     }
 
     //////// FULFILLED
@@ -614,6 +617,7 @@ public class Order implements Comparable<Order> {
 
         order.put("fulfilledHave", this.fulfilledHave.toPlainString());
         order.put("leftHave", amountHave.subtract(fulfilledHave).toPlainString());
+        order.put("leftWant", getAmountWantLeft().toPlainString());
 
         order.put("leftPrice", calcLeftPrice().toPlainString());
         order.put("leftPriceReverse", calcLeftPriceReverse().toPlainString());
@@ -664,8 +668,8 @@ public class Order implements Comparable<Order> {
                 //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
                 //// 	255979-3	255992-1
                 //|| height == 255992
-                ///Transaction.viewDBRef(id).equals("15057-1")
-                id == 3644468729217028L
+                Transaction.viewDBRef(id).equals("2685-1")
+            //id == 3644468729217028L
 
 
             //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
@@ -770,6 +774,7 @@ public class Order implements Comparable<Order> {
         }
 
         boolean completedOrder = false;
+        // используется для порядка отражения ордеров при поиске
         int index = 0;
 
         while (!completedOrder && index < orders.size()) {
@@ -787,8 +792,8 @@ public class Order implements Comparable<Order> {
             index++;
 
             if (debug ||
-                    //Transaction.viewDBRef(id).equals("776446-1")
-                    id == 3644468729217028L
+                    Transaction.viewDBRef(id).equals("2685-1")
+                //id == 3644468729217028L
             ) {
                 debug = true;
             }
@@ -878,13 +883,16 @@ public class Order implements Comparable<Order> {
                             BigDecimal priceUpdateTrade = calcPrice(orderAmountHaveLeft,
                                     // this.haveSacel for order.WANT
                                     tradeAmountForWant, haveAssetScale);
-                            // если цена такущей сделки не сильно изменится
-                            // или если остаток у ордера стенкт уже очень маленький по сравнению с текущей сделкой
+                            // если цена текущей сделки не сильно изменится
+                            // или если остаток у ордера стенки уже очень маленький по сравнению с текущей сделкой
                             // то весь ордер в сделку сольем
                             if (Order.isPricesClose(orderPrice, priceUpdateTrade, false)
                                     || orderAmountHaveLeft.subtract(tradeAmountForHave)
                                     .divide(orderAmountHaveLeft,
-                                            BlockChain.TRADE_PRICE_DIFF_LIMIT.scale(), RoundingMode.DOWN)
+                                            BlockChain.TRADE_PRICE_DIFF_LIMIT.scale(),
+                                            RoundingMode.DOWN) // FOR compare!
+                                    ///RoundingMode.HALF_DOWN)
+
                                     .compareTo(BlockChain.TRADE_PRICE_DIFF_LIMIT) < 0) {
 
                                 tradeAmountForHave = orderAmountHaveLeft;
@@ -985,8 +993,9 @@ public class Order implements Comparable<Order> {
 
                 //TRANSFER FUNDS
                 if (height > BlockChain.VERS_5_3) {
+                    AssetCls assetWant = ((CreateOrderTransaction) transaction).getWantAsset();
                     AssetCls.processTrade(dcSet, block, order.getCreator(),
-                            false, ((CreateOrderTransaction) transaction).getWantAsset(),
+                            false, assetWant,
                             ((CreateOrderTransaction) transaction).getHaveAsset(),
                             false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
 

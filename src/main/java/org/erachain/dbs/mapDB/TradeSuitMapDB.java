@@ -18,9 +18,9 @@ import org.mapdb.Fun.Tuple3;
 
 /**
  * Хранит сделки на бирже
- * Ключ: ссылка на иницатора + ссылка на цель
+ * Ключ: ссылка на инициатора + ссылка на цель
  * Значение - Сделка
-Initiator DBRef (Long) + Target DBRef (Long) -> Trade
+ * Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
 public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {

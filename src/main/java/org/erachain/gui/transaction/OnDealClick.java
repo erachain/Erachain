@@ -284,6 +284,10 @@ public class OnDealClick {
                 mess = "Invalid claim Creator: claim may be only to it Issuer";
                 break;
 
+            case Transaction.INVALID_AWARD:
+                mess = "Invalid Award Item";
+                break;
+
             case Transaction.INVALID_QUANTITY:
                 mess = "Invalid quantity";
                 break;

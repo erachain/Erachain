@@ -804,7 +804,6 @@ public class BlockExplorer {
                 output.put("error", "order not found");
                 return output;
             }
-            output.put("active", true);
         }
 
         output.put("order", order.toJson());
@@ -854,6 +853,7 @@ public class BlockExplorer {
         output.put("Label_Active", Lang.T("Active", langObj));
         output.put("Label_Completed", Lang.T("Completed", langObj));
         output.put("Label_Canceled", Lang.T("Canceled", langObj));
+        output.put("Label_Cancel", Lang.T("Cancel", langObj));
 
         output.put("Label_Fulfilled", Lang.T("Fulfilled", langObj));
         output.put("Label_LeftHave", Lang.T("Left Have", langObj));
@@ -886,7 +886,13 @@ public class BlockExplorer {
         AssetCls pairAssetHave;
         AssetCls pairAssetWant;
 
-        Order orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
+        Order orderInitiator = null;
+        Transaction cancelTX = null;
+        if (trade.isCancel()) {
+            cancelTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+        } else {
+            orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
+        }
 
         long pairHaveKey;
         long pairWantKey;
@@ -946,12 +952,21 @@ public class BlockExplorer {
         tradeJSON.put("realReversePrice", trade.calcPriceRevers());
 
         if (orderInitiator == null) {
-            if (BlockChain.CHECK_BUGS > 7) {
-                // show ERROR
-                tradeJSON.put("initiatorTx", "--");
-                tradeJSON.put("initiatorCreator_addr", "--"); // viewCreator
-                tradeJSON.put("initiatorCreator", "--");
-                tradeJSON.put("initiatorAmount", "--");
+            // CANCEL
+            if (cancelTX == null) {
+                if (BlockChain.CHECK_BUGS > 5) {
+                    // show ERROR
+                    tradeJSON.put("initiatorTx", "--");
+                    tradeJSON.put("initiatorCreator_addr", "--"); // viewCreator
+                    tradeJSON.put("initiatorCreator", "--");
+                    tradeJSON.put("initiatorAmount", "--");
+                }
+            } else {
+                // show CANCEL
+                tradeJSON.put("initiatorTx", cancelTX.viewHeightSeq());
+                tradeJSON.put("initiatorCreator_addr", cancelTX.getCreator().getAddress()); // viewCreator
+                tradeJSON.put("initiatorCreator", cancelTX.getCreator().getPersonOrShortAddress(12));
+                tradeJSON.put("initiatorAmount", trade.getAmountHave().toPlainString());
             }
         } else {
             tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
@@ -969,7 +984,13 @@ public class BlockExplorer {
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
-        if (orderInitiator == null && BlockChain.CHECK_BUGS > 7 || pairHaveKey == orderInitiator.getHaveAssetKey()) {
+        if (cancelTX != null) {
+            tradeJSON.put("type", "cancel");
+
+            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+
+        } else if (orderInitiator == null && BlockChain.CHECK_BUGS > -1 || pairHaveKey == orderInitiator.getHaveAssetKey()) {
             tradeJSON.put("type", "sell");
 
             tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());

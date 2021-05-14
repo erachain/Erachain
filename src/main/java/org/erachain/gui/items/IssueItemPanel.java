@@ -193,6 +193,13 @@ public abstract class IssueItemPanel extends IconPanel {
 
     protected abstract boolean checkValues();
 
+    protected void makeAppData() {
+        itemAppData = ItemCls.makeAppData(0L,
+                !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
+                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType());
+
+    }
+
     protected abstract void makeTransaction();
 
     protected abstract String makeTransactionView();
@@ -261,9 +268,7 @@ public abstract class IssueItemPanel extends IconPanel {
             }
 
             // соберем данные общего класса
-            itemAppData = ItemCls.makeAppData(0L,
-                    !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType());
+            makeAppData();
 
             makeTransaction();
 

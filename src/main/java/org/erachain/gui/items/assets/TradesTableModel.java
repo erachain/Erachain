@@ -182,8 +182,8 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 // Поэтому просто ищем тутт по ID
                 Fun.Tuple2<Long, Long> key = (Fun.Tuple2<Long, Long>) object;
                 for (Trade trade : list) {
-                    if (trade.getInitiator().equals(key.a)
-                            && trade.getTarget().equals(key.b)) {
+                    if (trade.getInitiator() == key.a
+                            && trade.getTarget() == key.b) {
                         this.needUpdate = true;
                         return;
                     }

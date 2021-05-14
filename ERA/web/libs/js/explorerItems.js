@@ -90,8 +90,13 @@ function itemHead(item, forPrint) {
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_TXCreator + ':<b> ' + creator + '</b><br>';
         } else {
             output += ': <a href=?tx=' + item.tx_seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + item.tx_seqNo + '</b></a></h4>';
-            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Pubkey + ':<b> ' + item.tx_creator_pubkey + '</b><br>';
-            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ':<b> ' + item.reference + '</b><br>';
+
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Pubkey + ': '
+             + '<a href ="?address=' + item.tx_creator_pubkey + get_lang() + '"><b> ' + item.tx_creator_pubkey + '</b></a><br>';
+
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ': '
+             + '<a href ="?tx=' + item.tx_signature + get_lang() + '"><b>' + item.tx_signature + '</b></a><br>';
+
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_TXCreator + ':<b> ' + creator + '</b><br>';
 
             output += '<a href=?q=' + item.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.Label_Actions + '</b></a>';
@@ -112,7 +117,8 @@ function itemFoot(item, forPrint) {
     var output = '';
     if (item.description) {
         output += '<h3>' + item.Label_Description;
-        output += ' &nbsp&nbsp<a href=../api'+ type + '/text/' + item.key + ' class="tiny button ll-blue-bgc" style="font-size:0.7em"><b>' + item.Label_SourceText + '</b></a>';
+        if (!forPrint)
+            output += ' &nbsp&nbsp<a href=../api'+ type + '/text/' + item.key + ' class="tiny button ll-blue-bgc" style="font-size:0.7em"><b>' + item.Label_SourceText + '</b></a>';
         output += '</h3><br>' + fformat(item.description);
     }
 

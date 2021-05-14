@@ -104,13 +104,37 @@ function asset(data, forPrint) {
     if (!forPrint)
         output += ', &nbsp&nbsp<a href=?top=all&asset=' + item.key + get_lang() + ' class="button ll-blue-bgc"><b>' + item.Label_Holders + '</b></a>';
 
-    output += '<br>' + item.Label_AssetType + ': <a href=?q=%3A' + item.type_abbrev + get_lang() + '&search=assets ><b>' + item.assetTypeNameFull + '</b></a><br>';
+    output += '<br>' + item.Label_AssetType + ': ';
+    if (forPrint) {
+        output += '<b>' + item.assetTypeNameFull + '</b><br>';
+    } else {
+        output += '<a href=?q=%3A' + item.type_abbrev + get_lang() + '&search=assets ><b>' + item.assetTypeNameFull + '</b></a><br>';
+    }
+
     if (item.properties) {
         output += '</p><p style="margin-bottom:0px">';
         output += '<b>' + item.Label_Properties + '</b>: ' + item.properties + '</p>';
     }
 
     output += '<p style="margin-bottom:0px"><b>' + item.Label_AssetType_Desc + '</b>: ' + item.assetTypeDesc + '</p>';
+
+    if (item.DEXAwards) {
+        output += '<p style="margin-bottom:0px"><b>' + item.Label_DEX_Awards + '</b>:<br>';
+        for (key in item.DEXAwards) {
+            output += '&nbsp;&nbsp;&nbsp;&nbsp;';
+            if (forPrint) {
+                output += item.DEXAwards[key].address;
+            } else {
+                output += '<a href ="?address=' + item.DEXAwards[key].address + get_lang() + '">' + item.DEXAwards[key].address + '</a>';
+            }
+            output += ' <b>x' + item.DEXAwards[key].value1 * 0.001 + '%</b>';
+            if (item.DEXAwards[key].memo) {
+                output += ' - ' + item.DEXAwards[key].memo;
+            }
+            output += '<br>';
+        }
+        output += '</p>';
+    }
 
     output += itemFoot(item, forPrint);
 

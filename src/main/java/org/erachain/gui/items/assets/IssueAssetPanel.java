@@ -1,6 +1,7 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.item.assets.AssetUnique;
@@ -37,7 +38,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     private AssetTypesComboBoxModel assetTypesComboBoxModel;
 
-    private MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel(fromJComboBox);
+    private MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel(fromJComboBox, assetTypeJComboBox);
 
     public IssueAssetPanel() {
         super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true, true);
@@ -144,8 +145,6 @@ public class IssueAssetPanel extends IssueItemPanel {
             scaleJLabel.setVisible(true);
         }
 
-        multipleRoyaltyPanel.setVisible(assetType.getId() == AssetCls.AS_NON_FUNGIBLE);
-
     }
 
     protected boolean checkValues() {
@@ -183,6 +182,14 @@ public class IssueAssetPanel extends IssueItemPanel {
         return true;
     }
 
+    @Override
+    protected void makeAppData() {
+        itemAppData = AssetCls.makeAppData(!addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
+                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
+                multipleRoyaltyPanel.recipientsTableModel.getRecipients());
+
+    }
+
     protected void makeTransaction() {
 
         AssetCls asset;
@@ -213,8 +220,19 @@ public class IssueAssetPanel extends IssueItemPanel {
                 + Lang.T("Asset Type") + ":&nbsp;"
                 + "<b>" + asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:" + Lang.T(asset.viewAssetTypeFull() + "") + "<br>"
                 + Lang.T("Quantity") + ":&nbsp;" + asset.getQuantity() + ", "
-                + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
-                + Lang.T("Description") + ":<br>";
+                + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>";
+
+        if (asset.getDEXAwards() != null) {
+            text += Lang.T("DEX Awards" + ":");
+            for (ExLinkAddress award : asset.getDEXAwards()) {
+                text += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
+                        + (award.getMemo() == null || award.getMemo().isEmpty() ? "" : " - " + award.getMemo());
+            }
+            text += "<br>";
+        }
+
+        text += Lang.T("Description") + ":<br>";
+
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
             text += Library.to_HTML(Lang.T(asset.viewDescription())) + "<br>";
         } else {

@@ -311,7 +311,7 @@ public class APIExchange {
         if (trade == null) {
             out.put("last", "--");
         } else {
-            if (trade.getHaveKey().equals(want)) {
+            if (trade.getHaveKey() == want) {
                 out.put("lastPrice", trade.calcPrice().toPlainString());
                 out.put("lastAmount", trade.getAmountHave().toPlainString());
                 out.put("lastDir", "buy");

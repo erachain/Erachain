@@ -216,11 +216,11 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
             }
 
             Order order = get(key);
-            if (BlockChain.CHECK_BUGS > 1 && order == null) {
+            if (BlockChain.CHECK_BUGS > -1 && order == null) {
                 logger.error("ORDER [" + Transaction.viewDBRef(key) + "] = NULL");
             }
             result.put(key, order);
-            // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
+            // здесь хотя бы одну заявку с неподходящей вроде бы ценой нужно взять
             // причем берем по Остаткам Цену теперь
             if (stopPrice != null && order.calcLeftPrice().compareTo(stopPrice) > 0) {
                 break;
