@@ -2168,14 +2168,14 @@ public abstract class AssetCls extends ItemCls {
                 if (exAddress.getValue1() <= 0) {
                     errorValue = "Award[" + i + "] percent is so small (<=0%)";
                     return Transaction.INVALID_AWARD;
-                } else if (exAddress.getValue1() > 50000) {
-                    errorValue = "Award[" + i + "] percent is so big (>50%)";
+                } else if (exAddress.getValue1() > 25000) {
+                    errorValue = "Award[" + i + "] percent is so big (>25%)";
                     return Transaction.INVALID_AWARD;
                 }
 
                 total += exAddress.getValue1();
-                if (total > 50000) {
-                    errorValue = "Total Award percent is so big (>50%)";
+                if (total > 25000) {
+                    errorValue = "Total Award percent is so big (>25%)";
                     return Transaction.INVALID_AWARD;
                 }
             }
