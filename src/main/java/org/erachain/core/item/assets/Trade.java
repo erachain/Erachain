@@ -93,7 +93,10 @@ public class Trade {
     }
 
     public Order getInitiatorOrder(DCSet db) {
-        return Order.getOrder(db, this.initiator);
+        if (type == TYPE_TRADE)
+            return Order.getOrder(db, this.initiator);
+
+        return null;
     }
 
     public long getTarget() {
@@ -198,11 +201,16 @@ public class Trade {
         }
 
         if (withCreators) {
-            Order order = getInitiatorOrder(DCSet.getInstance());
-            trade.put("initiatorCreator", order.getCreator().getAddress());
+            if (isCancel()) {
+                Transaction cancelTX = DCSet.getInstance().getTransactionFinalMap().get(initiator);
+                trade.put("initiatorCreator", cancelTX.getCreator().getAddress());
+            } else {
+                Order order = getInitiatorOrder(DCSet.getInstance());
+                trade.put("initiatorCreator", order.getCreator().getAddress());
+            }
 
-            order = getTargetOrder(DCSet.getInstance());
-            trade.put("targetCreator", order.getCreator().getAddress());
+            Order orderTarget = getTargetOrder(DCSet.getInstance());
+            trade.put("targetCreator", orderTarget.getCreator().getAddress());
 
         }
 
