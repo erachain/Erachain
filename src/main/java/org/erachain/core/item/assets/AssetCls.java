@@ -2409,20 +2409,19 @@ public abstract class AssetCls extends ItemCls {
         }
 
         PublicKeyAccount haveAssetMaker = assetHave.getMaker();
-        PublicKeyAccount inviter;
+        PublicKeyAccount inviter = null;
+
         if (assetHave.getAssetType() == AS_NON_FUNGIBLE) {
 
             Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
             if (issuerPersonDuration != null) {
                 inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
-                if (inviter == null) {
-                    inviterRoyalty = BigDecimal.ZERO;
-                } else {
-                    inviterRoyalty = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
-                }
-            } else {
-                inviter = null;
+            }
+
+            if (inviter == null) {
                 inviterRoyalty = BigDecimal.ZERO;
+            } else {
+                inviterRoyalty = tradeAmount.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
             }
 
             // всегда 1% форжеру
@@ -2447,10 +2446,35 @@ public abstract class AssetCls extends ItemCls {
                 inviterRoyalty = BigDecimal.ZERO;
             }
 
-        } else {
+        } else if (assetHave.isAccounting()) {
+            // FOR ACCOUNTING not USE
             inviterRoyalty = BigDecimal.ZERO;
             inviter = null;
             forgerFee = BigDecimal.ZERO;
+
+        } else {
+
+            if (assetRoyaltyTotal.signum() > 0) {
+
+                Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = haveAssetMaker.getPersonDuration(dcSet);
+                if (issuerPersonDuration != null) {
+                    inviter = PersonCls.getIssuer(dcSet, issuerPersonDuration.a);
+                }
+
+                if (inviter == null) {
+                    inviterRoyalty = BigDecimal.ZERO;
+                } else {
+                    inviterRoyalty = assetRoyaltyTotal.movePointLeft(2).setScale(scale, RoundingMode.DOWN);
+                }
+
+                forgerFee = assetRoyaltyTotal.movePointLeft(3).setScale(scale, RoundingMode.DOWN);
+
+            } else {
+                inviterRoyalty = BigDecimal.ZERO;
+                inviter = null;
+                forgerFee = BigDecimal.ZERO;
+            }
+
         }
 
         if (assetRoyaltyTotal.signum() > 0) {
