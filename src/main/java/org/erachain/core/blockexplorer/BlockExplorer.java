@@ -2869,6 +2869,7 @@ public class BlockExplorer {
 
         output.put("countTx", txCountJSON);
 
+        output.put("size", block.blockHead.size);
         output.put("totalFee", block.viewTotalFeeAsBigDecimal());
         output.put("version", block.getVersion());
 
@@ -2913,6 +2914,7 @@ public class BlockExplorer {
         output.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
         output.put("Label_Total_AT_Amount", Lang.T("Total AT Amount", langObj));
         output.put("Label_Total_Fee", Lang.T("Total Fee", langObj));
+        output.put("Label_Size", Lang.T("Size", langObj));
 
         output.put("Label_Win_Value", Lang.T("Win Value", langObj));
         output.put("Label_Generating_Balance",
