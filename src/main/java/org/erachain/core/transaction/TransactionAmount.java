@@ -876,7 +876,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     BigDecimal forSale = creator.getForSale(dcSet, FEE_KEY, height, true);
 
                                     if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0) {
-                                        amount = amount.add(fee);
+                                        forSale = forSale.subtract(fee);
                                         if (assetFee != null && assetFee.signum() != 0) {
                                             // учтем что еще процент с актива
                                             forSale = forSale.subtract(assetFee);
