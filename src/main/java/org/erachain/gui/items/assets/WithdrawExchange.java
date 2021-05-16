@@ -51,6 +51,7 @@ public class WithdrawExchange extends IconPanel {
     private JLabel jLabel_Details;
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
+    JLabel jText_Help = new JLabel();
 
     private AssetCls asset;
 
@@ -236,8 +237,6 @@ public class WithdrawExchange extends IconPanel {
         add(jText_Title, gridBagConstraints);
         jText_Title.setText("<html><h1>" + Lang.T("Withdraw from the Exchange") + "</h1></html>");
 
-        JLabel jText_Help = new JLabel();
-
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = ++gridy;
@@ -246,18 +245,6 @@ public class WithdrawExchange extends IconPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_Help, gridBagConstraints);
-        String cryto = "BTC";
-        jText_Help.setText("<html><h2>1. " + Lang.T("Select the Asset that you want to withdraw") + "</h2>"
-                + "<h3>2. " + Lang.T("Set the address to which you want to withdraw funds")
-                + ". " + Lang.T("And click button '%1' to open the panel for payment").replace("%1",
-                Lang.T("Withdraw"))
-                + ". " + Lang.T("Where You need to set only amount of withdraw asset in the panel for payment")
-                + ".</h3>"
-                + Lang.T("Minimal payment in equivalent")
-                + " <b>" + 0.00025 + " " + cryto + "</b>" + "<br>"
-                //+ Lang.T("Service will take commission fee approx - %1%").replace("%1","2.75")
-                + Lang.T("Service will have some commission")
-                + "</html>");
 
         /////////////// ASSET
         jLabel_Asset.setText(Lang.T("Asset") + ":");
@@ -285,28 +272,7 @@ public class WithdrawExchange extends IconPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    asset = (AssetCls) cbxAssets.getSelectedItem();
-
-                    String cryto;
-                    switch ((int) asset.getKey()) {
-                        case (int) DepositExchange.TEST_ASSET:
-                            cryto = "ZEN";
-                            break;
-                        default:
-                            cryto = asset.getName();
-                    }
-
-                    jText_Help.setText("<html><h3>2. " + Lang.T("Set the address to which you want to withdraw")
-                            + " " + cryto
-                            + ". " + Lang.T("And click button '%1' to open the panel for payment").replace("%1",
-                            Lang.T("Next"))
-                            + ". " + Lang.T("Where You need to set only amount of withdraw asset in the panel for payment")
-                            + ".</h3>"
-                            + Lang.T("Minimal payment in equivalent")
-                            + " <b>" + 0.00025 + " " + cryto + "</b>" + "<br>"
-                            //+ Lang.T("Service will take commission fee approx - %1%").replace("%1","2.75")
-                            + Lang.T("Service will have some commission")
-                    );
+                    reset();
                 }
             }
         });
@@ -420,6 +386,31 @@ public class WithdrawExchange extends IconPanel {
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_History, gridBagConstraints);
 
+        reset();
     }
 
+    private void reset() {
+        asset = (AssetCls) cbxAssets.getSelectedItem();
+
+        String cryto;
+        switch ((int) asset.getKey()) {
+            case (int) DepositExchange.TEST_ASSET:
+                cryto = "ZEN";
+                break;
+            default:
+                cryto = asset.getName();
+        }
+
+        jText_Help.setText("<html><h3>2. " + Lang.T("Set the address to which you want to withdraw")
+                + " " + cryto
+                + ". " + Lang.T("And click button '%1' to open the panel for payment").replace("%1",
+                Lang.T("Next"))
+                + ". " + Lang.T("Where You need to set only amount of withdraw asset in the panel for payment")
+                + ".</h3>"
+                + Lang.T("Minimal payment in equivalent")
+                + " <b>" + 2.5 + " USD</b>" + "<br>"
+                + Lang.T("Service will have some commission")
+        );
+
+    }
 }
