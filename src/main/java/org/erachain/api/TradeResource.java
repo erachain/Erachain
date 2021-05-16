@@ -406,10 +406,10 @@ public class TradeResource {
             if (startOrderID == null) {
                 startOrderID = Long.parseLong(fromOrder);
             }
-            listResult = Controller.getInstance().getTradeByOrderID(startOrderID, limit);
+            listResult = Controller.getInstance().getTradeFromToOrderID(startOrderID, 0, limit, false);
 
         } else if (fromHeight != null) {
-            listResult = Controller.getInstance().getTradeByHeight(fromHeight, limit);
+            listResult = Controller.getInstance().getTradeFromToHeight(fromHeight, 0, limit);
         } else {
             listResult = Controller.getInstance().getTradeByTimestamp(fromTimestamp * 1000, limit);
         }
@@ -446,10 +446,10 @@ public class TradeResource {
                 startOrderID = Long.parseLong(fromOrder);
             }
 
-            listResult = Controller.getInstance().getTradeByOrderID(have, want, startOrderID, limit);
+            listResult = Controller.getInstance().getTradeFromToOrderID(have, want, startOrderID, 0, limit, false);
 
         } else if (fromHeight != null) {
-            listResult = Controller.getInstance().getTradeByHeight(have, want, fromHeight, limit);
+            listResult = Controller.getInstance().getTradeFromToHeight(have, want, fromHeight, 0, limit);
         } else {
             listResult = Controller.getInstance().getTradeByTimestamp(have, want, fromTimestamp * 1000, limit);
         }
@@ -499,10 +499,10 @@ public class TradeResource {
                 startOrderID = Long.parseLong(fromOrder);
             }
 
-            listResult = Controller.getInstance().getTradeByOrderID(have, want, startOrderID, limit);
+            listResult = Controller.getInstance().getTradeFromToOrderID(have, want, startOrderID, 0, limit, false);
 
         } else if (fromHeight != null) {
-            listResult = Controller.getInstance().getTradeByHeight(have, want, fromHeight, limit);
+            listResult = Controller.getInstance().getTradeFromToHeight(have, want, fromHeight, 0, limit);
         } else {
             listResult = Controller.getInstance().getTradeByTimestamp(have, want, fromTimestamp * 1000, limit);
         }

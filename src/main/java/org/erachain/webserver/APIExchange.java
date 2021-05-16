@@ -509,7 +509,7 @@ public class APIExchange {
             startOrder = startLong;
 
         JSONArray arrayJSON = new JSONArray();
-        for (Trade trade : dcSet.getTradeMap().getTradesByOrderID(have, want, startOrder, 0, limit)) {
+        for (Trade trade : dcSet.getTradeMap().getTradesFromToOrderID(have, want, startOrder, 0, limit, false)) {
             JSONObject json = new JSONObject();
             json.put("initial_order_id", Transaction.viewDBRef(trade.getInitiator()));
             json.put("target_order_id", Transaction.viewDBRef(trade.getTarget()));

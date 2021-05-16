@@ -808,7 +808,7 @@ public class BlockExplorer {
 
         output.put("order", order.toJson());
 
-        List<Trade> trades = dcSet.getTradeMap().getTradesByOrderID(orderId);
+        List<Trade> trades = dcSet.getTradeMap().getTradesByOrderID(orderId, true);
 
         AssetCls assetHave = Controller.getInstance().getAsset(order.getHaveAssetKey());
         AssetCls assetWant = Controller.getInstance().getAsset(order.getWantAssetKey());

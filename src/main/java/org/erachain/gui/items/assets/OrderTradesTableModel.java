@@ -32,7 +32,7 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
 
         this.order = order;
         this.isSell = isSell;
-        this.list = DCSet.getInstance().getTradeMap().getTradesByOrderID(order.getId());
+        this.list = DCSet.getInstance().getTradeMap().getTradesByOrderID(order.getId(), true);
 
     }
 
@@ -51,7 +51,7 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
         int type = 0;
         DCSet dcSet = DCSet.getInstance();
 
-        Transaction initiatorOrderTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+        Transaction initiatorOrderTX = trade.getInitiatorTX(dcSet);
         Order targetOrder = Order.getOrder(dcSet, trade.getTarget());
 
         boolean isMine = Controller.getInstance().isAddressIsMine(initiatorOrderTX.getCreator().getAddress())
