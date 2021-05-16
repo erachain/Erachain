@@ -307,7 +307,7 @@ public class APIExchange {
             out.put("wantPrice", wantOrder.calcLeftPriceReverse().toPlainString());
         }
 
-        Trade trade = dcSet.getTradeMap().getLastTrade(have, want);
+        Trade trade = dcSet.getTradeMap().getLastTrade(have, want, false);
         if (trade == null) {
             out.put("last", "--");
         } else {

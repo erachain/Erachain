@@ -170,6 +170,10 @@ public class PairsController {
                         LOGGER.warn("trade for pair [" + key1 + "/" + key2 + "] not found");
                         continue;
                     }
+
+                    if (trade.isCancel())
+                        continue;
+
                     if (currentPair != null && lastTrade == null) {
                         // изменений не было
                         if (trade.getTimestamp() == currentPair.getLastTime()) {
@@ -203,7 +207,7 @@ public class PairsController {
                 // тут подсчет отклонения за сутки
             } else {
                 // за последние сутки не было сделок, значит смотрим просто последнюю цену
-                trade = tradesMap.getLastTrade(key1, key2);
+                trade = tradesMap.getLastTrade(key1, key2, false);
                 if (trade != null) {
                     reversed = trade.getHaveKey() == key2;
                     price = lastPrice = maxPrice = minPrice = reversed ? trade.calcPrice() : trade.calcPriceRevers();
@@ -267,6 +271,9 @@ public class PairsController {
             while (iterator.hasNext()) {
                 Trade trade = tradesMap.get(iterator.next());
                 if (trade == null)
+                    continue;
+
+                if (trade.isCancel())
                     continue;
 
                 if (lastTrade == null)

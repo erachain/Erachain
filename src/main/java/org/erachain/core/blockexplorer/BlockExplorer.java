@@ -1017,7 +1017,7 @@ public class BlockExplorer {
         List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTrade(have, want, false);
         List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTrade(want, have, true);
 
-        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 50);
+        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 50, false);
 
         AssetCls assetHave = Controller.getInstance().getAsset(have);
         AssetCls assetWant = Controller.getInstance().getAsset(want);
@@ -1138,6 +1138,9 @@ public class BlockExplorer {
 
         int i = 0;
         for (Trade trade : trades) {
+
+            if (trade.isCancel())
+                continue;
 
             tradesJSON.put(i++, tradeJSON(trade, assetHave, assetWant));
 
@@ -1394,32 +1397,6 @@ public class BlockExplorer {
         }
 
         return output;
-    }
-
-    private void duplicateCodeAssets(Map assetsJSON, AssetCls asset) {
-        Map assetJSON = new LinkedHashMap();
-
-        assetJSON.put("key", asset.getKey());
-        assetJSON.put("name", asset.viewName());
-        if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            assetJSON.put("description", Lang.T(asset.viewDescription(), langObj));
-        } else {
-            assetJSON.put("description", asset.viewDescription());
-        }
-        assetJSON.put("maker", asset.getMaker().getAddress());
-        assetJSON.put("quantity", NumberAsString.formatAsString(asset.getQuantity()));
-        assetJSON.put("released", NumberAsString.formatAsString(asset.getReleased(dcSet)));
-        assetJSON.put("scale", asset.getScale());
-        assetJSON.put("assetType", Lang.T(asset.viewAssetType(), langObj));
-        assetJSON.put("assetTypeFull", Lang.T(asset.viewAssetTypeFull(), langObj));
-        ///assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
-        assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-        List<Order> orders = dcSet
-                .getOrderMap().getOrders(asset.getKey());
-        List<Trade> trades = dcSet.getTradeMap()
-                .getTrades(asset.getKey());
-        assetJSON.put("operations", orders.size() + trades.size());
-        assetsJSON.put(asset.getKey(), assetJSON);
     }
 
     private void jsonQueryItemPerson(String first, boolean forPrint) {
@@ -2258,7 +2235,7 @@ public class BlockExplorer {
         output.put("type", "exchange");
         output.put("search_placeholder", Lang.T("Type searching asset keys", langObj));
 
-        OrderMap orders = dcSet.getOrderMap();
+        //OrderMap orders = dcSet.getOrderMap();
         TradeMap trades = dcSet.getTradeMap();
 
         JSONArray pairsArray = new JSONArray();
@@ -2307,6 +2284,8 @@ public class BlockExplorer {
                 if (trade == null) {
                     Long error = null;
                 }
+                if (trade.isCancel())
+                    continue;
 
                 tradesArray.add(tradeJSON(trade, null, null));
             }
@@ -2526,39 +2505,27 @@ public class BlockExplorer {
         List<Object> all = new ArrayList<Object>();
 
         Trade trade;
-        if (false) {
-            String[] signatures = query.split("/");
-            Transaction initiator = dcSet.getTransactionFinalMap().get(Base58.decode(signatures[0]));
-            Transaction target = dcSet.getTransactionFinalMap().get(Base58.decode(signatures[1]));
-            trade = dcSet.getTradeMap()
-                    .get(Fun.t2(Transaction.makeDBRef(initiator.getHeightSeqNo()),
-                            Transaction.makeDBRef(target.getHeightSeqNo())));
-            all.add(Controller.getInstance().getTransaction(Base58.decode(signatures[0])));
-            all.add(Controller.getInstance().getTransaction(Base58.decode(signatures[1])));
+        String[] refs = query.split("/");
 
-        } else {
-            String[] refs = query.split("/");
-
-            Long refInitiator = Transaction.parseDBRef(refs[0]);
-            if (refInitiator == null) {
-                output.put("error", "Initiator ID wrong");
-                return output;
-            }
-            Long refTarget = Transaction.parseDBRef(refs[1]);
-            if (refTarget == null) {
-                output.put("error", "Target ID wrong");
-                return output;
-            }
-            trade = dcSet.getTradeMap().get(Fun.t2(refInitiator, refTarget));
-            if (trade == null) {
-                output.put("error", "Trade not Found");
-                return output;
-            }
-
-            all.add(DCSet.getInstance().getTransactionFinalMap().get(refInitiator));
-            all.add(DCSet.getInstance().getTransactionFinalMap().get(refTarget));
-
+        Long refInitiator = Transaction.parseDBRef(refs[0]);
+        if (refInitiator == null) {
+            output.put("error", "Initiator ID wrong");
+            return output;
         }
+        Long refTarget = Transaction.parseDBRef(refs[1]);
+        if (refTarget == null) {
+            output.put("error", "Target ID wrong");
+            return output;
+        }
+        trade = dcSet.getTradeMap().get(Fun.t2(refInitiator, refTarget));
+        if (trade == null) {
+            output.put("error", "Trade not Found");
+            return output;
+        }
+
+        all.add(DCSet.getInstance().getTransactionFinalMap().get(refInitiator));
+        all.add(DCSet.getInstance().getTransactionFinalMap().get(refTarget));
+
         output.put("type", "trade");
         output.put("trade", query);
 

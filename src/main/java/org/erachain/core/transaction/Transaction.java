@@ -1494,7 +1494,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         BigDecimal compuRate;
         if (useDEX) {
-            Trade lastTrade = DCSet.getInstance().getTradeMap().getLastTrade(AssetCls.FEE_KEY, asset.getKey());
+            Trade lastTrade = DCSet.getInstance().getTradeMap().getLastTrade(AssetCls.FEE_KEY, asset.getKey(), false);
             if (lastTrade == null) {
                 compuRate = BigDecimal.ZERO;
             } else {
