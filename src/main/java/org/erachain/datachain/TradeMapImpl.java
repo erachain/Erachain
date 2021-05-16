@@ -174,7 +174,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTrades(long have, long want, Object fromKey, int limit) {
+    public List<Trade> getTrades(long have, long want, Object fromKey, int limit, boolean useCancel) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
@@ -190,8 +190,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Iterator<Tuple2<Long, Long>> iteratorLimit = Iterators.limit(iterator, limit);
 
             List<Trade> trades = new ArrayList<Trade>();
+            Trade trade;
             while (iteratorLimit.hasNext()) {
-                trades.add(this.get(iteratorLimit.next()));
+                trade = this.get(iteratorLimit.next());
+                if (!useCancel && trade.isCancel())
+                    continue;
+
+                trades.add(trade);
             }
             return trades;
 
@@ -203,7 +208,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
     @Override
     @SuppressWarnings("unchecked")
-    public Trade getLastTrade(long have, long want) {
+    public Trade getLastTrade(long have, long want, boolean andCancel) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -214,9 +219,17 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             if (iterator == null)
                 return null;
 
-            if (iterator.hasNext()) {
-                return this.get(iterator.next());
+            Trade trade;
+            while (iterator.hasNext()) {
+                trade = this.get(iterator.next());
+                if (andCancel)
+                    return trade;
+
+                if (!trade.isCancel()) {
+                    return trade;
+                }
             }
+
         } catch (IOException e) {
         }
 
@@ -302,8 +315,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorFromID(startTradeID)) {
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
+                trades.add(trade);
                 if (limit > 0 && --counter < 0)
                     break;
             }
@@ -391,8 +409,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                 return null;
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
+                trades.add(trade);
                 if (limit > 0 && --counter < 0)
                     break;
             }
@@ -416,8 +439,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                 return null;
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
+                trades.add(trade);
                 if (limit > 0 && --counter < 0)
                     break;
             }
@@ -451,6 +479,9 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
             while (iterator.hasNext()) {
                 Trade trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
                 if (trade.getHaveKey() == want) {
                     volume = volume.add(trade.getAmountHave());
                 } else {

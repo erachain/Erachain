@@ -92,11 +92,15 @@ public class Trade {
         return this.initiator;
     }
 
-    public Order getInitiatorOrder(DCSet db) {
+    public Order getInitiatorOrder(DCSet dcSet) {
         if (type == TYPE_TRADE)
-            return Order.getOrder(db, this.initiator);
+            return Order.getOrder(dcSet, this.initiator);
 
         return null;
+    }
+
+    public Transaction getInitiatorTX(DCSet dcSet) {
+        return dcSet.getTransactionFinalMap().get(this.initiator);
     }
 
     public long getTarget() {
