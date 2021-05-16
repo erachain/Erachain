@@ -71,9 +71,9 @@ public class WithdrawExchange extends IconPanel {
 
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
         //String url_string = "https://api.face2face.cash/apipay/index.json";
-        String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
-        String urlGetHistory = "https://api.face2face.cash/apipay/history.json/ERA/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
-        String urlGetDetails2 = "https://api.face2face.cash/apipay/get_uri_in.json/2/10/9/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
+        //String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
+        //String urlGetHistory = "https://api.face2face.cash/apipay/history.json/ERA/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
+        //String urlGetDetails2 = "https://api.face2face.cash/apipay/get_uri_in.json/2/10/9/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
 
         JSONObject jsonObject = null;
         String inputText = "";
@@ -84,29 +84,23 @@ public class WithdrawExchange extends IconPanel {
         String address = jTextField_Address.getText().trim();
         try {
 
+            // GET RATE
             String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
             assetIn = (AssetCls) cbxAssets.getSelectedItem();
+            String abbrevIN = assetIn.getName();
             switch ((int) assetIn.getKey()) {
-                case 12:
-                    urlGetDetails += "@BTC/BTC/" + address + "/0.1"; // eBTC -> BTC
+                case 1840:
+                    urlGetDetails += "fUSD/BTC/" + address + "/100"; // eUSD -> BTC
                     message += "BTC";
                     break;
-                case 95:
-                    urlGetDetails += "@USD/BTC/" + address + "/100"; // eUSD -> BTC
-                    message += "BTC";
-                    break;
-                case 94:
-                    urlGetDetails += "@EUR/BTC/" + address + "/100"; // eEUR -> BTC
-                    message += "BTC";
-                    break;
-                case 1114:
+                case (int) DepositExchange.TEST_ASSET:
                     urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
-                    urlGetDetails += "@ZEN/ZEN/" + address + "/30"; // eZEN -> ZEN
+                    urlGetDetails += "fZEN/ZEN/" + address + "/30"; // eZEN -> ZEN
                     message += "ZEN";
                     break;
                 default:
-                    urlGetDetails += "COMPU/BTC/" + address + "/1"; // COMPU -> BTC
-                    message += "BTC";
+                    urlGetDetails += "f" + abbrevIN + "/" + abbrevIN + "/" + address + "/10";
+                    message += abbrevIN;
             }
 
             // CREATE CONNECTION
@@ -171,19 +165,19 @@ public class WithdrawExchange extends IconPanel {
             String formTitle;
             String incomeAssetName = assetIn.getName();
             switch ((int) assetIn.getKey()) {
-                case 12:
-                    incomeAssetName = "BTC";
-                    formTitle = Lang.T("Withdraw %1 to").replace("%1", incomeAssetName) + " " + address;
-                    break;
-                case 1114:
-                    incomeAssetName = "ZEN";
-                    formTitle = Lang.T("Withdraw %1 to").replace("%1", incomeAssetName) + " " + address;
-                    break;
-                default:
+                case 1:
+                case 2:
                     formTitle = Lang.T("Transfer <b>%1</b> to this address for buy")
                             .replace("%1", incomeAssetName) + " <b>BTC</B>"
                             + " " + Lang.T("by rate") + ": <b>" + rate + "</b>"
                             + ", " + Lang.T("max buy amount") + ": <b>" + bal + "</b> BTC";
+                    break;
+                case (int) DepositExchange.TEST_ASSET:
+                    incomeAssetName = "ZEN";
+                    formTitle = Lang.T("Withdraw %1 to").replace("%1", incomeAssetName) + " " + address;
+                    break;
+                default:
+                    formTitle = Lang.T("Withdraw %1 to").replace("%1", incomeAssetName) + " " + address;
             }
 
             if (jsonObject.containsKey("may_pay")) {
@@ -295,11 +289,11 @@ public class WithdrawExchange extends IconPanel {
 
                     String cryto;
                     switch ((int) asset.getKey()) {
-                        case 1114:
+                        case (int) DepositExchange.TEST_ASSET:
                             cryto = "ZEN";
                             break;
                         default:
-                            cryto = "BTC";
+                            cryto = asset.getName();
                     }
 
                     jText_Help.setText("<html><h3>2. " + Lang.T("Set the address to which you want to withdraw")
