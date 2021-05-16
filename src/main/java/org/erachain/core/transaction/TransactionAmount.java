@@ -874,14 +874,17 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 if (absKey == FEE_KEY) {
 
                                     BigDecimal forSale = creator.getForSale(dcSet, FEE_KEY, height, true);
-                                    if (assetFee != null && assetFee.signum() != 0) {
-                                        // учтем что еще процент с актива
-                                        forSale = forSale.subtract(assetFee);
+
+                                    if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0) {
+                                        amount = amount.add(fee);
+                                        if (assetFee != null && assetFee.signum() != 0) {
+                                            // учтем что еще процент с актива
+                                            forSale = forSale.subtract(assetFee);
+                                        }
                                     }
 
-                                    if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
-                                            && !BlockChain.isFeeEnough(height, creator)
-                                            && forSale.compareTo(amount.add(fee)) < 0) {
+                                    if (!BlockChain.isFeeEnough(height, creator)
+                                            && forSale.compareTo(amount) < 0) {
 
                                         /// если это девелоп то не проверяем ниже особые счета
                                         if (BlockChain.CLONE_MODE || BlockChain.TEST_MODE)

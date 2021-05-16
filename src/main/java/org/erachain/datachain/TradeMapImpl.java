@@ -315,8 +315,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorFromID(startTradeID)) {
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
+                trades.add(trade);
                 if (limit > 0 && --counter < 0)
                     break;
             }
@@ -404,8 +409,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                 return null;
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
+                trades.add(trade);
                 if (limit > 0 && --counter < 0)
                     break;
             }
@@ -429,8 +439,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                 return null;
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
+                trades.add(trade);
                 if (limit > 0 && --counter < 0)
                     break;
             }

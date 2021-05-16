@@ -509,10 +509,11 @@ public class TradeResource {
 
         DCSet dcSet = DCSet.getInstance();
         JSONArray arrayJSON = new JSONArray();
+        Account initiatorAccount;
         for (Trade trade : listResult) {
-            Order initiator = trade.getInitiatorOrder(dcSet);
+            initiatorAccount = trade.getInitiatorTX(dcSet).getCreator();
             Order target = trade.getTargetOrder(dcSet);
-            if (initiator.getCreator().equals(address) || target.getCreator().equals(address)) {
+            if (initiatorAccount.equals(address) || target.getCreator().equals(address)) {
                 arrayJSON.add(trade.toJson(have, true));
             }
         }
