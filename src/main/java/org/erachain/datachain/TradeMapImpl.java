@@ -196,7 +196,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                 if (!useCancel && trade.isCancel())
                     continue;
 
-                trades.add(this.get(iteratorLimit.next()));
+                trades.add(trade);
             }
             return trades;
 

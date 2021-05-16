@@ -702,6 +702,12 @@ public class BlockChain {
                     new Tuple3<Long, Long, byte[]>(AssetCls.BTC_KEY, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("ETH",
                     new Tuple3<Long, Long, byte[]>(14L, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("BNB",
+                    new Tuple3<Long, Long, byte[]>(15L, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("DOGE",
+                    new Tuple3<Long, Long, byte[]>(16L, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("LTC",
+                    new Tuple3<Long, Long, byte[]>(17L, 0L, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
 
             ///
             NOVA_ASSETS.put("EI",
