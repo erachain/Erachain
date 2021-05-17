@@ -14,33 +14,34 @@ public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
 
     IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByInitiator(Long orderID);
 
-    List<Trade> getInitiatedTrades(Order order);
+    List<Trade> getInitiatedTrades(Order order, boolean useCancel);
 
-    List<Trade> getTradesByOrderID(Long orderID);
+    List<Trade> getTradesByOrderID(Long orderID, boolean useCancel);
 
     @SuppressWarnings("unchecked")
-    List<Trade> getTrades(long haveWant)
-    // get trades for order as HAVE and as WANT
+    List<Trade> getTrades(long haveWant, boolean useCancel)
+        // get trades for order as HAVE and as WANT
     ;
 
     @SuppressWarnings("unchecked")
-    List<Trade> getTrades(long have, long want, Object offset, int limit);
+    List<Trade> getTrades(long have, long want, Object offset, int limit, boolean useCancel);
 
     @SuppressWarnings("unchecked")
-    Trade getLastTrade(long have, long want);
+    Trade getLastTrade(long have, long want, boolean andCancel);
 
     List<Trade> getTradesByTimestamp(long startTimestamp, long stopTimestamp, int limit);
+
     List<Trade> getTradesByTimestamp(long have, long want, long startTimestamp, long stopTimestamp, int limit);
 
-    List<Trade> getTradesByHeight(int start, int stop, int limit);
-    List<Trade> getTradesByHeight(long have, long want, int start, int stop, int limit);
+    List<Trade> getTradesFromToHeight(int start, int stop, int limit);
+
+    List<Trade> getTradesFromToHeight(long have, long want, int start, int stop, int limit);
 
     List<Trade> getTradesFromTradeID(long[] startTradeID, int limit);
 
-    List<Trade> getTradesByTradeID(long[] startTradeID, int limit);
+    List<Trade> getTradesFromToOrderID(long startOrderID, long stopOrderID, int limit, boolean useCancel);
 
-    List<Trade> getTradesByOrderID(long startOrderID, long stopOrderID, int limit);
-    List<Trade> getTradesByOrderID(long have, long want, long startOrderID, long stopOrderID, int limit);
+    List<Trade> getTradesFromToOrderID(long have, long want, long startOrderID, long stopOrderID, int limit, boolean useCancel);
 
     BigDecimal getVolume24(long have, long want);
 

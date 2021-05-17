@@ -441,7 +441,7 @@ public class Order implements Comparable<Order> {
     }
 
     public List<Trade> getInitiatedTrades(DCSet db) {
-        return db.getTradeMap().getInitiatedTrades(this);
+        return db.getTradeMap().getInitiatedTrades(this, false);
     }
 
     //PARSE/CONVERT

@@ -94,14 +94,19 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getInitiatedTrades(Order order) {
+    public List<Trade> getInitiatedTrades(Order order, boolean useCancel) {
         //FILTER ALL TRADES
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(order.getId())) {
 
             //GET ALL TRADES FOR KEYS
             List<Trade> trades = new ArrayList<Trade>();
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (!useCancel && trade.isCancel())
+                    continue;
+
+                trades.add(trade);
             }
 
             //RETURN
@@ -112,7 +117,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTradesByOrderID(Long orderID) {
+    public List<Trade> getTradesByOrderID(Long orderID, boolean useCancel) {
         //ADD REVERSE KEYS
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
@@ -121,16 +126,26 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         List<Trade> trades = new ArrayList<Trade>();
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByKeys(orderID)) {
             //GET ALL ORDERS FOR KEYS as INITIATOR
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (!useCancel && trade.isCancel())
+                    continue;
+
+                trades.add(trade);
             }
         } catch (IOException e) {
         }
 
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getTargetsIterator(orderID)) {
             //GET ALL ORDERS FOR KEYS as TARGET
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (!useCancel && trade.isCancel())
+                    continue;
+
+                trades.add(trade);
             }
         } catch (IOException e) {
         }
@@ -140,7 +155,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTrades(long haveWant)
+    public List<Trade> getTrades(long haveWant, boolean useCancel)
     // get trades for order as HAVE and as WANT
     {
 
@@ -174,7 +189,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTrades(long have, long want, Object fromKey, int limit) {
+    public List<Trade> getTrades(long have, long want, Object fromKey, int limit, boolean useCancel) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
@@ -190,8 +205,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Iterator<Tuple2<Long, Long>> iteratorLimit = Iterators.limit(iterator, limit);
 
             List<Trade> trades = new ArrayList<Trade>();
+            Trade trade;
             while (iteratorLimit.hasNext()) {
-                trades.add(this.get(iteratorLimit.next()));
+                trade = this.get(iteratorLimit.next());
+                if (!useCancel && trade.isCancel())
+                    continue;
+
+                trades.add(trade);
             }
             return trades;
 
@@ -203,7 +223,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
     @Override
     @SuppressWarnings("unchecked")
-    public Trade getLastTrade(long have, long want) {
+    public Trade getLastTrade(long have, long want, boolean useCancel) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -214,9 +234,17 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             if (iterator == null)
                 return null;
 
-            if (iterator.hasNext()) {
-                return this.get(iterator.next());
+            Trade trade;
+            while (iterator.hasNext()) {
+                trade = this.get(iterator.next());
+                if (useCancel)
+                    return trade;
+
+                if (!trade.isCancel()) {
+                    return trade;
+                }
             }
+
         } catch (IOException e) {
         }
 
@@ -263,7 +291,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestampMS(stopTimestamp);
 
         //RETURN
-        return getTradesByHeight(fromBlock, toBlock, limit);
+        return getTradesFromToHeight(fromBlock, toBlock, limit);
     }
 
     /**
@@ -288,7 +316,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestampMS(stopTimestamp);
 
         //RETURN
-        return getTradesByHeight(have, want, fromBlock, toBlock, limit);
+        return getTradesFromToHeight(have, want, fromBlock, toBlock, limit);
     }
 
     @Override
@@ -302,8 +330,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorFromID(startTradeID)) {
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
+                trades.add(trade);
                 if (limit > 0 && --counter < 0)
                     break;
             }
@@ -314,28 +347,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTradesByTradeID(long[] startTradeID, int limit) {
-        if (Controller.getInstance().onlyProtocolIndexing) {
-            return null;
-        }
-
-        List<Trade> trades = new ArrayList<Trade>();
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorFromID(startTradeID)) {
-
-            int counter = limit;
-            while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
-                if (limit > 0 && --counter < 0)
-                    break;
-            }
-        } catch (IOException e) {
-        }
-
-        return trades;
-    }
-
-    @Override
-    public List<Trade> getTradesByOrderID(long startOrderID, long stopOrderID, int limit) {
+    public List<Trade> getTradesFromToOrderID(long startOrderID, long stopOrderID, int limit, boolean useCancel) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -345,8 +357,14 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairOrderIDIterator(startOrderID, stopOrderID)) {
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (!useCancel && trade.isCancel())
+                    continue;
+
+                trades.add(trade);
+
                 if (limit > 0 && --counter < 0)
                     break;
             }
@@ -357,7 +375,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTradesByOrderID(long have, long want, long startOrderID, long stopOrderID, int limit) {
+    public List<Trade> getTradesFromToOrderID(long have, long want, long startOrderID, long stopOrderID, int limit, boolean useCancel) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -367,8 +385,14 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairOrderIDIterator(have, want, startOrderID, stopOrderID)) {
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (!useCancel && trade.isCancel())
+                    continue;
+
+                trades.add(trade);
+
                 if (limit > 0 && --counter < 0)
                     break;
             }
@@ -379,7 +403,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTradesByHeight(int start, int stop, int limit) {
+    public List<Trade> getTradesFromToHeight(int start, int stop, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -391,8 +415,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                 return null;
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
+                trades.add(trade);
                 if (limit > 0 && --counter < 0)
                     break;
             }
@@ -404,7 +433,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTradesByHeight(long have, long want, int start, int stop, int limit) {
+    public List<Trade> getTradesFromToHeight(long have, long want, int start, int stop, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -416,8 +445,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                 return null;
 
             int counter = limit;
+            Trade trade;
             while (iterator.hasNext()) {
-                trades.add(this.get(iterator.next()));
+                trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
+                trades.add(trade);
                 if (limit > 0 && --counter < 0)
                     break;
             }
@@ -451,6 +485,9 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
             while (iterator.hasNext()) {
                 Trade trade = this.get(iterator.next());
+                if (trade.isCancel())
+                    continue;
+
                 if (trade.getHaveKey() == want) {
                     volume = volume.add(trade.getAmountHave());
                 } else {

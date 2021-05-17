@@ -97,7 +97,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.3.02 dev";
+    public static String version = "5.3.02";
     public static String buildTime = "2021-05-05 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -2924,22 +2924,52 @@ public class Controller extends Observable {
         return dcSet.getTradeMap().getTradesFromTradeID(tradeID, limit);
     }
 
-    public List<Trade> getTradeByOrderID(long orderID, int limit) {
-        return dcSet.getTradeMap().getTradesByOrderID(orderID, 0, limit);
+    /**
+     * @param fromOrderID
+     * @param toOrderID   0 - ALL to end
+     * @param limit
+     * @param useCancel
+     * @return
+     */
+    public List<Trade> getTradeFromToOrderID(long fromOrderID, long toOrderID, int limit, boolean useCancel) {
+        return dcSet.getTradeMap().getTradesFromToOrderID(fromOrderID, toOrderID, limit, useCancel);
     }
 
-    public List<Trade> getTradeByOrderID(long have, long want, long orderID, int limit) {
-        return dcSet.getTradeMap().getTradesByOrderID(have, want, orderID, 0, limit);
+    /**
+     * @param have
+     * @param want
+     * @param fromOrderID
+     * @param toOrderID   0 - ALL to and
+     * @param limit
+     * @param useCancel
+     * @return
+     */
+    public List<Trade> getTradeFromToOrderID(long have, long want, long fromOrderID, long toOrderID, int limit, boolean useCancel) {
+        return dcSet.getTradeMap().getTradesFromToOrderID(have, want, fromOrderID, toOrderID, limit, useCancel);
     }
 
-    public List<Trade> getTradeByHeight(int height, int limit) {
+    /**
+     * @param fromHeight
+     * @param toHeight   0 - ALL to and
+     * @param limit
+     * @return
+     */
+    public List<Trade> getTradeFromToHeight(int fromHeight, int toHeight, int limit) {
         // так как там обратный отсчет
-        return dcSet.getTradeMap().getTradesByHeight(height, 0, limit);
+        return dcSet.getTradeMap().getTradesFromToHeight(fromHeight, toHeight, limit);
     }
 
-    public List<Trade> getTradeByHeight(long have, long want, int height, int limit) {
+    /**
+     * @param have
+     * @param want
+     * @param fromHeight
+     * @param toHeight   0 - ALL to and
+     * @param limit
+     * @return
+     */
+    public List<Trade> getTradeFromToHeight(long have, long want, int fromHeight, int toHeight, int limit) {
         // так как там обратный отсчет
-        return dcSet.getTradeMap().getTradesByHeight(have, want, height, 0, limit);
+        return dcSet.getTradeMap().getTradesFromToHeight(have, want, fromHeight, toHeight, limit);
     }
 
     // IMPRINTS

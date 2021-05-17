@@ -874,14 +874,17 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 if (absKey == FEE_KEY) {
 
                                     BigDecimal forSale = creator.getForSale(dcSet, FEE_KEY, height, true);
-                                    if (assetFee != null && assetFee.signum() != 0) {
-                                        // учтем что еще процент с актива
-                                        forSale = forSale.subtract(assetFee);
+
+                                    if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0) {
+                                        forSale = forSale.subtract(fee);
+                                        if (assetFee != null && assetFee.signum() != 0) {
+                                            // учтем что еще процент с актива
+                                            forSale = forSale.subtract(assetFee);
+                                        }
                                     }
 
-                                    if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
-                                            && !BlockChain.isFeeEnough(height, creator)
-                                            && forSale.compareTo(amount.add(fee)) < 0) {
+                                    if (!BlockChain.isFeeEnough(height, creator)
+                                            && forSale.compareTo(amount) < 0) {
 
                                         /// если это девелоп то не проверяем ниже особые счета
                                         if (BlockChain.CLONE_MODE || BlockChain.TEST_MODE)
@@ -1190,7 +1193,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return ITEM_PERSON_IS_DEAD;
         }
 
-        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+        if (false // комиссия у так уже = 0 - нельзя модифицировать флаг внутри
+                && height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
                 && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
             // не учитываем комиссию если размер блока маленький
             flags = flags | NOT_VALIDATE_FLAG_FEE;
