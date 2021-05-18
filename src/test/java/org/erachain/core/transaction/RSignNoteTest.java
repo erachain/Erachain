@@ -95,7 +95,7 @@ public class RSignNoteTest {
                 filterAssetKey, filterBalancePos, filterBalanceSide, filterBalanceMIN, filterBalanceMAX,
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo, filterByGender, selfPay);
 
-        ExData exData = new ExData(flagsExData, exLink, exPays, "title", (byte) 0, null,
+        ExData exData = new ExData(flagsExData, exLink, exPays, airdrop, "title", (byte) 0, null,
                 (byte) 0, null,
                 (byte) 0, null, null, json, null);
 
