@@ -473,6 +473,8 @@ public abstract class AssetCls extends ItemCls {
                     return "♥";
 
                 return "±";
+            case AS_NON_FUNGIBLE:
+                return "\uD83D\uDC18";
             case AS_INDEX:
                 return "⤴";
             case AS_INSIDE_VOTE:
@@ -501,7 +503,6 @@ public abstract class AssetCls extends ItemCls {
                 return "◕";
             case AS_OUTSIDE_WORK_TIME_MINUTES:
                 return "◔";
-
 
         }
 
