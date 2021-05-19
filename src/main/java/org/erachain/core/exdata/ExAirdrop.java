@@ -8,13 +8,10 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceMap;
-import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -25,10 +22,8 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 
 /**
  * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
@@ -70,6 +65,8 @@ public class ExAirdrop {
         this.assetKey = assetKey;
         this.amount = amount;
         this.addresses = addresses;
+
+        totalPay = amount.multiply(BigDecimal.valueOf(addresses.length));
 
     }
 
@@ -293,107 +290,7 @@ public class ExAirdrop {
         return toJson;
     }
 
-    public void calcTotal() {
-
-        totalPay = BigDecimal.ZERO;
-        for (int index = 0; index < addresses.length; index++) {
-            totalPay = totalPay.add(amount);
-        }
-
-    }
-
-    public int makeFilterPayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
-
-        filteredAccruals = new ArrayList<>();
-
-        iteratorUses = 0L;
-        filteredAccrualsCount = 0;
-
-        int scale = asset.getScale();
-
-        byte[] accountFrom = creator.getShortAddressBytes();
-
-        ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
-        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
-
-        // определим - меняется ли позиция баланса если направление сменим
-        // это нужно чтобы отсекать смену знака у балансов для тек активов у кого меняется позиция от знака
-        // настроим данные платежа по знакам Актива ИКоличества, так как величина коэффициента способа всегда положительная
-        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(Account.BALANCE_POS_OWN);
-        int balancePosDirect = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), false, asset.isSelfManaged());
-        int balancePosBackward = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), true, asset.isSelfManaged());
-        int filterBySigNum;
-        if (balancePosDirect != balancePosBackward) {
-            if (balancePosDirect == TransactionAmount.ACTION_SPEND) {
-                // используем только отрицательные балансы
-                filterBySigNum = -1;
-            } else {
-                // используем только положительные балансы
-                filterBySigNum = 1;
-            }
-        } else {
-            filterBySigNum = 0;
-        }
-
-        boolean reversedBalancesInPosition = asset.isReverseBalancePos(Account.BALANCE_POS_OWN);
-        // сменим знак балансов для отрицательных
-        if (reversedBalancesInPosition) {
-            filterBySigNum *= -1;
-        }
-
-
-        byte[] key;
-        BigDecimal balance;
-        BigDecimal accrual;
-        BigDecimal totalBalances = BigDecimal.ZERO;
-
-        int count = 0;
-
-        Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
-        Long myPersonKey = null;
-        addressDuration = dcSet.getAddressPersonMap().getItem(accountFrom);
-        if (addressDuration != null) {
-            myPersonKey = addressDuration.a;
-        }
-
-        boolean creatorIsPerson = creator.isPerson(dcSet, height);
-
-        HashSet<Long> usedPersons = new HashSet<>();
-        PersonCls person;
-        byte[] assetOwner = asset.getMaker().getShortAddressBytes();
-
-        for (byte[] recipientShort : addresses) {
-
-            Account recipient = new Account(recipientShort);
-
-            // IF send from PERSON to ANONYMOUS
-            if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
-                    creatorIsPerson, assetKey, balancePos,
-                    asset)) {
-                errorValue = recipient.getAddress();
-                return -Transaction.RECEIVER_NOT_PERSONALIZED;
-            }
-
-            count++;
-            if (andValidate && count > MAX_COUNT) {
-                errorValue = "MAX count over: " + MAX_COUNT;
-                return -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR;
-            }
-
-        }
-
-        return Transaction.VALIDATE_OK;
-
-    }
-
-    public int makeFilterPayList(Transaction transaction, boolean andValidate) {
-        return makeFilterPayList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
-    }
-
     public void checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {
-
-        if (makeFilterPayList(dcSet, height, asset, creator, false) == Transaction.VALIDATE_OK)
-            return;
 
         Account recipient;
         //byte[] signature = rNote.getSignature();
@@ -424,125 +321,70 @@ public class ExAirdrop {
 
     public int isValid(RSignNote rNote) {
 
-        if (hasAmount()) {
-            if (this.assetKey == null || this.assetKey == 0L) {
-                errorValue = "Accruals: assetKey == null or ZERO";
-                return Transaction.INVALID_ITEM_KEY;
-            } else if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
-                errorValue = "Accruals: balancePos out off range";
-                return Transaction.INVALID_BALANCE_POS;
-            } else if (this.payMethodValue == null || payMethodValue.signum() == 0) {
-                errorValue = "Accruals: payMethodValue == null";
-                return Transaction.INVALID_AMOUNT;
-            } else if (payMethodValue.signum() < 0) {
-                errorValue = "Accruals: payMethodValue < 0";
-                return Transaction.INVALID_AMOUNT;
-            }
-            if (payMethod != PAYMENT_METHOD_TOTAL && useSelfBalance) {
-                errorValue = "Accruals: payMethodValue is not by TOTAL && useSelfBalance";
-                return Transaction.INVALID_AMOUNT;
-            }
-            if (payMethod != PAYMENT_METHOD_COEFF && (amountMin != null || amountMax != null)) {
-                errorValue = "Accruals: payMethod != PAYMENT_METHOD_COEFF && (amountMin != null || amountMax != null)";
-                return Transaction.INVALID_AMOUNT;
-            }
-
+        if (this.assetKey == 0L) {
+            errorValue = "Airdrop: assetKey == null or ZERO";
+            return Transaction.INVALID_ITEM_KEY;
+        } else if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
+            errorValue = "Airdrop: balancePos out off range";
+            return Transaction.INVALID_BALANCE_POS;
+        } else if (amount.signum() < 0) {
+            errorValue = "Airdrop: payMethodValue < 0";
+            return Transaction.INVALID_AMOUNT;
         }
 
-        if (hasAssetFilter()) {
-            if (this.filterAssetKey == null || this.filterAssetKey == 0L) {
-                errorValue = "Accruals: filterAssetKey == null or ZERO";
-                return Transaction.INVALID_ITEM_KEY;
-            } else if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_SPEND) {
-                errorValue = "Accruals: filterBalancePos";
-                return Transaction.INVALID_BALANCE_POS;
-            } else if (this.filterBalanceSide < Account.BALANCE_SIDE_DEBIT || this.filterBalanceSide > Account.BALANCE_SIDE_CREDIT) {
-                errorValue = "Accruals: filterBalanceSide";
-                return Transaction.INVALID_BALANCE_SIDE;
-            }
+
+        height = rNote.getBlockHeight();
+
+        // просчитаем значения для точного округления Общей Суммы
+        calcTotal();
+        if (false) {
+            // ошибка подсчета Общего значения - был взят в учет минус общий
+            errorValue = "Accruals: PayTotal == 0 && payMethod == PAYMENT_METHOD_TOTAL";
+            return Transaction.INVALID_AMOUNT;
         }
 
-        if (this.filterTXType != 0 && !Transaction.isValidTransactionType(this.filterTXType)) {
-            errorValue = "Accruals: filterTXType= " + filterTXType;
-            return Transaction.INVALID_TRANSACTION_TYPE;
+        Account recipient = new Account(addresses[0]);
+        PublicKeyAccount creator = rNote.getCreator();
+        byte[] signature = rNote.getSignature();
+        boolean creatorIsPerson = creator.isPerson(dcSet, height);
+
+        // возьмем знаки (минус) для создания позиции баланса такой
+        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+        long key = signs.a * assetKey;
+
+        // комиссию не проверяем так как она не правильно считается внутри?
+        long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
+
+        BigDecimal totalFeeBG = rNote.getFee();
+        int result;
+        // проверим как будто всю сумму одному переводим - с учетом комиссии полной
+        result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+                key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
+                backward, totalFeeBG, null, creatorIsPerson, actionFlags);
+        if (result != Transaction.VALIDATE_OK) {
+            errorValue = "Airdrop: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
+            return result;
         }
 
-        if (assetKey != null && filterAssetKey != null
-                && assetKey.equals(filterAssetKey)
-                && balancePos == filterBalancePos
-                && payMethod != PAYMENT_METHOD_ABSOLUTE) {
-            // при откате невозможно тогда будет правильно рассчитать - так как съехала общая сумма
-            errorValue = "Accruals: assetKey == filterAssetKey && balancePos == filterBalancePos for not ABSOLUTE method";
-            return Transaction.INVALID_TRANSFER_TYPE;
-        }
+        ////////// TODO NEED CHECK ALL
+        boolean needCheckAllList = false;
+        if (needCheckAllList) {
 
-        filteredAccrualsCount = makeFilterPayList(rNote, true);
+            for (byte[] address : addresses) {
 
-        if (filteredAccrualsCount < 0) {
-            // ERROR on make LIST
-            return -filteredAccrualsCount;
+                recipient = new Account(address);
+                if (recipient == null)
+                    break;
 
-        } else if (filteredAccrualsCount > 0) {
-            height = rNote.getBlockHeight();
+                result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+                        key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
+                        backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
 
-            if (payMethod == PAYMENT_METHOD_TOTAL) {
-                // просчитаем значения для точного округления Общей Суммы
-                if (!calcTotal()) {
-                    // ошибка подсчета Общего значения - был взят в учет минус общий
-                    errorValue = "Accruals: PayTotal == 0 && payMethod == PAYMENT_METHOD_TOTAL";
-                    return Transaction.INVALID_AMOUNT;
+                if (result != Transaction.VALIDATE_OK) {
+                    errorValue = "Accruals: " + amount.toPlainString() + " -> " + recipient.getAddress();
+                    return result;
                 }
-            }
 
-            Account recipient = filteredAccruals.get(0).a;
-            PublicKeyAccount creator = rNote.getCreator();
-            byte[] signature = rNote.getSignature();
-            boolean creatorIsPerson = creator.isPerson(dcSet, height);
-
-            // возьмем знаки (минус) для создания позиции баланса такой
-            Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
-            long key = signs.a * assetKey;
-
-            // комиссию не проверяем так как она не правильно считается внутри?
-            long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
-
-            BigDecimal totalFeeBG = rNote.getFee();
-            int result;
-            // проверим как будто всю сумму одному переводим - с учетом комиссии полной
-            result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                    key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
-                    backward, totalFeeBG, null, creatorIsPerson, actionFlags);
-            if (result != Transaction.VALIDATE_OK) {
-                errorValue = "Accruals: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
-                return result;
-            }
-
-            ////////// TODO NEED CHECK ALL
-            boolean needCheckAllList = false;
-            if (needCheckAllList) {
-
-                for (Fun.Tuple4 item : filteredAccruals) {
-
-                    recipient = (Account) item.a;
-                    if (recipient == null)
-                        break;
-
-                    if (creator.equals(recipient))
-                        // пропустим себя
-                        continue;
-
-                    BigDecimal amount = (BigDecimal) item.c;
-
-                    result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                            key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
-                            backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
-
-                    if (result != Transaction.VALIDATE_OK) {
-                        errorValue = "Accruals: " + amount.toPlainString() + " -> " + recipient.getAddress();
-                        return result;
-                    }
-
-                }
             }
         }
 
@@ -552,50 +394,48 @@ public class ExAirdrop {
     public void processBody(Transaction rNote, boolean asOrphan, Block block) {
         PublicKeyAccount creator = rNote.getCreator();
 
-        if (hasAssetFilter()) {
-            long absKey = assetKey;
+        long absKey = assetKey;
 
-            // возьмем знаки (минус) для создания позиции баланса такой
-            Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
-            Long actionPayKey = signs.a * assetKey;
-            boolean isAmountNegate;
-            BigDecimal actionPayAmount;
-            boolean incomeReverse = balancePos == Account.BALANCE_POS_HOLD;
-            boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
-            boolean backwardAction;
+        // возьмем знаки (минус) для создания позиции баланса такой
+        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+        Long actionPayKey = signs.a * assetKey;
+        boolean isAmountNegate;
+        BigDecimal actionPayAmount;
+        boolean incomeReverse = balancePos == Account.BALANCE_POS_HOLD;
+        boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
+        boolean backwardAction;
 
-            Account recipient;
-            for (Fun.Tuple4 item : filteredAccruals) {
+        Account recipient;
+        for (byte[] address : addresses) {
 
-                recipient = (Account) item.a;
-                if (recipient == null)
-                    break;
+            recipient = new Account(address);
+            if (recipient == null)
+                break;
 
-                actionPayAmount = (BigDecimal) item.c;
+            actionPayAmount = amount;
 
-                isAmountNegate = actionPayAmount.signum() < 0;
-                backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
+            isAmountNegate = actionPayAmount.signum() < 0;
+            backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
 
-                if (!asOrphan && block != null) {
-                    rNote.addCalculated(block, recipient, absKey, actionPayAmount,
-                            asset.viewAssetTypeAction(backwardAction, balancePos, asset.getMaker().equals(creator)));
-                }
-
-                if (creator.equals(recipient))
-                    // пропустим себя в любом случае - хотя КАлькулейтед оставим для виду
-                    continue;
-
-                // сбросим направлени от фильтра
-                actionPayAmount = actionPayAmount.abs();
-                // зазадим направление от Действия нашего
-                actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
-
-                TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
-                        asset, actionPayKey, actionPayAmount, backwardAction,
-                        incomeReverse);
-
-
+            if (!asOrphan && block != null) {
+                rNote.addCalculated(block, recipient, absKey, actionPayAmount,
+                        asset.viewAssetTypeAction(backwardAction, balancePos, asset.getMaker().equals(creator)));
             }
+
+            if (creator.equals(recipient))
+                // пропустим себя в любом случае - хотя КАлькулейтед оставим для виду
+                continue;
+
+            // сбросим направлени от фильтра
+            actionPayAmount = actionPayAmount.abs();
+            // зазадим направление от Действия нашего
+            actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
+
+            TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
+                    asset, actionPayKey, actionPayAmount, backwardAction,
+                    incomeReverse);
+
+
         }
 
     }
@@ -610,7 +450,8 @@ public class ExAirdrop {
             return;
 
         if (payMethod == PAYMENT_METHOD_TOTAL) {
-            if (!calcTotal())
+            calcTotal();
+            if (false)
                 // не удалось просчитать значения
                 return;
         }
@@ -626,15 +467,6 @@ public class ExAirdrop {
 
         if (filteredAccruals == null) {
             filteredAccrualsCount = makeFilterPayList(rNote, false);
-        }
-
-        if (filteredAccrualsCount == 0)
-            return;
-
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
-            if (!calcTotal())
-                // не удалось просчитать значения
-                return;
         }
 
         height = rNote.getBlockHeight();
