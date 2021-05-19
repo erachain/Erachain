@@ -21,9 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Date;
 
 /**
  * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
@@ -146,75 +144,17 @@ public class ExAirdrop {
     }
 
     public static Fun.Tuple2<ExAirdrop, String> make(Long assetKey, int balancePos, boolean backward,
-                                                     int payMethod, String payMethodValue, String amountMin, String amountMax,
-                                                     Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
-                                                     String filterBalanceMoreThen, String filterBalanceLessThen,
-                                                     int filterTXType, String filterTimeStartStr, String filterTimeXEndStr,
-                                                     int filterByPerson, boolean selfPay) {
+                                                     String amountStr, String[] addressesStr) {
 
         int steep = 0;
-        BigDecimal amountMinBG;
-        BigDecimal amountMaxBG;
-        BigDecimal payMethodValueBG;
-        BigDecimal filterBalanceMoreThenBG;
-        BigDecimal filterBalanceLessThenBG;
-        Long filterTimeStart;
-        Long filterTimeEnd;
+        BigDecimal amount;
 
         Controller cntr = Controller.getInstance();
         BlockChain chain = cntr.getBlockChain();
 
         try {
-            amountMinBG = amountMin == null || amountMin.isEmpty() ? null : new BigDecimal(amountMin);
             ++steep;
-            amountMaxBG = amountMax == null || amountMax.isEmpty() ? null : new BigDecimal(amountMax);
-            ++steep;
-            payMethodValueBG = payMethodValue == null || payMethodValue.isEmpty() ? null : new BigDecimal(payMethodValue);
-            ++steep;
-            filterBalanceMoreThenBG = filterBalanceMoreThen == null || filterBalanceMoreThen.isEmpty() ? null : new BigDecimal(filterBalanceMoreThen);
-            ++steep;
-            filterBalanceLessThenBG = filterBalanceLessThen == null || filterBalanceLessThen.isEmpty() ? null : new BigDecimal(filterBalanceLessThen);
-            ++steep;
-            if (filterTimeStartStr == null || filterTimeStartStr.isEmpty()) {
-                filterTimeStart = null;
-            } else {
-                try {
-                    Date parsedDate = DATE_FORMAT.parse(filterTimeStartStr);
-                    Timestamp timestamp = new Timestamp(parsedDate.getTime());
-                    filterTimeStart = timestamp.getTime();
-                } catch (Exception e) {
-                    filterTimeStart = Transaction.parseDBRefSeqNo(filterTimeStartStr);
-                    if (filterTimeStart == null) {
-                        try {
-                            filterTimeStart = Long.parseLong(filterTimeStartStr) * 1000L;
-                        } catch (Exception e1) {
-                        }
-                    } else {
-                        filterTimeStart = Transaction.getTimestampByDBRef((filterTimeStart));
-                    }
-                }
-            }
-
-            ++steep;
-            if (filterTimeXEndStr == null || filterTimeXEndStr.isEmpty()) {
-                filterTimeEnd = null;
-            } else {
-                try {
-                    Date parsedDate = DATE_FORMAT.parse(filterTimeXEndStr);
-                    Timestamp timestamp = new Timestamp(parsedDate.getTime());
-                    filterTimeEnd = timestamp.getTime();
-                } catch (Exception e) {
-                    filterTimeEnd = Transaction.parseDBRefSeqNo(filterTimeXEndStr);
-                    if (filterTimeEnd == null) {
-                        try {
-                            filterTimeEnd = Long.parseLong(filterTimeXEndStr) * 1000L;
-                        } catch (Exception e1) {
-                        }
-                    } else {
-                        filterTimeEnd = Transaction.getTimestampByDBRef(filterTimeEnd);
-                    }
-                }
-            }
+            amount = amountStr == null || amountStr.isEmpty() ? null : new BigDecimal(amountStr);
         } catch (Exception e) {
             String error;
             switch (steep) {
@@ -249,12 +189,12 @@ public class ExAirdrop {
             return new Fun.Tuple2<>(null, "Wrong assetKey (null or ZERO)");
         } else if (filterAssetKey == null || filterAssetKey == 0L) {
             return new Fun.Tuple2<>(null, "Wrong filterAssetKey (null or ZERO)");
-        } else if (payMethodValueBG == null || payMethodValueBG.signum() == 0) {
+        } else if (amount == null || amount.signum() == 0) {
             return new Fun.Tuple2<>(null, "Wrong payMethodValue (null or ZERO)");
         }
 
         int flags = 0;
-        return new Fun.Tuple2<>(new ExAirdrop(flags, assetKey, balancePos, backward, payMethod, payMethodValueBG, amountMinBG, amountMaxBG,
+        return new Fun.Tuple2<>(new ExAirdrop(flags, assetKey, balancePos, backward, payMethod, amount, amountMinBG, amountMaxBG,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMoreThenBG, filterBalanceLessThenBG,
                 filterTXType, filterTimeStart, filterTimeEnd,
@@ -290,7 +230,7 @@ public class ExAirdrop {
         return toJson;
     }
 
-    public void checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {
+    public int checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {
 
         Account recipient;
         //byte[] signature = rNote.getSignature();
@@ -305,6 +245,7 @@ public class ExAirdrop {
 
         int result;
         byte[] signature = new byte[0];
+        int index = 0;
         for (byte[] recipientShort : addresses) {
 
             recipient = new Account(recipientShort);
@@ -314,8 +255,11 @@ public class ExAirdrop {
                     backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
 
             if (result != Transaction.VALIDATE_OK) {
-
+                errorValue = "Airdrop: address[" + index + "] -> " + recipient.getAddress();
+                return result;
             }
+
+            ++index;
         }
     }
 
@@ -370,21 +314,9 @@ public class ExAirdrop {
         boolean needCheckAllList = false;
         if (needCheckAllList) {
 
-            for (byte[] address : addresses) {
-
-                recipient = new Account(address);
-                if (recipient == null)
-                    break;
-
-                result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                        key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
-                        backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
-
-                if (result != Transaction.VALIDATE_OK) {
-                    errorValue = "Accruals: " + amount.toPlainString() + " -> " + recipient.getAddress();
-                    return result;
-                }
-
+            result = checkValidList(dcSet, height, asset, creator);
+            if (result != Transaction.VALIDATE_OK) {
+                return result;
             }
         }
 
@@ -435,26 +367,11 @@ public class ExAirdrop {
                     asset, actionPayKey, actionPayAmount, backwardAction,
                     incomeReverse);
 
-
         }
 
     }
 
     public void process(Transaction rNote, Block block) {
-
-        if (filteredAccruals == null) {
-            filteredAccrualsCount = makeFilterPayList(rNote, false);
-        }
-
-        if (filteredAccrualsCount == 0)
-            return;
-
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
-            calcTotal();
-            if (false)
-                // не удалось просчитать значения
-                return;
-        }
 
         height = rNote.getBlockHeight();
         asset = dcSet.getItemAssetMap().get(assetKey);
@@ -464,10 +381,6 @@ public class ExAirdrop {
     }
 
     public void orphan(Transaction rNote) {
-
-        if (filteredAccruals == null) {
-            filteredAccrualsCount = makeFilterPayList(rNote, false);
-        }
 
         height = rNote.getBlockHeight();
         asset = dcSet.getItemAssetMap().get(assetKey);
