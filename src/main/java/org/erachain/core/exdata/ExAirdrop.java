@@ -8,7 +8,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -16,7 +15,6 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.TransactionFinalMapImpl;
-import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -26,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,11 +54,14 @@ public class ExAirdrop {
     private byte[][] addresses;
     private long assetKey;
     private BigDecimal amount;
+    private int balancePos;
+    boolean backward;
 
     /////////////////
     DCSet dcSet;
     private int height;
     AssetCls asset;
+    BigDecimal totalPay;
 
     public String errorValue;
 
@@ -91,33 +91,6 @@ public class ExAirdrop {
             this.dcSet = dcSet;
             this.asset = this.dcSet.getItemAssetMap().get(this.assetKey);
         }
-    }
-
-    public int parseDBData(byte[] dbData, int position) {
-        flags = Ints.fromByteArray(Arrays.copyOfRange(dbData, position, position + Integer.BYTES));
-        position += Integer.BYTES;
-
-        short listLen = (short) flags;
-        flags = flags >>> 16;
-
-        assetKey = Longs.fromByteArray(Arrays.copyOfRange(dbData, position, position + Long.BYTES));
-        position += Long.BYTES;
-
-
-        int scale = dbData[position++];
-        int len = dbData[position++];
-        amount = new BigDecimal(new BigInteger(Arrays.copyOfRange(dbData, position, position + len)), scale);
-
-        position += len;
-
-        addresses = new byte[listLen][];
-        for (int i = 0; i < listLen; i++) {
-            assetKey = Longs.fromByteArray(Arrays.copyOfRange(dbData, position, position + Long.BYTES));
-        }
-        position += listLen * Account.ADDRESS_SHORT_LENGTH;
-
-        return position;
-
     }
 
     public byte[] toBytes() throws Exception {
@@ -159,104 +132,22 @@ public class ExAirdrop {
         int payMethod = 0;
         BigDecimal payMethodValue = null;
 
-        if ((flags & AMOUNT_FLAG_MASK) != 0) {
-            assetKey = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
-            position += Long.BYTES;
+        assetKey = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
+        position += Long.BYTES;
 
-            balancePos = data[position++];
-            backward = data[position++] > 0;
-            payMethod = data[position++];
+        balancePos = data[position++];
+        backward = data[position++] > 0;
+        payMethod = data[position++];
 
-            scale = data[position++];
-            len = data[position++];
-            payMethodValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-            position += len;
-
-            if ((flags & AMOUNT_MIN_FLAG_MASK) != 0) {
-                scale = data[position++];
-                len = data[position++];
-                amountMin = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-                position += len;
-            }
-
-            if ((flags & AMOUNT_MAX_FLAG_MASK) != 0) {
-                scale = data[position++];
-                len = data[position++];
-                amountMax = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-                position += len;
-            }
-
-        }
-
-        Long filterAssetKey = null;
-        int filterBalancePos = 0;
-        int filterBalanceSide = 0;
-        BigDecimal filterBalanceLessThen = null;
-        BigDecimal filterBalanceMoreThen = null;
-
-        if ((flags & BALANCE_FLAG_MASK) != 0) {
-            filterAssetKey = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
-            position += Long.BYTES;
-
-            filterBalancePos = data[position++];
-            filterBalanceSide = data[position++];
-
-            if ((flags & BALANCE_AMOUNT_MIN_FLAG_MASK) != 0) {
-                scale = data[position++];
-                len = data[position++];
-                filterBalanceMoreThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-                position += len;
-            }
-
-            if ((flags & BALANCE_AMOUNT_MAX_FLAG_MASK) != 0) {
-                scale = data[position++];
-                len = data[position++];
-                filterBalanceLessThen = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-                position += len;
-            }
-
-        }
-
-        Long filterTXStart = null;
-        Long filterTXEnd = null;
-
-        if ((flags & ACTIVE_START_FLAG_MASK) != 0) {
-            filterTXStart = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
-            position += Long.BYTES;
-        }
-        if ((flags & ACTIVE_END_FLAG_MASK) != 0) {
-            filterTXEnd = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
-            position += Long.BYTES;
-        }
-
-        int filterTXType = data[position++];
-        int filterByPerson = data[position++];
-        boolean selfPay = data[position++] > 0;
+        scale = data[position++];
+        len = data[position++];
+        payMethodValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
+        position += len;
 
         return new ExAirdrop(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 );
     }
 
-    /**
-     * @param assetKey
-     * @param balancePos
-     * @param backward
-     * @param payMethod
-     * @param payMethodValue
-     * @param amountMin
-     * @param amountMax
-     * @param filterAssetKey
-     * @param filterBalancePos
-     * @param filterBalanceSide
-     * @param filterBalanceMoreThen
-     * @param filterBalanceLessThen
-     * @param filterTXType
-     * @param filterTimeStartStr    'yyyy-MM-dd hh:mm:00' or Timestamp[sec] or SeqNo: 123-1
-     * @param filterTimeXEndStr     'yyyy-MM-dd hh:mm:00' or Timestamp[sec] or SeqNo: 123-1
-     * @param filterByPerson
-     * @param selfPay
-     * @return
-     */
     public static Fun.Tuple2<ExAirdrop, String> make(Long assetKey, int balancePos, boolean backward,
                                                      int payMethod, String payMethodValue, String amountMin, String amountMax,
                                                      Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
@@ -381,50 +272,11 @@ public class ExAirdrop {
         JSONObject json = toJson();
 
         json.put("asset", asset.getName());
-        if (filterAssetKey != null && filterAssetKey > 0L) {
-            if (filterAsset == null)
-                filterAsset = dcSet.getItemAssetMap().get(filterAssetKey);
-            json.put("filterAsset", filterAsset.getName());
-        }
 
-        if (filteredAccrualsCount > 0) {
-            json.put("Label_Counter", Lang.T("Counter", langObj));
-            json.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
-            json.put("Label_Additional_Fee", Lang.T("Additional Fee", langObj));
+        json.put("Label_Counter", Lang.T("Counter", langObj));
+        json.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
+        json.put("Label_Additional_Fee", Lang.T("Additional Fee", langObj));
 
-        }
-
-        json.put("payMethodName", Lang.T(ExAirdrop.viewPayMethod(payMethod), langObj));
-        json.put("balancePosName", Lang.T(Account.balancePositionName(balancePos), langObj));
-        json.put("filterBalancePosName", Lang.T(Account.balancePositionName(filterBalancePos), langObj));
-        json.put("filterBalanceSideName", Lang.T(Account.balanceSideName(filterBalanceSide), langObj));
-        json.put("filterTXTypeName", Lang.T(Transaction.viewTypeName(filterTXType), langObj));
-        json.put("filterByGenderName", Lang.T(viewFilterPersMode(filterByGender), langObj));
-
-        json.put("Label_Action_for_Asset", Lang.T("Action for Asset", langObj));
-        json.put("Label_assetKey", Lang.T("Asset", langObj));
-        json.put("Label_balancePos", Lang.T("Balance Position", langObj));
-        json.put("Label_backward", Lang.T("Backward", langObj));
-
-        json.put("Label_payMethod", Lang.T("Method of calculation", langObj));
-        json.put("Label_payMethodValue", Lang.T("Value", langObj));
-        json.put("Label_amountMin", Lang.T("Minimal Accrual", langObj));
-        json.put("Label_amountMax", Lang.T("Maximum Accrual", langObj));
-
-        json.put("Label_Filter_By_Asset_and_Balance", Lang.T("Filter By Asset and Balance", langObj));
-        json.put("Label_balanceSide", Lang.T("Balance Side", langObj));
-        json.put("Label_filterBalanceMIN", Lang.T("More or Equal", langObj));
-        json.put("Label_filterBalanceMAX", Lang.T("Less or Equal", langObj));
-        json.put("Label_Filter_by_Actions_and_Period", Lang.T("Filter by Actions and Period", langObj));
-        json.put("Label_filterTXType", Lang.T("Action", langObj));
-        json.put("Label_filterTimeStart", Lang.T("Time start", langObj));
-        json.put("Label_filterTimeEnd", Lang.T("Time end", langObj));
-
-        json.put("Label_Filter_by_Persons", Lang.T("Filter by Persons", langObj));
-        json.put("Label_filterByGender", Lang.T("Gender", langObj));
-        json.put("Label_selfUse", Lang.T("Accrual by creator account too", langObj));
-
-        json.put("Label_", Lang.T("", langObj));
         return json;
 
     }
@@ -435,87 +287,19 @@ public class ExAirdrop {
 
         toJson.put("flags", flags);
         toJson.put("assetKey", assetKey);
-        toJson.put("balancePos", balancePos);
-        toJson.put("backward", backward);
 
-        toJson.put("payMethod", payMethod);
-        toJson.put("payMethodValue", payMethodValue.toPlainString());
-        if (payMethod != PAYMENT_METHOD_ABSOLUTE) {
-            toJson.put("amountMin", amountMin);
-            toJson.put("amountMax", amountMax);
-        }
-
-        toJson.put("filterAssetKey", filterAssetKey);
-        toJson.put("filterBalancePos", filterBalancePos);
-        toJson.put("filterBalanceSide", filterBalanceSide);
-        if (hasAssetFilterBalMIN())
-            toJson.put("filterBalanceMIN", filterBalanceMIN);
-        if (hasAssetFilterBalMAX())
-            toJson.put("filterBalanceMAX", filterBalanceMAX);
-
-        toJson.put("filterTXType", filterTXType);
-        if (hasTXTypeFilterActiveStart())
-            toJson.put("filterTimeStart", filterTimeStart);
-        if (hasTXTypeFilterActiveEnd())
-            toJson.put("filterTimeEnd", filterTimeEnd);
-
-        toJson.put("filterByGender", filterByGender);
-        toJson.put("useSelfBalance", useSelfBalance);
-
-        if (filteredAccrualsCount > 0) {
-            toJson.put("filteredAccrualsCount", filteredAccrualsCount);
-            toJson.put("totalPay", totalPay.toPlainString());
-            toJson.put("totalFeeBytes", totalFeeBytes);
-            toJson.put("totalFee", BlockChain.feeBG(totalFeeBytes).toPlainString());
-        }
+        toJson.put("amount", amount);
 
         return toJson;
     }
 
-    public boolean calcAccrualsForMethodTotal() {
+    public void calcTotal() {
 
-        if (filteredAccrualsCount == 0)
-            return false;
-
-        // нужно подсчитать выплаты по общей сумме балансов
-        int scale = asset.getScale();
-        BigDecimal totalBalances = totalPay;
-        if (totalBalances.signum() == 0)
-            // возможно это просто высылка писем всем - без перечислений
-            return false;
-
-        // подсчитаем более точно сумму к выплате - по коэффициентам она округлится
         totalPay = BigDecimal.ZERO;
-        BigDecimal coefficient = payMethodValue.divide(totalBalances,
-                scale + Order.powerTen(totalBalances) + 3, RoundingMode.HALF_DOWN);
-        Fun.Tuple4 item;
-        BigDecimal accrual;
-        maxBal = BigDecimal.ZERO;
-        for (int index = 0; index < filteredAccrualsCount; index++) {
-            item = filteredAccruals.get(index);
-            accrual = (BigDecimal) item.b;
-            accrual = accrual.multiply(coefficient).setScale(scale, RoundingMode.DOWN);
-
-            totalPay = totalPay.add(accrual);
-            filteredAccruals.set(index, new Fun.Tuple4(item.a, item.b, accrual, item.d));
-
-            if (maxBal.compareTo(accrual.abs()) < 0) {
-                // запомним максимальное для скидывания остатка
-                maxBal = accrual.abs();
-                maxIndex = index;
-            }
+        for (int index = 0; index < addresses.length; index++) {
+            totalPay = totalPay.add(amount);
         }
 
-        BigDecimal totalDiff = payMethodValue.subtract(totalPay);
-        if (totalDiff.signum() != 0) {
-            // есть нераспределенный остаток
-            Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> maxItem = filteredAccruals.get(maxIndex);
-            filteredAccruals.set(maxIndex, new Fun.Tuple4(maxItem.a, maxItem.b, maxItem.c.add(totalDiff), maxItem.d));
-
-            totalPay = payMethodValue;
-        }
-
-        return true;
     }
 
     public int makeFilterPayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
@@ -527,8 +311,6 @@ public class ExAirdrop {
 
         int scale = asset.getScale();
 
-        boolean onlyPerson = filterByGender > FILTER_PERSON_NONE;
-        int gender = filterByGender - FILTER_PERSON_ONLY_MAN;
         byte[] accountFrom = creator.getShortAddressBytes();
 
         ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
@@ -537,7 +319,7 @@ public class ExAirdrop {
         // определим - меняется ли позиция баланса если направление сменим
         // это нужно чтобы отсекать смену знака у балансов для тек активов у кого меняется позиция от знака
         // настроим данные платежа по знакам Актива ИКоличества, так как величина коэффициента способа всегда положительная
-        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(Account.BALANCE_POS_OWN);
         int balancePosDirect = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), false, asset.isSelfManaged());
         int balancePosBackward = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), true, asset.isSelfManaged());
         int filterBySigNum;
@@ -553,17 +335,12 @@ public class ExAirdrop {
             filterBySigNum = 0;
         }
 
-        boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
+        boolean reversedBalancesInPosition = asset.isReverseBalancePos(Account.BALANCE_POS_OWN);
         // сменим знак балансов для отрицательных
         if (reversedBalancesInPosition) {
             filterBySigNum *= -1;
         }
 
-
-        Long filterTimeStartSeqNo = filterTimeStart == null ? null : Transaction.makeDBRef(
-                Controller.getInstance().blockChain.getHeightOnTimestampMS(filterTimeStart), 0);
-        Long filterTimeEndSeqNo = filterTimeEnd == null ? null : Transaction.makeDBRef(
-                Controller.getInstance().blockChain.getHeightOnTimestampMS(filterTimeEnd), 0);
 
         byte[] key;
         BigDecimal balance;
@@ -574,11 +351,9 @@ public class ExAirdrop {
 
         Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
         Long myPersonKey = null;
-        if (onlyPerson && !useSelfBalance) {
-            addressDuration = dcSet.getAddressPersonMap().getItem(accountFrom);
-            if (addressDuration != null) {
-                myPersonKey = addressDuration.a;
-            }
+        addressDuration = dcSet.getAddressPersonMap().getItem(accountFrom);
+        if (addressDuration != null) {
+            myPersonKey = addressDuration.a;
         }
 
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
@@ -587,131 +362,27 @@ public class ExAirdrop {
         PersonCls person;
         byte[] assetOwner = asset.getMaker().getShortAddressBytes();
 
-        boolean hasAmount = hasAmount();
-        boolean hasAssetFilter = hasAssetFilter();
-        try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(hasAssetFilter ? filterAssetKey : AssetCls.FEE_KEY)) {
-            while (iterator.hasNext()) {
-                key = iterator.next();
+        for (byte[] recipientShort : addresses) {
 
-                balance = Account.balanceInPositionAndSide(balancesMap.get(key), filterBalancePos, filterBalanceSide);
-                if (filterBySigNum != 0 && balance.signum() != 0 && filterBySigNum != balance.signum()) {
-                    // произошла смена направления для актива у котро меняется Позиция баланса - пропускаем такое
-                    continue;
-                }
+            Account recipient = new Account(recipientShort);
 
-                if (hasAssetFilter && filterBalanceMIN != null && balance.compareTo(filterBalanceMIN) < 0
-                        || filterBalanceMAX != null && balance.compareTo(filterBalanceMAX) > 0)
-                    continue;
-
-                byte[] recipientShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
-                if ((filterBySigNum == 0 || asset.getQuantity() <= 0) && Arrays.equals(assetOwner, recipientShort))
-                    // создателю актива не даем если это в обе стороны балансы обработка - иначе Общая величина будет всегда = 0
-                    continue;
-
-                if (onlyPerson) {
-                    // так как тут сортировка по убыванию значит первым встретится тот счет на котром больше всего актива
-                    // - он и будет выбран куда 1 раз пошлем актив свой
-                    addressDuration = dcSet.getAddressPersonMap().getItem(recipientShort);
-                    if (addressDuration == null)
-                        continue;
-                    if (usedPersons.contains(addressDuration.a))
-                        continue;
-
-                    if (!useSelfBalance && myPersonKey != null && myPersonKey.equals(addressDuration.a)) {
-                        // сами себе не платим?
-                        continue;
-                    }
-
-                    person = (PersonCls) dcSet.getItemPersonMap().get(addressDuration.a);
-
-                    if (gender >= 0 && person.getGender() != gender) {
-                        continue;
-                    }
-
-                } else {
-
-                    if (!useSelfBalance && Arrays.equals(accountFrom, recipientShort)) {
-                        // сами себе не платим
-                        continue;
-                    }
-
-                    addressDuration = null;
-                    person = null;
-                }
-
-                Account recipient = new Account(recipientShort);
-
-                /// если задано то проверим - входит ли в в диапазон
-                // - собранные блоки учитываем? да - иначе долго будет делать поиск
-                if (filterTXType != 0 || filterTimeStartSeqNo != null || filterTimeEndSeqNo != null) {
-                    iteratorUses++; // учтем для начисления комиссии за каждый созданный итератор!
-                    // на счете должна быть активность в заданном диапазоне для данного типа
-                    if (!txMap.isCreatorWasActive(recipientShort, filterTimeStartSeqNo, filterTXType, filterTimeEndSeqNo))
-                        continue;
-                }
-
-                // IF send from PERSON to ANONYMOUS
-                if (hasAmount && andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
-                        creatorIsPerson, assetKey, balancePos,
-                        asset)) {
-                    errorValue = recipient.getAddress();
-                    return (filteredAccrualsCount = -Transaction.RECEIVER_NOT_PERSONALIZED);
-                }
-
-                if (!hasAmount) {
-                    accrual = null;
-                } else {
-                    switch (payMethod) {
-                        case PAYMENT_METHOD_COEFF:
-                            // нужно вычислить сразу сколько шлем
-                            accrual = balance.multiply(payMethodValue).setScale(scale, RoundingMode.HALF_DOWN);
-                            if (amountMin != null && amountMin.compareTo(accrual) > 0) {
-                                accrual = amountMin;
-                            } else if (amountMax != null && amountMax.compareTo(accrual) < 0) {
-                                accrual = amountMax;
-                            }
-                            totalBalances = totalBalances.add(accrual);
-                            break;
-                        case PAYMENT_METHOD_ABSOLUTE:
-                            accrual = payMethodValue.setScale(scale, RoundingMode.HALF_DOWN);
-                            break;
-                        default:
-                            accrual = null;
-                            totalBalances = totalBalances.add(balance);
-                    }
-                }
-
-                // не проверяем на 0 - так это может быть рассылка писем всем
-                filteredAccruals.add(new Fun.Tuple4(recipient, balance, accrual, null));
-
-                count++;
-                if (andValidate && count > MAX_COUNT) {
-                    errorValue = "MAX count over: " + MAX_COUNT;
-                    return (filteredAccrualsCount = -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
-                }
-
-                if (onlyPerson) {
-                    // учтем что такой персоне давали
-                    usedPersons.add(addressDuration.a);
-                }
-
+            // IF send from PERSON to ANONYMOUS
+            if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
+                    creatorIsPerson, assetKey, balancePos,
+                    asset)) {
+                errorValue = recipient.getAddress();
+                return -Transaction.RECEIVER_NOT_PERSONALIZED;
             }
 
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            count++;
+            if (andValidate && count > MAX_COUNT) {
+                errorValue = "MAX count over: " + MAX_COUNT;
+                return -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR;
+            }
+
         }
 
-        switch (payMethod) {
-            case PAYMENT_METHOD_ABSOLUTE:
-                totalPay = payMethodValue.multiply(new BigDecimal(count));
-                break;
-            default:
-                totalPay = totalBalances;
-        }
-
-        filteredAccrualsCount = count;
-        calcTotalFeeBytes();
-        return count;
+        return Transaction.VALIDATE_OK;
 
     }
 
@@ -721,22 +392,8 @@ public class ExAirdrop {
 
     public void checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {
 
-        if (!hasAmount()) {
-            filteredAccrualsCount = 0;
-            filteredAccruals = new ArrayList<>();
+        if (makeFilterPayList(dcSet, height, asset, creator, false) == Transaction.VALIDATE_OK)
             return;
-        }
-
-        filteredAccrualsCount = makeFilterPayList(dcSet, height, asset, creator, false);
-        if (filteredAccrualsCount == 0)
-            return;
-
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
-            // просчитаем значения для точного округления Общей Суммы
-            if (!calcAccrualsForMethodTotal())
-                // нет значений
-                return;
-        }
 
         Account recipient;
         //byte[] signature = rNote.getSignature();
@@ -750,26 +407,17 @@ public class ExAirdrop {
         long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
 
         int result;
-        Fun.Tuple4 item;
-        BigDecimal amount;
         byte[] signature = new byte[0];
-        for (int index = 0; index < filteredAccrualsCount; index++) {
+        for (byte[] recipientShort : addresses) {
 
-            item = filteredAccruals.get(index);
-            recipient = (Account) item.a;
-
-            if (creator.equals(recipient))
-                // пропустим себя
-                continue;
-
-            amount = (BigDecimal) item.c;
+            recipient = new Account(recipientShort);
 
             result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                    key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
+                    key, asset, amount, recipient,
                     backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
 
             if (result != Transaction.VALIDATE_OK) {
-                filteredAccruals.set(index, new Fun.Tuple4(item.a, item.b, item.c, new Fun.Tuple2<>(result, "")));
+
             }
         }
     }
@@ -839,7 +487,7 @@ public class ExAirdrop {
 
             if (payMethod == PAYMENT_METHOD_TOTAL) {
                 // просчитаем значения для точного округления Общей Суммы
-                if (!calcAccrualsForMethodTotal()) {
+                if (!calcTotal()) {
                     // ошибка подсчета Общего значения - был взят в учет минус общий
                     errorValue = "Accruals: PayTotal == 0 && payMethod == PAYMENT_METHOD_TOTAL";
                     return Transaction.INVALID_AMOUNT;
@@ -962,7 +610,7 @@ public class ExAirdrop {
             return;
 
         if (payMethod == PAYMENT_METHOD_TOTAL) {
-            if (!calcAccrualsForMethodTotal())
+            if (!calcTotal())
                 // не удалось просчитать значения
                 return;
         }
@@ -984,7 +632,7 @@ public class ExAirdrop {
             return;
 
         if (payMethod == PAYMENT_METHOD_TOTAL) {
-            if (!calcAccrualsForMethodTotal())
+            if (!calcTotal())
                 // не удалось просчитать значения
                 return;
         }
