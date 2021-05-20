@@ -560,62 +560,40 @@ public class DCSet extends DBASet implements Closeable {
          * WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
          */
 
-        if (true) {
+        if (Controller.CACHE_DC.equals("off")) {
+            databaseStruc.cacheDisable();
+        } else {
             // USE CACHE
             if (BLOCKS_MAP != DBS_MAP_DB) {
-                // если блоки не сохраняются в общей базе данных
+                // если блоки не сохраняются в общей базе данных, а трнзакции мелкие по размеру
                 databaseStruc
                         .cacheSize(1024 << (5 + Controller.HARD_WORK));
             } else {
-                if (needClearCache) {
-                    //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                    ///// добавил dcSet.clearCache(); --
-                    databaseStruc
-                            .cacheSize(32 + 32 << Controller.HARD_WORK)
-                    ;
-
-                } else if (BlockChain.TEST_DB > 0) {
-                    databaseStruc
-
-                            // при норм размере и досточной памяти скорость не хуже чем у остальных
-                            //.cacheLRUEnable() // скорость зависит от памяти и настроек -
-                            //.cacheSize(2048 + 64 << Controller.HARD_WORK)
-
-                            // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                            // у другого типа КЭША происходит утечка памяти
-                            .cacheHardRefEnable() // самый быстрый
-
-                    ///.cacheSoftRefEnable()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
-
-                    // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
-                    ///.cacheWeakRefEnable() // new WeakReference()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
-                    ;
-
-                } else {
-                    databaseStruc
-
-                            // при норм размере и досточной памяти скорость не хуже чем у остальных
-                            //.cacheLRUEnable() // скорость зависит от памяти и настроек -
-                            //.cacheSize(2048 + 64 << Controller.HARD_WORK)
-
-                            // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                            // у другого типа КЭША происходит утечка памяти
-                            ///.cacheHardRefEnable()
-
-                            ///.cacheSoftRefEnable()
-                            ///.cacheSize(32 << Controller.HARD_WORK)
-
-                            // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
-                            .cacheWeakRefEnable() // new WeakReference()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
-                    ;
-
-                }
+                // если блоки в этой MapDB то уменьшим - так как размер блока может быть большой
+                databaseStruc.cacheSize(32 + 32 << Controller.HARD_WORK);
             }
-        } else {
-            databaseStruc.cacheDisable();
+
+            // !!! кэш по умолчанию на количество записей - таблица в памяти
+            // !!! - может быстро съесть память ((
+            // !!! если записи (блоки или единичные транзакции) большого объема!!!
+
+            if (Controller.CACHE_DC.equals("lru")) {
+                // при норм размере и достаточной памяти скорость не хуже чем у остальных
+                // скорость зависит от памяти и настроек -
+                databaseStruc.cacheLRUEnable();
+            } else if (Controller.CACHE_DC.equals("weak")) {
+                // analog new cacheSoftRefE - в случае нехватки памяти кеш сам чистится
+                databaseStruc.cacheWeakRefEnable();
+            } else if (Controller.CACHE_DC.equals("soft")) {
+                // analog new WeakReference() - в случае нехватки памяти кеш сам чистится
+                databaseStruc.cacheSoftRefEnable();
+            } else {
+                // это чистит сама память если осталось 25% от кучи - так что она безопасная
+                // самый быстрый
+                // но чистится каждые 10 тыс обращений - org.mapdb.Caches.HardRef
+                // - опасный так как может поесть память быстро!
+                databaseStruc.cacheHardRefEnable();
+            }
         }
 
         DB database = databaseStruc.make();
