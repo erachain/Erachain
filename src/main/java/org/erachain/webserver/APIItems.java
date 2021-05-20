@@ -29,11 +29,11 @@ public class APIItems {
         }
 
         if (preView) {
-            byte[] imagePreview = PreviewVideo.getPreview(item.getItemTypeName(), key);
+            byte[] imagePreview = PreviewVideo.getPreview(item);
             if (imagePreview != null)
                 image = imagePreview;
         } else {
-            PreviewVideo.makePreview(item.getItemTypeName(), key);
+            PreviewVideo.makePreview(item);
         }
 
         return Response.status(200)

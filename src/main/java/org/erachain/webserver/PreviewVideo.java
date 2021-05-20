@@ -1,5 +1,6 @@
 package org.erachain.webserver;
 
+import org.erachain.core.item.ItemCls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,10 +12,10 @@ public class PreviewVideo {
 
     static Logger LOGGER = LoggerFactory.getLogger(PreviewVideo.class.getSimpleName());
 
-    public static byte[] getPreview(String itemType, long key) {
+    public static byte[] getPreview(ItemCls item) {
 
         try {
-            File file = makePreview(itemType, key);
+            File file = makePreview(item);
             if (file == null)
                 return null;
             if (file.canWrite())
@@ -26,27 +27,29 @@ public class PreviewVideo {
         return null;
     }
 
-    public static File makePreview(String itemType, long key) {
+    public static File makePreview(ItemCls item) {
 
-        String path = "dataPreviews" + File.separator + itemType + key + ".mp4";
-        File file = new File(path);
-        if (file.exists()) {
-            if (file.canWrite())
-                return file;
+        String outputName = item.getItemTypeName() + item.getKey();
+        String path = "dataPreviews" + File.separator + outputName;
+        File fileOut = new File(path + ".mp4");
+        if (fileOut.exists()) {
+            if (fileOut.canWrite())
+                return fileOut;
             // он еще записывается
             return null;
         }
 
-        ProcessBuilder builder = new ProcessBuilder("makeVPreview.bat", path);
+        ProcessBuilder builder = new ProcessBuilder("makeVPreview.bat",
+                "dataPreviews/demo1.mp4", fileOut.toPath().toString());
         // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
         builder.redirectErrorStream(true);
 
-        String output = "dataPreviews" + File.separator + itemType + key + ".txt";
+        String output = path + ".txt";
         builder.redirectOutput(new File(output));
         try {
             Process process = builder.start();
             process.waitFor();
-            return file;
+            return fileOut;
         } catch (IOException | InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         }
