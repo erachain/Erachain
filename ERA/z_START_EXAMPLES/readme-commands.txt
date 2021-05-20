@@ -54,7 +54,7 @@ Not store calculated transactions in DB. Make speed up
 -hardwork=0
 Set 0..10 - use big buffers. Seed up
 
--cache=off | lru | hard | weak | soft
+-cache=off | lru | weak | soft | hard
 
 -dbschain=rocksdb | mapdb | fast
 Select DataBase for dataChain. rocksdb - RocksDB or mapdb - MapDB or fast - it si complex DB for fast speed (default)
