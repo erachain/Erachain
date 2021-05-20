@@ -343,10 +343,12 @@ public class DCSet extends DBASet implements Closeable {
     protected DCSet(DCSet parent, DB idDatabase) {
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
-            // System.out.println("########################### Free Memory:"
-            // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                     + (Controller.MIN_MEMORY_TAIL)) {
+
+                //logger.debug("########################### Max=Total Memory [MB]:" + (Runtime.getRuntime().totalMemory() >> 20));
+                //logger.debug("########################### Free Memory [MB]:" + (Runtime.getRuntime().freeMemory() >> 20));
+
                 // у родителя чистим - у себя нет, так как только создали
                 parent.clearCache();
                 System.gc();
