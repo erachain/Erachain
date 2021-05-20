@@ -27,7 +27,7 @@ public class PaymentOrdersTableModel extends WalletTableModel<Transaction> imple
     public static final int COLUMN_SIZE = 8;
 
     public PaymentOrdersTableModel() {
-        super(Controller.getInstance().wallet.database.getTransactionMap(),
+        super(Controller.getInstance().getWallet().database.getTransactionMap(),
                 new String[]{"Confirmation", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"},
                 new Boolean[]{true, true, true, true, true, true, true, false, false}, true, 1000);
 

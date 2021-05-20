@@ -15,7 +15,7 @@ public class FavoriteTemplatesTableModel extends FavoriteItemModelTable {
 
     public FavoriteTemplatesTableModel() {
         super(DCSet.getInstance().getItemTemplateMap(),
-                Controller.getInstance().wallet.database.getTemplateFavoritesSet(),
+                Controller.getInstance().getWallet().database.getTemplateFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Favorite"},
                 new Boolean[]{false, true, true, false},
                 ObserverMessage.RESET_TEMPLATE_FAVORITES_TYPE,

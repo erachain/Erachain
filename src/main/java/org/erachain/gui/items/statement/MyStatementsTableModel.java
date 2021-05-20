@@ -26,7 +26,7 @@ public class MyStatementsTableModel extends WalletTableModel<Tuple2<Tuple2<Long,
      *
      */
     DCSet dcSet;
-    Wallet wallet = Controller.getInstance().wallet;
+    Wallet wallet = Controller.getInstance().getWallet();
 
     public MyStatementsTableModel() {
         super(Controller.getInstance().getWallet().database.getTransactionMap(),
@@ -104,7 +104,6 @@ public class MyStatementsTableModel extends WalletTableModel<Tuple2<Tuple2<Long,
 
         list = new ArrayList<>();
 
-        Wallet wallet = Controller.getInstance().wallet;
         Iterator<Tuple2<Long, Integer>> iterator = ((WTransactionMap) map).getTypeIterator(
                 (byte) Transaction.SIGN_NOTE_TRANSACTION, true);
         if (iterator == null) {

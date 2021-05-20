@@ -480,7 +480,7 @@ public class DWSet extends DBASet {
         if (this.database == null || this.database.isClosed())
             return;
 
-        Controller.getInstance().wallet.synchronizeBodyUsed = false;
+        Controller.getInstance().getWallet().synchronizeBodyUsed = false;
 
         int step = 0;
         while (uses > 0 && ++step < 100) {

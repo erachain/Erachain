@@ -14,7 +14,7 @@ public class WalletItemStatusesTableModel extends WalletTableModel<StatusCls> {
     public static final int COLUMN_FAVORITE = 5;
 
     public WalletItemStatusesTableModel() {
-        super(Controller.getInstance().wallet.database.getStatusMap(),
+        super(Controller.getInstance().getWallet().database.getStatusMap(),
                 new String[]{"Key", "Name", "Creator", "Unique", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false, false}, true, COLUMN_FAVORITE);
     }

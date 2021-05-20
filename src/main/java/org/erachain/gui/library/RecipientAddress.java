@@ -116,7 +116,7 @@ public class RecipientAddress extends JComboBox {
         protected FavoriteAccountsMap favoriteMap;
 
         public RecipientModel() {
-            favoriteMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
+            favoriteMap = Controller.getInstance().getWallet().database.getFavoriteAccountsMap();
             addObservers();
 
         }
@@ -172,7 +172,7 @@ public class RecipientAddress extends JComboBox {
 
             } else {
                 // ожидаем открытия кошелька
-                Controller.getInstance().wallet.addWaitingObserver(this);
+                Controller.getInstance().getWallet().addWaitingObserver(this);
             }
 
         }

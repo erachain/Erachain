@@ -50,7 +50,7 @@ public class StatementsMySplitPanel extends SplitPanel {
     int alpha = 255;
     int alpha_int;
     MyStatementsTableModel my_Statements_Model;
-    Wallet wallet = Controller.getInstance().wallet;
+    Wallet wallet = Controller.getInstance().getWallet();
 
 
     private TableRowSorter search_Sorter;
