@@ -121,6 +121,7 @@ public class Controller extends Observable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class.getSimpleName());
 
     public static int HARD_WORK = 0;
+    public static String CACHE_DC = "hard";
     public boolean useGui = true;
     public boolean useNet = true;
 
@@ -3975,6 +3976,11 @@ public class Controller extends Observable {
                     }
                 } catch (Exception e) {
                 }
+                continue;
+            }
+
+            if (arg.startsWith("-cache=") && arg.length() > 7) {
+                CACHE_DC = arg.substring(7).toLowerCase();
                 continue;
             }
 

@@ -1,0 +1,16 @@
+// coding UTF-8
+// set arguments for start Erachain here
+// This is example
+// make startARGS.txt in Erachain folder
+
+dbs=mapdb
+
+// not use memory for cache
+cache=off
+
+// speed up
+nousewallet
+
+web=on
+weballowed=*
+
