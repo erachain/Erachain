@@ -176,7 +176,7 @@ public class APIItemTemplate {
                     Transaction.ITEM_TEMPLATE_NOT_EXIST);
         }
 
-        return APIItems.getImage(map, key);
+        return APIItems.getImage(map, key, false);
 
     }
 

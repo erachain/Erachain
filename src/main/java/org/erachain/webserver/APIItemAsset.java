@@ -24,6 +24,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -195,7 +196,11 @@ public class APIItemAsset {
     @Path("image/{key}")
     @GET
     //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
-    public Response assetImage(@PathParam("key") long key) throws IOException {
+    public Response assetImage(@Context UriInfo info, @PathParam("key") long key) throws IOException {
+
+
+        boolean preview = API.checkBoolean(info, "preview");
+        preview = true;
 
         int weight = 0;
         if (key <= 0) {
@@ -212,7 +217,7 @@ public class APIItemAsset {
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
-        return APIItems.getImage(map, key);
+        return APIItems.getImage(map, key, preview);
 
     }
 

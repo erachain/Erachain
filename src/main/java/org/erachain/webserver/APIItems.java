@@ -16,7 +16,7 @@ import java.io.ByteArrayInputStream;
 
 public class APIItems {
 
-    public static Response getImage(ItemMap map, long key) {
+    public static Response getImage(ItemMap map, long key, boolean preView) {
 
         ItemCls item = map.get(key);
 
@@ -26,6 +26,12 @@ public class APIItems {
                     .header("Access-Control-Allow-Origin", "*")
                     .entity("")
                     .build();
+        }
+
+        if (preView) {
+            image = PreviewVideo.getPreview(item.getItemTypeName(), key);
+        } else {
+            PreviewVideo.makePreview(item.getItemTypeName(), key);
         }
 
         return Response.status(200)

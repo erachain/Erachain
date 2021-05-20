@@ -176,7 +176,7 @@ public class APIItemStatus {
                     Transaction.ITEM_STATUS_NOT_EXIST);
         }
 
-        return APIItems.getImage(map, key);
+        return APIItems.getImage(map, key, false);
 
     }
 
