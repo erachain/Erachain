@@ -109,7 +109,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
      */
-    private static final boolean needClearCache = false;
+    private static boolean needClearCache = false;
 
     private static boolean isStoped = false;
     private volatile static DCSet instance;
@@ -562,6 +562,7 @@ public class DCSet extends DBASet implements Closeable {
 
         if (Controller.CACHE_DC.equals("off")) {
             databaseStruc.cacheDisable();
+            needClearCache = false;
         } else {
             // USE CACHE
             if (BLOCKS_MAP != DBS_MAP_DB) {
@@ -581,18 +582,22 @@ public class DCSet extends DBASet implements Closeable {
                 // при норм размере и достаточной памяти скорость не хуже чем у остальных
                 // скорость зависит от памяти и настроек -
                 databaseStruc.cacheLRUEnable();
+                needClearCache = true;
             } else if (Controller.CACHE_DC.equals("weak")) {
                 // analog new cacheSoftRefE - в случае нехватки памяти кеш сам чистится
                 databaseStruc.cacheWeakRefEnable();
+                needClearCache = false;
             } else if (Controller.CACHE_DC.equals("soft")) {
                 // analog new WeakReference() - в случае нехватки памяти кеш сам чистится
                 databaseStruc.cacheSoftRefEnable();
+                needClearCache = false;
             } else {
                 // это чистит сама память если осталось 25% от кучи - так что она безопасная
                 // самый быстрый
                 // но чистится каждые 10 тыс обращений - org.mapdb.Caches.HardRef
                 // - опасный так как может поесть память быстро!
                 databaseStruc.cacheHardRefEnable();
+                needClearCache = true;
             }
         }
 

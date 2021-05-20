@@ -62,18 +62,19 @@ public class TelegramAnswerMessage extends Message {
         for(String key:telegramKeys){
             // senders
             Transaction tran = Controller.getInstance().telegramStore.database.getTelegramsMap().get(key);
-            if(senderAccount.contains(tran.viewCreator()) &&  !telegransList.contains(tran)){
+            if (senderAccount.contains(tran.viewCreator()) && !telegransList.contains(tran)) {
                 telegransList.add(tran);
                 continue;
             }
-            // recievers
-            HashSet<Account> recipients = tran.getRecipientAccounts();
-            for(Account recipient:recipients){
-            
-              if (Controller.getInstance().wallet.accountExists(recipient) && !telegransList.contains(tran))
-                  telegransList.add(tran);
+            // receivers
+            if (Controller.getInstance().doesWalletExists()) {
+                HashSet<Account> recipients = tran.getRecipientAccounts();
+                for (Account recipient : recipients) {
+                    if (Controller.getInstance().getWallet().accountExists(recipient) && !telegransList.contains(tran))
+                        telegransList.add(tran);
+                }
             }
-      }
+        }
         // add JSON
         JSONObject jsonList = new JSONObject();
         for(int i = 0;i<telegransList.size(); i++){

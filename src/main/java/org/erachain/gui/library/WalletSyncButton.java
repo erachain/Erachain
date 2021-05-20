@@ -29,7 +29,7 @@ public class WalletSyncButton extends JButton implements Observer {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 // check synchronize Walet
-                if (Controller.getInstance().wallet.synchronizeBodyUsed) {
+                if (Controller.getInstance().getWallet().synchronizeBodyUsed) {
                     return;
                 }
                 // CHECK IF WALLET UNLOCKED
@@ -44,7 +44,7 @@ public class WalletSyncButton extends JButton implements Observer {
                     }
                 }
 
-                Controller.getInstance().wallet.updateAccountsFromSecretKeys();
+                Controller.getInstance().getWallet().updateAccountsFromSecretKeys();
 
                 int n = JOptionPane.showConfirmDialog(
                         new JFrame(), Lang.T("Sync wallet") + "?",
@@ -57,7 +57,7 @@ public class WalletSyncButton extends JButton implements Observer {
                     @Override
                     public void run() {
 
-                        Controller.getInstance().wallet.synchronizeFull();
+                        Controller.getInstance().getWallet().synchronizeFull();
                     }
                 }.start();
             }

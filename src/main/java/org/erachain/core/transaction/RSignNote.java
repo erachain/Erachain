@@ -966,7 +966,10 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     public boolean isFavorite() {
-        return Controller.getInstance().wallet.database.getDocumentFavoritesSet().contains(this.dbRef);
+        if (Controller.getInstance().doesWalletExists()) {
+            return Controller.getInstance().getWallet().database.getDocumentFavoritesSet().contains(this.dbRef);
+        }
+        return false;
     }
 
     public Fun.Tuple3<Integer, String, RSignNote> decrypt(Account recipient) {

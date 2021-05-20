@@ -171,7 +171,7 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
             map.addObserver(this);
         } else {
             // ожидаем открытия кошелька
-            Controller.getInstance().wallet.addWaitingObserver(this);
+            Controller.getInstance().getWallet().addWaitingObserver(this);
         }
     }
 

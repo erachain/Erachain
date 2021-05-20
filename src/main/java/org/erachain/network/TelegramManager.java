@@ -578,19 +578,19 @@ public class TelegramManager extends Thread {
 
         this.handledTelegrams.put(signatureKey, telegram);
 
-        if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
+        if (Controller.getInstance().doesWalletExists()
+                && Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
             // IF MY STORE is USED
-            if (controller.wallet.isWalletDatabaseExisting()) {
 
-                // save telegram to wallet DB
-                if (controller.wallet.accountExists(transaction.getCreator())) {
-                    // add as my OUTCOME
-                    controller.wallet.database.getTelegramsMap().add(signatureKey, transaction);
-                } else {
-                    // TRY ADD as my INCOME
-                    controller.addTelegramToWallet(transaction, signatureKey);
-                }
+            // save telegram to wallet DB
+            if (controller.getWallet().accountExists(transaction.getCreator())) {
+                // add as my OUTCOME
+                controller.getWallet().database.getTelegramsMap().add(signatureKey, transaction);
+            } else {
+                // TRY ADD as my INCOME
+                controller.addTelegramToWallet(transaction, signatureKey);
             }
+
         }
 
         // MAP timestamps

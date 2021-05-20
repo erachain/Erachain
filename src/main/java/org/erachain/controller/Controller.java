@@ -130,7 +130,7 @@ public class Controller extends Observable {
     public static long buildTimestamp;
     private static Controller instance;
     public PairsController pairsController;
-    public Wallet wallet;
+    private Wallet wallet;
     public TelegramStore telegramStore;
     private int status;
     private boolean dcSetWithObserver = false;

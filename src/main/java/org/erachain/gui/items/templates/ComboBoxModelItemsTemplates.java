@@ -2,9 +2,7 @@ package org.erachain.gui.items.templates;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.gui.items.ComboBoxModelItems;
 import org.erachain.gui.models.FavoriteComboBoxModel;
-import org.erachain.utils.ObserverMessage;
 
 @SuppressWarnings("serial")
 public class ComboBoxModelItemsTemplates extends FavoriteComboBoxModel {
@@ -14,7 +12,7 @@ public class ComboBoxModelItemsTemplates extends FavoriteComboBoxModel {
     }
 
     public void setObservable() {
-        this.observable = Controller.getInstance().wallet.database.getTemplateFavoritesSet();
+        this.observable = Controller.getInstance().getWallet().database.getTemplateFavoritesSet();
     }
 
 }
