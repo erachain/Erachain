@@ -29,7 +29,9 @@ public class APIItems {
         }
 
         if (preView) {
-            image = PreviewVideo.getPreview(item.getItemTypeName(), key);
+            byte[] imagePreview = PreviewVideo.getPreview(item.getItemTypeName(), key);
+            if (imagePreview != null)
+                image = imagePreview;
         } else {
             PreviewVideo.makePreview(item.getItemTypeName(), key);
         }

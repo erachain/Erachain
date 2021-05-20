@@ -17,7 +17,8 @@ public class PreviewVideo {
             File file = makePreview(itemType, key);
             if (file == null)
                 return null;
-            return Files.readAllBytes(makePreview(itemType, key).toPath());
+            if (file.canWrite())
+                return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -27,7 +28,7 @@ public class PreviewVideo {
 
     public static File makePreview(String itemType, long key) {
 
-        String path = "previews" + File.separator + itemType + key;
+        String path = "dataPreviews" + File.separator + itemType + key + ".mp4";
         File file = new File(path);
         if (file.exists()) {
             if (file.canWrite())
@@ -36,11 +37,12 @@ public class PreviewVideo {
             return null;
         }
 
-        ProcessBuilder builder = new ProcessBuilder(path + ".mp4", "previews" + File.separator + "make");
-        // задаем переменную окружения руками
-        // builder.environment().put( "COWPATH", "e:/cowsay-inst/share/cows/" );
+        ProcessBuilder builder = new ProcessBuilder("makeVPreview.bat", path);
         // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
         builder.redirectErrorStream(true);
+
+        String output = "dataPreviews" + File.separator + itemType + key + ".txt";
+        builder.redirectOutput(new File(output));
         try {
             Process process = builder.start();
             process.waitFor();
