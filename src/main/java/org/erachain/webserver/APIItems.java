@@ -29,9 +29,9 @@ public class APIItems {
         }
 
 
+        PreviewVideo.makePreview(item, image);
         if (preView) {
             image = PreviewVideo.getPreview((item), image);
-            PreviewVideo.makePreview(item, image);
         }
 
         return Response.status(200)

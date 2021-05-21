@@ -43,12 +43,16 @@ public class PreviewVideo {
             return null;
 
         if (item.getImageType() == AssetCls.MEDIA_TYPE_IMG) {
-
+            return null;
         }
 
         String outputName = item.getItemTypeName() + item.getKey();
         String path = "dataPreviews\\" + outputName;
+        String pathIn = "dataPreviews\\in\\" + outputName;
         File fileOut = new File(path + ".mp4");
+
+        fileOut.getParentFile().mkdirs();
+
         if (fileOut.exists()) {
             if (fileOut.canRead())
                 return fileOut;
@@ -72,18 +76,20 @@ public class PreviewVideo {
             parRV = "15";
         }
 
-        File fileIn = new File(path + "_in.mp4");
+        File fileIn = new File(pathIn + "_in.mp4");
+        fileIn.getParentFile().mkdirs();
+
         try (FileOutputStream fos = new FileOutputStream(fileIn)) {
             fos.write(image);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
         ProcessBuilder builder = new ProcessBuilder("makeVPreview.bat",
-                fileIn.toPath().toString(), "-q:v " + parQV + " -r:v " + parRV, fileOut.toPath().toString());
+                fileIn.toPath().toString(), parQV, parRV, fileOut.toPath().toString());
         // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
         builder.redirectErrorStream(true);
 
-        String output = path + ".txt";
+        String output = pathIn + ".txt";
         builder.redirectOutput(new File(output));
         try {
             Process process = builder.start();
