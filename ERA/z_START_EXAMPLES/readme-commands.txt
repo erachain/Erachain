@@ -68,8 +68,9 @@ Exapmle 1:  -datachainpath=rrr - make and use folder 'rrr' in folder of applicat
 Exapmle 2:  -datachainpath=\rrr - make and use folder 'rrr' in root folder of disk
 
 -videoPM=
-use: bash makeVPreview.bash for UNIX
-use: makeVPreview.bat for Windows
+for UNIX use: bash makeVPreview.bash
+for Windows use: makeVPreview.bat
+default: -
 
 
 example for Windows:

@@ -43,6 +43,10 @@ public class PreviewVideo {
         if (image.length < VIDEO_USE_ORIG_LEN)
             return null;
 
+        String command = Settings.getInstance().getVideoPreviewMaker();
+        if (command == null || command.isEmpty() || command.equals("-"))
+            return null;
+
         if (item.getImageType() == AssetCls.MEDIA_TYPE_IMG) {
             return null;
         }
@@ -89,8 +93,12 @@ public class PreviewVideo {
                 LOGGER.error(e.getMessage(), e);
             }
 
-            ProcessBuilder builder = new ProcessBuilder(Settings.getInstance().getVideoPreviewMaker(),
-                    fileIn.toPath().toString(), parQV, parRV, fileOut.toPath().toString());
+            ProcessBuilder builder = new ProcessBuilder(command,
+                    // replace all / by \
+                    fileIn.toPath().toString().replace(File.separator, "\\"),
+                    parQV, parRV,
+                    // replace all / by \
+                    fileOut.toPath().toString().replace(File.separator, "\\"));
             // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
             builder.redirectErrorStream(true);
 
