@@ -28,10 +28,13 @@ public class APIItems {
                     .build();
         }
 
+
         if (preView) {
-            byte[] imagePreview = PreviewVideo.getPreview(item);
-            if (imagePreview != null)
-                image = imagePreview;
+            if (false)
+                return Response.ok(PreviewVideo.getPreviewAsFile(item), "video/mp4").build();
+            else
+                image = PreviewVideo.getPreview((item));
+
         } else {
             PreviewVideo.makePreview(item);
         }

@@ -18,11 +18,22 @@ public class PreviewVideo {
             File file = makePreview(item);
             if (file == null)
                 return null;
-            if (file.canWrite())
+            if (file.canRead())
                 return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
+
+        return null;
+    }
+
+    public static File getPreviewAsFile(ItemCls item) {
+
+        File file = makePreview(item);
+        if (file == null)
+            return null;
+        if (file.canRead())
+            return file;
 
         return null;
     }
@@ -33,14 +44,31 @@ public class PreviewVideo {
         String path = "dataPreviews" + File.separator + outputName;
         File fileOut = new File(path + ".mp4");
         if (fileOut.exists()) {
-            if (fileOut.canWrite())
+            if (fileOut.canRead())
                 return fileOut;
             // он еще записывается
             return null;
         }
 
+        byte[] image = item.getImage();
+        String parQV;
+        String parRV;
+        if (image.length > 4000000) {
+            parQV = "20";
+            parRV = "10";
+        } else if (image.length > 1000000) {
+            parQV = "16";
+            parRV = "12";
+        } else if (image.length > 500000) {
+            parQV = "14";
+            parRV = "14";
+        } else {
+            parQV = "12";
+            parRV = "15";
+        }
+
         ProcessBuilder builder = new ProcessBuilder("makeVPreview.bat",
-                "dataPreviews/demo1.mp4", fileOut.toPath().toString());
+                "dataPreviews/demo1.mp4", "-q:v " + parQV + " -r:v " + parRV, fileOut.toPath().toString());
         // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
         builder.redirectErrorStream(true);
 
