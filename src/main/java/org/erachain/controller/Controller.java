@@ -3984,6 +3984,11 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.startsWith("-videoPM=") && arg.length() > 9) {
+                Settings.getInstance().videoPM = arg.substring(9).toLowerCase();
+                continue;
+            }
+
             if (arg.startsWith("-dbschain=") && arg.length() > 10) {
                 try {
                     String dbsChain = arg.substring(10).toLowerCase();

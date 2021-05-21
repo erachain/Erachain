@@ -67,6 +67,11 @@ Set path for /datachain folder (there is blockchain database) so You may use one
 Exapmle 1:  -datachainpath=rrr - make and use folder 'rrr' in folder of application
 Exapmle 2:  -datachainpath=\rrr - make and use folder 'rrr' in root folder of disk
 
+-videoPM=
+use makeVPreview.bash for UNUX
+use makeVPreview.bat for Windows
+
+
 example for Windows:
 	>start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1
 example for other OS:

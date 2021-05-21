@@ -2,6 +2,7 @@ package org.erachain.webserver;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class PreviewVideo {
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        ProcessBuilder builder = new ProcessBuilder("makeVPreview.bat",
+        ProcessBuilder builder = new ProcessBuilder(Settings.getInstance().getVideoPreviewMaker(),
                 fileIn.toPath().toString(), parQV, parRV, fileOut.toPath().toString());
         // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
         builder.redirectErrorStream(true);
