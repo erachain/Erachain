@@ -48,8 +48,8 @@ public class PreviewVideo {
         }
 
         String outputName = item.getItemTypeName() + item.getKey();
-        String path = "dataPreviews\\" + outputName;
-        String pathIn = "dataPreviews\\in\\" + outputName;
+        String path = "dataPreviews" + File.separator + outputName;
+        String pathIn = "dataPreviews" + File.separator + " orig" + File.separator + outputName;
         File fileOut = new File(path + ".mp4");
 
         fileOut.getParentFile().mkdirs();

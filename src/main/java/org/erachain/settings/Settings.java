@@ -170,7 +170,7 @@ public class Settings {
     private String dataTelePath = "";
     private String backUpPath = "";
     private String tempPath;
-    public String videoPM = "makeVPreview.bash"; // makeVPreview.bat
+    public String videoPM = "bash makeVPreview.bash"; // "makeVPreview.bat"
 
     private String telegramDefaultSender;
     private String telegramDefaultReciever;
