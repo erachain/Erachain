@@ -80,11 +80,14 @@ public class PreviewVideo {
         File fileIn = new File(pathIn + "_in.mp4");
         fileIn.getParentFile().mkdirs();
 
-        try (FileOutputStream fos = new FileOutputStream(fileIn)) {
-            fos.write(image);
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+        if (!fileIn.exists()) {
+            try (FileOutputStream fos = new FileOutputStream(fileIn)) {
+                fos.write(image);
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
         }
+
         ProcessBuilder builder = new ProcessBuilder(Settings.getInstance().getVideoPreviewMaker(),
                 fileIn.toPath().toString(), parQV, parRV, fileOut.toPath().toString());
         // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
