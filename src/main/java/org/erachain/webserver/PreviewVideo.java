@@ -1,47 +1,53 @@
 package org.erachain.webserver;
 
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 
 public class PreviewVideo {
 
+    static final int VIDEO_USE_ORIG_LEN = 1 << 19;
+    static final int IMAGE_USE_ORIG_LEN = 1 << 18;
+
     static Logger LOGGER = LoggerFactory.getLogger(PreviewVideo.class.getSimpleName());
 
-    public static byte[] getPreview(ItemCls item) {
+    public static byte[] getPreview(ItemCls item, byte[] image) {
+
+        if (item.getImageType() == AssetCls.MEDIA_TYPE_VIDEO && image.length < VIDEO_USE_ORIG_LEN
+                || item.getImageType() == AssetCls.MEDIA_TYPE_IMG //&& image.length < IMAGE_USE_ORIG_LEN
+        )
+            return image;
 
         try {
-            File file = makePreview(item);
+            File file = makePreview(item, image);
             if (file == null)
-                return null;
+                return image;
             if (file.canRead())
                 return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
 
-        return null;
+        return image;
     }
 
-    public static File getPreviewAsFile(ItemCls item) {
+    public static File makePreview(ItemCls item, byte[] image) {
 
-        File file = makePreview(item);
-        if (file == null)
+        if (image.length < VIDEO_USE_ORIG_LEN)
             return null;
-        if (file.canRead())
-            return file;
 
-        return null;
-    }
+        if (item.getImageType() == AssetCls.MEDIA_TYPE_IMG) {
 
-    public static File makePreview(ItemCls item) {
+        }
 
         String outputName = item.getItemTypeName() + item.getKey();
-        String path = "dataPreviews" + File.separator + outputName;
+        String path = "dataPreviews\\" + outputName;
         File fileOut = new File(path + ".mp4");
         if (fileOut.exists()) {
             if (fileOut.canRead())
@@ -50,13 +56,12 @@ public class PreviewVideo {
             return null;
         }
 
-        byte[] image = item.getImage();
         String parQV;
         String parRV;
         if (image.length > 4000000) {
             parQV = "20";
             parRV = "10";
-        } else if (image.length > 1000000) {
+        } else if (image.length > 1500000) {
             parQV = "16";
             parRV = "12";
         } else if (image.length > 500000) {
@@ -67,8 +72,14 @@ public class PreviewVideo {
             parRV = "15";
         }
 
+        File fileIn = new File(path + "_in.mp4");
+        try (FileOutputStream fos = new FileOutputStream(fileIn)) {
+            fos.write(image);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
         ProcessBuilder builder = new ProcessBuilder("makeVPreview.bat",
-                "dataPreviews/demo1.mp4", "-q:v " + parQV + " -r:v " + parRV, fileOut.toPath().toString());
+                fileIn.toPath().toString(), "-q:v " + parQV + " -r:v " + parRV, fileOut.toPath().toString());
         // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
         builder.redirectErrorStream(true);
 

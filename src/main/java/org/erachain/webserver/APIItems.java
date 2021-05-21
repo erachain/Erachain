@@ -30,13 +30,8 @@ public class APIItems {
 
 
         if (preView) {
-            if (false)
-                return Response.ok(PreviewVideo.getPreviewAsFile(item), "video/mp4").build();
-            else
-                image = PreviewVideo.getPreview((item));
-
-        } else {
-            PreviewVideo.makePreview(item);
+            image = PreviewVideo.getPreview((item), image);
+            PreviewVideo.makePreview(item, image);
         }
 
         return Response.status(200)
