@@ -98,11 +98,9 @@ public class PreviewMaker {
             }
 
             ProcessBuilder builder = new ProcessBuilder(command,
-                    // replace all / by \
-                    fileIn.toPath().toString().replace(File.separator, "\\"),
+                    fileIn.toPath().toString(),
                     parQV, parRV,
-                    // replace all / by \
-                    fileOut.toPath().toString().replace(File.separator, "\\"));
+                    fileOut.toPath().toString());
             // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
             builder.redirectErrorStream(true);
 
