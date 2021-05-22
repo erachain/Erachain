@@ -14,3 +14,8 @@ nousewallet
 web=on
 weballowed=*
 
+// ******* make previews for media data for tiled lists
+///// select one:
+//previewmaker=bash makePreview.bash
+///// or
+//previewmaker=makePreview.bat

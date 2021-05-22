@@ -68,11 +68,17 @@ Exapmle 1:  -datachainpath=rrr - make and use folder 'rrr' in folder of applicat
 Exapmle 2:  -datachainpath=\rrr - make and use folder 'rrr' in root folder of disk
 
 -previewmaker=
-for UNIX use: "bash makePreview.bash"
+for UNIX use: "bash makePreview.bash" (for command line) or bash makePreview.bash (in startARGS.txt)
 for Windows use: makePreview.bat
 default: -
-for example:
+for example in command line:
 -previewmaker="bash makePreview.bash"
+or
+-previewmaker=makePreview.bat
+for example in startARGS.txt:
+previewmaker=bash makePreview.bash
+or
+previewmaker=makePreview.bat
 
 
 **** Examples
