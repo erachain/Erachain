@@ -30,12 +30,18 @@ public class APIItems {
         }
 
 
-        PreviewMaker.makePreview(item, image);
+        PreviewMaker preViewMaker = new PreviewMaker();
+        preViewMaker.makePreview(item, image);
         if (preView) {
-            image = PreviewMaker.getPreview((item), image);
+            image = preViewMaker.getPreview((item), image);
             if (image == null) {
-                throw ApiErrorFactory.getInstance().createError(
-                        "previewmaker parameter is empty, see z_START_EXAMPLES/readme-commands.txt");
+                if (preViewMaker.errorMess == null) {
+                    throw ApiErrorFactory.getInstance().createError(
+                            "previewmaker parameter is empty, see z_START_EXAMPLES/readme-commands.txt");
+                } else {
+                    throw ApiErrorFactory.getInstance().createError(
+                            preViewMaker.errorMess);
+                }
             }
         }
 

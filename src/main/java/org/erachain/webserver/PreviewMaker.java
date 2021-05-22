@@ -13,12 +13,14 @@ import java.nio.file.Files;
 
 public class PreviewMaker {
 
+    public String errorMess;
+
     static final int VIDEO_USE_ORIG_LEN = 1 << 19;
     static final int IMAGE_USE_ORIG_LEN = 1 << 18;
 
     static Logger LOGGER = LoggerFactory.getLogger(PreviewMaker.class.getSimpleName());
 
-    public static byte[] getPreview(ItemCls item, byte[] image) {
+    public byte[] getPreview(ItemCls item, byte[] image) {
 
         if (item.getImageType() == AssetCls.MEDIA_TYPE_VIDEO && image.length < VIDEO_USE_ORIG_LEN
                 || item.getImageType() == AssetCls.MEDIA_TYPE_IMG //&& image.length < IMAGE_USE_ORIG_LEN
@@ -33,12 +35,13 @@ public class PreviewMaker {
                 return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
+            errorMess = e.getMessage();
         }
 
         return null;
     }
 
-    public static File makePreview(ItemCls item, byte[] image) {
+    public File makePreview(ItemCls item, byte[] image) {
 
         if (image.length < VIDEO_USE_ORIG_LEN)
             return null;
@@ -53,7 +56,7 @@ public class PreviewMaker {
 
         String outputName = item.getItemTypeName() + item.getKey();
         String path = "dataPreviews" + File.separator + outputName;
-        String pathIn = "dataPreviews" + File.separator + " orig" + File.separator + outputName;
+        String pathIn = "dataPreviews" + File.separator + "orig" + File.separator + outputName;
         File fileOut = new File(path + ".mp4");
 
         fileOut.getParentFile().mkdirs();
@@ -91,6 +94,7 @@ public class PreviewMaker {
                 fos.write(image);
             } catch (IOException e) {
                 LOGGER.error(e.getMessage(), e);
+                errorMess = e.getMessage();
             }
 
             ProcessBuilder builder = new ProcessBuilder(command,
@@ -109,6 +113,7 @@ public class PreviewMaker {
                 return fileOut;
             } catch (IOException | InterruptedException e) {
                 LOGGER.error(e.getMessage(), e);
+                errorMess = e.getMessage();
             }
         }
 
