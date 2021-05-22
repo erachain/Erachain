@@ -171,10 +171,10 @@ public class Settings {
     private String backUpPath = "";
     private String tempPath;
     /**
-     * "bash makeVPreview.bash" - for UNIX
-     * "makeVPreview.bat" - for Windows
+     * "bash makePreview.bash" - for UNIX
+     * "makePreview.bat" - for Windows
      */
-    public String videoPM = null;
+    public String previewMakerCommand = null;
 
     private String telegramDefaultSender;
     private String telegramDefaultReciever;
@@ -495,16 +495,18 @@ public class Settings {
     }
 
     /**
-     * for Windows use makeVPreview.bash
-     * for Unix use makeVPreview.bat
+     * for Windows use makePreview.bash
+     * for Unix use makePreview.bat
      *
      * @return
      */
-    public String getVideoPreviewMaker() {
-        if (this.settingsJSON.containsKey("videoPreviewMaker")) {
-            videoPM = (String) this.settingsJSON.get("videoPreviewMaker");
+    public String getPreviewMakerCommand() {
+        if (previewMakerCommand == null) {
+            if (this.settingsJSON.containsKey("previewMaker")) {
+                previewMakerCommand = (String) this.settingsJSON.get("previewMaker");
+            }
         }
-        return videoPM;
+        return previewMakerCommand;
     }
 
     ////////////////

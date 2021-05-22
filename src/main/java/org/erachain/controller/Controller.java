@@ -3917,6 +3917,7 @@ public class Controller extends Observable {
         databaseSystem = DCSet.DBS_MAP_DB;
 
         for (String arg : args) {
+
             if (arg.equals("-cli")) {
                 cli = true;
                 useGui = false;
@@ -3984,8 +3985,8 @@ public class Controller extends Observable {
                 continue;
             }
 
-            if (arg.startsWith("-videoPM=") && arg.length() > 9) {
-                Settings.getInstance().videoPM = arg.substring(9).toLowerCase();
+            if (arg.startsWith("-previewmaker=") && arg.length() > 14) {
+                Settings.getInstance().previewMakerCommand = arg.substring(14).toLowerCase();
                 continue;
             }
 

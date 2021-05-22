@@ -67,16 +67,20 @@ Set path for /datachain folder (there is blockchain database) so You may use one
 Exapmle 1:  -datachainpath=rrr - make and use folder 'rrr' in folder of application
 Exapmle 2:  -datachainpath=\rrr - make and use folder 'rrr' in root folder of disk
 
--videoPM=
-for UNIX use: bash makeVPreview.bash
-for Windows use: makeVPreview.bat
+-previewmaker=
+for UNIX use: "bash makePreview.bash"
+for Windows use: makePreview.bat
 default: -
+for example:
+-previewmaker="bash makePreview.bash"
 
 
+**** Examples
 example for Windows:
 	>start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1
 example for other OS:
 	>java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1
 
-
-USE startARGS.txt for ser arguments for start application. For example for Mac OS
+*** Pre-set commands
+USE startARGS.txt for set arguments for start application. For example for Mac OS.
+Examples see in startARGS_example.txt

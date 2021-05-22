@@ -11,12 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class PreviewVideo {
+public class PreviewMaker {
 
     static final int VIDEO_USE_ORIG_LEN = 1 << 19;
     static final int IMAGE_USE_ORIG_LEN = 1 << 18;
 
-    static Logger LOGGER = LoggerFactory.getLogger(PreviewVideo.class.getSimpleName());
+    static Logger LOGGER = LoggerFactory.getLogger(PreviewMaker.class.getSimpleName());
 
     public static byte[] getPreview(ItemCls item, byte[] image) {
 
@@ -28,14 +28,14 @@ public class PreviewVideo {
         try {
             File file = makePreview(item, image);
             if (file == null)
-                return image;
+                return null;
             if (file.canRead())
                 return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
 
-        return image;
+        return null;
     }
 
     public static File makePreview(ItemCls item, byte[] image) {
@@ -43,7 +43,7 @@ public class PreviewVideo {
         if (image.length < VIDEO_USE_ORIG_LEN)
             return null;
 
-        String command = Settings.getInstance().getVideoPreviewMaker();
+        String command = Settings.getInstance().getPreviewMakerCommand();
         if (command == null || command.isEmpty() || command.equals("-"))
             return null;
 

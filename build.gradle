@@ -160,7 +160,7 @@ task CopyResourse {
         include 'market.json'
         include 'peers*'
         include 'start*'
-        include 'makeVPreview*'
+        include 'makePreview*'
     }
 
     copy {

@@ -5,6 +5,7 @@ package org.erachain.webserver;
 //import com.sun.org.apache.xpath.internal.operations.Or;
 //import javafx.print.Collation;
 
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.ItemMap;
 
@@ -29,9 +30,13 @@ public class APIItems {
         }
 
 
-        PreviewVideo.makePreview(item, image);
+        PreviewMaker.makePreview(item, image);
         if (preView) {
-            image = PreviewVideo.getPreview((item), image);
+            image = PreviewMaker.getPreview((item), image);
+            if (image == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        "previewmaker parameter is empty, see z_START_EXAMPLES/readme-commands.txt");
+            }
         }
 
         return Response.status(200)
