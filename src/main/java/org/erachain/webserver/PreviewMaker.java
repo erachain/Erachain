@@ -2,7 +2,6 @@ package org.erachain.webserver;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +43,6 @@ public class PreviewMaker {
     public File makePreview(ItemCls item, byte[] image) {
 
         if (image.length < VIDEO_USE_ORIG_LEN)
-            return null;
-
-        String command = Settings.getInstance().getPreviewMakerCommand();
-        if (command == null || command.isEmpty() || command.equals("-"))
             return null;
 
         if (item.getImageType() == AssetCls.MEDIA_TYPE_IMG) {
