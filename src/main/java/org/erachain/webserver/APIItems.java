@@ -11,6 +11,7 @@ import org.erachain.datachain.ItemMap;
 
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 
 //import com.google.gson.Gson;
 //import org.mapdb.Fun;
@@ -37,7 +38,7 @@ public class APIItems {
             if (image == null) {
                 if (preViewMaker.errorMess == null) {
                     throw ApiErrorFactory.getInstance().createError(
-                            "previewmaker parameter is empty, see z_START_EXAMPLES/readme-commands.txt");
+                            "Some error - see in dataPreviews" + File.separator + "orig" + File.separator + PreviewMaker.getItemName(item) + ".log");
                 } else {
                     throw ApiErrorFactory.getInstance().createError(
                             preViewMaker.errorMess);

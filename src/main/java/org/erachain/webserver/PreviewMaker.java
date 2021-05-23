@@ -40,6 +40,10 @@ public class PreviewMaker {
         return null;
     }
 
+    public static String getItemName(ItemCls item) {
+        return item.getItemTypeName() + item.getKey();
+    }
+
     public File makePreview(ItemCls item, byte[] image) {
 
         if (image.length < VIDEO_USE_ORIG_LEN)
@@ -49,7 +53,7 @@ public class PreviewMaker {
             return null;
         }
 
-        String outputName = item.getItemTypeName() + item.getKey();
+        String outputName = getItemName(item);
         String path = "dataPreviews" + File.separator + outputName;
         String pathIn = "dataPreviews" + File.separator + "orig" + File.separator + outputName;
         File fileOut = new File(path + ".mp4");
@@ -79,7 +83,7 @@ public class PreviewMaker {
             parRV = "15";
         }
 
-        String output = pathIn + ".txt";
+        String output = pathIn + ".log";
         File outLog = new File(output);
         outLog.getParentFile().mkdirs();
 
