@@ -95,6 +95,7 @@ public class PreviewMaker {
             } catch (IOException e) {
                 LOGGER.error(e.getMessage(), e);
                 errorMess = e.getMessage();
+                return null;
             }
 
             boolean isWindows = System.getProperty("os.name").startsWith("Windows");
@@ -122,6 +123,7 @@ public class PreviewMaker {
             } catch (IOException | InterruptedException e) {
                 LOGGER.error(e.getMessage(), e);
                 errorMess = e.getMessage();
+                return null;
             }
         }
 
