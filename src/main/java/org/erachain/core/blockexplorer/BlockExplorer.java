@@ -1132,11 +1132,11 @@ public class BlockExplorer {
 
         JSONArray tradesJSON = new JSONArray();
 
-        int count = 0;
+        int count = 50;
 
         TradeMap tradesMap = dcSet.getTradeMap();
         try (IteratorCloseable<Tuple2<Long, Long>> iterator = tradesMap.getIndexIterator(0, true)) {
-            while (count < 50 && iterator.hasNext()) {
+            while (count > 0 && iterator.hasNext()) {
                 Tuple2<Long, Long> key = iterator.next();
                 Trade trade = tradesMap.get(key);
                 if (trade == null) {
@@ -1145,7 +1145,7 @@ public class BlockExplorer {
                 if (trade.isCancel())
                     continue;
 
-                count--;
+                --count;
                 tradesJSON.add(tradeJSON(trade, assetHave, assetWant));
             }
         } catch (IOException e) {
