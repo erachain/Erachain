@@ -99,17 +99,29 @@ public class PreviewMaker {
 
             boolean isWindows = System.getProperty("os.name").startsWith("Windows");
             ProcessBuilder builder;
+            // -i %1 -y -fs 512k -vcodec h264 -s 256x256 -q:v %2 -r:v %3 %4
             if (isWindows) {
                 builder = new ProcessBuilder("makePreview.bat",
                         fileIn.toPath().toString(),
                         parQV, parRV,
                         fileOut.toPath().toString());
             } else {
-                builder = new ProcessBuilder("bash",
-                        "makePreview.bash",
-                        fileIn.toPath().toString(),
-                        parQV, parRV,
-                        fileOut.toPath().toString());
+                if (true) {
+                    String args = "-i %1 -y -fs 512k -vcodec h264 -s 256x256 -q:v %2 -r:v %3 %4"
+                            .replace("%1", fileIn.toPath().toString())
+                            .replace("%2", parQV)
+                            .replace("%3", parRV)
+                            .replace("%4", fileOut.toPath().toString());
+                    builder = new ProcessBuilder("ffmpeg",
+                            args
+                    );
+                } else {
+                    builder = new ProcessBuilder("bash",
+                            "makePreview.bash",
+                            fileIn.toPath().toString(),
+                            parQV, parRV,
+                            fileOut.toPath().toString());
+                }
             }
             // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
             builder.redirectErrorStream(true);
