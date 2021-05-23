@@ -227,8 +227,8 @@ public class PairsController {
         Order askLastOrder = ordersMap.getHaveWanFirst(key1, key2);
         BigDecimal lower_askPrice = askLastOrder == null ? BigDecimal.ZERO : askLastOrder.calcLeftPrice();
 
-        int countOrdersBid = ordersMap.getCountHave(key2, 100);
-        int countOrdersAsk = ordersMap.getCountHave(key1, 100);
+        int countOrdersBid = ordersMap.getCount(key2, key1, 200);
+        int countOrdersAsk = ordersMap.getCount(key1, key2, 200);
 
         return new TradePair(asset1, asset2, lastPrice, lastTime,
                 highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, price,

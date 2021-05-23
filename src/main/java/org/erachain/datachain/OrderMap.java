@@ -11,9 +11,9 @@ import java.util.Set;
 
 public interface OrderMap extends DBTab<Long, Order> {
 
-    long getCount(long have, long want);
+    int getCount(long have, long want);
 
-    long getCount(long have, long want, int limit);
+    int getCount(long have, long want, int limit);
 
     int getCountHave(long have, int limit);
 

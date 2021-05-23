@@ -2262,7 +2262,7 @@ public class BlockExplorer {
 
             String key = assetHave.getName() + "_" + assetWant.getName();
 
-            TradePair pair = PairsController.reCalcAndUpdate(assetHave, assetWant, pairsMap, 30);
+            TradePair pair = PairsController.reCalcAndUpdate(assetHave, assetWant, pairsMap, 3);
             pairsCnt.spotPairs.put(key, pair);
 
             int ordersCount = pair.getCountOrdersBid() + pair.getCountOrdersAsk();
