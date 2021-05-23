@@ -46,9 +46,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.cover = cover;
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
-            logger.debug("########################### Free Memory:" + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                     + (Controller.MIN_MEMORY_TAIL)) {
+
+                logger.debug("########################### Max=Total Memory [MB]:" + (Runtime.getRuntime().totalMemory() >> 20)
+                        + " " + cover.getClass().getName());
+                logger.debug("########################### Free Memory [MB]:" + (Runtime.getRuntime().freeMemory() >> 20)
+                        + " " + cover.getClass().getName());
+
                 // у родителя чистим - у себя нет, так как только создали
                 ((DBASet) parent.getDBSet()).clearCache();
                 System.gc();

@@ -50,7 +50,7 @@ public class WalletNotifyTimer<U> implements Observer {
 
     public void update(Observable o, Object arg) {
 
-        if (!contr.doesWalletExists() || contr.wallet.synchronizeBodyUsed
+        if (!contr.doesWalletExists() || contr.getWallet().synchronizeBodyUsed
                 || !settings.isTrayEventEnabled())
             return;
 
@@ -85,7 +85,7 @@ public class WalletNotifyTimer<U> implements Observer {
                     RSend rSend = (RSend) transaction;
                     if (rSend.hasAmount()) {
                         // TRANSFER
-                        if (contr.wallet.accountExists(creator)) {
+                        if (contr.getWallet().accountExists(creator)) {
                             if (settings.isSoundNewTransactionEnabled())
                                 sound = "send.wav";
 
@@ -107,7 +107,7 @@ public class WalletNotifyTimer<U> implements Observer {
                         }
                     } else {
                         // MAIL
-                        if (contr.wallet.accountExists(rSend.getCreator())) {
+                        if (contr.getWallet().accountExists(rSend.getCreator())) {
                             if (settings.isSoundNewTransactionEnabled())
                                 sound = "send.wav";
 
@@ -131,7 +131,7 @@ public class WalletNotifyTimer<U> implements Observer {
 
                 } else {
 
-                    if (contr.wallet.accountExists(transaction.getCreator())) {
+                    if (contr.getWallet().accountExists(transaction.getCreator())) {
                         if (settings.isSoundNewTransactionEnabled())
                             sound = "outcometransaction.wav";
 

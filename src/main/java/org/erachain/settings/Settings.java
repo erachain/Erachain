@@ -157,7 +157,6 @@ public class Settings {
     private InetAddress localAddress;
     private String[] defaultPeers = {};
 
-
     private String userPath = "";
 
     /**

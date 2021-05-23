@@ -56,7 +56,7 @@ public class WalletOrphanButton extends JButton implements Observer {
                             Integer retValint = Integer.valueOf(retVal);
                             int hh = DCSet.getInstance().getBlockMap().size() - retValint;
                             if (hh > 1) {
-                                Controller.getInstance().wallet.synchronizeBodyUsed = false;
+                                Controller.getInstance().getWallet().synchronizeBodyUsed = false;
                                 Controller.getInstance().setOrphanTo(hh);
                             }
                         }

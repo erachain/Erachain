@@ -64,16 +64,16 @@ public class WalletResource {
         String password = null;
         APIUtils.askAPICallAllowed(password, "GET wallet/synchronize", request, true);
 
-        //CHECK IF WALLET EXISTS
+        //CHECK IF WALLET EXISTSашч
         if (!Controller.getInstance().doesWalletExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
-        if (!Controller.getInstance().wallet.synchronizeBodyUsed) {
+        if (!Controller.getInstance().getWallet().synchronizeBodyUsed) {
 
             // TODO: was
             //Controller.getInstance().synchronizeWallet();
-            Controller.getInstance().wallet.synchronizeFull();
+            Controller.getInstance().getWallet().synchronizeFull();
 
             return String.valueOf(true);
         } else {

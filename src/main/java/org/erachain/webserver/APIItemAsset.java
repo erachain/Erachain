@@ -24,6 +24,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,7 +51,7 @@ public class APIItemAsset {
         help.put("GET apiasset/{key}", "Get by ID");
         help.put("GET apiasset/raw/{key}", "Returns RAW in Base58 of asset with the given key.");
         help.put("GET apiasset/find?filter={name_string}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use patterns from 5 chars in words. Default {descending} - true");
-        help.put("Get apiasset/image/{key}", "Get Asset Image");
+        help.put("Get apiasset/image/{key}?preview", "Get Asset Image. Use 'preview' for the tiles list");
         help.put("Get apiasset/icon/{key}", "Get Asset Icon");
         help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
         help.put("GET apiasset/text/{key", "Get description by ID");
@@ -195,7 +196,10 @@ public class APIItemAsset {
     @Path("image/{key}")
     @GET
     //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
-    public Response assetImage(@PathParam("key") long key) throws IOException {
+    public Response assetImage(@Context UriInfo info, @PathParam("key") long key) throws IOException {
+
+
+        boolean preview = API.checkBoolean(info, "preview");
 
         int weight = 0;
         if (key <= 0) {
@@ -212,7 +216,7 @@ public class APIItemAsset {
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
-        return APIItems.getImage(map, key);
+        return APIItems.getImage(map, key, preview);
 
     }
 

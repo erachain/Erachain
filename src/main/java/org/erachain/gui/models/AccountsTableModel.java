@@ -33,7 +33,7 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
     private Account account;
 
     public AccountsTableModel() {
-        super(Controller.getInstance().wallet.database.getAccountMap(),
+        super(Controller.getInstance().getWallet().database.getAccountMap(),
                 new String[]{"No.", "Account", "Name",
                         "OWN (1)", "DEBT (2)", "HOLD (3)", "SPEND (4)",
                         AssetCls.FEE_NAME},
@@ -76,7 +76,7 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
                 return account.getPersonAsString();
 
             case COLUMN_NAME:
-                FavoriteAccountsMap favoriteMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
+                FavoriteAccountsMap favoriteMap = Controller.getInstance().getWallet().database.getFavoriteAccountsMap();
                 if (favoriteMap.contains(account.getAddress())) {
                     Fun.Tuple3<String, String, String> itemAccount = favoriteMap.get(account.getAddress());
                     if (itemAccount.b != null)
@@ -148,7 +148,7 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
 
     @Override
     public void getInterval() {
-        list = Controller.getInstance().wallet.getPublicKeyAccounts();
+        list = Controller.getInstance().getWallet().getPublicKeyAccounts();
     }
 
     public void addObservers() {
@@ -156,8 +156,8 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
         super.addObservers();
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {
-            Controller.getInstance().wallet.database.getBlocksHeadMap().addObserver(this);
-            Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
+            Controller.getInstance().getWallet().database.getBlocksHeadMap().addObserver(this);
+            Controller.getInstance().getWallet().database.getTransactionMap().addObserver(this);
         }
 
     }
@@ -167,8 +167,8 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
         super.deleteObservers();
 
         if (Controller.getInstance().doesWalletDatabaseExists()) {
-            Controller.getInstance().wallet.database.getBlocksHeadMap().deleteObserver(this);
-            Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
+            Controller.getInstance().getWallet().database.getBlocksHeadMap().deleteObserver(this);
+            Controller.getInstance().getWallet().database.getTransactionMap().deleteObserver(this);
         }
     }
 

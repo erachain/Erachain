@@ -163,7 +163,7 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
 
         } else {
             // ожидаем открытия кошелька
-            Controller.getInstance().wallet.addWaitingObserver(this);
+            Controller.getInstance().getWallet().addWaitingObserver(this);
         }
 
     }

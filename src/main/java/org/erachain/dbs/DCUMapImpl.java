@@ -67,6 +67,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                     + (Controller.MIN_MEMORY_TAIL)) {
+
+                LOGGER.debug("########################### Max=Total Memory [MB]:" + (Runtime.getRuntime().totalMemory() >> 20)
+                        + " " + TAB_NAME);
+                LOGGER.debug("########################### Free Memory [MB]:" + (Runtime.getRuntime().freeMemory() >> 20)
+                        + " " + TAB_NAME);
+
                 // у родителя чистим - у себя нет, так как только создали
                 ((DBASet) parent.getDBSet()).clearCache();
                 System.gc();

@@ -121,6 +121,7 @@ public class Controller extends Observable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class.getSimpleName());
 
     public static int HARD_WORK = 0;
+    public static String CACHE_DC = "hard";
     public boolean useGui = true;
     public boolean useNet = true;
 
@@ -129,7 +130,7 @@ public class Controller extends Observable {
     public static long buildTimestamp;
     private static Controller instance;
     public PairsController pairsController;
-    public Wallet wallet;
+    private Wallet wallet;
     public TelegramStore telegramStore;
     private int status;
     private boolean dcSetWithObserver = false;
@@ -3916,6 +3917,7 @@ public class Controller extends Observable {
         databaseSystem = DCSet.DBS_MAP_DB;
 
         for (String arg : args) {
+
             if (arg.equals("-cli")) {
                 cli = true;
                 useGui = false;
@@ -3975,6 +3977,11 @@ public class Controller extends Observable {
                     }
                 } catch (Exception e) {
                 }
+                continue;
+            }
+
+            if (arg.startsWith("-cache=") && arg.length() > 7) {
+                CACHE_DC = arg.substring(7).toLowerCase();
                 continue;
             }
 

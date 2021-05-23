@@ -23,7 +23,7 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
     public static final int COLUMN_FEE = 6;
 
     public WalletBlocksTableModel() {
-        super(Controller.getInstance().wallet.database.getBlocksHeadMap(),
+        super(Controller.getInstance().getWallet().database.getBlocksHeadMap(),
                 new String[]{"Height", "Timestamp", "Creator account", "Gen.Balance", "dtWV", "Transactions", "Fee"},
                 new Boolean[]{false, true, true, false, false, true, false}, true, -1);
     }

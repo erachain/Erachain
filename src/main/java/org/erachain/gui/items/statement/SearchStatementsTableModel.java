@@ -22,7 +22,7 @@ public class SearchStatementsTableModel extends SearchTableModelCls<Transaction>
     private static final long serialVersionUID = 1L;
 
     DCSet dcSet = DCSet.getInstance();
-    Wallet wallet = Controller.getInstance().wallet;
+    Wallet wallet = Controller.getInstance().getWallet();
 
     public SearchStatementsTableModel() {
 

@@ -20,11 +20,11 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
     private static final long serialVersionUID = 1L;
 
     DCSet dcSet = DCSet.getInstance();
-    Wallet wallet = Controller.getInstance().wallet;
+    Wallet wallet = Controller.getInstance().getWallet();
 
     public FavoriteTransactionTableModel() {
         super(DCSet.getInstance().getTransactionFinalMap(),
-                Controller.getInstance().wallet.database.getTransactionFavoritesSet(),
+                Controller.getInstance().getWallet().database.getTransactionFavoritesSet(),
                 new String[]{"№", "Timestamp", "Type", "Creator", "Statement", "Favorite"},
                 new Boolean[]{true, true, true, true, true, false},
                 ObserverMessage.RESET_TRANSACTION_FAVORITES_TYPE,

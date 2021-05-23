@@ -5,18 +5,20 @@ package org.erachain.webserver;
 //import com.sun.org.apache.xpath.internal.operations.Or;
 //import javafx.print.Collation;
 
+import org.erachain.api.ApiErrorFactory;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.ItemMap;
 
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 
 //import com.google.gson.Gson;
 //import org.mapdb.Fun;
 
 public class APIItems {
 
-    public static Response getImage(ItemMap map, long key) {
+    public static Response getImage(ItemMap map, long key, boolean preView) {
 
         ItemCls item = map.get(key);
 
@@ -26,6 +28,22 @@ public class APIItems {
                     .header("Access-Control-Allow-Origin", "*")
                     .entity("")
                     .build();
+        }
+
+
+        PreviewMaker preViewMaker = new PreviewMaker();
+        preViewMaker.makePreview(item, image);
+        if (preView) {
+            image = preViewMaker.getPreview((item), image);
+            if (image == null) {
+                if (preViewMaker.errorMess == null) {
+                    throw ApiErrorFactory.getInstance().createError(
+                            "Some error - see in dataPreviews" + File.separator + "orig" + File.separator + PreviewMaker.getItemName(item) + ".log");
+                } else {
+                    throw ApiErrorFactory.getInstance().createError(
+                            preViewMaker.errorMess);
+                }
+            }
         }
 
         return Response.status(200)

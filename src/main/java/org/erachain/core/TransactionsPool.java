@@ -208,7 +208,7 @@ public class TransactionsPool extends MonitoredThread {
             controller.network.broadcast(transactionMessage, false);
 
             if (controller.doesWalletExists() && Controller.HARD_WORK < 3) {
-                controller.wallet.processTransaction(transaction);
+                controller.getWallet().processTransaction(transaction);
             }
 
         }

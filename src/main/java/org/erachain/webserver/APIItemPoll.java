@@ -179,7 +179,7 @@ public class APIItemPoll {
                     Transaction.ITEM_POLL_NOT_EXIST);
         }
 
-        return APIItems.getImage(map, key);
+        return APIItems.getImage(map, key, false);
 
     }
 

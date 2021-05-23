@@ -44,7 +44,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     private RowSorter<ItemsPersonsTableModel> search_Sorter;
     private int selected_Item;
     private JTextField key_Item;
-    Wallet wallet = Controller.getInstance().wallet;
+    Wallet wallet = Controller.getInstance().getWallet();
 
     public SearchStatementsSplitPanel() {
         super(NAME, TITLE);
