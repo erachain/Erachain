@@ -88,7 +88,7 @@ public class PreviewMaker {
         outLog.getParentFile().mkdirs();
 
         if (!outLog.exists()) {
-            File fileIn = new File(pathIn + "_in.mp4");
+            File fileIn = new File(pathIn + ".mp4");
             try (FileOutputStream fos = new FileOutputStream(fileIn)) {
                 fos.write(image);
             } catch (IOException e) {
@@ -123,6 +123,10 @@ public class PreviewMaker {
                 LOGGER.error(e.getMessage(), e);
                 errorMess = e.getMessage();
                 return null;
+            } finally {
+                if (fileOut.exists()) {
+                    fileIn.delete();
+                }
             }
         }
 
