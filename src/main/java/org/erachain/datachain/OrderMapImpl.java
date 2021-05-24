@@ -75,7 +75,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
-    public long getCount(long have, long want) {
+    public int getCount(long have, long want) {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
@@ -87,7 +87,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
-    public long getCount(long have, long want, int limit) {
+    public int getCount(long have, long want, int limit) {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }

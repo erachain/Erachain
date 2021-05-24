@@ -1069,20 +1069,30 @@ public class WebResource {
     @Path("index/img/{filename}")
     @GET
     public Response image(@PathParam("filename") String filename) {
-        ArrayList<String> imgs = new ArrayList<String>();
 
-        imgs.addAll(Arrays.asList(imgsArray));
+        File file;
+        if (true) {
+            file = new File("web/img/" + filename);
+            if (!file.exists())
+                return error404(request, null);
+        } else {
+            // OLD
+            ArrayList<String> imgs = new ArrayList<String>();
 
-        int imgnum = imgs.indexOf(filename);
+            imgs.addAll(Arrays.asList(imgsArray));
 
-        if (imgnum == -1) {
-            return error404(request, null);
+            int imgnum = imgs.indexOf(filename);
+
+            if (imgnum == -1) {
+                return error404(request, null);
+            }
+
+            file = new File("web/img/" + imgs.get(imgnum));
         }
 
-        File file = new File("web/img/" + imgs.get(imgnum));
         String type = "";
 
-        switch (getFileExtention(imgs.get(imgnum))) {
+        switch (getFileExtention(filename)) {
             case "png":
                 type = "image/png";
                 break;
@@ -1101,6 +1111,12 @@ public class WebResource {
         } else {
             return error404(request, null);
         }
+    }
+
+    @Path("ic/{filename}")
+    @GET
+    public Response imageIC(@PathParam("filename") String filename) {
+        return image("ic/" + filename);
     }
 
     @Path("index/video/{filename}")

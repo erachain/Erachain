@@ -1017,8 +1017,6 @@ public class BlockExplorer {
         List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTrade(have, want, false);
         List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTrade(want, have, true);
 
-        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 50, false);
-
         AssetCls assetHave = Controller.getInstance().getAsset(have);
         AssetCls assetWant = Controller.getInstance().getAsset(want);
 
@@ -1132,21 +1130,28 @@ public class BlockExplorer {
         output.put("buysSumTotal", sumAmount.toPlainString());
         output.put("buysSumTotalGood", sumAmountGood.toPlainString());
 
-        Map tradesJSON = new LinkedHashMap();
+        JSONArray tradesJSON = new JSONArray();
 
-        output.put("tradesCount", trades.size());
+        int count = 50;
 
-        int i = 0;
-        for (Trade trade : trades) {
+        TradeMap tradesMap = dcSet.getTradeMap();
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = tradesMap.getIndexIterator(0, true)) {
+            while (count > 0 && iterator.hasNext()) {
+                Tuple2<Long, Long> key = iterator.next();
+                Trade trade = tradesMap.get(key);
+                if (trade == null) {
+                    Long error = null;
+                }
+                if (trade.isCancel())
+                    continue;
 
-            if (trade.isCancel())
-                continue;
-
-            tradesJSON.put(i++, tradeJSON(trade, assetHave, assetWant));
-
-            if (i > 100)
-                break;
+                --count;
+                tradesJSON.add(tradeJSON(trade, assetHave, assetWant));
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
         }
+
         output.put("trades", tradesJSON);
 
         output.put("Label_Trades", Lang.T("Trades", langObj));
@@ -2235,9 +2240,6 @@ public class BlockExplorer {
         output.put("type", "exchange");
         output.put("search_placeholder", Lang.T("Type searching asset keys", langObj));
 
-        //OrderMap orders = dcSet.getOrderMap();
-        TradeMap trades = dcSet.getTradeMap();
-
         JSONArray pairsArray = new JSONArray();
 
         PairsController pairsCnt = Controller.getInstance().pairsController;
@@ -2260,7 +2262,7 @@ public class BlockExplorer {
 
             String key = assetHave.getName() + "_" + assetWant.getName();
 
-            TradePair pair = PairsController.reCalcAndUpdate(assetHave, assetWant, pairsMap, 30);
+            TradePair pair = PairsController.reCalcAndUpdate(assetHave, assetWant, pairsMap, 3);
             pairsCnt.spotPairs.put(key, pair);
 
             int ordersCount = pair.getCountOrdersBid() + pair.getCountOrdersAsk();
@@ -2275,18 +2277,20 @@ public class BlockExplorer {
 
         JSONArray tradesArray = new JSONArray();
 
-        int count = 25;
+        int count = 50;
 
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = trades.getIndexIterator(0, true)) {
-            while (count-- > 0 && iterator.hasNext()) {
+        TradeMap tradesMap = dcSet.getTradeMap();
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = tradesMap.getIndexIterator(0, true)) {
+            while (count > 0 && iterator.hasNext()) {
                 Tuple2<Long, Long> key = iterator.next();
-                Trade trade = trades.get(key);
+                Trade trade = tradesMap.get(key);
                 if (trade == null) {
                     Long error = null;
                 }
                 if (trade.isCancel())
                     continue;
 
+                --count;
                 tradesArray.add(tradeJSON(trade, null, null));
             }
         } catch (IOException e) {
