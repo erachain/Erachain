@@ -72,8 +72,9 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
     public void process(Block block, int forDeal) {
 
         AssetCls asset = (AssetCls) item;
-        if (BlockChain.MAIN_MODE && this.dcSet.getItemAssetMap().size() > 1
-                || item.isNovaAsset(dcSet) <= 0)
+        if (this.dcSet.getItemAssetMap().size() > 1
+                && (!BlockChain.TEST_MODE || item.isNovaAsset(dcSet) <= 0)
+        )
             // SKIP all base TOKENS
             return;
 
