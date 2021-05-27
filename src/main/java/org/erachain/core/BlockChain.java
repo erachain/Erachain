@@ -641,6 +641,8 @@ public class BlockChain {
             // из p130 счета для прорверки
             NOVA_ASSETS.put("BTC",
                     new Tuple3<Long, Long, byte[]>(12L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
+            NOVA_ASSETS.put("DOGE",
+                    new Tuple3<Long, Long, byte[]>(18L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
             NOVA_ASSETS.put("USD",
                     new Tuple3<Long, Long, byte[]>(95L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
 
