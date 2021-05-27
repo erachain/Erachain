@@ -1159,7 +1159,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      * @param dcSet
      * @return key если еще не добавлен, -key если добавлен и 0 - если это не НОВА
      */
-    public long isNovaAsset(DCSet dcSet) {
+    public long isNovaItem(DCSet dcSet) {
         Object item = getNovaItems().get(this.name);
         if (item != null && maker.equals(getNovaItemCreator(item))) {
             ItemMap dbMap = this.getDBMap(dcSet);
@@ -1180,7 +1180,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         ItemMap dbMap = this.getDBMap(db);
 
         long newKey;
-        long novaKey = this.isNovaAsset(db);
+        long novaKey = this.isNovaItem(db);
         if (novaKey > 0) {
 
             // INSERT WITH NOVA KEY

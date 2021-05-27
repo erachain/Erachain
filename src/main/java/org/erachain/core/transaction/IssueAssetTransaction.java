@@ -132,7 +132,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
     @Override
     public boolean hasPublicText() {
 
-        if (this.item.isNovaAsset(this.dcSet) > 0) {
+        if (this.item.isNovaItem(this.dcSet) > 0) {
             return false;
         }
 
@@ -177,7 +177,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
                 return INVALID_QUANTITY;
             }
 
-            if (this.item.isNovaAsset(this.dcSet) > 0) {
+            if (this.item.isNovaItem(this.dcSet) > 0) {
                 Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
                 if (item.b < quantity) {
                     return INVALID_QUANTITY;
