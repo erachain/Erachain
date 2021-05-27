@@ -133,7 +133,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         if (this.amount != null) {
             long assetKey = this.getAbsKey();
-            AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(assetKey);
+            AssetCls asset = this.dcSet.getItemAssetMap().get(assetKey);
             if (asset == null || assetKey > BlockChain.AMOUNT_SCALE_FROM) {
                 int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
                 if (different_scale != 0) {

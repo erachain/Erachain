@@ -286,7 +286,7 @@ public class IssuePersonRecord extends IssueItemRecord {
             }
         }
 
-        if (this.item.isNovaAsset(this.creator, this.dcSet) > 0) {
+        if (this.item.isNovaAsset(this.dcSet) > 0) {
             Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_PERSONS.get(this.item.getName());
             if (!item.b.equals(((PersonCls) this.item).getBirthday())) {
                 return INVALID_TIMESTAMP_START;

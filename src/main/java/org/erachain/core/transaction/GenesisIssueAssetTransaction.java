@@ -1,5 +1,6 @@
 package org.erachain.core.transaction;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
@@ -70,13 +71,14 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
 
     public void process(Block block, int forDeal) {
 
-        if (this.dcSet.getItemAssetMap().size() > 1)
+        AssetCls asset = (AssetCls) item;
+        if (BlockChain.MAIN_MODE && this.dcSet.getItemAssetMap().size() > 1
+                || item.isNovaAsset(dcSet) <= 0)
             // SKIP all base TOKENS
             return;
 
         super.process(block, forDeal);
 
-        AssetCls asset = (AssetCls) item;
         long quantity = asset.getQuantity();
         if (quantity > 0L) {
             Account maker = item.getMaker();
