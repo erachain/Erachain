@@ -640,9 +640,11 @@ public class BlockChain {
 
             // из p130 счета для прорверки
             NOVA_ASSETS.put("BTC",
-                    new Tuple3<Long, Long, byte[]>(12L, 0L, new Account("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz").getShortAddressBytes()));
+                    new Tuple3<Long, Long, byte[]>(12L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
+            NOVA_ASSETS.put("DOGE",
+                    new Tuple3<Long, Long, byte[]>(18L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
             NOVA_ASSETS.put("USD",
-                    new Tuple3<Long, Long, byte[]>(95L, 0L, new Account("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz").getShortAddressBytes()));
+                    new Tuple3<Long, Long, byte[]>(95L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
 
             LOCKED__ADDRESSES.put("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz", "7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1");
             TRUSTED_ANONYMOUS.add("762eatKnsB3xbyy2t9fwjjqUG1GoxQ8Rhx");
