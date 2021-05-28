@@ -24,6 +24,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -56,7 +57,7 @@ public class APIItemPerson {
         help.put("GET apiperson/status/{personKey}/{statusKey}?history=true",
                 "Get Status data for Person Key. JSON ARRAY format: [timeFrom, timeTo, [par1, par2, str1, str2, reference, description], block, txNo]");
 
-        help.put("GET apiperson/addresses/{key}", "Get Person Addresses");
+        help.put("GET apiperson/addresses/{key}?full", "Get Person Addresses");
         help.put("GET apiperson/statuses/{key}", "Get Person Statuses");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -352,8 +353,8 @@ public class APIItemPerson {
     }
 
     @GET
-    @Path("addresses/{key}")
-    public Response getAddresses(@PathParam("key") Long key) {
+    @Path("addresses/{key}?full")
+    public Response getAddresses(@Context UriInfo info, @PathParam("key") Long key) {
         if (DCSet.getInstance().getItemPersonMap().get(key) == null) {
             JSONObject out = new JSONObject();
             out.put("error", "Person not Found");
@@ -362,10 +363,20 @@ public class APIItemPerson {
                     .header("Access-Control-Allow-Origin", "*")
                     .entity(out.toJSONString())
                     .build();
+
         } else {
-            TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(new Long(key));
-            JSONArray out = new JSONArray();
-            out.addAll(addresses.keySet());
+            JSONArray out;
+            if (API.checkBoolean(info, "full")) {
+                out = PersonCls.toJsonAddresses(key);
+
+            } else {
+                TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses
+                        = DCSet.getInstance().getPersonAddressMap().getItems(new Long(key));
+
+                out = new JSONArray();
+                out.addAll(addresses.keySet());
+
+            }
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
@@ -376,7 +387,7 @@ public class APIItemPerson {
 
     @GET
     @Path("statuses/{key}")
-    public Response getStauses(@PathParam("key") Long key) {
+    public Response getStatuses(@PathParam("key") Long key) {
         if (DCSet.getInstance().getItemPersonMap().get(key) == null) {
             JSONObject out = new JSONObject();
             out.put("error", "Person not Found");
