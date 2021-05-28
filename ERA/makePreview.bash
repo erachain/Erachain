@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ## http://www.ffmpeg.org/download.html
 
 ## not used now!
