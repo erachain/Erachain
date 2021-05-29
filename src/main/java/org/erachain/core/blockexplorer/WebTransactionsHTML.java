@@ -446,8 +446,8 @@ public class WebTransactionsHTML {
         out += "<h4><a href='?order=" + Transaction.viewDBRef(orderID) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
 
         out += Lang.T("Update Price", langObj) + ": <b>"
-                + orderUpdate.makeOrder().calcPrice().toPlainString()
-                + " / " + orderUpdate.makeOrder().calcPriceReverse().toPlainString() + "</b><br>";
+                + orderUpdate.makeUpdatedOrder().calcPrice().toPlainString()
+                + " / " + orderUpdate.makeUpdatedOrder().calcPriceReverse().toPlainString() + "</b><br>";
 
         return out;
     }

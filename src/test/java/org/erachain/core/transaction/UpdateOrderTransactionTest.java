@@ -198,13 +198,16 @@ public class UpdateOrderTransactionTest {
                 init(dbs);
 
                 //CREATE ORDER
-                CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), 0l, new byte[]{5, 6});
-                createOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1, true);
+                CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY,
+                        BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+                        BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), 0L);
+                createOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, 1, true);
                 createOrderTransaction.sign(maker, asPack);
                 createOrderTransaction.process(gb, asPack);
 
                 //CREATE UPDATE ORDER
-                UpdateOrderTransaction tx = new UpdateOrderTransaction(maker, new byte[64], BigDecimal.TEN, FEE_POWER, timestamp, 0L);
+                UpdateOrderTransaction tx = new UpdateOrderTransaction(maker, createOrderTransaction.getSignature(),
+                        BigDecimal.TEN, FEE_POWER, timestamp, 0L);
                 tx.sign(maker, Transaction.FOR_NETWORK);
                 tx.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1, true);
                 tx.process(gb, Transaction.FOR_NETWORK);

@@ -161,12 +161,12 @@ public class UpdateOrderTransaction extends Transaction {
 
     public BigDecimal getPriceCalc() {
         // precision bad return Order.calcPrice(this.amountHave, this.amountWant);
-        return makeOrder().calcPrice();
+        return makeUpdatedOrder().calcPrice();
     }
 
     public BigDecimal getPriceCalcReverse() {
         //return Order.calcPrice(this.amountWant, this.amountHave);
-        return makeOrder().calcPriceReverse();
+        return makeUpdatedOrder().calcPriceReverse();
     }
 
     @Override
@@ -176,7 +176,7 @@ public class UpdateOrderTransaction extends Transaction {
 
     // PARSE CONVERT
 
-    public Order makeOrder() {
+    public Order makeUpdatedOrder() {
         return new Order(order, this.amountWant);
     }
 
@@ -417,16 +417,22 @@ public class UpdateOrderTransaction extends Transaction {
         // удалим сперва - чтобы почистить все ключ с ценой корректно
         dcSet.getOrderMap().delete(orderID);
 
-        // изменяемые объекты нужно заново создавать
-        Order updatedOrder = makeOrder();
-        dcSet.getOrderMap().put(orderID, updatedOrder);
-
         Trade trade = new Trade(Trade.TYPE_UPDATE, dbRef, orderID, order.getHaveAssetKey(), order.getWantAssetKey(),
                 order.getAmountWant(), amountWant,
-                createOrderTx.getWantAsset().getScale(), createOrderTx.getHaveAsset().getScale(), -2);
+                createOrderTx.getWantAsset().getScale(), createOrderTx.getHaveAsset().getScale(), 1);
 
         // нужно запомнить чтобы при откате обновить взад цену
         dcSet.getTradeMap().put(trade);
+
+        // изменяемые объекты нужно заново создавать
+        Order updatedOrder = makeUpdatedOrder();
+
+        if (order.getAmountWant().compareTo(amountWant) > 0) {
+            /// цена уменьшилась - проверим может он сработает
+            updatedOrder.process(block, createOrderTx);
+        } else {
+            dcSet.getOrderMap().put(orderID, updatedOrder);
+        }
 
     }
 
@@ -447,7 +453,12 @@ public class UpdateOrderTransaction extends Transaction {
         // изменяемые объекты нужно заново создавать
         Order orderBefore = new Order(updatedOrder, trade.getAmountHave());
 
-        dcSet.getOrderMap().put(orderID, orderBefore);
+        if (orderBefore.getAmountWant().compareTo(amountWant) > 0) {
+            /// цена уменьшилась - откатим, ведь может он сработал
+            updatedOrder.orphan(block);
+        } else {
+            dcSet.getOrderMap().put(orderID, orderBefore);
+        }
 
     }
 
