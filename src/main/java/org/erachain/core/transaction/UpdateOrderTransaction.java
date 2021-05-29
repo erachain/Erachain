@@ -456,6 +456,7 @@ public class UpdateOrderTransaction extends Transaction {
         Trade trade = dcSet.getTradeMap().remove(new Fun.Tuple2<>(dbRef, orderID));
 
         // изменяемые объекты нужно заново создавать
+        // восстановим Хочу по инфо из Сделки
         Order orderBefore = new Order(updatedOrder, trade.getAmountWant());
 
         if (orderBefore.getAmountWant().compareTo(amountWant) > 0) {
