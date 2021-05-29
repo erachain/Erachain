@@ -2,6 +2,7 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -18,6 +19,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +30,8 @@ import java.util.List;
 public class ChangeOrderFrame extends JDialog {
     private Order order;
     private JTextField txtFeePow;
-    private JButton cancelOrderButton;
+    private JButton changeOrderButton;
+    private JTextField txtPrice;
 
     public ChangeOrderFrame(Order order) {
         setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Change Order"));
@@ -130,7 +134,7 @@ public class ChangeOrderFrame extends JDialog {
 
         //TXT PRICE
         txtGBC.gridy = 5;
-        JTextField txtPrice = new JTextField(order.getPrice().toPlainString());
+        txtPrice = new JTextField(order.getPrice().toPlainString());
         txtPrice.setEditable(true);
         this.add(txtPrice, txtGBC);
 
@@ -160,15 +164,15 @@ public class ChangeOrderFrame extends JDialog {
 
         //BUTTON CANCEL SALE
         buttonGBC.gridy = 8;
-        cancelOrderButton = new JButton(Lang.T("Change Order"));
+        changeOrderButton = new JButton(Lang.T("Change Order"));
         //    cancelOrderButton.setPreferredSize(new Dimension(120, 25));
-        cancelOrderButton.addActionListener(new ActionListener() {
+        changeOrderButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onCancelOrderClick();
             }
         });
-        this.add(cancelOrderButton, buttonGBC);
+        this.add(changeOrderButton, buttonGBC);
 
         //PACK
         this.pack();
@@ -180,7 +184,7 @@ public class ChangeOrderFrame extends JDialog {
 
     public void onCancelOrderClick() {
         //DISABLE
-        this.cancelOrderButton.setEnabled(false);
+        this.changeOrderButton.setEnabled(false);
 
         //CHECK IF WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {
@@ -191,7 +195,7 @@ public class ChangeOrderFrame extends JDialog {
                 JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
                 //ENABLE
-                this.cancelOrderButton.setEnabled(true);
+                this.changeOrderButton.setEnabled(true);
 
                 return;
             }
@@ -202,9 +206,16 @@ public class ChangeOrderFrame extends JDialog {
             feePow = Integer.parseInt(txtFeePow.getText());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, Lang.T("Invalid fee!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+            this.changeOrderButton.setEnabled(true);
+            return;
+        }
 
-            this.cancelOrderButton.setEnabled(true);
-
+        BigDecimal wantAmount;
+        try {
+            wantAmount = new BigDecimal(txtPrice.getText());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, Lang.T("Invalid amount") + "!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+            this.changeOrderButton.setEnabled(true);
             return;
         }
 
@@ -217,12 +228,15 @@ public class ChangeOrderFrame extends JDialog {
             return;
         }
 
-        Transaction cancelOrder = Controller.getInstance().cancelOrder1(creator, order, feePow);
-        if (ResultDialog.make(this, cancelOrder, false)) {
+        AssetCls wantAsset = DCSet.getInstance().getItemAssetMap().get(order.getWantAssetKey());
+        wantAmount = order.getAmountHave().multiply(wantAmount).setScale(wantAsset.getScale(), RoundingMode.HALF_DOWN);
+
+        Transaction changeOrder = Controller.getInstance().changeOrder(creator, feePow, order, wantAmount);
+        if (ResultDialog.make(this, changeOrder, false)) {
             dispose();
         }
 
         //ENABLE
-        this.cancelOrderButton.setEnabled(true);
+        this.changeOrderButton.setEnabled(true);
     }
 }

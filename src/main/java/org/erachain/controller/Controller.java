@@ -3474,10 +3474,10 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction changeOrder(PrivateKeyAccount creator, Order order, int feePow, BigDecimal wantAmount) {
+    public Transaction changeOrder(PrivateKeyAccount creator, int feePow, Order order, BigDecimal wantAmount) {
         Transaction orderCreate = this.dcSet.getTransactionFinalMap().get(order.getId());
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createChangeOrderTransaction1(creator, feePow, orderCreate.getSignature(), wantAmount);
+            return this.transactionCreator.createChangeOrderTransaction(creator, feePow, orderCreate.getSignature(), wantAmount);
         }
     }
 

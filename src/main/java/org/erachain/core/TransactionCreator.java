@@ -569,7 +569,7 @@ public class TransactionCreator {
         return cancelOrderTransaction;
     }
 
-    public Transaction createChangeOrderTransaction1(PrivateKeyAccount creator, int feePow, byte[] orderID, BigDecimal wantAmount) {
+    public Transaction createChangeOrderTransaction(PrivateKeyAccount creator, int feePow, byte[] orderID, BigDecimal wantAmount) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 
