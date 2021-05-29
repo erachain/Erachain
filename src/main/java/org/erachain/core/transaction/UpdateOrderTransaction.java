@@ -151,6 +151,10 @@ public class UpdateOrderTransaction extends Transaction {
         return getKey();
     }
 
+    public byte[] getOrderRef() {
+        return this.orderRef;
+    }
+
     public BigDecimal getAmountWant() {
         return this.amountWant;
     }

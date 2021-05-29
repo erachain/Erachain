@@ -41,6 +41,8 @@ public class UpdateOrderTransactionTest {
 
     //Long Transaction.FOR_NETWORK = null;
 
+    int asPack = Transaction.FOR_NETWORK;
+
     long dbRef = 0L;
     long FEE_KEY = AssetCls.FEE_KEY;
     byte FEE_POWER = (byte) 1;
@@ -101,14 +103,14 @@ public class UpdateOrderTransactionTest {
 
         maker_1.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
 
-        asset = new AssetVenture(itemAppData, maker, "aasdasd", icon, image, "asdasda", 1, 8, 50000l);
+        asset = new AssetVenture(itemAppData, maker, "aasdasd", icon, image, "asdasda", 1, 8, 50000L);
         // set SCALABLE assets ++
         asset.setReference(Crypto.getInstance().digest(asset.toBytes(forDeal, false, false)), dbRef);
         asset.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
-        asset.insertToMap(dcSet, 0l);
+        asset.insertToMap(dcSet, 0L);
         key = asset.getKey(dcSet);
 
-        assetMovable = new AssetVenture(itemAppData, maker, "movable", icon, image, "...", 0, 8, 500l);
+        assetMovable = new AssetVenture(itemAppData, maker, "movable", icon, image, "...", 0, 8, 500L);
         assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(forDeal, false, false)), dbRef);
 
     }
@@ -117,13 +119,91 @@ public class UpdateOrderTransactionTest {
     @Test
     public void parse() {
 
+        init(IDB.DBS_MAP_DB);
+
+        //CREATE UPDATE ORDER
+        UpdateOrderTransaction tx = new UpdateOrderTransaction(maker, new byte[64], BigDecimal.TEN, FEE_POWER, timestamp, 0L);
+        tx.sign(maker, Transaction.FOR_NETWORK);
+
+        //CONVERT TO BYTES
+        byte[] rawTX = tx.toBytes(Transaction.FOR_NETWORK, true);
+
+        //CHECK DATA LENGTH
+        assertEquals(rawTX.length, tx.getDataLength(Transaction.FOR_NETWORK, true));
+
+        try {
+            //PARSE FROM BYTES
+            UpdateOrderTransaction parsedTX = (UpdateOrderTransaction) TransactionFactory.getInstance().parse(rawTX, Transaction.FOR_NETWORK);
+
+            //CHECK INSTANCE
+            assertEquals(true, parsedTX instanceof UpdateOrderTransaction);
+
+            //CHECK SIGNATURE
+            assertEquals(true, Arrays.equals(tx.getSignature(), parsedTX.getSignature()));
+
+            //CHECK ISSUER
+            assertEquals(tx.getCreator().getAddress(), parsedTX.getCreator().getAddress());
+
+            //CHECK REFERENCE
+            //assertEquals((long)tx.getReference(), (long)parsedTX.getReference());
+
+            //CHECK TIMESTAMP
+            assertEquals(tx.getTimestamp(), parsedTX.getTimestamp());
+
+            assertEquals(tx.getAmountWant(), parsedTX.getAmountWant());
+
+            assertEquals(Arrays.equals(tx.getOrderRef(), parsedTX.getOrderRef()), true);
+
+        } catch (Exception e) {
+            fail("Exception while parsing transaction.");
+        }
+
+        //PARSE TRANSACTION FROM WRONG BYTES
+        rawTX = new byte[tx.getDataLength(Transaction.FOR_NETWORK, true)];
+
+        try {
+            //PARSE FROM BYTES
+            TransactionFactory.getInstance().parse(rawTX, Transaction.FOR_NETWORK);
+
+            //FAIL
+            fail("this should throw an exception");
+        } catch (Exception e) {
+            //EXCEPTION IS THROWN OK
+        }
+
+    }
+
+    @Test
+    public void toBytes() {
+    }
+
+    @Test
+    public void getDataLength() {
+    }
+
+    @Test
+    public void isValid() {
+    }
+
+    @Test
+    public void makeItemsKeys() {
+    }
+
+    @Test
+    public void process() {
         for (int dbs : TESTED_DBS) {
 
             try {
 
                 init(dbs);
 
-                //CREATE ISSUE ASSET TRANSACTION
+                //CREATE ORDER
+                CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), 0l, new byte[]{5, 6});
+                createOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1, true);
+                createOrderTransaction.sign(maker, asPack);
+                createOrderTransaction.process(gb, asPack);
+
+                //CREATE UPDATE ORDER
                 UpdateOrderTransaction tx = new UpdateOrderTransaction(maker, new byte[64], BigDecimal.TEN, FEE_POWER, timestamp, 0L);
                 tx.sign(maker, Transaction.FOR_NETWORK);
                 tx.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1, true);
@@ -173,26 +253,5 @@ public class UpdateOrderTransactionTest {
                 dcSet.close();
             }
         }
-
-    }
-
-    @Test
-    public void toBytes() {
-    }
-
-    @Test
-    public void getDataLength() {
-    }
-
-    @Test
-    public void isValid() {
-    }
-
-    @Test
-    public void makeItemsKeys() {
-    }
-
-    @Test
-    public void process() {
     }
 }
