@@ -428,13 +428,14 @@ public class WebTransactionsHTML {
         UpdateOrderTransaction orderUpdate = (UpdateOrderTransaction) transaction;
 
         Long refDB = orderUpdate.getDBRef();
+        Long orderID = orderUpdate.getOrderId();
         //
         Order order = null;
         String status;
-        if (dcSet.getOrderMap().contains(refDB)) {
-            order = dcSet.getOrderMap().get(refDB);
-        } else if (dcSet.getCompletedOrderMap().contains(refDB)) {
-            order = dcSet.getCompletedOrderMap().get(refDB);
+        if (dcSet.getOrderMap().contains(orderID)) {
+            order = dcSet.getOrderMap().get(orderID);
+        } else if (dcSet.getCompletedOrderMap().contains(orderID)) {
+            order = dcSet.getCompletedOrderMap().get(orderID);
         }
         if (order == null) {
             status = "Unknown";
@@ -442,21 +443,9 @@ public class WebTransactionsHTML {
             status = order.viewStatus();
         }
 
-        out += "<h4><a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
+        out += "<h4><a href='?order=" + Transaction.viewDBRef(orderID) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
 
-        out += Lang.T("Have", langObj) + ": <b>"
-                + orderUpdate.getAmountHave().toPlainString() + " x "
-                + itemNameHTML(orderUpdate.getHaveAsset()) + "</b>"
-                + (order != null ? "<br>" + Lang.T("Fulfilled", langObj)
-                + ": <b>" + order.getFulfilledHave().toPlainString() + "</b>" : "")
-                + "<br>";
-        out += Lang.T("Want", langObj) + ": <b>"
-                + orderUpdate.getAmountWant().toPlainString() + " x "
-                + itemNameHTML(orderUpdate.getWantAsset()) + "</b>"
-                + (order != null ? "<br>" + Lang.T("Fulfilled", langObj)
-                + ": <b>" + order.getFulfilledWant().toPlainString() + "</b>" : "")
-                + "<br>";
-        out += Lang.T("Price", langObj) + ": <b>"
+        out += Lang.T("Update Price", langObj) + ": <b>"
                 + orderUpdate.makeOrder().calcPrice().toPlainString()
                 + " / " + orderUpdate.makeOrder().calcPriceReverse().toPlainString() + "</b><br>";
 

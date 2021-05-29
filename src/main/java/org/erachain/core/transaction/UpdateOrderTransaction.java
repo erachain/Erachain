@@ -133,7 +133,7 @@ public class UpdateOrderTransaction extends Transaction {
     }
 
     public Long getOrderId() {
-        return order.getId();
+        return orderID;
     }
 
     @Override
@@ -173,10 +173,7 @@ public class UpdateOrderTransaction extends Transaction {
     // PARSE CONVERT
 
     public Order makeOrder() {
-        return new Order(dcSet, Transaction.makeDBRef(createOrderTx.height, createOrderTx.seqNo), this.creator,
-                createOrderTx.getHaveKey(), createOrderTx.getAmountHave(), createOrderTx.getHaveAsset().getScale(),
-                createOrderTx.getWantKey(), this.amountWant, createOrderTx.getWantAsset().getScale()
-        );
+        return new Order(order, this.amountWant);
     }
 
     @SuppressWarnings("unchecked")
