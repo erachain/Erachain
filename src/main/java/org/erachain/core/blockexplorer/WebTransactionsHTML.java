@@ -134,6 +134,9 @@ public class WebTransactionsHTML {
             case Transaction.CANCEL_ORDER_TRANSACTION:
                 outTX.put("body", cancel_Order_HTML(transaction));
                 break;
+            case Transaction.UPDATE_ORDER_TRANSACTION:
+                outTX.put("body", update_Order_HTML(transaction));
+                break;
             case Transaction.VOTE_ON_ITEM_POLL_TRANSACTION:
                 outTX.put("body", vote_On_Item_Poll_HTML(transaction));
                 break;
@@ -413,6 +416,49 @@ public class WebTransactionsHTML {
         out += Lang.T("Price", langObj) + ": <b>"
                 + orderCreation.makeOrder().calcPrice().toPlainString()
                 + " / " + orderCreation.makeOrder().calcPriceReverse().toPlainString() + "</b><br>";
+
+        return out;
+    }
+
+    private String update_Order_HTML(Transaction transaction) {
+        // TODO Auto-generated method stub
+
+        String out = "";
+
+        UpdateOrderTransaction orderUpdate = (UpdateOrderTransaction) transaction;
+
+        Long refDB = orderUpdate.getDBRef();
+        //
+        Order order = null;
+        String status;
+        if (dcSet.getOrderMap().contains(refDB)) {
+            order = dcSet.getOrderMap().get(refDB);
+        } else if (dcSet.getCompletedOrderMap().contains(refDB)) {
+            order = dcSet.getCompletedOrderMap().get(refDB);
+        }
+        if (order == null) {
+            status = "Unknown";
+        } else {
+            status = order.viewStatus();
+        }
+
+        out += "<h4><a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
+
+        out += Lang.T("Have", langObj) + ": <b>"
+                + orderUpdate.getAmountHave().toPlainString() + " x "
+                + itemNameHTML(orderUpdate.getHaveAsset()) + "</b>"
+                + (order != null ? "<br>" + Lang.T("Fulfilled", langObj)
+                + ": <b>" + order.getFulfilledHave().toPlainString() + "</b>" : "")
+                + "<br>";
+        out += Lang.T("Want", langObj) + ": <b>"
+                + orderUpdate.getAmountWant().toPlainString() + " x "
+                + itemNameHTML(orderUpdate.getWantAsset()) + "</b>"
+                + (order != null ? "<br>" + Lang.T("Fulfilled", langObj)
+                + ": <b>" + order.getFulfilledWant().toPlainString() + "</b>" : "")
+                + "<br>";
+        out += Lang.T("Price", langObj) + ": <b>"
+                + orderUpdate.makeOrder().calcPrice().toPlainString()
+                + " / " + orderUpdate.makeOrder().calcPriceReverse().toPlainString() + "</b><br>";
 
         return out;
     }

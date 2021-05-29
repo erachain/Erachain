@@ -318,6 +318,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     // exchange of assets
     public static final int CREATE_ORDER_TRANSACTION = 50;
     public static final int CANCEL_ORDER_TRANSACTION = 51;
+    public static final int UPDATE_ORDER_TRANSACTION = 52;
     // voting
     public static final int CREATE_POLL_TRANSACTION = 61;
     public static final int VOTE_ON_POLL_TRANSACTION = 62;
@@ -750,6 +751,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 // exchange of assets
                 CREATE_ORDER_TRANSACTION,
                 CANCEL_ORDER_TRANSACTION,
+                UPDATE_ORDER_TRANSACTION,
 
                 // voting
                 VOTE_ON_ITEM_POLL_TRANSACTION
@@ -817,6 +819,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 return CreateOrderTransaction.TYPE_NAME;
             case CANCEL_ORDER_TRANSACTION:
                 return CancelOrderTransaction.TYPE_NAME;
+            case UPDATE_ORDER_TRANSACTION:
+                return UpdateOrderTransaction.TYPE_NAME;
 
             // voting
             case VOTE_ON_ITEM_POLL_TRANSACTION:

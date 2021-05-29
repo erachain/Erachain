@@ -34,12 +34,12 @@ typeBytes[2].3-7 = point accuracy for HAVE amount: -16..16 = BYTE - 16
 typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
 
  */
-public class CreateOrderTransaction extends Transaction implements Itemable {
+public class UpdateOrderTransaction extends Transaction implements Itemable {
     public static final byte[][] VALID_REC = new byte[][]{
             //Base58.decode("4...")
     };
-    public static final byte TYPE_ID = (byte) Transaction.CREATE_ORDER_TRANSACTION;
-    public static final String TYPE_NAME = "Create Order";
+    public static final byte TYPE_ID = (byte) Transaction.UPDATE_ORDER_TRANSACTION;
+    public static final String TYPE_NAME = "Update Order";
 
     private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
     private static final int HAVE_LENGTH = 8;
@@ -60,7 +60,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     private BigDecimal amountHave;
     private BigDecimal amountWant;
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
+    public UpdateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
         super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
         this.haveKey = haveKey;
@@ -71,7 +71,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     }
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
+    public UpdateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
                                   byte[] signature) {
         this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
@@ -79,7 +79,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     }
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
+    public UpdateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
                                   byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
@@ -90,7 +90,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     }
 
-    public CreateOrderTransaction(PublicKeyAccount creator, long haveKey, long wantKey, BigDecimal amountHave,
+    public UpdateOrderTransaction(PublicKeyAccount creator, long haveKey, long wantKey, BigDecimal amountHave,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference,
                 signature);
@@ -140,7 +140,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         }
     }
 
-    public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave,
+    public UpdateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amountHave, amountWant, feePow, timestamp,
                 reference);
@@ -261,7 +261,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             amountWant = amountWant.scaleByPowerOfTen(-accuracy);
         }
 
-        return new CreateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp,
+        return new UpdateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp,
                 reference, signatureBytes, seqNo, feeLong);
     }
 
@@ -414,8 +414,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     // VALIDATE
 
     @Override
-    public int getDataLength(int forDeal, boolean withSignature)
-    {
+    public int getDataLength(int forDeal, boolean withSignature) {
         int base_len;
         if (forDeal == FOR_MYPACK)
             base_len = BASE_LENGTH_AS_MYPACK;
