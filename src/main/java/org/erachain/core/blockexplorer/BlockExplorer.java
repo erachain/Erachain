@@ -888,10 +888,12 @@ public class BlockExplorer {
 
         Order orderInitiator = null;
         Transaction cancelTX = null;
-        if (trade.isCancel()) {
+        if (trade.isTrade()) {
+            orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
+        } else if (trade.isUpdate()) {
             cancelTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
         } else {
-            orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
+            cancelTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
         }
 
         long pairHaveKey;
@@ -1142,7 +1144,7 @@ public class BlockExplorer {
                 if (trade == null) {
                     Long error = null;
                 }
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 --count;
@@ -2287,7 +2289,7 @@ public class BlockExplorer {
                 if (trade == null) {
                     Long error = null;
                 }
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 --count;

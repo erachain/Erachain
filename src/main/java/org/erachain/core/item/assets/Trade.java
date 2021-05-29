@@ -83,6 +83,10 @@ public class Trade {
         return "unknown";
     }
 
+    public boolean isTrade() {
+        return type == TYPE_TRADE;
+    }
+
     public boolean isCancel() {
         return type == TYPE_CANCEL;
     }
@@ -212,12 +216,12 @@ public class Trade {
         }
 
         if (withCreators) {
-            if (isCancel()) {
-                Transaction cancelTX = DCSet.getInstance().getTransactionFinalMap().get(initiator);
-                trade.put("initiatorCreator", cancelTX.getCreator().getAddress());
-            } else {
+            if (isTrade()) {
                 Order order = getInitiatorOrder(DCSet.getInstance());
                 trade.put("initiatorCreator", order.getCreator().getAddress());
+            } else {
+                Transaction cancelTX = DCSet.getInstance().getTransactionFinalMap().get(initiator);
+                trade.put("initiatorCreator", cancelTX.getCreator().getAddress());
             }
 
             Order orderTarget = getTargetOrder(DCSet.getInstance());

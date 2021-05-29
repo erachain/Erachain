@@ -171,7 +171,7 @@ public class PairsController {
                         continue;
                     }
 
-                    if (trade.isCancel())
+                    if (!trade.isTrade())
                         continue;
 
                     if (currentPair != null && lastTrade == null) {
@@ -273,7 +273,7 @@ public class PairsController {
                 if (trade == null)
                     continue;
 
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 if (lastTrade == null)
