@@ -1725,10 +1725,11 @@ public class BlockExplorer {
                             .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
         }
         output.put("Label_Table_Account", Lang.T("Account", langObj));
-        output.put("Label_Balance_1", Lang.T("OWN (1)", langObj));
-        output.put("Label_Balance_2", Lang.T("DEBT (2)", langObj));
-        output.put("Label_Balance_3", Lang.T("HOLD (3)", langObj));
-        output.put("Label_Balance_4", Lang.T("SPEND (4)", langObj));
+        output.put("Label_Balance_1", Lang.T(Account.balancePositionName(1), langObj));
+        output.put("Label_Balance_2", Lang.T(Account.balancePositionName(2), langObj));
+        output.put("Label_Balance_3", Lang.T(Account.balancePositionName(3), langObj));
+        output.put("Label_Balance_4", Lang.T(Account.balancePositionName(4), langObj));
+        output.put("Label_Balance_5", Lang.T(Account.balancePositionName(5), langObj));
         output.put("Label_Table_Prop", Lang.T("Prop.", langObj));
         output.put("Label_Table_person", Lang.T("Maker", langObj));
 
@@ -1786,10 +1787,11 @@ public class BlockExplorer {
         output.put("Label_asset_key", Lang.T("Key", langObj));
         output.put("Label_asset_name", Lang.T("Name", langObj));
 
-        output.put("Label_Balance_1", Lang.T("OWN (1)", langObj));
-        output.put("Label_Balance_2", Lang.T("DEBT (2)", langObj));
-        output.put("Label_Balance_3", Lang.T("HOLD (3)", langObj));
-        output.put("Label_Balance_4", Lang.T("SPEND (4)", langObj));
+        output.put("Label_Balance_1", Lang.T(Account.balancePositionName(1), langObj));
+        output.put("Label_Balance_2", Lang.T(Account.balancePositionName(2), langObj));
+        output.put("Label_Balance_3", Lang.T(Account.balancePositionName(3), langObj));
+        output.put("Label_Balance_4", Lang.T(Account.balancePositionName(4), langObj));
+        output.put("Label_Balance_5", Lang.T(Account.balancePositionName(5), langObj));
 
         ItemAssetMap assetsMap = DCSet.getInstance().getItemAssetMap();
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
@@ -1833,6 +1835,7 @@ public class BlockExplorer {
                     bal.put("balance_2", Account.balanceInPositionAndSide(itemBals, 2, side).setScale(asset.getScale()).toPlainString());
                     bal.put("balance_3", Account.balanceInPositionAndSide(itemBals, 3, side).setScale(asset.getScale()).toPlainString());
                     bal.put("balance_4", Account.balanceInPositionAndSide(itemBals, 4, side).setScale(asset.getScale()).toPlainString());
+                    bal.put("balance_5", Account.balanceInPositionAndSide(itemBals, 5, side).setScale(asset.getScale()).toPlainString());
                     balAssets.put("" + assetKey, bal);
                 }
             }
