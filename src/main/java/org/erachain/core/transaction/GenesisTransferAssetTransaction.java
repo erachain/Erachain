@@ -279,7 +279,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         //UPDATE RECIPIENT OWN or RENT
         this.recipient.changeBalance(this.dcSet, false, false, key, this.amount,
-                false, false, false);
+                false, false, false, false);
 
         //UPDATE REFERENCE OF RECIPIENT
         this.recipient.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
@@ -296,7 +296,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
             // THIS is CREDIT
             //this.maker.setBalance(key, this.owner.getBalance(db, key).subtract(this.amount), db);
             this.sender.changeBalance(this.dcSet, true, false, key, this.amount,
-                    false, false, false);
+                    false, false, false, false);
             this.dcSet.getCredit_AddressesMap().add(
                     new Tuple3<String, Long, String>(
                             this.sender.getAddress(), -key,
@@ -308,19 +308,19 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
             // CREATOR update
             if (key == FEE_KEY) {
                 BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, true, false, key, this.amount,
-                        false, false, false);
+                        false, false, false, false);
 
                 if (BlockChain.CLONE_MODE) {
                     BigDecimal sideRoyalty = amount.multiply(new BigDecimal("0.05")); // 5%
                     BlockChain.CLONE_ROYALTY_ERACHAIN_ACCOUNT.changeBalance(dcSet, false, false, Transaction.FEE_KEY,
-                            sideRoyalty, false, false, false);
+                            sideRoyalty, false, false, false, false);
                     BlockChain.FEE_ASSET_EMITTER.changeBalance(this.dcSet, true, false, Transaction.FEE_KEY,
-                            sideRoyalty, false, false, false);
+                            sideRoyalty, false, false, false, false);
                 }
 
             } else {
                 GenesisBlock.CREATOR.changeBalance(this.dcSet, true, false, key, this.amount,
-                        false, false, false);
+                        false, false, false, false);
             }
 
         }

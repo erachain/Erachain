@@ -659,7 +659,9 @@ public class Order implements Comparable<Order> {
         // REVERT not completed AMOUNT
         BigDecimal left = this.getAmountHaveLeft();
         this.creator.changeBalance(this.dcSet, false,
-                false, this.haveAssetKey, left, false, false, false);
+                false, this.haveAssetKey, left, false, false, false,
+                // accounting on PLEDGE position
+                true);
         transaction.addCalculated(block, this.creator, this.haveAssetKey, left,
                 "Outprice " + (forTarget ? "close" : "ended") + " Order @" + transaction.viewDBRef(this.id));
 
@@ -668,10 +670,12 @@ public class Order implements Comparable<Order> {
     /**
      * Поидее тут ордер активный должен себе получить лучшие условия если округление пошло в строну,
      * так как он в мнее выгодных условиях по цене
+     *
      * @param block
      * @param transaction
+     * @param asChange
      */
-    public void process(Block block, Transaction transaction) {
+    public void process(Block block, Transaction transaction, boolean asChange) {
 
         // GET HEIGHT from ID
         int height = (int) (this.id >> 32);
@@ -709,10 +713,14 @@ public class Order implements Comparable<Order> {
         ////// NEED FOR making secondary keys in TradeMap
         /// not need now ordersMap.add(this);
 
-        //REMOVE HAVE
-        //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
-        this.creator.changeBalance(this.dcSet, true, false, this.haveAssetKey, this.amountHave,
-                false, false, true);
+        if (!asChange) {
+            //REMOVE HAVE
+            //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
+            this.creator.changeBalance(this.dcSet, true, false, this.haveAssetKey, this.amountHave,
+                    false, false, true,
+                    // accounting on PLEDGE position
+                    true);
+        }
 
         BigDecimal thisPriceReverse = calcPriceReverse();
 
@@ -1023,7 +1031,7 @@ public class Order implements Comparable<Order> {
 
                 } else {
                     order.getCreator().changeBalance(this.dcSet, false, false, order.wantAssetKey,
-                            tradeAmountForWant, false, false, false);
+                            tradeAmountForWant, false, false, false, false);
                     transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
                             "Trade Order @" + Transaction.viewDBRef(order.id));
                 }
@@ -1090,7 +1098,7 @@ public class Order implements Comparable<Order> {
                         false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
             } else {
                 this.creator.changeBalance(this.dcSet, false, false, this.wantAssetKey,
-                        processedAmountFulfilledWant, false, false, false);
+                        processedAmountFulfilledWant, false, false, false, false);
                 transaction.addCalculated(block, this.creator, this.wantAssetKey, processedAmountFulfilledWant,
                         "Resolve Order @" + Transaction.viewDBRef(this.id));
             }
@@ -1154,7 +1162,7 @@ public class Order implements Comparable<Order> {
                 } else {
 
                     target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey,
-                            tradeAmountWant, false, false, false);
+                            tradeAmountWant, false, false, false, false);
                 }
                 // Учтем что у стороны ордера обновилась форжинговая информация
                 if (target.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
@@ -1191,7 +1199,9 @@ public class Order implements Comparable<Order> {
         // GET HAVE LEFT - if it CANCELWED by INCREMENT close
         //   - если обработка остановлена по достижению порога Инкремента
         this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey,
-                this.getAmountHaveLeft(), false, false, true);
+                this.getAmountHaveLeft(), false, false, true,
+                // accounting on PLEDGE position
+                true);
 
         //REVERT WANT
         if (height > BlockChain.VERS_5_3) {
@@ -1200,7 +1210,7 @@ public class Order implements Comparable<Order> {
                     true, thisAmountFulfilledWant, Transaction.getTimestampByDBRef(id), 0L);
         } else {
             this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey,
-                    thisAmountFulfilledWant, false, false, false);
+                    thisAmountFulfilledWant, false, false, false, false);
         }
     }
 

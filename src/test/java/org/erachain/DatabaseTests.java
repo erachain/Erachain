@@ -89,8 +89,8 @@ public class DatabaseTests {
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
         maker.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
-        maker.changeBalance(dcSet, true, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
-        maker.changeBalance(dcSet, true, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        maker.changeBalance(dcSet, true, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
+        maker.changeBalance(dcSet, true, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
 
         person = new PersonHuman(itemAppData, maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,

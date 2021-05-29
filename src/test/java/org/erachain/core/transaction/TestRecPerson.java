@@ -142,12 +142,12 @@ public class TestRecPerson {
         last_ref = gb.getTimestamp();
 
         registrar.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
-        registrar.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
-        registrar.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        registrar.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
+        registrar.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
 
         certifier.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
-        certifier.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
-        certifier.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        certifier.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
+        certifier.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
 
         byte gender = 0;
         long birthDay = timestamp - 12345678;
@@ -291,7 +291,7 @@ public class TestRecPerson {
                 //issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
 
                 // ADD FEE
-                userAccount1.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+                userAccount1.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
 
                 //CHECK IF ISSUE PERSON IS VALID
                 assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
@@ -510,7 +510,7 @@ public class TestRecPerson {
 
                 assertEquals(Transaction.VALIDATE_OK, r_CertifyPubKeys.isValid(Transaction.FOR_NETWORK, txFlags));
 
-                certifier.changeBalance(this.dcSet, true, false, AssetCls.ERA_KEY, new BigDecimal("1000"), false, false, false);
+                certifier.changeBalance(this.dcSet, true, false, AssetCls.ERA_KEY, new BigDecimal("1000"), false, false, false, false);
                 assertEquals(Transaction.NOT_ENOUGH_ERA_USE_100, r_CertifyPubKeys.isValid(Transaction.FOR_NETWORK,
                         txFlags | Transaction.NOT_VALIDATE_FLAG_PERSONAL));
 
@@ -536,14 +536,14 @@ public class TestRecPerson {
                 personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 1, 5, true);
 
                 //CREATE INVALID ISSUE PERSON - NOT FEE
-                userAccount2.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+                userAccount2.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
                 assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(Transaction.FOR_NETWORK,
                         txFlags | Transaction.NOT_VALIDATE_FLAG_PERSONAL));
                 // ADD FEE
-                userAccount2.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+                userAccount2.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
                 assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, txFlags));
                 // ADD RIGHTS
-                userAccount1.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+                userAccount1.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
                 assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, txFlags));
 
                 List<PublicKeyAccount> certifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();

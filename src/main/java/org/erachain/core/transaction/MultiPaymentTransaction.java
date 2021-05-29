@@ -210,7 +210,7 @@ public class MultiPaymentTransaction extends Transaction {
         // TODO REMOVE FORK!!!! - use calculate instead
         try (DCSet fork = this.dcSet.fork(this.toString())) {
             //this.creator.setBalance(FEE_KEY, this.creator.getBalance(fork, FEE_KEY).subtract(this.fee), fork);
-            this.creator.changeBalance(fork, true, false, FEE_KEY, this.fee, false, false, false);
+            this.creator.changeBalance(fork, true, false, FEE_KEY, this.fee, false, false, false, false);
 
             //CHECK IF CREATOR HAS ENOUGH FEE BALANCE
             if (this.creator.getBalance(fork, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) == -1) {

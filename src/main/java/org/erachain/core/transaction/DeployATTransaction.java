@@ -382,7 +382,7 @@ public class DeployATTransaction extends Transaction {
         super.process(block, forDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
         this.creator.changeBalance(this.dcSet, true, false, Transaction.FEE_KEY, this.amount,
-                false, false, false);
+                false, false, false, false);
 
         //CREATE AT ID = ADDRESS
         String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
@@ -391,7 +391,7 @@ public class DeployATTransaction extends Transaction {
 
         //atAccount.setBalance(Transaction.FEE_KEY, this.amount , db );
         atAccount.changeBalance(this.dcSet, false, false, Transaction.FEE_KEY, this.amount,
-                false, false, false);
+                false, false, false, false);
 
         //UPDATE REFERENCE OF RECIPIENT
         if (true || atAccount.getLastTimestamp(this.dcSet) == null) {
@@ -447,7 +447,7 @@ public class DeployATTransaction extends Transaction {
         super.orphan(block, forDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.amount), db);
         this.creator.changeBalance(this.dcSet, false, false, Transaction.FEE_KEY, this.amount,
-                false, false, false);
+                false, false, false, false);
 
         String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
 
@@ -456,7 +456,7 @@ public class DeployATTransaction extends Transaction {
         //UPDATE RECIPIENT
         //atAccount.setBalance(Transaction.FEE_KEY, atAccount.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
         atAccount.changeBalance(this.dcSet, true, false, Transaction.FEE_KEY, this.amount,
-                false, false, false);
+                false, false, false, false);
 
         //UPDATE REFERENCE OF SENDER
         this.creator.setLastTimestamp(new long[]{this.reference, dbRef}, this.dcSet);

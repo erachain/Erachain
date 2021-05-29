@@ -433,7 +433,7 @@ public class ChangeOrderTransaction extends Transaction {
 
         if (order.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - проверим может он сработает
-            updatedOrder.process(block, createOrderTx);
+            updatedOrder.process(block, createOrderTx, false);
         } else {
             dcSet.getOrderMap().put(orderID, updatedOrder);
         }

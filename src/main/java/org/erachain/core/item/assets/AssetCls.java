@@ -2415,7 +2415,7 @@ public abstract class AssetCls extends ItemCls {
                 if (assetRoyalty.signum() > 0) {
                     assetRoyaltyTotal = assetRoyaltyTotal.add(assetRoyalty);
                     dexAward.getAccount().changeBalance(dcSet, asOrphan, false, assetWantKey,
-                            assetRoyalty, false, false, false);
+                            assetRoyalty, false, false, false, false);
                     if (!asOrphan && block != null)
                         block.addCalculated(dexAward.getAccount(), assetWantKey, assetRoyalty,
                                 "NFT Royalty by Order @" + Transaction.viewDBRef(orderID), orderID);
@@ -2504,7 +2504,7 @@ public abstract class AssetCls extends ItemCls {
         }
 
         receiver.changeBalance(dcSet, asOrphan, false, assetWantKey,
-                tradeAmount, false, false, false);
+                tradeAmount, false, false, false, false);
         if (!asOrphan && block != null)
             block.addCalculated(receiver, assetWantKey, tradeAmount,
                     "Trade Order @" + Transaction.viewDBRef(orderID), orderID);

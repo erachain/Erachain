@@ -312,19 +312,19 @@ public class IssueAssetTransaction extends IssueItemRecord {
         long quantity = asset.getQuantity();
         if (quantity > 0) {
             creator.changeBalance(dcSet, false, false, asset.getKey(dcSet),
-                    new BigDecimal(quantity).setScale(0), false, false, false);
+                    new BigDecimal(quantity).setScale(0), false, false, false, false);
 
             // make HOLD balance
             if (!asset.isUnHoldable()) {
                 creator.changeBalance(dcSet, false, true, asset.getKey(dcSet),
-                        new BigDecimal(-quantity).setScale(0), false, false, false);
+                        new BigDecimal(-quantity).setScale(0), false, false, false, false);
             }
 
         } else if (quantity == 0) {
             // безразмерные - нужно баланс в таблицу нулевой записать чтобы в блокэксплорере он отображался у счета
             // см. https://lab.erachain.org/erachain/Erachain/issues/1103
             this.creator.changeBalance(this.dcSet, false, false, asset.getKey(this.dcSet),
-                    BigDecimal.ZERO.setScale(0), false, false, false);
+                    BigDecimal.ZERO.setScale(0), false, false, false, false);
 
         }
 
@@ -340,12 +340,12 @@ public class IssueAssetTransaction extends IssueItemRecord {
         long quantity = asset.getQuantity();
         if (quantity > 0) {
             this.creator.changeBalance(this.dcSet, true, false, asset.getKey(this.dcSet),
-                    new BigDecimal(quantity).setScale(0), false, false, false);
+                    new BigDecimal(quantity).setScale(0), false, false, false, false);
 
             // на балансе На Руках - добавляем тоже
             if (!asset.isUnHoldable()) {
                 creator.changeBalance(dcSet, true, true, asset.getKey(dcSet),
-                        new BigDecimal(-quantity).setScale(0), false, false, false);
+                        new BigDecimal(-quantity).setScale(0), false, false, false, false);
             }
         }
     }

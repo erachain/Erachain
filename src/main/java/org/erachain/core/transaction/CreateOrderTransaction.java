@@ -654,7 +654,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         // изменяемые объекты нужно заново создавать
         //.copy() // тут надо что-то сделать новым - а то значения в памяти по ссылке меняются
         Order order = makeOrder(); //.copy();
-        order.process(block, this);
+        order.process(block, this, false);
 
         if (Controller.getInstance().dlSet != null
                 // так как проверка в Форке - потом быстрый слив и эта таблица вообще не будет просчитана

@@ -2133,7 +2133,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 Account richAccount = new Account(rich);
                 richAccount.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
-                        new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), false, false, true);
+                        new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), false, false, true, false);
             } else {
                 emittedFee = this.blockHead.emittedFee;
             }
@@ -2149,7 +2149,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                 // Авторские начисления на счет Эрачейн от всех комиссий в блоке
                 long blockFeeRoyaltyLong = this.blockHead.totalFee / 20; // 5%
                 BlockChain.CLONE_ROYALTY_ERACHAIN_ACCOUNT.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
-                        new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE), false, false, false);
+                        new BigDecimal(blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE), false, false, false, false);
 
                 forgerEarn = new BigDecimal(this.blockHead.totalFee - blockFeeRoyaltyLong).movePointLeft(BlockChain.FEE_SCALE)
                         .setScale(BlockChain.FEE_SCALE);
@@ -2158,7 +2158,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
 
             this.creator.changeBalance(dcSet, asOrphan, false, Transaction.FEE_KEY,
-                    forgerEarn, false, false, true);
+                    forgerEarn, false, false, true, false);
 
             // учтем что нафоржили
             this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Account.BALANCE_SIDE_FORGED);
@@ -2173,7 +2173,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
             BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, Transaction.FEE_KEY,
-                    new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), false, false, true);
+                    new BigDecimal(emittedFee).movePointLeft(BlockChain.FEE_SCALE), false, false, true, false);
         }
 
     }
@@ -2208,7 +2208,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             // учтем для форжера что он нафоржил
             if (earnedPair.a.signum() != 0) {
                 this.creator.changeBalance(dcSet, asOrphan, false, asset.getKey(),
-                        earnedPair.a, false, false, true);
+                        earnedPair.a, false, false, true, false);
                 if (!asOrphan && this.txCalculated != null) {
                     this.txCalculated.add(new RCalculated(this.creator, asset.getKey(),
                             earnedPair.a, "Asset Total Forged", Transaction.makeDBRef(this.heightBlock, 0), 0L));
@@ -2218,7 +2218,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             // учтем для эмитента что для него сгорело
             if (earnedPair.b.signum() != 0) {
                 asset.getMaker().changeBalance(dcSet, asOrphan, false, asset.getKey(),
-                        earnedPair.b, false, false, true);
+                        earnedPair.b, false, false, true, false);
                 if (!asOrphan && this.txCalculated != null) {
                     this.txCalculated.add(new RCalculated(asset.getMaker(), asset.getKey(),
                             earnedPair.b, "Asset Total Burned", Transaction.makeDBRef(this.heightBlock, 0), 0L));
@@ -2411,13 +2411,13 @@ public class Block implements Closeable, ExplorerJsonLine {
                 if (balanceHold.signum() <= 0)
                     continue;
 
-                holder.changeBalance(dcSet, asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, false, false);
+                holder.changeBalance(dcSet, asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, false, false, false);
                 // учтем что получили бонусы
                 holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Account.BALANCE_SIDE_DEBIT);
 
                 // у эмитента снимем
                 BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.FEE_KEY, balanceHold,
-                        false, false, false);
+                        false, false, false, false);
                 BlockChain.FEE_ASSET_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Account.BALANCE_SIDE_DEBIT);
 
                 if (this.txCalculated != null) {
@@ -2430,7 +2430,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             // учтем снятие с начисления для держателей долей
             BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, asOrphan, false, -BlockChain.FEE_KEY,
-                    totalPayedRoyalty, false, false, true);
+                    totalPayedRoyalty, false, false, true, false);
 
             if (this.txCalculated != null) {
                 txCalculated.add(new RCalculated(BlockChain.FEE_ASSET_EMITTER, BlockChain.FEE_KEY, totalPayedRoyalty.negate(),

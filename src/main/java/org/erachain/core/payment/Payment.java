@@ -110,23 +110,23 @@ public class Payment {
         //UPDATE SENDER
         //sender.setBalance(this.asset, sender.getBalance(db, this.asset).subtract(this.amount), db);
         sender.changeBalance(db, true, false, this.asset, this.amount,
-                false, false, true);
+                false, false, true, false);
 
         //UPDATE RECIPIENT
         //this.recipient.setBalance(this.asset, this.recipient.getBalance(db, this.asset).add(this.amount), db);
         this.recipient.changeBalance(db, false, false, this.asset, this.amount,
-                false, false, false);
+                false, false, false, false);
     }
 
     public void orphan(PublicKeyAccount sender, DCSet db) {
         //UPDATE SENDER
         //sender.setBalance(this.asset, sender.getBalance(db, this.asset).add(this.amount), db);
         sender.changeBalance(db, false, false, this.asset, this.amount,
-                false, false, true);
+                false, false, true, false);
 
         //UPDATE RECIPIENT
         //this.recipient.setBalance(this.asset, this.recipient.getBalance(db, this.asset).subtract(this.amount), db);
         this.recipient.changeBalance(db, true, false, this.asset, this.amount,
-                false, false, false);
+                false, false, false, false);
     }
 }

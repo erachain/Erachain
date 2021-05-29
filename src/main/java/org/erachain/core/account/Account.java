@@ -911,8 +911,9 @@ public class Account {
      */
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
-    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean subtract, boolean isBackward, long key,
-                                                                    BigDecimal amount_in, boolean isDirect, boolean isNotSender, boolean notUpdateIncomed) {
+    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(
+            DCSet db, boolean subtract, boolean isBackward, long key,
+            BigDecimal amount_in, boolean isDirect, boolean isNotSender, boolean notUpdateIncomed, boolean toPledge) {
 
         int balancePosition = balancePosition(key, amount_in, isBackward, isDirect);
 
@@ -949,7 +950,14 @@ public class Account {
                             updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
                             balance.a.b.add(amount)),
-                    balance.b, balance.c, balance.d, balance.e);
+                    balance.b, balance.c, balance.d,
+                    toPledge ?
+                            // одновременно увеличим / уменьшим зеркально ЗАЛОГ
+                            !subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                                    updateIncomed ? balance.e.a.subtract(amount) : balance.e.a, balance.e.b.subtract(amount))
+                                    : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.e.a.add(amount) : balance.e.a,
+                                    balance.e.b.add(amount))
+                            : balance.e);
         } else if (balancePosition == BALANCE_POS_DEBT) {
             // DEBT + CREDIT
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(

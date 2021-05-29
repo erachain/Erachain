@@ -666,17 +666,17 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
             // EMITTE LIA
             issuer.changeBalance(this.dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE,
-                    false, false, false);
+                    false, false, false, false);
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, true, false, AssetCls.LIA_KEY, BigDecimal.ONE,
-                    false, false, true);
+                    false, false, true, false);
 
             // EMITTE LIA
             this.creator.changeBalance(this.dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE,
-                    false, false, false);
+                    false, false, false, false);
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE,
-                    false, false, true);
+                    false, false, true, false);
 
 
             // GIVE GIFT for this PUB_KEY - to PERSON
@@ -684,7 +684,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
             if (personBonus.signum() != 0) {
                 pkAccount.changeBalance(dcSet, false, false, FEE_KEY, personBonus,
-                        false, false, false);
+                        false, false, false, false);
                 pkAccount.changeCOMPUBonusBalances(dcSet, false, personBonus, Account.BALANCE_SIDE_DEBIT);
                 if (block != null) {
                     block.addCalculated(pkAccount, FEE_KEY, personBonus,
@@ -697,7 +697,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
-                    false, false, false);
+                    false, false, false, false);
             issuer.changeCOMPUBonusBalances(dcSet, false, issued_FEE_BD, Account.BALANCE_SIDE_DEBIT);
             if (block != null)
                 block.addCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
@@ -707,7 +707,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
             // TO EMITTE FEE (with minus)
             BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, true, false, FEE_KEY, issued_FEE_BD_total,
-                    false, false, true);
+                    false, false, true, false);
 
         }
 
@@ -800,14 +800,14 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
             // EMITTE LIA
             issuer.changeBalance(this.dcSet, true, false, AssetCls.LIA_KEY, BigDecimal.ONE,
-                    false, false, false);
+                    false, false, false, false);
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE, false, false, true);
+            GenesisBlock.CREATOR.changeBalance(dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE, false, false, true, false);
 
             // EMITTE LIA
-            this.creator.changeBalance(this.dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false, false);
+            this.creator.changeBalance(this.dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false, false, false);
             // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false, true);
+            GenesisBlock.CREATOR.changeBalance(dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false, true, false);
 
             // BONUSES
 
@@ -816,7 +816,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
             if (personBonus.signum() != 0) {
 
-                pkAccount.changeBalance(dcSet, true, false, FEE_KEY, personBonus, false, false, false);
+                pkAccount.changeBalance(dcSet, true, false, FEE_KEY, personBonus, false, false, false, false);
                 pkAccount.changeCOMPUBonusBalances(dcSet, true, personBonus, Account.BALANCE_SIDE_DEBIT);
                 issued_FEE_BD_total = personBonus;
             } else {
@@ -825,12 +825,12 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(dcSet, true, false, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRAR_4_11,
-                    false, false, false);
+                    false, false, false, false);
             issuer.changeCOMPUBonusBalances(dcSet, true, issued_FEE_BD, Account.BALANCE_SIDE_DEBIT);
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // ADD to EMISSION (with minus)
-            BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD_total, false, false, true);
+            BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD_total, false, false, true, false);
 
         }
 

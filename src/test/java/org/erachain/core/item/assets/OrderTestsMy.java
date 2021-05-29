@@ -161,12 +161,12 @@ public class OrderTestsMy {
 
         // FEE FUND
         accountA.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
-        accountA.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false);
-        accountA.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false);
+        accountA.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false, false);
+        accountA.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false, false);
 
         accountB.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
-        accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false);
-        accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false);
+        accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false, false);
+        accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false, false);
 
         assetA = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "START", icon, image, ".", 0, 8, 50000L);
         // сразу зазадим чтобы все активы были уже в версии где учитывается точность
@@ -3235,7 +3235,7 @@ public class OrderTestsMy {
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
-                accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(assetA.getScale()), false, false, false);
+                accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(assetA.getScale()), false, false, false, false);
 
                 // CREATE ASSET
                 AssetCls assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 8, 50000l);
@@ -3397,7 +3397,7 @@ public class OrderTestsMy {
                 // transaction = new GenesisTransaction(accountB,
                 // BigDecimal.valueOf(1000), NTP.getTime());
                 // transaction.process(dcSet, false);
-                accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
+                accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false, false);
 
                 // CREATE ASSET
                 AssetCls assetB = new AssetVenture(itemAppData, accountB, "b", icon, image, "b", 0, 8, 50000l);
@@ -3628,7 +3628,7 @@ public class OrderTestsMy {
                 cancelOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
 
                 // CHECK IF CANCEL ORDER IS INVALID
-                accountA.changeBalance(fork, true, false, FEE_KEY, new BigDecimal("1000"), false, false, false);
+                accountA.changeBalance(fork, true, false, FEE_KEY, new BigDecimal("1000"), false, false, false, false);
                 assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
             } finally {

@@ -1243,12 +1243,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // STANDARD ACTION PROCESS
         // UPDATE SENDER
         if (absKey == 666L) {
-            creator.changeBalance(dcSet, subtract, backward, key, amount, isDirect, false, !incomeReverse);
+            creator.changeBalance(dcSet, subtract, backward, key, amount, isDirect, false, !incomeReverse, false);
         } else {
-            creator.changeBalance(dcSet, !subtract, backward, key, amount, isDirect, false, !incomeReverse);
+            creator.changeBalance(dcSet, !subtract, backward, key, amount, isDirect, false, !incomeReverse, false);
         }
         // UPDATE RECIPIENT
-        recipient.changeBalance(dcSet, subtract, backward, key, amount, isDirect, true, incomeReverse);
+        recipient.changeBalance(dcSet, subtract, backward, key, amount, isDirect, true, incomeReverse, false);
 
         if (balancePos == ACTION_DEBT) {
             String creatorStr = creator.getAddress();
@@ -1353,7 +1353,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         if (assetFee != null && assetFee.signum() != 0) {
             // учтем что он еще заплатил коэффициент с суммы
-            this.creator.changeBalance(db, !backward, backward, absKey, this.assetFee, false, false, !incomeReverse);
+            this.creator.changeBalance(db, !backward, backward, absKey, this.assetFee, false, false, !incomeReverse, false);
             if (block != null) {
                 block.addCalculated(this.creator, absKey,
                         this.assetFee.negate(), "Asset Fee", this.dbRef);
@@ -1388,7 +1388,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
 
         if (assetFee != null && assetFee.signum() != 0) {
-            this.creator.changeBalance(dcSet, backward, backward, absKey, this.assetFee, false, false, !incomeReverse);
+            this.creator.changeBalance(dcSet, backward, backward, absKey, this.assetFee, false, false, !incomeReverse, false);
         }
 
     }
