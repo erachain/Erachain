@@ -118,7 +118,7 @@ public class PreviewMaker {
                 // -vf scale=256:-2,setsar=1:1
                 builder = new ProcessBuilder("ffmpeg",
                         "-i", fileIn.toPath().toString(),
-                        "-y", "-fs", "512k", "-vcodec", "h264",
+                        "-y", "-fs", "512k", "-vcodec", "h264", "-an",
                         "-vf", "scale=256:-2,setsar=1:1", // "-s", "256x256",
                         "-q:v", parQV, "-r:v", parRV, fileOut.toPath().toString()
                 );
