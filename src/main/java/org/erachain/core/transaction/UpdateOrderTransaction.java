@@ -97,11 +97,12 @@ public class UpdateOrderTransaction extends Transaction {
         super.setDC(dcSet, false);
 
         orderID = dcSet.getTransactionFinalMapSigns().get(orderRef);
+        createOrderTx = (CreateOrderTransaction) dcSet.getTransactionFinalMap().get(orderID);
+
         order = dcSet.getOrderMap().get(orderID);
         if (order == null) {
             order = dcSet.getCompletedOrderMap().get(orderID);
         }
-        createOrderTx = (CreateOrderTransaction) dcSet.getTransactionFinalMap().get(orderID);
         order.setDC(dcSet);
 
         if (false && andUpdateFromState && !isWiped())
@@ -109,12 +110,10 @@ public class UpdateOrderTransaction extends Transaction {
 
     }
 
-    // public static String getName() { return "Create Order"; }
-
     public String getTitle() {
-        ///return viewTypeName();
-        return TYPE_NAME + " " + ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE,
-                order.getHaveAssetKey()) + " " + ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, order.getWantAssetKey());
+        return //TYPE_NAME + " " +
+                ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE,
+                        order.getHaveAssetKey()) + " " + ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, order.getWantAssetKey());
     }
 
     @Override
