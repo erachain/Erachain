@@ -417,9 +417,10 @@ public class UpdateOrderTransaction extends Transaction {
         // удалим сперва - чтобы почистить все ключ с ценой корректно
         dcSet.getOrderMap().delete(orderID);
 
+        // запомним для отката что там было до изменения
         Trade trade = new Trade(Trade.TYPE_UPDATE, dbRef, orderID, order.getHaveAssetKey(), order.getWantAssetKey(),
-                order.getAmountWant(), amountWant,
-                createOrderTx.getWantAsset().getScale(), createOrderTx.getHaveAsset().getScale(), 1);
+                order.getAmountHave(), order.getAmountWant(),
+                createOrderTx.getHaveAsset().getScale(), createOrderTx.getWantAsset().getScale(), 1);
 
         // нужно запомнить чтобы при откате обновить взад цену
         dcSet.getTradeMap().put(trade);
@@ -448,10 +449,11 @@ public class UpdateOrderTransaction extends Transaction {
         Order updatedOrder = dcSet.getOrderMap().remove(orderID);
 
         // трейд ищем по ордеру и своему дбРЕФ
-        Trade trade = dcSet.getTradeMap().get(new Fun.Tuple2<>(dbRef, orderID));
+        // чтобы восстановить старую цену
+        Trade trade = dcSet.getTradeMap().remove(new Fun.Tuple2<>(dbRef, orderID));
 
         // изменяемые объекты нужно заново создавать
-        Order orderBefore = new Order(updatedOrder, trade.getAmountHave());
+        Order orderBefore = new Order(updatedOrder, trade.getAmountWant());
 
         if (orderBefore.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - откатим, ведь может он сработал
