@@ -353,7 +353,7 @@ public class APIItemPerson {
     }
 
     @GET
-    @Path("addresses/{key}?full")
+    @Path("addresses/{key}")
     public Response getAddresses(@Context UriInfo info, @PathParam("key") Long key) {
         if (DCSet.getInstance().getItemPersonMap().get(key) == null) {
             JSONObject out = new JSONObject();

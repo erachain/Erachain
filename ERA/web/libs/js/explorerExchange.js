@@ -153,6 +153,9 @@ function order(data){
     output += data.Label_LeftHave + ': <b>' + addCommas(data.order.leftHave) + ' / ' + addCommas(data.order.leftWant) + '</b><br>';
     output += data.Label_LeftPrice + ': <b>' + addCommas(data.order.leftPrice) + ' / ' + addCommas(data.order.leftPriceReverse) + '</b><br>';
 
+    output += data.Label_Pair + ': <a href="?asset=' + data.assetHaveKey
+        + '&asset=' + data.assetWantKey + get_lang() + '"><b>' + data.assetHaveName + ' / ' + data.assetWantName + '</b></a>';
+
     output += '</p>';
 
     output += '</div><div class="col-lg-7" style="padding-right: 5em;">';

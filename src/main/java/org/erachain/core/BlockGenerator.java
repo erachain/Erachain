@@ -402,22 +402,23 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         newBlockDC = dcSet.fork(database, "getUnconfirmedTransactions");
                     }
 
-                    transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
-
-                    if (false // вообще-то все внутренние транзакции уже провверены на подпись!
-                            && !transaction.isSignatureValid(newBlockDC)) {
-                        needRemoveInvalids.add(transaction.getSignature());
-                        continue;
-                    }
-
-                    if (false && // тут нельзя пока удалять - может она будет включена
-                            // и пусть удаляется только если невалидная будет
-                            timestamp > transaction.getDeadline()) {
-                        needRemoveInvalids.add(transaction.getSignature());
-                        continue;
-                    }
-
                     try {
+
+                        // здесь уже может быть ошибка если Ордер не найден например для Отмена ордера
+                        transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
+
+                        if (false // вообще-то все внутренние транзакции уже провверены на подпись!
+                                && !transaction.isSignatureValid(newBlockDC)) {
+                            needRemoveInvalids.add(transaction.getSignature());
+                            continue;
+                        }
+
+                        if (false && // тут нельзя пока удалять - может она будет включена
+                                // и пусть удаляется только если невалидная будет
+                                timestamp > transaction.getDeadline()) {
+                            needRemoveInvalids.add(transaction.getSignature());
+                            continue;
+                        }
 
                         if (transaction.isValid(Transaction.FOR_NETWORK, 0L) != Transaction.VALIDATE_OK) {
                             needRemoveInvalids.add(transaction.getSignature());
