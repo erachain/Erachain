@@ -197,61 +197,25 @@ public class UpdateOrderTransactionTest {
 
                 init(dbs);
 
+                int height = 1;
+
                 //CREATE ORDER
                 CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY,
                         BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
                         BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), 0L);
-                createOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, 1, true);
                 createOrderTransaction.sign(maker, asPack);
+                createOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);
                 createOrderTransaction.process(gb, asPack);
+                dcSet.getTransactionFinalMap().put(createOrderTransaction);
+                dcSet.getTransactionFinalMapSigns().put(createOrderTransaction.getSignature(), createOrderTransaction.getDBRef());
 
                 //CREATE UPDATE ORDER
                 UpdateOrderTransaction tx = new UpdateOrderTransaction(maker, createOrderTransaction.getSignature(),
                         BigDecimal.TEN, FEE_POWER, timestamp, 0L);
                 tx.sign(maker, Transaction.FOR_NETWORK);
-                tx.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1, true);
+                tx.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);
                 tx.process(gb, Transaction.FOR_NETWORK);
 
-                //CONVERT TO BYTES
-                byte[] rawTX = tx.toBytes(Transaction.FOR_NETWORK, true);
-
-                //CHECK DATA LENGTH
-                assertEquals(rawTX.length, tx.getDataLength(Transaction.FOR_NETWORK, true));
-
-                try {
-                    //PARSE FROM BYTES
-                    IssueAssetTransaction parsedIssueAssetTransaction = (IssueAssetTransaction) TransactionFactory.getInstance().parse(rawTX, Transaction.FOR_NETWORK);
-
-                    //CHECK INSTANCE
-                    assertEquals(true, parsedIssueAssetTransaction instanceof IssueAssetTransaction);
-
-                    //CHECK SIGNATURE
-                    assertEquals(true, Arrays.equals(tx.getSignature(), parsedIssueAssetTransaction.getSignature()));
-
-                    //CHECK ISSUER
-                    assertEquals(tx.getCreator().getAddress(), parsedIssueAssetTransaction.getCreator().getAddress());
-
-                    //CHECK REFERENCE
-                    //assertEquals((long)tx.getReference(), (long)parsedIssueAssetTransaction.getReference());
-
-                    //CHECK TIMESTAMP
-                    assertEquals(tx.getTimestamp(), parsedIssueAssetTransaction.getTimestamp());
-                } catch (Exception e) {
-                    fail("Exception while parsing transaction.");
-                }
-
-                //PARSE TRANSACTION FROM WRONG BYTES
-                rawTX = new byte[tx.getDataLength(Transaction.FOR_NETWORK, true)];
-
-                try {
-                    //PARSE FROM BYTES
-                    TransactionFactory.getInstance().parse(rawTX, Transaction.FOR_NETWORK);
-
-                    //FAIL
-                    fail("this should throw an exception");
-                } catch (Exception e) {
-                    //EXCEPTION IS THROWN OK
-                }
             } finally {
                 dcSet.close();
             }

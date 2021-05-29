@@ -656,8 +656,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         Order order = makeOrder(); //.copy();
         order.process(block, this);
 
-        if (true // так как проверка в Форке - потом быстрый слив и эта таблица вообще не будет просчитана
-                || !dcSet.isFork()) {
+        if (Controller.getInstance().dlSet != null
+                // так как проверка в Форке - потом быстрый слив и эта таблица вообще не будет просчитана
+                && !dcSet.isFork()) {
             // статистику по парам
             PairMapImpl pairMap = Controller.getInstance().dlSet.getPairMap();
             if (!pairMap.contains(new Fun.Tuple2(haveKey, wantKey))) {
