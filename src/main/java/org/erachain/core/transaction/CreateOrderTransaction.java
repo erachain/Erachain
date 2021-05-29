@@ -41,7 +41,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     public static final byte TYPE_ID = (byte) Transaction.CREATE_ORDER_TRANSACTION;
     public static final String TYPE_NAME = "Create Order";
 
-    private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
+    public static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
     private static final int HAVE_LENGTH = 8;
     private static final int WANT_LENGTH = 8;
     // private static final int PRICE_LENGTH = 12;
@@ -96,6 +96,13 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 signature);
     }
 
+    public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave,
+                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amountHave, amountWant, feePow, timestamp,
+                reference);
+    }
+
+
     // GETTERS/SETTERS
 
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
@@ -138,12 +145,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         } else {
             return long_fee;
         }
-    }
-
-    public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave,
-                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amountHave, amountWant, feePow, timestamp,
-                reference);
     }
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {

@@ -110,6 +110,27 @@ public class Order implements Comparable<Order> {
 
     }
 
+    public Order(Order order, BigDecimal newWantAmount) {
+
+        this.id = order.id;
+        this.creator = order.creator;
+        this.haveAssetKey = order.haveAssetKey;
+        this.wantAssetKey = order.wantAssetKey;
+
+        this.amountHave = order.amountHave;
+        this.amountWant = newWantAmount;
+
+        this.haveAssetScale = order.haveAssetScale;
+        this.wantAssetScale = order.wantAssetScale;
+
+        this.fulfilledHave = order.fulfilledHave;
+
+        this.status = order.status;
+
+        price = calcPrice();
+
+    }
+
     //GETTERS/SETTERS
 
     public static Order getOrder(DCSet db, Long key) {

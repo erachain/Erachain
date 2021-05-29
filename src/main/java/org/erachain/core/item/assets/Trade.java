@@ -41,6 +41,7 @@ public class Trade {
 
     public static final byte TYPE_TRADE = 0;
     public static final byte TYPE_CANCEL = 1;
+    public static final byte TYPE_UPDATE = 2;
 
     // make trading if two orders is seeked
     public Trade(long initiator, long target, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, int haveAssetScale, int wantAssetScale, int sequence) {
@@ -76,12 +77,18 @@ public class Trade {
                 return "trade";
             case TYPE_CANCEL:
                 return "cancel";
+            case TYPE_UPDATE:
+                return "update";
         }
         return "unknown";
     }
 
     public boolean isCancel() {
         return type == TYPE_CANCEL;
+    }
+
+    public boolean isUpdate() {
+        return type == TYPE_UPDATE;
     }
 
     public String viewID() {
