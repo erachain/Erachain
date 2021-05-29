@@ -9,6 +9,7 @@ import org.erachain.api.ApiErrorFactory;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.ItemMap;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -30,26 +31,34 @@ public class APIItems {
                     .build();
         }
 
+        MediaType mediaType;
 
-        PreviewMaker preViewMaker = new PreviewMaker();
-        preViewMaker.makePreview(item, image);
-        if (preView) {
-            image = preViewMaker.getPreview((item), image);
-            if (image == null) {
-                if (preViewMaker.errorMess == null) {
-                    throw ApiErrorFactory.getInstance().createError(
-                            "Some error - see in dataPreviews" + File.separator + "orig" + File.separator + PreviewMaker.getItemName(item) + ".log");
-                } else {
-                    throw ApiErrorFactory.getInstance().createError(
-                            preViewMaker.errorMess);
+        if (PreviewMaker.notNeedPreview(item, image)) {
+            mediaType = item.getImageMediaType();
+        } else {
+            PreviewMaker preViewMaker = new PreviewMaker();
+            preViewMaker.makePreview(item, image);
+            if (preView) {
+                image = preViewMaker.getPreview((item), image);
+                if (image == null) {
+                    if (preViewMaker.errorMess == null) {
+                        throw ApiErrorFactory.getInstance().createError(
+                                "Some error - see in dataPreviews" + File.separator + "orig" + File.separator + PreviewMaker.getItemName(item) + ".log");
+                    } else {
+                        throw ApiErrorFactory.getInstance().createError(
+                                preViewMaker.errorMess);
+                    }
                 }
+                mediaType = new MediaType("video", "mp4");
+            } else {
+                mediaType = item.getImageMediaType();
             }
         }
 
         return Response.status(200)
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(new ByteArrayInputStream(image))
-                .type(item.getImageMediaType())
+                .type(mediaType)
                 .build();
 
     }

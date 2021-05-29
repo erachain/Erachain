@@ -14,16 +14,20 @@ public class PreviewMaker {
 
     public String errorMess;
 
-    static final int VIDEO_USE_ORIG_LEN = 1 << 19;
-    static final int IMAGE_USE_ORIG_LEN = 1 << 18;
+    static final int VIDEO_USE_ORIG_LEN = 1 << 18;
+    static final int IMAGE_USE_ORIG_LEN = 1 << 16;
 
     static Logger LOGGER = LoggerFactory.getLogger(PreviewMaker.class.getSimpleName());
 
+    public static boolean notNeedPreview(ItemCls item, byte[] image) {
+        return item.getImageType() == AssetCls.MEDIA_TYPE_VIDEO && image.length < VIDEO_USE_ORIG_LEN
+                || item.getImageType() == AssetCls.MEDIA_TYPE_IMG && image.length < IMAGE_USE_ORIG_LEN;
+
+    }
+
     public byte[] getPreview(ItemCls item, byte[] image) {
 
-        if (item.getImageType() == AssetCls.MEDIA_TYPE_VIDEO && image.length < VIDEO_USE_ORIG_LEN
-                || item.getImageType() == AssetCls.MEDIA_TYPE_IMG //&& image.length < IMAGE_USE_ORIG_LEN
-        )
+        if (notNeedPreview(item, image))
             return image;
 
         try {
@@ -44,14 +48,17 @@ public class PreviewMaker {
         return item.getItemTypeName() + item.getKey();
     }
 
+    /**
+     * Convert all media (JPG, GIF, aminated-GIF, MPEG etc. to MP4
+     *
+     * @param item
+     * @param image
+     * @return
+     */
     public File makePreview(ItemCls item, byte[] image) {
 
-        if (image.length < VIDEO_USE_ORIG_LEN)
+        if (notNeedPreview(item, image))
             return null;
-
-        if (item.getImageType() == AssetCls.MEDIA_TYPE_IMG) {
-            return null;
-        }
 
         String outputName = getItemName(item);
         String path = "dataPreviews" + File.separator + outputName;
@@ -88,7 +95,7 @@ public class PreviewMaker {
         outLog.getParentFile().mkdirs();
 
         if (!outLog.exists()) {
-            File fileIn = new File(pathIn + ".mp4");
+            File fileIn = new File(pathIn);
             try (FileOutputStream fos = new FileOutputStream(fileIn)) {
                 fos.write(image);
             } catch (IOException e) {
@@ -108,9 +115,11 @@ public class PreviewMaker {
             } else {
                 // в Unix через bash makePreview.bash - вызывает ошибку "Unable to find a suitable output format for"
                 // - последний параметр как-то криво передается
+                // -vf scale=256:-2,setsar=1:1
                 builder = new ProcessBuilder("ffmpeg",
                         "-i", fileIn.toPath().toString(),
-                        "-y", "-fs", "512k", "-vcodec", "h264", "-s", "256x256",
+                        "-y", "-fs", "512k", "-vcodec", "h264",
+                        "-vf", "scale=256:-2,setsar=1:1", // "-s", "256x256",
                         "-q:v", parQV, "-r:v", parRV, fileOut.toPath().toString()
                 );
             }
