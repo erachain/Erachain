@@ -115,7 +115,7 @@ public class RecResource {
                     //return CancelOrderTransaction.Parse(data, releaserReference);
                     break;
 
-                case Transaction.UPDATE_ORDER_TRANSACTION:
+                case Transaction.CHANGE_ORDER_TRANSACTION:
 
                     //PARSE ORDER CREATION TRANSACTION
                     //return CreateOrderTransaction.Parse(data, releaserReference);

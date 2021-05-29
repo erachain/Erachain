@@ -1,6 +1,6 @@
 package org.erachain.gui.transaction;
 
-import org.erachain.core.transaction.UpdateOrderTransaction;
+import org.erachain.core.transaction.ChangeOrderTransaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
@@ -9,7 +9,7 @@ import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class UpdateOrderDetailsFrame extends RecDetailsFrame {
-    public UpdateOrderDetailsFrame(UpdateOrderTransaction orderUpdate) {
+    public UpdateOrderDetailsFrame(ChangeOrderTransaction orderUpdate) {
         super(orderUpdate, true);
 
         orderUpdate.setDC(DCSet.getInstance(), true);

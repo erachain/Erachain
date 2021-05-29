@@ -160,7 +160,7 @@ public class ChangeOrderFrame extends JDialog {
 
         //BUTTON CANCEL SALE
         buttonGBC.gridy = 8;
-        cancelOrderButton = new JButton(Lang.T("Cancel Order"));
+        cancelOrderButton = new JButton(Lang.T("Change Order"));
         //    cancelOrderButton.setPreferredSize(new Dimension(120, 25));
         cancelOrderButton.addActionListener(new ActionListener() {
             @Override
@@ -181,17 +181,6 @@ public class ChangeOrderFrame extends JDialog {
     public void onCancelOrderClick() {
         //DISABLE
         this.cancelOrderButton.setEnabled(false);
-
-        //CHECK IF NETWORK OK
-        if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
-            //NETWORK NOT OK
-            JOptionPane.showMessageDialog(null, Lang.T("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-
-            //ENABLE
-            this.cancelOrderButton.setEnabled(true);
-
-            return;
-        }
 
         //CHECK IF WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {

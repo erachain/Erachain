@@ -134,7 +134,7 @@ public class WebTransactionsHTML {
             case Transaction.CANCEL_ORDER_TRANSACTION:
                 outTX.put("body", cancel_Order_HTML(transaction));
                 break;
-            case Transaction.UPDATE_ORDER_TRANSACTION:
+            case Transaction.CHANGE_ORDER_TRANSACTION:
                 outTX.put("body", update_Order_HTML(transaction));
                 break;
             case Transaction.VOTE_ON_ITEM_POLL_TRANSACTION:
@@ -425,7 +425,7 @@ public class WebTransactionsHTML {
 
         String out = "";
 
-        UpdateOrderTransaction orderUpdate = (UpdateOrderTransaction) transaction;
+        ChangeOrderTransaction orderUpdate = (ChangeOrderTransaction) transaction;
 
         Long refDB = orderUpdate.getDBRef();
         Long orderID = orderUpdate.getOrderId();

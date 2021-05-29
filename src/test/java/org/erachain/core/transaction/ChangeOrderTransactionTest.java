@@ -26,9 +26,9 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class UpdateOrderTransactionTest {
+public class ChangeOrderTransactionTest {
 
-    static Logger LOGGER = LoggerFactory.getLogger(UpdateOrderTransactionTest.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(ChangeOrderTransactionTest.class.getName());
 
     ExLink exLink = null;
 
@@ -122,7 +122,7 @@ public class UpdateOrderTransactionTest {
         init(IDB.DBS_MAP_DB);
 
         //CREATE UPDATE ORDER
-        UpdateOrderTransaction tx = new UpdateOrderTransaction(maker, new byte[64], BigDecimal.TEN, FEE_POWER, timestamp, 0L);
+        ChangeOrderTransaction tx = new ChangeOrderTransaction(maker, new byte[64], BigDecimal.TEN, FEE_POWER, timestamp, 0L);
         tx.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -133,10 +133,10 @@ public class UpdateOrderTransactionTest {
 
         try {
             //PARSE FROM BYTES
-            UpdateOrderTransaction parsedTX = (UpdateOrderTransaction) TransactionFactory.getInstance().parse(rawTX, Transaction.FOR_NETWORK);
+            ChangeOrderTransaction parsedTX = (ChangeOrderTransaction) TransactionFactory.getInstance().parse(rawTX, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
-            assertEquals(true, parsedTX instanceof UpdateOrderTransaction);
+            assertEquals(true, parsedTX instanceof ChangeOrderTransaction);
 
             //CHECK SIGNATURE
             assertEquals(true, Arrays.equals(tx.getSignature(), parsedTX.getSignature()));
@@ -210,7 +210,7 @@ public class UpdateOrderTransactionTest {
                 dcSet.getTransactionFinalMapSigns().put(createOrderTransaction.getSignature(), createOrderTransaction.getDBRef());
 
                 //CREATE UPDATE ORDER
-                UpdateOrderTransaction tx = new UpdateOrderTransaction(maker, createOrderTransaction.getSignature(),
+                ChangeOrderTransaction tx = new ChangeOrderTransaction(maker, createOrderTransaction.getSignature(),
                         BigDecimal.TEN, FEE_POWER, timestamp, 0L);
                 tx.sign(maker, Transaction.FOR_NETWORK);
                 tx.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);

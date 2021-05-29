@@ -244,8 +244,8 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             trr.recipient = "" + cancelOrder.getOrderID();
             trr.title = "";
 
-        } else if (transaction.getType() == Transaction.UPDATE_ORDER_TRANSACTION) {
-            UpdateOrderTransaction updateOrder = (UpdateOrderTransaction) transaction;
+        } else if (transaction.getType() == Transaction.CHANGE_ORDER_TRANSACTION) {
+            ChangeOrderTransaction updateOrder = (ChangeOrderTransaction) transaction;
 
             trr.amount = updateOrder.getAmountWant();
             trr.recipient = ""; // + updateOrder.getAmountWant();

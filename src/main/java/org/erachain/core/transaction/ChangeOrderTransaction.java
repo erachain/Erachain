@@ -31,9 +31,9 @@ typeBytes[2].3-7 = point accuracy for HAVE amount: -16..16 = BYTE - 16
 typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
 
  */
-public class UpdateOrderTransaction extends Transaction {
-    public static final byte TYPE_ID = (byte) Transaction.UPDATE_ORDER_TRANSACTION;
-    public static final String TYPE_NAME = "Update Order";
+public class ChangeOrderTransaction extends Transaction {
+    public static final byte TYPE_ID = (byte) Transaction.CHANGE_ORDER_TRANSACTION;
+    public static final String TYPE_NAME = "Change Order";
 
     private static final int AMOUNT_LENGTH = CreateOrderTransaction.AMOUNT_LENGTH;
 
@@ -50,7 +50,7 @@ public class UpdateOrderTransaction extends Transaction {
     private CreateOrderTransaction createOrderTx;
     private Order order;
 
-    public UpdateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
+    public ChangeOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
         super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
@@ -59,7 +59,7 @@ public class UpdateOrderTransaction extends Transaction {
 
     }
 
-    public UpdateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
+    public ChangeOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference,
                                   byte[] signature) {
         this(typeBytes, creator, orderRef, amountWant, feePow, timestamp, reference);
@@ -67,7 +67,7 @@ public class UpdateOrderTransaction extends Transaction {
 
     }
 
-    public UpdateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
+    public ChangeOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference,
                                   byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, orderRef, amountWant, feePow, timestamp, reference);
@@ -78,13 +78,13 @@ public class UpdateOrderTransaction extends Transaction {
 
     }
 
-    public UpdateOrderTransaction(PublicKeyAccount creator, byte[] orderRef,
+    public ChangeOrderTransaction(PublicKeyAccount creator, byte[] orderRef,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderRef, amountWant, feePow, timestamp, reference,
                 signature);
     }
 
-    public UpdateOrderTransaction(PublicKeyAccount creator, byte[] orderRef,
+    public ChangeOrderTransaction(PublicKeyAccount creator, byte[] orderRef,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderRef, amountWant, feePow, timestamp,
                 reference);
@@ -287,7 +287,7 @@ public class UpdateOrderTransaction extends Transaction {
             amountWant = amountWant.scaleByPowerOfTen(-accuracy);
         }
 
-        return new UpdateOrderTransaction(typeBytes, creator, orderRef, amountWant, feePow, timestamp,
+        return new ChangeOrderTransaction(typeBytes, creator, orderRef, amountWant, feePow, timestamp,
                 reference, signatureBytes, seqNo, feeLong);
     }
 

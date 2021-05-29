@@ -161,11 +161,11 @@ public class TransactionDetailsFactory {
 
                 return cancelOrderDetailsFrame;
 
-            case Transaction.UPDATE_ORDER_TRANSACTION:
+            case Transaction.CHANGE_ORDER_TRANSACTION:
 
-                UpdateOrderTransaction updateOrderTransaction = (UpdateOrderTransaction) transaction;
+                ChangeOrderTransaction changeOrderTransaction = (ChangeOrderTransaction) transaction;
 
-                UpdateOrderDetailsFrame updateOrderDetailsFrame = new UpdateOrderDetailsFrame(updateOrderTransaction);
+                UpdateOrderDetailsFrame updateOrderDetailsFrame = new UpdateOrderDetailsFrame(changeOrderTransaction);
                 gridBagConstraints.gridy = updateOrderDetailsFrame.labelGBC.gridy + 1;
                 updateOrderDetailsFrame.add(jLabel9, gridBagConstraints);
 
