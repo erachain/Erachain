@@ -884,7 +884,7 @@ public class BlockChain {
 
         }
 
-        FEE_ASSET = Controller.getInstance().getDCSet().getItemAssetMap().get(AssetCls.FEE_KEY);
+        FEE_ASSET = dcSet.getItemAssetMap().get(AssetCls.FEE_KEY);
 
     }
 
