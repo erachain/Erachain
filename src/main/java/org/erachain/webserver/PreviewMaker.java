@@ -49,7 +49,7 @@ public class PreviewMaker {
     }
 
     /**
-     * Convert all media (JPG, GIF, aminated-GIF, MPEG etc. to MP4
+     * Convert all media (JPG, GIF, animated-GIF, MPEG etc. to MP4
      *
      * @param item
      * @param image
