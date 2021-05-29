@@ -361,6 +361,9 @@ public class UpdateOrderTransaction extends Transaction {
         if (amountWant.signum() <= 0) {
             return NEGATIVE_AMOUNT;
         }
+        if (amountWant.compareTo(order.getAmountWant()) == 0) {
+            return INVALID_AMOUNT;
+        }
 
         // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
         // and SCALE
