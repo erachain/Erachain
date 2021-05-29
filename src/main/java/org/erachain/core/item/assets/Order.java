@@ -793,6 +793,7 @@ public class Order implements Comparable<Order> {
         }
 
         BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
+        BigDecimal thisAmountHaveLeftStart = thisAmountHaveLeft;
         BigDecimal processedAmountFulfilledWant = BigDecimal.ZERO;
 
         int compare = 0;
@@ -1001,6 +1002,12 @@ public class Order implements Comparable<Order> {
 
                 //UPDATE FULFILLED HAVE
                 order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // this.amountHave));
+                // accounting on PLEDGE position
+                order.creator.changeBalance(this.dcSet, true,
+                        true, order.haveAssetKey, tradeAmountForHave, false, false, false,
+                        false);
+
+
                 this.setFulfilledHave(this.getFulfilledHave().add(tradeAmountForWant)); //this.amountWant));
 
                 if (order.isFulfilled()) {
@@ -1104,6 +1111,13 @@ public class Order implements Comparable<Order> {
             }
         }
 
+        // с ордера сколько было продано моего актива? на это число уменьшаем залог
+        thisAmountHaveLeftStart = thisAmountHaveLeftStart.subtract(this.getAmountHaveLeft());
+        if (thisAmountHaveLeftStart.signum() > 0) {
+            this.creator.changeBalance(this.dcSet, true, true, this.haveAssetKey,
+                    thisAmountHaveLeftStart, false, false, false, false);
+        }
+
     }
 
     public void orphan(Block block) {
@@ -1127,6 +1141,8 @@ public class Order implements Comparable<Order> {
         completedMap.delete(this);
 
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
+
+        BigDecimal thisAmountHaveLeftEnd = this.getAmountHaveLeft();
 
         AssetCls assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
         AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
@@ -1153,6 +1169,12 @@ public class Order implements Comparable<Order> {
 
                 //REVERSE FULFILLED
                 target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
+                // accounting on PLEDGE position
+                target.creator.changeBalance(this.dcSet, false,
+                        true, target.haveAssetKey, tradeAmountHave, false, false, false,
+                        false);
+
+
                 thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
                 if (height > BlockChain.VERS_5_3) {
@@ -1202,6 +1224,13 @@ public class Order implements Comparable<Order> {
                 this.getAmountHaveLeft(), false, false, true,
                 // accounting on PLEDGE position
                 true);
+
+        // с ордера сколько было продано моего актива? на это число уменьшаем залог
+        thisAmountHaveLeftEnd = this.getAmountHaveLeft().subtract(thisAmountHaveLeftEnd);
+        if (thisAmountHaveLeftEnd.signum() > 0) {
+            this.creator.changeBalance(this.dcSet, false, true, this.haveAssetKey,
+                    thisAmountHaveLeftEnd, false, false, false, false);
+        }
 
         //REVERT WANT
         if (height > BlockChain.VERS_5_3) {

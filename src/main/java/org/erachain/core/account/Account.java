@@ -997,6 +997,18 @@ public class Account {
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.d.a.add(amount) : balance.d.a,
                             balance.d.b.add(amount)),
                     balance.e);
+
+        } else if (balancePosition == BALANCE_POS_PLEDGE) {
+            // DEX PLEDGE
+
+            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    balance.a, balance.b,
+                    balance.c, balance.d,
+                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                            updateIncomed ? balance.e.a.subtract(amount) : balance.e.a, balance.e.b.subtract(amount))
+                            : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.e.a.add(amount) : balance.e.a,
+                            balance.e.b.add(amount))
+            );
         }
 
         map.put(getShortAddressBytes(), absKey, balance);
