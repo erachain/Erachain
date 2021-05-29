@@ -59,7 +59,7 @@ public class PairsController {
         File file = new File(Settings.getInstance().getUserPath() + "market.json");
 
         //CREATE FILE IF IT DOESNT EXIST
-        if (BlockChain.MAIN_MODE && file.exists()) {
+        if (!BlockChain.CLONE_MODE && file.exists()) {
             String jsonString = "";
             try {
                 //READ PEERS FILE
