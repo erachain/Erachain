@@ -19,30 +19,6 @@ public class UpdateOrderDetailsFrame extends RecDetailsFrame {
         JLabel haveLabel = new JLabel(Lang.T("Have") + ":");
         this.add(haveLabel, labelGBC);
 
-        //HAVE
-        ++fieldGBC.gridy;
-        JTextField have = new JTextField(
-                orderUpdate.getAmountHave().toPlainString()
-                        + " x "
-                        + String.valueOf(orderUpdate.getHaveAsset().toString()));
-        have.setEditable(false);
-        MenuPopupUtil.installContextMenu(have);
-        this.add(have, fieldGBC);
-
-        //LABEL WANT
-        ++labelGBC.gridy;
-        JLabel wantLabel = new JLabel(Lang.T("Want") + ":");
-        this.add(wantLabel, labelGBC);
-
-        //HAVE
-        ++fieldGBC.gridy;
-        JTextField want = new JTextField(
-                orderUpdate.getAmountWant().toPlainString() + " x "
-                        + String.valueOf(orderUpdate.getWantAsset().toString()));
-        want.setEditable(false);
-        MenuPopupUtil.installContextMenu(want);
-        this.add(want, fieldGBC);
-
         //LABEL PRICE
         ++labelGBC.gridy;
         JLabel priceLabel = new JLabel(Lang.T("Price") + ":");
