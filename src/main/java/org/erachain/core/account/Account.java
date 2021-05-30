@@ -874,7 +874,8 @@ public class Account {
         } else if (side == FEE_BALANCE_SIDE_FORGED) {
             // учтем что Всего нафоржили
             // это Баланс 4-й (ПОТРАТИЛ) сторона 1
-            balance.a, balance.b, balance.c,
+            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    balance.a, balance.b, balance.c,
                     substract ? new Tuple2<BigDecimal, BigDecimal>(balance.d.a.subtract(amount), balance.d.b)
                             : new Tuple2<BigDecimal, BigDecimal>(balance.d.a.add(amount), balance.d.b),
                     balance.e);
@@ -910,6 +911,8 @@ public class Account {
             case FEE_BALANCE_SIDE_DEFFER:
                 return balance.c.a.add(balance.c.b).add(balance.d.a).subtract(balance.d.b);
         }
+
+        return null;
     }
 
     /**

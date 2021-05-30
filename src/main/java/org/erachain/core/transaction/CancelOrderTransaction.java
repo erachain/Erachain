@@ -12,7 +12,6 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
@@ -76,22 +75,28 @@ public class CancelOrderTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
-    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
-        super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
-
-        Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
-        if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID) {
-            LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderSignature));
-            if (BlockChain.CHECK_BUGS > 8) {
-                Long error = null;
-                error++;
-            }
+    /**
+     * нельзя вызывать для Форка и для isWIPED
+     */
+    public void updateFromStateDB() {
+        if (this.dbRef == 0) {
+            // неподтвержденная транзакция не может быть обновлена
+            return;
         }
-        this.orderID = createDBRef;
 
-        if (false && andUpdateFromState && !isWiped())
-            updateFromStateDB();
-
+        if (orderID == null || orderID == 0) {
+            // эта транзакция взята как скелет из набора блока
+            // найдем сохраненную транзакцию - в ней есь Номер Сути
+            Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
+            if (createDBRef == null && height > BlockChain.CANCEL_ORDERS_ALL_VALID) {
+                LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderSignature));
+                if (BlockChain.CHECK_BUGS > 8) {
+                    Long error = null;
+                    error++;
+                }
+            }
+            this.orderID = createDBRef;
+        }
     }
 
     public byte[] getorderSignature() {
