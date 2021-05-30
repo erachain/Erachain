@@ -1758,7 +1758,9 @@ public class Controller extends Observable {
             // BROADCAST MESSAGE
             this.network.broadcast(telegram, false);
             // save DB
-            Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
+            if (wallet != null && wallet.database != null) {
+                wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
+            }
         }
 
         return notAdded;
@@ -2618,6 +2620,10 @@ public class Controller extends Observable {
     }
 
     public void addTelegramToWallet(Transaction transaction, String signatureKey) {
+        if (wallet == null || wallet.database == null) {
+            return;
+        }
+
         HashSet<Account> recipients = transaction.getRecipientAccounts();
         PublicKeyAccount creator = transaction.getCreator();
         String creator58 = creator.getAddress();
@@ -3756,7 +3762,7 @@ public class Controller extends Observable {
             return null;
         }
 
-        if (wallet != null) {
+        if (wallet != null && wallet.database != null) {
             Tuple3<String, String, String> favorite = wallet.database.getFavoriteAccountsMap().get(address);
             if (favorite != null && favorite.a != null) {
                 return Base58.decode(favorite.a);
