@@ -139,7 +139,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         super(typeBytes, name, creator, exLink, feePow, timestamp, reference);
         this.recipient = recipient;
 
-        if (amount == null || amount.equals(BigDecimal.ZERO)) {
+        if (amount == null || amount.signum() == 0) {
             // set version to 1
             typeBytes[2] = (byte) (typeBytes[2] | (byte) -128);
         } else {
