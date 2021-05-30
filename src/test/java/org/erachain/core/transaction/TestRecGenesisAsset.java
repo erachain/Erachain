@@ -273,7 +273,7 @@ public class TestRecGenesisAsset {
         assetTransfer.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE VALID ASSET TRANSFER
-        maker.changeBalance(db, false, false, 1, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
+        maker.changeBalance(db, false, false, 1, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
         assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CHECK IF ASSET TRANSFER IS VALID

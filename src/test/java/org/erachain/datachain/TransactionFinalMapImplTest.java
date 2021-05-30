@@ -99,12 +99,12 @@ public class TransactionFinalMapImplTest {
 
         // FEE FUND
         accountA.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
-        accountA.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false, false);
-        accountA.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false, false);
+        accountA.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false);
+        accountA.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false);
 
         accountB.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
-        accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false, false);
-        accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false, false);
+        accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false);
+        accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false);
 
         timestamp = NTP.getTime();
     }

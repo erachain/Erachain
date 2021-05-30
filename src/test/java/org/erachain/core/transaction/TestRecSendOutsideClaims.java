@@ -89,10 +89,10 @@ public class TestRecSendOutsideClaims {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        maker.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false, false);
-        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false, false);
-        recipient.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false, false);
-        recipient2.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false, false);
+        maker.changeBalance(db, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false);
+        maker.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
+        recipient.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
+        recipient2.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
         assetA = new AssetVenture(itemAppData, maker, "AAA", icon, image, ".", AssetCls.AS_OUTSIDE_OTHER_CLAIM, 2, 0L);
 

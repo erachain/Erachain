@@ -343,7 +343,7 @@ public class CancelOrderTransaction extends Transaction {
         order.getCreator().changeBalance(dcSet, false, false, order.getHaveAssetKey(), left,
                 false, false, false,
                 // accounting on PLEDGE position
-                true);
+                Account.BALANCE_POS_PLEDGE);
         this.addCalculated(block, this.creator, order.getHaveAssetKey(), left,
                 "Cancel Order @" + Transaction.viewDBRef(order.getId()));
     }
@@ -390,7 +390,7 @@ public class CancelOrderTransaction extends Transaction {
         order.getCreator().changeBalance(dcSet, true, false, order.getHaveAssetKey(),
                 order.getAmountHaveLeft(), false, false, false,
                 // accounting on PLEDGE position
-                true);
+                Account.BALANCE_POS_PLEDGE);
     }
 
     @Override

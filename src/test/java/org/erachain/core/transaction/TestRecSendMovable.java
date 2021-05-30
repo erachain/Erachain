@@ -81,10 +81,10 @@ public class TestRecSendMovable {
 
         // FEE FUND
         deliver.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        deliver.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false, false);
+        deliver.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
         producer.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        producer.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false, false);
+        producer.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1), false, false, false);
 
         asset = new AssetVenture(itemAppData, deliver, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
         // set SCALABLE assets ++

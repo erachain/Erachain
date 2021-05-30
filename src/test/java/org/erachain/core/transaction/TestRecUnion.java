@@ -107,8 +107,8 @@ public class TestRecUnion {
         //genesis_certify.process(db, false);
 
         certifier.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        certifier.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false, false, false);
-        certifier.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
+        certifier.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false, false);
+        certifier.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
         union = new Union(itemAppData, certifier, "РСФСР", timestamp - 1234567,
                 parent + 1, icon, image, "Россия");
@@ -177,15 +177,15 @@ public class TestRecUnion {
         issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db)[0], new byte[64]);
         assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
         // ADD FEE
-        userAccount1.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false, false);
+        userAccount1.changeBalance(db, false, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
         assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CHECK IF ISSUE UNION IS VALID
-        userAccount1.changeBalance(db, false, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false, false, false, false);
+        userAccount1.changeBalance(db, false, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false, false, false);
         assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CHECK
-        userAccount1.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false, false, false);
+        userAccount1.changeBalance(db, false, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false, false, false);
         assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
     }
