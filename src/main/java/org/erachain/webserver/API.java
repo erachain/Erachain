@@ -1416,7 +1416,7 @@ public class API {
 
         if (publicKey == null) {
             throw ApiErrorFactory.getInstance().createError(
-                    Transaction.INVALID_PUBLIC_KEY);
+                    Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT);
         } else {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")

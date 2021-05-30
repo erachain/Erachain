@@ -172,7 +172,7 @@ public class OnDealClick {
                 mess = "Invalid message length";
                 break;
             case Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT:
-                mess = "Unknown public key for encrypt";
+                mess = "Unknown public key (need for encrypt)";
                 break;
 
             case Transaction.HASH_ALREADY_EXIST:
