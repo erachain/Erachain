@@ -20,9 +20,9 @@ public class PreviewMaker {
 
     public static boolean notNeedPreview(ItemCls item, byte[] image) {
 
-        return item.getImageType() == AssetCls.MEDIA_TYPE_VIDEO && image.length < VIDEO_USE_ORIG_LEN
-                // так как даже маленькие картинки - они будут обрамлены в теге ВИДЕО на сайте
-                || item.getImageType() == AssetCls.MEDIA_TYPE_IMG;
+        // так как даже маленькие картинки будут обрамлены в теге ВИДЕО на сайте то все IMG
+        // и только большие ВИДЕО
+        return item.getImageType() == AssetCls.MEDIA_TYPE_VIDEO && image.length < VIDEO_USE_ORIG_LEN;
 
     }
 
