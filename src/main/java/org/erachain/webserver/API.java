@@ -79,9 +79,9 @@ public class API {
         //help.put("see /apirecords", "Help for transactions API"); // @Deprecated
         help.put("see /apidocuments", "Help for documents API");
 
-        help.put("*** BALANCE SYSTEM ***", "");
-        help.put("bal 1", "Balance Components - {Total_Income, Remaining_Balance]");
-        help.put("bal 2", "Balances Array - [Balance in Own, Balance in Debt, Balance on Hold, Balance of Consumer]");
+        help.put("*** BALANCE STRUCTURE ***", "");
+        help.put("balance Side", "Balance has Sides: - BigDecimal array: [Total_Income (side 1), Remaining_Balance (side 2)]. Side 3 - Total Outcome as difference: Side1 - Side2");
+        help.put("balance Positions", "Balances Array - BigDecimal array: [Balance in Own (pos 1), Balance in Debt (pos 2), Balance on Hold (pos 2), Balance of Spend/Consumer 9pos4), Balance of Pledge (pos 5)]");
 
         help.put("*** CHAIN ***", "");
         help.put("GET Height", "height");
