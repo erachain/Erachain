@@ -14,14 +14,15 @@ public class PreviewMaker {
 
     public String errorMess;
 
-    static final int VIDEO_USE_ORIG_LEN = 1 << 18;
-    static final int IMAGE_USE_ORIG_LEN = 1 << 16;
+    static final int VIDEO_USE_ORIG_LEN = 1 << 17;
 
     static Logger LOGGER = LoggerFactory.getLogger(PreviewMaker.class.getSimpleName());
 
     public static boolean notNeedPreview(ItemCls item, byte[] image) {
+
         return item.getImageType() == AssetCls.MEDIA_TYPE_VIDEO && image.length < VIDEO_USE_ORIG_LEN
-                || item.getImageType() == AssetCls.MEDIA_TYPE_IMG && image.length < IMAGE_USE_ORIG_LEN;
+                // так как даже маленькие картинки - они будут обрамлены в теге ВИДЕО на сайте
+                || item.getImageType() == AssetCls.MEDIA_TYPE_IMG;
 
     }
 
