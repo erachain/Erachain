@@ -139,7 +139,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         super(typeBytes, name, creator, exLink, feePow, timestamp, reference);
         this.recipient = recipient;
 
-        if (amount == null || amount.equals(BigDecimal.ZERO)) {
+        if (amount == null || amount.signum() == 0) {
             // set version to 1
             typeBytes[2] = (byte) (typeBytes[2] | (byte) -128);
         } else {
@@ -417,7 +417,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public String viewAmount() {
-        if (this.amount == null)
+        if (amount == null || amount.signum() == 0)
             return "";
 
         if (this.amount.signum() < 0) {
@@ -429,7 +429,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     
     @Override
     public String viewAmount(Account account) {
-        if (this.amount == null)
+        if (amount == null || amount.signum() == 0)
             return "";
         String address = account.getAddress();
         return NumberAsString.formatAsString(getAmount(address));
@@ -437,7 +437,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     
     @Override
     public String viewAmount(String address) {
-        if (this.amount == null)
+        if (amount == null || amount.signum() == 0)
             return "";
         return NumberAsString.formatAsString(getAmount(address));
     }
@@ -448,7 +448,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public String viewActionType() {
-        if (asset == null)
+        if (amount == null || amount.signum() == 0)
             return "Mail";
 
         //return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
@@ -502,7 +502,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         JSONObject transaction = super.getJsonBase();
         
         transaction.put("recipient", this.recipient.getAddress());
-        if (this.amount != null) {
+        if (amount != null && amount.signum() != 0) {
             transaction.put("asset", this.getAbsKey());
             transaction.put("assetKey", this.getAbsKey());
             transaction.put("amount", this.amount.toPlainString());
