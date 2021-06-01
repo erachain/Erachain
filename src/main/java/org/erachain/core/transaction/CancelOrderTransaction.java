@@ -252,6 +252,7 @@ public class CancelOrderTransaction extends Transaction {
                     }
                 }
 
+                errorValue = "orderID: " + (orderID == null ? "null" : Transaction.viewDBRef(orderID));
                 return ORDER_DOES_NOT_EXIST;
             } else {
                 emptyOrder = true;
