@@ -238,21 +238,24 @@ public class CancelOrderTransaction extends Transaction {
 
                 if (true) {
                     if (this.orderID == null) {
-                        LOGGER.debug("INVALID: this.orderID == null");
+                        errorValue = "orderID == null";
+                        LOGGER.debug("INVALID: " + errorValue);
                     } else {
+                        errorValue = "orderID: " + Transaction.viewDBRef(orderID);
                         // 3qUAUPdifyWYg7ABYa5TiWmyssHH1gJtKDatATS6UeKMnSzEwpuPJN5QFKCPHtUWpDYbK7fceFyDGhc51CuhiJ3
                         LOGGER.debug("INVALID: this.sign = " + Base58.encode(signature));
-                        LOGGER.debug("INVALID: this.orderID = " + Transaction.viewDBRef(orderID));
+                        LOGGER.debug("INVALID: " + errorValue);
                         LOGGER.debug("INVALID: this.orderSign == " + Base58.encode(orderSignature));
                         if (this.dcSet.getCompletedOrderMap().contains(this.orderID)) {
+                            errorValue += " already Completed";
                             LOGGER.debug("INVALID: already Completed");
                         } else {
+                            errorValue += " not exist in chain";
                             LOGGER.debug("INVALID: not exist in chain");
                         }
                     }
                 }
 
-                errorValue = "orderID: " + (orderID == null ? "null" : Transaction.viewDBRef(orderID));
                 return ORDER_DOES_NOT_EXIST;
             } else {
                 emptyOrder = true;
