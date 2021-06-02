@@ -659,9 +659,9 @@ public class Order implements Comparable<Order> {
         // REVERT not completed AMOUNT
         BigDecimal left = this.getAmountHaveLeft();
         this.creator.changeBalance(this.dcSet, false,
-                false, this.haveAssetKey, left, false, false, true,
+                false, this.haveAssetKey, left, false, false,
                 // accounting on PLEDGE position
-                Account.BALANCE_POS_PLEDGE);
+                true, Account.BALANCE_POS_PLEDGE);
         transaction.addCalculated(block, this.creator, this.haveAssetKey, left,
                 "Outprice " + (forTarget ? "close" : "ended") + " Order @" + transaction.viewDBRef(this.id));
 
@@ -717,9 +717,9 @@ public class Order implements Comparable<Order> {
             //REMOVE HAVE
             //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
             this.creator.changeBalance(this.dcSet, true, false, this.haveAssetKey, this.amountHave,
-                    false, false, true,
+                    false, false,
                     // accounting on PLEDGE position
-                    Account.BALANCE_POS_PLEDGE);
+                    true, Account.BALANCE_POS_PLEDGE);
         }
 
         BigDecimal thisPriceReverse = calcPriceReverse();
@@ -1004,7 +1004,8 @@ public class Order implements Comparable<Order> {
                 order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // this.amountHave));
                 // accounting on PLEDGE position
                 order.creator.changeBalance(this.dcSet, true,
-                        true, order.haveAssetKey, tradeAmountForHave, false, false, false
+                        true, order.haveAssetKey, tradeAmountForHave, false, false,
+                        true
                 );
 
 
@@ -1114,8 +1115,9 @@ public class Order implements Comparable<Order> {
         // с ордера сколько было продано моего актива? на это число уменьшаем залог
         thisAmountHaveLeftStart = thisAmountHaveLeftStart.subtract(this.getAmountHaveLeft());
         if (thisAmountHaveLeftStart.signum() > 0) {
+            // change PLEDGE
             this.creator.changeBalance(this.dcSet, true, true, this.haveAssetKey,
-                    thisAmountHaveLeftStart, false, false, false);
+                    thisAmountHaveLeftStart, false, false, true);
         }
 
     }
@@ -1171,7 +1173,8 @@ public class Order implements Comparable<Order> {
                 target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
                 // accounting on PLEDGE position
                 target.creator.changeBalance(this.dcSet, false,
-                        true, target.haveAssetKey, tradeAmountHave, false, false, false
+                        true, target.haveAssetKey, tradeAmountHave, false, false,
+                        true
                 );
 
 
@@ -1223,16 +1226,17 @@ public class Order implements Comparable<Order> {
             // GET HAVE LEFT - if it CANCELWED by INCREMENT close
             //   - если обработка остановлена по достижению порога Инкремента
             this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey,
-                    this.getAmountHaveLeft(), false, false, true,
+                    this.getAmountHaveLeft(), false, false,
                     // accounting on PLEDGE position
-                    Account.BALANCE_POS_PLEDGE);
+                    true, Account.BALANCE_POS_PLEDGE);
         }
 
         // с ордера сколько было продано моего актива? на это число уменьшаем залог
         thisAmountHaveLeftEnd = this.getAmountHaveLeft().subtract(thisAmountHaveLeftEnd);
         if (thisAmountHaveLeftEnd.signum() > 0) {
+            // change PLEDGE
             this.creator.changeBalance(this.dcSet, false, true, this.haveAssetKey,
-                    thisAmountHaveLeftEnd, false, false, false);
+                    thisAmountHaveLeftEnd, false, false, true);
         }
 
         //REVERT WANT
