@@ -346,7 +346,7 @@ public class CancelOrderTransaction extends Transaction {
         //UPDATE BALANCE OF CREATOR
         BigDecimal left = order.getAmountHaveLeft();
         order.getCreator().changeBalance(dcSet, false, false, order.getHaveAssetKey(), left,
-                false, false, false,
+                false, false, true,
                 // accounting on PLEDGE position
                 Account.BALANCE_POS_PLEDGE);
         this.addCalculated(block, this.creator, order.getHaveAssetKey(), left,
@@ -393,7 +393,7 @@ public class CancelOrderTransaction extends Transaction {
 
         //REMOVE BALANCE OF CREATOR
         order.getCreator().changeBalance(dcSet, true, false, order.getHaveAssetKey(),
-                order.getAmountHaveLeft(), false, false, false,
+                order.getAmountHaveLeft(), false, false, true,
                 // accounting on PLEDGE position
                 Account.BALANCE_POS_PLEDGE);
     }

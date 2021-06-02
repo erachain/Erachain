@@ -659,7 +659,7 @@ public class Order implements Comparable<Order> {
         // REVERT not completed AMOUNT
         BigDecimal left = this.getAmountHaveLeft();
         this.creator.changeBalance(this.dcSet, false,
-                false, this.haveAssetKey, left, false, false, false,
+                false, this.haveAssetKey, left, false, false, true,
                 // accounting on PLEDGE position
                 Account.BALANCE_POS_PLEDGE);
         transaction.addCalculated(block, this.creator, this.haveAssetKey, left,
