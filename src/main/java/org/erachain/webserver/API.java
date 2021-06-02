@@ -116,6 +116,8 @@ public class API {
         help.put("GET Address Unconfirmed Last Reference", "addressunconfirmedlastreference/{address}/{from}/{count}");
         help.put("GET Address Generating Balance", "addressgeneratingbalance/{address}");
         help.put("GET Address Asset Balance", "addressassetbalance/{address}/{assetid}");
+        help.put("GET Address FEE Statistics", "addressfeestats/{address}");
+
         help.put("GET Address Assets", "addressassets/{address}");
         help.put("GET Address Public Key", "addresspublickey/{address}");
         help.put("GET Address Forging Info", "addressforge/{address}");
@@ -1344,6 +1346,36 @@ public class API {
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(array.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("addressfeestats/{address}")
+    public Response getAddressFEEStats(@PathParam("address") String address) {
+        // CHECK IF VALID ADDRESS
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_ADDRESS);
+
+        }
+
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                = result.a.getBalance(AssetCls.FEE_KEY);
+
+        JSONObject out = new JSONObject();
+
+        out.put("referalAndGift", balance.c.a);
+        out.put("totalEarn", balance.c.b);
+        out.put("forged", balance.c.b.subtract(balance.c.a));
+        out.put("totalSpend", balance.d.b);
+        out.put("result", balance.c.b.subtract(balance.d.b));
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
                 .build();
     }
 

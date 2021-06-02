@@ -1249,13 +1249,13 @@ public class BlockExplorer {
             if (position == TransactionAmount.ACTION_HOLD || position == TransactionAmount.ACTION_SEND) {
 
                 output.put("Label_Balance_Pos", Lang.T(Account.balanceCOMPUPositionName(position), langObj));
-                output.put("Label_Balance_Side", Lang.T(Account.balanceCOMPUSideName(side), langObj));
+                output.put("Label_Balance_Side", Lang.T(Account.balanceCOMPUSideName(position, side), langObj));
 
-                output.put("Label_TotalReferal", Lang.T(Account.balanceCOMPUSideName(Account.FEE_BALANCE_SIDE_REFERAL), langObj));
-                output.put("Label_TotalEarned", Lang.T(Account.balanceCOMPUSideName(Account.FEE_BALANCE_SIDE_EARNED), langObj));
-                output.put("Label_TotalForged", Lang.T(Account.balanceCOMPUSideName(Account.FEE_BALANCE_SIDE_FORGED), langObj));
-                output.put("Label_TotalSpend", Lang.T(Account.balanceCOMPUSideName(Account.FEE_BALANCE_SIDE_SPEND), langObj));
-                output.put("Label_Difference", Lang.T(Account.balanceCOMPUSideName(Account.FEE_BALANCE_SIDE_DEFFER), langObj));
+                output.put("Label_TotalReferal", Lang.T(Account.balanceCOMPUSideName(position, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS), langObj));
+                output.put("Label_TotalEarned", Lang.T(Account.balanceCOMPUSideName(position, Account.FEE_BALANCE_SIDE_TOTAL_EARNED), langObj));
+                output.put("Label_TotalForged", Lang.T(Account.balanceCOMPUSideName(position, Account.FEE_BALANCE_SIDE_FORGED), langObj));
+                output.put("Label_TotalSpend", Lang.T(Account.balanceCOMPUSideName(position, Account.FEE_BALANCE_SIDE_SPEND), langObj));
+                output.put("Label_Difference", Lang.T(Account.balanceCOMPUSideName(position, Account.FEE_BALANCE_SIDE_DIFFERENCE), langObj));
 
                 output.put("Side_Help", Lang.T("Side_Help_COMPU_BONUS", langObj));
 

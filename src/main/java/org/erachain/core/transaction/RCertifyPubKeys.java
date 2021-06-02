@@ -685,7 +685,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             if (personBonus.signum() != 0) {
                 pkAccount.changeBalance(dcSet, false, false, FEE_KEY, personBonus,
                         false, false, false);
-                pkAccount.changeCOMPUBonusBalances(dcSet, false, personBonus, Account.FEE_BALANCE_SIDE_EARNED);
+                pkAccount.changeCOMPUStatsBalances(dcSet, false, personBonus, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
                 if (block != null) {
                     block.addCalculated(pkAccount, FEE_KEY, personBonus,
                             "enter bonus", this.dbRef);
@@ -698,7 +698,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(dcSet, false, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
                     false, false, false);
-            issuer.changeCOMPUBonusBalances(dcSet, false, issued_FEE_BD, Account.FEE_BALANCE_SIDE_EARNED);
+            issuer.changeCOMPUStatsBalances(dcSet, false, issued_FEE_BD, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
             if (block != null)
                 block.addCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
                         "register reward @P:" + this.key, this.dbRef);
@@ -817,7 +817,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             if (personBonus.signum() != 0) {
 
                 pkAccount.changeBalance(dcSet, true, false, FEE_KEY, personBonus, false, false, false);
-                pkAccount.changeCOMPUBonusBalances(dcSet, true, personBonus, Account.FEE_BALANCE_SIDE_EARNED);
+                pkAccount.changeCOMPUStatsBalances(dcSet, true, personBonus, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
                 issued_FEE_BD_total = personBonus;
             } else {
                 issued_FEE_BD_total = BigDecimal.ZERO;
@@ -826,7 +826,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(dcSet, true, false, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRAR_4_11,
                     false, false, false);
-            issuer.changeCOMPUBonusBalances(dcSet, true, issued_FEE_BD, Account.FEE_BALANCE_SIDE_EARNED);
+            issuer.changeCOMPUStatsBalances(dcSet, true, issued_FEE_BD, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // ADD to EMISSION (with minus)

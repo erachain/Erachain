@@ -61,11 +61,11 @@ public class Account {
     public static final int BALANCE_SIDE_LEFT = 2;
     public static final int BALANCE_SIDE_CREDIT = 3;
 
-    public static final int FEE_BALANCE_SIDE_REFERAL = 1; // это чисто с рефералки накапало
-    public static final int FEE_BALANCE_SIDE_EARNED = 2; // всего заработали - доход разный с %%
-    public static final int FEE_BALANCE_SIDE_FORGED = 3; // всего нафоржили
+    public static final int FEE_BALANCE_SIDE_REFERAL_AND_GIFTS = 1; // это чисто с рефералки накапало
+    public static final int FEE_BALANCE_SIDE_FORGED = 2; // всего нафоржили
+    public static final int FEE_BALANCE_SIDE_TOTAL_EARNED = 3; // всего заработали - доход со всего
     public static final int FEE_BALANCE_SIDE_SPEND = 4; // всего на комиссии
-    public static final int FEE_BALANCE_SIDE_DEFFER = 5; // разница между всем доходом и расходами
+    public static final int FEE_BALANCE_SIDE_DIFFERENCE = 5; // разница между всем доходом и расходами
 
     protected String address;
     protected byte[] bytes;
@@ -163,18 +163,6 @@ public class Account {
 
     }
 
-    public static String balanceCOMPUPositionName(int position) {
-        switch (position) {
-            case BALANCE_POS_OWN:
-                return "I Own";
-            case BALANCE_POS_DEBT:
-                return "I Debt";
-            case BALANCE_POS_PLEDGE:
-                return "I Pledge";
-        }
-        return "Statistics";
-    }
-
     public static String balanceSideName(int side) {
         switch (side) {
             case BALANCE_SIDE_DEBIT:
@@ -189,20 +177,65 @@ public class Account {
 
     }
 
-    public static String balanceCOMPUSideName(int side) {
-        switch (side) {
-            case FEE_BALANCE_SIDE_REFERAL:
-                return "Referal";
-            case FEE_BALANCE_SIDE_EARNED:
-                return "Earn";
-            case FEE_BALANCE_SIDE_SPEND:
-                return "Spend # Потрачено";
-            case FEE_BALANCE_SIDE_FORGED:
-                return "Forged";
-            case FEE_BALANCE_SIDE_DEFFER:
-                return "Difference";
+    public static String balanceCOMPUPositionName(int position) {
+        switch (position) {
+            case BALANCE_POS_OWN:
+                return "I Own";
+            case BALANCE_POS_DEBT:
+                return "I Debt";
+            case BALANCE_POS_HOLD:
+                return "I Earn";
+            case BALANCE_POS_SPEND:
+                return "I Spend";
+            case BALANCE_POS_PLEDGE:
+                return "I Pledge";
         }
         return null;
+    }
+
+    public static String balanceCOMPUSideName(int position, int side) {
+        switch (position) {
+            case BALANCE_POS_HOLD:
+                switch (side) {
+                    case BALANCE_SIDE_DEBIT:
+                        return "Referal & Gift";
+                    case BALANCE_SIDE_LEFT:
+                        return "Total Earn";
+                    case BALANCE_SIDE_CREDIT:
+                        return "Forged";
+                }
+            case BALANCE_POS_SPEND:
+                switch (side) {
+                    case BALANCE_SIDE_LEFT:
+                        return "Spend # Потрачено";
+                    case BALANCE_SIDE_CREDIT:
+                        return "Difference";
+                }
+        }
+        return null;
+
+    }
+
+    public static int balanceCOMPUStatsSide(int position, int side) {
+        switch (position) {
+            case BALANCE_POS_HOLD:
+                switch (side) {
+                    case BALANCE_SIDE_DEBIT:
+                        return FEE_BALANCE_SIDE_REFERAL_AND_GIFTS;
+                    case BALANCE_SIDE_LEFT:
+                        return FEE_BALANCE_SIDE_TOTAL_EARNED;
+                    case BALANCE_SIDE_CREDIT:
+                        return FEE_BALANCE_SIDE_FORGED;
+                }
+            case BALANCE_POS_SPEND:
+                switch (side) {
+                    case BALANCE_SIDE_LEFT:
+                        return FEE_BALANCE_SIDE_SPEND;
+                    case BALANCE_SIDE_CREDIT:
+                        return FEE_BALANCE_SIDE_DIFFERENCE;
+                }
+        }
+        return -1;
 
     }
 
@@ -849,21 +882,23 @@ public class Account {
 
     }
 
-    public void changeCOMPUBonusBalances(DCSet dcSet, boolean substract, BigDecimal amount, int side) {
+    public void changeCOMPUStatsBalances(DCSet dcSet, boolean substract, BigDecimal amount, int side) {
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 balance = dcSet.getAssetBalanceMap().get(getShortAddressBytes(), Transaction.FEE_KEY);
 
-        if (side == FEE_BALANCE_SIDE_REFERAL) {
-            // учтем Всего рефералка
+        if (side == FEE_BALANCE_SIDE_REFERAL_AND_GIFTS) {
+            // учтем Всего рефералка награды разные
             // это Баланс 3-й (ХРАНЮ) сторона 1
+            // одновременно увеличим Бонусы и Всего заработал
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b,
-                    substract ? new Tuple2<BigDecimal, BigDecimal>(balance.c.a.subtract(amount), balance.c.b)
-                            : new Tuple2<BigDecimal, BigDecimal>(balance.c.a.add(amount), balance.c.b),
+                    substract ? new Tuple2<BigDecimal, BigDecimal>(balance.c.a.subtract(amount), balance.c.b.subtract(amount))
+                            : new Tuple2<BigDecimal, BigDecimal>(balance.c.a.add(amount), balance.c.b.add(amount)),
                     balance.d,
                     balance.e);
-        } else if (side == FEE_BALANCE_SIDE_EARNED) {
-            // учтем что Всего потратили
+        } else if (side == FEE_BALANCE_SIDE_FORGED) {
+            // учтем что Всего нафоржили - это как разница между Бонусы и всего Заработали
+            // поэтому увеличим только Остаток
             // это Баланс 3-й (ХРАНЮ) сторона 2
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b,
@@ -871,8 +906,8 @@ public class Account {
                             : new Tuple2<BigDecimal, BigDecimal>(balance.c.a, balance.c.b.add(amount)),
                     balance.d,
                     balance.e);
-        } else if (side == FEE_BALANCE_SIDE_FORGED) {
-            // учтем что Всего нафоржили
+        } else if (false) {
+            // не трогаем
             // это Баланс 4-й (ПОТРАТИЛ) сторона 1
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b, balance.c,
@@ -895,21 +930,21 @@ public class Account {
 
     }
 
-    public BigDecimal getCOMPUBonusBalances(DCSet dcSet, int side) {
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                balance = dcSet.getAssetBalanceMap().get(getShortAddressBytes(), Transaction.FEE_KEY);
+    public BigDecimal getCOMPUStatsBalances(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance, int side) {
 
         switch (side) {
-            case FEE_BALANCE_SIDE_REFERAL:
+            case FEE_BALANCE_SIDE_REFERAL_AND_GIFTS:
                 return balance.c.a;
-            case FEE_BALANCE_SIDE_EARNED:
+            case FEE_BALANCE_SIDE_TOTAL_EARNED:
                 return balance.c.b;
             case FEE_BALANCE_SIDE_FORGED:
-                return balance.d.a;
+                // как разница
+                return balance.c.b.subtract(balance.c.a);
             case FEE_BALANCE_SIDE_SPEND:
                 return balance.d.b;
-            case FEE_BALANCE_SIDE_DEFFER:
-                return balance.c.a.add(balance.c.b).add(balance.d.a).subtract(balance.d.b);
+            case FEE_BALANCE_SIDE_DIFFERENCE:
+                // все разница приход / расход
+                return balance.c.b.subtract(balance.d.b);
         }
 
         return null;
