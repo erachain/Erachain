@@ -1245,22 +1245,28 @@ public class BlockExplorer {
         BigDecimal sum;
 
         if (assetKey.equals(Transaction.FEE_KEY)) {
+            output.put("Label_Balance_3", Lang.T(Account.balanceCOMPUPositionName(3), langObj));
             output.put("Label_Balance_4", Lang.T(Account.balanceCOMPUPositionName(4), langObj));
-            output.put("Label_Balance_5", Lang.T(Account.balanceCOMPUPositionName(5), langObj));
 
-            if (position == TransactionAmount.ACTION_HOLD || position == TransactionAmount.ACTION_SEND) {
+            if (position == TransactionAmount.ACTION_HOLD || position == TransactionAmount.ACTION_SPEND) {
 
                 String name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_DEBIT));
                 if (name != null)
                     output.put("Label_TotalDebit", Lang.T(name, langObj));
+                else
+                    output.remove("Label_TotalDebit");
 
                 name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_LEFT));
                 if (name != null)
                     output.put("Label_Left", Lang.T(name, langObj));
+                else
+                    output.remove("Label_Left");
 
                 name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_CREDIT));
                 if (name != null)
                     output.put("Label_TotalCredit", Lang.T(name, langObj));
+                else
+                    output.remove("Label_TotalCredit");
 
                 output.put("Label_Balance_Pos", Lang.T(Account.balanceCOMPUPositionName(position), langObj));
 
