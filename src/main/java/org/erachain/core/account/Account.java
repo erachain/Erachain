@@ -193,24 +193,18 @@ public class Account {
         return null;
     }
 
-    public static String balanceCOMPUSideName(int position, int side) {
-        switch (position) {
-            case BALANCE_POS_HOLD:
-                switch (side) {
-                    case BALANCE_SIDE_DEBIT:
-                        return "Referal & Gift";
-                    case BALANCE_SIDE_LEFT:
-                        return "Total Earn";
-                    case BALANCE_SIDE_CREDIT:
-                        return "Forged";
-                }
-            case BALANCE_POS_SPEND:
-                switch (side) {
-                    case BALANCE_SIDE_LEFT:
-                        return "Spend # Потрачено";
-                    case BALANCE_SIDE_CREDIT:
-                        return "Difference";
-                }
+    public static String balanceCOMPUSideName(int statsSide) {
+        switch (statsSide) {
+            case FEE_BALANCE_SIDE_REFERAL_AND_GIFTS:
+                return "Referal & Gift";
+            case FEE_BALANCE_SIDE_TOTAL_EARNED:
+                return "Total Earn";
+            case FEE_BALANCE_SIDE_FORGED:
+                return "Forged";
+            case FEE_BALANCE_SIDE_SPEND:
+                return "Spend # Потрачено";
+            case FEE_BALANCE_SIDE_DIFFERENCE:
+                return "Difference";
         }
         return null;
 

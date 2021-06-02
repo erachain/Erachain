@@ -1242,35 +1242,45 @@ public class BlockExplorer {
 
         output.put("Side_Help", Lang.T("Side_Help", langObj));
 
+        BigDecimal sum;
+
         if (assetKey.equals(Transaction.FEE_KEY)) {
             output.put("Label_Balance_4", Lang.T(Account.balanceCOMPUPositionName(4), langObj));
             output.put("Label_Balance_5", Lang.T(Account.balanceCOMPUPositionName(5), langObj));
 
             if (position == TransactionAmount.ACTION_HOLD || position == TransactionAmount.ACTION_SEND) {
 
-                output.put("Label_Balance_Pos", Lang.T(Account.balanceCOMPUPositionName(position), langObj));
-                output.put("Label_Balance_Side", Lang.T(Account.balanceCOMPUSideName(position, side), langObj));
+                String name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_DEBIT));
+                if (name != null)
+                    output.put("Label_TotalDebit", Lang.T(name, langObj));
 
-                output.put("Label_TotalReferal", Lang.T(Account.balanceCOMPUSideName(position, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS), langObj));
-                output.put("Label_TotalEarned", Lang.T(Account.balanceCOMPUSideName(position, Account.FEE_BALANCE_SIDE_TOTAL_EARNED), langObj));
-                output.put("Label_TotalForged", Lang.T(Account.balanceCOMPUSideName(position, Account.FEE_BALANCE_SIDE_FORGED), langObj));
-                output.put("Label_TotalSpend", Lang.T(Account.balanceCOMPUSideName(position, Account.FEE_BALANCE_SIDE_SPEND), langObj));
-                output.put("Label_Difference", Lang.T(Account.balanceCOMPUSideName(position, Account.FEE_BALANCE_SIDE_DIFFERENCE), langObj));
+                name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_LEFT));
+                if (name != null)
+                    output.put("Label_Left", Lang.T(name, langObj));
+
+                name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_CREDIT));
+                if (name != null)
+                    output.put("Label_TotalCredit", Lang.T(name, langObj));
+
+                output.put("Label_Balance_Pos", Lang.T(Account.balanceCOMPUPositionName(position), langObj));
+
+                int sideStats = Account.balanceCOMPUStatsSide(position, side);
+                if (sideStats > 0)
+                    output.put("Label_Balance_Side", Lang.T(Account.balanceCOMPUSideName(sideStats), langObj));
 
                 output.put("Side_Help", Lang.T("Side_Help_COMPU_BONUS", langObj));
 
-                //if (side == Account.FEE_BALANCE_SIDE_FORGED) {
-                //    // Это запрос на баланса Нафоржили - он в 5-й позиции на стороне 2
-                //    position = TransactionAmount.ACTION_PLEDGE;
-                //    side = Account.BALANCE_SIDE_LEFT;
-                //}
+                sum = PersonCls.getBalance(personKey, assetKey, position, side);
 
+            } else {
+                sum = PersonCls.getBalance(personKey, assetKey, position, side);
             }
 
+        } else {
+            sum = PersonCls.getBalance(personKey, assetKey, position, side);
         }
 
 
-        BigDecimal sum = PersonCls.getBalance(personKey, assetKey, position, side);
         output.put("sum", sum);
 
         return output;
