@@ -672,6 +672,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     /**
+     * Нужно для наполнения данными для isValid & process
+     *
      * @param dcSet
      * @param forDeal
      * @param blockHeight
@@ -696,7 +698,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     /**
-     * Нарастить мясо на скелет из базы состояния - нужно например для созданим вторичных ключей и Номер Сущности
+     * Нарастить мясо на скелет из базы состояния - нужно для записи в FinalMap b созданим вторичных ключей и Номер Сущности
      */
     public void updateFromStateDB() {
     }
