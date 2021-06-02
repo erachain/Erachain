@@ -1598,7 +1598,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     @SuppressWarnings("unchecked")
     protected JSONObject getJsonBase() {
 
-        DCSet localDCSet = DCSet.getInstance();
+        if (dcSet == null) {
+            setDC(DCSet.getInstance(), true);
+        }
 
         JSONObject transaction = new JSONObject();
 
@@ -1606,7 +1608,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
         transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
 
-        transaction.put("confirmations", this.getConfirmations(localDCSet));
+        transaction.put("confirmations", this.getConfirmations(dcSet));
         transaction.put("type", getType());
         transaction.put("record_type", this.viewTypeName());
         transaction.put("type_name", this.viewTypeName());
@@ -1647,9 +1649,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         transaction.put("size", this.viewSize(Transaction.FOR_NETWORK));
 
-        if (dcSet == null) {
-            setDC(localDCSet, true);
-        }
         transaction.put("tags", Arrays.asList(this.getTags()));
 
         return transaction;

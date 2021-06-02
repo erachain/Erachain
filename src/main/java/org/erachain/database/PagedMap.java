@@ -45,7 +45,7 @@ public class PagedMap<T, U> {
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
                     key = iterator.next();
                     currentRow = (U) mapImpl.get(key);
-                    if (filerRows()) {
+                    if (currentRow == null || filerRows()) {
                         continue;
                     }
 
@@ -64,6 +64,9 @@ public class PagedMap<T, U> {
                         && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
                     for (U pageRow : getPageList(fromKey, 0, limit - count, false)) {
+                        if (currentRow == null)
+                            continue;
+
                         currentRow = pageRow;
                         boolean exist = false;
                         for (U rowHere : rows) {
@@ -98,7 +101,7 @@ public class PagedMap<T, U> {
 
                     key = iterator.next();
                     currentRow = (U) mapImpl.get(key);
-                    if (filerRows()) {
+                    if (currentRow == null || filerRows()) {
                         continue;
                     }
 
@@ -119,6 +122,9 @@ public class PagedMap<T, U> {
                     int limitLeft = limit - count;
                     for (U pageRow : getPageList(fromKey, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
                         currentRow = pageRow;
+                        if (currentRow == null)
+                            continue;
+
                         boolean exist = false;
                         for (U rowHere : rows) {
                             if (pageRow.equals(rowHere)) {
