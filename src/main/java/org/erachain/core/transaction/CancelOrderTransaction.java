@@ -311,7 +311,7 @@ public class CancelOrderTransaction extends Transaction {
         super.process(block, forDeal);
 
         if (this.orderID == null) {
-            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
                 return;
             Long error = null;
             error++;
@@ -325,7 +325,7 @@ public class CancelOrderTransaction extends Transaction {
         Order order = this.dcSet.getOrderMap().get(this.orderID);
 
         if (order == null) {
-            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
                 return;
             Long error = null;
             error++;
@@ -367,7 +367,7 @@ public class CancelOrderTransaction extends Transaction {
         super.orphan(block, forDeal);
 
         if (this.orderID == null) {
-            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
                 return;
             Long error = null;
             error++;
@@ -377,7 +377,7 @@ public class CancelOrderTransaction extends Transaction {
         Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);
 
         if (order == null) {
-            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
                 return;
             Long error = null;
             error++;
