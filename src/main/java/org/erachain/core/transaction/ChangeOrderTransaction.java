@@ -433,7 +433,7 @@ public class ChangeOrderTransaction extends Transaction {
 
         if (order.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - проверим может он сработает
-            updatedOrder.process(block, createOrderTx, false);
+            updatedOrder.process(block, createOrderTx, true);
         } else {
             dcSet.getOrderMap().put(orderID, updatedOrder);
         }
@@ -461,7 +461,7 @@ public class ChangeOrderTransaction extends Transaction {
 
         if (orderBefore.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - откатим, ведь может он сработал
-            updatedOrder.orphan(block);
+            updatedOrder.orphan(block, true);
         } else {
             dcSet.getOrderMap().put(orderID, orderBefore);
         }

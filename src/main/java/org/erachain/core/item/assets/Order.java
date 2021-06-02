@@ -1120,7 +1120,7 @@ public class Order implements Comparable<Order> {
 
     }
 
-    public void orphan(Block block) {
+    public void orphan(Block block, boolean asChange) {
 
         // GET HEIGHT from ID
         int height = (int) (this.id >> 32);
@@ -1217,13 +1217,16 @@ public class Order implements Comparable<Order> {
             ordersMap.delete(thisOrder);
         }
 
-        //REMOVE HAVE
-        // GET HAVE LEFT - if it CANCELWED by INCREMENT close
-        //   - если обработка остановлена по достижению порога Инкремента
-        this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey,
-                this.getAmountHaveLeft(), false, false, true,
-                // accounting on PLEDGE position
-                Account.BALANCE_POS_PLEDGE);
+        if (!asChange) {
+
+            //REMOVE HAVE
+            // GET HAVE LEFT - if it CANCELWED by INCREMENT close
+            //   - если обработка остановлена по достижению порога Инкремента
+            this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey,
+                    this.getAmountHaveLeft(), false, false, true,
+                    // accounting on PLEDGE position
+                    Account.BALANCE_POS_PLEDGE);
+        }
 
         // с ордера сколько было продано моего актива? на это число уменьшаем залог
         thisAmountHaveLeftEnd = this.getAmountHaveLeft().subtract(thisAmountHaveLeftEnd);
