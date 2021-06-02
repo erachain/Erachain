@@ -1254,19 +1254,19 @@ public class BlockExplorer {
                 if (name != null)
                     output.put("Label_TotalDebit", Lang.T(name, langObj));
                 else
-                    output.remove("Label_TotalDebit");
+                    output.put("Label_TotalDebit", Lang.T("", langObj));
 
                 name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_LEFT));
                 if (name != null)
                     output.put("Label_Left", Lang.T(name, langObj));
                 else
-                    output.remove("Label_Left");
+                    output.put("Label_Left", Lang.T("", langObj));
 
                 name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_CREDIT));
                 if (name != null)
                     output.put("Label_TotalCredit", Lang.T(name, langObj));
                 else
-                    output.remove("Label_TotalCredit");
+                    output.put("Label_TotalCredit", Lang.T("", langObj));
 
                 output.put("Label_Balance_Pos", Lang.T(Account.balanceCOMPUPositionName(position), langObj));
 
@@ -1277,6 +1277,9 @@ public class BlockExplorer {
                 output.put("Side_Help", Lang.T("Side_Help_COMPU_BONUS", langObj));
 
                 sum = PersonCls.getBalance(personKey, assetKey, position, side);
+                if (sideStats == Account.FEE_BALANCE_SIDE_FORGED) {
+                    sum = sum.negate();
+                }
 
             } else {
                 sum = PersonCls.getBalance(personKey, assetKey, position, side);
