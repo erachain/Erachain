@@ -189,7 +189,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTrades(long have, long want, Object fromKey, int limit, boolean useCancel) {
+    public List<Trade> getTrades(long have, long want, Object fromKey, int limit, boolean useCancel, boolean useChange) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
@@ -209,6 +209,8 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             while (iteratorLimit.hasNext()) {
                 trade = this.get(iteratorLimit.next());
                 if (!useCancel && trade.isCancel())
+                    continue;
+                if (!useChange && trade.isUpdate())
                     continue;
 
                 trades.add(trade);

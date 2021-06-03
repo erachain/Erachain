@@ -561,12 +561,28 @@ public class TransactionCreator {
         long time = NTP.getTime();
 
         //CREATE PRDER TRANSACTION
-        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderID, (byte) feePow, time, 0l);
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderID, (byte) feePow, time, 0L);
         cancelOrderTransaction.sign(creator, Transaction.FOR_NETWORK);
         cancelOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
         //VALIDATE AND PROCESS
         return cancelOrderTransaction;
+    }
+
+    public Transaction createChangeOrderTransaction(PrivateKeyAccount creator, int feePow, byte[] orderID, BigDecimal wantAmount) {
+        //CHECK FOR UPDATES
+        this.checkUpdate();
+
+        //TIME
+        long time = NTP.getTime();
+
+        //CREATE PRDER TRANSACTION
+        ChangeOrderTransaction changeOrderTransaction = new ChangeOrderTransaction(creator, orderID, wantAmount, (byte) feePow, time, 0L);
+        changeOrderTransaction.sign(creator, Transaction.FOR_NETWORK);
+        changeOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
+
+        //VALIDATE AND PROCESS
+        return changeOrderTransaction;
     }
 
     public Pair<Transaction, Integer> sendMultiPayment(PrivateKeyAccount creator, List<Payment> payments, int feePow) {

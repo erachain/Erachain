@@ -234,6 +234,24 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         });
         sellOrdersMenu.add(trades);
 
+        JMenuItem sellChange = new JMenuItem(Lang.T("Change"));
+        sellChange.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+
+                if (sellOrdersTableModel.isEmpty())
+                    return;
+                int row = sellOrdersTable.getSelectedRow();
+                if (row < 0)
+                    return;
+                int row1 = sellOrdersTable.convertRowIndexToModel(row);
+
+                Order order = sellOrdersTableModel.getItem(row1);
+                new ChangeOrderFrame(order);
+            }
+        });
+        sellOrdersMenu.add(sellChange);
+
         JMenuItem cancel = new JMenuItem(Lang.T("Cancel"));
         cancel.addActionListener(new ActionListener() {
 
@@ -251,6 +269,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
             }
         });
         sellOrdersMenu.add(cancel);
+
     //    sellOrdersTable.setComponentPopupMenu(sellOrdersMenu);
         TableMenuPopupUtil.installContextMenu(sellOrdersTable, sellOrdersMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
@@ -401,6 +420,24 @@ public class EchangeSellBuyPanel extends JTabbedPane {
             }
         });
         buyOrdersMenu.add(buyTrades);
+
+        JMenuItem buyChange = new JMenuItem(Lang.T("Change"));
+        buyChange.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (buyOrdersTableModel.isEmpty())
+                    return;
+                int row = buyOrdersTable.getSelectedRow();
+                if (row < 0)
+                    return;
+                int row1 = buyOrdersTable.convertRowIndexToModel(row);
+
+                Order order = buyOrdersTableModel.getItem(row1);
+                new ChangeOrderFrame(order);
+            }
+        });
+        buyOrdersMenu.add(buyChange);
+
         JMenuItem buyCancel = new JMenuItem(Lang.T("Cancel"));
         buyCancel.addActionListener(new ActionListener() {
             @Override
@@ -419,7 +456,8 @@ public class EchangeSellBuyPanel extends JTabbedPane {
             }
         });
         buyOrdersMenu.add(buyCancel);
-  //      buyOrdersTable.setComponentPopupMenu(buyOrdersMenu);
+
+        //      buyOrdersTable.setComponentPopupMenu(buyOrdersMenu);
         TableMenuPopupUtil.installContextMenu(buyOrdersTable, buyOrdersMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 

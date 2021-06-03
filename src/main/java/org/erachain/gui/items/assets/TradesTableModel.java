@@ -64,7 +64,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
         }
 
         Trade trade = null;
-        int type = 0;
+        boolean typeSell = false;
         Order initatorOrder = null;
         Order targetOrder = null;
 
@@ -77,7 +77,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 targetOrder = Order.getOrder(db, trade.getTarget());
 
                 if (initatorOrder != null)
-                    type = initatorOrder.getHaveAssetKey() == this.have.getKey() ? -1 : 1;
+                    typeSell = initatorOrder.getHaveAssetKey() == this.have.getKey();
                 else {
                     boolean debug = true;
                 }
@@ -100,7 +100,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 //    return "<html><i>" + NumberAsString.formatAsString(sumAsset1) + "</i></html>";
 
                 String result = "";
-                if (type > 0)
+                if (typeSell)
                     result = NumberAsString.formatAsString(trade.getAmountHave());
                 else
                     result = NumberAsString.formatAsString(trade.getAmountWant());
@@ -118,14 +118,14 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                     return "";
                     ///return null;
 
-                if (type > 0)
+                if (typeSell)
                     return "<html><span style='color:green'>▲</span>"
-                        + NumberAsString.formatAsString(trade.calcPrice())
-                        + "</html>";
+                            + NumberAsString.formatAsString(trade.calcPrice())
+                            + "</html>";
                 else
                     return "<html><span style='color:red'>▼</span>"
-                        + NumberAsString.formatAsString(trade.calcPriceRevers())
-                        + "</html>";
+                            + NumberAsString.formatAsString(trade.calcPriceRevers())
+                            + "</html>";
 
             case COLUMN_ASSET_2:
 
@@ -133,7 +133,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                     return "";
                     ///return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
 
-                if (type > 0)
+                if (typeSell)
                     result = NumberAsString.formatAsString(trade.getAmountWant());
                 else
                     result = NumberAsString.formatAsString(trade.getAmountHave());
@@ -152,7 +152,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
     @Override
     public void getInterval() {
 
-        this.list = ((TradeMap) map).getTrades(haveKey, wantKey, startKey, step, false);
+        this.list = ((TradeMap) map).getTrades(haveKey, wantKey, startKey, step, false, false);
 
     }
 

@@ -24,7 +24,7 @@ public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
     ;
 
     @SuppressWarnings("unchecked")
-    List<Trade> getTrades(long have, long want, Object offset, int limit, boolean useCancel);
+    List<Trade> getTrades(long have, long want, Object offset, int limit, boolean useCancel, boolean useChange);
 
     @SuppressWarnings("unchecked")
     Trade getLastTrade(long have, long want, boolean andCancel);

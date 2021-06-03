@@ -1391,15 +1391,15 @@ public class OrderTestsMy {
 
                 // INITIATOR of all trades is order_BA_1
                 Trade trade = order_BA_1.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(order_BA_1_ID));
-                Assert.assertEquals(0, order_BA_1.getInitiatedTrades(dcSet).get(1).getInitiator().compareTo(order_BA_1_ID));
+                Assert.assertEquals(0, trade.getInitiator() == (order_BA_1_ID));
+                Assert.assertEquals(0, order_BA_1.getInitiatedTrades(dcSet).get(1).getInitiator() == (order_BA_1_ID));
                 // здесь иногда почему-то получается то один ордер то другой - без
                 // сортировки
-                if (trade.getTarget().compareTo(order_AB_1_ID) == 0) {
+                if (trade.getTarget() == order_AB_1_ID) {
                     // 1
-                    Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_1_ID));
-                    Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(1000)));
-                    Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(100)));
+                    Assert.assertEquals(0, trade.getTarget() == (order_AB_1_ID));
+                    Assert.assertEquals(0, trade.getAmountHave() == (BigDecimal.valueOf(1000)));
+                    Assert.assertEquals(0, trade.getAmountWant() == (BigDecimal.valueOf(100)));
                     // 2
                     trade = order_BA_1.getInitiatedTrades(dcSet).get(1);
                     Assert.assertEquals(trade.getAmountHave().toPlainString(), BigDecimal.valueOf(20)
@@ -1407,20 +1407,20 @@ public class OrderTestsMy {
                             .divide(order_AB_2_tmp.getPrice(), BlockChain.AMOUNT_DEDAULT_SCALE,
                                     BigDecimal.ROUND_HALF_UP).setScale(trade.getAmountHave().scale(), BigDecimal.ROUND_HALF_UP).toPlainString());
                     Assert.assertEquals(trade.getAmountWant().toPlainString(), BigDecimal.valueOf(20).toPlainString());
-                    Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_2_ID));
+                    Assert.assertEquals(0, trade.getTarget() == (order_AB_2_ID));
                 } else {
                     // 2
-                    Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_2_ID));
+                    Assert.assertEquals(0, trade.getTarget() == (order_AB_2_ID));
                     Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(20)
                             // .multiply(orderB.getPriceCalcReverse()));
                             .divide(order_AB_2_tmp.getPrice(), BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_HALF_UP));
                     Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20));
                     // 1
                     trade = order_BA_1.getInitiatedTrades(dcSet).get(1);
-                    Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_1_ID));
-                    Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(1000)));
-                    Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(100)));
-                    Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_1_ID));
+                    Assert.assertEquals(0, trade.getTarget() == (order_AB_1_ID));
+                    Assert.assertEquals(0, trade.getAmountHave() == (BigDecimal.valueOf(1000)));
+                    Assert.assertEquals(0, trade.getAmountWant() == (BigDecimal.valueOf(100)));
+                    Assert.assertEquals(0, trade.getTarget() == (order_AB_1_ID));
                 }
 
                 ////////////////////////////
@@ -1515,7 +1515,7 @@ public class OrderTestsMy {
 
                 // CHECK ORDERS
                 Assert.assertEquals(false, dcSet.getOrderMap().contains(order_AB_8.getId()));
-                Assert.assertEquals(0, order_AB_8.getFulfilledHave().compareTo(amoHave));
+                Assert.assertEquals(0, order_AB_8.getFulfilledHave() == (amoHave));
                 Assert.assertEquals(true, order_AB_8.isFulfilled());
 
                 BigDecimal ttt = order_BA_2.getPrice();
@@ -1534,10 +1534,10 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, order_AB_8.getInitiatedTrades(dcSet).size());
 
                 trade = order_AB_8.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(order_AB_8.getId()));
-                Assert.assertEquals(0, trade.getTarget().compareTo(order_BA_2_ID));
-                Assert.assertEquals(0, trade.getAmountHave().compareTo(tradedAmoB));
-                Assert.assertEquals(0, trade.getAmountWant().compareTo(amoHave));
+                Assert.assertEquals(0, trade.getInitiator() == (order_AB_8.getId()));
+                Assert.assertEquals(0, trade.getTarget() == (order_BA_2_ID));
+                Assert.assertEquals(0, trade.getAmountHave() == (tradedAmoB));
+                Assert.assertEquals(0, trade.getAmountWant() == (amoHave));
 
             } finally {
                 dcSet.close();
@@ -1715,9 +1715,9 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, order_BA_1.getInitiatedTrades(dcSet).size());
 
                 Trade trade = order_BA_1.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(order_BA_1_ID));
-                Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_1_ID));
-                Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(100)));
+                Assert.assertEquals(0, trade.getInitiator() == (order_BA_1_ID));
+                Assert.assertEquals(0, trade.getTarget() == (order_AB_1_ID));
+                Assert.assertEquals(0, trade.getAmountHave() == (BigDecimal.valueOf(100)));
                 Assert.assertEquals(trade.getAmountWant().toPlainString(), "1000");
 
                 bal_A_keyA = accountA.getBalanceUSE(keyA, dcSet);
@@ -1784,8 +1784,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, order_BA_1.getInitiatedTrades(dcSet).size());
 
                 trade = orderC.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(order_AB_2_ID));
-                Assert.assertEquals(0, trade.getTarget().compareTo(order_BA_1_ID));
+                Assert.assertEquals(0, trade.getInitiator() == (order_AB_2_ID));
+                Assert.assertEquals(0, trade.getTarget() == (order_BA_1_ID));
                 Assert.assertEquals(trade.getAmountHave().setScale(8), order_BA_2_wantTaked);
                 Assert.assertEquals(trade.getAmountWant(), amoHave);
             } finally {
@@ -1881,8 +1881,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderB.getInitiatedTrades(dcSet).size());
 
                 Trade trade = orderB.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_B));
-                Assert.assertEquals(0, trade.getTarget().compareTo(orderID_A));
+                Assert.assertEquals(0, trade.getInitiator() == (orderID_B));
+                Assert.assertEquals(0, trade.getTarget() == (orderID_A));
                 Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(999)));
                 Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(99.9)));
 
@@ -2029,8 +2029,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderB.getInitiatedTrades(dcSet).size());
 
                 Trade trade = orderB.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_B));
-                Assert.assertEquals(0, trade.getTarget().compareTo(orderID_A));
+                Assert.assertEquals(0, trade.getInitiator() == (orderID_B));
+                Assert.assertEquals(0, trade.getTarget() == (orderID_A));
                 Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(1000)));
                 Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(100)));
 
@@ -2087,8 +2087,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderB.getInitiatedTrades(dcSet).size());
 
                 trade = orderC.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_C));
-                Assert.assertEquals(0, trade.getTarget().compareTo(orderID_B));
+                Assert.assertEquals(0, trade.getInitiator() == (orderID_C));
+                Assert.assertEquals(0, trade.getTarget() == (orderID_B));
                 Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(19.18));
                 Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(95.9));
             } finally {
@@ -2220,20 +2220,20 @@ public class OrderTestsMy {
                 Assert.assertEquals(3, orderD.getInitiatedTrades(dcSet).size());
 
                 Trade trade = orderD.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_D));
+                Assert.assertEquals(0, trade.getInitiator() == (orderID_D));
 
                 // this may be WRONG in some case - reRUN task!
                 // rundon sorting - 3 orders -тут нет сортровки и выдает ордер один из
                 // 3-х
-                if (trade.getTarget().compareTo(orderID_A) == 0) {
-                    Assert.assertEquals(0, trade.getTarget().compareTo(orderID_A));
+                if (trade.getTarget() == orderID_A) {
+                    Assert.assertEquals(0, trade.getTarget() == (orderID_A));
                     Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1));
                     Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(15000));
 
                     if (false) {
                         trade = orderD.getInitiatedTrades(dcSet).get(1);
-                        Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_D));
-                        Assert.assertEquals(0, trade.getTarget().compareTo(orderID_B));
+                        Assert.assertEquals(0, trade.getInitiator() == (orderID_D));
+                        Assert.assertEquals(0, trade.getTarget() == (orderID_B));
                         Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(2));
                         Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(40000));
                     }
@@ -2293,8 +2293,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderE.getInitiatedTrades(dcSet).size());
 
                 trade = orderE.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_E));
-                Assert.assertEquals(0, trade.getTarget().compareTo(orderID_C));
+                Assert.assertEquals(0, trade.getInitiator() == (orderID_E));
+                Assert.assertEquals(0, trade.getTarget() == (orderID_C));
                 Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(2.24));
                 Assert.assertEquals(trade.getAmountWant().toPlainString(), "56000");
 
@@ -2435,18 +2435,18 @@ public class OrderTestsMy {
                 Assert.assertEquals(3, orderD.getInitiatedTrades(dcSet).size());
 
                 Trade trade = orderD.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_D));
+                Assert.assertEquals(0, trade.getInitiator() == (orderID_D));
 
                 // this may be WRONG in some case - reRUN task!
-                if (trade.getTarget().compareTo(orderID_A) == 0) {
-                    Assert.assertEquals(0, trade.getTarget().compareTo(orderID_A));
+                if (trade.getTarget() == orderID_A) {
+                    Assert.assertEquals(0, trade.getTarget() == (orderID_A));
                     Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1));
                     Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(15000.88));
 
                     trade = orderD.getInitiatedTrades(dcSet).get(1);
-                    if (trade.getTarget().compareTo(orderID_B) == 0) {
-                        Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_D));
-                        Assert.assertEquals(0, trade.getTarget().compareTo(orderID_B));
+                    if (trade.getTarget() == orderID_B) {
+                        Assert.assertEquals(0, trade.getInitiator() == (orderID_D));
+                        Assert.assertEquals(0, trade.getTarget() == (orderID_B));
                         Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(2)); // 1
                         Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(40000.33)); //20000.165));
                     }
@@ -2502,8 +2502,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderE.getInitiatedTrades(dcSet).size());
 
                 trade = orderE.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_E));
-                Assert.assertEquals(1, trade.getTarget().compareTo(orderID_B));
+                Assert.assertEquals(0, trade.getInitiator() == (orderID_E));
+                Assert.assertEquals(1, trade.getTarget() == (orderID_B));
                 Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(2.03985721));
                 Assert.assertEquals(trade.getAmountWant().toPlainString(), BigDecimal.valueOf(51000).toPlainString());
 
@@ -2774,8 +2774,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderB.getInitiatedTrades(dcSet).size());
 
                 Trade trade = orderB.getInitiatedTrades(dcSet).get(0);
-                assertEquals(trade.getInitiator(), orderID_B);
-                assertEquals(trade.getTarget(), orderID_A);
+                assertEquals(trade.getInitiator(), (long) orderID_B);
+                assertEquals(trade.getTarget(), (long) orderID_A);
                 Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(1000)));
                 Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(100)));
 
@@ -2892,7 +2892,7 @@ public class OrderTestsMy {
 
                 trade = orderD.getInitiatedTrades(dcSet).get(0);
                 /// ??? assertEquals(trade.getInitiator(), orderID);
-                assertEquals(trade.getTarget(), orderID_B);
+                assertEquals(trade.getTarget(), (long) orderID_B);
                 Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(895));
                 Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(4475));
 
@@ -3005,8 +3005,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderB.getInitiatedTrades(dcSet).size());
 
                 Trade trade = orderB.getInitiatedTrades(dcSet).get(0);
-                assertEquals(trade.getInitiator(), orderID_B);
-                assertEquals(trade.getTarget(), orderID_A);
+                assertEquals(trade.getInitiator(), (long) orderID_B);
+                assertEquals(trade.getTarget(), (long) orderID_A);
                 Assert.assertEquals(trade.getAmountHave().toPlainString(), "100");
                 Assert.assertEquals(trade.getAmountWant().toPlainString(), "10");
 
@@ -3103,8 +3103,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderB.getInitiatedTrades(dcSet).size());
 
                 Trade trade = orderB.getInitiatedTrades(dcSet).get(0);
-                assertEquals(trade.getInitiator(), orderID_B);
-                assertEquals(trade.getTarget(), orderID_A);
+                assertEquals(trade.getInitiator(), (long) orderID_B);
+                assertEquals(trade.getTarget(), (long) orderID_A);
                 Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(11));
                 Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(0.38));
             } finally {
@@ -3206,8 +3206,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderB.getInitiatedTrades(dcSet).size());
 
                 Trade trade = orderB.getInitiatedTrades(dcSet).get(0);
-                assertEquals(trade.getInitiator(), orderID_B);
-                assertEquals(trade.getTarget(), orderID_A);
+                assertEquals(trade.getInitiator(), (long) orderID_B);
+                assertEquals(trade.getTarget(), (long) orderID_A);
                 Assert.assertEquals(trade.getAmountHave().toPlainString(), "100");
                 Assert.assertEquals(trade.getAmountWant().toPlainString(), "10");
 
@@ -3356,14 +3356,14 @@ public class OrderTestsMy {
                 Assert.assertEquals(2, orderC.getInitiatedTrades(dcSet).size());
 
                 Trade trade = orderC.getInitiatedTrades(dcSet).get(1);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_C));
-                assertEquals(trade.getTarget(), orderID_B);
+                Assert.assertEquals(trade.getInitiator(), (long) orderID_C);
+                assertEquals(trade.getTarget(), (long) orderID_B);
                 Assert.assertEquals(trade.getAmountHave().toPlainString(), "250");
                 Assert.assertEquals(trade.getAmountWant().toPlainString(), "50");
 
                 trade = orderC.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_C));
-                Assert.assertEquals(trade.getTarget(), orderID_A);
+                Assert.assertEquals(trade.getInitiator(), (long) orderID_C);
+                Assert.assertEquals(trade.getTarget(), (long) orderID_A);
                 Assert.assertEquals(trade.getAmountHave().toPlainString(), "1000");
                 Assert.assertEquals(trade.getAmountWant().toPlainString(), "100");
             } finally {

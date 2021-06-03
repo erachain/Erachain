@@ -318,6 +318,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     // exchange of assets
     public static final int CREATE_ORDER_TRANSACTION = 50;
     public static final int CANCEL_ORDER_TRANSACTION = 51;
+    public static final int CHANGE_ORDER_TRANSACTION = 52;
     // voting
     public static final int CREATE_POLL_TRANSACTION = 61;
     public static final int VOTE_ON_POLL_TRANSACTION = 62;
@@ -671,6 +672,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     /**
+     * Нужно для наполнения данными для isValid & process
+     *
      * @param dcSet
      * @param forDeal
      * @param blockHeight
@@ -695,7 +698,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     /**
-     * Нарастить мясо на скелет из базы состояния - нужно например для созданим вторичных ключей и Номер Сущности
+     * Нарастить мясо на скелет из базы состояния - нужно для записи в FinalMap b созданим вторичных ключей и Номер Сущности
      */
     public void updateFromStateDB() {
     }
@@ -750,6 +753,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 // exchange of assets
                 CREATE_ORDER_TRANSACTION,
                 CANCEL_ORDER_TRANSACTION,
+                CHANGE_ORDER_TRANSACTION,
 
                 // voting
                 VOTE_ON_ITEM_POLL_TRANSACTION
@@ -817,6 +821,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 return CreateOrderTransaction.TYPE_NAME;
             case CANCEL_ORDER_TRANSACTION:
                 return CancelOrderTransaction.TYPE_NAME;
+            case CHANGE_ORDER_TRANSACTION:
+                return ChangeOrderTransaction.TYPE_NAME;
 
             // voting
             case VOTE_ON_ITEM_POLL_TRANSACTION:
@@ -2156,7 +2162,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                     giftBG, false, false, false);
             // учтем что получили бонусы
             if (royaltyAssetKey == BlockChain.FEE_KEY) {
-                invitedAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Account.BALANCE_SIDE_DEBIT);
+                invitedAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
             }
 
             if (txCalculated != null && !asOrphan) {
@@ -2189,7 +2195,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
             // учтем что получили бонусы
             if (royaltyAssetKey == BlockChain.FEE_KEY) {
-                issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Account.BALANCE_SIDE_DEBIT);
+                issuerAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
             }
 
             if (txCalculated != null && !asOrphan) {
@@ -2213,7 +2219,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
             // учтем что получили бонусы
             if (royaltyAssetKey == BlockChain.FEE_KEY) {
-                issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Account.BALANCE_SIDE_DEBIT);
+                issuerAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
             }
 
             if (txCalculated != null && !asOrphan) {
@@ -2372,7 +2378,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         account.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, royaltyBG, false, false, false);
         // учтем что получили бонусы
-        account.changeCOMPUBonusBalances(dcSet, asOrphan, royaltyBG, Account.BALANCE_SIDE_DEBIT);
+        account.changeCOMPUStatsBalances(dcSet, asOrphan, royaltyBG, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
 
         if (block != null && !asOrphan) {
             block.addCalculated(account, FEE_KEY, royaltyBG,
@@ -2452,7 +2458,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 // NOT update INCOME balance
                 this.creator.changeBalance(this.dcSet, true, false, FEE_KEY, this.fee, false, false, true);
                 // учтем траты
-                this.creator.changeCOMPUBonusBalances(this.dcSet, true, this.fee, Account.BALANCE_SIDE_CREDIT);
+                this.creator.changeCOMPUStatsBalances(this.dcSet, false, this.fee, Account.FEE_BALANCE_SIDE_SPEND);
             }
 
             // Multi Level Referal
@@ -2491,7 +2497,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 // NOT update INCOME balance
                 this.creator.changeBalance(this.dcSet, false, false, FEE_KEY, this.fee, false, false, true);
                 // учтем траты
-                this.creator.changeCOMPUBonusBalances(this.dcSet, false, this.fee, Account.BALANCE_SIDE_CREDIT);
+                this.creator.changeCOMPUStatsBalances(this.dcSet, true, this.fee, Account.FEE_BALANCE_SIDE_SPEND);
 
             }
 

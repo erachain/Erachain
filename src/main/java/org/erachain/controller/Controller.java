@@ -97,7 +97,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.3.031 dev";
+    public static String version = "5.3.032 dev";
     public static String buildTime = "2021-05-05 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -3477,6 +3477,13 @@ public class Controller extends Observable {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createCancelOrderTransaction2(creator, orderID, feePow);
+        }
+    }
+
+    public Transaction changeOrder(PrivateKeyAccount creator, int feePow, Order order, BigDecimal wantAmount) {
+        Transaction orderCreate = this.dcSet.getTransactionFinalMap().get(order.getId());
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createChangeOrderTransaction(creator, feePow, orderCreate.getSignature(), wantAmount);
         }
     }
 
