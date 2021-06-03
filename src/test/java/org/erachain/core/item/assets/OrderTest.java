@@ -483,23 +483,29 @@ public class OrderTest {
                 BigDecimal amount1 = BigDecimal.ONE;
                 BigDecimal amount10 = BigDecimal.TEN;
                 BigDecimal amount100 = new BigDecimal("100");
-                orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                CreateOrderTransaction orderCreation1 = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), assetB.getKey(dcSet),
                         amount10, amount100,
                         (byte) 0, timestamp++, 0L);
-                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
-                orderCreation.process(null, Transaction.FOR_NETWORK);
+                orderCreation1.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation1.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                orderCreation1.process(null, Transaction.FOR_NETWORK);
 
                 assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, amount10);
 
-                orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet),
+                CreateOrderTransaction orderCreation2 = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet),
                         amount10,
                         amount1, (byte) 0, timestamp++, 0L);
-                orderCreation.sign(accountB, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
-                orderCreation.process(null, Transaction.FOR_NETWORK);
+                orderCreation2.sign(accountB, Transaction.FOR_NETWORK);
+                orderCreation2.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                orderCreation2.process(null, Transaction.FOR_NETWORK);
 
                 assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, amount10.subtract(amount1));
+
+                orderCreation2.orphan(null, Transaction.FOR_NETWORK);
+                assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, amount10);
+
+                orderCreation1.orphan(null, Transaction.FOR_NETWORK);
+                assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, BigDecimal.ZERO);
 
             } finally {
                 dcSet.close();
