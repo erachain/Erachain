@@ -3,6 +3,7 @@ package org.erachain.core.item.assets;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
@@ -56,6 +57,7 @@ public class OrderTest {
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balanceA;
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balanceB;
     DCSet dcSet;
+    BlockChain chain;
     GenesisBlock gb;
     // CREATE KNOWN ACCOUNT
     PrivateKeyAccount accountA;
@@ -84,10 +86,10 @@ public class OrderTest {
         height = BlockChain.ALL_BALANCES_OK_TO + 2;
 
         dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(tempDir.getPath(), dbs);
-        gb = new GenesisBlock();
 
         try {
-            gb.process(dcSet);
+            chain = new BlockChain(dcSet);
+            gb = chain.getGenesisBlock();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -112,7 +114,7 @@ public class OrderTest {
         assetA = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
         keyA = issueAssetTransaction.getAssetKey(dcSet);
@@ -121,7 +123,7 @@ public class OrderTest {
         assetB = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 0L, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
         keyB = issueAssetTransaction.getAssetKey(dcSet);
 
@@ -467,7 +469,47 @@ public class OrderTest {
     }
 
     @Test
+    public void pledge1() {
+
+
+        for (int dbs : TESTED_DBS) {
+            try {
+                init(dbs);
+
+                TransactionFinalMapSigns transSignsMap = dcSet.getTransactionFinalMapSigns();
+                TransactionFinalMapImpl transFinMap = dcSet.getTransactionFinalMap();
+
+
+                BigDecimal amount1 = BigDecimal.ONE;
+                BigDecimal amount10 = BigDecimal.TEN;
+                BigDecimal amount100 = new BigDecimal("100");
+                orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                        amount10, amount100,
+                        (byte) 0, timestamp++, 0L);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                orderCreation.process(null, Transaction.FOR_NETWORK);
+
+                assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, amount10);
+
+                orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet),
+                        amount10,
+                        amount1, (byte) 0, timestamp++, 0L);
+                orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                orderCreation.process(null, Transaction.FOR_NETWORK);
+
+                assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, amount10.subtract(amount1));
+
+            } finally {
+                dcSet.close();
+            }
+        }
+    }
+
+    @Test
     public void orphan() {
     }
+
 
 }
