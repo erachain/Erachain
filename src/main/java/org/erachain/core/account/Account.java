@@ -992,99 +992,106 @@ public class Account {
         switch (mirrorToPos) {
             case BALANCE_POS_OWN:
                 balance1 = !subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                        updateIncomed ? balance1.a.subtract(amount)
-                                : balance1.a, balance1.b.subtract(amount))
-                        : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance1.a.add(amount)
-                        : balance1.a, balance1.b.add(amount));
+                        updateIncomed ? balance1.a.subtract(amount) : balance1.a, balance1.b.subtract(amount))
+                        : new Tuple2<BigDecimal, BigDecimal>(
+                        updateIncomed ? balance1.a.add(amount) : balance1.a, balance1.b.add(amount));
                 break;
             case BALANCE_POS_DEBT:
                 // тут ничего нельзя делать так как еще есть отдельные записи совместного баланса
                 break;
             case BALANCE_POS_HOLD:
                 balance3 = !subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                        updateIncomed ? balance3.a.subtract(amount)
-                                : balance3.a, balance3.b.subtract(amount))
-                        : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance3.a.add(amount)
-                        : balance3.a, balance3.b.add(amount));
+                        updateIncomed ? balance3.a.subtract(amount) : balance3.a, balance3.b.subtract(amount))
+                        : new Tuple2<BigDecimal, BigDecimal>(
+                        updateIncomed ? balance3.a.add(amount) : balance3.a, balance3.b.add(amount));
                 break;
             case BALANCE_POS_SPEND:
                 balance4 = !subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                        updateIncomed ? balance4.a.subtract(amount)
-                                : balance4.a, balance4.b.subtract(amount))
-                        : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance4.a.add(amount)
-                        : balance4.a, balance4.b.add(amount));
+                        updateIncomed ? balance4.a.subtract(amount) : balance4.a, balance4.b.subtract(amount))
+                        : new Tuple2<BigDecimal, BigDecimal>(
+                        updateIncomed ? balance4.a.add(amount) : balance4.a, balance4.b.add(amount));
                 break;
             case BALANCE_POS_PLEDGE:
                 balance5 = !subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                        updateIncomed ? balance5.a.subtract(amount)
-                                : balance5.a, balance5.b.subtract(amount))
-                        : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ?
-                        balance5.a.add(amount)
-                        : balance5.a, balance5.b.add(amount));
+                        updateIncomed ? balance5.a.subtract(amount) : balance5.a,
+                        balance5.b.subtract(amount))
+                        : new Tuple2<BigDecimal, BigDecimal>(
+                        updateIncomed ? balance5.a.add(amount) : balance5.a,
+                        balance5.b.add(amount));
                 break;
 
         }
 
-        if (balancePosition == BALANCE_POS_OWN) {
-            // OWN + property
-            //if (isBackward) amount = amount.negate();
-            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                            updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
-                            : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
-                            balance.a.b.add(amount)),
-                    balance2, balance3, balance4, balance5);
-        } else if (balancePosition == BALANCE_POS_DEBT) {
-            // DEBT + CREDIT
-            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                    balance1,
-                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                            updateIncomed ? balance.b.a.subtract(amount) : balance.b.a, balance.b.b.subtract(amount))
-                            : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.b.a.add(amount) : balance.b.a,
-                            balance.b.b.add(amount)),
-                    balance3, balance4, balance5);
-        } else if (balancePosition == BALANCE_POS_HOLD) {
-            // HOLD + STOCK 🕐 🕝
+        switch (balancePosition) {
+            case BALANCE_POS_OWN:
+                // OWN + property
+                //if (isBackward) amount = amount.negate();
+                balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                        subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                                updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
+                                : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
+                                balance.a.b.add(amount)),
+                        balance2, balance3, balance4, balance5);
+                break;
 
-            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                    balance1, balance2,
-                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                            updateIncomed ? balance.c.a.subtract(amount) : balance.c.a, balance.c.b.subtract(amount))
-                            : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.c.a.add(amount) : balance.c.a,
-                            balance.c.b.add(amount)),
-                    balance4, balance5);
-        } else if (balancePosition == BALANCE_POS_SPEND) {
+            case BALANCE_POS_DEBT:
+                // DEBT + CREDIT
+                balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                        balance1,
+                        subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                                updateIncomed ? balance.b.a.subtract(amount) : balance.b.a, balance.b.b.subtract(amount))
+                                : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.b.a.add(amount) : balance.b.a,
+                                balance.b.b.add(amount)),
+                        balance3, balance4, balance5);
+                break;
 
-            Tuple2<BigDecimal, BigDecimal> ownBalance = balance.a;
+            case BALANCE_POS_HOLD:
+                // HOLD + STOCK 🕐 🕝
 
-            if (!isNotSender) {
-                // у создателя транзакции так же баланс ИМЕЮ уменьшаем - просто вычитаем - для учета вывода из оборота
-                if (subtract) {
-                    ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.subtract(amount));
-                } else {
-                    ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
+                balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                        balance1, balance2,
+                        subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                                updateIncomed ? balance.c.a.subtract(amount) : balance.c.a, balance.c.b.subtract(amount))
+                                : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.c.a.add(amount) : balance.c.a,
+                                balance.c.b.add(amount)),
+                        balance4, balance5);
+                break;
+
+            case BALANCE_POS_SPEND:
+
+                Tuple2<BigDecimal, BigDecimal> ownBalance = balance.a;
+
+                if (!isNotSender) {
+                    // у создателя транзакции так же баланс ИМЕЮ уменьшаем - просто вычитаем - для учета вывода из оборота
+                    if (subtract) {
+                        ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.subtract(amount));
+                    } else {
+                        ownBalance = new Tuple2<BigDecimal, BigDecimal>(ownBalance.a, ownBalance.b.add(amount));
+                    }
                 }
-            }
 
-            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                    ownBalance, balance2, balance3,
-                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                            updateIncomed ? balance.d.a.subtract(amount) : balance.d.a, balance.d.b.subtract(amount))
-                            : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.d.a.add(amount) : balance.d.a,
-                            balance.d.b.add(amount)),
-                    balance5);
+                balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                        ownBalance, balance2, balance3,
+                        subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                                updateIncomed ? balance.d.a.subtract(amount) : balance.d.a, balance.d.b.subtract(amount))
+                                : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.d.a.add(amount) : balance.d.a,
+                                balance.d.b.add(amount)),
+                        balance5);
+                break;
 
-        } else if (balancePosition == BALANCE_POS_PLEDGE) {
-            // DEX PLEDGE
+            case BALANCE_POS_PLEDGE:
+                // DEX PLEDGE
 
-            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                    balance1, balance2,
-                    balance3, balance4,
-                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                            updateIncomed ? balance.e.a.subtract(amount) : balance.e.a, balance.e.b.subtract(amount))
-                            : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.e.a.add(amount) : balance.e.a,
-                            balance.e.b.add(amount))
-            );
+                balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                        balance1, balance2,
+                        balance3, balance4,
+                        subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                                updateIncomed ? balance.e.a.subtract(amount) : balance.e.a, balance.e.b.subtract(amount))
+                                : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.e.a.add(amount) : balance.e.a,
+                                balance.e.b.add(amount))
+                );
+                break;
+
         }
 
         map.put(getShortAddressBytes(), absKey, balance);
