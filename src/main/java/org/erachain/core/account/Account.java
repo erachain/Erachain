@@ -1028,9 +1028,9 @@ public class Account {
                 //if (isBackward) amount = amount.negate();
                 balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                         subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                                updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
-                                : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
-                                balance.a.b.add(amount)),
+                                updateIncomed ? balance1.a.subtract(amount) : balance1.a, balance1.b.subtract(amount))
+                                : new Tuple2<BigDecimal, BigDecimal>(
+                                updateIncomed ? balance1.a.add(amount) : balance1.a, balance1.b.add(amount)),
                         balance2, balance3, balance4, balance5);
                 break;
 
@@ -1039,9 +1039,9 @@ public class Account {
                 balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                         balance1,
                         subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                                updateIncomed ? balance.b.a.subtract(amount) : balance.b.a, balance.b.b.subtract(amount))
-                                : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.b.a.add(amount) : balance.b.a,
-                                balance.b.b.add(amount)),
+                                updateIncomed ? balance2.a.subtract(amount) : balance2.a, balance2.b.subtract(amount))
+                                : new Tuple2<BigDecimal, BigDecimal>(
+                                updateIncomed ? balance2.a.add(amount) : balance2.a, balance2.b.add(amount)),
                         balance3, balance4, balance5);
                 break;
 
@@ -1051,9 +1051,9 @@ public class Account {
                 balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                         balance1, balance2,
                         subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                                updateIncomed ? balance.c.a.subtract(amount) : balance.c.a, balance.c.b.subtract(amount))
-                                : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.c.a.add(amount) : balance.c.a,
-                                balance.c.b.add(amount)),
+                                updateIncomed ? balance3.a.subtract(amount) : balance3.a, balance3.b.subtract(amount))
+                                : new Tuple2<BigDecimal, BigDecimal>(
+                                updateIncomed ? balance3.a.add(amount) : balance3.a, balance3.b.add(amount)),
                         balance4, balance5);
                 break;
 
@@ -1073,9 +1073,9 @@ public class Account {
                 balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                         ownBalance, balance2, balance3,
                         subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                                updateIncomed ? balance.d.a.subtract(amount) : balance.d.a, balance.d.b.subtract(amount))
-                                : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.d.a.add(amount) : balance.d.a,
-                                balance.d.b.add(amount)),
+                                updateIncomed ? balance4.a.subtract(amount) : balance4.a, balance4.b.subtract(amount))
+                                : new Tuple2<BigDecimal, BigDecimal>(
+                                updateIncomed ? balance4.a.add(amount) : balance4.a, balance4.b.add(amount)),
                         balance5);
                 break;
 
@@ -1086,9 +1086,9 @@ public class Account {
                         balance1, balance2,
                         balance3, balance4,
                         subtract ? new Tuple2<BigDecimal, BigDecimal>(
-                                updateIncomed ? balance.e.a.subtract(amount) : balance.e.a, balance.e.b.subtract(amount))
-                                : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.e.a.add(amount) : balance.e.a,
-                                balance.e.b.add(amount))
+                                updateIncomed ? balance5.a.subtract(amount) : balance5.a, balance5.b.subtract(amount))
+                                : new Tuple2<BigDecimal, BigDecimal>(
+                                updateIncomed ? balance5.a.add(amount) : balance5.a, balance5.b.add(amount))
                 );
                 break;
 

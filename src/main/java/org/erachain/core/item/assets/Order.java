@@ -1186,7 +1186,7 @@ public class Order implements Comparable<Order> {
                             true, tradeAmountWant, Transaction.getTimestampByDBRef(id), 0L);
                 } else {
 
-                    target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey,
+                    target.creator.changeBalance(this.dcSet, true, false, target.wantAssetKey,
                             tradeAmountWant, false, false, false);
                 }
                 // Учтем что у стороны ордера обновилась форжинговая информация
