@@ -83,7 +83,7 @@ public class OrderTest {
         BlockChain.CHECK_BUGS = 10;
         height = BlockChain.ALL_BALANCES_OK_TO + 2;
 
-        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
+        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(tempDir.getPath(), dbs);
         gb = new GenesisBlock();
 
         try {

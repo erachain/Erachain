@@ -60,7 +60,7 @@ public class APIItemAsset {
         help.put("GET apiasset/types/actions", "Return array of asset types and Actions for localize.");
 
         help.put("GET apiasset/balances/[assetKey]?position=POS&offset=OFFSET&limit=LIMIT",
-                "Get balances for assetKey sorted by Own Amount. Balance positions: 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other. Default: POS=1. Balance A - total debit. Balance B - final amount.");
+                "Get balances for assetKey sorted by Own Amount. Balance positions: 0 - all positions, 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Pledge (on DEX). Default: POS=1. Balance A - total debit. Balance B - final amount.");
 
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")

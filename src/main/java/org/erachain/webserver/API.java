@@ -1426,7 +1426,7 @@ public class API {
                 .build();
     }
 
-    private JSONArray setJSONArray(Tuple2 t) {
+    public static JSONArray setJSONArray(Tuple2 t) {
         JSONArray array = new JSONArray();
         array.add(t.a);
         array.add(t.b);

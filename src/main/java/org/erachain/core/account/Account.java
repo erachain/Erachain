@@ -581,7 +581,7 @@ public class Account {
      * @return
      */
     public Tuple2<BigDecimal, BigDecimal> getBalanceInSettedPosition(long key) {
-        return getBalanceForAction(DCSet.getInstance(), key, this.viewBalancePosition);
+        return getBalanceForPosition(DCSet.getInstance(), key, this.viewBalancePosition);
     }
 
     /**
@@ -591,11 +591,11 @@ public class Account {
      * @param action
      * @return
      */
-    public Tuple2<BigDecimal, BigDecimal> getBalanceForAction(long key, int action) {
-        return getBalanceForAction(DCSet.getInstance(), key, action);
+    public Tuple2<BigDecimal, BigDecimal> getBalanceForPosition(long key, int action) {
+        return getBalanceForPosition(DCSet.getInstance(), key, action);
     }
 
-    public Tuple2<BigDecimal, BigDecimal> getBalanceForAction(DCSet dcSet, long key, int action) {
+    public Tuple2<BigDecimal, BigDecimal> getBalanceForPosition(DCSet dcSet, long key, int action) {
         switch (action) {
             case BALANCE_POS_OWN:
                 return this.getBalance(dcSet, key).a;
@@ -668,8 +668,8 @@ public class Account {
         return null;
     }
 
-    static public Tuple2<BigDecimal, BigDecimal> getBalanceForAction(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
-                                                                     int position) {
+    static public Tuple2<BigDecimal, BigDecimal> getBalanceForPosition(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
+                                                                       int position) {
         switch (position) {
             case BALANCE_POS_OWN:
                 return balance.a;
