@@ -113,8 +113,8 @@ public class ChangeOrderTransaction extends Transaction {
 
     public String getTitle() {
         return //TYPE_NAME + " " +
-                ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE,
-                        order.getHaveAssetKey()) + " " + ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, order.getWantAssetKey());
+                ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, order.getHaveAssetKey())
+                        + " " + ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, order.getWantAssetKey());
     }
 
     @Override
