@@ -101,6 +101,7 @@ public class ChangeOrderTransaction extends Transaction {
 
         order = dcSet.getOrderMap().get(orderID);
         if (order == null) {
+            // for show in JSON and blockexplorer
             order = dcSet.getCompletedOrderMap().get(orderID);
         }
         order.setDC(dcSet);
