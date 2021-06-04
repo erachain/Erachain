@@ -140,7 +140,7 @@ public class OrderTestsMy {
         }
 
         BlockChain.CHECK_BUGS = 10;
-        height = BlockChain.ALL_BALANCES_OK_TO + 2;
+        height = Integer.max(BlockChain.VERS_5_3, BlockChain.ALL_BALANCES_OK_TO) + 2;
 
         dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(tempDir.getPath(), dbs);
 
@@ -1286,7 +1286,7 @@ public class OrderTestsMy {
         // https://docs.google.com/spreadsheets/d/14OjXtMM36XHqtercQZCytusK7KKD0dSY_uno0lWMsCs/edit#gid=0
 
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
-                BigDecimal.valueOf(100), (byte) 0, timestamp++, 0l, new byte[64]);
+                BigDecimal.valueOf(100), (byte) 0, timestamp++, 0L);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
         orderCreation.process(null, Transaction.FOR_NETWORK);
@@ -1294,7 +1294,7 @@ public class OrderTestsMy {
         order_AB_1_ID = orderCreation.getOrderId();
 
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
-                BigDecimal.valueOf(300), (byte) 0, timestamp++, 0l, new byte[64]);
+                BigDecimal.valueOf(300), (byte) 0, timestamp++, 0L);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
         orderCreation.process(null, Transaction.FOR_NETWORK);
@@ -1302,7 +1302,7 @@ public class OrderTestsMy {
         order_AB_4_ID = order_AB_4.getId();
 
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1400),
-                BigDecimal.valueOf(200), (byte) 0, timestamp++, 0l, new byte[64]);
+                BigDecimal.valueOf(200), (byte) 0, timestamp++, 0L);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
         orderCreation.process(null, Transaction.FOR_NETWORK);
@@ -1310,7 +1310,7 @@ public class OrderTestsMy {
         order_AB_3_ID = order_AB_3.getId();
 
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
-                BigDecimal.valueOf(130), (byte) 0, timestamp++, 0l, new byte[64]);
+                BigDecimal.valueOf(130), (byte) 0, timestamp++, 0L);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
         orderCreation.process(null, Transaction.FOR_NETWORK);
@@ -1334,7 +1334,7 @@ public class OrderTestsMy {
                 // CREATE ORDER SELLING 120 B FOR A AT A PRICE OF 595)
                 // должно инициировать 2 торговли на Приказ АБ_1 и Приказ АБ_2
                 orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(120),
-                        BigDecimal.valueOf(595), (byte) 0, timestamp++, 0l, new byte[]{5, 6});
+                        BigDecimal.valueOf(595), (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
@@ -1355,7 +1355,7 @@ public class OrderTestsMy {
                 // FOR
                 // ACCOUNT
                 // B
-                Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet), BigDecimal.valueOf(120)); // BALANCE
+                Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet), new BigDecimal("120.00000000")); // BALANCE
                 // B
                 // FOR
                 // ACCOUNT
@@ -1583,14 +1583,14 @@ public class OrderTestsMy {
 
                 // CHECK BALANCES
                 Assert.assertEquals(accountA.getBalanceUSE(keyA, dcSet), new BigDecimal("49000")); // BALANCE
-                Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet), new BigDecimal("0.0002")); // BALANCE
+                Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet), new BigDecimal("0.00020000")); // BALANCE
 
                 Assert.assertEquals(accountB.getBalanceUSE(keyB, dcSet), new BigDecimal("49999.9998")); // BALANCE
                 Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet), new BigDecimal("0.00030769")); // BALANCE
 
                 Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet)
                                 .add(accountB.getBalanceUSE(keyB, dcSet)),
-                        new BigDecimal("50000.0000")); // BALANCE
+                        new BigDecimal("50000.00000000")); // BALANCE
 
                 Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet)
                                 .add(accountA.getBalanceUSE(keyA, dcSet)),
@@ -1612,7 +1612,7 @@ public class OrderTestsMy {
                 init(dbs);
 
                 orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, new BigDecimal("30"),
-                        new BigDecimal("0.1"), (byte) 0, timestamp++, 0l, new byte[64]);
+                        new BigDecimal("0.1"), (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
@@ -1622,7 +1622,7 @@ public class OrderTestsMy {
                 // CREATE ORDER TWO (SELLING 4995 B FOR A AT A PRICE OF 0.05))
                 // GENERATES TRADE 100 B FOR 1000 A
                 orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, new BigDecimal("0.00000334"),
-                        new BigDecimal("0.00100"), (byte) 0, timestamp++, 0l, new byte[]{5, 6});
+                        new BigDecimal("0.00100"), (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
@@ -1633,7 +1633,7 @@ public class OrderTestsMy {
                 Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet), new BigDecimal("0.00000334")); // BALANCE
 
                 Assert.assertEquals(accountB.getBalanceUSE(keyB, dcSet), new BigDecimal("49999.99999666")); // BALANCE
-                Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet), new BigDecimal("0.001002")); // BALANCE
+                Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet), new BigDecimal("0.00100200")); // BALANCE
 
                 Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet)
                                 .add(accountB.getBalanceUSE(keyB, dcSet)),
@@ -1641,7 +1641,7 @@ public class OrderTestsMy {
 
                 Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet)
                                 .add(accountA.getBalanceUSE(keyA, dcSet)),
-                        new BigDecimal("49970.001002")); // BALANCE
+                        new BigDecimal("49970.00100200")); // BALANCE
 
             } finally {
                 dcSet.close();
@@ -1661,7 +1661,7 @@ public class OrderTestsMy {
                 // CREATE ORDER ONE (SELLING 100 A FOR B AT A PRICE OF 10)
                 // amountHAVE 100 - amountWant 1000
                 orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(100),
-                        BigDecimal.valueOf(1000), (byte) 0, timestamp++, 0l, new byte[64]);
+                        BigDecimal.valueOf(1000), (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
@@ -1671,7 +1671,7 @@ public class OrderTestsMy {
                 // CREATE ORDER TWO (SELLING 4995 B FOR A AT A PRICE OF 0.05))
                 // GENERATES TRADE 100 B FOR 1000 A
                 orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(4995),
-                        BigDecimal.valueOf(249.75), (byte) 0, timestamp++, 0l, new byte[]{5, 6});
+                        BigDecimal.valueOf(249.75), (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
@@ -1683,7 +1683,7 @@ public class OrderTestsMy {
                 // FOR
                 // ACCOUNT
                 // A
-                Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet), BigDecimal.valueOf(1000)); // BALANCE
+                Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet), new BigDecimal("1000.00000000")); // BALANCE
                 // B
                 // FOR
                 // ACCOUNT
@@ -1693,7 +1693,7 @@ public class OrderTestsMy {
                 // FOR
                 // ACCOUNT
                 // B
-                Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(100)); // BALANCE
+                Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet), new BigDecimal("100.00000000")); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
@@ -1716,9 +1716,9 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, order_BA_1.getInitiatedTrades(dcSet).size());
 
                 Trade trade = order_BA_1.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator() == (order_BA_1_ID));
-                Assert.assertEquals(0, trade.getTarget() == (order_AB_1_ID));
-                Assert.assertEquals(0, trade.getAmountHave() == (BigDecimal.valueOf(100)));
+                Assert.assertEquals(true, trade.getInitiator() == order_BA_1_ID);
+                Assert.assertEquals(true, trade.getTarget() == order_AB_1_ID);
+                Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(100).stripTrailingZeros());
                 Assert.assertEquals(trade.getAmountWant().toPlainString(), "1000");
 
                 bal_A_keyA = accountA.getBalanceUSE(keyA, dcSet);
@@ -1730,7 +1730,7 @@ public class OrderTestsMy {
                 BigDecimal amoHave = BigDecimal.valueOf(1.99999999);
                 BigDecimal amoWant = BigDecimal.valueOf(3.99999998);
 
-                orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, amoHave, amoWant, (byte) 0, timestamp++, 0l);
+                orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, amoHave, amoWant, (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
@@ -1785,8 +1785,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, order_BA_1.getInitiatedTrades(dcSet).size());
 
                 trade = orderC.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator() == (order_AB_2_ID));
-                Assert.assertEquals(0, trade.getTarget() == (order_BA_1_ID));
+                Assert.assertEquals(trade.getInitiator(), (long) order_AB_2_ID);
+                Assert.assertEquals(trade.getTarget(), (long) order_BA_1_ID);
                 Assert.assertEquals(trade.getAmountHave().setScale(8), order_BA_2_wantTaked);
                 Assert.assertEquals(trade.getAmountWant(), amoHave);
             } finally {
