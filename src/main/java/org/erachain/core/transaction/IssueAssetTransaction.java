@@ -45,6 +45,10 @@ public class IssueAssetTransaction extends IssueItemRecord {
         super(typeBytes, TYPE_NAME, creator, linkTo, asset, (byte) 0, 0L, null, signature);
     }
 
+    public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, feePow, timestamp, reference);
+    }
+
     public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, feePow, timestamp, reference, signature);
     }
