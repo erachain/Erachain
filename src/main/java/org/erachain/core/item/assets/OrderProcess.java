@@ -15,11 +15,14 @@ import java.math.RoundingMode;
 import java.util.List;
 
 @Slf4j
+/**
+ * Для простых переходов на функции Ордера при отладке и программировании
+ */
 public class OrderProcess {
 
     /**
-     * Поидее тут ордер активный должен себе получить лучшие условия если округление пошло в строну,
-     * так как он в мнее выгодных условиях по цене
+     * По идее тут ордер активный должен себе получить лучшие условия если округление пошло в сторону,
+     * так как он в мне выгодных условиях по цене
      *
      * @param block
      * @param transaction
@@ -35,7 +38,7 @@ public class OrderProcess {
         BigDecimal amountHave = orderThis.getAmountHave();
         long wantAssetKey = orderThis.getWantAssetKey();
         int haveAssetScale = orderThis.getHaveAssetScale();
-        BigDecimal amountWant = orderThis.getAmountWant();
+        //BigDecimal amountWant = orderThis.getAmountWant();
         int wantAssetScale = orderThis.getWantAssetScale();
 
         BigDecimal price = orderThis.getPrice();
