@@ -7,6 +7,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.CompletedOrderMap;
+import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
 
@@ -30,10 +31,7 @@ public class OrderProcess {
      */
     public static void process(Order orderThis, Block block, Transaction transaction, boolean asChange) {
 
-        // GET HEIGHT from ID
-        long id = orderThis.getId();
-        int height = (int) (id >> 32);
-
+        DCSet dcSet = orderThis.dcSet;
         long haveAssetKey = orderThis.getHaveAssetKey();
         BigDecimal amountHave = orderThis.getAmountHave();
         long wantAssetKey = orderThis.getWantAssetKey();
@@ -44,16 +42,20 @@ public class OrderProcess {
         BigDecimal price = orderThis.getPrice();
         Account creator = orderThis.getCreator();
 
-        CompletedOrderMap completedMap = orderThis.dcSet.getCompletedOrderMap();
-        OrderMap ordersMap = orderThis.dcSet.getOrderMap();
-        TradeMap tradesMap = orderThis.dcSet.getTradeMap();
+        long id = orderThis.getId();
+        // GET HEIGHT from ID
+        int height = (int) (id >> 32);
+
+        CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
+        OrderMap ordersMap = dcSet.getOrderMap();
+        TradeMap tradesMap = dcSet.getTradeMap();
 
         boolean debug = false;
 
         if (BlockChain.CHECK_BUGS > 1 &&
-                //orderThis.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-                //orderThis.id.equals(Transaction.makeDBRef(12435, 1))
-                //orderThis.id.equals(770667456757788l) // 174358 ---- 	255979-3	255992-1
+                //creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+                //id.equals(Transaction.makeDBRef(12435, 1))
+                //id.equals(770667456757788l) // 174358 ---- 	255979-3	255992-1
                 //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
                 //// 	255979-3	255992-1
                 //|| height == 255992
@@ -64,11 +66,11 @@ public class OrderProcess {
             //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
             //|| height == 253841 // сработал NEW_FLOR 2-й
             //|| height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
-            //|| (orderThis.haveAssetKey == 12L && orderThis.wantAssetKey == 95L)
-            //|| (orderThis.wantAssetKey == 95L && orderThis.haveAssetKey == 12L)
+            //|| (haveAssetKey == 12L && wantAssetKey == 95L)
+            //|| (wantAssetKey == 95L && haveAssetKey == 12L)
             //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
             //Arrays.equals(Base58.decode("2GnkzTNDJtMgDHmKKxkZSQP95S7DesENCR2HRQFQHcspFCmPStz6yn4XEnpdW4BmSYW5dkML6xYZm1xv7JXfbfNz"), transaction.getSignature()
-            //orderThis.id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
+            //id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
             //&& !db.isFork()
         ) {
             debug = true;
@@ -79,8 +81,8 @@ public class OrderProcess {
 
         if (!asChange) {
             //REMOVE HAVE
-            //orderThis.creator.setBalance(orderThis.have, orderThis.creator.getBalance(db, orderThis.have).subtract(orderThis.amountHave), db);
-            orderThis.getCreator().changeBalance(orderThis.dcSet, true, false, haveAssetKey, amountHave,
+            //creator.setBalance(have, creator.getBalance(db, have).subtract(amountHave), db);
+            creator.changeBalance(dcSet, true, false, haveAssetKey, amountHave,
                     false, false,
                     // accounting on PLEDGE position
                     true, Account.BALANCE_POS_PLEDGE);
@@ -90,7 +92,7 @@ public class OrderProcess {
 
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
-        List<Order> orders = ordersMap.getOrdersForTradeWithFork(orderThis.getWantAssetKey(), haveAssetKey, thisPriceReverse);
+        List<Order> orders = ordersMap.getOrdersForTradeWithFork(wantAssetKey, haveAssetKey, thisPriceReverse);
 
         /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
         if (id > BlockChain.LEFT_PRICE_HEIGHT_SEQ && (debug || BlockChain.CHECK_BUGS > 5) && !orders.isEmpty()) {
@@ -112,7 +114,7 @@ public class OrderProcess {
                     timestamp = null;
                     ++timestamp;
                 }
-                // потому что сравнивается потом обратная цена то тут должно быть возрастание
+                // потому что сранивается потом обратная цена то тут должно быть возрастание
                 // и если не так то ошибка
                 int comp = priceTst.compareTo(item.calcLeftPrice());
                 if (comp > 0) {
@@ -174,7 +176,7 @@ public class OrderProcess {
         while (!completedOrder && index < orders.size()) {
             //GET ORDER
             Order order;
-            if (orderThis.dcSet.inMemory()) {
+            if (dcSet.inMemory()) {
                 // так как это все в памяти расположено то нужно создать новый объект
                 // иначе везде будет ссылка на один и тот же объект и
                 // при переходе на MAIN базу возьмется уже обновленный ордер из памяти с уже пересчитанными остатками
@@ -276,16 +278,18 @@ public class OrderProcess {
                         willUnResolvedFor = order.willUnResolvedFor(tradeAmountForHave);
                         if (willUnResolvedFor) {
                             BigDecimal priceUpdateTrade = Order.calcPrice(orderAmountHaveLeft,
-                                    // orderThis.haveSacel for order.WANT
+                                    // haveSacel for order.WANT
                                     tradeAmountForWant, haveAssetScale);
                             // если цена текущей сделки не сильно изменится
                             // или если остаток у ордера стенки уже очень маленький по сравнению с текущей сделкой
                             // то весь ордер в сделку сольем
-                            if (Order.isPricesClose(orderPrice, priceUpdateTrade, true)
+                            if (Order.isPricesClose(orderPrice, priceUpdateTrade, false)
                                     || orderAmountHaveLeft.subtract(tradeAmountForHave)
                                     .divide(orderAmountHaveLeft,
                                             BlockChain.TRADE_PRICE_DIFF_LIMIT.scale(),
-                                            RoundingMode.DOWN) // FOR compare! --RoundingMode.HALF_DOWN)
+                                            RoundingMode.DOWN) // FOR compare!
+                                    ///RoundingMode.HALF_DOWN)
+
                                     .compareTo(BlockChain.TRADE_PRICE_DIFF_LIMIT) < 0) {
 
                                 tradeAmountForHave = orderAmountHaveLeft;
@@ -349,7 +353,7 @@ public class OrderProcess {
                     error++;
                 }
 
-                trade = new Trade(orderThis.getId(), order.getId(), haveAssetKey, wantAssetKey,
+                trade = new Trade(id, order.getId(), haveAssetKey, wantAssetKey,
                         tradeAmountForHave, tradeAmountForWant,
                         haveAssetScale, wantAssetScale, index);
 
@@ -363,15 +367,15 @@ public class OrderProcess {
                 ordersMap.delete(order);
 
                 //UPDATE FULFILLED HAVE
-                order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // orderThis.amountHave));
+                order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // amountHave));
                 // accounting on PLEDGE position
-                order.getCreator().changeBalance(orderThis.dcSet, true,
+                order.getCreator().changeBalance(dcSet, true,
                         true, wantAssetKey, tradeAmountForHave, false, false,
                         true
                 );
 
 
-                orderThis.setFulfilledHave(orderThis.getFulfilledHave().add(tradeAmountForWant)); //orderThis.amountWant));
+                orderThis.setFulfilledHave(orderThis.getFulfilledHave().add(tradeAmountForWant)); //amountWant));
 
                 if (order.isFulfilled()) {
                     //ADD TO COMPLETED ORDERS
@@ -380,7 +384,7 @@ public class OrderProcess {
                     //UPDATE ORDER
                     if (willUnResolvedFor) {
                         // if left not enough for 1 buy by price this order
-                        order.dcSet = orderThis.dcSet;
+                        order.dcSet = dcSet;
                         order.processOnUnresolved(block, transaction, true);
 
                         //ADD TO COMPLETED ORDERS
@@ -394,13 +398,13 @@ public class OrderProcess {
                 //TRANSFER FUNDS
                 if (height > BlockChain.VERS_5_3) {
                     AssetCls assetWant = ((CreateOrderTransaction) transaction).getWantAsset();
-                    AssetCls.processTrade(orderThis.dcSet, block, order.getCreator(),
+                    AssetCls.processTrade(dcSet, block, order.getCreator(),
                             false, assetWant,
                             ((CreateOrderTransaction) transaction).getHaveAsset(),
                             false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
 
                 } else {
-                    order.getCreator().changeBalance(orderThis.dcSet, false, false, haveAssetKey,
+                    order.getCreator().changeBalance(dcSet, false, false, haveAssetKey,
                             tradeAmountForWant, false, false, false);
                     transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
                             "Trade Order @" + Transaction.viewDBRef(order.getId()));
@@ -428,13 +432,18 @@ public class OrderProcess {
                     break;
                 }
 
-                // if can't trade by more good price than self - by orderPrice - then  auto cancel!
+                // if can't trade by more good price than self - by orderOrice - then  auto cancel!
                 if (orderThis.isUnResolved()) {
 
                     if (debug) {
                         debug = orderThis.isUnResolved();
                     }
 
+                    // cancel order if it not fulfiled isDivisible
+
+                    // or HAVE not enough to one WANT  = price
+                    ///CancelOrderTransaction.process_it(dcSet, this);
+                    //and stop resolve
                     completedOrder = true;
                     // REVERT not completed AMOUNT
                     orderThis.processOnUnresolved(block, transaction, false);
@@ -457,12 +466,12 @@ public class OrderProcess {
         //TRANSFER FUNDS
         if (processedAmountFulfilledWant.signum() > 0) {
             if (height > BlockChain.VERS_5_3) {
-                AssetCls.processTrade(orderThis.dcSet, block, creator,
+                AssetCls.processTrade(dcSet, block, creator,
                         true, ((CreateOrderTransaction) transaction).getHaveAsset(),
                         ((CreateOrderTransaction) transaction).getWantAsset(),
                         false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
             } else {
-                creator.changeBalance(orderThis.dcSet, false, false, wantAssetKey,
+                creator.changeBalance(dcSet, false, false, wantAssetKey,
                         processedAmountFulfilledWant, false, false, false);
                 transaction.addCalculated(block, creator, wantAssetKey, processedAmountFulfilledWant,
                         "Resolve Order @" + Transaction.viewDBRef(id));
@@ -473,7 +482,7 @@ public class OrderProcess {
         thisAmountHaveLeftStart = thisAmountHaveLeftStart.subtract(orderThis.getAmountHaveLeft());
         if (thisAmountHaveLeftStart.signum() > 0) {
             // change PLEDGE
-            creator.changeBalance(orderThis.dcSet, true, true, haveAssetKey,
+            creator.changeBalance(dcSet, true, true, haveAssetKey,
                     thisAmountHaveLeftStart, false, false, true);
         }
 
