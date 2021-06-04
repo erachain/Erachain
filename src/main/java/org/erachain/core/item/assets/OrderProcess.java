@@ -112,7 +112,7 @@ public class OrderProcess {
                     timestamp = null;
                     ++timestamp;
                 }
-                // потому что сранивается потом обратная цена то тут должно быть возрастание
+                // потому что сравнивается потом обратная цена то тут должно быть возрастание
                 // и если не так то ошибка
                 int comp = priceTst.compareTo(item.calcLeftPrice());
                 if (comp > 0) {
@@ -435,11 +435,6 @@ public class OrderProcess {
                         debug = orderThis.isUnResolved();
                     }
 
-                    // cancel order if it not fulfiled isDivisible
-
-                    // or HAVE not enough to one WANT  = price
-                    ///CancelOrderTransaction.process_it(orderThis.dcSet, this);
-                    //and stop resolve
                     completedOrder = true;
                     // REVERT not completed AMOUNT
                     orderThis.processOnUnresolved(block, transaction, false);
