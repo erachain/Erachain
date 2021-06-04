@@ -150,8 +150,10 @@ function order(data){
     output += data.Label_table_want + ': <a href=?asset=' + data.assetWantKey + get_lang() + '><b>' + data.assetWantName + '</b></a><br>';
     output += data.Label_Creator + ': <a href="?address=' + data.creator + '">' + data.creator_person + '</a><br>';
     //output += data.Label_Fulfilled + ': <b>' + addCommas(data.order.fulfilledHave) + '</b><br>';
-    output += data.Label_LeftHave + ': <b>' + addCommas(data.order.leftHave) + ' / ' + addCommas(data.order.leftWant) + '</b><br>';
-    output += data.Label_LeftPrice + ': <b>' + addCommas(data.order.leftPrice) + ' / ' + addCommas(data.order.leftPriceReverse) + '</b><br>';
+    if (data.order.leftHave != 0 && data.order.leftWant != 0) {
+        output += data.Label_LeftHave + ': ' + addCommas(data.order.leftHave) + ' / ' + addCommas(data.order.leftWant) + '<br>';
+        output += data.Label_LeftPrice + ': ' + (100.0 * (1 - data.order.leftPrice / data.order.price)).toPrecision(4) + '%<br>';
+    }
 
     output += data.Label_Pair + ': <a href="?asset=' + data.assetHaveKey
         + '&asset=' + data.assetWantKey + get_lang() + '"><b>' + data.assetHaveName + ' / ' + data.assetWantName + '</b></a>';
