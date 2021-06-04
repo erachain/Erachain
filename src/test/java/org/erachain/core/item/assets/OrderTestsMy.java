@@ -62,6 +62,7 @@ public class OrderTestsMy {
     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balanceA;
     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balanceB;
     DCSet dcSet;
+    BlockChain chain;
     GenesisBlock gb;
     Order orderREC;
     Trade tradeREC;
@@ -141,11 +142,11 @@ public class OrderTestsMy {
         BlockChain.CHECK_BUGS = 10;
         height = BlockChain.ALL_BALANCES_OK_TO + 2;
 
-        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
-
-        gb = new GenesisBlock();
+        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(tempDir.getPath(), dbs);
 
         try {
+            chain = new BlockChain(dcSet);
+            gb = chain.getGenesisBlock();
             gb.process(dcSet);
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -176,7 +177,7 @@ public class OrderTestsMy {
         assetA = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
         keyA = issueAssetTransaction.getAssetKey(dcSet);
@@ -185,7 +186,7 @@ public class OrderTestsMy {
         assetB = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(dcSet)[0], new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
         keyB = issueAssetTransaction.getAssetKey(dcSet);
 
@@ -1331,7 +1332,7 @@ public class OrderTestsMy {
                 testOrderProcessingDivisible_init();
 
                 // CREATE ORDER SELLING 120 B FOR A AT A PRICE OF 595)
-                // должно иницировать 2 торговли на Приказ АБ_1 и Приказ АБ_2
+                // должно инициировать 2 торговли на Приказ АБ_1 и Приказ АБ_2
                 orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(120),
                         BigDecimal.valueOf(595), (byte) 0, timestamp++, 0l, new byte[]{5, 6});
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
@@ -1391,15 +1392,15 @@ public class OrderTestsMy {
 
                 // INITIATOR of all trades is order_BA_1
                 Trade trade = order_BA_1.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator() == (order_BA_1_ID));
-                Assert.assertEquals(0, order_BA_1.getInitiatedTrades(dcSet).get(1).getInitiator() == (order_BA_1_ID));
+                Assert.assertEquals((Long) trade.getInitiator(), order_BA_1_ID);
+                Assert.assertEquals((Long) order_BA_1.getInitiatedTrades(dcSet).get(1).getInitiator(), order_BA_1_ID);
                 // здесь иногда почему-то получается то один ордер то другой - без
                 // сортировки
                 if (trade.getTarget() == order_AB_1_ID) {
                     // 1
-                    Assert.assertEquals(0, trade.getTarget() == (order_AB_1_ID));
-                    Assert.assertEquals(0, trade.getAmountHave() == (BigDecimal.valueOf(1000)));
-                    Assert.assertEquals(0, trade.getAmountWant() == (BigDecimal.valueOf(100)));
+                    Assert.assertEquals((Long) trade.getTarget(), order_AB_1_ID);
+                    Assert.assertEquals(false, trade.getAmountHave().equals(BigDecimal.valueOf(1000)));
+                    Assert.assertEquals(false, trade.getAmountWant().equals(BigDecimal.valueOf(100)));
                     // 2
                     trade = order_BA_1.getInitiatedTrades(dcSet).get(1);
                     Assert.assertEquals(trade.getAmountHave().toPlainString(), BigDecimal.valueOf(20)
@@ -1407,7 +1408,7 @@ public class OrderTestsMy {
                             .divide(order_AB_2_tmp.getPrice(), BlockChain.AMOUNT_DEDAULT_SCALE,
                                     BigDecimal.ROUND_HALF_UP).setScale(trade.getAmountHave().scale(), BigDecimal.ROUND_HALF_UP).toPlainString());
                     Assert.assertEquals(trade.getAmountWant().toPlainString(), BigDecimal.valueOf(20).toPlainString());
-                    Assert.assertEquals(0, trade.getTarget() == (order_AB_2_ID));
+                    Assert.assertEquals(true, trade.getTarget() == (order_AB_2_ID));
                 } else {
                     // 2
                     Assert.assertEquals(0, trade.getTarget() == (order_AB_2_ID));
@@ -1515,7 +1516,7 @@ public class OrderTestsMy {
 
                 // CHECK ORDERS
                 Assert.assertEquals(false, dcSet.getOrderMap().contains(order_AB_8.getId()));
-                Assert.assertEquals(0, order_AB_8.getFulfilledHave() == (amoHave));
+                Assert.assertEquals(false, order_AB_8.getFulfilledHave() == (amoHave));
                 Assert.assertEquals(true, order_AB_8.isFulfilled());
 
                 BigDecimal ttt = order_BA_2.getPrice();
@@ -1534,10 +1535,10 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, order_AB_8.getInitiatedTrades(dcSet).size());
 
                 trade = order_AB_8.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator() == (order_AB_8.getId()));
-                Assert.assertEquals(0, trade.getTarget() == (order_BA_2_ID));
-                Assert.assertEquals(0, trade.getAmountHave() == (tradedAmoB));
-                Assert.assertEquals(0, trade.getAmountWant() == (amoHave));
+                Assert.assertEquals(true, trade.getInitiator() == (order_AB_8.getId()));
+                Assert.assertEquals(true, trade.getTarget() == (order_BA_2_ID));
+                Assert.assertEquals(true, trade.getAmountHave().equals(tradedAmoB));
+                Assert.assertEquals(true, trade.getAmountWant().equals(amoHave));
 
             } finally {
                 dcSet.close();
