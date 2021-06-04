@@ -428,7 +428,7 @@ public class OrderProcess {
                     break;
                 }
 
-                // if can't trade by more good price than self - by orderOrice - then  auto cancel!
+                // if can't trade by more good price than self - by orderPrice - then  auto cancel!
                 if (orderThis.isUnResolved()) {
 
                     if (debug) {
