@@ -221,9 +221,6 @@ public class OrderUnresolveTest {
 
                 assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b,
                         have1.negate()); // BALANCE
-                assertEquals(accountB.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
-                        have2.negate().subtract(have3)); // BALANCE
-
 
                 Trade trade2 = Trade.get(dcSet, order_BA_2, order_AB_1);
                 assertEquals(trade2.getAmountWant(), have3);
@@ -236,6 +233,9 @@ public class OrderUnresolveTest {
                 assertEquals(trade2.calcPrice(), new BigDecimal("0.002181209359"));
                 assertEquals(order_AB_1.getPrice(), new BigDecimal("0.00218120936")); // 0.00218120936
                 assertEquals(order_BA_2.calcPriceReverse(), new BigDecimal("0.002181209988"));
+
+                assertEquals(accountB.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
+                        have2.negate().subtract(have3)); // BALANCE
 
                 assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
                         have1.subtract(trade2.getAmountHave())); // BALANCE
