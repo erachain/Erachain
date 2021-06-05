@@ -21,6 +21,7 @@ import java.util.List;
  */
 public class OrderProcess {
 
+    static BigDecimal MIN_LEFT_SHARE = new BigDecimal("0.0002");
     /**
      * По идее тут ордер активный должен себе получить лучшие условия если округление пошло в сторону,
      * так как он в мне выгодных условиях по цене
@@ -238,12 +239,24 @@ public class OrderProcess {
             }
 
             compareLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
-            if (compareLeft <= 0) {
+            if (compareLeft == 0) {
                 tradeAmountForHave = orderAmountHaveLeft;
                 tradeAmountForWant = orderAmountWantLeft;
 
-                if (compareLeft == 0) {
+                completedOrder = true;
+
+            } else if (compareLeft < 0) {
+
+                tradeAmountForHave = orderAmountHaveLeft;
+
+                // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
+                if (orderThis.willUnResolvedFor(orderAmountWantLeft)
+                        && thisAmountHaveLeft.subtract(orderAmountWantLeft).divide(orderAmountWantLeft, 6, RoundingMode.HALF_DOWN)
+                        .compareTo(MIN_LEFT_SHARE) <= 0) {
+                    tradeAmountForWant = thisAmountHaveLeft;
                     completedOrder = true;
+                } else {
+                    tradeAmountForWant = orderAmountWantLeft;
                 }
 
             } else {
