@@ -26,6 +26,7 @@ import org.mapdb.Fun;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -176,9 +177,13 @@ public class OrderUnresolveTest {
                         new BigDecimal("-8.12")); // BALANCE
 
                 Trade trade1 = Trade.get(dcSet, order_BA_1, order_AB_1);
+                Assert.assertEquals(trade1.getAmountWant(), have2);
+                Assert.assertEquals(trade1.getAmountWant().multiply(order_BA_1.getPrice())
+                        .setScale(8, RoundingMode.HALF_DOWN).stripTrailingZeros(), want2);
+                Assert.assertEquals(trade1.getAmountHave().stripTrailingZeros(), want2);
                 Assert.assertEquals(trade1.calcPrice(), new BigDecimal("0.002181209359"));
-                Assert.assertEquals(trade1.calcPrice(), order_AB_1.getPrice());
-                Assert.assertEquals(trade1.calcPrice(), order_BA_1.calcPriceReverse());
+                Assert.assertEquals(order_AB_1.getPrice(), new BigDecimal("0.00218120936")); // 0.00218120936
+                Assert.assertEquals(order_BA_1.calcPriceReverse(), new BigDecimal("0.002181209988"));
 
 
                 Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
