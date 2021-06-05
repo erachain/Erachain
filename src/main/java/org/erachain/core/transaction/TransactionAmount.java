@@ -638,7 +638,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         return AMOUNT_LENGHT_SO_LONG;
                     }
                     // SCALE wrong
-                    int scale = amount.scale();
+                    int scale = amount.stripTrailingZeros().scale();
                     if (scale < minSCALE
                             || scale > maxSCALE
                             || scale > asset.getScale()) {
