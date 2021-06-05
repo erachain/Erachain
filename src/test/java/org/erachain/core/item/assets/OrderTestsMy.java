@@ -3503,8 +3503,9 @@ public class OrderTestsMy {
 
                 // ORPHAN ORDER TWO
                 createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
-                        BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2)[0], new byte[]{1, 2});
-                createOrderTransaction.setDC(fork3, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                        BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2)[0]);
+                createOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
+                createOrderTransaction.setDC(fork3, Transaction.FOR_NETWORK, height, ++seqNo, false);
                 createOrderTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
                 // CHECK BALANCES

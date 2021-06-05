@@ -1897,7 +1897,7 @@ public class BlockExplorer {
                 transactionDataJSON.put("height", trade.getInitiator() >> 32);
                 transactionDataJSON.put("confirmations", Controller.getInstance().getMyHeight() - height);
 
-                transactionDataJSON.put("timestamp", Transaction.getTimestampByDBRef(trade.getInitiator()));
+                transactionDataJSON.put("timestamp", Controller.getInstance().blockChain.getTimestampByDBRef(trade.getInitiator()));
 
                 transactionDataJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress());
                 transactionDataJSON.put("initiatorCreatorName", orderInitiator.getCreator().getPersonAsString());

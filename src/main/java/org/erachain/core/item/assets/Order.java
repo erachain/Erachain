@@ -684,7 +684,12 @@ public class Order implements Comparable<Order> {
         OrderProcess.process(this, block, tx, asChange);
     }
 
-    public void orphan(Block block, boolean asChange) {
+    /**
+     * @param block
+     * @param blockTime timestamp of block
+     * @param asChange
+     */
+    public void orphan(Block block, long blockTime, boolean asChange) {
 
         // GET HEIGHT from ID
         int height = (int) (this.id >> 32);
@@ -745,7 +750,9 @@ public class Order implements Comparable<Order> {
                 if (height > BlockChain.VERS_5_3) {
                     AssetCls.processTrade(dcSet, block, target.getCreator(),
                             false, assetWant, assetHave,
-                            true, tradeAmountWant, Transaction.getTimestampByDBRef(id), 0L);
+                            true, tradeAmountWant,
+                            blockTime,
+                            0L);
                 } else {
 
                     target.creator.changeBalance(this.dcSet, true, false, target.wantAssetKey,
@@ -805,7 +812,7 @@ public class Order implements Comparable<Order> {
         if (height > BlockChain.VERS_5_3) {
             AssetCls.processTrade(dcSet, block, this.creator,
                     true, assetHave, assetWant,
-                    true, thisAmountFulfilledWant, Transaction.getTimestampByDBRef(id), 0L);
+                    true, thisAmountFulfilledWant, blockTime, 0L);
         } else {
             this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey,
                     thisAmountFulfilledWant, false, false, false);

@@ -639,7 +639,7 @@ public class ExPays {
                         } catch (Exception e1) {
                         }
                     } else {
-                        filterTimeStart = Transaction.getTimestampByDBRef((filterTimeStart));
+                        filterTimeStart = Controller.getInstance().blockChain.getTimestampByDBRef((filterTimeStart));
                     }
                 }
             }
@@ -660,7 +660,7 @@ public class ExPays {
                         } catch (Exception e1) {
                         }
                     } else {
-                        filterTimeEnd = Transaction.getTimestampByDBRef(filterTimeEnd);
+                        filterTimeEnd = Controller.getInstance().blockChain.getTimestampByDBRef(filterTimeEnd);
                     }
                 }
             }

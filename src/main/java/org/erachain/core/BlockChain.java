@@ -1077,6 +1077,11 @@ public class BlockChain {
         return heightCheckPoint;
     }
 
+    public Long getTimestampByDBRef(Long dbRef) {
+        Tuple2<Integer, Integer> key = Transaction.parseDBRef(dbRef);
+        return getTimestamp(key.a) + key.b;
+    }
+
     public byte[] getMyHardCheckPointSign() {
         if (CHECKPOINT.a > 1) {
             return CHECKPOINT.b;

@@ -852,12 +852,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return this.timestamp;
     }
 
-    public static Long getTimestampByDBRef(Long dbRef) {
-        Tuple2<Integer, Integer> key = parseDBRef(dbRef);
-        BlockChain blockChain = Controller.getInstance().getBlockChain();
-        return blockChain.getTimestamp(key.a) + key.b;
-    }
-
     // for test signature only!!!
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
