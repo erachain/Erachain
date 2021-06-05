@@ -321,6 +321,18 @@ public class Order implements Comparable<Order> {
 
     }
 
+    public static Order reloadOrder(DCSet dcSet, Order order) {
+        return reloadOrder(dcSet, order.id);
+    }
+
+    public static void deleteOrder(DCSet dcSet, Long orderID) {
+        if (dcSet.getCompletedOrderMap().contains(orderID))
+            dcSet.getCompletedOrderMap().delete(orderID);
+        else
+            dcSet.getOrderMap().delete(orderID);
+
+    }
+
     public void setDC(DCSet dcSet) {
         this.dcSet = dcSet;
     }

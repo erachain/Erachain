@@ -198,27 +198,6 @@ public class OrderTestsMy {
 
     }
 
-    // reload from DB
-    private Order reloadOrder(Order order) {
-
-        return dcSet.getCompletedOrderMap().contains(order.getId()) ? dcSet.getCompletedOrderMap().get(order.getId())
-                : dcSet.getOrderMap().get(order.getId());
-
-    }
-
-    private Order reloadOrder(Long orderId) {
-
-        return Order.getOrder(dcSet, orderId);
-
-    }
-
-    private void deleteOrder(Long orderId) {
-
-        dcSet.getCompletedOrderMap().delete(orderId);
-        dcSet.getOrderMap().delete(orderId);
-
-    }
-
     @Test
     public void crypto() {
 
@@ -554,8 +533,8 @@ public class OrderTestsMy {
                     order_BA_1_ID = orderCreation.getOrderId();
 
                     // посре обработки обновим все данные
-                    order_AB_1 = reloadOrder(order_AB_1_ID);
-                    order_BA_1 = reloadOrder(order_BA_1_ID);
+                    order_AB_1 = Order.reloadOrder(dcSet, order_AB_1_ID);
+                    order_BA_1 = Order.reloadOrder(dcSet, order_BA_1_ID);
 
                     BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
                     BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
@@ -574,8 +553,8 @@ public class OrderTestsMy {
                     assertEquals(true, order_BA_1.isFulfilled());
 
                     // удалим их на всяк случай чтобы они не ыбли в стакане
-                    deleteOrder(order_AB_1_ID);
-                    deleteOrder(order_BA_1_ID);
+                    Order.deleteOrder(dcSet, order_AB_1_ID);
+                    Order.deleteOrder(dcSet, order_BA_1_ID);
 
                 }
 
@@ -598,8 +577,8 @@ public class OrderTestsMy {
                     order_BA_1_ID = orderCreation.getOrderId();
 
                     // посре обработки обновим все данные
-                    order_AB_1 = reloadOrder(order_AB_1_ID);
-                    order_BA_1 = reloadOrder(order_BA_1_ID);
+                    order_AB_1 = Order.reloadOrder(dcSet, order_AB_1_ID);
+                    order_BA_1 = Order.reloadOrder(dcSet, order_BA_1_ID);
 
                     BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
                     BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
@@ -611,8 +590,8 @@ public class OrderTestsMy {
                     assertEquals(true, order_BA_1.isFulfilled());
 
                     // удалим их на всяк случай чтобы они не ыбли в стакане
-                    deleteOrder(order_AB_1_ID);
-                    deleteOrder(order_BA_1_ID);
+                    Order.deleteOrder(dcSet, order_AB_1_ID);
+                    Order.deleteOrder(dcSet, order_BA_1_ID);
 
                 }
 
@@ -672,8 +651,8 @@ public class OrderTestsMy {
                     order_BA_1_ID = orderCreation.getOrderId();
 
                     // посре обработки обновим все данные
-                    order_AB_1 = reloadOrder(order_AB_1_ID);
-                    order_BA_1 = reloadOrder(order_BA_1_ID);
+                    order_AB_1 = Order.reloadOrder(dcSet, order_AB_1_ID);
+                    order_BA_1 = Order.reloadOrder(dcSet, order_BA_1_ID);
 
                     BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
                     BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
@@ -692,8 +671,8 @@ public class OrderTestsMy {
                     assertEquals(false, order_BA_1.isFulfilled());
 
                     // удалим их на всяк случай чтобы они не ыбли в стакане
-                    deleteOrder(order_AB_1_ID);
-                    deleteOrder(order_BA_1_ID);
+                    Order.deleteOrder(dcSet, order_AB_1_ID);
+                    Order.deleteOrder(dcSet, order_BA_1_ID);
 
                 }
             } finally {
@@ -754,8 +733,8 @@ public class OrderTestsMy {
                     order_BA_1_ID = orderCreation.getOrderId();
 
                     // посре обработки обновим все данные
-                    order_AB_1 = reloadOrder(order_AB_1_ID);
-                    order_BA_1 = reloadOrder(order_BA_1_ID);
+                    order_AB_1 = Order.reloadOrder(dcSet, order_AB_1_ID);
+                    order_BA_1 = Order.reloadOrder(dcSet, order_BA_1_ID);
 
                     Trade trade = Trade.get(dcSet, order_BA_1, order_AB_1);
 
@@ -781,8 +760,8 @@ public class OrderTestsMy {
                     assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) == 0);
 
                     // удалим их на всяк случай чтобы они не ыбли в стакане
-                    deleteOrder(order_AB_1_ID);
-                    deleteOrder(order_BA_1_ID);
+                    Order.deleteOrder(dcSet, order_AB_1_ID);
+                    Order.deleteOrder(dcSet, order_BA_1_ID);
 
                 }
             } finally {
@@ -849,9 +828,9 @@ public class OrderTestsMy {
                     orderCreation.process(null, Transaction.FOR_NETWORK);
                     order_BA_1_ID = orderCreation.getOrderId();
 
-                    // посре обработки обновим все данные
-                    order_AB_1 = reloadOrder(order_AB_1_ID);
-                    order_BA_1 = reloadOrder(order_BA_1_ID);
+                    // после обработки обновим все данные
+                    order_AB_1 = Order.reloadOrder(dcSet, order_AB_1_ID);
+                    order_BA_1 = Order.reloadOrder(dcSet, order_BA_1_ID);
 
                     Trade trade = Trade.get(dcSet, order_BA_1, order_AB_1);
 
@@ -878,8 +857,8 @@ public class OrderTestsMy {
                     assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) == 0);
 
                     // удалим их на всяк случай чтобы они не ыбли в стакане
-                    deleteOrder(order_AB_1_ID);
-                    deleteOrder(order_BA_1_ID);
+                    Order.deleteOrder(dcSet, order_AB_1_ID);
+                    Order.deleteOrder(dcSet, order_BA_1_ID);
 
                 }
 
@@ -1344,7 +1323,7 @@ public class OrderTestsMy {
                 order_BA_1_ID = order_BA_1.getId();
 
                 // RELOAD new VALUES (amountLeft)
-                order_AB_2 = reloadOrder(order_AB_2);
+                order_AB_2 = Order.reloadOrder(dcSet, order_AB_2);
 
                 // CHECK BALANCES
                 Assert.assertEquals(accountA.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(45600)); // BALANCE
@@ -1442,10 +1421,10 @@ public class OrderTestsMy {
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
-                order_BA_2 = reloadOrder(orderCreation.makeOrder());
+                order_BA_2 = Order.reloadOrder(dcSet, orderCreation.makeOrder());
                 order_BA_2_ID = order_BA_2.getId();
 
-                order_AB_2 = reloadOrder(order_AB_2);
+                order_AB_2 = Order.reloadOrder(dcSet, order_AB_2);
 
                 // CHECK BALANCES
                 Assert.assertEquals(accountA.getBalanceUSE(keyA, dcSet), bal_A_keyA); // BALANCE
@@ -1486,10 +1465,10 @@ public class OrderTestsMy {
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
-                order_AB_8 = reloadOrder(orderCreation.makeOrder());
+                order_AB_8 = Order.reloadOrder(dcSet, orderCreation.makeOrder());
                 order_AB_8_ID = order_AB_8.getId();
 
-                order_BA_2 = reloadOrder(order_BA_2);
+                order_BA_2 = Order.reloadOrder(dcSet, order_BA_2);
 
                 trade_1_amoA = order_AB_8.getAmountHaveLeft();
                 trade_1_amoB = order_BA_2.getAmountHaveLeft();
@@ -1738,7 +1717,7 @@ public class OrderTestsMy {
                 orderCreation.process(null, Transaction.FOR_NETWORK);
                 Order order_BA_2 = orderCreation.makeOrder();
                 Long order_AB_2_ID = order_BA_2.getId();
-                order_BA_2 = reloadOrder(order_BA_2);
+                order_BA_2 = Order.reloadOrder(dcSet, order_BA_2);
 
                 /////// BigDecimal haveTaked =
                 /////// amoHave.multiply(order_BA_1.getPriceCalcReverse()).setScale(8,
