@@ -479,7 +479,7 @@ public class Order implements Comparable<Order> {
     // forDB - use fulFill
     public static Order parse(byte[] data) throws Exception {
         //CHECK IF CORRECT LENGTH
-        if(data.length != BASE_LENGTH) {
+        if (data.length != BASE_LENGTH) {
             throw new Exception("Data does not match order length");
         }
 
@@ -488,6 +488,10 @@ public class Order implements Comparable<Order> {
         //READ ID
         byte[] idBytes = Arrays.copyOfRange(data, position, position + ID_LENGTH);
         long id = Longs.fromByteArray(idBytes);
+        if (id <= 1000) {
+            throw new Exception("Order ID is wrong");
+        }
+
         position += ID_LENGTH;
 
         //READ CREATOR
