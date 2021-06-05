@@ -239,13 +239,12 @@ public class OrderProcess {
 
             compareLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
             if (compareLeft <= 0) {
-
-                // У позиции меньше чем нам надо - берем все данные с позиции
                 tradeAmountForHave = orderAmountHaveLeft;
                 tradeAmountForWant = orderAmountWantLeft;
 
-                if (compareLeft == 0)
+                if (compareLeft < 0) {
                     completedOrder = true;
+                }
 
             } else {
 
