@@ -155,9 +155,9 @@ public class OrderUnresolveTest {
                 Order order_AB_1 = Order.reloadOrder(dcSet, order_AB_1_ID);
 
                 Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b,
-                        new BigDecimal("-8.12")); // BALANCE
+                        have1.negate()); // BALANCE
                 Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
-                        new BigDecimal("8.12")); // BALANCE
+                        have1); // BALANCE
                 Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
                         new BigDecimal("0")); // BALANCE
 
@@ -172,25 +172,38 @@ public class OrderUnresolveTest {
                 orderCreation.process(null, Transaction.FOR_NETWORK);
                 long order_BA_1_ID = orderCreation.getOrderId();
                 Order order_BA_1 = Order.reloadOrder(dcSet, order_BA_1_ID);
+                assertEquals(false, order_BA_1.isActive(dcSet));
+                assertEquals(true, order_BA_1.isCompleted());
+
+                assertEquals(true, order_AB_1.isActive(dcSet));
+                assertEquals(false, order_AB_1.isCompleted());
 
                 Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b,
-                        new BigDecimal("-8.12")); // BALANCE
+                        have1.negate()); // BALANCE
+                Assert.assertEquals(accountB.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
+                        have2.negate()); // BALANCE
 
                 Trade trade1 = Trade.get(dcSet, order_BA_1, order_AB_1);
                 Assert.assertEquals(trade1.getAmountWant(), have2);
                 Assert.assertEquals(trade1.getAmountWant().multiply(order_BA_1.getPrice())
                         .setScale(8, RoundingMode.HALF_DOWN).stripTrailingZeros(), want2);
-                Assert.assertEquals(trade1.getAmountHave().stripTrailingZeros(), want2);
+                Assert.assertEquals(trade1.getAmountHave(), new BigDecimal("5.10005147"));
+                Assert.assertEquals(trade1.getAmountWant(), new BigDecimal("0.01112428"));
+                // сделка проходит по более выгодной цене и получаем больше чем хотели:
+                Assert.assertEquals(1, trade1.getAmountHave().compareTo(want2)); // 5.10005147 > 5.10005
                 Assert.assertEquals(trade1.calcPrice(), new BigDecimal("0.002181209359"));
                 Assert.assertEquals(order_AB_1.getPrice(), new BigDecimal("0.00218120936")); // 0.00218120936
                 Assert.assertEquals(order_BA_1.calcPriceReverse(), new BigDecimal("0.002181209988"));
 
-
                 Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
-                        have1.subtract(want2)); // BALANCE
+                        have1.subtract(trade1.getAmountHave())); // BALANCE
                 Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
-                        new BigDecimal("0.01112428")); // BALANCE
+                        trade1.getAmountWant()); // BALANCE
 
+                Assert.assertEquals(accountB.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b,
+                        trade1.getAmountHave()); // BALANCE
+                Assert.assertEquals(accountB.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
+                        have2.subtract(trade1.getAmountWant()).stripTrailingZeros()); // BALANCE
 
                 // https://explorer.erachain.org/index/blockexplorer.html?order=2068567-2&lang=en
                 BigDecimal have3 = new BigDecimal("0.00658715");
@@ -201,6 +214,38 @@ public class OrderUnresolveTest {
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
+                long order_BA_2_ID = orderCreation.getOrderId();
+                Order order_BA_2 = Order.reloadOrder(dcSet, order_BA_2_ID);
+
+                assertEquals(false, order_BA_2.isActive(dcSet));
+
+                assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b,
+                        have1.negate()); // BALANCE
+                assertEquals(accountB.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
+                        have2.negate().subtract(have3)); // BALANCE
+
+
+                Trade trade2 = Trade.get(dcSet, order_BA_2, order_AB_1);
+                assertEquals(trade2.getAmountWant(), have3);
+                assertEquals(trade2.getAmountWant().multiply(order_BA_2.getPrice())
+                        .setScale(8, RoundingMode.HALF_DOWN).stripTrailingZeros(), want3);
+                assertEquals(trade2.getAmountHave(), new BigDecimal("5.10005147"));
+                assertEquals(trade2.getAmountWant(), new BigDecimal("0.01112428"));
+                // сделка проходит по более выгодной цене и получаем больше чем хотели:
+                assertEquals(1, trade2.getAmountHave().compareTo(want3)); // 5.10005147 > 5.10005
+                assertEquals(trade2.calcPrice(), new BigDecimal("0.002181209359"));
+                assertEquals(order_AB_1.getPrice(), new BigDecimal("0.00218120936")); // 0.00218120936
+                assertEquals(order_BA_2.calcPriceReverse(), new BigDecimal("0.002181209988"));
+
+                assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
+                        have1.subtract(trade2.getAmountHave())); // BALANCE
+                assertEquals(accountA.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
+                        trade2.getAmountWant()); // BALANCE
+
+                assertEquals(accountB.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b,
+                        trade2.getAmountHave()); // BALANCE
+                assertEquals(accountB.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
+                        have3.subtract(trade2.getAmountWant()).stripTrailingZeros()); // BALANCE
 
             } finally {
                 dcSet.close();
