@@ -242,7 +242,7 @@ public class OrderProcess {
                 tradeAmountForHave = orderAmountHaveLeft;
                 tradeAmountForWant = orderAmountWantLeft;
 
-                if (compareLeft < 0) {
+                if (compareLeft == 0) {
                     completedOrder = true;
                 }
 
