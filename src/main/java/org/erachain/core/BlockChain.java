@@ -226,7 +226,7 @@ public class BlockChain {
      * Если задан то это режим синхронизации со стрым протоколом - значит нам нельза генерить блоки и трнзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? (DEMO_MODE ? 37700 : 0) : 0; // see in sidePROTOCOL.json as 'allValidBefore'
+    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? (DEMO_MODE ? 0 : 0) : 0; // see in sidePROTOCOL.json as 'allValidBefore'
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904; //260120;
     public static final int WIN_VAL_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904; //260120;
     /**
@@ -1338,7 +1338,7 @@ public class BlockChain {
 
         int base = BlockChain.getTargetedMin(height);
         int targetedWinValue = calcWinValueTargeted(win_value, target);
-        if (height > ALL_VALID_BEFORE
+        if (height > WIN_VAL_ALL_VALID && height > ALL_VALID_BEFORE
                 && !ERA_COMPU_ALL_UP && !BlockChain.TEST_MODE
                 && base > targetedWinValue) {
             return -targetedWinValue;

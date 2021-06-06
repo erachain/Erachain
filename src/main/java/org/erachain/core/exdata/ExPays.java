@@ -1086,7 +1086,7 @@ public class ExPays {
         // комиссию не проверяем так как она не правильно считается внутри?
         long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
 
-        int result;
+        Fun.Tuple2<Integer, String> result;
         Fun.Tuple4 item;
         BigDecimal amount;
         byte[] signature = new byte[0];
@@ -1105,8 +1105,9 @@ public class ExPays {
                     key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
                     backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
 
-            if (result != Transaction.VALIDATE_OK) {
-                filteredAccruals.set(index, new Fun.Tuple4(item.a, item.b, item.c, new Fun.Tuple2<>(result, "")));
+            if (result.a != Transaction.VALIDATE_OK) {
+                errorValue = result.b;
+                filteredAccruals.set(index, new Fun.Tuple4(item.a, item.b, item.c, result));
             }
         }
     }
@@ -1196,14 +1197,14 @@ public class ExPays {
             long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
 
             BigDecimal totalFeeBG = rNote.getFee();
-            int result;
+            Fun.Tuple2<Integer, String> result;
             // проверим как будто всю сумму одному переводим - с учетом комиссии полной
             result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                     key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
                     backward, totalFeeBG, null, creatorIsPerson, actionFlags);
-            if (result != Transaction.VALIDATE_OK) {
-                errorValue = "Accruals: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
-                return result;
+            if (result.a != Transaction.VALIDATE_OK) {
+                errorValue = result.b + " - Accruals: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
+                return result.a;
             }
 
             ////////// TODO NEED CHECK ALL
@@ -1226,9 +1227,9 @@ public class ExPays {
                             key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
                             backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
 
-                    if (result != Transaction.VALIDATE_OK) {
-                        errorValue = "Accruals: " + amount.toPlainString() + " -> " + recipient.getAddress();
-                        return result;
+                    if (result.a != Transaction.VALIDATE_OK) {
+                        errorValue = result.b + " - Accruals: " + amount.toPlainString() + " -> " + recipient.getAddress();
+                        return result.a;
                     }
 
                 }
