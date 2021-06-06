@@ -638,7 +638,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         return new Fun.Tuple2<>(AMOUNT_LENGHT_SO_LONG, "amountBytes.length = " + amountBytes.length);
                     }
                     // SCALE wrong
-                    int scale = amount.stripTrailingZeros().scale();
+                    int scale = amount.scale();
                     if (scale < minSCALE
                             || scale > maxSCALE
                             || scale > asset.getScale()) {

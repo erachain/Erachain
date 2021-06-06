@@ -174,16 +174,19 @@ public class IssueAssetTransaction extends IssueItemRecord {
             long quantity = asset.getQuantity();
             //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
             if (quantity > maxQuantity || quantity < -1) {
+                errorValue = "quantity > maxQuantity  or < -1: " + quantity + " > " + maxQuantity;
                 return INVALID_QUANTITY;
             }
 
             if (((AssetCls) this.item).isAccounting() && quantity != 0) {
+                errorValue = "Asset is Accounting and quantity != 0";
                 return INVALID_QUANTITY;
             }
 
             if (this.item.isNovaItem(this.dcSet) > 0) {
                 Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
                 if (item.b < quantity) {
+                    errorValue = "Nova asset quantity > set : " + quantity + " > " + item.b;
                     return INVALID_QUANTITY;
                 }
             }
