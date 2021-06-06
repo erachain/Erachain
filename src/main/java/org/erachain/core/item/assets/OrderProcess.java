@@ -60,7 +60,7 @@ public class OrderProcess {
                 //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
                 //// 	255979-3	255992-1
                 //|| height == 255992
-                Transaction.viewDBRef(id).equals("2685-1")
+                Transaction.viewDBRef(id).equals("1831504-1")
             //id == 3644468729217028L
 
 
@@ -250,7 +250,7 @@ public class OrderProcess {
                 tradeAmountForHave = orderAmountHaveLeft;
 
                 // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
-                if (orderThis.willUnResolvedFor(orderAmountWantLeft)
+                if (orderThis.willUnResolvedFor(orderAmountWantLeft, false)
                         && thisAmountHaveLeft.subtract(orderAmountWantLeft).divide(orderAmountWantLeft, 6, RoundingMode.HALF_DOWN)
                         .compareTo(MIN_LEFT_SHARE) <= 0) {
                     tradeAmountForWant = thisAmountHaveLeft;
@@ -287,7 +287,7 @@ public class OrderProcess {
                         }
 
                         // если исполненый ордер станет не исполняемым то попробуем его тут обработать особо
-                        willUnResolvedFor = order.willUnResolvedFor(tradeAmountForHave);
+                        willUnResolvedFor = order.willUnResolvedFor(tradeAmountForHave, true);
                         if (willUnResolvedFor) {
                             BigDecimal priceUpdateTrade = Order.calcPrice(orderAmountHaveLeft,
                                     // haveSacel for order.WANT
@@ -445,10 +445,10 @@ public class OrderProcess {
                 }
 
                 // if can't trade by more good price than self - by orderOrice - then  auto cancel!
-                if (orderThis.isUnResolved()) {
+                if (orderThis.isInitiatorUnResolved()) {
 
                     if (debug) {
-                        debug = orderThis.isUnResolved();
+                        debug = orderThis.isInitiatorUnResolved();
                     }
 
                     // cancel order if it not fulfiled isDivisible

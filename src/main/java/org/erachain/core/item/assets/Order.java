@@ -189,9 +189,10 @@ public class Order implements Comparable<Order> {
      * Это вызывается только для ордера-Цели
      *
      * @param fulfilledHaveWill
+     * @param forTarget
      * @return
      */
-    public boolean willUnResolvedFor(BigDecimal fulfilledHaveWill) {
+    public boolean willUnResolvedFor(BigDecimal fulfilledHaveWill, boolean forTarget) {
         BigDecimal willHave = amountHave.subtract(fulfilledHave).subtract(fulfilledHaveWill);
         if (willHave.signum() == 0)
             // уже не сошлось
@@ -199,10 +200,13 @@ public class Order implements Comparable<Order> {
 
         // сколько нам надо будет еще купить если эту сделку обработаем
         BigDecimal willWant = getFulfilledWant(willHave, this.price, this.wantAssetScale);
+        if (willWant.signum() == 0) {
+            return true;
+        }
 
         BigDecimal priceForLeft = calcPrice(willHave, willWant, wantAssetScale);
 
-        return isPricesClose(price, priceForLeft, true);
+        return isPricesClose(price, priceForLeft, forTarget);
 
     }
 
@@ -216,7 +220,7 @@ public class Order implements Comparable<Order> {
      *
      * @return
      */
-    public boolean isUnResolved() {
+    public boolean isInitiatorUnResolved() {
 
         if (isFulfilled())
             return false;
@@ -435,12 +439,8 @@ public class Order implements Comparable<Order> {
         return dcSet.getOrderMap().contains(id);
     }
 
-    // TO DO
     public static BigDecimal getFulfilledWant(BigDecimal fulfilledHave, BigDecimal price, int wantAssetScale) {
-        // надо округлять до точности актива, иначе из-за более точной цены может точность лишу дать в isUnResolved
-        BigDecimal result = fulfilledHave.multiply(price).setScale(wantAssetScale + 2, RoundingMode.HALF_DOWN);
-        BigDecimal result2 = fulfilledHave.multiply(price).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
-        return result2;
+        return fulfilledHave.multiply(price).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
     }
 
     public BigDecimal getFulfilledWant() {
