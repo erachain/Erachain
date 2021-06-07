@@ -223,7 +223,7 @@ public class BlockChain {
     public static final int HOLD_VALID_START = VERS_4_11;
 
     /**
-     * Если задан то это режим синхронизации со старым протоколом - значит нам нельза генерить блоки и транзакции
+     * Если задан то это режим синхронизации со старым протоколом - значит нам нельзя генерить блоки и транзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
     public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? (DEMO_MODE ? 0 : 0) : 1707784; // see in sidePROTOCOL.json as 'allValidBefore'
