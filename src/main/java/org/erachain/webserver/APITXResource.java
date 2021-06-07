@@ -108,7 +108,7 @@ public class APITXResource {
     @Path("{signature}")
     public Response getBySign(@PathParam("signature") String signature) {
 
-        Map out = new LinkedHashMap();
+        Map out = new JSONObject();
 
         int step = 1;
 
@@ -133,7 +133,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toString())
+                .entity(StrJSonFine.convert(out))
                 .build();
     }
 
@@ -141,7 +141,7 @@ public class APITXResource {
     @Path("bynumber/{number}")
     public Response getByNumber(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        Map out = new JSONObject();
         int step = 1;
 
         try {
@@ -169,7 +169,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toString())
+                .entity(StrJSonFine.convert(out))
                 .build();
     }
 
@@ -219,7 +219,7 @@ public class APITXResource {
     @Path("signs/{number}")
     public Response getSigns(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        Map out = new JSONObject();
         int step = 1;
 
         Long dbRef = Transaction.parseDBRef(numberStr);
@@ -241,7 +241,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toString())
+                .entity(StrJSonFine.convert(out))
                 .build();
     }
 
@@ -249,7 +249,7 @@ public class APITXResource {
     @Path("vouches/{number}")
     public Response getVouches(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        Map out = new JSONObject();
         int step = 1;
 
         Long dbRef = Transaction.parseDBRef(numberStr);
@@ -271,7 +271,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toString())
+                .entity(StrJSonFine.convert(out))
                 .build();
     }
 

@@ -405,7 +405,7 @@ public class APIItemPerson {
             JSONArray out = new JSONArray();
 
             for (Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>> item : StatusCls.getSortedItems(statuses)) {
-                Map statusJSON = new LinkedHashMap();
+                Map statusJSON = new JSONObject();
                 StatusCls status = item.b;
 
                 statusJSON.put("key", item.a);
