@@ -16,6 +16,7 @@ import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.StrJSonFine;
+import org.erachain.webserver.API;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -249,6 +250,7 @@ public class ItemAssetsResource {
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         byte[] key;
         Crypto crypto = Crypto.getInstance();
+        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balanceAll;
         Fun.Tuple2<BigDecimal, BigDecimal> balance;
 
         JSONArray out = new JSONArray();
@@ -262,19 +264,42 @@ public class ItemAssetsResource {
                 }
 
                 try {
-                    balance = Account.getBalanceForAction(map.get(key), position);
 
-                    // пустые не берем
-                    if (balance.a.signum() == 0 && balance.b.signum() == 0)
-                        continue;
+                    balanceAll = map.get(key);
+                    if (position == 0) {
+                        // пустые не берем
+                        if (balanceAll.a.a.signum() == 0 && balanceAll.a.b.signum() == 0
+                                && balanceAll.b.a.signum() == 0 && balanceAll.b.b.signum() == 0
+                                && balanceAll.c.a.signum() == 0 && balanceAll.c.b.signum() == 0
+                                && balanceAll.d.a.signum() == 0 && balanceAll.d.b.signum() == 0
+                                && balanceAll.e.a.signum() == 0 && balanceAll.e.b.signum() == 0
+                        )
+                            continue;
 
-                    JSONArray bal = new JSONArray();
-                    bal.add(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)));
-                    bal.add(balance.a.toPlainString());
-                    bal.add(balance.b.toPlainString());
-                    out.add(bal);
+                        JSONArray bal = new JSONArray();
+                        bal.add(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)));
+                        bal.add(API.setJSONArray(balanceAll.a));
+                        bal.add(API.setJSONArray(balanceAll.b));
+                        bal.add(API.setJSONArray(balanceAll.c));
+                        bal.add(API.setJSONArray(balanceAll.d));
+                        bal.add(API.setJSONArray(balanceAll.e));
+                        out.add(bal);
 
-                } catch (java.lang.ArrayIndexOutOfBoundsException e) {
+                    } else {
+                        balance = Account.getBalanceForPosition(map.get(key), position);
+
+                        // пустые не берем
+                        if (balance.a.signum() == 0 && balance.b.signum() == 0)
+                            continue;
+
+                        JSONArray bal = new JSONArray();
+                        bal.add(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)));
+                        bal.add(balance.a.toPlainString());
+                        bal.add(balance.b.toPlainString());
+                        out.add(bal);
+                    }
+
+                } catch (ArrayIndexOutOfBoundsException e) {
                     logger.error("Wrong key raw: " + Base58.encode(key));
                 }
 

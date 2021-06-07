@@ -433,7 +433,7 @@ public abstract class PersonCls extends ItemCls {
 
         for (String address : addresses.keySet()) {
             Account account = new Account(address);
-            Tuple2<BigDecimal, BigDecimal> balance = account.getBalanceForAction(assetKey, position);
+            Tuple2<BigDecimal, BigDecimal> balance = account.getBalanceForPosition(assetKey, position);
             if (balance != null)
                 balanceTotal = balanceTotal.add(balance.b);
         }

@@ -45,6 +45,10 @@ public class IssueAssetTransaction extends IssueItemRecord {
         super(typeBytes, TYPE_NAME, creator, linkTo, asset, (byte) 0, 0L, null, signature);
     }
 
+    public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, feePow, timestamp, reference);
+    }
+
     public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, feePow, timestamp, reference, signature);
     }
@@ -170,16 +174,19 @@ public class IssueAssetTransaction extends IssueItemRecord {
             long quantity = asset.getQuantity();
             //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
             if (quantity > maxQuantity || quantity < -1) {
+                errorValue = "quantity > maxQuantity  or < -1: " + quantity + " > " + maxQuantity;
                 return INVALID_QUANTITY;
             }
 
             if (((AssetCls) this.item).isAccounting() && quantity != 0) {
+                errorValue = "Asset is Accounting and quantity != 0";
                 return INVALID_QUANTITY;
             }
 
             if (this.item.isNovaItem(this.dcSet) > 0) {
                 Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
                 if (item.b < quantity) {
+                    errorValue = "Nova asset quantity > set : " + quantity + " > " + item.b;
                     return INVALID_QUANTITY;
                 }
             }

@@ -1557,7 +1557,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
         // если по ALL_VALID_BEFORE пройдет дальше то там корректировка значения стоит!
-        if (this.winValue < 1 && this.heightBlock > BlockChain.ALL_VALID_BEFORE) {
+        if (this.winValue < 1 && this.heightBlock > BlockChain.WIN_VAL_ALL_VALID && this.heightBlock > BlockChain.ALL_VALID_BEFORE) {
             this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
             this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
 

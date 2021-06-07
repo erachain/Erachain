@@ -856,8 +856,8 @@ public class BlockExplorer {
         output.put("Label_Cancel", Lang.T("Cancel", langObj));
 
         output.put("Label_Fulfilled", Lang.T("Fulfilled", langObj));
-        output.put("Label_LeftHave", Lang.T("Left Have", langObj));
-        output.put("Label_LeftPrice", Lang.T("Left Price", langObj));
+        output.put("Label_LeftHave", Lang.T("Remains", langObj));
+        output.put("Label_LeftPrice", Lang.T("Deviation Remainder Price", langObj));
         output.put("Label_table_LastTrades", Lang.T("Last Trades", langObj));
         output.put("Label_table_have", Lang.T("Base Asset", langObj));
         output.put("Label_table_want", Lang.T("Price Asset", langObj));
@@ -1897,7 +1897,7 @@ public class BlockExplorer {
                 transactionDataJSON.put("height", trade.getInitiator() >> 32);
                 transactionDataJSON.put("confirmations", Controller.getInstance().getMyHeight() - height);
 
-                transactionDataJSON.put("timestamp", Transaction.getTimestampByDBRef(trade.getInitiator()));
+                transactionDataJSON.put("timestamp", Controller.getInstance().blockChain.getTimestampByDBRef(trade.getInitiator()));
 
                 transactionDataJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress());
                 transactionDataJSON.put("initiatorCreatorName", orderInitiator.getCreator().getPersonAsString());

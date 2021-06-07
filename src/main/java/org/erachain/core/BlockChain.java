@@ -223,19 +223,19 @@ public class BlockChain {
     public static final int HOLD_VALID_START = VERS_4_11;
 
     /**
-     * Если задан то это режим синхронизации со стрым протоколом - значит нам нельза генерить блоки и трнзакции
+     * Если задан то это режим синхронизации со старым протоколом - значит нам нельзя генерить блоки и транзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? (DEMO_MODE ? 37700 : 0) : 208247; // see in sidePROTOCOL.json as 'allValidBefore'
-    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904; //260120;
+    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? (DEMO_MODE ? 0 : 0) : 1707784; // see in sidePROTOCOL.json as 'allValidBefore'
+    public static final int WIN_VAL_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2023904;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 2092000;
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 1932512; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
      * !!! ВНИМАНИЕ !!! нельзя изменять походу собранной цепочки - так как съедут цены и индекс не удалится у некоторых ордеров - цена о другая.
      * см issue https://lab.erachain.org/erachain/Erachain/-/issues/1322
      */
     public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904;
-
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 900000;
     /**
      * {@link LEFT_PRICE_HEIGHT} as SeqNo
      */
@@ -1077,6 +1077,11 @@ public class BlockChain {
         return heightCheckPoint;
     }
 
+    public Long getTimestampByDBRef(Long dbRef) {
+        Tuple2<Integer, Integer> key = Transaction.parseDBRef(dbRef);
+        return getTimestamp(key.a) + key.b;
+    }
+
     public byte[] getMyHardCheckPointSign() {
         if (CHECKPOINT.a > 1) {
             return CHECKPOINT.b;
@@ -1332,7 +1337,7 @@ public class BlockChain {
 
         int base = BlockChain.getTargetedMin(height);
         int targetedWinValue = calcWinValueTargeted(win_value, target);
-        if (height > ALL_VALID_BEFORE
+        if (height > WIN_VAL_ALL_VALID && height > ALL_VALID_BEFORE
                 && !ERA_COMPU_ALL_UP && !BlockChain.TEST_MODE
                 && base > targetedWinValue) {
             return -targetedWinValue;
