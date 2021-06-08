@@ -19,6 +19,7 @@ import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
@@ -97,6 +98,9 @@ public class APITXResource {
                 "GET Links of transaction by Height and Sequence (SeqNo)");
 
         help.put("GET api/tx/types", "Return array of transaction types.");
+
+        help.put("GET api/tx/parse/{raw}?check=true&lang=en", "Parse and check. Param [lang] for translate errors messages. For validate use [check]");
+        help.put("POST api/tx/parse", "Return array of transaction types. {'raw':'Base58', 'check:true, 'lang':'en}");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -905,14 +909,44 @@ public class APITXResource {
 
     @POST
     @Path("parse")
-    public Response parse(String raw) {
+    public Response parse(String x) {
 
         JSONObject out = new JSONObject();
 
-        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw, false, false);
+        JSONObject jsonObject = null;
+        try {
+            // READ JSON
+            jsonObject = (JSONObject) JSONValue.parse(x);
+        } catch (NullPointerException e) {
+            // JSON EXCEPTION
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_JSON);
+        } catch (ClassCastException e) {
+            // JSON EXCEPTION
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_JSON);
+        }
+
+        if (jsonObject == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_JSON);
+        }
+
+        String lang = (String) jsonObject.get("lang");
+
+        JSONObject langObj = null;
+        if (lang != null) {
+            out.put("lang", lang);
+            langObj = Lang.getInstance().getLangJson(lang);
+        }
+
+        String raw = (String) jsonObject.get("raw");
+        Boolean andCheck = (Boolean) jsonObject.get("check");
+        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw, false,
+                andCheck == null ? false : andCheck);
         if (result.a == null) {
-            out.put("error", result.b);
-            out.put("message", result.c);
+            Transaction.updateMapByErrorSimple(result.b,
+                    langObj == null || result.c == null ? result.c : Lang.T(result.c, langObj), out);
 
         } else {
             try {
@@ -934,9 +968,13 @@ public class APITXResource {
     @GET
     @Path("parse/{raw}")
     public Response recordParseGET(@PathParam("raw") String raw,
-                                   @QueryParam("lang") String lang) // throws JSONException
-    {
-        return parse(raw);
+                                   @QueryParam("check") Boolean andCheck,
+                                   @QueryParam("lang") String lang) {
+        JSONObject json = new JSONObject();
+        json.put("raw", raw);
+        json.put("check", andCheck);
+        json.put("lang", lang);
+        return parse(json.toJSONString());
     }
 
 }
