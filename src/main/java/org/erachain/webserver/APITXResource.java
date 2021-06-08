@@ -14,6 +14,7 @@ import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
+import org.erachain.utils.APIUtils;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.json.simple.JSONArray;
@@ -900,6 +901,42 @@ public class APITXResource {
         }
 
         return (getTypesCACHE = jsonArray.toJSONString());
+    }
+
+    @POST
+    @Path("parse")
+    public Response parse(String raw) {
+
+        JSONObject out = new JSONObject();
+
+        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw, false, false);
+        if (result.a == null) {
+            out.put("error", result.b);
+            out.put("message", result.c);
+
+        } else {
+            try {
+                out = result.a.toJson();
+            } catch (Exception e) {
+                out.put("error", -1);
+                out.put("message", APIUtils.errorMess(-1, e.toString(), result.a));
+                result.a.updateMapByError(-1, e.toString(), out);
+            }
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("parse/{raw}")
+    public Response recordParseGET(@PathParam("raw") String raw,
+                                   @QueryParam("lang") String lang) // throws JSONException
+    {
+        return parse(raw);
     }
 
 }

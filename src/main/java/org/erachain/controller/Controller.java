@@ -3098,26 +3098,69 @@ public class Controller extends Observable {
      * this.transactionCreator.createTransactionFromRaw(rawData); } }
      */
 
-    public Pair<Transaction, Integer> lightCreateTransactionFromRaw(byte[] rawData) {
+    public Fun.Tuple3<Transaction, Integer, String> parseAndCheck(String rawDataStr, boolean base64, boolean andCheck) {
+        byte[] transactionBytes;
+        try {
+            if (base64) {
+                transactionBytes = Base64.getDecoder().decode(rawDataStr);
+            } else {
+                transactionBytes = Base58.decode(rawDataStr);
+            }
+        } catch (Exception e) {
+            return new Fun.Tuple3<>(null, -1, "JSON error: " + e.getMessage());
+        }
+
+        if (transactionBytes == null) {
+            return new Fun.Tuple3<>(null, -1, "JSON error");
+        }
+
+        if (andCheck)
+            return Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, true);
+
+        try {
+            Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
+            return new Tuple3<Transaction, Integer, String>(transaction, null, null);
+        } catch (Exception e) {
+            return new Tuple3<Transaction, Integer, String>(null, Transaction.INVALID_RAW_DATA, e.getMessage());
+        }
+
+    }
+
+    public Tuple3<Transaction, Integer, String> lightCreateTransactionFromRaw(byte[] rawData, boolean notRelease) {
 
         // CREATE TRANSACTION FROM RAW
         Transaction transaction;
         try {
             transaction = TransactionFactory.getInstance().parse(rawData, Transaction.FOR_NETWORK);
         } catch (Exception e) {
-            return new Pair<Transaction, Integer>(null, Transaction.INVALID_RAW_DATA);
+            return new Tuple3<Transaction, Integer, String>(null, Transaction.INVALID_RAW_DATA, e.getMessage());
         }
 
         // CHECK IF RECORD VALID
         if (!transaction.isSignatureValid(DCSet.getInstance()))
-            return new Pair<Transaction, Integer>(transaction, Transaction.INVALID_SIGNATURE);
+            return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
 
         // CHECK FOR UPDATES
-        int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0l);
-        if (valid != Transaction.VALIDATE_OK)
-            return new Pair<Transaction, Integer>(transaction, valid);
+        int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0L, notRelease);
+        if (valid == Transaction.VALIDATE_OK)
+            return new Tuple3<Transaction, Integer, String>(transaction, null, null);
 
-        return new Pair<Transaction, Integer>(transaction, valid);
+        return new Tuple3<Transaction, Integer, String>(transaction, valid, transaction.errorValue);
+
+    }
+
+    public Tuple3<Transaction, Integer, String> checkTransaction(Transaction transaction) {
+
+        // CHECK IF RECORD VALID
+        if (!transaction.isSignatureValid(DCSet.getInstance()))
+            return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
+
+        // CHECK FOR UPDATES
+        int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0l, false);
+        if (valid != Transaction.VALIDATE_OK)
+            return new Tuple3<Transaction, Integer, String>(transaction, valid, transaction.errorValue);
+
+        return new Tuple3<Transaction, Integer, String>(transaction, valid, null);
 
     }
 
