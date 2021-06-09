@@ -2100,9 +2100,37 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
     }
 
+    public void updateMapByError(int error, HashMap out, String lang) {
+        out.put("error", error);
+        if (lang == null) {
+            out.put("message", OnDealClick.resultMess(error));
+        } else {
+            out.put("lang", lang);
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            out.put("message", langObj == null ? OnDealClick.resultMess(error) : Lang.T(OnDealClick.resultMess(error), langObj));
+        }
+        if (errorValue != null) {
+            out.put("value", errorValue);
+        }
+    }
+
     public void updateMapByError(int error, String errorMess, HashMap out) {
         out.put("error", error);
         out.put("message", errorMess);
+        if (errorValue != null) {
+            out.put("value", errorValue);
+        }
+    }
+
+    public void updateMapByError(int error, String errorMess, HashMap out, String lang) {
+        out.put("error", error);
+        if (lang == null) {
+            out.put("message", errorMess);
+        } else {
+            out.put("lang", lang);
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            out.put("message", langObj == null ? errorMess : Lang.T(errorMess, langObj));
+        }
         if (errorValue != null) {
             out.put("value", errorValue);
         }

@@ -407,6 +407,7 @@ public class OnDealClick {
             case Transaction.ITEM_DOES_NOT_EXIST:
                 mess = "Item does not exist";
                 break;
+
             case Transaction.OWNER_NOT_PERSONALIZED:
                 mess = "Owner Account is not personalized";
                 break;
@@ -463,6 +464,9 @@ public class OnDealClick {
                 break;
             case Transaction.ITEM_POLL_NOT_EXIST:
                 mess = "Item poll does not exist";
+                break;
+            case Transaction.ITEM_STATUS_NOT_EXIST:
+                mess = "Item status does not exist";
                 break;
             case Transaction.ITEM_UNION_NOT_EXIST:
                 mess = "Item union does not exist";

@@ -18,11 +18,9 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -964,32 +962,26 @@ public class API {
 
     // http://127.0.0.1:9047/api/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
     public JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
-        int step = 1;
-        JSONObject out = new JSONObject();
-        try {
+        Tuple3<Transaction, Integer, String> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, false);
+        if (result.a == null) {
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple(result.b, langObj == null || result.c == null ?
+                    result.c : Lang.T(result.c, langObj), out);
+            return out;
 
-            step++;
-            Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
-            if (result.getB() == Transaction.VALIDATE_OK) {
-                out.put("status", "ok");
-                return out;
-            } else {
-                JSONObject langObj = Lang.getInstance().getLangJson(lang);
+        }
 
-                out.put("error", result.getB());
-                out.put("message", langObj == null ? OnDealClick.resultMess(result.getB()) : Lang.T(OnDealClick.resultMess(result.getB()), langObj));
-                out.put("lang", lang);
-                if (result.getA() != null && result.getA().errorValue != null) {
-                    out.put("value", langObj == null ? result.getA().errorValue : Lang.T(result.getA().errorValue, langObj));
-                }
-                return out;
-            }
-
-        } catch (Exception e) {
-            LOGGER.warn(" on step: " + step + " - " + e.toString() + " - " + e.getMessage(), e);
-            Transaction.updateMapByErrorSimple(-1, e.toString() + " on step: " + step, out);
+        JSONObject out = result.a.toJson();
+        if (result.b == Transaction.VALIDATE_OK) {
+            out.put("status", "ok");
             return out;
         }
+
+        result.a.updateMapByError(result.b, out, lang);
+
+        return out;
+
     }
 
     public JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
