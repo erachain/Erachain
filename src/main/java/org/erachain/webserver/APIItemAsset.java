@@ -220,6 +220,13 @@ public class APIItemAsset {
 
     }
 
+    @Path("image/{key}.mp4")
+    @GET
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    public Response assetImageMP4(@Context UriInfo info, @PathParam("key") long key) throws IOException {
+        return assetImage(info, key);
+    }
+
     @Path("icon/{key}")
     @GET
     //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
