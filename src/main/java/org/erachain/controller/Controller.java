@@ -3142,7 +3142,7 @@ public class Controller extends Observable {
         // CHECK FOR UPDATES
         int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0L, notRelease);
         if (valid == Transaction.VALIDATE_OK)
-            return new Tuple3<Transaction, Integer, String>(transaction, null, null);
+            return new Tuple3<Transaction, Integer, String>(transaction, valid, null);
 
         return new Tuple3<Transaction, Integer, String>(transaction, valid, transaction.errorValue);
 
