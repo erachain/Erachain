@@ -922,7 +922,7 @@ public class APITXResource {
         } catch (ClassCastException e) {
             // JSON EXCEPTION
             throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_JSON);
+                    ApiErrorFactory.ERROR_JSON, e.getMessage());
         }
 
         if (jsonObject == null) {
