@@ -6,6 +6,7 @@ package org.erachain.webserver;
 //import javafx.print.Collation;
 
 import org.erachain.api.ApiErrorFactory;
+import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.ItemMap;
 
@@ -55,8 +56,13 @@ public class APIItems {
             }
         }
 
+        Controller cnt = Controller.getInstance();
+
         return Response.status(200)
                 .header("Access-Control-Allow-Origin", "*")
+                .header("Content-length", image.length)
+                .header("Last-Modified", cnt.blockChain.getTimestamp(1000))
+                .header("Timing-Allow-Origin", "*")
                 .entity(new ByteArrayInputStream(image))
                 .type(mediaType)
                 .build();
