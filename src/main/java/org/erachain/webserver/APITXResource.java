@@ -99,8 +99,8 @@ public class APITXResource {
 
         help.put("GET api/tx/types", "Return array of transaction types.");
 
-        help.put("GET api/tx/parse/{raw}?check=true&lang=en", "Parse and check. Param [lang] for translate errors messages. For validate use [check]");
-        help.put("POST api/tx/parse", "Return array of transaction types. {'raw':'Base58', 'check:true, 'lang':'en}");
+        help.put("GET api/tx/parse/{raw in BaseXX}?check=false&lang=en&base58=false", "Parse and check. Param [lang] for translate errors messages. For validate use [check=true]. If RAW in Base58 use [base58=true] else it in Base64");
+        help.put("POST api/tx/parse", "See 'GET parse'. Body: {\"raw\":\"bytes in BaseXX\", \"check\":false, \"lang\":\"en\", \"base58\":false}");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -911,8 +911,6 @@ public class APITXResource {
     @Path("parse")
     public Response parse(String x) {
 
-        JSONObject out = new JSONObject();
-
         JSONObject jsonObject = null;
         try {
             // READ JSON
@@ -932,7 +930,19 @@ public class APITXResource {
                     ApiErrorFactory.ERROR_JSON);
         }
 
-        String lang = (String) jsonObject.get("lang");
+        return parse((String) jsonObject.get("raw"),
+                (Boolean) jsonObject.get("base58"),
+                (Boolean) jsonObject.get("check"),
+                (String) jsonObject.get("lang"));
+    }
+
+    @GET
+    @Path("parse/{raw}")
+    public Response parse(@PathParam("raw") String raw,
+                          @QueryParam("base58") Boolean base58,
+                          @QueryParam("check") Boolean andCheck,
+                          @QueryParam("lang") String lang) {
+        JSONObject out = new JSONObject();
 
         JSONObject langObj = null;
         if (lang != null) {
@@ -940,9 +950,8 @@ public class APITXResource {
             langObj = Lang.getInstance().getLangJson(lang);
         }
 
-        String raw = (String) jsonObject.get("raw");
-        Boolean andCheck = (Boolean) jsonObject.get("check");
-        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw, false,
+        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw,
+                base58 == null || !base58,
                 andCheck == null ? false : andCheck);
         if (result.a == null) {
             Transaction.updateMapByErrorSimple(result.b,
@@ -963,18 +972,6 @@ public class APITXResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(out.toJSONString())
                 .build();
-    }
-
-    @GET
-    @Path("parse/{raw}")
-    public Response recordParseGET(@PathParam("raw") String raw,
-                                   @QueryParam("check") Boolean andCheck,
-                                   @QueryParam("lang") String lang) {
-        JSONObject json = new JSONObject();
-        json.put("raw", raw);
-        json.put("check", andCheck);
-        json.put("lang", lang);
-        return parse(json.toJSONString());
     }
 
 }

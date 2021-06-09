@@ -3100,18 +3100,17 @@ public class Controller extends Observable {
 
     public Fun.Tuple3<Transaction, Integer, String> parseAndCheck(String rawDataStr, boolean base64, boolean andCheck) {
         byte[] transactionBytes;
+
+        int step = 1;
         try {
             if (base64) {
                 transactionBytes = Base64.getDecoder().decode(rawDataStr);
             } else {
+                step++;
                 transactionBytes = Base58.decode(rawDataStr);
             }
         } catch (Exception e) {
-            return new Fun.Tuple3<>(null, -1, "JSON error: " + e.getMessage());
-        }
-
-        if (transactionBytes == null) {
-            return new Fun.Tuple3<>(null, -1, "JSON error");
+            return new Fun.Tuple3<>(null, -1, "Base" + (step == 2 ? "58" : "64") + " decode: " + e.getMessage());
         }
 
         if (andCheck)
