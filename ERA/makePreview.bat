@@ -3,7 +3,7 @@
 rem https://stackoverflow.com/questions/34391499/change-video-resolution-ffmpeg
 rem ffmpeg -y -i "%%i" -vf scale=480:-2,setsar=1:1 -c:v libx264 -c:a copy "%%~ni_shrink.mp4"
 
-rem !!! use '-pix_fmt yuv420p -vcodec libx264' for FireFox instead h264 !!!
+rem !!! use '-pix_fmt yuv420p -vcodec libx264' for FireFox instead h264 !!! see https://github.com/ccrisan/motioneye/issues/1067
 
 rem param 2 and 3 - for make small video
 
