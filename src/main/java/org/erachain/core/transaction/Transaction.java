@@ -2117,7 +2117,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public void updateMapByError2(HashMap out, int error, String lang) {
         JSONObject json = new JSONObject();
-        json.put("error", error);
+        json.put("code", error);
         if (lang == null) {
             json.put("message", OnDealClick.resultMess(error));
         } else {
