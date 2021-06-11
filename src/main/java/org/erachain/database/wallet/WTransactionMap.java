@@ -175,11 +175,21 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
 
         this.addressAssetKey = database.createTreeSet("address_asset_txs").comparator(Fun.TUPLE2_COMPARATOR)
                 .makeOrGet();
-        Bind.secondaryKey((Bind.MapWithModificationListener) map, this.addressAssetKey,
-                new Fun.Function2<Tuple2<Integer, Long>, Tuple2<Long, Integer>, Transaction>() {
+        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.addressAssetKey,
+                new Fun.Function2<Tuple2<Integer, Long>[], Tuple2<Long, Integer>, Transaction>() {
                     @Override
-                    public Tuple2<Integer, Long> run(Tuple2<Long, Integer> key, Transaction value) {
-                        return new Tuple2<>(key.b.hashCode(), value.getAbsKey());
+                    public Tuple2<Integer, Long>[] run(Tuple2<Long, Integer> key, Transaction value) {
+                        Object[][] itemKeys = value.getItemsKeys();
+                        if (itemKeys == null)
+                            return null;
+
+                        Tuple2<Integer, Long>[] keys = new Tuple2[itemKeys.length];
+                        for (Object itemKey : itemKeys) {
+                            if (itemKey instanceof Long) {
+
+                            }
+                        }
+                        return keys;
                     }
                 });
 

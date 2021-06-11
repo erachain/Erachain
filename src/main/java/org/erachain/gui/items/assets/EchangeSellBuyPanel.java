@@ -247,7 +247,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 int row1 = sellOrdersTable.convertRowIndexToModel(row);
 
                 Order order = sellOrdersTableModel.getItem(row1);
-                new ChangeOrderFrame(order);
+                new ChangeOrderFrame(order, false);
             }
         });
         sellOrdersMenu.add(sellChange);
@@ -433,7 +433,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 int row1 = buyOrdersTable.convertRowIndexToModel(row);
 
                 Order order = buyOrdersTableModel.getItem(row1);
-                new ChangeOrderFrame(order);
+                new ChangeOrderFrame(order, true);
             }
         });
         buyOrdersMenu.add(buyChange);
