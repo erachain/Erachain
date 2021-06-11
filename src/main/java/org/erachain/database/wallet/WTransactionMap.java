@@ -189,7 +189,7 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
                         Tuple2<Integer, Long>[] keys = new Tuple2[itemKeys.length];
                         for (int i = 0; i < keys.length; i++) {
                             if (((int) itemKeys[i][0]) == ItemCls.ASSET_TYPE) {
-                                keys[i] = new Tuple2<Integer, Long>()
+                                keys[i] = new Tuple2<Integer, Long>(key.b.hashCode(), (Long) itemKeys[i][1]);
                             }
                         }
                         return keys;
