@@ -22,10 +22,7 @@ import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -102,6 +99,7 @@ public class APITXResource {
 
         help.put("GET api/tx/broadcast/{raw in BaseXX}?lang=en&base58", "Broadcast byte-code in Base58 or Base64. Use [lang] for localize error message. If RAW in Base58 use [base58] else it in Base64");
         help.put("POST api/tx/broadcast?lang=en&base58", "See 'GET broadcast'. Body: [RAW in BaseXX]");
+        help.put("POST api/tx/broadcastjson JSON", "See 'GET broadcast'. Body is JSON: {\"raw\":\"BaseXX\", \"lang\":\"en|ru\", \"base58\":false}");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -1024,6 +1022,24 @@ public class APITXResource {
         }
 
         return broadcastFromRawByte(transactionBytes, lang);
+    }
+
+    @POST
+    @Path("broadcastjson")
+    public Response broadcastFromRawJsonPost(@Context UriInfo info,
+                                             @Context HttpServletRequest request,
+                                             MultivaluedMap<String, String> form) {
+
+        String raw = form.getFirst("raw");
+        boolean base58 = API.checkBoolean(info, "base58");
+        String lang = form.getFirst("lang");
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, !base58, lang).toJSONString())
+                .build();
+
     }
 
 }

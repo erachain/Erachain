@@ -99,10 +99,6 @@ public class API {
         help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");
 
         help.put("*** RECORD ***", "");
-        help.put("GET Record Parse from RAW", "recordparse/{RAW}");
-        help.put("POST Record Parse from RAW", "recordparse RAW");
-        //help.put("GET Record", "record/{signature}");
-        //help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
         help.put("GET Record RAW", "recordraw/{signature}");
         help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{block-seqNo]");
         help.put("GET Record RAW by Height and Sequence 2", "recordrawbynumber/{block]/[seqNo]");
@@ -140,13 +136,6 @@ public class API {
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
         help.put("GET info by node", " GET api/info");
         help.put("GET benchmark info by node", " GET api/bench");
-
-        help.put("GET Broadcast", "/broadcast/{raw(Base58)}?lang=en|ru - lang for localize error message");
-        help.put("GET Broadcast64", "/broadcast64/{raw(Base64)}?lang=en|ru - lang for localize error message");
-        help.put("POST Broadcast", "/broadcast?lang=en|ru raw(Base58) - lang for localize error message");
-        help.put("POST Broadcast64", "/broadcast64?lang=en|ru raw(Base64) - lang for localize error message");
-        help.put("POST Broadcastjson", "/broadcastjson?lang=en|ru JSON - JSON: {raw:raw(Base58), lang:en|ru} - lang for localize error message");
-        help.put("POST Broadcastjson64", "/broadcastjson64?lang=en|ru JSON - JSON: {raw:raw(Base64), lang:en|ru} - lang for localize error message");
 
         help.put("POST Broadcasttelegram", "/broadcasttelegram?lang=en|ru JSON {'raw': raw(Base58)}");
         help.put("POST Broadcasttelegram64", "/broadcasttelegram64?lang=en|ru JSON {'raw': raw(Base64)}");
@@ -661,6 +650,7 @@ public class API {
      * ************** RECORDS **********
      */
 
+    @Deprecated
     @POST
     @Path("recordparse")
     public Response recordParse(String raw) // throws JSONException
@@ -690,6 +680,8 @@ public class API {
                 .build();
     }
 
+
+    @Deprecated
     @GET
     @Path("recordparse/{raw}")
     public Response recordParseGET(@PathParam("raw") String raw) // throws JSONException
@@ -872,6 +864,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("broadcast/{raw}")
     // http://127.0.0.1:9047/api/broadcast/DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
@@ -885,6 +878,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("broadcast64/{raw}")
     public Response broadcastRaw64(@PathParam("raw") String raw, @QueryParam("lang") String lang) {
@@ -897,6 +891,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @POST
     @Path("broadcastjson")
     public Response broadcastFromRawJsonPost(@Context HttpServletRequest request,
@@ -913,6 +908,7 @@ public class API {
 
     }
 
+    @Deprecated
     @POST
     @Path("broadcastjson64")
     public Response broadcastFromRaw64JsonPost(@Context HttpServletRequest request,
@@ -929,6 +925,7 @@ public class API {
 
     }
 
+    @Deprecated
     @POST
     @Path("broadcast")
     public Response broadcastFromRawPost(@Context HttpServletRequest request,
@@ -943,6 +940,7 @@ public class API {
 
     }
 
+    @Deprecated
     @POST
     @Path("broadcast64")
     public Response broadcastFromRaw64Post(@Context HttpServletRequest request,
