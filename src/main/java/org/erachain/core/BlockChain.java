@@ -341,7 +341,7 @@ public class BlockChain {
      * see org.erachain.core.item.assets.OrderTestsMy#testOrderProcessingNonDivisible() - 0.0000432
      * Тут точность можно сделать меньше так он либо полностью исполнится либо встанет уже с новой ценой по остатку в стакане
      */
-    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT = new BigDecimal("0.001");
+    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT = new BigDecimal("0.0005");
     final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT_NEG = INITIATOR_PRICE_DIFF_LIMIT.multiply(new BigDecimal(5));
     /**
      * Если после исполнения торговой сделки остается остаток у ордера-цели и
@@ -349,14 +349,14 @@ public class BlockChain {
      * Тут нужно точность выше чем у Инициатора - так как он может перекрыть цену других встречных ордеров в стакане
      * И по хорошему его нужно пересчитать как Активный если цена полезла не в его сторону
      */
-    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.001");
+    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.0005");
     final public static BigDecimal TARGET_PRICE_DIFF_LIMIT_NEG = TARGET_PRICE_DIFF_LIMIT.multiply(new BigDecimal(5));
     /**
      * Если сыграло INITIATOR_PRICE_DIFF_LIMIT и цена сделки после скидывания в нее остатка ордера-цели не выйдет за это ограничени то скидываем в сделку.
      * Инача отдаем обратно
      */
     ///final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
-    final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("0.001");
+    final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("0.002");
 
     public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : !MAIN_MODE ? 0 : VERS_4_11;
 
