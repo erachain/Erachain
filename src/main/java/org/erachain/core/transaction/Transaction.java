@@ -450,7 +450,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected PersonCls creatorPerson;
 
     /**
-     * Для создания поисковых Меток - Тип сущности + номер ее. например @P12 - персона 12
+     * Для создания поисковых Меток - Тип сущности + номер ее (например @P12 - персона 12) + Метки (Tags) от самой Сущности
      */
     protected Object[][] itemsKeys;
 
@@ -874,6 +874,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public Object[][] getItemsKeys() {
+        if (itemsKeys == null)
+            makeItemsKeys();
+
         return itemsKeys;
     }
 
