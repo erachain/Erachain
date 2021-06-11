@@ -20,7 +20,6 @@ import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.erachain.utils.APIUtils;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -676,8 +675,6 @@ public class API {
             try {
                 out = transaction.toJson();
             } catch (Exception e) {
-                out.put("error", -1);
-                out.put("message", APIUtils.errorMess(-1, e.toString(), transaction));
                 transaction.updateMapByError(-1, e.toString(), out);
             }
         } catch (Exception e) {

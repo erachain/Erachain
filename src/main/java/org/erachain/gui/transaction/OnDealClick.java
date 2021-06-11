@@ -530,6 +530,10 @@ public class OnDealClick {
                 mess = "Invalid transaction type";
                 break;
 
+            case Transaction.JSON_ERROR:
+                mess = "Invalid JSON";
+                break;
+
         }
         return mess;
     }

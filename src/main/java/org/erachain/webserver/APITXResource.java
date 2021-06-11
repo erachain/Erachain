@@ -14,7 +14,6 @@ import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
-import org.erachain.utils.APIUtils;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.json.simple.JSONArray;
@@ -927,16 +926,14 @@ public class APITXResource {
 
         Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw, !base58, check);
         if (result.a == null) {
-            Transaction.updateMapByErrorSimple(result.b,
-                    langObj == null || result.c == null ? result.c : Lang.T(result.c, langObj), out);
+            Transaction.updateMapByErrorSimple2(out, result.b,
+                    langObj == null || result.c == null ? result.c : Lang.T(result.c, langObj), lang);
 
         } else {
             try {
                 out = result.a.toJson();
             } catch (Exception e) {
-                out.put("error", -1);
-                out.put("message", APIUtils.errorMess(-1, e.toString(), result.a));
-                result.a.updateMapByError(-1, e.toString(), out);
+                result.a.updateMapByError2(out, Transaction.JSON_ERROR, e.toString());
             }
         }
 
@@ -981,9 +978,52 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(API.broadcastFromRawString(raw, !base58, lang).toJSONString())
+                .entity(broadcastFromRawString(raw, !base58, lang).toJSONString())
                 .build();
 
+    }
+
+    public static JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
+        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, false);
+        if (result.a == null) {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple2(out, result.b, result.c, lang);
+            return out;
+
+        }
+
+        JSONObject out = result.a.toJson();
+        if (result.b == Transaction.VALIDATE_OK) {
+            out.put("status", "ok");
+            return out;
+        }
+
+        result.a.updateMapByError2(out, result.b, lang);
+
+        return out;
+
+    }
+
+    public static JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
+        JSONObject out = new JSONObject();
+        byte[] transactionBytes;
+        try {
+            if (base64) {
+                transactionBytes = Base64.getDecoder().decode(rawDataStr);
+            } else {
+                transactionBytes = Base58.decode(rawDataStr);
+            }
+        } catch (Exception e) {
+            Transaction.updateMapByErrorSimple2(out, Transaction.JSON_ERROR, e.getMessage(), lang);
+            return out;
+        }
+
+        if (transactionBytes == null) {
+            Transaction.updateMapByErrorSimple2(out, Transaction.JSON_ERROR, "", lang);
+            return out;
+        }
+
+        return broadcastFromRawByte(transactionBytes, lang);
     }
 
 }
