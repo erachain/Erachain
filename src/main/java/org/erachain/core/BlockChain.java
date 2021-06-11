@@ -336,20 +336,20 @@ public class BlockChain {
     // DEX precision
     ///public static final int TRADE_PRECISION = 4;
     /**
-     * Если после исполнения торговой сделки оостатется статок у ордера-инициатора и
+     * Если после исполнения торговой сделки остается остаток у ордера-инициатора и
      * цена для остатка отклонится больше чем на эту величину то ему возвращаем остаток
      * see org.erachain.core.item.assets.OrderTestsMy#testOrderProcessingNonDivisible() - 0.0000432
      * Тут точность можно сделать меньше так он либо полностью исполнится либо встанет уже с новой ценой по остатку в стакане
      */
-    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT = new BigDecimal("0.0005");
+    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT = new BigDecimal("0.001");
     final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT_NEG = INITIATOR_PRICE_DIFF_LIMIT.multiply(new BigDecimal(5));
     /**
-     * Если после исполнения торговой сделки оостатется статок у ордера-цели и
+     * Если после исполнения торговой сделки остается остаток у ордера-цели и
      * цена для остатка отклонится больше чем на эту величину то либо скидываем остаток в эту сделку либо ему возвращаем остаток
      * Тут нужно точность выше чем у Инициатора - так как он может перекрыть цену других встречных ордеров в стакане
      * И по хорошему его нужно пересчитать как Активный если цена полезла не в его сторону
      */
-    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.00005");
+    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.001");
     final public static BigDecimal TARGET_PRICE_DIFF_LIMIT_NEG = TARGET_PRICE_DIFF_LIMIT.multiply(new BigDecimal(5));
     /**
      * Если сыграло INITIATOR_PRICE_DIFF_LIMIT и цена сделки после скидывания в нее остатка ордера-цели не выйдет за это ограничени то скидываем в сделку.
