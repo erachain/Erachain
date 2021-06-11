@@ -740,7 +740,7 @@ public class OrderTestsMy {
 
                     BigDecimal tradePrice = trade.calcPrice();
                     logger.info(order_AB_1.getPrice() + " - " + tradePrice);
-                    assertEquals(false, Order.isPricesClose(order_AB_1.getPrice(), tradePrice, false));
+                    assertEquals(false, Order.isPricesNotClose(order_AB_1.getPrice(), tradePrice, false));
 
                     BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
                     BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
@@ -836,7 +836,7 @@ public class OrderTestsMy {
 
                     BigDecimal tradePrice = trade.calcPrice();
                     logger.info(order_AB_1.getPrice() + " - " + tradePrice);
-                    assertEquals(false, Order.isPricesClose(order_AB_1.getPrice(), tradePrice, false));
+                    assertEquals(false, Order.isPricesNotClose(order_AB_1.getPrice(), tradePrice, false));
 
                     BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
                     BigDecimal fullfilledB = order_AB_1.getFulfilledHave();

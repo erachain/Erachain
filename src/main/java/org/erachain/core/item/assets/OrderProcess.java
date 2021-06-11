@@ -286,7 +286,7 @@ public class OrderProcess {
                             debug = true;
                         }
 
-                        // если исполненый ордер станет не исполняемым то попробуем его тут обработать особо
+                        // если исполняемый ордер станет не исполняемым, то попробуем его тут обработать особо
                         willUnResolvedFor = order.willUnResolvedFor(tradeAmountForHave, true);
                         if (willUnResolvedFor) {
                             BigDecimal priceUpdateTrade = Order.calcPrice(orderAmountHaveLeft,
@@ -295,7 +295,7 @@ public class OrderProcess {
                             // если цена текущей сделки не сильно изменится
                             // или если остаток у ордера стенки уже очень маленький по сравнению с текущей сделкой
                             // то весь ордер в сделку сольем
-                            if (Order.isPricesClose(orderPrice, priceUpdateTrade, false)
+                            if (!Order.isPricesNotClose(orderPrice, priceUpdateTrade, false)
                                     || orderAmountHaveLeft.subtract(tradeAmountForHave)
                                     .divide(orderAmountHaveLeft,
                                             BlockChain.TRADE_PRICE_DIFF_LIMIT.scale(),
