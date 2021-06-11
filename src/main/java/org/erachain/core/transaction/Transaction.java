@@ -2126,7 +2126,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             JSONObject langObj = Lang.getInstance().getLangJson(lang);
             if (langObj != null) {
                 json.put("lang", lang);
-                json.put("message_lang", Lang.T(OnDealClick.resultMess(error), langObj));
+                json.put("localMessage", Lang.T(OnDealClick.resultMess(error), langObj));
             }
         }
         if (errorValue != null) {
@@ -2182,7 +2182,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             JSONObject langObj = Lang.getInstance().getLangJson(lang);
             if (langObj != null) {
                 json.put("lang", lang);
-                json.put("message_lang", Lang.T(errorMess, langObj));
+                json.put("localMessage", Lang.T(errorMess, langObj));
             }
         }
         out.put("error", json);
