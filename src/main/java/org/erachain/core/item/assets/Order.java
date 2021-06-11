@@ -206,7 +206,7 @@ public class Order implements Comparable<Order> {
 
         BigDecimal priceForLeft = calcPrice(willHave, willWant, wantAssetScale);
 
-        return isPricesClose(price, priceForLeft, forTarget);
+        return isPricesNotClose(price, priceForLeft, forTarget);
 
     }
 
@@ -230,19 +230,19 @@ public class Order implements Comparable<Order> {
             // уже не сошлось
             return true;
 
-        return isPricesClose(price, priceForLeft, false);
+        return isPricesNotClose(price, priceForLeft, false);
 
     }
 
     /**
-     * есди цены в погрешности
+     * если эти цены слишком далеки и не в допустимой погрешности
      *
      * @param price
      * @param priceForLeft
      * @param forTarget
      * @return
      */
-    public static boolean isPricesClose(BigDecimal price, BigDecimal priceForLeft, boolean forTarget) {
+    public static boolean isPricesNotClose(BigDecimal price, BigDecimal priceForLeft, boolean forTarget) {
 
         BigDecimal diff = price.subtract(priceForLeft);
         int signum = diff.signum();

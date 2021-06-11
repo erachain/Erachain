@@ -20,7 +20,6 @@ import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.erachain.utils.APIUtils;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -676,8 +675,6 @@ public class API {
             try {
                 out = transaction.toJson();
             } catch (Exception e) {
-                out.put("error", -1);
-                out.put("message", APIUtils.errorMess(-1, e.toString(), transaction));
                 transaction.updateMapByError(-1, e.toString(), out);
             }
         } catch (Exception e) {
@@ -961,7 +958,7 @@ public class API {
     }
 
     // http://127.0.0.1:9047/api/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-    public JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
+    public static JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
         Tuple3<Transaction, Integer, String> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, false);
         if (result.a == null) {
             JSONObject langObj = Lang.getInstance().getLangJson(lang);
@@ -984,7 +981,7 @@ public class API {
 
     }
 
-    public JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
+    public static JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
         JSONObject out = new JSONObject();
         byte[] transactionBytes;
         try {

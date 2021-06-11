@@ -14,12 +14,10 @@ import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
-import org.erachain.utils.APIUtils;
 import org.erachain.utils.StrJSonFine;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
@@ -99,8 +97,11 @@ public class APITXResource {
 
         help.put("GET api/tx/types", "Return array of transaction types.");
 
-        help.put("GET api/tx/parse/{raw in BaseXX}?check=false&lang=en&base58=false", "Parse and check. Param [lang] for translate errors messages. For validate use [check=true]. If RAW in Base58 use [base58=true] else it in Base64");
-        help.put("POST api/tx/parse", "See 'GET parse'. Body: {\"raw\":\"bytes in BaseXX\", \"check\":false, \"lang\":\"en\", \"base58\":false}");
+        help.put("GET api/tx/parse/{raw in BaseXX}?check&lang=en&base58", "Parse and check. Param [lang] for translate errors messages. For validate use [check]. If RAW in Base58 use [base58] else it in Base64");
+        help.put("POST api/tx/parse?check&lang=en&base58", "See 'GET parse'. Body: [RAW in BaseXX]");
+
+        help.put("GET api/tx/broadcast/{raw in BaseXX}?lang=en&base58", "Broadcast byte-code in Base58 or Base64. Use [lang] for localize error message. If RAW in Base58 use [base58] else it in Base64");
+        help.put("POST api/tx/broadcast?lang=en&base58", "See 'GET broadcast'. Body: [RAW in BaseXX]");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -907,41 +908,14 @@ public class APITXResource {
         return (getTypesCACHE = jsonArray.toJSONString());
     }
 
-    @POST
-    @Path("parse")
-    public Response parse(String x) {
-
-        JSONObject jsonObject = null;
-        try {
-            // READ JSON
-            jsonObject = (JSONObject) JSONValue.parse(x);
-        } catch (NullPointerException e) {
-            // JSON EXCEPTION
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_JSON);
-        } catch (ClassCastException e) {
-            // JSON EXCEPTION
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_JSON, e.getMessage());
-        }
-
-        if (jsonObject == null) {
-            throw ApiErrorFactory.getInstance().createError(
-                    ApiErrorFactory.ERROR_JSON);
-        }
-
-        return parse((String) jsonObject.get("raw"),
-                (Boolean) jsonObject.get("base58"),
-                (Boolean) jsonObject.get("check"),
-                (String) jsonObject.get("lang"));
-    }
-
     @GET
     @Path("parse/{raw}")
-    public Response parse(@PathParam("raw") String raw,
-                          @QueryParam("base58") Boolean base58,
-                          @QueryParam("check") Boolean andCheck,
+    public Response parse(@Context UriInfo info,
+                          @PathParam("raw") String raw,
                           @QueryParam("lang") String lang) {
+        boolean base58 = API.checkBoolean(info, "base58");
+        boolean check = API.checkBoolean(info, "check");
+
         JSONObject out = new JSONObject();
 
         JSONObject langObj = null;
@@ -950,20 +924,16 @@ public class APITXResource {
             langObj = Lang.getInstance().getLangJson(lang);
         }
 
-        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw,
-                base58 == null || !base58,
-                andCheck == null ? false : andCheck);
+        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw, !base58, check);
         if (result.a == null) {
-            Transaction.updateMapByErrorSimple(result.b,
-                    langObj == null || result.c == null ? result.c : Lang.T(result.c, langObj), out);
+            Transaction.updateMapByErrorSimple2(out, result.b,
+                    langObj == null || result.c == null ? result.c : Lang.T(result.c, langObj), lang);
 
         } else {
             try {
                 out = result.a.toJson();
             } catch (Exception e) {
-                out.put("error", -1);
-                out.put("message", APIUtils.errorMess(-1, e.toString(), result.a));
-                result.a.updateMapByError(-1, e.toString(), out);
+                result.a.updateMapByError2(out, Transaction.JSON_ERROR, e.toString());
             }
         }
 
@@ -972,6 +942,88 @@ public class APITXResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(out.toJSONString())
                 .build();
+    }
+
+    @POST
+    @Path("parse")
+    public Response parsePost(@Context UriInfo info,
+                              @QueryParam("lang") String lang,
+                              String raw) {
+
+        return parse(info, raw, lang);
+    }
+
+    @GET
+    @Path("broadcast/{raw}")
+    public Response broadcast(@Context UriInfo info,
+                              @PathParam("raw") String raw,
+                              @QueryParam("lang") String lang) {
+
+        boolean base58 = API.checkBoolean(info, "base58");
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(API.broadcastFromRawString(raw, !base58, lang).toJSONString())
+                .build();
+    }
+
+    @POST
+    @Path("broadcast")
+    public Response broadcastPost(@Context UriInfo info,
+                                  @QueryParam("lang") String lang,
+                                  String raw) {
+
+        boolean base58 = API.checkBoolean(info, "base58");
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, !base58, lang).toJSONString())
+                .build();
+
+    }
+
+    public static JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
+        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, false);
+        if (result.a == null) {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple2(out, result.b, result.c, lang);
+            return out;
+
+        }
+
+        JSONObject out = result.a.toJson();
+        if (result.b == Transaction.VALIDATE_OK) {
+            out.put("status", "ok");
+            return out;
+        }
+
+        result.a.updateMapByError2(out, result.b, lang);
+
+        return out;
+
+    }
+
+    public static JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
+        JSONObject out = new JSONObject();
+        byte[] transactionBytes;
+        try {
+            if (base64) {
+                transactionBytes = Base64.getDecoder().decode(rawDataStr);
+            } else {
+                transactionBytes = Base58.decode(rawDataStr);
+            }
+        } catch (Exception e) {
+            Transaction.updateMapByErrorSimple2(out, Transaction.JSON_ERROR, e.getMessage(), lang);
+            return out;
+        }
+
+        if (transactionBytes == null) {
+            Transaction.updateMapByErrorSimple2(out, Transaction.JSON_ERROR, "", lang);
+            return out;
+        }
+
+        return broadcastFromRawByte(transactionBytes, lang);
     }
 
 }

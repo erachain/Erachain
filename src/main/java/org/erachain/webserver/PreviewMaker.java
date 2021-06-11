@@ -119,7 +119,9 @@ public class PreviewMaker {
                 // -vf scale=256:-2,setsar=1:1
                 builder = new ProcessBuilder("ffmpeg",
                         "-i", fileIn.toPath().toString(),
-                        "-y", "-fs", "512k", "-vcodec", "h264", "-an",
+                        "-y", "-fs", "512k",
+                        "-pix_fmt", "yuv420p", // for FireFox (neg error NS_ERROR_DOM_MEDIA_FATAL_ERR see https://github.com/ccrisan/motioneye/issues/1067
+                        "-vcodec", "h264", "-an",
                         "-vf", "scale=256:-2,setsar=1:1", // "-s", "256x256",
                         "-q:v", parQV, "-r:v", parRV, fileOut.toPath().toString()
                 );

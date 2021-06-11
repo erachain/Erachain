@@ -86,6 +86,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
 
     // VALIDATION CODE
+    public static final int JSON_ERROR = -1;
     public static final int VALIDATE_OK = 1;
     public static final int FUTURE_ABILITY = 2;
     public static final int INVALID_WALLET_ADDRESS = 3;
@@ -2114,12 +2115,39 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
     }
 
+    public void updateMapByError2(HashMap out, int error, String lang) {
+        JSONObject json = new JSONObject();
+        json.put("code", error);
+        if (lang == null) {
+            json.put("message", OnDealClick.resultMess(error));
+        } else {
+            json.put("lang", lang);
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            json.put("message", langObj == null ? OnDealClick.resultMess(error) : Lang.T(OnDealClick.resultMess(error), langObj));
+        }
+        if (errorValue != null) {
+            json.put("value", errorValue);
+        }
+        out.put("error", json);
+    }
+
+    @Deprecated
     public void updateMapByError(int error, String errorMess, HashMap out) {
         out.put("error", error);
         out.put("message", errorMess);
         if (errorValue != null) {
             out.put("value", errorValue);
         }
+    }
+
+    public void updateMapByError2(int error, String errorMess, HashMap out) {
+        JSONObject json = new JSONObject();
+        json.put("code", error);
+        json.put("message", errorMess);
+        if (errorValue != null) {
+            json.put("value", errorValue);
+        }
+        out.put("error", json);
     }
 
     public void updateMapByError(int error, String errorMess, HashMap out, String lang) {
@@ -2136,9 +2164,23 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
     }
 
+    @Deprecated
     public static void updateMapByErrorSimple(int error, String errorMess, HashMap out) {
         out.put("error", error);
         out.put("message", errorMess);
+    }
+
+    public static void updateMapByErrorSimple2(HashMap out, int error, String errorMess, String lang) {
+        JSONObject json = new JSONObject();
+        json.put("code", error);
+        if (lang == null) {
+            json.put("message", errorMess);
+        } else {
+            json.put("lang", lang);
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            json.put("message", langObj == null ? errorMess : Lang.T(errorMess, langObj));
+        }
+        out.put("error", json);
     }
 
     public static void updateMapByErrorSimple(int error, HashMap out) {

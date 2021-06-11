@@ -97,8 +97,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.3.032 dev";
-    public static String buildTime = "2021-05-05 12:00:00 UTC";
+    public static String version = "5.3";
+    public static String buildTime = "2021-06-11 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -3142,7 +3142,7 @@ public class Controller extends Observable {
         // CHECK FOR UPDATES
         int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0L, notRelease);
         if (valid == Transaction.VALIDATE_OK)
-            return new Tuple3<Transaction, Integer, String>(transaction, null, null);
+            return new Tuple3<Transaction, Integer, String>(transaction, valid, null);
 
         return new Tuple3<Transaction, Integer, String>(transaction, valid, transaction.errorValue);
 
