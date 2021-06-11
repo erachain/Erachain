@@ -2121,12 +2121,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public void updateMapByError2(HashMap out, int error, String lang) {
         JSONObject json = new JSONObject();
         json.put("code", error);
-        if (lang == null) {
-            json.put("message", OnDealClick.resultMess(error));
-        } else {
-            json.put("lang", lang);
+        json.put("message", OnDealClick.resultMess(error));
+        if (lang != null) {
             JSONObject langObj = Lang.getInstance().getLangJson(lang);
-            json.put("message", langObj == null ? OnDealClick.resultMess(error) : Lang.T(OnDealClick.resultMess(error), langObj));
+            if (langObj != null) {
+                json.put("lang", lang);
+                json.put("message_lang", Lang.T(OnDealClick.resultMess(error), langObj));
+            }
         }
         if (errorValue != null) {
             json.put("value", errorValue);
@@ -2176,12 +2177,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static void updateMapByErrorSimple2(HashMap out, int error, String errorMess, String lang) {
         JSONObject json = new JSONObject();
         json.put("code", error);
-        if (lang == null) {
-            json.put("message", errorMess);
-        } else {
-            json.put("lang", lang);
+        json.put("message", errorMess);
+        if (lang != null) {
             JSONObject langObj = Lang.getInstance().getLangJson(lang);
-            json.put("message", langObj == null ? errorMess : Lang.T(errorMess, langObj));
+            if (langObj != null) {
+                json.put("lang", lang);
+                json.put("message_lang", Lang.T(errorMess, langObj));
+            }
         }
         out.put("error", json);
     }
