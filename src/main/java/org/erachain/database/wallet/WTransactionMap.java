@@ -5,7 +5,6 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IndexIterator;
 import org.erachain.database.serializer.TransactionSerializer;
-import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -47,7 +46,7 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
      */
     NavigableSet<Tuple2<Byte, Tuple2<Long, Integer>>> typeKey;
     /**
-     * Поиск по данному счету с сортировкой по времени
+     * Поиск по данному счету для заданного ключа Актива с сортировкой по времени
      */
     NavigableSet<Tuple2<Tuple2<Integer, Long>, Tuple2<Long, Integer>>> addressAssetKey;
 
@@ -181,7 +180,7 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
                 new Fun.Function2<Tuple2<Integer, Long>[], Tuple2<Long, Integer>, Transaction>() {
                     @Override
                     public Tuple2<Integer, Long>[] run(Tuple2<Long, Integer> key, Transaction value) {
-                        value.setDC((DCSet) databaseSet, true);
+                        value.setDC(((DWSet) databaseSet).dcSet, true);
                         Object[][] itemKeys = value.getItemsKeys();
                         if (itemKeys == null)
                             return null;
@@ -189,7 +188,7 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
                         Tuple2<Integer, Long>[] keys = new Tuple2[itemKeys.length];
                         for (int i = 0; i < keys.length; i++) {
                             if (((int) itemKeys[i][0]) == ItemCls.ASSET_TYPE) {
-                                keys[i] = new Tuple2<Integer, Long>(key.b.hashCode(), (Long) itemKeys[i][1]);
+                                keys[i] = new Tuple2<Integer, Long>(key.b, (Long) itemKeys[i][1]);
                             }
                         }
                         return keys;

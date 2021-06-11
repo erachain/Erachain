@@ -6,6 +6,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
+import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,10 +35,10 @@ public class WalletTests {
     // INIT NOTES
     private void init() {
 
-        database = DWSet.reCreateDB(false, false);
+        database = DWSet.reCreateDB(DCSet.getInstance(), false, false);
         secureDatabase = new SecureWalletDatabase(password);
 
-        wallet = new Wallet(false, false);
+        wallet = new Wallet(DCSet.getInstance(), false, false);
         create = wallet.create(database, secureDatabase, Crypto.getInstance()
                 .digest(password.getBytes()), 10, false, false);
     }
