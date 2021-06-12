@@ -478,10 +478,6 @@ public class Order implements Comparable<Order> {
         return getPrice().toPlainString();
     }
 
-    public List<Trade> getInitiatedTrades() {
-        return this.getInitiatedTrades(DCSet.getInstance());
-    }
-
     public List<Trade> getInitiatedTrades(DCSet db) {
         return db.getTradeMap().getInitiatedTrades(this, false);
     }

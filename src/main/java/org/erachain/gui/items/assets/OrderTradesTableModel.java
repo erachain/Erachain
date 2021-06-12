@@ -32,7 +32,7 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
 
         this.order = order;
         this.isSell = isSell;
-        this.list = DCSet.getInstance().getTradeMap().getTradesByOrderID(order.getId(), true);
+        this.list = DCSet.getInstance().getTradeMap().getTradesByOrderID(order.getId(), true, descending);
 
     }
 

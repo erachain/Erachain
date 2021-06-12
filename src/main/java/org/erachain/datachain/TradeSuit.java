@@ -5,9 +5,9 @@ import org.mapdb.Fun;
 
 public interface TradeSuit {
 
-    IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByInitiator(Long orderID);
+    IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByInitiator(Long orderID, boolean descending);
 
-    IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByTarget(Long orderID);
+    IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByTarget(Long orderID, boolean descending);
 
     IteratorCloseable<Fun.Tuple2<Long, Long>> getHaveIterator(long have);
 

@@ -45,10 +45,11 @@ public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade>
      * - нужно для отката Заказа - просмотр по всем его покусанным сделкам
      *
      * @param orderID
+     * @param descending
      * @return
      */
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByInitiator(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByInitiator(Long orderID, boolean descending) {
         // берем из родителя
         IteratorCloseable<Tuple2<Long, Long>> parentIterator = ((TradeMapImpl) parent).getIteratorByInitiator(orderID);
         // берем свои
@@ -63,7 +64,7 @@ public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade>
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByTarget(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByTarget(Long orderID, boolean descending) {
         return null;
     }
 

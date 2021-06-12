@@ -161,23 +161,33 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
      * поиск ключей для протокольных вторичных индексов с учетом Родительской таблицы (если база форкнута)
      *
      * @param orderID
+     * @param descending
      * @return
      */
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByInitiator(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByInitiator(Long orderID, boolean descending) {
         //FILTER ALL KEYS
+        if (descending)
+            return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) map).descendingMap().subMap(
+                    Fun.t2(orderID, Long.MAX_VALUE),
+                    Fun.t2(orderID, null)).keySet().iterator());
+
         return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) map).subMap(
                 Fun.t2(orderID, null),
                 Fun.t2(orderID, Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByTarget(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByTarget(Long orderID, boolean descending) {
 
         if (targetsKeyMap == null)
             return null;
 
-        //ADD REVERSE KEYS
+        if (descending)
+            return new IteratorCloseableImpl(((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.targetsKeyMap).descendingMap().subMap(
+                    Fun.t2(orderID, Fun.HI()),
+                    Fun.t2(orderID, null)).values().iterator());
+
         return new IteratorCloseableImpl(((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.targetsKeyMap).subMap(
                 Fun.t2(orderID, null),
                 Fun.t2(orderID, Fun.HI())).values().iterator());

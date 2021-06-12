@@ -90,13 +90,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
      */
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getIteratorByInitiator(Long orderID) {
-        return ((TradeSuit) this.map).getIteratorByInitiator(orderID);
+        return ((TradeSuit) this.map).getIteratorByInitiator(orderID, false);
     }
 
     @Override
     public List<Trade> getInitiatedTrades(Order order, boolean useCancel) {
         //FILTER ALL TRADES
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(order.getId())) {
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(order.getId(), false)) {
 
             //GET ALL TRADES FOR KEYS
             List<Trade> trades = new ArrayList<Trade>();
@@ -121,40 +121,69 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
      *
      * @param orderID
      * @param useCancel
+     * @param descending
      * @return
      */
     @Override
-    public List<Trade> getTradesByOrderID(Long orderID, boolean useCancel) {
+    public List<Trade> getTradesByOrderID(Long orderID, boolean useCancel, boolean descending) {
         //ADD REVERSE KEYS
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
         }
 
         List<Trade> trades = new ArrayList<Trade>();
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(orderID)) {
-            //GET ALL ORDERS FOR KEYS as INITIATOR
-            Trade trade;
-            while (iterator.hasNext()) {
-                trade = this.get(iterator.next());
-                if (!useCancel && trade.isCancel())
-                    continue;
+        if (descending) {
+            try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(orderID, descending)) {
+                //GET ALL ORDERS FOR KEYS as INITIATOR
+                Trade trade;
+                while (iterator.hasNext()) {
+                    trade = this.get(iterator.next());
+                    if (!useCancel && trade.isCancel())
+                        continue;
 
-                trades.add(trade);
+                    trades.add(trade);
+                }
+            } catch (IOException e) {
             }
-        } catch (IOException e) {
-        }
 
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByTarget(orderID)) {
-            //GET ALL ORDERS FOR KEYS as TARGET
-            Trade trade;
-            while (iterator.hasNext()) {
-                trade = this.get(iterator.next());
-                if (!useCancel && trade.isCancel())
-                    continue;
+            try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByTarget(orderID, descending)) {
+                //GET ALL ORDERS FOR KEYS as TARGET
+                Trade trade;
+                while (iterator.hasNext()) {
+                    trade = this.get(iterator.next());
+                    if (!useCancel && trade.isCancel())
+                        continue;
 
-                trades.add(trade);
+                    trades.add(trade);
+                }
+            } catch (IOException e) {
             }
-        } catch (IOException e) {
+        } else {
+            try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByTarget(orderID, descending)) {
+                //GET ALL ORDERS FOR KEYS as TARGET
+                Trade trade;
+                while (iterator.hasNext()) {
+                    trade = this.get(iterator.next());
+                    if (!useCancel && trade.isCancel())
+                        continue;
+
+                    trades.add(trade);
+                }
+            } catch (IOException e) {
+            }
+
+            try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(orderID, descending)) {
+                //GET ALL ORDERS FOR KEYS as INITIATOR
+                Trade trade;
+                while (iterator.hasNext()) {
+                    trade = this.get(iterator.next());
+                    if (!useCancel && trade.isCancel())
+                        continue;
+
+                    trades.add(trade);
+                }
+            } catch (IOException e) {
+            }
         }
 
         //RETURN
