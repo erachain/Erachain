@@ -62,14 +62,14 @@ public class Wallet extends Observable implements Observer {
 	private List<ObserverWaiter> waitingObservers = new ArrayList<>();
 	// CONSTRUCTORS
 
-	public Wallet(boolean withObserver, boolean dynamicGUI) {
+	public Wallet(DCSet dcSet, boolean withObserver, boolean dynamicGUI) {
 
 		//this.syncHeight = ;
 
 		// CHECK IF EXISTS
 		if (this.walletKeysExists()) {
 			// OPEN WALLET
-			this.database = DWSet.reCreateDB(withObserver, dynamicGUI);
+			this.database = DWSet.reCreateDB(dcSet, withObserver, dynamicGUI);
 
 			linkWaitingObservers(withObserver);
 
@@ -393,8 +393,8 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	// CREATE
-    public synchronized boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,
-                                       boolean withObserver, boolean dynamicGUI) {
+	public synchronized boolean create(DCSet dcSet, byte[] seed, String password, int depth, boolean synchronize, String path,
+									   boolean withObserver, boolean dynamicGUI) {
 		String oldPath = Settings.getInstance().getWalletKeysPath();
 		// set wallet dir
 		Settings.getInstance().setWalletKeysPath(path);
@@ -403,7 +403,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.close();
 		}
 		// OPEN WALLET
-		DWSet database = DWSet.reCreateDB(withObserver, dynamicGUI);
+		DWSet database = DWSet.reCreateDB(dcSet, withObserver, dynamicGUI);
 
 		if (this.secureDatabase != null) {
 			// CLOSE secured WALLET

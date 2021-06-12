@@ -450,7 +450,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected PersonCls creatorPerson;
 
     /**
-     * Для создания поисковых Меток - Тип сущности + номер ее. например @P12 - персона 12
+     * Для создания поисковых Меток - Тип сущности + номер ее (например @P12 - персона 12) + Метки (Tags) от самой Сущности
      */
     protected Object[][] itemsKeys;
 
@@ -874,6 +874,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public Object[][] getItemsKeys() {
+        if (itemsKeys == null)
+            makeItemsKeys();
+
         return itemsKeys;
     }
 
@@ -2093,6 +2096,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return out;
     }
 
+    @Deprecated
     public void updateMapByError(int error, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));
@@ -2101,6 +2105,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
     }
 
+    @Deprecated
     public void updateMapByError(int error, HashMap out, String lang) {
         out.put("error", error);
         if (lang == null) {
@@ -2118,12 +2123,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public void updateMapByError2(HashMap out, int error, String lang) {
         JSONObject json = new JSONObject();
         json.put("code", error);
-        if (lang == null) {
-            json.put("message", OnDealClick.resultMess(error));
-        } else {
-            json.put("lang", lang);
+        json.put("message", OnDealClick.resultMess(error));
+        if (lang != null) {
             JSONObject langObj = Lang.getInstance().getLangJson(lang);
-            json.put("message", langObj == null ? OnDealClick.resultMess(error) : Lang.T(OnDealClick.resultMess(error), langObj));
+            if (langObj != null) {
+                json.put("lang", lang);
+                json.put("local", Lang.T(OnDealClick.resultMess(error), langObj));
+            }
         }
         if (errorValue != null) {
             json.put("value", errorValue);
@@ -2150,6 +2156,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         out.put("error", json);
     }
 
+    @Deprecated
     public void updateMapByError(int error, String errorMess, HashMap out, String lang) {
         out.put("error", error);
         if (lang == null) {
@@ -2173,21 +2180,24 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static void updateMapByErrorSimple2(HashMap out, int error, String errorMess, String lang) {
         JSONObject json = new JSONObject();
         json.put("code", error);
-        if (lang == null) {
-            json.put("message", errorMess);
-        } else {
-            json.put("lang", lang);
+        json.put("message", errorMess);
+        if (lang != null) {
             JSONObject langObj = Lang.getInstance().getLangJson(lang);
-            json.put("message", langObj == null ? errorMess : Lang.T(errorMess, langObj));
+            if (langObj != null) {
+                json.put("lang", lang);
+                json.put("local", Lang.T(errorMess, langObj));
+            }
         }
         out.put("error", json);
     }
 
+    @Deprecated
     public static void updateMapByErrorSimple(int error, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));
     }
 
+    @Deprecated
     public static void updateMapByErrorValue(int error, String errorValue, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));

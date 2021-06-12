@@ -33,11 +33,19 @@ public class ChangeOrderFrame extends JDialog {
     private JButton changeOrderButton;
     private JTextField txtPrice;
 
-    public ChangeOrderFrame(Order order) {
+    boolean reversePrice;
+    AssetCls assetHave;
+    AssetCls assetWant;
+
+    public ChangeOrderFrame(Order order, boolean reversePrice) {
         setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Change Order"));
         this.order = order;
         //	setAlwaysOnTop(true);
         setModal(true);
+
+        assetHave = Controller.getInstance().getAsset(order.getHaveAssetKey());
+        assetWant = Controller.getInstance().getAsset(order.getWantAssetKey());
+        this.reversePrice = reversePrice;
 
         //ICON
         List<Image> icons = new ArrayList<Image>();
@@ -96,23 +104,23 @@ public class ChangeOrderFrame extends JDialog {
 
         //LABEL HAVE
         labelGBC.gridy = 2;
-        JLabel haveLabel = new JLabel(Lang.T("Have") + ":");
+        JLabel haveLabel = new JLabel(Lang.T("Sell") + ":");
         this.add(haveLabel, labelGBC);
 
         //TXT HAVE
         txtGBC.gridy = 2;
-        JTextField txtHave = new JTextField(String.valueOf(order.getHaveAssetKey()));
+        JTextField txtHave = new JTextField(reversePrice ? assetWant.toString() : assetHave.toString());
         txtHave.setEditable(false);
         this.add(txtHave, txtGBC);
 
         //LABEL WANT
         labelGBC.gridy = 3;
-        JLabel wantLabel = new JLabel(Lang.T("Want") + ":");
+        JLabel wantLabel = new JLabel(Lang.T("Buy") + ":");
         this.add(wantLabel, labelGBC);
 
         //TXT WANT
         txtGBC.gridy = 3;
-        JTextField txtWant = new JTextField(String.valueOf(order.getWantAssetKey()));
+        JTextField txtWant = new JTextField(reversePrice ? assetHave.toString() : assetWant.toString());
         txtWant.setEditable(false);
         this.add(txtWant, txtGBC);
 
@@ -123,7 +131,7 @@ public class ChangeOrderFrame extends JDialog {
 
         //TXT WANT
         txtGBC.gridy = 4;
-        JTextField txtAmount = new JTextField(order.getAmountHave().toPlainString());
+        JTextField txtAmount = new JTextField((reversePrice ? order.getAmountWant() : order.getAmountHave()).toPlainString());
         txtAmount.setEditable(false);
         this.add(txtAmount, txtGBC);
 
@@ -134,7 +142,7 @@ public class ChangeOrderFrame extends JDialog {
 
         //TXT PRICE
         txtGBC.gridy = 5;
-        txtPrice = new JTextField(order.getPrice().toPlainString());
+        txtPrice = new JTextField((reversePrice ? order.calcPriceReverse() : order.getPrice()).toPlainString());
         txtPrice.setEditable(true);
         this.add(txtPrice, txtGBC);
 
@@ -145,7 +153,7 @@ public class ChangeOrderFrame extends JDialog {
 
         //TXT FULFILLED
         txtGBC.gridy = 6;
-        JTextField txtFulfilled = new JTextField(order.getFulfilledHave().toPlainString());
+        JTextField txtFulfilled = new JTextField((reversePrice ? order.getFulfilledWant() : order.getFulfilledHave()).toPlainString());
         txtFulfilled.setEditable(false);
         this.add(txtFulfilled, txtGBC);
 
@@ -169,7 +177,7 @@ public class ChangeOrderFrame extends JDialog {
         changeOrderButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                onCancelOrderClick();
+                onChangeOrderClick();
             }
         });
         this.add(changeOrderButton, buttonGBC);
@@ -182,7 +190,7 @@ public class ChangeOrderFrame extends JDialog {
         this.setVisible(true);
     }
 
-    public void onCancelOrderClick() {
+    public void onChangeOrderClick() {
         //DISABLE
         this.changeOrderButton.setEnabled(false);
 
@@ -214,7 +222,7 @@ public class ChangeOrderFrame extends JDialog {
         try {
             wantAmount = new BigDecimal(txtPrice.getText());
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, Lang.T("Invalid amount") + "!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, Lang.T("Invalid price") + "!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             this.changeOrderButton.setEnabled(true);
             return;
         }
@@ -228,8 +236,11 @@ public class ChangeOrderFrame extends JDialog {
             return;
         }
 
-        AssetCls wantAsset = DCSet.getInstance().getItemAssetMap().get(order.getWantAssetKey());
-        wantAmount = order.getAmountHave().multiply(wantAmount).setScale(wantAsset.getScale(), RoundingMode.HALF_DOWN);
+        if (reversePrice) {
+            wantAmount = order.getAmountHave().divide(wantAmount, assetWant.getScale(), RoundingMode.HALF_DOWN);
+        } else {
+            wantAmount = order.getAmountHave().multiply(wantAmount).setScale(assetWant.getScale(), RoundingMode.HALF_DOWN);
+        }
 
         Transaction changeOrder = Controller.getInstance().changeOrder(creator, feePow, order, wantAmount);
         if (ResultDialog.make(this, changeOrder, false)) {
