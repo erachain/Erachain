@@ -94,19 +94,18 @@ public class APITXResource {
 
         help.put("GET api/tx/types", "Return array of transaction types.");
 
-        help.put("GET api/tx/parse/{raw in BaseXX}?check&lang=en&base58", "Parse and check. Param [lang] for translate errors messages. For validate use [check]. If RAW in Base58 use [base58] else it in Base64");
-        help.put("POST api/tx/parse?check&lang=en&base58", "See 'GET parse'. Body: [RAW in BaseXX]");
+        help.put("GET api/tx/parse/{raw in BaseXX}?check&lang=en&base58", "Parse RAW (transaction byte-code) and check. Param [lang] for localize error message. For validate use [check]. If RAW in Base58 use [base58]. Base58 is slow - use it for test only.");
+        help.put("POST api/tx/parse?check&lang=en", "See 'GET parse'. Body: [RAW in Base64 only]");
 
-        help.put("GET api/tx/broadcast/{raw in BaseXX}?lang=en&base58", "Broadcast byte-code in Base58 or Base64. Use [lang] for localize error message. If RAW in Base58 use [base58] else it in Base64");
-        help.put("POST api/tx/broadcast?lang=en&base58", "See 'GET broadcast'. Body: [RAW in BaseXX]");
-        help.put("POST api/tx/broadcastjson JSON", "See 'GET broadcast'. Body is JSON: {\"raw\":\"BaseXX\", \"lang\":\"en|ru\", \"base58\":false}");
+        help.put("GET api/tx/broadcast/{raw in BaseXX}?lang=en&base58", "Broadcast RAW in Base58 or Base64. Base58 is slow - use it for test only. Use [lang] for localize error message. If RAW in Base58 use [base58]");
+        help.put("POST api/tx/broadcast?lang=en", "See 'GET broadcast'. Body: [RAW in Base64 only]");
+        help.put("POST api/tx/broadcastjson JSON", "See 'GET broadcast'. Body is JSON: {\"raw\":\"Base64\", \"lang\":\"en|ru\"}");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(StrJSonFine.convert(help)).build();
 
     }
-
 
     @GET
     @Path("{signature}")
@@ -906,13 +905,7 @@ public class APITXResource {
         return (getTypesCACHE = jsonArray.toJSONString());
     }
 
-    @GET
-    @Path("parse/{raw}")
-    public Response parse(@Context UriInfo info,
-                          @PathParam("raw") String raw,
-                          @QueryParam("lang") String lang) {
-        boolean base58 = API.checkBoolean(info, "base58");
-        boolean check = API.checkBoolean(info, "check");
+    public Response parse(String raw, boolean base64, boolean check, String lang) {
 
         JSONObject out = new JSONObject();
 
@@ -922,7 +915,7 @@ public class APITXResource {
             langObj = Lang.getInstance().getLangJson(lang);
         }
 
-        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw, !base58, check);
+        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw, base64, check);
         if (result.a == null) {
             Transaction.updateMapByErrorSimple2(out, result.b,
                     langObj == null || result.c == null ? result.c : Lang.T(result.c, langObj), lang);
@@ -942,44 +935,29 @@ public class APITXResource {
                 .build();
     }
 
+    @GET
+    @Path("parse/{raw}")
+    public Response parse(@Context UriInfo info,
+                          @PathParam("raw") String raw,
+                          @QueryParam("lang") String lang) {
+
+        boolean base58 = API.checkBoolean(info, "base58");
+        boolean check = API.checkBoolean(info, "check");
+
+        return parse(raw, !base58, check, lang);
+    }
+
     @POST
     @Path("parse")
     public Response parsePost(@Context UriInfo info,
                               @QueryParam("lang") String lang,
                               String raw) {
 
-        return parse(info, raw, lang);
+        boolean check = API.checkBoolean(info, "check");
+        return parse(raw, true, check, lang);
     }
 
-    @GET
-    @Path("broadcast/{raw}")
-    public Response broadcast(@Context UriInfo info,
-                              @PathParam("raw") String raw,
-                              @QueryParam("lang") String lang) {
-
-        boolean base58 = API.checkBoolean(info, "base58");
-        return Response.status(200)
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(API.broadcastFromRawString(raw, !base58, lang).toJSONString())
-                .build();
-    }
-
-    @POST
-    @Path("broadcast")
-    public Response broadcastPost(@Context UriInfo info,
-                                  @QueryParam("lang") String lang,
-                                  String raw) {
-
-        boolean base58 = API.checkBoolean(info, "base58");
-
-        return Response.status(200)
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRawString(raw, !base58, lang).toJSONString())
-                .build();
-
-    }
+    /////////////////// BROADCAST
 
     public static JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
         Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, false);
@@ -1024,6 +1002,34 @@ public class APITXResource {
         return broadcastFromRawByte(transactionBytes, lang);
     }
 
+    @GET
+    @Path("broadcast/{raw}")
+    public Response broadcast(@Context UriInfo info,
+                              @PathParam("raw") String raw,
+                              @QueryParam("lang") String lang) {
+
+        boolean base58 = API.checkBoolean(info, "base58");
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, !base58, lang).toJSONString())
+                .build();
+    }
+
+    @POST
+    @Path("broadcast")
+    public Response broadcastPost(@Context UriInfo info,
+                                  @QueryParam("lang") String lang,
+                                  String raw) {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, true, lang).toJSONString())
+                .build();
+
+    }
+
     @POST
     @Path("broadcastjson")
     public Response broadcastFromRawJsonPost(@Context UriInfo info,
@@ -1031,13 +1037,12 @@ public class APITXResource {
                                              MultivaluedMap<String, String> form) {
 
         String raw = form.getFirst("raw");
-        boolean base58 = API.checkBoolean(info, "base58");
         String lang = form.getFirst("lang");
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(broadcastFromRawString(raw, !base58, lang).toJSONString())
+                .entity(broadcastFromRawString(raw, true, lang).toJSONString())
                 .build();
 
     }

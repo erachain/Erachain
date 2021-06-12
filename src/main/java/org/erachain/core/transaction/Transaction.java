@@ -2096,6 +2096,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return out;
     }
 
+    @Deprecated
     public void updateMapByError(int error, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));
@@ -2104,6 +2105,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
     }
 
+    @Deprecated
     public void updateMapByError(int error, HashMap out, String lang) {
         out.put("error", error);
         if (lang == null) {
@@ -2126,7 +2128,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             JSONObject langObj = Lang.getInstance().getLangJson(lang);
             if (langObj != null) {
                 json.put("lang", lang);
-                json.put("localMessage", Lang.T(OnDealClick.resultMess(error), langObj));
+                json.put("local", Lang.T(OnDealClick.resultMess(error), langObj));
             }
         }
         if (errorValue != null) {
@@ -2154,6 +2156,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         out.put("error", json);
     }
 
+    @Deprecated
     public void updateMapByError(int error, String errorMess, HashMap out, String lang) {
         out.put("error", error);
         if (lang == null) {
@@ -2182,17 +2185,19 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             JSONObject langObj = Lang.getInstance().getLangJson(lang);
             if (langObj != null) {
                 json.put("lang", lang);
-                json.put("localMessage", Lang.T(errorMess, langObj));
+                json.put("local", Lang.T(errorMess, langObj));
             }
         }
         out.put("error", json);
     }
 
+    @Deprecated
     public static void updateMapByErrorSimple(int error, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));
     }
 
+    @Deprecated
     public static void updateMapByErrorValue(int error, String errorValue, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));

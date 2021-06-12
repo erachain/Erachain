@@ -956,6 +956,7 @@ public class API {
     }
 
     // http://127.0.0.1:9047/api/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+    @Deprecated
     public static JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
         Tuple3<Transaction, Integer, String> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, false);
         if (result.a == null) {
@@ -979,6 +980,7 @@ public class API {
 
     }
 
+    @Deprecated
     public static JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
         JSONObject out = new JSONObject();
         byte[] transactionBytes;
@@ -1001,6 +1003,7 @@ public class API {
         return broadcastFromRawByte(transactionBytes, lang);
     }
 
+    @Deprecated
     public JSONObject broadcastTelegramBytes(byte[] transactionBytes, String lang) {
         JSONObject out = new JSONObject();
         Transaction transaction;
