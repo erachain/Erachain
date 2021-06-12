@@ -422,7 +422,7 @@ public class ChangeOrderTransaction extends Transaction {
         dcSet.getOrderMap().delete(orderID);
 
         // запомним для отката что там было до изменения
-        Trade trade = new Trade(Trade.TYPE_UPDATE, dbRef, orderID, order.getHaveAssetKey(), order.getWantAssetKey(),
+        Trade trade = new Trade(Trade.TYPE_CHANGE, dbRef, orderID, order.getHaveAssetKey(), order.getWantAssetKey(),
                 order.getAmountHave(), order.getAmountWant(),
                 createOrderTx.getHaveAsset().getScale(), createOrderTx.getWantAsset().getScale(), 1);
 
@@ -453,7 +453,7 @@ public class ChangeOrderTransaction extends Transaction {
         // удалим чтобы очистить ключи вторичные по цене
         Order updatedOrder = dcSet.getOrderMap().remove(orderID);
 
-        // трейд ищем по ордеру и своему дбРЕФ
+        // сделку ищем по ордеру и своему дбРЕФ
         // чтобы восстановить старую цену
         Trade trade = dcSet.getTradeMap().remove(new Fun.Tuple2<>(dbRef, orderID));
 

@@ -210,7 +210,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                 trade = this.get(iteratorLimit.next());
                 if (!useCancel && trade.isCancel())
                     continue;
-                if (!useChange && trade.isUpdate())
+                if (!useChange && trade.isChange())
                     continue;
 
                 trades.add(trade);
