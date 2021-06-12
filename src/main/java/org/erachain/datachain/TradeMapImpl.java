@@ -116,6 +116,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         return null;
     }
 
+    /**
+     * Надо сперва кто его покусал с обратном порядке, потом его самого
+     *
+     * @param orderID
+     * @param useCancel
+     * @return
+     */
     @Override
     public List<Trade> getTradesByOrderID(Long orderID, boolean useCancel) {
         //ADD REVERSE KEYS
@@ -124,7 +131,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         }
 
         List<Trade> trades = new ArrayList<Trade>();
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByKeys(orderID)) {
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(orderID)) {
             //GET ALL ORDERS FOR KEYS as INITIATOR
             Trade trade;
             while (iterator.hasNext()) {
@@ -137,7 +144,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         } catch (IOException e) {
         }
 
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getTargetsIterator(orderID)) {
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByTarget(orderID)) {
             //GET ALL ORDERS FOR KEYS as TARGET
             Trade trade;
             while (iterator.hasNext()) {

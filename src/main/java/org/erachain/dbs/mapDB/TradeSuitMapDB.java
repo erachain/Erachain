@@ -172,15 +172,7 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
-        //FILTER ALL KEYS
-        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) map).subMap(
-                Fun.t2(orderID, null),
-                Fun.t2(orderID, Long.MAX_VALUE)).keySet().iterator());
-    }
-
-    @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getTargetsIterator(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByTarget(Long orderID) {
 
         if (targetsKeyMap == null)
             return null;

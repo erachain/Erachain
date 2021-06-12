@@ -170,13 +170,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
-        // тут нужно не Индекс включать
-        return map.getIndexIteratorFilter(Longs.toByteArray(orderID), false, false);
-    }
-
-    @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getTargetsIterator(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByTarget(Long orderID) {
         return map.getIndexIteratorFilter(reverseIndex.getColumnFamilyHandle(), Longs.toByteArray(orderID), false, true);
     }
 
