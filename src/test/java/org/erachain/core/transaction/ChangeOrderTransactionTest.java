@@ -8,6 +8,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
+import org.erachain.core.item.assets.Order;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
@@ -197,24 +198,41 @@ public class ChangeOrderTransactionTest {
 
                 init(dbs);
 
+
                 int height = 1;
 
                 //CREATE ORDER
-                CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY,
+                CreateOrderTransaction createOrderTX = new CreateOrderTransaction(maker, key, FEE_KEY,
                         BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                        BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), 0L);
-                createOrderTransaction.sign(maker, asPack);
-                createOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);
-                createOrderTransaction.process(gb, asPack);
-                dcSet.getTransactionFinalMap().put(createOrderTransaction);
-                dcSet.getTransactionFinalMapSigns().put(createOrderTransaction.getSignature(), createOrderTransaction.getDBRef());
+                        BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, ++timestamp, 0L);
+                TransactionTests.signAndProcess(dcSet, maker, gb, createOrderTX, ++height, 1);
+                Order orderOrig = dcSet.getOrderMap().get(createOrderTX.dbRef);
+                assertEquals(orderOrig.isActive(), true);
 
-                //CREATE UPDATE ORDER
-                ChangeOrderTransaction tx = new ChangeOrderTransaction(maker, createOrderTransaction.getSignature(),
-                        BigDecimal.TEN, FEE_POWER, timestamp, 0L);
-                tx.sign(maker, Transaction.FOR_NETWORK);
-                tx.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);
-                tx.process(gb, Transaction.FOR_NETWORK);
+                //CREATE UPDATE ORDER 1
+                ChangeOrderTransaction changeOrderTX_1 = new ChangeOrderTransaction(maker, createOrderTX.getSignature(),
+                        BigDecimal.TEN, FEE_POWER, ++timestamp, 0L);
+                TransactionTests.signAndProcess(dcSet, maker, gb, changeOrderTX_1, ++height, 1);
+
+                orderOrig = dcSet.getCompletedOrderMap().get(createOrderTX.dbRef);
+                assertEquals(orderOrig.isCanceled(), true);
+
+                Order orderChanged_1 = dcSet.getOrderMap().get(changeOrderTX_1.dbRef);
+                assertEquals(orderChanged_1.isActive(), true);
+
+                //CREATE UPDATE ORDER 2
+                ChangeOrderTransaction changeOrderTX_2 = new ChangeOrderTransaction(maker, changeOrderTX_1.getSignature(),
+                        BigDecimal.TEN, FEE_POWER, ++timestamp, 0L);
+                TransactionTests.signAndProcess(dcSet, maker, gb, changeOrderTX_2, ++height, 1);
+
+                orderOrig = dcSet.getCompletedOrderMap().get(createOrderTX.dbRef);
+                assertEquals(orderOrig.isCanceled(), true);
+
+                orderChanged_1 = dcSet.getCompletedOrderMap().get(changeOrderTX_1.dbRef);
+                assertEquals(orderChanged_1.isCanceled(), true);
+
+                Order orderChanged_2 = dcSet.getOrderMap().get(changeOrderTX_2.dbRef);
+                assertEquals(orderChanged_2.isActive(), true);
 
             } finally {
                 dcSet.close();

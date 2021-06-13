@@ -439,6 +439,10 @@ public class Order implements Comparable<Order> {
         return dcSet.getOrderMap().contains(id);
     }
 
+    public boolean isActive() {
+        return status == ACTIVE || status == FULFILLED;
+    }
+
     public static BigDecimal getFulfilledWant(BigDecimal fulfilledHave, BigDecimal price, int wantAssetScale) {
         return fulfilledHave.multiply(price).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
     }
