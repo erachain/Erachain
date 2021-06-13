@@ -338,6 +338,11 @@ public abstract class AssetCls extends ItemCls {
 
                 if (pos >= appData.length) {
                     // старая версия с 255 числом
+                    ExLinkAddress[] dexAwardsTMP = new ExLinkAddress[dexAwardsLen - 1];
+                    for (int k = 0; k < dexAwardsTMP.length; k++) {
+                        dexAwardsTMP[k] = dexAwards[k];
+                    }
+                    dexAwards = dexAwardsTMP;
                     break;
                 }
 
@@ -2185,10 +2190,6 @@ public abstract class AssetCls extends ItemCls {
             int total = 0;
             for (int i = 0; i < dexAwards.length; ++i) {
                 ExLinkAddress exAddress = dexAwards[i];
-                if (exAddress == null) {
-                    // старая версия с 255
-                    break;
-                }
                 if (exAddress.getValue1() <= 0) {
                     errorValue = "Award[" + i + "] percent is so small (<=0%)";
                     return Transaction.INVALID_AWARD;
