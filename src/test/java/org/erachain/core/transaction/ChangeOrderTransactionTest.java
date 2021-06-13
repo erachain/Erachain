@@ -97,6 +97,7 @@ public class ChangeOrderTransactionTest {
 
         cntrl.initBlockChain(dcSet);
         bchain = cntrl.getBlockChain();
+        BlockChain.ALL_VALID_BEFORE = 0;
         gb = bchain.getGenesisBlock();
         //gb.process(db);
 
@@ -204,21 +205,26 @@ public class ChangeOrderTransactionTest {
                 int height = 1;
 
                 //CREATE ORDER
-                CreateOrderTransaction createOrderTX = new CreateOrderTransaction(maker, key, FEE_KEY,
+                final CreateOrderTransaction createOrderTX = new CreateOrderTransaction(maker, key, FEE_KEY,
                         BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
                         BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, ++timestamp, 0L);
-                TransactionTests.signAndProcess(dcSet, maker, gb, createOrderTX, ++height, 1);
+                TransactionTests.signAndProcess(dcSet, maker, null, createOrderTX, ++height, 1);
                 Order orderOrig = dcSet.getOrderMap().get(createOrderTX.dbRef);
                 assertEquals(orderOrig.isActive(), true);
+                orderOrig = dcSet.getCompletedOrderMap().get(createOrderTX.dbRef);
+                assertEquals(orderOrig, null);
 
-                //CREATE UPDATE ORDER 1
-                ChangeOrderTransaction changeOrderTX_1 = new ChangeOrderTransaction(maker, createOrderTX.getSignature(),
+
+                // UPDATE ORDER 1
+                final ChangeOrderTransaction changeOrderTX_1 = new ChangeOrderTransaction(maker, createOrderTX.getSignature(),
                         BigDecimal.TEN, FEE_POWER, ++timestamp, 0L);
                 changeOrderTX_1.sign(maker, Transaction.FOR_NETWORK);
                 changeOrderTX_1.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);
                 assertEquals(changeOrderTX_1.isValid(Transaction.FOR_NETWORK, 0L), Transaction.VALIDATE_OK);
-                TransactionTests.process(dcSet, gb, changeOrderTX_1);
+                TransactionTests.process(dcSet, null, changeOrderTX_1);
 
+                orderOrig = dcSet.getOrderMap().get(createOrderTX.dbRef);
+                assertEquals(orderOrig, null);
                 orderOrig = dcSet.getCompletedOrderMap().get(createOrderTX.dbRef);
                 assertEquals(orderOrig.isCanceled(), true);
 
@@ -229,22 +235,63 @@ public class ChangeOrderTransactionTest {
                 assertEquals(tradeChange.getAmountWant(), BigDecimal.TEN);
 
 
-                //CREATE UPDATE ORDER 2
-                ChangeOrderTransaction changeOrderTX_2 = new ChangeOrderTransaction(maker, changeOrderTX_1.getSignature(),
-                        BigDecimal.TEN, FEE_POWER, ++timestamp, 0L);
+                // UPDATE ORDER 2
+                BigDecimal newAmount = BigDecimal.TEN.add(BigDecimal.ONE);
+                final ChangeOrderTransaction changeOrderTX_2 = new ChangeOrderTransaction(maker, changeOrderTX_1.getSignature(),
+                        newAmount, FEE_POWER, ++timestamp, 0L);
                 changeOrderTX_2.sign(maker, Transaction.FOR_NETWORK);
                 changeOrderTX_2.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);
                 assertEquals(changeOrderTX_2.isValid(Transaction.FOR_NETWORK, 0L), Transaction.VALIDATE_OK);
-                TransactionTests.process(dcSet, gb, changeOrderTX_2);
+                TransactionTests.process(dcSet, null, changeOrderTX_2);
 
+                orderOrig = dcSet.getOrderMap().get(createOrderTX.dbRef);
+                assertEquals(orderOrig, null);
                 orderOrig = dcSet.getCompletedOrderMap().get(createOrderTX.dbRef);
                 assertEquals(orderOrig.isCanceled(), true);
 
+                orderChanged_1 = dcSet.getOrderMap().get(changeOrderTX_1.dbRef);
+                assertEquals(orderChanged_1, null);
                 orderChanged_1 = dcSet.getCompletedOrderMap().get(changeOrderTX_1.dbRef);
                 assertEquals(orderChanged_1.isCanceled(), true);
 
                 Order orderChanged_2 = dcSet.getOrderMap().get(changeOrderTX_2.dbRef);
                 assertEquals(orderChanged_2.isActive(), true);
+                orderChanged_2 = dcSet.getCompletedOrderMap().get(changeOrderTX_2.dbRef);
+                assertEquals(orderChanged_2, null);
+
+                tradeChange = dcSet.getTradeMap().get(new Tuple2<>(changeOrderTX_2.dbRef, changeOrderTX_1.dbRef));
+                assertEquals(tradeChange.getAmountWant(), newAmount);
+
+                ////////////// ORPHAN 2
+                changeOrderTX_2.orphan(null, Transaction.FOR_NETWORK);
+                orderChanged_2 = dcSet.getCompletedOrderMap().get(changeOrderTX_2.dbRef);
+                assertEquals(orderChanged_2, null);
+                orderChanged_2 = dcSet.getOrderMap().get(changeOrderTX_2.dbRef);
+                assertEquals(orderChanged_2, null);
+
+                orderChanged_1 = dcSet.getCompletedOrderMap().get(changeOrderTX_1.dbRef);
+                assertEquals(orderChanged_1, null);
+                orderChanged_1 = dcSet.getOrderMap().get(changeOrderTX_1.dbRef);
+                assertEquals(orderChanged_1.isActive(), true);
+
+                orderOrig = dcSet.getOrderMap().get(createOrderTX.dbRef);
+                assertEquals(orderOrig, null);
+                orderOrig = dcSet.getCompletedOrderMap().get(createOrderTX.dbRef);
+                assertEquals(orderOrig.isCanceled(), true);
+
+                tradeChange = dcSet.getTradeMap().get(new Tuple2<>(changeOrderTX_2.dbRef, changeOrderTX_1.dbRef));
+                assertEquals(tradeChange, null);
+
+                orderChanged_1 = dcSet.getOrderMap().get(changeOrderTX_1.dbRef);
+                assertEquals(orderChanged_1.isActive(), true);
+
+                ////////////// ORPHAN 1
+                changeOrderTX_1.orphan(null, Transaction.FOR_NETWORK);
+                orderChanged_1 = dcSet.getOrderMap().get(changeOrderTX_1.dbRef);
+                assertEquals(orderChanged_1, null);
+
+                orderOrig = dcSet.getOrderMap().get(createOrderTX.dbRef);
+                assertEquals(orderOrig.isActive(), true);
 
             } finally {
                 dcSet.close();

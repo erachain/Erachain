@@ -99,7 +99,7 @@ public class TransactionTests {
 
     public static void signAndProcess(DCSet dcSet, PrivateKeyAccount maker, Block block, Transaction tx, int height, int seqNo) {
         tx.sign(maker, Transaction.FOR_NETWORK);
-        tx.setDC(dcSet, Transaction.FOR_NETWORK, ++height, seqNo, true);
+        tx.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo, true);
         tx.process(block, Transaction.FOR_NETWORK);
         dcSet.getTransactionFinalMap().put(tx);
         dcSet.getTransactionFinalMapSigns().put(tx.getSignature(), tx.getDBRef());
