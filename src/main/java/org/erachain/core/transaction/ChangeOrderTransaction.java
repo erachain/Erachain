@@ -10,6 +10,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -102,6 +103,7 @@ public class ChangeOrderTransaction extends Transaction {
         order = dcSet.getOrderMap().get(orderID);
         if (order == null) {
             // for show in JSON and blockexplorer
+            // так же если уже сработала транзакция - он будет в Отмененных - и его надо вытащить для Откатов например
             order = dcSet.getCompletedOrderMap().get(orderID);
         }
         order.setDC(dcSet);
@@ -178,7 +180,7 @@ public class ChangeOrderTransaction extends Transaction {
     // PARSE CONVERT
 
     public Order makeUpdatedOrder() {
-        return new Order(order, this.amountWant);
+        return new Order(order, seqNo, this.amountWant);
     }
 
     @SuppressWarnings("unchecked")
@@ -412,17 +414,28 @@ public class ChangeOrderTransaction extends Transaction {
 
     // PROCESS/ORPHAN
 
-    // @Override
+    /**
+     * Суть такова что мы делаем новый ордер с новым ID так как иначе сортировка Сделок будет нарушена так как
+     * будет по Инициатору ключ, а его мы тогда берем старый ИД. А надо новый чтобы история действий не менялась
+     *
+     * @param block
+     * @param forDeal
+     */
     @Override
     public void process(Block block, int forDeal) {
-        // UPDATE CREATOR
         super.process(block, forDeal);
 
-        // удалим сперва - чтобы почистить все ключ с ценой корректно
+        // PROCESS UPDATE ORDER
+
+        // удалим
         dcSet.getOrderMap().delete(orderID);
+        // делаем его как отмененный - чтобы новый ордер создать
+        dcSet.getCompletedOrderMap().put(order);
 
         // запомним для отката что там было до изменения
-        Trade trade = new Trade(Trade.TYPE_CHANGE, dbRef, orderID, order.getHaveAssetKey(), order.getWantAssetKey(),
+        Trade trade = new Trade(Trade.TYPE_CHANGE, dbRef,
+                dbRef, // номер инициатора по нашему номеру
+                order.getHaveAssetKey(), order.getWantAssetKey(),
                 order.getAmountHave(), order.getAmountWant(),
                 createOrderTx.getHaveAsset().getScale(), createOrderTx.getWantAsset().getScale(), 1);
 
@@ -435,39 +448,35 @@ public class ChangeOrderTransaction extends Transaction {
         if (order.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - проверим может он сработает
             updatedOrder.setDC(dcSet);
-            updatedOrder.process(block, createOrderTx, true);
+            OrderProcess.process(updatedOrder, block, this);
         } else {
-            dcSet.getOrderMap().put(orderID, updatedOrder);
+            dcSet.getOrderMap().put(updatedOrder);
         }
 
     }
 
-    // @Override
     @Override
     public void orphan(Block block, int forDeal) {
-        // UPDATE CREATOR
         super.orphan(block, forDeal);
 
         // ORPHAN UPDATE ORDER
 
-        // удалим чтобы очистить ключи вторичные по цене
-        Order updatedOrder = dcSet.getOrderMap().remove(orderID);
-
         // сделку ищем по ордеру и своему дбРЕФ
         // чтобы восстановить старую цену
-        Trade trade = dcSet.getTradeMap().remove(new Fun.Tuple2<>(dbRef, orderID));
+        dcSet.getTradeMap().delete(new Fun.Tuple2<>(dbRef, orderID));
 
-        // изменяемые объекты нужно заново создавать
-        // восстановим Хочу по инфо из Сделки
-        Order orderBefore = new Order(updatedOrder, trade.getAmountWant());
+        Order updatedOrder = makeUpdatedOrder();
 
-        if (orderBefore.getAmountWant().compareTo(amountWant) > 0) {
+        if (order.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - откатим, ведь может он сработал
             updatedOrder.setDC(dcSet);
             updatedOrder.orphan(block, block == null ? timestamp : block.getTimestamp(), true);
-        } else {
-            dcSet.getOrderMap().put(orderID, orderBefore);
         }
+
+        // удалим из исполненных
+        dcSet.getCompletedOrderMap().delete(orderID);
+        // добавим в ожидающие
+        dcSet.getOrderMap().put(order);
 
     }
 

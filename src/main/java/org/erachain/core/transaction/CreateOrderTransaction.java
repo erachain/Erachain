@@ -11,6 +11,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
@@ -654,7 +655,14 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         // изменяемые объекты нужно заново создавать
         //.copy() // тут надо что-то сделать новым - а то значения в памяти по ссылке меняются
         Order order = makeOrder(); //.copy();
-        order.process(block, this, false);
+
+        // MOVE HAVE from OWN to PLEDGE
+        creator.changeBalance(dcSet, true, false, haveKey, amountHave,
+                false, false,
+                // accounting on PLEDGE position
+                true, Account.BALANCE_POS_PLEDGE);
+        OrderProcess.process(order, block, this);
+
 
         if (Controller.getInstance().dlSet != null
                 // так как проверка в Форке - потом быстрый слив и эта таблица вообще не будет просчитана

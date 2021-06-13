@@ -28,9 +28,8 @@ public class OrderProcess {
      *
      * @param block
      * @param transaction
-     * @param asChange
      */
-    public static void process(Order orderThis, Block block, Transaction transaction, boolean asChange) {
+    public static void process(Order orderThis, Block block, Transaction transaction) {
 
         DCSet dcSet = orderThis.dcSet;
         long haveAssetKey = orderThis.getHaveAssetKey();
@@ -79,15 +78,6 @@ public class OrderProcess {
 
         ////// NEED FOR making secondary keys in TradeMap
         /// not need now ordersMap.add(this);
-
-        if (!asChange) {
-            //REMOVE HAVE
-            //creator.setBalance(have, creator.getBalance(db, have).subtract(amountHave), db);
-            creator.changeBalance(dcSet, true, false, haveAssetKey, amountHave,
-                    false, false,
-                    // accounting on PLEDGE position
-                    true, Account.BALANCE_POS_PLEDGE);
-        }
 
         BigDecimal thisPriceReverse = orderThis.calcPriceReverse();
 

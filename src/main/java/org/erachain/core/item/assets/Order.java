@@ -109,9 +109,9 @@ public class Order implements Comparable<Order> {
 
     }
 
-    public Order(Order order, BigDecimal newWantAmount) {
+    public Order(Order order, long id, BigDecimal newWantAmount) {
 
-        this.id = order.id;
+        this.id = id;
         this.creator = order.creator;
         this.haveAssetKey = order.haveAssetKey;
         this.wantAssetKey = order.wantAssetKey;
@@ -688,9 +688,13 @@ public class Order implements Comparable<Order> {
 
     }
 
-    public void process(Block block, Transaction tx, boolean asChange) {
-        OrderProcess.process(this, block, tx, asChange);
+    /*
+    public void process(Block block, Transaction tx) {
+
+        OrderProcess.process(this, block, tx);
+
     }
+     */
 
     /**
      * @param block
