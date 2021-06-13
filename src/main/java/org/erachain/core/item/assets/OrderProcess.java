@@ -493,20 +493,27 @@ public class OrderProcess {
 
     }
 
-    public static void orphan(Order orderThis, Block block, long blockTime) {
+    public static Order orphan(DCSet dcSet, Long id, Block block, long blockTime) {
 
-        DCSet dcSet = orderThis.dcSet;
+        CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
+        OrderMap ordersMap = dcSet.getOrderMap();
+        TradeMap tradesMap = dcSet.getTradeMap();
+
+
+        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled
+        // - на всякий случай удалим его в любом случае
+        //// тут нужно получить остатки все из текущего состояния иначе индексы по измененной цене с остатков не удалятся
+        /// поэтому смотрим что есть в таблице и если есть то его грузим с ценой по остаткам той что в базе
+        Order orderThis = completedMap.remove(id);
+        if (orderThis == null) {
+            orderThis = ordersMap.remove(id);
+        }
+
         long haveAssetKey = orderThis.getHaveAssetKey();
-        BigDecimal amountHave = orderThis.getAmountHave();
         long wantAssetKey = orderThis.getWantAssetKey();
-        int haveAssetScale = orderThis.getHaveAssetScale();
-        //BigDecimal amountWant = orderThis.getAmountWant();
-        int wantAssetScale = orderThis.getWantAssetScale();
 
-        BigDecimal price = orderThis.getPrice();
         Account creator = orderThis.getCreator();
 
-        long id = orderThis.getId();
         // GET HEIGHT from ID
         int height = (int) (id >> 32);
 
@@ -517,13 +524,6 @@ public class OrderProcess {
             boolean debug = false;
         }
 
-        CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
-        OrderMap ordersMap = dcSet.getOrderMap();
-        TradeMap tradesMap = dcSet.getTradeMap();
-
-        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled
-        // - на всякий случай удалим его в любом случае
-        completedMap.delete(id);
 
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
 
@@ -564,7 +564,6 @@ public class OrderProcess {
                         true
                 );
 
-
                 thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
                 if (height > BlockChain.VERS_5_3) {
@@ -601,14 +600,6 @@ public class OrderProcess {
         } catch (IOException e) {
         }
 
-        //// тут нужно получить остатки все из текущего состояния иначе индексы по измененной цене с остатков не удалятся
-        /// поэтому смотрим что есть в таблице и если есть то его грузим с ценой по остаткам той что в базе
-        Order thisOrder = ordersMap.get(id);
-        if (thisOrder != null) {
-            //REMOVE ORDER FROM DATABASE
-            ordersMap.delete(thisOrder);
-        }
-
         // с ордера сколько было продано моего актива? на это число уменьшаем залог
         thisAmountHaveLeftEnd = orderThis.getAmountHaveLeft().subtract(thisAmountHaveLeftEnd);
         if (thisAmountHaveLeftEnd.signum() > 0) {
@@ -626,6 +617,8 @@ public class OrderProcess {
             creator.changeBalance(dcSet, true, false, wantAssetKey,
                     thisAmountFulfilledWant, false, false, false);
         }
+
+        return orderThis;
     }
 
 }

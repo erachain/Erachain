@@ -432,14 +432,14 @@ public class ChangeOrderTransaction extends Transaction {
         // делаем его как отмененный - чтобы новый ордер создать
         dcSet.getCompletedOrderMap().put(order);
 
-        // запомним для отката что там было до изменения
+        // запомним для отчета что цена изменилась
         Trade trade = new Trade(Trade.TYPE_CHANGE, dbRef,
                 dbRef, // номер инициатора по нашему номеру
                 order.getHaveAssetKey(), order.getWantAssetKey(),
-                order.getAmountHave(), order.getAmountWant(),
+                order.getAmountHave(), amountWant,
                 createOrderTx.getHaveAsset().getScale(), createOrderTx.getWantAsset().getScale(), 1);
 
-        // нужно запомнить чтобы при откате обновить взад цену
+        // нужно запомнить чтобы при откате обновить назад цену
         dcSet.getTradeMap().put(trade);
 
         // изменяемые объекты нужно заново создавать
@@ -465,14 +465,13 @@ public class ChangeOrderTransaction extends Transaction {
         // чтобы восстановить старую цену
         dcSet.getTradeMap().delete(new Fun.Tuple2<>(dbRef, orderID));
 
-        Order updatedOrder = makeUpdatedOrder();
-
         if (order.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - откатим, ведь может он сработал
-            updatedOrder.setDC(dcSet);
             if (true) {
-                OrderProcess.orphan(updatedOrder, block, block == null ? timestamp : block.getTimestamp());
+                Order updatedOrder = OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
             } else {
+                Order updatedOrder = makeUpdatedOrder();
+                updatedOrder.setDC(dcSet);
                 updatedOrder.orphan(block, block == null ? timestamp : block.getTimestamp(), true);
             }
         }

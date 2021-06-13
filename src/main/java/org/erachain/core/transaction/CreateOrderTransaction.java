@@ -661,8 +661,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 false, false,
                 // accounting on PLEDGE position
                 true, Account.BALANCE_POS_PLEDGE);
-        OrderProcess.process(order, block, this);
 
+        OrderProcess.process(order, block, this);
 
         if (Controller.getInstance().dlSet != null
                 // так как проверка в Форке - потом быстрый слив и эта таблица вообще не будет просчитана
@@ -687,23 +687,25 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         super.orphan(block, forDeal);
 
         // ORPHAN ORDER
+
         // изменяемые объекты нужно заново создавать
         //this.order.copy().orphan();
 
-        // изменяемые объекты нужно заново создавать
-        Order order = makeOrder();
         if (true) {
-            OrderProcess.orphan(order, block, block == null ? timestamp : block.getTimestamp());
+            Order order = OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
 
             // RESTORE HAVE
             // GET HAVE LEFT - if it CANCELED by Outprice or not completed
             //   - если обработка остановлена по достижению порога Инкремента
             creator.changeBalance(dcSet, false, false, haveKey,
-                    order.getAmountHaveLeft(), false, false,
+                    order.getAmountHaveLeft(), // так как внутри может сработать Unresolved by Outprice
+                    false, false,
                     // accounting on PLEDGE position
                     true, Account.BALANCE_POS_PLEDGE);
 
         } else {
+            // изменяемые объекты нужно заново создавать
+            Order order = makeOrder();
             order.orphan(block, block == null ? timestamp : block.getTimestamp(), false);
         }
 
