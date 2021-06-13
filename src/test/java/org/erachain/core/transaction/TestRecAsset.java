@@ -139,7 +139,7 @@ public class TestRecAsset {
                 //CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, 0l);
                 issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
-                issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
+                issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, 1, true);
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
                 asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
 
