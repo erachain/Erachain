@@ -105,6 +105,12 @@ public class TransactionTests {
         dcSet.getTransactionFinalMapSigns().put(tx.getSignature(), tx.getDBRef());
     }
 
+    public static void process(DCSet dcSet, Block block, Transaction tx) {
+        tx.process(block, Transaction.FOR_NETWORK);
+        dcSet.getTransactionFinalMap().put(tx);
+        dcSet.getTransactionFinalMapSigns().put(tx.getSignature(), tx.getDBRef());
+    }
+
     //PAYMENT
 
     @Test

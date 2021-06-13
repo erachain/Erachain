@@ -9,6 +9,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
@@ -16,6 +17,7 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
 import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,7 +214,10 @@ public class ChangeOrderTransactionTest {
                 //CREATE UPDATE ORDER 1
                 ChangeOrderTransaction changeOrderTX_1 = new ChangeOrderTransaction(maker, createOrderTX.getSignature(),
                         BigDecimal.TEN, FEE_POWER, ++timestamp, 0L);
-                TransactionTests.signAndProcess(dcSet, maker, gb, changeOrderTX_1, ++height, 1);
+                changeOrderTX_1.sign(maker, Transaction.FOR_NETWORK);
+                changeOrderTX_1.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);
+                assertEquals(changeOrderTX_1.isValid(Transaction.FOR_NETWORK, 0L), Transaction.VALIDATE_OK);
+                TransactionTests.process(dcSet, gb, changeOrderTX_1);
 
                 orderOrig = dcSet.getCompletedOrderMap().get(createOrderTX.dbRef);
                 assertEquals(orderOrig.isCanceled(), true);
@@ -220,10 +225,17 @@ public class ChangeOrderTransactionTest {
                 Order orderChanged_1 = dcSet.getOrderMap().get(changeOrderTX_1.dbRef);
                 assertEquals(orderChanged_1.isActive(), true);
 
+                Trade tradeChange = dcSet.getTradeMap().get(new Tuple2<>(changeOrderTX_1.dbRef, createOrderTX.dbRef));
+                assertEquals(tradeChange.getAmountWant(), BigDecimal.TEN);
+
+
                 //CREATE UPDATE ORDER 2
                 ChangeOrderTransaction changeOrderTX_2 = new ChangeOrderTransaction(maker, changeOrderTX_1.getSignature(),
                         BigDecimal.TEN, FEE_POWER, ++timestamp, 0L);
-                TransactionTests.signAndProcess(dcSet, maker, gb, changeOrderTX_2, ++height, 1);
+                changeOrderTX_2.sign(maker, Transaction.FOR_NETWORK);
+                changeOrderTX_2.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);
+                assertEquals(changeOrderTX_2.isValid(Transaction.FOR_NETWORK, 0L), Transaction.VALIDATE_OK);
+                TransactionTests.process(dcSet, gb, changeOrderTX_2);
 
                 orderOrig = dcSet.getCompletedOrderMap().get(createOrderTX.dbRef);
                 assertEquals(orderOrig.isCanceled(), true);
