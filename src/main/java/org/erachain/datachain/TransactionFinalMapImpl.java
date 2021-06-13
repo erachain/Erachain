@@ -635,7 +635,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     continue;
 
                 // теперь проверим все слова в Заголовке
-                transaction.setDC(dcSet);
+                transaction.setDC(dcSet, true);
                 String[] titleArray = transaction.getTags();
 
                 if (titleArray == null || titleArray.length < words.length)

@@ -97,6 +97,14 @@ public class ChangeOrderTransaction extends Transaction {
 
     // GETTERS/SETTERS
 
+    @Override
+    public void updateFromStateDB() {
+        if (order == null) {
+            // возможно для блокэксплорера нужно - если ордер уже сыграл
+            order = dcSet.getCompletedOrderMap().get(orderID);
+        }
+    }
+
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
 
         super.setDC(dcSet, false);

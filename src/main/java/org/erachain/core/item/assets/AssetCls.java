@@ -329,11 +329,18 @@ public abstract class AssetCls extends ItemCls {
     protected int parseAppData() {
         int pos = super.parseAppData();
         if ((flags & APP_DATA_DEX_AWARDS_MASK) != 0) {
-            int dexAwardsLen = appData[pos++];
+            int dexAwardsLen = Byte.toUnsignedInt(appData[pos++]) + 1;
             dexAwards = new ExLinkAddress[dexAwardsLen];
             for (int i = 0; i < dexAwardsLen; i++) {
+
                 dexAwards[i] = new ExLinkAddress(appData, pos);
                 pos += dexAwards[i].length();
+
+                if (pos >= appData.length) {
+                    // старая версия с 255 числом
+                    break;
+                }
+
             }
         }
         return pos;
@@ -347,7 +354,7 @@ public abstract class AssetCls extends ItemCls {
         if (dexAwards == null)
             return appData;
 
-        appData = Bytes.concat(appData, new byte[]{(byte) dexAwards.length});
+        appData = Bytes.concat(appData, new byte[]{(byte) (dexAwards.length - 1)});
         for (ExLinkAddress exAddress : dexAwards) {
             appData = Bytes.concat(appData, exAddress.toBytes());
         }
@@ -2170,10 +2177,18 @@ public abstract class AssetCls extends ItemCls {
                 return Transaction.INVALID_AWARD;
             }
 
+            if (dexAwards.length > 256) {
+                return Transaction.INVALID_MAX_AWARD_COUNT;
+            }
+
             // нельзя делать ссылку на иконку у Персон
             int total = 0;
             for (int i = 0; i < dexAwards.length; ++i) {
                 ExLinkAddress exAddress = dexAwards[i];
+                if (exAddress == null) {
+                    // старая версия с 255
+                    break;
+                }
                 if (exAddress.getValue1() <= 0) {
                     errorValue = "Award[" + i + "] percent is so small (<=0%)";
                     return Transaction.INVALID_AWARD;

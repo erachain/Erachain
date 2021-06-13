@@ -892,6 +892,7 @@ public class BlockExplorer {
             orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
         } else if (trade.isChange()) {
             actionTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+            actionTX.setDC(dcSet, true);
         } else {
             actionTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
         }
