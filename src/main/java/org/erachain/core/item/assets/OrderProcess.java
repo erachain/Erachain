@@ -10,7 +10,10 @@ import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
+import org.erachain.dbs.IteratorCloseable;
+import org.mapdb.Fun;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -488,6 +491,141 @@ public class OrderProcess {
                     thisAmountHaveLeftStart, false, false, true);
         }
 
+    }
+
+    public static void orphan(Order orderThis, Block block, long blockTime) {
+
+        DCSet dcSet = orderThis.dcSet;
+        long haveAssetKey = orderThis.getHaveAssetKey();
+        BigDecimal amountHave = orderThis.getAmountHave();
+        long wantAssetKey = orderThis.getWantAssetKey();
+        int haveAssetScale = orderThis.getHaveAssetScale();
+        //BigDecimal amountWant = orderThis.getAmountWant();
+        int wantAssetScale = orderThis.getWantAssetScale();
+
+        BigDecimal price = orderThis.getPrice();
+        Account creator = orderThis.getCreator();
+
+        long id = orderThis.getId();
+        // GET HEIGHT from ID
+        int height = (int) (id >> 32);
+
+        if (BlockChain.CHECK_BUGS > 1 &&
+                //Transaction.viewDBRef(id).equals("776446-1")
+                id == 3644468729217028L
+        ) {
+            boolean debug = false;
+        }
+
+        CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
+        OrderMap ordersMap = dcSet.getOrderMap();
+        TradeMap tradesMap = dcSet.getTradeMap();
+
+        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled
+        // - на всякий случай удалим его в любом случае
+        completedMap.delete(id);
+
+        BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
+
+        BigDecimal thisAmountHaveLeft = orderThis.getAmountHaveLeft();
+        BigDecimal thisAmountHaveLeftEnd = thisAmountHaveLeft; //this.getAmountHaveLeft();
+
+        AssetCls assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
+        AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
+
+        //ORPHAN TRADES
+        Trade trade;
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(id)) {
+            while (iterator.hasNext()) {
+
+                trade = tradesMap.get(iterator.next());
+                if (!trade.isTrade()) {
+                    continue;
+                }
+                Order target = trade.getTargetOrder(dcSet);
+
+                //REVERSE FUNDS
+                BigDecimal tradeAmountHave = trade.getAmountHave();
+                BigDecimal tradeAmountWant = trade.getAmountWant();
+
+                //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
+                // - на всякий случай удалим его в любом случае
+                completedMap.delete(target);
+
+                //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
+                /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
+                ordersMap.delete(target);
+
+                //REVERSE FULFILLED
+                target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
+                // accounting on PLEDGE position
+                target.getCreator().changeBalance(dcSet, false,
+                        true, wantAssetKey, tradeAmountHave, false, false,
+                        true
+                );
+
+
+                thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
+
+                if (height > BlockChain.VERS_5_3) {
+                    AssetCls.processTrade(dcSet, block, target.getCreator(),
+                            false, assetWant, assetHave,
+                            true, tradeAmountWant,
+                            blockTime,
+                            0L);
+                } else {
+
+                    target.getCreator().changeBalance(dcSet, true, false, haveAssetKey,
+                            tradeAmountWant, false, false, false);
+                }
+                // Учтем что у стороны ордера обновилась форжинговая информация
+                if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
+                    block.addForgingInfoUpdate(target.getCreator());
+                }
+
+                //UPDATE ORDERS
+                ordersMap.put(target);
+
+                //REMOVE TRADE FROM DATABASE
+                tradesMap.delete(trade);
+
+                if (BlockChain.CHECK_BUGS > 3) {
+                    if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
+                        Long err = null;
+                        err++;
+                    }
+                }
+
+
+            }
+        } catch (IOException e) {
+        }
+
+        //// тут нужно получить остатки все из текущего состояния иначе индексы по измененной цене с остатков не удалятся
+        /// поэтому смотрим что есть в таблице и если есть то его грузим с ценой по остаткам той что в базе
+        Order thisOrder = ordersMap.get(id);
+        if (thisOrder != null) {
+            //REMOVE ORDER FROM DATABASE
+            ordersMap.delete(thisOrder);
+        }
+
+        // с ордера сколько было продано моего актива? на это число уменьшаем залог
+        thisAmountHaveLeftEnd = orderThis.getAmountHaveLeft().subtract(thisAmountHaveLeftEnd);
+        if (thisAmountHaveLeftEnd.signum() > 0) {
+            // change PLEDGE
+            creator.changeBalance(dcSet, false, true, haveAssetKey,
+                    thisAmountHaveLeftEnd, false, false, true);
+        }
+
+        //REVERT WANT
+        if (height > BlockChain.VERS_5_3) {
+            AssetCls.processTrade(dcSet, block, creator,
+                    true, assetHave, assetWant,
+                    true, thisAmountFulfilledWant, blockTime, 0L);
+        } else {
+            creator.changeBalance(dcSet, true, false, wantAssetKey,
+                    thisAmountFulfilledWant, false, false, false);
+        }
     }
 
 }

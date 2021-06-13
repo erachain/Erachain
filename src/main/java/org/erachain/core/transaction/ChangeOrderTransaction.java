@@ -470,7 +470,11 @@ public class ChangeOrderTransaction extends Transaction {
         if (order.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - откатим, ведь может он сработал
             updatedOrder.setDC(dcSet);
-            updatedOrder.orphan(block, block == null ? timestamp : block.getTimestamp(), true);
+            if (true) {
+                OrderProcess.orphan(updatedOrder, block, block == null ? timestamp : block.getTimestamp());
+            } else {
+                updatedOrder.orphan(block, block == null ? timestamp : block.getTimestamp(), true);
+            }
         }
 
         // удалим из исполненных

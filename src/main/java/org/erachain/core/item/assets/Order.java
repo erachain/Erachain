@@ -734,6 +734,9 @@ public class Order implements Comparable<Order> {
             while (iterator.hasNext()) {
 
                 trade = tradesMap.get(iterator.next());
+                if (!trade.isTrade()) {
+                    continue;
+                }
                 Order target = trade.getTargetOrder(this.dcSet);
 
                 //REVERSE FUNDS
@@ -803,8 +806,8 @@ public class Order implements Comparable<Order> {
 
         if (!asChange) {
 
-            //REMOVE HAVE
-            // GET HAVE LEFT - if it CANCELWED by INCREMENT close
+            // RESTORE HAVE
+            // GET HAVE LEFT - if it CANCELED by Outprice or not completed
             //   - если обработка остановлена по достижению порога Инкремента
             this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey,
                     this.getAmountHaveLeft(), false, false,
