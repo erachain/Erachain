@@ -23,14 +23,9 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/*
-
-#### PROPERTY 1
-typeBytes[2].3-7 = point accuracy for HAVE amount: -16..16 = BYTE - 16
-
-#### PROPERTY 2
-typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
-
+/**
+ * Закрывает родительский Заказ и создает новый.
+ * При этом создает Сделку  с типом Измена Заказа, в которую вставляет новое Хочу
  */
 public class ChangeOrderTransaction extends Transaction {
     public static final byte TYPE_ID = (byte) Transaction.CHANGE_ORDER_TRANSACTION;
@@ -48,9 +43,18 @@ public class ChangeOrderTransaction extends Transaction {
     private BigDecimal amountWant;
 
     long orderID;
-    private CreateOrderTransaction createOrderTx;
+    //private CreateOrderTransaction createOrderTx;
     private Order order;
 
+    /**
+     * @param typeBytes
+     * @param creator
+     * @param orderRef   signature of Creating or last Changing Order transaction
+     * @param amountWant
+     * @param feePow
+     * @param timestamp
+     * @param reference
+     */
     public ChangeOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
         super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
@@ -98,17 +102,12 @@ public class ChangeOrderTransaction extends Transaction {
         super.setDC(dcSet, false);
 
         orderID = dcSet.getTransactionFinalMapSigns().get(orderRef);
-        createOrderTx = (CreateOrderTransaction) dcSet.getTransactionFinalMap().get(orderID);
+        //createOrderTx = (CreateOrderTransaction) dcSet.getTransactionFinalMap().get(orderID);
 
+        // при откате может быть НУЛЬ
         order = dcSet.getOrderMap().get(orderID);
-        if (order == null) {
-            // for show in JSON and blockexplorer
-            // так же если уже сработала транзакция - он будет в Отмененных - и его надо вытащить для Откатов например
-            order = dcSet.getCompletedOrderMap().get(orderID);
-        }
-        order.setDC(dcSet);
 
-        if (false && andUpdateFromState && !isWiped())
+        if (andUpdateFromState && !isWiped())
             updateFromStateDB();
 
     }
@@ -151,7 +150,7 @@ public class ChangeOrderTransaction extends Transaction {
 
     @Override
     public long getAssetKey() {
-        return getKey();
+        return order.getHaveAssetKey();
     }
 
     public byte[] getOrderRef() {
@@ -180,7 +179,7 @@ public class ChangeOrderTransaction extends Transaction {
     // PARSE CONVERT
 
     public Order makeUpdatedOrder() {
-        return new Order(order, seqNo, this.amountWant);
+        return new Order(order, dbRef, this.amountWant);
     }
 
     @SuppressWarnings("unchecked")
@@ -352,11 +351,11 @@ public class ChangeOrderTransaction extends Transaction {
             return VALIDATE_OK;
         }
 
-        if (order == null) {
+        if (orderID == 0L) {
             return ORDER_DOES_NOT_EXIST;
         }
 
-        if (!createOrderTx.getCreator().equals(creator)) {
+        if (!order.getCreator().equals(creator)) {
             return INVALID_CREATOR;
         }
 
@@ -381,7 +380,7 @@ public class ChangeOrderTransaction extends Transaction {
             return AMOUNT_SCALE_WRONG;
         }
         scale = this.amountWant.stripTrailingZeros().scale();
-        if (scale > createOrderTx.getWantAsset().getScale()) {
+        if (scale > order.getWantAssetScale()) {
             return AMOUNT_SCALE_WRONG;
         }
 
@@ -396,18 +395,14 @@ public class ChangeOrderTransaction extends Transaction {
 
         if (creatorPersonDuration == null) {
             itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.ASSET_TYPE, createOrderTx.getHaveKey(), createOrderTx.getHaveAsset() == null ?
-                            null : createOrderTx.getHaveAsset().getTags()}, // транзакция ошибочная
-                    new Object[]{ItemCls.ASSET_TYPE, createOrderTx.getWantKey(), createOrderTx.getWantAsset() == null ?
-                            null : createOrderTx.getWantAsset().getTags()},
+                    new Object[]{ItemCls.ASSET_TYPE, order.getHaveAssetKey()},
+                    new Object[]{ItemCls.ASSET_TYPE, order.getWantAssetKey()},
             };
         } else {
             itemsKeys = new Object[][]{
                     new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
-                    new Object[]{ItemCls.ASSET_TYPE, createOrderTx.getHaveKey(), createOrderTx.getHaveAsset() == null ?
-                            null : createOrderTx.getHaveAsset().getTags()}, // транзакция ошибочная
-                    new Object[]{ItemCls.ASSET_TYPE, createOrderTx.getWantKey(), createOrderTx.getWantAsset() == null ?
-                            null : createOrderTx.getWantAsset().getTags()},
+                    new Object[]{ItemCls.ASSET_TYPE, order.getHaveAssetKey()},
+                    new Object[]{ItemCls.ASSET_TYPE, order.getWantAssetKey()},
             };
         }
     }
@@ -433,11 +428,12 @@ public class ChangeOrderTransaction extends Transaction {
         dcSet.getCompletedOrderMap().put(order);
 
         // запомним для отчета что цена изменилась
-        Trade trade = new Trade(Trade.TYPE_CHANGE, dbRef,
+        Trade trade = new Trade(Trade.TYPE_CHANGE,
                 dbRef, // номер инициатора по нашему номеру
+                orderID, // номер оригинала?
                 order.getHaveAssetKey(), order.getWantAssetKey(),
                 order.getAmountHave(), amountWant,
-                createOrderTx.getHaveAsset().getScale(), createOrderTx.getWantAsset().getScale(), 1);
+                order.getHaveAssetScale(), order.getWantAssetScale(), 1);
 
         // нужно запомнить чтобы при откате обновить назад цену
         dcSet.getTradeMap().put(trade);
@@ -465,21 +461,17 @@ public class ChangeOrderTransaction extends Transaction {
         // чтобы восстановить старую цену
         dcSet.getTradeMap().delete(new Fun.Tuple2<>(dbRef, orderID));
 
-        if (order.getAmountWant().compareTo(amountWant) > 0) {
+        // удалим из исполненных
+        Order orderOrig = dcSet.getCompletedOrderMap().remove(orderID);
+
+        if (orderOrig.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - откатим, ведь может он сработал
-            if (true) {
-                Order updatedOrder = OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
-            } else {
-                Order updatedOrder = makeUpdatedOrder();
-                updatedOrder.setDC(dcSet);
-                updatedOrder.orphan(block, block == null ? timestamp : block.getTimestamp(), true);
-            }
+            Order updatedOrder = OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
         }
 
-        // удалим из исполненных
-        dcSet.getCompletedOrderMap().delete(orderID);
         // добавим в ожидающие
-        dcSet.getOrderMap().put(order);
+        dcSet.getOrderMap().put(orderOrig);
+
 
     }
 
