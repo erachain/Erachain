@@ -4,12 +4,10 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -198,16 +196,15 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
                 Order order = sellOrdersTableModel.getItem(row);
 
-                Transaction orderAction = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
-
-                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), true, orderAction,
+                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), true, null,
                         (int) (MainFrame.getInstance().getWidth() / 1.2),
                         (int) (MainFrame.getInstance().getHeight() / 1.2),
                         "");
 
-                JPanel panel = TransactionDetailsFactory.getInstance().createTransactionDetail(orderAction);
+                JPanel panel = new OrderInfoPanel(order);
                 dialog.jScrollPane1.setViewportView(panel);
                 dialog.setLocationRelativeTo(null);
+                dialog.pack();
                 dialog.setVisible(true);
 
             }
@@ -382,14 +379,13 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
                 Order order = buyOrdersTableModel.getItem(row);
-                Transaction orderAction = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
-                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), true, orderAction,
+                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), true, null,
                         (int) (MainFrame.getInstance().getWidth() / 1.2),
                         (int) (MainFrame.getInstance().getHeight() / 1.2),
                         "");
 
-                JPanel panel = TransactionDetailsFactory.getInstance().createTransactionDetail(orderAction);
+                JPanel panel = new OrderInfoPanel(order);
                 dialog.jScrollPane1.setViewportView(panel);
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();
