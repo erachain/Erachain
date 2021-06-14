@@ -4,13 +4,12 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.transaction.CreateOrderDetailsFrame;
+import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -198,18 +197,18 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 row = sellOrdersTable.convertRowIndexToModel(row);
 
                 Order order = sellOrdersTableModel.getItem(row);
-                
-                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
-                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, createOrder,
+                Transaction orderAction = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
+
+                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), true, orderAction,
                         (int) (MainFrame.getInstance().getWidth() / 1.2),
                         (int) (MainFrame.getInstance().getHeight() / 1.2),
                         "");
 
-                CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
-                dd.jScrollPane1.setViewportView(ww);
-                dd.setLocationRelativeTo(null);
-                dd.setVisible(true);
+                JPanel panel = TransactionDetailsFactory.getInstance().createTransactionDetail(orderAction);
+                dialog.jScrollPane1.setViewportView(panel);
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
 
             }
         });
@@ -383,18 +382,18 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
                 Order order = buyOrdersTableModel.getItem(row);
-                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
+                Transaction orderAction = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
-                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, createOrder,
+                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), true, orderAction,
                         (int) (MainFrame.getInstance().getWidth() / 1.2),
                         (int) (MainFrame.getInstance().getHeight() / 1.2),
                         "");
 
-                CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
-                dd.jScrollPane1.setViewportView(ww);
-                dd.setLocationRelativeTo(null);
-                dd.pack();
-                dd.setVisible(true);
+                JPanel panel = TransactionDetailsFactory.getInstance().createTransactionDetail(orderAction);
+                dialog.jScrollPane1.setViewportView(panel);
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
 
             }
         });
