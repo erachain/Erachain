@@ -42,6 +42,16 @@ public class OrderProcess {
         //BigDecimal amountWant = orderThis.getAmountWant();
         int wantAssetScale = orderThis.getWantAssetScale();
 
+        AssetCls assetHave;
+        AssetCls assetWant;
+        if (transaction instanceof CreateOrderTransaction) {
+            assetHave = ((CreateOrderTransaction) transaction).getHaveAsset();
+            assetWant = ((CreateOrderTransaction) transaction).getWantAsset();
+        } else {
+            assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
+            assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
+        }
+
         BigDecimal price = orderThis.getPrice();
         Account creator = orderThis.getCreator();
 
@@ -402,16 +412,6 @@ public class OrderProcess {
 
                 //TRANSFER FUNDS
                 if (height > BlockChain.VERS_5_3) {
-                    AssetCls assetHave;
-                    AssetCls assetWant;
-                    if (transaction instanceof CreateOrderTransaction) {
-                        assetHave = ((CreateOrderTransaction) transaction).getHaveAsset();
-                        assetWant = ((CreateOrderTransaction) transaction).getWantAsset();
-                    } else {
-                        assetHave = dcSet.getItemAssetMap().get(order.getHaveAssetKey());
-                        assetWant = dcSet.getItemAssetMap().get(order.getWantAssetKey());
-                    }
-
                     AssetCls.processTrade(dcSet, block, order.getCreator(),
                             false, assetWant, assetHave,
                             false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
@@ -480,8 +480,7 @@ public class OrderProcess {
         if (processedAmountFulfilledWant.signum() > 0) {
             if (height > BlockChain.VERS_5_3) {
                 AssetCls.processTrade(dcSet, block, creator,
-                        true, ((CreateOrderTransaction) transaction).getHaveAsset(),
-                        ((CreateOrderTransaction) transaction).getWantAsset(),
+                        true, assetHave, assetWant,
                         false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
             } else {
                 creator.changeBalance(dcSet, false, false, wantAssetKey,
