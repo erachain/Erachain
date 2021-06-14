@@ -69,7 +69,7 @@ public class WalletUpdater extends MonitoredThread {
         if (pair.getA()) {
             // ORPHAN
             if (!wallet.checkNeedSyncWallet(pair.getB().getSignature())) {
-                wallet.orphanBlock(dcSet, pair.getB());
+                wallet.orphanBlock(pair.getB());
 
             } else {
                 // set then NEED SYNCH
@@ -80,7 +80,7 @@ public class WalletUpdater extends MonitoredThread {
             // PROCESS
             if (controller.isStatusOK() // только если нет синхронизации
                     && !wallet.checkNeedSyncWallet(pair.getB().getReference())) {
-                wallet.processBlock(dcSet, pair.getB());
+                wallet.processBlock(pair.getB());
 
             } else {
                 // set then NEED SYNCH
@@ -202,7 +202,7 @@ public class WalletUpdater extends MonitoredThread {
                                 return;
                             }
                             lastBlock = lastBlocks.get(key);
-                            wallet.orphanBlock(dcSet, lastBlock);
+                            wallet.orphanBlock(lastBlock);
                             lastBlock.close();
                             lastBlocks.remove(key);
                             key--;

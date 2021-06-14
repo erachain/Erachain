@@ -2261,7 +2261,7 @@ public class Controller extends Observable {
             return true;
 
         // IF NEW WALLET CREADED
-        if (this.wallet.create(dcSet, seed, password, amount, false, path,
+        if (this.wallet.create(seed, password, amount, false, path,
                 this.dcSetWithObserver, this.dynamicGUI)) {
             this.setWalletLicense(licenseKey);
             return true;
@@ -2274,7 +2274,7 @@ public class Controller extends Observable {
         if (noUseWallet)
             return true;
 
-        if (this.wallet.create(dcSet, seed, password, amount, false, path,
+        if (this.wallet.create(seed, password, amount, false, path,
                 this.dcSetWithObserver, this.dynamicGUI)) {
 
             return true;
