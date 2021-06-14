@@ -427,15 +427,31 @@ public class WebTransactionsHTML {
 
         ChangeOrderTransaction orderUpdate = (ChangeOrderTransaction) transaction;
 
-        Long refDB = orderUpdate.getDBRef();
         Long orderID = orderUpdate.getOrderId();
+        //
+        Order orderOrig = null;
+        String statusOrig;
+        if (dcSet.getOrderMap().contains(orderID)) {
+            orderOrig = dcSet.getOrderMap().get(orderID);
+        } else if (dcSet.getCompletedOrderMap().contains(orderID)) {
+            orderOrig = dcSet.getCompletedOrderMap().get(orderID);
+        }
+        if (orderOrig == null) {
+            statusOrig = "Unknown";
+        } else {
+            statusOrig = orderOrig.viewStatus();
+        }
+
+        out += "<h4><a href='?order=" + Transaction.viewDBRef(orderID) + get_Lang() + "'>" + Lang.T(statusOrig, langObj) + "</a>";
+
+        Long refDB = orderUpdate.getDBRef();
         //
         Order order = null;
         String status;
-        if (dcSet.getOrderMap().contains(orderID)) {
-            order = dcSet.getOrderMap().get(orderID);
-        } else if (dcSet.getCompletedOrderMap().contains(orderID)) {
-            order = dcSet.getCompletedOrderMap().get(orderID);
+        if (dcSet.getOrderMap().contains(refDB)) {
+            order = dcSet.getOrderMap().get(refDB);
+        } else if (dcSet.getCompletedOrderMap().contains(refDB)) {
+            order = dcSet.getCompletedOrderMap().get(refDB);
         }
         if (order == null) {
             status = "Unknown";
@@ -443,7 +459,7 @@ public class WebTransactionsHTML {
             status = order.viewStatus();
         }
 
-        out += "<h4><a href='?order=" + Transaction.viewDBRef(orderID) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
+        out += " - <a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
 
         out += Lang.T("Update Price", langObj) + ": <b>"
                 + orderUpdate.makeUpdatedOrder().calcPrice().toPlainString()

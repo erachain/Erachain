@@ -402,10 +402,18 @@ public class OrderProcess {
 
                 //TRANSFER FUNDS
                 if (height > BlockChain.VERS_5_3) {
-                    AssetCls assetWant = ((CreateOrderTransaction) transaction).getWantAsset();
+                    AssetCls assetHave;
+                    AssetCls assetWant;
+                    if (transaction instanceof CreateOrderTransaction) {
+                        assetHave = ((CreateOrderTransaction) transaction).getHaveAsset();
+                        assetWant = ((CreateOrderTransaction) transaction).getWantAsset();
+                    } else {
+                        assetHave = dcSet.getItemAssetMap().get(order.getHaveAssetKey());
+                        assetWant = dcSet.getItemAssetMap().get(order.getWantAssetKey());
+                    }
+
                     AssetCls.processTrade(dcSet, block, order.getCreator(),
-                            false, assetWant,
-                            ((CreateOrderTransaction) transaction).getHaveAsset(),
+                            false, assetWant, assetHave,
                             false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
 
                 } else {

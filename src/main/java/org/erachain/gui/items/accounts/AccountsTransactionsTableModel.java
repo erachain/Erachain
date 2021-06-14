@@ -275,6 +275,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
         public String title;
 
         Trans(Fun.Tuple2<Long, Integer> walletKey, Transaction transaction) {
+            transaction.setDC(dcSet, true);
             this.transaction = transaction;
             this.walletKey = walletKey;
             isUnViewed = ((WTransactionMap) map).isUnViewed(transaction);

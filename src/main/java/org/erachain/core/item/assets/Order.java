@@ -40,11 +40,11 @@ public class Order implements Comparable<Order> {
             + STATUS_LENGTH;
 
     public static final int UNCONFIRMED = 0;
-    public static final int ACTIVE = 1;
-    public static final int FULFILLED = 2;
-    public static final int COMPLETED = 3;
-    public static final int CANCELED = 4;
-    public static final int ORPHANED = -1;
+    public static final int OPENED = 1; // открыт
+    public static final int FULFILLED = 2; // начат, почат
+    public static final int COMPLETED = 3; // закрыт, исполнен
+    public static final int CANCELED = 4; // отмене
+    public static final int ORPHANED = -1; // откачен, отброшен
 
     //protected DCSet dcSet;
 
@@ -440,7 +440,7 @@ public class Order implements Comparable<Order> {
     }
 
     public boolean isActive() {
-        return status == ACTIVE || status == FULFILLED;
+        return status == OPENED || status == FULFILLED;
     }
 
     public static BigDecimal getFulfilledWant(BigDecimal fulfilledHave, BigDecimal price, int wantAssetScale) {
@@ -453,8 +453,8 @@ public class Order implements Comparable<Order> {
 
     public String viewStatus() {
         switch (status) {
-            case ACTIVE:
-                return "Active";
+            case OPENED:
+                return "Open # Открыт";
             case FULFILLED:
                 return "Fulfilled";
             case COMPLETED:
