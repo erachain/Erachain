@@ -102,12 +102,12 @@ public class ChangeOrderTransaction extends Transaction {
         super.setDC(dcSet, false);
 
         orderID = dcSet.getTransactionFinalMapSigns().get(orderRef);
-        //createOrderTx = (CreateOrderTransaction) dcSet.getTransactionFinalMap().get(orderID);
 
         // при откате может быть НУЛЬ
         order = dcSet.getOrderMap().get(orderID);
         if (order == null) {
             // возможно для блокэксплорера нужно - если ордер уже сыграл
+            // и для кошелька тоже надо
             order = dcSet.getCompletedOrderMap().get(orderID);
         }
 
