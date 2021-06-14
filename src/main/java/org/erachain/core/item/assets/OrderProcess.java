@@ -116,7 +116,7 @@ public class OrderProcess {
                     timestamp = null;
                     ++timestamp;
                 } else if (comp == 0) {
-                    // здесь так же должно быть возростание
+                    // здесь так же должно быть возрастание
                     // если не так то ошибка
                     if (timestamp.compareTo(item.getId()) > 0) {
                         // RISE ERROR
