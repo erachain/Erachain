@@ -196,10 +196,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
                 Order order = sellOrdersTableModel.getItem(row);
 
-                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), true, null,
-                        (int) (MainFrame.getInstance().getWidth() / 1.2),
-                        (int) (MainFrame.getInstance().getHeight() / 1.2),
-                        "");
+                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), "Order Info");
 
                 JPanel panel = new OrderInfoPanel(order);
                 dialog.jScrollPane1.setViewportView(panel);
@@ -380,10 +377,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
                 Order order = buyOrdersTableModel.getItem(row);
 
-                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), true, null,
-                        (int) (MainFrame.getInstance().getWidth() / 1.2),
-                        (int) (MainFrame.getInstance().getHeight() / 1.2),
-                        "");
+                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), "Order Info");
 
                 JPanel panel = new OrderInfoPanel(order);
                 dialog.jScrollPane1.setViewportView(panel);

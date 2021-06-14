@@ -3,7 +3,6 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
@@ -158,12 +157,8 @@ public class MyOrderTab extends SplitPanel {
                     return;
 
                 Order order = ordersModel.getItem(row);
-                Transaction orderAction = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
-                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), true, orderAction,
-                        (int) (MainFrame.getInstance().getWidth() / 1.2),
-                        (int) (MainFrame.getInstance().getHeight() / 1.2),
-                        "");
+                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), "Order Info");
 
                 JPanel panel = new OrderInfoPanel(order);
                 dialog.jScrollPane1.setViewportView(panel);

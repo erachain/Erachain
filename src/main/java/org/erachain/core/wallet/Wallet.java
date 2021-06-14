@@ -1656,6 +1656,7 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
+		this.database.getOrderMap().add(Order.getOrder(dcSet, orderChanging.getOrderId()));
 		this.database.getOrderMap().add(Order.getOrder(dcSet, orderChanging.getDBRef()));
 
 	}
