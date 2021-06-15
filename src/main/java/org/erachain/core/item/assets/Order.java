@@ -53,18 +53,18 @@ public class Order implements Comparable<Order> {
     /**
      * height[int] + SeqNo[int]
      */
-    private Long id;
-    private Account creator;
-    private long haveAssetKey;
-    private BigDecimal amountHave;
-    private int haveAssetScale;
+    private final Long id;
+    private final Account creator;
+    private final long haveAssetKey;
+    private final BigDecimal amountHave;
+    private final int haveAssetScale;
     private BigDecimal fulfilledHave;
 
-    private long wantAssetKey;
-    private BigDecimal amountWant;
-    private int wantAssetScale;
+    private final long wantAssetKey;
+    private final BigDecimal amountWant;
+    private final int wantAssetScale;
 
-    private BigDecimal price;
+    private final BigDecimal price;
 
     DCSet dcSet;
 
@@ -374,10 +374,6 @@ public class Order implements Comparable<Order> {
 
     public Long getId() {
         return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Account getCreator() {
