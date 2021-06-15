@@ -461,6 +461,9 @@ public class WebTransactionsHTML {
 
         out += " - <a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
 
+        out += Lang.T("Order Signature", langObj) + ": <a href='?tx=" + Base58.encode(orderUpdate.getOrderRef()) + "'><b>"
+                + Base58.encode(orderUpdate.getOrderRef()) + "</b></a><br>";
+
         out += Lang.T("Update Price", langObj) + ": <b>"
                 + orderUpdate.makeUpdatedOrder().calcPrice().toPlainString()
                 + " / " + orderUpdate.makeUpdatedOrder().calcPriceReverse().toPlainString() + "</b><br>";

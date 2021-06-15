@@ -444,7 +444,7 @@ public class ChangeOrderTransaction extends Transaction {
                 orderID, // номер оригинала?
                 order.getHaveAssetKey(), order.getWantAssetKey(),
                 order.getAmountHave(), amountWant,
-                order.getHaveAssetScale(), order.getWantAssetScale(), 1);
+                order.getHaveAssetScale(), order.getWantAssetScale(), 0);
 
         // нужно запомнить чтобы при откате обновить назад цену
         dcSet.getTradeMap().put(trade);
