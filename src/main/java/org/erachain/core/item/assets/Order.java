@@ -166,12 +166,25 @@ public class Order implements Comparable<Order> {
         return this.status;
     }
 
+    /**
+     * Выдает степень 10 числа
+     *
+     * @param value
+     * @return
+     */
     public static int powerTen(BigDecimal value) {
         BigDecimal t = value;
         int i = 0;
-        while (t.compareTo(BigDecimal.ONE) > 0) {
-            t = t.movePointLeft(1);
-            i++;
+
+        if (value.compareTo(BigDecimal.ONE) > 0) {
+            while (t.compareTo(BigDecimal.ONE) > 0) {
+                t = t.movePointLeft(1);
+                i++;
+            }
+        }
+        while (t.compareTo(BigDecimal.ONE) < 0) {
+            t = t.movePointRight(1);
+            i--;
         }
         return i;
     }
@@ -272,16 +285,27 @@ public class Order implements Comparable<Order> {
     }
 
     public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int wantScale) {
-        // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
-        int scalePrice = calcPriceScale(amountHave, wantScale, 3);
+
         if (amountHave.signum() == 0)
             return BigDecimal.ONE.negate();
+
+        // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
+        int scalePrice = calcPriceScale(amountHave, wantScale, 3);
 
         BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
         // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
-        if (result.scale() < 0)
+        int scale = result.scale();
+        if (scale < 0)
             return result.setScale(0);
+        else if (scale > 0) {
+            int accuracy = powerTen(result) + scale;
+            if (accuracy > 6) {
+                // обрежем точность цены чтобы на бирже лишней точности не было
+                scale -= accuracy - 6;
+                result.setScale(scale, RoundingMode.HALF_DOWN);
+            }
+        }
         return result;
     }
 
