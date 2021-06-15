@@ -300,7 +300,7 @@ public class OnDealClick {
             case Transaction.INVALID_ECXHANGE_PAIR:
                 mess = "Invalid Ecxhange Pair";
                 break;
-                
+
             case Transaction.INVALID_RETURN:
                 mess = "Invalid return";
                 break;
@@ -310,6 +310,10 @@ public class OnDealClick {
             case Transaction.ORDER_DOES_NOT_EXIST:
                 mess = "Order does not exists";
                 break;
+            case Transaction.ORDER_ALREADY_COMPLETED:
+                mess = "Order already completed";
+                break;
+
             case Transaction.INVALID_ORDER_CREATOR:
                 mess = "Invalid order creator";
                 break;

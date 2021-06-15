@@ -355,8 +355,12 @@ public class ChangeOrderTransaction extends Transaction {
             return VALIDATE_OK;
         }
 
-        if (orderID == 0L) {
+        if (orderID == 0L || order == null) {
             return ORDER_DOES_NOT_EXIST;
+        }
+
+        if (!order.isActive()) {
+            return ORDER_ALREADY_COMPLETED;
         }
 
         if (!order.getCreator().equals(creator)) {
