@@ -808,7 +808,7 @@ public class BlockExplorer {
 
         output.put("order", order.toJson());
 
-        List<Trade> trades = dcSet.getTradeMap().getTradesByOrderID(orderId, true);
+        List<Trade> trades = dcSet.getTradeMap().getTradesByOrderID(orderId, true, true);
 
         AssetCls assetHave = Controller.getInstance().getAsset(order.getHaveAssetKey());
         AssetCls assetWant = Controller.getInstance().getAsset(order.getWantAssetKey());
@@ -887,13 +887,14 @@ public class BlockExplorer {
         AssetCls pairAssetWant;
 
         Order orderInitiator = null;
-        Transaction cancelTX = null;
+        Transaction actionTX = null;
         if (trade.isTrade()) {
             orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
-        } else if (trade.isUpdate()) {
-            cancelTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+        } else if (trade.isChange()) {
+            actionTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+            actionTX.setDC(dcSet, true);
         } else {
-            cancelTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+            actionTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
         }
 
         long pairHaveKey;
@@ -902,6 +903,7 @@ public class BlockExplorer {
 
         boolean unchecked = false;
 
+        Controller cnt = Controller.getInstance();
         if (assetHaveIn == null) {
 
             pairHaveKey = trade.getHaveKey();
@@ -911,15 +913,8 @@ public class BlockExplorer {
             pairAssetWant = dcSet.getItemAssetMap().get(pairWantKey);
 
             /// если пару нужно перевернуть так как есть общепринятые пары
-            if (pairHaveKey == 2L && pairWantKey == 1l
-                    || pairHaveKey == 95l
-                    || pairHaveKey > 33 && pairHaveKey < 1000
-                    && (pairWantKey < 33 && pairWantKey > 1000)
-                    || pairHaveKey > 10 && pairHaveKey < 33
-                    && (pairWantKey < 10)
-                    || pairAssetHave.isIndex() && pairHaveKey < pairWantKey
-                    || pairAssetHave.isInsideCurrency() && pairHaveKey < pairWantKey
-                    || pairHaveKey < 5 && pairWantKey > 1000
+            if (pairHaveKey == 1L && pairWantKey == 2l
+                    || cnt.pairsController.spotPairsList.containsKey(pairAssetWant.getName() + "_" + pairAssetHave.getName())
             ) {
                 // swap pair
                 tempKey = pairHaveKey;
@@ -949,13 +944,9 @@ public class BlockExplorer {
         tradeJSON.put("assetHaveMaker", pairAssetHave.getMaker().getAddress());
         tradeJSON.put("assetWantMaker", pairAssetWant.getMaker().getAddress());
 
-        tradeJSON.put("realPrice", trade.calcPrice());
-
-        tradeJSON.put("realReversePrice", trade.calcPriceRevers());
-
         if (orderInitiator == null) {
             // CANCEL
-            if (cancelTX == null) {
+            if (actionTX == null) {
                 if (BlockChain.CHECK_BUGS > 5) {
                     // show ERROR
                     tradeJSON.put("initiatorTx", "--");
@@ -965,9 +956,9 @@ public class BlockExplorer {
                 }
             } else {
                 // show CANCEL
-                tradeJSON.put("initiatorTx", cancelTX.viewHeightSeq());
-                tradeJSON.put("initiatorCreator_addr", cancelTX.getCreator().getAddress()); // viewCreator
-                tradeJSON.put("initiatorCreator", cancelTX.getCreator().getPersonOrShortAddress(12));
+                tradeJSON.put("initiatorTx", actionTX.viewHeightSeq());
+                tradeJSON.put("initiatorCreator_addr", actionTX.getCreator().getAddress()); // viewCreator
+                tradeJSON.put("initiatorCreator", actionTX.getCreator().getPersonOrShortAddress(12));
                 tradeJSON.put("initiatorAmount", trade.getAmountHave().toPlainString());
             }
         } else {
@@ -986,11 +977,11 @@ public class BlockExplorer {
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
-        if (cancelTX != null) {
-            tradeJSON.put("type", "cancel");
-
-            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        if (actionTX != null) {
+            tradeJSON.put("type", trade.viewType());
+            if (trade.isCancel()) {
+                tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+            }
 
         } else if (orderInitiator == null && BlockChain.CHECK_BUGS > -1 || pairHaveKey == orderInitiator.getHaveAssetKey()) {
             tradeJSON.put("type", "sell");
@@ -1003,6 +994,14 @@ public class BlockExplorer {
 
             tradeJSON.put("amountHave", trade.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
             tradeJSON.put("amountWant", trade.getAmountWant().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        }
+
+        if (trade.isChange()) {
+            tradeJSON.put("realPrice", ((ChangeOrderTransaction) actionTX).getPriceCalc());
+            tradeJSON.put("realReversePrice", ((ChangeOrderTransaction) actionTX).getPriceCalcReverse());
+        } else {
+            tradeJSON.put("realPrice", trade.calcPrice());
+            tradeJSON.put("realReversePrice", trade.calcPriceRevers());
         }
 
         return tradeJSON;

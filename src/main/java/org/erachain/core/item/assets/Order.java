@@ -27,6 +27,8 @@ public class Order implements Comparable<Order> {
 
     //private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
 
+    public static final int MAX_PRICE_ACCURACY = 6;
+
     public static final int ID_LENGTH = 8;
     private static final int CREATOR_LENGTH = 20; // as SHORT (old - 25)
     private static final int HAVE_LENGTH = 8;
@@ -40,11 +42,11 @@ public class Order implements Comparable<Order> {
             + STATUS_LENGTH;
 
     public static final int UNCONFIRMED = 0;
-    public static final int ACTIVE = 1;
-    public static final int FULFILLED = 2;
-    public static final int COMPLETED = 3;
-    public static final int CANCELED = 4;
-    public static final int ORPHANED = -1;
+    public static final int OPENED = 1; // открыт
+    public static final int FULFILLED = 2; // начат, почат
+    public static final int COMPLETED = 3; // закрыт, исполнен
+    public static final int CANCELED = 4; // отмене
+    public static final int ORPHANED = -1; // откачен, отброшен
 
     //protected DCSet dcSet;
 
@@ -109,9 +111,9 @@ public class Order implements Comparable<Order> {
 
     }
 
-    public Order(Order order, BigDecimal newWantAmount) {
+    public Order(Order order, long id, BigDecimal newWantAmount) {
 
-        this.id = order.id;
+        this.id = id;
         this.creator = order.creator;
         this.haveAssetKey = order.haveAssetKey;
         this.wantAssetKey = order.wantAssetKey;
@@ -166,12 +168,25 @@ public class Order implements Comparable<Order> {
         return this.status;
     }
 
+    /**
+     * Выдает степень 10 числа
+     *
+     * @param value
+     * @return
+     */
     public static int powerTen(BigDecimal value) {
         BigDecimal t = value;
         int i = 0;
-        while (t.compareTo(BigDecimal.ONE) > 0) {
-            t = t.movePointLeft(1);
-            i++;
+
+        if (value.compareTo(BigDecimal.ONE) > 0) {
+            while (t.compareTo(BigDecimal.ONE) > 0) {
+                t = t.movePointLeft(1);
+                i++;
+            }
+        }
+        while (t.compareTo(BigDecimal.ONE) < 0) {
+            t = t.movePointRight(1);
+            i--;
         }
         return i;
     }
@@ -272,16 +287,27 @@ public class Order implements Comparable<Order> {
     }
 
     public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int wantScale) {
-        // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
-        int scalePrice = calcPriceScale(amountHave, wantScale, 3);
+
         if (amountHave.signum() == 0)
             return BigDecimal.ONE.negate();
+
+        // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
+        int scalePrice = calcPriceScale(amountHave, wantScale, 3);
 
         BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
         // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
-        if (result.scale() < 0)
+        int scale = result.scale();
+        if (scale < 0)
             return result.setScale(0);
+        else if (scale > 0) {
+            int accuracy = powerTen(result) + scale;
+            if (accuracy > MAX_PRICE_ACCURACY) {
+                // обрежем точность цены чтобы на бирже лишней точности не было
+                scale -= accuracy - MAX_PRICE_ACCURACY;
+                result.setScale(scale, RoundingMode.HALF_DOWN);
+            }
+        }
         return result;
     }
 
@@ -439,6 +465,10 @@ public class Order implements Comparable<Order> {
         return dcSet.getOrderMap().contains(id);
     }
 
+    public boolean isActive() {
+        return status == OPENED || status == FULFILLED;
+    }
+
     public static BigDecimal getFulfilledWant(BigDecimal fulfilledHave, BigDecimal price, int wantAssetScale) {
         return fulfilledHave.multiply(price).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
     }
@@ -449,8 +479,8 @@ public class Order implements Comparable<Order> {
 
     public String viewStatus() {
         switch (status) {
-            case ACTIVE:
-                return "Active";
+            case OPENED:
+                return "Open # Открыт";
             case FULFILLED:
                 return "Fulfilled";
             case COMPLETED:
@@ -476,10 +506,6 @@ public class Order implements Comparable<Order> {
 
     public String viewPrice() {
         return getPrice().toPlainString();
-    }
-
-    public List<Trade> getInitiatedTrades() {
-        return this.getInitiatedTrades(DCSet.getInstance());
     }
 
     public List<Trade> getInitiatedTrades(DCSet db) {
@@ -692,9 +718,13 @@ public class Order implements Comparable<Order> {
 
     }
 
-    public void process(Block block, Transaction tx, boolean asChange) {
-        OrderProcess.process(this, block, tx, asChange);
+    /*
+    public void process(Block block, Transaction tx) {
+
+        OrderProcess.process(this, block, tx);
+
     }
+     */
 
     /**
      * @param block
@@ -734,6 +764,9 @@ public class Order implements Comparable<Order> {
             while (iterator.hasNext()) {
 
                 trade = tradesMap.get(iterator.next());
+                if (!trade.isTrade()) {
+                    continue;
+                }
                 Order target = trade.getTargetOrder(this.dcSet);
 
                 //REVERSE FUNDS
@@ -803,8 +836,8 @@ public class Order implements Comparable<Order> {
 
         if (!asChange) {
 
-            //REMOVE HAVE
-            // GET HAVE LEFT - if it CANCELWED by INCREMENT close
+            // RESTORE HAVE
+            // GET HAVE LEFT - if it CANCELED by Outprice or not completed
             //   - если обработка остановлена по достижению порога Инкремента
             this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey,
                     this.getAmountHaveLeft(), false, false,

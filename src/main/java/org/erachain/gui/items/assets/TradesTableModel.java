@@ -116,22 +116,22 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
 
                 if (row == this.list.size())
                     return "";
-                    ///return null;
+                ///return null;
 
                 if (typeSell)
-                    return "<html><span style='color:green'>▲</span>"
-                            + NumberAsString.formatAsString(trade.calcPrice())
-                            + "</html>";
-                else
                     return "<html><span style='color:red'>▼</span>"
                             + NumberAsString.formatAsString(trade.calcPriceRevers())
                             + "</html>";
+
+                return "<html><span style='color:green'>▲</span>"
+                        + NumberAsString.formatAsString(trade.calcPrice())
+                        + "</html>";
 
             case COLUMN_ASSET_2:
 
                 if (row == this.list.size())
                     return "";
-                    ///return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
+                ///return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
 
                 if (typeSell)
                     result = NumberAsString.formatAsString(trade.getAmountWant());

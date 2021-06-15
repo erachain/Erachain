@@ -12,8 +12,8 @@ import java.awt.*;
 @SuppressWarnings("serial")
 public class OrderInfoPanel extends JPanel {
 
-    public GridBagConstraints labelGBC = new GridBagConstraints();
-    public GridBagConstraints detailGBC = new GridBagConstraints();
+    public GridBagConstraints labelGBC;
+    public GridBagConstraints detailGBC;
 
     public OrderInfoPanel(Order order) {
 
@@ -30,6 +30,15 @@ public class OrderInfoPanel extends JPanel {
         labelGBC.anchor = GridBagConstraints.FIRST_LINE_START;// ..NORTHWEST;
         labelGBC.weightx = 0;
         labelGBC.gridx = 0;
+
+        // DETAIL GBC
+        detailGBC = new GridBagConstraints();
+        detailGBC.insets = new Insets(0, 5, 5, 0);
+        detailGBC.fill = GridBagConstraints.BOTH;
+        detailGBC.anchor = GridBagConstraints.FIRST_LINE_START;// ..NORTHWEST;
+        detailGBC.weightx = 0;
+        detailGBC.gridx = 1;
+
         // LABEL HAVE
         ++labelGBC.gridy;
         JLabel haveLabel = new JLabel(Lang.T("Have") + ":");
@@ -63,7 +72,7 @@ public class OrderInfoPanel extends JPanel {
 
         // PRICE
         ++detailGBC.gridy;
-        JTextField price = new JTextField(order.getPrice().toPlainString());
+        JTextField price = new JTextField(order.getPrice().toPlainString() + " / " + order.calcPriceReverse().toPlainString());
         //+ " / " + order.getPriceCalcReverse().toPlainString());
         price.setEditable(false);
         MenuPopupUtil.installContextMenu(price);

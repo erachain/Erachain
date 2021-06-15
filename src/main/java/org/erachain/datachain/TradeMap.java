@@ -16,7 +16,7 @@ public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
 
     List<Trade> getInitiatedTrades(Order order, boolean useCancel);
 
-    List<Trade> getTradesByOrderID(Long orderID, boolean useCancel);
+    List<Trade> getTradesByOrderID(Long orderID, boolean useCancel, boolean descending);
 
     @SuppressWarnings("unchecked")
     List<Trade> getTrades(long haveWant, boolean useCancel)

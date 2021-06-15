@@ -10,7 +10,10 @@ import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
+import org.erachain.dbs.IteratorCloseable;
+import org.mapdb.Fun;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -28,9 +31,8 @@ public class OrderProcess {
      *
      * @param block
      * @param transaction
-     * @param asChange
      */
-    public static void process(Order orderThis, Block block, Transaction transaction, boolean asChange) {
+    public static void process(Order orderThis, Block block, Transaction transaction) {
 
         DCSet dcSet = orderThis.dcSet;
         long haveAssetKey = orderThis.getHaveAssetKey();
@@ -39,6 +41,16 @@ public class OrderProcess {
         int haveAssetScale = orderThis.getHaveAssetScale();
         //BigDecimal amountWant = orderThis.getAmountWant();
         int wantAssetScale = orderThis.getWantAssetScale();
+
+        AssetCls assetHave;
+        AssetCls assetWant;
+        if (transaction instanceof CreateOrderTransaction) {
+            assetHave = ((CreateOrderTransaction) transaction).getHaveAsset();
+            assetWant = ((CreateOrderTransaction) transaction).getWantAsset();
+        } else {
+            assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
+            assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
+        }
 
         BigDecimal price = orderThis.getPrice();
         Account creator = orderThis.getCreator();
@@ -80,15 +92,6 @@ public class OrderProcess {
         ////// NEED FOR making secondary keys in TradeMap
         /// not need now ordersMap.add(this);
 
-        if (!asChange) {
-            //REMOVE HAVE
-            //creator.setBalance(have, creator.getBalance(db, have).subtract(amountHave), db);
-            creator.changeBalance(dcSet, true, false, haveAssetKey, amountHave,
-                    false, false,
-                    // accounting on PLEDGE position
-                    true, Account.BALANCE_POS_PLEDGE);
-        }
-
         BigDecimal thisPriceReverse = orderThis.calcPriceReverse();
 
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
@@ -123,7 +126,7 @@ public class OrderProcess {
                     timestamp = null;
                     ++timestamp;
                 } else if (comp == 0) {
-                    // здесь так же должно быть возростание
+                    // здесь так же должно быть возрастание
                     // если не так то ошибка
                     if (timestamp.compareTo(item.getId()) > 0) {
                         // RISE ERROR
@@ -409,10 +412,8 @@ public class OrderProcess {
 
                 //TRANSFER FUNDS
                 if (height > BlockChain.VERS_5_3) {
-                    AssetCls assetWant = ((CreateOrderTransaction) transaction).getWantAsset();
                     AssetCls.processTrade(dcSet, block, order.getCreator(),
-                            false, assetWant,
-                            ((CreateOrderTransaction) transaction).getHaveAsset(),
+                            false, assetWant, assetHave,
                             false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
 
                 } else {
@@ -479,8 +480,7 @@ public class OrderProcess {
         if (processedAmountFulfilledWant.signum() > 0) {
             if (height > BlockChain.VERS_5_3) {
                 AssetCls.processTrade(dcSet, block, creator,
-                        true, ((CreateOrderTransaction) transaction).getHaveAsset(),
-                        ((CreateOrderTransaction) transaction).getWantAsset(),
+                        true, assetHave, assetWant,
                         false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
             } else {
                 creator.changeBalance(dcSet, false, false, wantAssetKey,
@@ -498,6 +498,134 @@ public class OrderProcess {
                     thisAmountHaveLeftStart, false, false, true);
         }
 
+    }
+
+    public static Order orphan(DCSet dcSet, Long id, Block block, long blockTime) {
+
+        CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
+        OrderMap ordersMap = dcSet.getOrderMap();
+        TradeMap tradesMap = dcSet.getTradeMap();
+
+
+        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled
+        // - на всякий случай удалим его в любом случае
+        //// тут нужно получить остатки все из текущего состояния иначе индексы по измененной цене с остатков не удалятся
+        /// поэтому смотрим что есть в таблице и если есть то его грузим с ценой по остаткам той что в базе
+        Order orderThis = completedMap.remove(id);
+        if (orderThis == null) {
+            orderThis = ordersMap.remove(id);
+        }
+
+        long haveAssetKey = orderThis.getHaveAssetKey();
+        long wantAssetKey = orderThis.getWantAssetKey();
+
+        Account creator = orderThis.getCreator();
+
+        // GET HEIGHT from ID
+        int height = (int) (id >> 32);
+
+        if (BlockChain.CHECK_BUGS > 1 &&
+                //Transaction.viewDBRef(id).equals("776446-1")
+                id == 3644468729217028L
+        ) {
+            boolean debug = false;
+        }
+
+
+        BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
+
+        BigDecimal thisAmountHaveLeft = orderThis.getAmountHaveLeft();
+        BigDecimal thisAmountHaveLeftEnd = thisAmountHaveLeft; //this.getAmountHaveLeft();
+
+        AssetCls assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
+        AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
+
+        //ORPHAN TRADES
+        Trade trade;
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(id)) {
+            while (iterator.hasNext()) {
+
+                trade = tradesMap.get(iterator.next());
+                if (!trade.isTrade()) {
+                    continue;
+                }
+                Order target = trade.getTargetOrder(dcSet);
+
+                //REVERSE FUNDS
+                BigDecimal tradeAmountHave = trade.getAmountHave();
+                BigDecimal tradeAmountWant = trade.getAmountWant();
+
+                //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
+                // - на всякий случай удалим его в любом случае
+                completedMap.delete(target);
+
+                //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
+                /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
+                ordersMap.delete(target);
+
+                //REVERSE FULFILLED
+                target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
+                // accounting on PLEDGE position
+                target.getCreator().changeBalance(dcSet, false,
+                        true, wantAssetKey, tradeAmountHave, false, false,
+                        true
+                );
+
+                thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
+
+                if (height > BlockChain.VERS_5_3) {
+                    AssetCls.processTrade(dcSet, block, target.getCreator(),
+                            false, assetWant, assetHave,
+                            true, tradeAmountWant,
+                            blockTime,
+                            0L);
+                } else {
+
+                    target.getCreator().changeBalance(dcSet, true, false, haveAssetKey,
+                            tradeAmountWant, false, false, false);
+                }
+                // Учтем что у стороны ордера обновилась форжинговая информация
+                if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
+                    block.addForgingInfoUpdate(target.getCreator());
+                }
+
+                //UPDATE ORDERS
+                ordersMap.put(target);
+
+                //REMOVE TRADE FROM DATABASE
+                tradesMap.delete(trade);
+
+                if (BlockChain.CHECK_BUGS > 3) {
+                    if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
+                        Long err = null;
+                        err++;
+                    }
+                }
+
+
+            }
+        } catch (IOException e) {
+        }
+
+        // с ордера сколько было продано моего актива? на это число уменьшаем залог
+        thisAmountHaveLeftEnd = orderThis.getAmountHaveLeft().subtract(thisAmountHaveLeftEnd);
+        if (thisAmountHaveLeftEnd.signum() > 0) {
+            // change PLEDGE
+            creator.changeBalance(dcSet, false, true, haveAssetKey,
+                    thisAmountHaveLeftEnd, false, false, true);
+        }
+
+        //REVERT WANT
+        if (height > BlockChain.VERS_5_3) {
+            AssetCls.processTrade(dcSet, block, creator,
+                    true, assetHave, assetWant,
+                    true, thisAmountFulfilledWant, blockTime, 0L);
+        } else {
+            creator.changeBalance(dcSet, true, false, wantAssetKey,
+                    thisAmountFulfilledWant, false, false, false);
+        }
+
+        return orderThis;
     }
 
 }

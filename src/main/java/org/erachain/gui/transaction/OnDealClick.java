@@ -287,6 +287,9 @@ public class OnDealClick {
             case Transaction.INVALID_AWARD:
                 mess = "Invalid Award Item";
                 break;
+            case Transaction.INVALID_MAX_AWARD_COUNT:
+                mess = "MAX Award Count";
+                break;
 
             case Transaction.INVALID_QUANTITY:
                 mess = "Invalid quantity";
