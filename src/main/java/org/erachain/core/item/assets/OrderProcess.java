@@ -52,12 +52,15 @@ public class OrderProcess {
             assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
         }
 
-        BigDecimal price = orderThis.getPrice();
-        Account creator = orderThis.getCreator();
-
         long id = orderThis.getId();
         // GET HEIGHT from ID
         int height = (int) (id >> 32);
+
+        BigDecimal price = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? orderThis.calcLeftPrice() : orderThis.getPrice();
+        BigDecimal thisPriceReverse = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? orderThis.calcLeftPriceReverse() : orderThis.calcPriceReverse();
+
+        Account creator = orderThis.getCreator();
+
 
         CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
         OrderMap ordersMap = dcSet.getOrderMap();
@@ -68,11 +71,12 @@ public class OrderProcess {
         if (BlockChain.CHECK_BUGS > 1 &&
                 //creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //id.equals(Transaction.makeDBRef(12435, 1))
-                id == 1132136199356417L // 174358 ---- 	255979-3	255992-1
-            //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
-            //// 	255979-3	255992-1
-            //|| height == 255992
-            //Transaction.viewDBRef(id).equals("1831504-1")
+                //c id == 1132136199356417L // 174358 ---- 	255979-3	255992-1
+                //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
+                //// 	255979-3	255992-1
+                //|| height == 255992
+                Transaction.viewDBRef(id).equals("791319-1")
+                || transaction.viewHeightSeq().equals("695143-1")
             //id == 3644468729217028L
 
 
@@ -91,8 +95,6 @@ public class OrderProcess {
 
         ////// NEED FOR making secondary keys in TradeMap
         /// not need now ordersMap.add(this);
-
-        BigDecimal thisPriceReverse = orderThis.calcPriceReverse();
 
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
@@ -191,9 +193,10 @@ public class OrderProcess {
 
             index++;
 
+            String orderREF = Transaction.viewDBRef(order.getId());
             if (debug ||
-                    //    Transaction.viewDBRef(id).equals("2685-1")
-                    id == 1132136199356417L
+                    orderREF.equals("695143-1")
+                //id == 1132136199356417L
             ) {
                 debug = true;
             }
@@ -214,7 +217,6 @@ public class OrderProcess {
             BigDecimal tradeAmountAccurate;
             BigDecimal differenceTrade;
             //BigDecimal differenceTradeThis;
-            String orderREF = Transaction.viewDBRef(order.getId());
 
             /////////////// - разность точности цены из-за того что у одного ордера значение больше на порядки и этот порядок в точность уходит
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
