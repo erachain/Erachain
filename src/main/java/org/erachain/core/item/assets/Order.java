@@ -7,15 +7,9 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.OrderMap;
-import org.erachain.datachain.TradeMap;
-import org.erachain.dbs.IteratorCloseable;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -717,152 +711,6 @@ public class Order implements Comparable<Order> {
         transaction.addCalculated(block, this.creator, this.haveAssetKey, left,
                 "Outprice " + (forTarget ? "close" : "ended") + " Order @" + transaction.viewDBRef(this.id));
 
-    }
-
-    /*
-    public void process(Block block, Transaction tx) {
-
-        OrderProcess.process(this, block, tx);
-
-    }
-     */
-
-    /**
-     * @param block
-     * @param blockTime timestamp of block
-     * @param asChange
-     */
-    public void orphan(Block block, long blockTime, boolean asChange) {
-
-        // GET HEIGHT from ID
-        int height = (int) (this.id >> 32);
-
-        if (BlockChain.CHECK_BUGS > 1 &&
-                //Transaction.viewDBRef(id).equals("776446-1")
-                id == 3644468729217028L
-        ) {
-            boolean debug = false;
-        }
-
-        CompletedOrderMap completedMap = this.dcSet.getCompletedOrderMap();
-        OrderMap ordersMap = this.dcSet.getOrderMap();
-        TradeMap tradesMap = this.dcSet.getTradeMap();
-
-        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled
-        // - на всякий случай удалим его в любом случае
-        completedMap.delete(this);
-
-        BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
-
-        BigDecimal thisAmountHaveLeftEnd = this.getAmountHaveLeft();
-
-        AssetCls assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
-        AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
-
-        //ORPHAN TRADES
-        Trade trade;
-        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(this.id)) {
-            while (iterator.hasNext()) {
-
-                trade = tradesMap.get(iterator.next());
-                if (!trade.isTrade()) {
-                    continue;
-                }
-                Order target = trade.getTargetOrder(this.dcSet);
-
-                //REVERSE FUNDS
-                BigDecimal tradeAmountHave = trade.getAmountHave();
-                BigDecimal tradeAmountWant = trade.getAmountWant();
-
-                //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
-                // - на всякий случай удалим его в любом случае
-                completedMap.delete(target);
-
-                //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
-                /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
-                ordersMap.delete(target);
-
-                //REVERSE FULFILLED
-                target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
-                // accounting on PLEDGE position
-                target.creator.changeBalance(this.dcSet, false,
-                        true, target.haveAssetKey, tradeAmountHave, false, false,
-                        true
-                );
-
-
-                thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
-
-                if (height > BlockChain.VERS_5_3) {
-                    AssetCls.processTrade(dcSet, block, target.getCreator(),
-                            false, assetWant, assetHave,
-                            true, tradeAmountWant,
-                            blockTime,
-                            0L);
-                } else {
-
-                    target.creator.changeBalance(this.dcSet, true, false, target.wantAssetKey,
-                            tradeAmountWant, false, false, false);
-                }
-                // Учтем что у стороны ордера обновилась форжинговая информация
-                if (target.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
-                    block.addForgingInfoUpdate(target.getCreator());
-                }
-
-                //UPDATE ORDERS
-                ordersMap.put(target);
-
-                //REMOVE TRADE FROM DATABASE
-                tradesMap.delete(trade);
-
-                if (BlockChain.CHECK_BUGS > 3) {
-                    if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
-                        Long err = null;
-                        err++;
-                    }
-                }
-
-
-            }
-        } catch (IOException e) {
-        }
-
-        //// тут нужно получить остатки все из текущего состояния иначе индексы по измененой цене с остатков не удалятся
-        /// поэтому смотрим что есть в таблице и если есть то его грузим с ценой по остаткам той что в базе
-        Order thisOrder = ordersMap.get(id);
-        if (thisOrder != null) {
-            //REMOVE ORDER FROM DATABASE
-            ordersMap.delete(thisOrder);
-        }
-
-        if (!asChange) {
-
-            // RESTORE HAVE
-            // GET HAVE LEFT - if it CANCELED by Outprice or not completed
-            //   - если обработка остановлена по достижению порога Инкремента
-            this.creator.changeBalance(this.dcSet, false, false, this.haveAssetKey,
-                    this.getAmountHaveLeft(), false, false,
-                    // accounting on PLEDGE position
-                    true, Account.BALANCE_POS_PLEDGE);
-        }
-
-        // с ордера сколько было продано моего актива? на это число уменьшаем залог
-        thisAmountHaveLeftEnd = this.getAmountHaveLeft().subtract(thisAmountHaveLeftEnd);
-        if (thisAmountHaveLeftEnd.signum() > 0) {
-            // change PLEDGE
-            this.creator.changeBalance(this.dcSet, false, true, this.haveAssetKey,
-                    thisAmountHaveLeftEnd, false, false, true);
-        }
-
-        //REVERT WANT
-        if (height > BlockChain.VERS_5_3) {
-            AssetCls.processTrade(dcSet, block, this.creator,
-                    true, assetHave, assetWant,
-                    true, thisAmountFulfilledWant, blockTime, 0L);
-        } else {
-            this.creator.changeBalance(this.dcSet, true, false, this.wantAssetKey,
-                    thisAmountFulfilledWant, false, false, false);
-        }
     }
 
     @Override
