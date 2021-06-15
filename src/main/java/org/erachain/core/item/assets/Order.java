@@ -169,10 +169,11 @@ public class Order implements Comparable<Order> {
      * @return
      */
     public static int powerTen(BigDecimal value) {
-        BigDecimal t = value;
+
         int i = 0;
 
-        if (value.compareTo(BigDecimal.TEN) > 0) {
+        BigDecimal t = value.abs();
+        if (t.compareTo(BigDecimal.TEN) > 0) {
             while (t.compareTo(BigDecimal.TEN) > 0) {
                 t = t.movePointLeft(1);
                 i++;
