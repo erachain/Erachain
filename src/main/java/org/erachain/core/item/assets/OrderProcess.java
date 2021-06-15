@@ -68,11 +68,11 @@ public class OrderProcess {
         if (BlockChain.CHECK_BUGS > 1 &&
                 //creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //id.equals(Transaction.makeDBRef(12435, 1))
-                //id.equals(770667456757788l) // 174358 ---- 	255979-3	255992-1
-                //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
-                //// 	255979-3	255992-1
-                //|| height == 255992
-                Transaction.viewDBRef(id).equals("1831504-1")
+                id == 1132136199356417L // 174358 ---- 	255979-3	255992-1
+            //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
+            //// 	255979-3	255992-1
+            //|| height == 255992
+            //Transaction.viewDBRef(id).equals("1831504-1")
             //id == 3644468729217028L
 
 
@@ -149,7 +149,7 @@ public class OrderProcess {
                     timestamp = null;
                     ++timestamp;
                 } else if (comp == 0) {
-                    // здесь так же должно быть возростание
+                    // здесь так же должно быть возрастание
                     // если не так то ошибка
                     if (timestamp.compareTo(item.getId()) > 0) {
                         // RISE ERROR
@@ -192,8 +192,8 @@ public class OrderProcess {
             index++;
 
             if (debug ||
-                    Transaction.viewDBRef(id).equals("2685-1")
-                //id == 3644468729217028L
+                    //    Transaction.viewDBRef(id).equals("2685-1")
+                    id == 1132136199356417L
             ) {
                 debug = true;
             }
@@ -273,13 +273,17 @@ public class OrderProcess {
                 if (compare == 0) {
                     // цена совпала (возможно с округлением) то без пересчета берем что раньше посчитали
                     tradeAmountForHave = orderThis.getAmountWantLeft();
+                    if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
+                        // если вылазим после округления за предел то берем что есть
+                        tradeAmountForHave = orderAmountHaveLeft;
+                    }
 
                 } else {
 
                     // RESOLVE amount with SCALE
                     // тут округляем наоборот вверх - больше даем тому кто активный
                     tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
-                    if (tradeAmountForHave.compareTo(orderAmountHaveLeft) >= 0) {
+                    if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
                         // если вылазим после округления за предел то берем что есть
                         tradeAmountForHave = orderAmountHaveLeft;
 
