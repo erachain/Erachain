@@ -178,11 +178,12 @@ public class Order implements Comparable<Order> {
         BigDecimal t = value;
         int i = 0;
 
-        if (value.compareTo(BigDecimal.ONE) > 0) {
-            while (t.compareTo(BigDecimal.ONE) > 0) {
+        if (value.compareTo(BigDecimal.TEN) > 0) {
+            while (t.compareTo(BigDecimal.TEN) > 0) {
                 t = t.movePointLeft(1);
                 i++;
             }
+            return i;
         }
         while (t.compareTo(BigDecimal.ONE) < 0) {
             t = t.movePointRight(1);
@@ -275,7 +276,7 @@ public class Order implements Comparable<Order> {
 
     // BigDecimal.precision() - is WRONG calculating!!! Sometime = 0 for 100 or 10
     public static int precision(BigDecimal value) {
-        return powerTen(value) + value.scale();
+        return powerTen(value) + value.scale() + 1;
     }
 
     public static int calcPriceScale(int powerAmountHave, int wantScale, int addScale) {
@@ -301,11 +302,15 @@ public class Order implements Comparable<Order> {
         if (scale < 0)
             return result.setScale(0);
         else if (scale > 0) {
-            int accuracy = powerTen(result) + scale;
+            int accuracy = powerTen(result) + scale + 1;
             if (accuracy > MAX_PRICE_ACCURACY) {
                 // обрежем точность цены чтобы на бирже лишней точности не было
                 scale -= accuracy - MAX_PRICE_ACCURACY;
-                result.setScale(scale, RoundingMode.HALF_DOWN);
+                result = result.setScale(scale, RoundingMode.HALF_DOWN).stripTrailingZeros();
+                scale = result.scale();
+                // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
+                if (scale < 0)
+                    return result.setScale(0);
             }
         }
         return result;
