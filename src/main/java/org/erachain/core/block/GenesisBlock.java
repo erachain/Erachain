@@ -641,6 +641,15 @@ public class GenesisBlock extends Block {
         ///// STATUSES
         for (int i = 1; i <= StatusCls.MEMBER_KEY; i++)
             transactions.add(new GenesisIssueStatusRecord(makeStatus(i)));
+
+        if (BlockChain.TEST_MODE) {
+            for (String name : BlockChain.NOVA_ASSETS.keySet()) {
+                AssetVenture asset = new AssetVenture((byte) 0, itemAppData, creator, name,
+                        null, null, "", AssetCls.AS_INSIDE_ASSETS, 8, 0L);
+                transactions.add(new GenesisIssueAssetTransaction(asset));
+            }
+        }
+
     }
 
     //GETTERS

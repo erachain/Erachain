@@ -90,13 +90,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
      */
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getIteratorByInitiator(Long orderID) {
-        return ((TradeSuit) this.map).getIteratorByInitiator(orderID);
+        return ((TradeSuit) this.map).getIteratorByInitiator(orderID, false);
     }
 
     @Override
     public List<Trade> getInitiatedTrades(Order order, boolean useCancel) {
         //FILTER ALL TRADES
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(order.getId())) {
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByInitiator(order.getId(), false)) {
 
             //GET ALL TRADES FOR KEYS
             List<Trade> trades = new ArrayList<Trade>();
@@ -116,15 +116,25 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         return null;
     }
 
+    /**
+     * Надо сперва кто его покусал с обратном порядке, потом его самого
+     *
+     * @param orderID
+     * @param useCancel
+     * @param descending
+     * @return
+     */
     @Override
-    public List<Trade> getTradesByOrderID(Long orderID, boolean useCancel) {
+    public List<Trade> getTradesByOrderID(Long orderID, boolean useCancel, boolean descending) {
         //ADD REVERSE KEYS
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
         }
 
         List<Trade> trades = new ArrayList<Trade>();
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByKeys(orderID)) {
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator =
+                     descending ? ((TradeSuit) this.map).getIteratorByTarget(orderID, true)
+                             : ((TradeSuit) this.map).getIteratorByInitiator(orderID, false)) {
             //GET ALL ORDERS FOR KEYS as INITIATOR
             Trade trade;
             while (iterator.hasNext()) {
@@ -137,7 +147,9 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         } catch (IOException e) {
         }
 
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getTargetsIterator(orderID)) {
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator =
+                     descending ? ((TradeSuit) this.map).getIteratorByInitiator(orderID, true)
+                             : ((TradeSuit) this.map).getIteratorByTarget(orderID, false)) {
             //GET ALL ORDERS FOR KEYS as TARGET
             Trade trade;
             while (iterator.hasNext()) {
@@ -189,7 +201,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTrades(long have, long want, Object fromKey, int limit, boolean useCancel) {
+    public List<Trade> getTrades(long have, long want, Object fromKey, int limit, boolean useCancel, boolean useChange) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
@@ -209,6 +221,8 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             while (iteratorLimit.hasNext()) {
                 trade = this.get(iteratorLimit.next());
                 if (!useCancel && trade.isCancel())
+                    continue;
+                if (!useChange && trade.isChange())
                     continue;
 
                 trades.add(trade);

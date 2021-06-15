@@ -51,7 +51,7 @@ public class APIItemAsset {
         help.put("GET apiasset/{key}", "Get by ID");
         help.put("GET apiasset/raw/{key}", "Returns RAW in Base58 of asset with the given key.");
         help.put("GET apiasset/find?filter={name_string}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use patterns from 5 chars in words. Default {descending} - true");
-        help.put("Get apiasset/image/{key}?preview", "Get Asset Image. Use 'preview' for the tiles list");
+        help.put("Get apiasset/image/{key}?preview", "Get Asset Image. Use 'preview' for see as small video (use it for the tiles list for example). Install `ffmpeg` for preview option, see makePreview.bat for Windows or install ffmpeg on Unix");
         help.put("Get apiasset/icon/{key}", "Get Asset Icon");
         help.put("Get apiasset/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
         help.put("GET apiasset/text/{key", "Get description by ID");
@@ -60,7 +60,7 @@ public class APIItemAsset {
         help.put("GET apiasset/types/actions", "Return array of asset types and Actions for localize.");
 
         help.put("GET apiasset/balances/[assetKey]?position=POS&offset=OFFSET&limit=LIMIT",
-                "Get balances for assetKey sorted by Own Amount. Balance positions: 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other. Default: POS=1. Balance A - total debit. Balance B - final amount.");
+                "Get balances for assetKey sorted by Own Amount. Balance positions: 0 - all positions, 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Pledge (on DEX). Default: POS=1. Balance A - total debit. Balance B - final amount.");
 
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -218,6 +218,13 @@ public class APIItemAsset {
 
         return APIItems.getImage(map, key, preview);
 
+    }
+
+    @Path("image/{key}.mp4")
+    @GET
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    public Response assetImageMP4(@Context UriInfo info, @PathParam("key") long key) throws IOException {
+        return assetImage(info, key);
     }
 
     @Path("icon/{key}")

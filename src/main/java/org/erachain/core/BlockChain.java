@@ -223,19 +223,19 @@ public class BlockChain {
     public static final int HOLD_VALID_START = VERS_4_11;
 
     /**
-     * Если задан то это режим синхронизации со стрым протоколом - значит нам нельза генерить блоки и трнзакции
+     * Если задан то это режим синхронизации со старым протоколом - значит нам нельзя генерить блоки и транзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? (DEMO_MODE ? 37700 : 0) : 2029900; // see in sidePROTOCOL.json as 'allValidBefore'
-    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904; //260120;
+    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? (DEMO_MODE ? 0 : 0) : 1707784; // see in sidePROTOCOL.json as 'allValidBefore'
+    public static final int WIN_VAL_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2023904;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 2103440;
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 1932512; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
      * !!! ВНИМАНИЕ !!! нельзя изменять походу собранной цепочки - так как съедут цены и индекс не удалится у некоторых ордеров - цена о другая.
      * см issue https://lab.erachain.org/erachain/Erachain/-/issues/1322
      */
     public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904;
-
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 900000;
     /**
      * {@link LEFT_PRICE_HEIGHT} as SeqNo
      */
@@ -336,7 +336,7 @@ public class BlockChain {
     // DEX precision
     ///public static final int TRADE_PRECISION = 4;
     /**
-     * Если после исполнения торговой сделки оостатется статок у ордера-инициатора и
+     * Если после исполнения торговой сделки остается остаток у ордера-инициатора и
      * цена для остатка отклонится больше чем на эту величину то ему возвращаем остаток
      * see org.erachain.core.item.assets.OrderTestsMy#testOrderProcessingNonDivisible() - 0.0000432
      * Тут точность можно сделать меньше так он либо полностью исполнится либо встанет уже с новой ценой по остатку в стакане
@@ -344,19 +344,19 @@ public class BlockChain {
     final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT = new BigDecimal("0.0005");
     final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT_NEG = INITIATOR_PRICE_DIFF_LIMIT.multiply(new BigDecimal(5));
     /**
-     * Если после исполнения торговой сделки оостатется статок у ордера-цели и
+     * Если после исполнения торговой сделки остается остаток у ордера-цели и
      * цена для остатка отклонится больше чем на эту величину то либо скидываем остаток в эту сделку либо ему возвращаем остаток
      * Тут нужно точность выше чем у Инициатора - так как он может перекрыть цену других встречных ордеров в стакане
      * И по хорошему его нужно пересчитать как Активный если цена полезла не в его сторону
      */
-    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.00005");
+    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.0005");
     final public static BigDecimal TARGET_PRICE_DIFF_LIMIT_NEG = TARGET_PRICE_DIFF_LIMIT.multiply(new BigDecimal(5));
     /**
-     * Если сыграло INITIATOR_PRICE_DIFF_LIMIT и цена сделки после скидывания в нее остатка ордера-цели не выйдет за это ограничени то скидываем в сделку.
-     * Инача отдаем обратно
+     * Если сыграло INITIATOR_PRICE_DIFF_LIMIT и цена сделки после скидывания в нее остатка ордера-цели не выйдет
+     * за это ограничение, то скидываем в сделку. Иначе отдаем обратно как OUTPRICE
      */
     ///final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
-    final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("0.001");
+    final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("0.002");
 
     public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : !MAIN_MODE ? 0 : VERS_4_11;
 
@@ -640,9 +640,11 @@ public class BlockChain {
 
             // из p130 счета для прорверки
             NOVA_ASSETS.put("BTC",
-                    new Tuple3<Long, Long, byte[]>(12L, 0L, new Account("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz").getShortAddressBytes()));
+                    new Tuple3<Long, Long, byte[]>(12L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
+            NOVA_ASSETS.put("DOGE",
+                    new Tuple3<Long, Long, byte[]>(18L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
             NOVA_ASSETS.put("USD",
-                    new Tuple3<Long, Long, byte[]>(95L, 0L, new Account("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz").getShortAddressBytes()));
+                    new Tuple3<Long, Long, byte[]>(95L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
 
             LOCKED__ADDRESSES.put("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz", "7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1");
             TRUSTED_ANONYMOUS.add("762eatKnsB3xbyy2t9fwjjqUG1GoxQ8Rhx");
@@ -882,7 +884,7 @@ public class BlockChain {
 
         }
 
-        FEE_ASSET = Controller.getInstance().getDCSet().getItemAssetMap().get(AssetCls.FEE_KEY);
+        FEE_ASSET = dcSet.getItemAssetMap().get(AssetCls.FEE_KEY);
 
     }
 
@@ -1073,6 +1075,11 @@ public class BlockChain {
         if (dynamicCheckPoint > heightCheckPoint)
             return dynamicCheckPoint;
         return heightCheckPoint;
+    }
+
+    public Long getTimestampByDBRef(Long dbRef) {
+        Tuple2<Integer, Integer> key = Transaction.parseDBRef(dbRef);
+        return getTimestamp(key.a) + key.b;
     }
 
     public byte[] getMyHardCheckPointSign() {
@@ -1330,8 +1337,8 @@ public class BlockChain {
 
         int base = BlockChain.getTargetedMin(height);
         int targetedWinValue = calcWinValueTargeted(win_value, target);
-        if (!ERA_COMPU_ALL_UP && !BlockChain.TEST_MODE
-                && height > VERS_4_11
+        if (height > WIN_VAL_ALL_VALID && height > ALL_VALID_BEFORE
+                && !ERA_COMPU_ALL_UP && !BlockChain.TEST_MODE
                 && base > targetedWinValue) {
             return -targetedWinValue;
         }

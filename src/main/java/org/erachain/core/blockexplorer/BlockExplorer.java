@@ -808,7 +808,7 @@ public class BlockExplorer {
 
         output.put("order", order.toJson());
 
-        List<Trade> trades = dcSet.getTradeMap().getTradesByOrderID(orderId, true);
+        List<Trade> trades = dcSet.getTradeMap().getTradesByOrderID(orderId, true, true);
 
         AssetCls assetHave = Controller.getInstance().getAsset(order.getHaveAssetKey());
         AssetCls assetWant = Controller.getInstance().getAsset(order.getWantAssetKey());
@@ -856,8 +856,8 @@ public class BlockExplorer {
         output.put("Label_Cancel", Lang.T("Cancel", langObj));
 
         output.put("Label_Fulfilled", Lang.T("Fulfilled", langObj));
-        output.put("Label_LeftHave", Lang.T("Left Have", langObj));
-        output.put("Label_LeftPrice", Lang.T("Left Price", langObj));
+        output.put("Label_LeftHave", Lang.T("Remains", langObj));
+        output.put("Label_LeftPrice", Lang.T("Deviation Remainder Price", langObj));
         output.put("Label_table_LastTrades", Lang.T("Last Trades", langObj));
         output.put("Label_table_have", Lang.T("Base Asset", langObj));
         output.put("Label_table_want", Lang.T("Price Asset", langObj));
@@ -887,11 +887,14 @@ public class BlockExplorer {
         AssetCls pairAssetWant;
 
         Order orderInitiator = null;
-        Transaction cancelTX = null;
-        if (trade.isCancel()) {
-            cancelTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
-        } else {
+        Transaction actionTX = null;
+        if (trade.isTrade()) {
             orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
+        } else if (trade.isChange()) {
+            actionTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+            actionTX.setDC(dcSet, true);
+        } else {
+            actionTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
         }
 
         long pairHaveKey;
@@ -900,6 +903,7 @@ public class BlockExplorer {
 
         boolean unchecked = false;
 
+        Controller cnt = Controller.getInstance();
         if (assetHaveIn == null) {
 
             pairHaveKey = trade.getHaveKey();
@@ -909,15 +913,8 @@ public class BlockExplorer {
             pairAssetWant = dcSet.getItemAssetMap().get(pairWantKey);
 
             /// если пару нужно перевернуть так как есть общепринятые пары
-            if (pairHaveKey == 2L && pairWantKey == 1l
-                    || pairHaveKey == 95l
-                    || pairHaveKey > 33 && pairHaveKey < 1000
-                    && (pairWantKey < 33 && pairWantKey > 1000)
-                    || pairHaveKey > 10 && pairHaveKey < 33
-                    && (pairWantKey < 10)
-                    || pairAssetHave.isIndex() && pairHaveKey < pairWantKey
-                    || pairAssetHave.isInsideCurrency() && pairHaveKey < pairWantKey
-                    || pairHaveKey < 5 && pairWantKey > 1000
+            if (pairHaveKey == 1L && pairWantKey == 2l
+                    || cnt.pairsController.spotPairsList.containsKey(pairAssetWant.getName() + "_" + pairAssetHave.getName())
             ) {
                 // swap pair
                 tempKey = pairHaveKey;
@@ -947,13 +944,9 @@ public class BlockExplorer {
         tradeJSON.put("assetHaveMaker", pairAssetHave.getMaker().getAddress());
         tradeJSON.put("assetWantMaker", pairAssetWant.getMaker().getAddress());
 
-        tradeJSON.put("realPrice", trade.calcPrice());
-
-        tradeJSON.put("realReversePrice", trade.calcPriceRevers());
-
         if (orderInitiator == null) {
             // CANCEL
-            if (cancelTX == null) {
+            if (actionTX == null) {
                 if (BlockChain.CHECK_BUGS > 5) {
                     // show ERROR
                     tradeJSON.put("initiatorTx", "--");
@@ -963,9 +956,9 @@ public class BlockExplorer {
                 }
             } else {
                 // show CANCEL
-                tradeJSON.put("initiatorTx", cancelTX.viewHeightSeq());
-                tradeJSON.put("initiatorCreator_addr", cancelTX.getCreator().getAddress()); // viewCreator
-                tradeJSON.put("initiatorCreator", cancelTX.getCreator().getPersonOrShortAddress(12));
+                tradeJSON.put("initiatorTx", actionTX.viewHeightSeq());
+                tradeJSON.put("initiatorCreator_addr", actionTX.getCreator().getAddress()); // viewCreator
+                tradeJSON.put("initiatorCreator", actionTX.getCreator().getPersonOrShortAddress(12));
                 tradeJSON.put("initiatorAmount", trade.getAmountHave().toPlainString());
             }
         } else {
@@ -984,11 +977,11 @@ public class BlockExplorer {
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
-        if (cancelTX != null) {
-            tradeJSON.put("type", "cancel");
-
-            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        if (actionTX != null) {
+            tradeJSON.put("type", trade.viewType());
+            if (trade.isCancel()) {
+                tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+            }
 
         } else if (orderInitiator == null && BlockChain.CHECK_BUGS > -1 || pairHaveKey == orderInitiator.getHaveAssetKey()) {
             tradeJSON.put("type", "sell");
@@ -1001,6 +994,14 @@ public class BlockExplorer {
 
             tradeJSON.put("amountHave", trade.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
             tradeJSON.put("amountWant", trade.getAmountWant().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        }
+
+        if (trade.isChange()) {
+            tradeJSON.put("realPrice", ((ChangeOrderTransaction) actionTX).getPriceCalc());
+            tradeJSON.put("realReversePrice", ((ChangeOrderTransaction) actionTX).getPriceCalcReverse());
+        } else {
+            tradeJSON.put("realPrice", trade.calcPrice());
+            tradeJSON.put("realReversePrice", trade.calcPriceRevers());
         }
 
         return tradeJSON;
@@ -1134,15 +1135,15 @@ public class BlockExplorer {
 
         int count = 50;
 
-        TradeMap tradesMap = dcSet.getTradeMap();
-        try (IteratorCloseable<Tuple2<Long, Long>> iterator = tradesMap.getIndexIterator(0, true)) {
+        TradeMapImpl tradesMap = dcSet.getTradeMap();
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = tradesMap.getPairIterator(have, want)) {
             while (count > 0 && iterator.hasNext()) {
                 Tuple2<Long, Long> key = iterator.next();
                 Trade trade = tradesMap.get(key);
                 if (trade == null) {
                     Long error = null;
                 }
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 --count;
@@ -1240,34 +1241,54 @@ public class BlockExplorer {
 
         output.put("Side_Help", Lang.T("Side_Help", langObj));
 
-        if (assetKey.equals(Transaction.FEE_KEY)) {
-            output.put("Label_Balance_4", Lang.T(Account.balanceCOMPUPositionName(4), langObj));
-            output.put("Label_Balance_5", Lang.T(Account.balanceCOMPUPositionName(5), langObj));
+        BigDecimal sum;
 
-            if (position == TransactionAmount.ACTION_SPEND || position == TransactionAmount.ACTION_PLEDGE) {
+        if (assetKey.equals(Transaction.FEE_KEY)) {
+            output.put("Label_Balance_3", Lang.T(Account.balanceCOMPUPositionName(3), langObj));
+            output.put("Label_Balance_4", Lang.T(Account.balanceCOMPUPositionName(4), langObj));
+
+            if (position == TransactionAmount.ACTION_HOLD || position == TransactionAmount.ACTION_SPEND) {
+
+                String name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_DEBIT));
+                if (name != null)
+                    output.put("Label_TotalDebit", Lang.T(name, langObj));
+                else
+                    output.put("Label_TotalDebit", Lang.T("", langObj));
+
+                name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_LEFT));
+                if (name != null)
+                    output.put("Label_Left", Lang.T(name, langObj));
+                else
+                    output.put("Label_Left", Lang.T("", langObj));
+
+                name = Account.balanceCOMPUSideName(Account.balanceCOMPUStatsSide(position, Account.BALANCE_SIDE_CREDIT));
+                if (name != null)
+                    output.put("Label_TotalCredit", Lang.T(name, langObj));
+                else
+                    output.put("Label_TotalCredit", Lang.T("", langObj));
 
                 output.put("Label_Balance_Pos", Lang.T(Account.balanceCOMPUPositionName(position), langObj));
-                output.put("Label_Balance_Side", Lang.T(Account.balanceCOMPUSideName(side), langObj));
 
-                output.put("Label_TotalDebit", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_DEBIT), langObj));
-                output.put("Label_Left", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_LEFT), langObj));
-                output.put("Label_TotalCredit", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_CREDIT), langObj));
-                output.put("Label_TotalForged", Lang.T(Account.balanceCOMPUSideName(Account.BALANCE_SIDE_FORGED), langObj));
+                int sideStats = Account.balanceCOMPUStatsSide(position, side);
+                if (sideStats > 0)
+                    output.put("Label_Balance_Side", Lang.T(Account.balanceCOMPUSideName(sideStats), langObj));
 
                 output.put("Side_Help", Lang.T("Side_Help_COMPU_BONUS", langObj));
 
-                if (side == Account.BALANCE_SIDE_FORGED) {
-                    // Это запрос на баланса Нафоржили - он в 5-й позиции на стороне 2
-                    position = TransactionAmount.ACTION_PLEDGE;
-                    side = Account.BALANCE_SIDE_LEFT;
+                sum = PersonCls.getBalance(personKey, assetKey, position, side);
+                if (sideStats == Account.FEE_BALANCE_SIDE_FORGED) {
+                    sum = sum.negate();
                 }
 
+            } else {
+                sum = PersonCls.getBalance(personKey, assetKey, position, side);
             }
 
+        } else {
+            sum = PersonCls.getBalance(personKey, assetKey, position, side);
         }
 
 
-        BigDecimal sum = PersonCls.getBalance(personKey, assetKey, position, side);
         output.put("sum", sum);
 
         return output;
@@ -1723,10 +1744,11 @@ public class BlockExplorer {
                             .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
         }
         output.put("Label_Table_Account", Lang.T("Account", langObj));
-        output.put("Label_Balance_1", Lang.T("OWN (1)", langObj));
-        output.put("Label_Balance_2", Lang.T("DEBT (2)", langObj));
-        output.put("Label_Balance_3", Lang.T("HOLD (3)", langObj));
-        output.put("Label_Balance_4", Lang.T("SPEND (4)", langObj));
+        output.put("Label_Balance_1", Lang.T(Account.balancePositionName(1), langObj));
+        output.put("Label_Balance_2", Lang.T(Account.balancePositionName(2), langObj));
+        output.put("Label_Balance_3", Lang.T(Account.balancePositionName(3), langObj));
+        output.put("Label_Balance_4", Lang.T(Account.balancePositionName(4), langObj));
+        output.put("Label_Balance_5", Lang.T(Account.balancePositionName(5), langObj));
         output.put("Label_Table_Prop", Lang.T("Prop.", langObj));
         output.put("Label_Table_person", Lang.T("Maker", langObj));
 
@@ -1784,10 +1806,11 @@ public class BlockExplorer {
         output.put("Label_asset_key", Lang.T("Key", langObj));
         output.put("Label_asset_name", Lang.T("Name", langObj));
 
-        output.put("Label_Balance_1", Lang.T("OWN (1)", langObj));
-        output.put("Label_Balance_2", Lang.T("DEBT (2)", langObj));
-        output.put("Label_Balance_3", Lang.T("HOLD (3)", langObj));
-        output.put("Label_Balance_4", Lang.T("SPEND (4)", langObj));
+        output.put("Label_Balance_1", Lang.T(Account.balancePositionName(1), langObj));
+        output.put("Label_Balance_2", Lang.T(Account.balancePositionName(2), langObj));
+        output.put("Label_Balance_3", Lang.T(Account.balancePositionName(3), langObj));
+        output.put("Label_Balance_4", Lang.T(Account.balancePositionName(4), langObj));
+        output.put("Label_Balance_5", Lang.T(Account.balancePositionName(5), langObj));
 
         ItemAssetMap assetsMap = DCSet.getInstance().getItemAssetMap();
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
@@ -1831,6 +1854,7 @@ public class BlockExplorer {
                     bal.put("balance_2", Account.balanceInPositionAndSide(itemBals, 2, side).setScale(asset.getScale()).toPlainString());
                     bal.put("balance_3", Account.balanceInPositionAndSide(itemBals, 3, side).setScale(asset.getScale()).toPlainString());
                     bal.put("balance_4", Account.balanceInPositionAndSide(itemBals, 4, side).setScale(asset.getScale()).toPlainString());
+                    bal.put("balance_5", Account.balanceInPositionAndSide(itemBals, 5, side).setScale(asset.getScale()).toPlainString());
                     balAssets.put("" + assetKey, bal);
                 }
             }
@@ -1872,7 +1896,7 @@ public class BlockExplorer {
                 transactionDataJSON.put("height", trade.getInitiator() >> 32);
                 transactionDataJSON.put("confirmations", Controller.getInstance().getMyHeight() - height);
 
-                transactionDataJSON.put("timestamp", Transaction.getTimestampByDBRef(trade.getInitiator()));
+                transactionDataJSON.put("timestamp", Controller.getInstance().blockChain.getTimestampByDBRef(trade.getInitiator()));
 
                 transactionDataJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress());
                 transactionDataJSON.put("initiatorCreatorName", orderInitiator.getCreator().getPersonAsString());
@@ -2287,7 +2311,7 @@ public class BlockExplorer {
                 if (trade == null) {
                     Long error = null;
                 }
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 --count;

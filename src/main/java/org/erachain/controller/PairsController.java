@@ -59,7 +59,7 @@ public class PairsController {
         File file = new File(Settings.getInstance().getUserPath() + "market.json");
 
         //CREATE FILE IF IT DOESNT EXIST
-        if (BlockChain.MAIN_MODE && file.exists()) {
+        if (!BlockChain.CLONE_MODE && file.exists()) {
             String jsonString = "";
             try {
                 //READ PEERS FILE
@@ -171,7 +171,7 @@ public class PairsController {
                         continue;
                     }
 
-                    if (trade.isCancel())
+                    if (!trade.isTrade())
                         continue;
 
                     if (currentPair != null && lastTrade == null) {
@@ -273,7 +273,7 @@ public class PairsController {
                 if (trade == null)
                     continue;
 
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 if (lastTrade == null)

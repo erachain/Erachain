@@ -244,6 +244,13 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             trr.recipient = "" + cancelOrder.getOrderID();
             trr.title = "";
 
+        } else if (transaction.getType() == Transaction.CHANGE_ORDER_TRANSACTION) {
+            ChangeOrderTransaction updateOrder = (ChangeOrderTransaction) transaction;
+
+            trr.amount = updateOrder.getAmountWant();
+            trr.recipient = ""; // + updateOrder.getAmountWant();
+            trr.title = "" + updateOrder.getAmountWant().toPlainString();
+
         } else {
             trr.recipient = "";
             trr.title = transaction.getTitle();
@@ -268,6 +275,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
         public String title;
 
         Trans(Fun.Tuple2<Long, Integer> walletKey, Transaction transaction) {
+            transaction.setDC(dcSet, true);
             this.transaction = transaction;
             this.walletKey = walletKey;
             isUnViewed = ((WTransactionMap) map).isUnViewed(transaction);

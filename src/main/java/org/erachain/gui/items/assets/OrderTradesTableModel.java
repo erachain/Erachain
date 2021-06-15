@@ -6,6 +6,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 
@@ -32,7 +33,7 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
 
         this.order = order;
         this.isSell = isSell;
-        this.list = DCSet.getInstance().getTradeMap().getTradesByOrderID(order.getId(), true);
+        this.list = DCSet.getInstance().getTradeMap().getTradesByOrderID(order.getId(), true, descending);
 
     }
 
@@ -67,7 +68,14 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
                 String result;
 
                 if (isSell)
-                    result = NumberAsString.formatAsString(trade.getAmountHave());
+                    if (trade.isTrade()) {
+                        result = NumberAsString.formatAsString(trade.getAmountHave());
+                    } else if (trade.isChange()) {
+                        result = Lang.T("Change");
+                    } else {
+                        // CANCEL
+                        result = Lang.T("Cancel");
+                    }
                 else
                     result = initiatorOrderTX.getCreator().getPersonAsString();
 
@@ -94,8 +102,14 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
 
                 if (isSell)
                     result = initiatorOrderTX.getCreator().getPersonAsString();
-                else
+                else if (trade.isTrade()) {
                     result = NumberAsString.formatAsString(trade.getAmountHave());
+                } else if (trade.isChange()) {
+                    result = Lang.T("Change");
+                } else {
+                    // CANCEL
+                    result = Lang.T("Cancel");
+                }
 
                 if (isMine) {
                     result = "<html><b>" + result + "</b></html>";

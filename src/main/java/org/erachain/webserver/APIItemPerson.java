@@ -1,10 +1,14 @@
 package org.erachain.webserver;
 
+import org.apache.commons.net.util.Base64;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
+import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -20,6 +24,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -47,10 +52,13 @@ public class APIItemPerson {
         help.put("Get apiperson/listfrom/{start}?page={pageSize}&showperson={showPerson}&desc={descending}", "Gel list from {start} limit by {pageSize}. {ShowPerson} default - true, {descending} - true. If START = -1 list from last");
         help.put("GET apiperson/text/{key", "Get description by ID");
 
-        help.put("apiperson/balance/{personKey}/{assetKey}/{position}?side=[]side",
+        help.put("GET apiperson/balance/{personKey}/{assetKey}/{position}?side=[]side",
                 "Get Asset Key balance in Position [1..5] for Person Key. Balance Side =0 - total debit; =1 - left; =2 - total credit");
-        help.put("apiperson/status/{personKey}/{statusKey}?history=true",
+        help.put("GET apiperson/status/{personKey}/{statusKey}?history=true",
                 "Get Status data for Person Key. JSON ARRAY format: [timeFrom, timeTo, [par1, par2, str1, str2, reference, description], block, txNo]");
+
+        help.put("GET apiperson/addresses/{key}?full", "Get Person Addresses");
+        help.put("GET apiperson/statuses/{key}", "Get Person Statuses");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -342,6 +350,97 @@ public class APIItemPerson {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(item.getDescription())
                 .build();
+    }
+
+    @GET
+    @Path("addresses/{key}")
+    public Response getAddresses(@Context UriInfo info, @PathParam("key") Long key) {
+        if (DCSet.getInstance().getItemPersonMap().get(key) == null) {
+            JSONObject out = new JSONObject();
+            out.put("error", "Person not Found");
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(out.toJSONString())
+                    .build();
+
+        } else {
+            JSONArray out;
+            if (API.checkBoolean(info, "full")) {
+                out = PersonCls.toJsonAddresses(key);
+
+            } else {
+                TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses
+                        = DCSet.getInstance().getPersonAddressMap().getItems(new Long(key));
+
+                out = new JSONArray();
+                out.addAll(addresses.keySet());
+
+            }
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(out.toJSONString())
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("statuses/{key}")
+    public Response getStatuses(@PathParam("key") Long key) {
+        if (DCSet.getInstance().getItemPersonMap().get(key) == null) {
+            JSONObject out = new JSONObject();
+            out.put("error", "Person not Found");
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(out.toJSONString())
+                    .build();
+        } else {
+            TreeMap<Long, Stack<Fun.Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = dcSet.getPersonStatusMap().get(key);
+
+            int block;
+            int seqNo;
+            Transaction tx;
+            JSONArray out = new JSONArray();
+
+            for (Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>> item : StatusCls.getSortedItems(statuses)) {
+                Map statusJSON = new JSONObject();
+                StatusCls status = item.b;
+
+                statusJSON.put("key", item.a);
+                statusJSON.put("icon", Base64.encodeBase64String(status.getIcon()));
+
+                statusJSON.put("name", status.toString(dcSet, item.c.c));
+
+                statusJSON.put("start", item.c.a);
+                statusJSON.put("stop", item.c.b);
+                statusJSON.put("period", StatusCls.viewPeriod(item.c.a, item.c.b));
+
+                block = item.c.d;
+                seqNo = item.c.e;
+                statusJSON.put("seqNo", Transaction.viewDBRef(block, seqNo));
+
+                tx = Transaction.findByHeightSeqNo(dcSet, block, seqNo);
+                Account creator = tx.getCreator();
+                if (creator != null) {
+                    statusJSON.put("creator", creator.getAddress());
+                    if (creator.isPerson()) {
+                        statusJSON.put("creator_name", creator.getPerson().b.viewName());
+                    }
+                } else {
+                    statusJSON.put("creator", GenesisBlock.CREATOR.getAddress());
+                    statusJSON.put("creator_name", "GENESIS");
+                }
+
+                out.add(statusJSON);
+            }
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(out.toJSONString())
+                    .build();
+        }
     }
 
 }

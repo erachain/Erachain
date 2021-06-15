@@ -47,6 +47,8 @@ public class TradeMapImplTest {
     byte[] itemAppData = null;
     long txFlags = 0L;
 
+    boolean useCancel = false;
+
     int seqNo = 0;
 
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balanceA;

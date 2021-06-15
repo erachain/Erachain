@@ -32,6 +32,8 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
         }
 
         AssetCls asset = (AssetCls) this.getItem(row);
+        if (asset == null)
+            return "--";
 
         switch (column) {
             case COLUMN_KEY:

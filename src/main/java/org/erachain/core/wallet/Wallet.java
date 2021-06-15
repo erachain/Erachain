@@ -58,18 +58,20 @@ public class Wallet extends Observable implements Observer {
 	private Timer lockTimer; // = new Timer();
 	private int syncHeight;
 	public WalletUpdater walletUpdater;
+	DCSet dcSet;
 
 	private List<ObserverWaiter> waitingObservers = new ArrayList<>();
 	// CONSTRUCTORS
 
-	public Wallet(boolean withObserver, boolean dynamicGUI) {
+	public Wallet(DCSet dcSet, boolean withObserver, boolean dynamicGUI) {
 
+		this.dcSet = dcSet;
 		//this.syncHeight = ;
 
 		// CHECK IF EXISTS
 		if (this.walletKeysExists()) {
 			// OPEN WALLET
-			this.database = DWSet.reCreateDB(withObserver, dynamicGUI);
+			this.database = DWSet.reCreateDB(dcSet, withObserver, dynamicGUI);
 
 			linkWaitingObservers(withObserver);
 
@@ -393,8 +395,8 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	// CREATE
-    public synchronized boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,
-                                       boolean withObserver, boolean dynamicGUI) {
+	public synchronized boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,
+									   boolean withObserver, boolean dynamicGUI) {
 		String oldPath = Settings.getInstance().getWalletKeysPath();
 		// set wallet dir
 		Settings.getInstance().setWalletKeysPath(path);
@@ -403,7 +405,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.close();
 		}
 		// OPEN WALLET
-		DWSet database = DWSet.reCreateDB(withObserver, dynamicGUI);
+		DWSet database = DWSet.reCreateDB(dcSet, withObserver, dynamicGUI);
 
 		if (this.secureDatabase != null) {
 			// CLOSE secured WALLET
@@ -468,7 +470,7 @@ public class Wallet extends Observable implements Observer {
 
 		// ADD OBSERVER
 		////////// Controller.getInstance().addObserver(this);
-		////DCSet.getInstance().getCompletedOrderMap().addObserver(this);
+		////dcSet.getCompletedOrderMap().addObserver(this);
 
 		// SOME
 		// Account initAccount = this.getAccounts().get(0);
@@ -563,7 +565,6 @@ public class Wallet extends Observable implements Observer {
 
 		synchronizeBodyUsed = true;
 
-		DCSet dcSet = DCSet.getInstance();
 		Block blockStart;
 		int height;
 
@@ -643,7 +644,7 @@ public class Wallet extends Observable implements Observer {
 					}
 
 					try {
-						this.processBlock(dcSet, block);
+						this.processBlock(block);
 						block.close();
 						block = null;
 					} catch (java.lang.OutOfMemoryError e) {
@@ -938,13 +939,13 @@ public class Wallet extends Observable implements Observer {
 
 			/// вешает при синхронизации ничего нельзя сделать с кошельком - ни открыть ни закрыть
 			// тем более сейчас это событие не используется в кошельке никак
-			/// DCSet.getInstance().getTransactionTab().addObserver(this);
+			/// DCSet..getTransactionTab().addObserver(this);
 
 			/// вешает при синхронизации ничего нельзя сделать с кошельком - ни открыть ни закрыть
 			// тем более сейчас это событие не используется в кошельке никак
-			// DCSet.getInstance().getBlockMap().addObserver(this);
+			// DCSet..getBlockMap().addObserver(this);
 
-			// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
+			// DCSet..getCompletedOrderMap().addObserver(this);
 
 
 			// REGISTER ON ORDERS - foe BELLs on incomed TRADES
@@ -1026,7 +1027,7 @@ public class Wallet extends Observable implements Observer {
 
 	private void deal_transaction(Account account, Transaction transaction, boolean asOrphan) {
 
-		transaction.setDC(DCSet.getInstance());
+		transaction.setDC(dcSet, true);
 		// UPDATE UNCONFIRMED BALANCE for ASSET
 		// TODO: fee doubled?
 		long absKey = transaction.getAbsKey();
@@ -1153,6 +1154,8 @@ public class Wallet extends Observable implements Observer {
 		if (!this.walletKeysExists()) {
 			return false;
 		}
+
+		transaction.updateFromStateDB();
 
 		// FOR ALL ACCOUNTS
 		List<Account> accounts = this.getAccounts();
@@ -1281,7 +1284,7 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-	public void feeProcess(DCSet dcSet, Long blockFee, Account blockGenerator, boolean asOrphan) {
+	public void feeProcess(Long blockFee, Account blockGenerator, boolean asOrphan) {
 
 		/*
         BigDecimal bonusFee; // = block.getBonusFee();
@@ -1315,7 +1318,49 @@ public class Wallet extends Observable implements Observer {
 
 	private long processBlockLogged = 0;
 
-	void processBlock(DCSet dcSet, Block block) {
+	void processTransaction(int height, int seqNo, Transaction transaction) {
+		// TODO нужно сделать при закрытии базы чтобы ожидала окончания проходя всего блока тут - пока ОТКАТ
+
+		if (transaction.isWiped()) {
+			return;
+		}
+
+		if (transaction.noDCSet())
+			transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo, true);
+
+		if (!processTransaction(transaction))
+			return;
+
+		Controller.getInstance().playWalletEvent(transaction);
+
+		// SKIP PAYMENT TRANSACTIONS
+		if (transaction instanceof RSend) {
+			return;
+		}
+
+		// CHECK IF ITEM ISSUE
+		else if (transaction instanceof IssueItemRecord) {
+			this.processItemIssue((IssueItemRecord) transaction);
+		}
+
+		// CHECK IF SERTIFY PErSON
+		else if (transaction instanceof RCertifyPubKeys) {
+			this.processSertifyPerson((RCertifyPubKeys) transaction, height);
+		}
+
+		// CHECK IF ORDER CREATION
+		if (transaction instanceof CreateOrderTransaction) {
+			this.processOrderCreation((CreateOrderTransaction) transaction);
+		}
+
+		// CHECK IF ORDER CHANGE
+		else if (transaction instanceof ChangeOrderTransaction) {
+			this.processOrderChanging((ChangeOrderTransaction) transaction);
+		}
+
+	}
+
+	void processBlock(Block block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.walletKeysExists()) {
 			return;
@@ -1343,7 +1388,7 @@ public class Wallet extends Observable implements Observer {
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
 			// PROCESS FEE
-			feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, false);
+			feeProcess(block.blockHead.totalFee, blockGenerator, false);
 
 			Controller.getInstance().playWalletEvent(block);
 
@@ -1357,42 +1402,7 @@ public class Wallet extends Observable implements Observer {
 
 			// TODO нужно сделать при закрытии базы чтобы ожидала окончания проходя всего блока тут - пока ОТКАТ
 
-			if (transaction.isWiped()) {
-				continue;
-			}
-
-			if (transaction.noDCSet())
-				transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo, true);
-
-			if (!processTransaction(transaction))
-				continue;
-
-			Controller.getInstance().playWalletEvent(transaction);
-
-			// SKIP PAYMENT TRANSACTIONS
-			if (transaction instanceof RSend) {
-				continue;
-			}
-
-			// CHECK IF ITEM ISSUE
-			else if (transaction instanceof IssueItemRecord) {
-				this.processItemIssue((IssueItemRecord) transaction);
-			}
-
-			// CHECK IF SERTIFY PErSON
-			else if (transaction instanceof RCertifyPubKeys) {
-				this.processSertifyPerson((RCertifyPubKeys) transaction, height);
-			}
-
-			// CHECK IF ORDER CREATION
-			if (transaction instanceof CreateOrderTransaction) {
-				this.processOrderCreation(dcSet, (CreateOrderTransaction) transaction);
-			}
-
-			// CHECK IF ORDER CANCEL
-			else if (transaction instanceof CancelOrderTransaction) {
-				this.processOrderCancel((CancelOrderTransaction) transaction);
-			}
+			processTransaction(height, seqNo, transaction);
 
 		}
 
@@ -1407,9 +1417,9 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-    }
+	}
 
-	void orphanBlock(DCSet dcSet, Block block) {
+	void orphanBlock(Block block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.walletKeysExists()) {
 			return;
@@ -1447,16 +1457,6 @@ public class Wallet extends Observable implements Observer {
 				this.orphanSertifyPerson((RCertifyPubKeys) transaction, height);
 			}
 
-			// CHECK IF ORDER CREATION
-			else if (transaction instanceof CreateOrderTransaction) {
-				this.orphanOrderCreation((CreateOrderTransaction) transaction);
-			}
-
-			// CHECK IF ORDER CANCEL
-			else if (transaction instanceof CancelOrderTransaction) {
-				this.orphanOrderCancel((CancelOrderTransaction) transaction);
-			}
-
 			this.orphanTransaction(transaction);
 
 		}
@@ -1472,7 +1472,7 @@ public class Wallet extends Observable implements Observer {
 			// this.database.setLastBlockSignature(block.getReference());
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
-			feeProcess(dcSet, block.blockHead.totalFee, blockGenerator, true);
+			feeProcess(block.blockHead.totalFee, blockGenerator, true);
 
 		}
 
@@ -1534,10 +1534,8 @@ public class Wallet extends Observable implements Observer {
 
 		addOwnerInFavorites(certifyPubKeys);
 
-		DCSet db = DCSet.getInstance();
-
 		boolean personalized = false;
-		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = db.getPersonAddressMap().getItems(certifyPubKeys.getKey());
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = dcSet.getPersonAddressMap().getItems(certifyPubKeys.getKey());
 		if (personalisedData == null || personalisedData.isEmpty()) {
 			personalized = true;
 		}
@@ -1546,10 +1544,10 @@ public class Wallet extends Observable implements Observer {
 			// IT IS NOT VOUCHED PERSON
 
 			// FIND person
-			ItemCls person = db.getItemPersonMap().get(certifyPubKeys.getKey());
+			ItemCls person = dcSet.getItemPersonMap().get(certifyPubKeys.getKey());
 			if (person != null) {
 				// FIND issue record
-				Transaction transPersonIssue = db.getTransactionFinalMap().get(person.getReference());
+				Transaction transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
 				///// GET FEE from that record
 				///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
@@ -1598,10 +1596,9 @@ public class Wallet extends Observable implements Observer {
 			return;
 
 		// GIFTs
-		DCSet db = DCSet.getInstance();
 
 		boolean personalized = false;
-		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = db.getPersonAddressMap().getItems(certifyPubKeys.getKey());
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = dcSet.getPersonAddressMap().getItems(certifyPubKeys.getKey());
 		if (personalisedData == null || personalisedData.isEmpty()) {
 			personalized = true;
 		}
@@ -1610,12 +1607,12 @@ public class Wallet extends Observable implements Observer {
 			// IT IS NOT VOUCHED PERSON
 
 			// FIND person
-			ItemCls person = db.getItemPersonMap().get(certifyPubKeys.getKey());
+			ItemCls person = dcSet.getItemPersonMap().get(certifyPubKeys.getKey());
 			if (person == null)
 				return;
 
 			// FIND issue record
-			Transaction transPersonIssue = db.getTransactionFinalMap().get(person.getReference());
+			Transaction transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
 			//// GET FEE from that record
 			///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
@@ -1640,7 +1637,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void processOrderCreation(DCSet dcSet, CreateOrderTransaction orderCreation) {
+	private void processOrderCreation(CreateOrderTransaction orderCreation) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.walletKeysExists()) {
 			return;
@@ -1649,74 +1646,22 @@ public class Wallet extends Observable implements Observer {
 		if (orderCreation.getOrderId() == null)
 			return;
 
-		this.addOrder(dcSet, orderCreation);
+		this.database.getOrderMap().add(Order.getOrder(dcSet, orderCreation.getOrderId()));
 
 	}
 
-	private void addOrder(DCSet dcSet, CreateOrderTransaction orderCreation) {
-
-		// UPDATE Order INFO
-		Order orderNew = Order.getOrder(dcSet, orderCreation.getOrderId());
-		// ADD ORDER
-		this.database.getOrderMap().add(orderNew);
-	}
-
-	private void orphanOrderCreation(CreateOrderTransaction orderCreation) {
+	private void processOrderChanging(ChangeOrderTransaction orderChanging) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.walletKeysExists()) {
 			return;
 		}
 
-		if (orderCreation.getOrderId() == null)
-			return;
+		this.database.getOrderMap().add(Order.getOrder(dcSet, orderChanging.getOrderId()));
+		this.database.getOrderMap().add(Order.getOrder(dcSet, orderChanging.getDBRef()));
 
-		// CHECK IF WE ARE CREATOR
-		if (this.accountExists(orderCreation.getCreator())) {
-			// DELETE ORDER
-			if (false) {
-				// order STATUS is ORPHANED
-				this.database.getOrderMap().delete(orderCreation.getDBRef());
-			}
-		}
 	}
 
-	private void processOrderCancel(CancelOrderTransaction orderCancel) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.walletKeysExists()) {
-			return;
-		}
-
-		if (orderCancel.getOrderID() == null)
-			return;
-
-		// CHECK IF WE ARE CREATOR
-		if (this.accountExists(orderCancel.getCreator())) {
-			if (false) {
-				// DELETE ORDER
-				this.database.getOrderMap().delete(orderCancel.getDBRef());
-			}
-		}
-	}
-
-	private void orphanOrderCancel(CancelOrderTransaction orderCancel) {
-		// CHECK IF WALLET IS OPEN
-		if (!this.walletKeysExists()) {
-			return;
-		}
-
-		if (orderCancel.getOrderID() == null)
-			return;
-
-		// CHECK IF WE ARE CREATOR
-		if (this.accountExists(orderCancel.getCreator())) {
-			if (false) {
-				// DELETE ORDER
-				Order order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrderID());
-				this.database.getOrderMap().add(order);
-			}
-		}
-	}
-
+	/////////////////////////////////////////
 	long notifySysTrayRecord;
 
 	@SuppressWarnings("unchecked")

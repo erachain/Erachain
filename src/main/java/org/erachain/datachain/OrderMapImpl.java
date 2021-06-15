@@ -344,7 +344,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         Order order = super.get(id);
         if (order != null) {
             if (order.isNotTraded()) {
-                order.setStatus(Order.ACTIVE);
+                order.setStatus(Order.OPENED);
             } else {
                 order.setStatus(Order.FULFILLED);
             }

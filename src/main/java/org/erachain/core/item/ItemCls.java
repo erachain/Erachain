@@ -6,7 +6,6 @@ import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.Jsonable;
-import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.blockexplorer.WebTransactionsHTML;
@@ -911,7 +910,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         //itemJSON.put("itemTypeSub", this.getItemSubType());
         itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
         itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
-        itemJSON.put("description", this.description);
+        itemJSON.put("description", viewDescription());
         itemJSON.put("maker", this.maker.getAddress());
         itemJSON.put("creator", this.maker.getAddress()); // @Deprecated
         itemJSON.put("maker_public_key", this.maker.getBase58());
@@ -1157,15 +1156,14 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     /**
-     * @param creator
      * @param dcSet
      * @return key если еще не добавлен, -key если добавлен и 0 - если это не НОВА
      */
-    public long isNovaAsset(Account creator, DCSet dcSet) {
+    public long isNovaItem(DCSet dcSet) {
         Object item = getNovaItems().get(this.name);
-        if (item != null && creator.equals(getNovaItemCreator(item))) {
+        if (item != null && maker.equals(getNovaItemCreator(item))) {
             ItemMap dbMap = this.getDBMap(dcSet);
-            Long key = (Long) getNovaItemKey(item);
+            Long key = getNovaItemKey(item);
             if (dbMap.contains(key)) {
                 return -key;
             } else {
@@ -1182,7 +1180,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         ItemMap dbMap = this.getDBMap(db);
 
         long newKey;
-        long novaKey = this.isNovaAsset(this.maker, db);
+        long novaKey = this.isNovaItem(db);
         if (novaKey > 0) {
 
             // INSERT WITH NOVA KEY

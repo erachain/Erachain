@@ -134,6 +134,9 @@ public class WebTransactionsHTML {
             case Transaction.CANCEL_ORDER_TRANSACTION:
                 outTX.put("body", cancel_Order_HTML(transaction));
                 break;
+            case Transaction.CHANGE_ORDER_TRANSACTION:
+                outTX.put("body", update_Order_HTML(transaction));
+                break;
             case Transaction.VOTE_ON_ITEM_POLL_TRANSACTION:
                 outTX.put("body", vote_On_Item_Poll_HTML(transaction));
                 break;
@@ -413,6 +416,57 @@ public class WebTransactionsHTML {
         out += Lang.T("Price", langObj) + ": <b>"
                 + orderCreation.makeOrder().calcPrice().toPlainString()
                 + " / " + orderCreation.makeOrder().calcPriceReverse().toPlainString() + "</b><br>";
+
+        return out;
+    }
+
+    private String update_Order_HTML(Transaction transaction) {
+        // TODO Auto-generated method stub
+
+        String out = "";
+
+        ChangeOrderTransaction orderUpdate = (ChangeOrderTransaction) transaction;
+
+        Long orderID = orderUpdate.getOrderId();
+        //
+        Order orderOrig = null;
+        String statusOrig;
+        if (dcSet.getOrderMap().contains(orderID)) {
+            orderOrig = dcSet.getOrderMap().get(orderID);
+        } else if (dcSet.getCompletedOrderMap().contains(orderID)) {
+            orderOrig = dcSet.getCompletedOrderMap().get(orderID);
+        }
+        if (orderOrig == null) {
+            statusOrig = "Unknown";
+        } else {
+            statusOrig = orderOrig.viewStatus();
+        }
+
+        out += "<h4><a href='?order=" + Transaction.viewDBRef(orderID) + get_Lang() + "'>" + Lang.T(statusOrig, langObj) + "</a>";
+
+        Long refDB = orderUpdate.getDBRef();
+        //
+        Order order = null;
+        String status;
+        if (dcSet.getOrderMap().contains(refDB)) {
+            order = dcSet.getOrderMap().get(refDB);
+        } else if (dcSet.getCompletedOrderMap().contains(refDB)) {
+            order = dcSet.getCompletedOrderMap().get(refDB);
+        }
+        if (order == null) {
+            status = "Unknown";
+        } else {
+            status = order.viewStatus();
+        }
+
+        out += " - <a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
+
+        out += Lang.T("Order Signature", langObj) + ": <a href='?tx=" + Base58.encode(orderUpdate.getOrderRef()) + "'><b>"
+                + Base58.encode(orderUpdate.getOrderRef()) + "</b></a><br>";
+
+        out += Lang.T("Update Price", langObj) + ": <b>"
+                + orderUpdate.makeUpdatedOrder().calcPrice().toPlainString()
+                + " / " + orderUpdate.makeUpdatedOrder().calcPriceReverse().toPlainString() + "</b><br>";
 
         return out;
     }

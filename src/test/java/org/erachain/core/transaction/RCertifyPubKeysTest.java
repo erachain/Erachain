@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class RCertifyPubKeysTest {
 
@@ -246,10 +247,11 @@ public class RCertifyPubKeysTest {
 
             init(dbs);
 
-            assertEquals(registrar.getLastTimestamp(dcSet), null);
+            assertNotEquals(registrar.getLastTimestamp(dcSet), null);
 
             RCertifyPubKeys certPubKey = new RCertifyPubKeys(0, registrar, FEE_POWER,
                     person.getKey(dcSet), certifiedPublicKeys, timestamp, 0L);
+            certPubKey.sign(registrar, Transaction.FOR_NETWORK);
             certPubKey.setDC(dcSet, Transaction.FOR_NETWORK, 3, 5, true);
             certPubKey.process(null, Transaction.FOR_NETWORK);
 

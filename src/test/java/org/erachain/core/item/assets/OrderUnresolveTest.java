@@ -15,17 +15,18 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.datachain.TransactionFinalMapSigns;
-import org.erachain.dbs.DBSuit;
 import org.erachain.dbs.rocksDB.DBMapSuit;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mapdb.Fun;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,7 +36,7 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 
 @Slf4j
-public class OrderTest {
+public class OrderUnresolveTest {
 
     int[] TESTED_DBS = new int[]{
             IDB.DBS_MAP_DB,
@@ -111,151 +112,139 @@ public class OrderTest {
         accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false);
         accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false);
 
-        assetA = new AssetVenture(itemAppData, gb.getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
+        assetA = new AssetVenture(itemAppData, gb.getCreator(), "ERA", icon, image, ".", 0, 8, 0L);
 
-        issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
+        issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0L);
+        issueAssetTransaction.sign(accountA, Transaction.FOR_NETWORK);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
         keyA = issueAssetTransaction.getAssetKey(dcSet);
         balanceA = accountA.getBalance(dcSet, keyA);
 
-        assetB = new AssetVenture(itemAppData, gb.getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
-        issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                0L, new byte[64]);
+        assetB = new AssetVenture(itemAppData, gb.getCreator(), "COMPU", icon, image, ".", 0, 8, 0L);
+        issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++, 0L);
+        issueAssetTransaction.sign(accountB, Transaction.FOR_NETWORK);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
         keyB = issueAssetTransaction.getAssetKey(dcSet);
 
-        // CREATE ORDER TRANSACTION
-        orderCreation = new CreateOrderTransaction(accountA, keyA, 3l, BigDecimal.valueOf(10), BigDecimal.valueOf(100),
-                (byte) 0, timestamp, 0l);
-
     }
 
     /**
-     * Ситуация следующая - есть список ордеров которые подходят для текущего и один из них не поностью исполняется
-     *  - он переписывается в форкнутую базу
-     *  Затем второй ордер к этому списку обрабатывается. And в списке полявляется двойная запись
-     *  ранее покусанного ордера и его родитель из родительской таблицы. Надо сэмулировать такой случай и проверять тут
      *
      */
     @Test
-    public void processDoubleInFork() {
-
+    public void process1() {
 
         for (int dbs : TESTED_DBS) {
 
             try {
                 init(dbs);
 
-                Iterator<Long> iterator;
-                int count = 0;
-
-                OrderMap ordersMap = dcSet.getOrderMap();
-
-                // создадим много ордеров
-                int len = 10;
-                for (int i = 0; i < len; i++) {
-                    BigDecimal amountSell = new BigDecimal("100");
-                    BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
-
-                    orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
-                            amountSell, (byte) 0, timestamp++, 0L);
-                    orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
-                    orderCreation.process(null, Transaction.FOR_NETWORK);
-
-                    iterator = ordersMap.getIndexIterator(0, false);
-                    count = 0;
-                    while (iterator.hasNext()) {
-                        Long key = iterator.next();
-                        Order value = ordersMap.get(key);
-                        String price = value.viewPrice();
-                        count++;
-                    }
-                    assertEquals(count, i + 1);
-
-                }
-
-                DBSuit suit = ordersMap.getSuit();
-                iterator = suit.getIndexIterator(1, false);
-
-                count = 0;
-                while (iterator.hasNext()) {
-                    Long key = iterator.next();
-                    count++;
-                }
-                assertEquals(count, len);
-
-                iterator = ordersMap.getIndexIterator(0, false);
-                count = 0;
-                while (iterator.hasNext()) {
-                    Long key = iterator.next();
-                    Order value = ordersMap.get(key);
-                    String price = value.viewPrice();
-                    count++;
-                }
-                assertEquals(count, len);
-
-                // тут в базе форкнутой должен быть ордер из стенки в измененном виде
-                // а повторный расчет в форке не должен его дублировать
-                List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
-                        null);
-
-                DCSet forkDC = dcSet.fork(this.toString());
-                // создадим первый ордер который изменит ордера стенки
-                orderCreation = new CreateOrderTransaction(accountB, assetA.getKey(dcSet), assetB.getKey(dcSet),
-                        new BigDecimal("10"),
-                        new BigDecimal("10"), (byte) 0, timestamp++, 0L);
-                orderCreation.sign(accountB, Transaction.FOR_NETWORK);
-                orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                // https://explorer.erachain.org/index/blockexplorer.html?order=2068330-1&lang=en
+                BigDecimal have1 = new BigDecimal("8.12");
+                BigDecimal want1 = new BigDecimal("0.01771142");
+                orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                        have1, want1,
+                        (byte) 0, timestamp++, 0L);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
+                long order_AB_1_ID = orderCreation.getOrderId();
+                Order order_AB_1 = Order.reloadOrder(dcSet, order_AB_1_ID);
 
-                ordersMap = forkDC.getOrderMap();
-                // тут в базе форкнутой должен быть ордер из стенки в измененном виде
-                // а повторный расчет в форке не должен его дублировать
-                orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(forkDC), assetA.getKey(forkDC), null);
+                Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b,
+                        have1.negate()); // BALANCE
+                Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
+                        have1); // BALANCE
+                Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
+                        new BigDecimal("0")); // BALANCE
 
-                assertEquals(orders.size(), len);
-                if (ordersMap.isSizeEnable()) {
-                    assertEquals(ordersMap.size(), len);
-                }
+                // https://explorer.erachain.org/index/blockexplorer.html?order=2068416-1&lang=en
+                BigDecimal have2 = new BigDecimal("0.01112428");
+                BigDecimal want2 = new BigDecimal("5.10005");
+                orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet),
+                        have2, want2,
+                        (byte) 0, timestamp++, 0L);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                orderCreation.process(null, Transaction.FOR_NETWORK);
+                long order_BA_1_ID = orderCreation.getOrderId();
+                Order order_BA_1 = Order.reloadOrder(dcSet, order_BA_1_ID);
+                assertEquals(false, order_BA_1.isActive(dcSet));
+                assertEquals(true, order_BA_1.isCompleted());
 
-                // эмуляция отмены некотрого ордера
-                ordersMap.delete(orders.get(5).getId());
+                assertEquals(true, order_AB_1.isActive(dcSet));
+                assertEquals(false, order_AB_1.isCompleted());
 
-                if (ordersMap.isSizeEnable()) {
-                    assertEquals(ordersMap.size(), len - 1);
-                }
+                Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b,
+                        have1.negate()); // BALANCE
+                Assert.assertEquals(accountB.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
+                        have2.negate()); // BALANCE
 
-                // эмуляция отмены измененого ордера, записанного в Форк
-                ordersMap.delete(orders.get(0));
+                Trade trade1 = Trade.get(dcSet, order_BA_1, order_AB_1);
+                Assert.assertEquals(trade1.getAmountWant(), have2);
+                Assert.assertEquals(trade1.getAmountWant().multiply(order_BA_1.getPrice())
+                        .setScale(8, RoundingMode.HALF_DOWN).stripTrailingZeros(), want2);
+                Assert.assertEquals(trade1.getAmountHave(), new BigDecimal("5.10005147"));
+                Assert.assertEquals(trade1.getAmountWant(), new BigDecimal("0.01112428"));
+                // сделка проходит по более выгодной цене и получаем больше чем хотели:
+                Assert.assertEquals(1, trade1.getAmountHave().compareTo(want2)); // 5.10005147 > 5.10005
+                Assert.assertEquals(trade1.calcPrice(), new BigDecimal("0.002181209359"));
+                Assert.assertEquals(order_AB_1.getPrice(), new BigDecimal("0.00218120936")); // 0.00218120936
+                Assert.assertEquals(order_BA_1.calcPriceReverse(), new BigDecimal("0.002181209988"));
 
-                if (ordersMap.isSizeEnable()) {
-                    assertEquals(ordersMap.size(), len - 2);
-                }
+                Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
+                        have1.subtract(trade1.getAmountHave())); // BALANCE
+                Assert.assertEquals(accountA.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
+                        trade1.getAmountWant()); // BALANCE
 
-                // ПОВТОРНО отмены измененого ордера, записанного в Форк
-                ordersMap.delete(orders.get(0));
+                Assert.assertEquals(accountB.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b,
+                        trade1.getAmountHave()); // BALANCE
+                Assert.assertEquals(accountB.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
+                        have2.subtract(trade1.getAmountWant()).stripTrailingZeros()); // BALANCE
 
-                if (ordersMap.isSizeEnable()) {
-                    assertEquals(ordersMap.size(), len - 2);
-                }
+                // https://explorer.erachain.org/index/blockexplorer.html?order=2068567-2&lang=en
+                BigDecimal have3 = new BigDecimal("0.00658715");
+                BigDecimal want3 = new BigDecimal("3.01994853");
+                orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet),
+                        have3, want3,
+                        (byte) 0, timestamp++, 0L);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                orderCreation.process(null, Transaction.FOR_NETWORK);
+                long order_BA_2_ID = orderCreation.getOrderId();
+                Order order_BA_2 = Order.reloadOrder(dcSet, order_BA_2_ID);
 
-                // добавим назад
-                ordersMap.put(orders.get(0));
+                assertEquals(false, order_BA_2.isActive(dcSet));
 
-                if (ordersMap.isSizeEnable()) {
-                    assertEquals(ordersMap.size(), len - 1);
-                }
+                assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b,
+                        have1.negate()); // BALANCE
 
-                // ПОВТОРНО добавим назад
-                ordersMap.put(orders.get(0));
+                Trade trade2 = Trade.get(dcSet, order_BA_2, order_AB_1);
+                assertEquals(trade2.getAmountWant(), have3);
+                assertEquals(trade2.getAmountWant().multiply(order_BA_2.getPrice())
+                        .setScale(8, RoundingMode.HALF_DOWN).stripTrailingZeros(), want3);
+                assertEquals(trade2.getAmountHave(), new BigDecimal("3.01994853"));
+                assertEquals(trade2.getAmountWant(), new BigDecimal("0.00658715"));
+                // сделка проходит по более выгодной цене и получаем больше чем хотели:
+                assertEquals(trade2.getAmountHave(), want3); // 5.10005147 > 5.10005
+                assertEquals(trade2.calcPrice(), new BigDecimal("0.002181212671"));
+                assertEquals(order_BA_2.calcPriceReverse(), new BigDecimal("0.002181212671"));
 
-                if (ordersMap.isSizeEnable()) {
-                    assertEquals(ordersMap.size(), len - 1);
-                }
+                assertEquals(accountB.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
+                        have2.negate().subtract(have3)); // BALANCE
+
+                assertEquals(accountA.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b.stripTrailingZeros(),
+                        BigDecimal.ZERO); // BALANCE
+                assertEquals(accountA.getBalanceForPosition(dcSet, keyB, Account.BALANCE_POS_OWN).b,
+                        have2.add(have3)); // BALANCE
+
+                assertEquals(accountB.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_OWN).b.stripTrailingZeros(),
+                        have1); // BALANCE
+                assertEquals(accountB.getBalanceForPosition(dcSet, keyA, Account.BALANCE_POS_PLEDGE).b,
+                        BigDecimal.ZERO); // BALANCE
 
             } finally {
                 dcSet.close();

@@ -43,6 +43,11 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
     /**
      * Creates new form Issue_Asset_Confirm_Dialog
      */
+    public IssueConfirmDialog(java.awt.Frame parent, String text) {
+        super(parent, Lang.T(text), true);
+        Init(parent, true, null, 0, 0, "", "");
+    }
+
     public IssueConfirmDialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
                               int w, int h, String status_Text, String title_Text) {
         super(parent, modal);
@@ -153,8 +158,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         if (fontSize <= 7) fontSize = 8;
         initComponents();
         jTitle_Label.setText(title_Text);
-        JPanel pp = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
-        jScrollPane1.setViewportView(pp);
+
         if (status_Text == null || status_Text.isEmpty()) {
             jStatus_Label.setVisible(false);
         } else {
@@ -165,20 +169,29 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         jButtonFREE.setVisible(false);
         jButtonGO.setVisible(false);
 
-        jButtonRAW.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                // TODO Auto-generated method stub
-                isConfirm = GER_RAW;
-                StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(
-                        transaction.toBytes(Transaction.FOR_NETWORK, true)));
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.T("Bytecode has been copy to buffer") + ".",
-                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
-                dispose();
-            }
-        });
+        if (transaction == null) {
+            jButtonRAW.setVisible(false);
+            jButtonCancel.setText(Lang.T("OK"));
+        } else {
+
+            JPanel pp = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+            jScrollPane1.setViewportView(pp);
+
+            jButtonRAW.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    // TODO Auto-generated method stub
+                    isConfirm = GER_RAW;
+                    StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(
+                            transaction.toBytes(Transaction.FOR_NETWORK, true)));
+                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.T("Bytecode has been copy to buffer") + ".",
+                            Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
+                }
+            });
+        }
 
         jButtonCancel.addActionListener(new ActionListener() {
             @Override

@@ -768,7 +768,7 @@ public class Controller extends Observable {
         // CREATE WALLET
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open Wallet"));
-        this.wallet = new Wallet(this.dcSetWithObserver, this.dynamicGUI);
+        this.wallet = new Wallet(dcSet, this.dcSetWithObserver, this.dynamicGUI);
 
         boolean walletKeysRecovered = false;
         if (this.seedCommand != null && this.seedCommand.length > 1 && !Wallet.walletKeysExists()) {
@@ -897,7 +897,7 @@ public class Controller extends Observable {
         Settings.getInstance().setWalletKeysPath(selectedDir);
 
         // open wallet
-        Controller.getInstance().wallet = new Wallet(dcSetWithObserver, dynamicGUI);
+        Controller.getInstance().wallet = new Wallet(dcSet, dcSetWithObserver, dynamicGUI);
         // not wallet return 0;
         if (!Controller.getInstance().wallet.walletKeysExists()) {
             Settings.getInstance().setWalletKeysPath(pathOld);
@@ -1758,7 +1758,9 @@ public class Controller extends Observable {
             // BROADCAST MESSAGE
             this.network.broadcast(telegram, false);
             // save DB
-            Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
+            if (wallet != null && wallet.database != null) {
+                wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
+            }
         }
 
         return notAdded;
@@ -2618,6 +2620,10 @@ public class Controller extends Observable {
     }
 
     public void addTelegramToWallet(Transaction transaction, String signatureKey) {
+        if (wallet == null || wallet.database == null) {
+            return;
+        }
+
         HashSet<Account> recipients = transaction.getRecipientAccounts();
         PublicKeyAccount creator = transaction.getCreator();
         String creator58 = creator.getAddress();
@@ -3092,26 +3098,68 @@ public class Controller extends Observable {
      * this.transactionCreator.createTransactionFromRaw(rawData); } }
      */
 
-    public Pair<Transaction, Integer> lightCreateTransactionFromRaw(byte[] rawData) {
+    public Fun.Tuple3<Transaction, Integer, String> parseAndCheck(String rawDataStr, boolean base64, boolean andCheck) {
+        byte[] transactionBytes;
+
+        int step = 1;
+        try {
+            if (base64) {
+                transactionBytes = Base64.getDecoder().decode(rawDataStr);
+            } else {
+                step++;
+                transactionBytes = Base58.decode(rawDataStr);
+            }
+        } catch (Exception e) {
+            return new Fun.Tuple3<>(null, -1, "Base" + (step == 2 ? "58" : "64") + " decode: " + e.getMessage());
+        }
+
+        if (andCheck)
+            return Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, true);
+
+        try {
+            Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
+            return new Tuple3<Transaction, Integer, String>(transaction, null, null);
+        } catch (Exception e) {
+            return new Tuple3<Transaction, Integer, String>(null, Transaction.INVALID_RAW_DATA, e.getMessage());
+        }
+
+    }
+
+    public Tuple3<Transaction, Integer, String> lightCreateTransactionFromRaw(byte[] rawData, boolean notRelease) {
 
         // CREATE TRANSACTION FROM RAW
         Transaction transaction;
         try {
             transaction = TransactionFactory.getInstance().parse(rawData, Transaction.FOR_NETWORK);
         } catch (Exception e) {
-            return new Pair<Transaction, Integer>(null, Transaction.INVALID_RAW_DATA);
+            return new Tuple3<Transaction, Integer, String>(null, Transaction.INVALID_RAW_DATA, e.getMessage());
         }
 
         // CHECK IF RECORD VALID
         if (!transaction.isSignatureValid(DCSet.getInstance()))
-            return new Pair<Transaction, Integer>(transaction, Transaction.INVALID_SIGNATURE);
+            return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
 
         // CHECK FOR UPDATES
-        int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0l);
-        if (valid != Transaction.VALIDATE_OK)
-            return new Pair<Transaction, Integer>(transaction, valid);
+        int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0L, notRelease);
+        if (valid == Transaction.VALIDATE_OK)
+            return new Tuple3<Transaction, Integer, String>(transaction, valid, null);
 
-        return new Pair<Transaction, Integer>(transaction, valid);
+        return new Tuple3<Transaction, Integer, String>(transaction, valid, transaction.errorValue);
+
+    }
+
+    public Tuple3<Transaction, Integer, String> checkTransaction(Transaction transaction) {
+
+        // CHECK IF RECORD VALID
+        if (!transaction.isSignatureValid(DCSet.getInstance()))
+            return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
+
+        // CHECK FOR UPDATES
+        int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0l, false);
+        if (valid != Transaction.VALIDATE_OK)
+            return new Tuple3<Transaction, Integer, String>(transaction, valid, transaction.errorValue);
+
+        return new Tuple3<Transaction, Integer, String>(transaction, valid, null);
 
     }
 
@@ -3474,6 +3522,13 @@ public class Controller extends Observable {
         }
     }
 
+    public Transaction changeOrder(PrivateKeyAccount creator, int feePow, Order order, BigDecimal wantAmount) {
+        Transaction orderCreate = this.dcSet.getTransactionFinalMap().get(order.getId());
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createChangeOrderTransaction(creator, feePow, orderCreate.getSignature(), wantAmount);
+        }
+    }
+
     public Pair<Transaction, Integer> deployAT(PrivateKeyAccount creator, String name, String description, String type,
                                                String tags, byte[] creationBytes, BigDecimal quantity, int feePow) {
 
@@ -3756,7 +3811,7 @@ public class Controller extends Observable {
             return null;
         }
 
-        if (wallet != null) {
+        if (wallet != null && wallet.database != null) {
             Tuple3<String, String, String> favorite = wallet.database.getFavoriteAccountsMap().get(address);
             if (favorite != null && favorite.a != null) {
                 return Base58.decode(favorite.a);

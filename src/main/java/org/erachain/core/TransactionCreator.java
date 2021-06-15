@@ -561,12 +561,28 @@ public class TransactionCreator {
         long time = NTP.getTime();
 
         //CREATE PRDER TRANSACTION
-        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderID, (byte) feePow, time, 0l);
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderID, (byte) feePow, time, 0L);
         cancelOrderTransaction.sign(creator, Transaction.FOR_NETWORK);
         cancelOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
         //VALIDATE AND PROCESS
         return cancelOrderTransaction;
+    }
+
+    public Transaction createChangeOrderTransaction(PrivateKeyAccount creator, int feePow, byte[] orderID, BigDecimal wantAmount) {
+        //CHECK FOR UPDATES
+        this.checkUpdate();
+
+        //TIME
+        long time = NTP.getTime();
+
+        //CREATE PRDER TRANSACTION
+        ChangeOrderTransaction changeOrderTransaction = new ChangeOrderTransaction(creator, orderID, wantAmount, (byte) feePow, time, 0L);
+        changeOrderTransaction.sign(creator, Transaction.FOR_NETWORK);
+        changeOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
+
+        //VALIDATE AND PROCESS
+        return changeOrderTransaction;
     }
 
     public Pair<Transaction, Integer> sendMultiPayment(PrivateKeyAccount creator, List<Payment> payments, int feePow) {
@@ -893,7 +909,9 @@ public class TransactionCreator {
             return Transaction.KEY_COLLISION;
         }
 
+        boolean incremented = false;
         if (!this.fork.equals(transaction.getDCSet())) {
+            incremented = true;
             transaction.setDC(this.fork, forDeal, this.blockHeight, this.seqNo.incrementAndGet());
         }
 
@@ -902,30 +920,29 @@ public class TransactionCreator {
         if (valid == Transaction.VALIDATE_OK) {
 
             if (forDeal > Transaction.FOR_PACK) {
-                //PROCESS IN FORK
-                transaction.process(null, forDeal);
 
-                // if it ISSUE - reset key
-                // не надо теперь сбрасывать - Так как дальше скелет передается в onTransactionCreate
-                if (false && transaction instanceof IssueItemRecord) {
-                    IssueItemRecord issueItem = (IssueItemRecord) transaction;
-                    issueItem.getItem().resetKey();
-                }
-
-                if (!notRelease)
+                if (notRelease) {
+                    if (incremented)
+                        this.seqNo.decrementAndGet();
+                } else {
+                    //PROCESS IN FORK
+                    transaction.process(null, forDeal);
                     Controller.getInstance().onTransactionCreate(transaction);
+                }
             }
         } else {
-            this.seqNo.decrementAndGet();
+            if (incremented)
+                this.seqNo.decrementAndGet();
         }
+
 
         //RETURN
         return valid;
     }
 
-    public Integer afterCreateRaw(Transaction transaction, int forDeal, long flags) {
+    public Integer afterCreateRaw(Transaction transaction, int forDeal, long flags, boolean notRelease) {
         this.checkUpdate();
-        return this.afterCreate(transaction, forDeal, false, false);
+        return this.afterCreate(transaction, forDeal, false, notRelease);
     }
 
 }

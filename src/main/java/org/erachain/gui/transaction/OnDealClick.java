@@ -172,7 +172,7 @@ public class OnDealClick {
                 mess = "Invalid message length";
                 break;
             case Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT:
-                mess = "Unknown public key for encrypt";
+                mess = "Unknown public key (need for encrypt)";
                 break;
 
             case Transaction.HASH_ALREADY_EXIST:
@@ -287,6 +287,9 @@ public class OnDealClick {
             case Transaction.INVALID_AWARD:
                 mess = "Invalid Award Item";
                 break;
+            case Transaction.INVALID_MAX_AWARD_COUNT:
+                mess = "MAX Award Count";
+                break;
 
             case Transaction.INVALID_QUANTITY:
                 mess = "Invalid quantity";
@@ -297,7 +300,7 @@ public class OnDealClick {
             case Transaction.INVALID_ECXHANGE_PAIR:
                 mess = "Invalid Ecxhange Pair";
                 break;
-                
+
             case Transaction.INVALID_RETURN:
                 mess = "Invalid return";
                 break;
@@ -307,6 +310,10 @@ public class OnDealClick {
             case Transaction.ORDER_DOES_NOT_EXIST:
                 mess = "Order does not exists";
                 break;
+            case Transaction.ORDER_ALREADY_COMPLETED:
+                mess = "Order already completed";
+                break;
+
             case Transaction.INVALID_ORDER_CREATOR:
                 mess = "Invalid order creator";
                 break;
@@ -407,6 +414,7 @@ public class OnDealClick {
             case Transaction.ITEM_DOES_NOT_EXIST:
                 mess = "Item does not exist";
                 break;
+
             case Transaction.OWNER_NOT_PERSONALIZED:
                 mess = "Owner Account is not personalized";
                 break;
@@ -463,6 +471,9 @@ public class OnDealClick {
                 break;
             case Transaction.ITEM_POLL_NOT_EXIST:
                 mess = "Item poll does not exist";
+                break;
+            case Transaction.ITEM_STATUS_NOT_EXIST:
+                mess = "Item status does not exist";
                 break;
             case Transaction.ITEM_UNION_NOT_EXIST:
                 mess = "Item union does not exist";
@@ -524,6 +535,10 @@ public class OnDealClick {
 
             case Transaction.INVALID_TRANSACTION_TYPE:
                 mess = "Invalid transaction type";
+                break;
+
+            case Transaction.JSON_ERROR:
+                mess = "Invalid JSON";
                 break;
 
         }
