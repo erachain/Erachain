@@ -355,10 +355,13 @@ public class ChangeOrderTransaction extends Transaction {
             return VALIDATE_OK;
         }
 
-        if (orderID == 0L || order == null) {
+        if (orderID == 0L
+                // в SetDC он в любом случае подтянется - даже их Completed, поэтому тут проверку
+                || order == null) {
             return ORDER_DOES_NOT_EXIST;
         }
 
+        // в SetDC он в любом случае подтянется - даже их Completed, поэтому тут проверку
         if (!order.isActive()) {
             return ORDER_ALREADY_COMPLETED;
         }
