@@ -295,7 +295,7 @@ public class Order implements Comparable<Order> {
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
         int scalePrice = calcPriceScale(amountHave, wantScale, 3);
 
-        BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
+        BigDecimal result = amountWant.divide(amountHave, scalePrice, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros();
 
         // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
         int scale = result.scale();
@@ -306,7 +306,7 @@ public class Order implements Comparable<Order> {
             if (accuracy > MAX_PRICE_ACCURACY) {
                 // обрежем точность цены чтобы на бирже лишней точности не было
                 scale -= accuracy - MAX_PRICE_ACCURACY;
-                result = result.setScale(scale, RoundingMode.HALF_DOWN).stripTrailingZeros();
+                result = result.setScale(scale, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros();
                 scale = result.scale();
                 // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
                 if (scale < 0)
