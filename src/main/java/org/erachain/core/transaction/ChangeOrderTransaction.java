@@ -104,7 +104,7 @@ public class ChangeOrderTransaction extends Transaction {
         orderID = dcSet.getTransactionFinalMapSigns().get(orderRef);
 
         order = dcSet.getOrderMap().get(orderID);
-        // подтянем в любом случае даже з Completed, а ниже проверку вставим на Активен?
+        // подтянем в любом случае даже из Completed, а ниже проверку вставим на Активен?
         if (order == null) {
             // возможно для блокэксплорера нужно - если ордер уже сыграл
             // и для кошелька тоже надо
