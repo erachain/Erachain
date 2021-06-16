@@ -24,7 +24,6 @@ import java.util.List;
  */
 public class OrderProcess {
 
-    static BigDecimal MIN_LEFT_SHARE = new BigDecimal("0.0002");
     /**
      * По идее тут ордер активный должен себе получить лучшие условия если округление пошло в сторону,
      * так как он в мне выгодных условиях по цене
@@ -169,17 +168,17 @@ public class OrderProcess {
         BigDecimal processedAmountFulfilledWant = BigDecimal.ZERO;
 
         int compare = 0;
-        int compareLeft = 0;
+        int compareThisLeft = 0;
 
         if (debug) {
             debug = true;
         }
 
-        boolean completedOrder = false;
+        boolean completedThisOrder = false;
         // используется для порядка отражения ордеров при поиске
         int index = 0;
 
-        while (!completedOrder && index < orders.size()) {
+        while (!completedThisOrder && index < orders.size()) {
             //GET ORDER
             Order order;
             if (dcSet.inMemory()) {
@@ -235,36 +234,36 @@ public class OrderProcess {
 
             boolean willUnResolvedFor = false;
             orderAmountHaveLeft = order.getAmountHaveLeft();
-            // SCALE for HAVE in ORDER
-            // цену ему занижаем так как это держатель позиции
             if (order.getFulfilledHave().signum() == 0) {
                 orderAmountWantLeft = order.getAmountWant();
             } else {
                 orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveAssetScale, RoundingMode.HALF_DOWN);
             }
 
-            compareLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
-            if (compareLeft == 0) {
+            compareThisLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
+            if (compareThisLeft == 0) {
+                // оба ордера полностью исполнены
                 tradeAmountForHave = orderAmountHaveLeft;
-                tradeAmountForWant = orderAmountWantLeft;
+                tradeAmountForWant = thisAmountHaveLeft;
 
-                completedOrder = true;
+                completedThisOrder = true;
 
-            } else if (compareLeft < 0) {
-
+            } else if (compareThisLeft < 0) {
+                // берем из текущего (Order) заказа данные для сделки - он полностью будет исполнен
                 tradeAmountForHave = orderAmountHaveLeft;
 
                 // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
+                // и при этом сильно цена сделки для него не изменится
                 if (orderThis.willUnResolvedFor(orderAmountWantLeft, false)
-                        && thisAmountHaveLeft.subtract(orderAmountWantLeft).divide(orderAmountWantLeft, 6, RoundingMode.HALF_DOWN)
-                        .compareTo(MIN_LEFT_SHARE) <= 0) {
+                        && !orderThis.isTradePriceOut(orderAmountWantLeft)) {
                     tradeAmountForWant = thisAmountHaveLeft;
-                    completedOrder = true;
+                    completedThisOrder = true;
                 } else {
                     tradeAmountForWant = orderAmountWantLeft;
                 }
 
             } else {
+                // берем из нашего (OrderThis) заказа данные для сделки - он полностью будет исполнен
 
                 tradeAmountForWant = thisAmountHaveLeft;
 
@@ -282,10 +281,8 @@ public class OrderProcess {
 
                 } else {
 
-                    // RESOLVE amount with SCALE
-                    // тут округляем наоборот вверх - больше даем тому кто активный
                     tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
-                    if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
+                    if (tradeAmountForHave.compareTo(orderAmountHaveLeft) >= 0) {
                         // если вылазим после округления за предел то берем что есть
                         tradeAmountForHave = orderAmountHaveLeft;
 
@@ -297,37 +294,15 @@ public class OrderProcess {
 
                         // если исполняемый ордер станет не исполняемым, то попробуем его тут обработать особо
                         willUnResolvedFor = order.willUnResolvedFor(tradeAmountForHave, true);
-                        if (willUnResolvedFor) {
-                            BigDecimal priceUpdateTrade = Order.calcPrice(orderAmountHaveLeft,
-                                    // haveSacel for order.WANT
-                                    tradeAmountForWant, haveAssetScale);
-                            // если цена текущей сделки не сильно изменится
-                            // или если остаток у ордера стенки уже очень маленький по сравнению с текущей сделкой
-                            // то весь ордер в сделку сольем
-                            if (!Order.isPricesNotClose(orderPrice, priceUpdateTrade, false)
-                                    || orderAmountHaveLeft.subtract(tradeAmountForHave)
-                                    .divide(orderAmountHaveLeft,
-                                            BlockChain.TRADE_PRICE_DIFF_LIMIT.scale(),
-                                            RoundingMode.DOWN) // FOR compare!
-                                    ///RoundingMode.HALF_DOWN)
-
-                                    .compareTo(BlockChain.TRADE_PRICE_DIFF_LIMIT) < 0) {
-
-                                tradeAmountForHave = orderAmountHaveLeft;
-
-                            }
-
-                            // проверим еще раз может вылезло за рамки
-                            if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
-                                // если вылазим после округления за предел то берем что есть
-                                tradeAmountForHave = orderAmountHaveLeft;
-                            }
+                        if (willUnResolvedFor
+                                && !order.isLeftPriceOut(orderAmountWantLeft)) {
+                            tradeAmountForHave = orderAmountHaveLeft;
                         }
                     }
                 }
 
                 //THIS is COMPLETED
-                completedOrder = true;
+                completedThisOrder = true;
 
             }
 
@@ -442,12 +417,12 @@ public class OrderProcess {
                     debug = true;
                 }
 
-                if (completedOrder)
+                if (completedThisOrder)
                     break;
 
                 // возможно схлопнулся?
                 if (orderThis.isFulfilled()) {
-                    completedOrder = true;
+                    completedThisOrder = true;
                     break;
                 }
 
@@ -463,7 +438,7 @@ public class OrderProcess {
                     // or HAVE not enough to one WANT  = price
                     ///CancelOrderTransaction.process_it(dcSet, this);
                     //and stop resolve
-                    completedOrder = true;
+                    completedThisOrder = true;
                     // REVERT not completed AMOUNT
                     orderThis.processOnUnresolved(block, transaction, false);
                     break;
@@ -476,10 +451,10 @@ public class OrderProcess {
             debug = true;
         }
 
-        if (!completedOrder) {
-            ordersMap.put(orderThis);
-        } else {
+        if (completedThisOrder) {
             completedMap.put(orderThis);
+        } else {
+            ordersMap.put(orderThis);
         }
 
         //TRANSFER FUNDS

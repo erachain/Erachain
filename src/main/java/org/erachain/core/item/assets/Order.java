@@ -199,14 +199,13 @@ public class Order implements Comparable<Order> {
     /**
      * Это вызывается только для ордера-Цели
      *
-     * @param fulfilledHaveWill
+     * @param fulfillingHaveWill
      * @param forTarget
      * @return
      */
-    public boolean willUnResolvedFor(BigDecimal fulfilledHaveWill, boolean forTarget) {
-        BigDecimal willHave = amountHave.subtract(fulfilledHave).subtract(fulfilledHaveWill);
+    public boolean willUnResolvedFor(BigDecimal fulfillingHaveWill, boolean forTarget) {
+        BigDecimal willHave = amountHave.subtract(fulfilledHave).subtract(fulfillingHaveWill);
         if (willHave.signum() == 0)
-            // уже не сошлось
             return false;
 
         // сколько нам надо будет еще купить если эту сделку обработаем
@@ -255,18 +254,52 @@ public class Order implements Comparable<Order> {
      */
     public static boolean isPricesNotClose(BigDecimal price, BigDecimal priceForLeft, boolean forTarget) {
 
+        if (priceForLeft.signum() == 0)
+            // новая цена посл округления уже ноль
+            return true;
+
         BigDecimal diff = price.subtract(priceForLeft);
         int signum = diff.signum();
         if (signum == 0) {
             return false;
         }
 
-        diff = diff.divide(price.min(priceForLeft),
-                (forTarget ? BlockChain.TARGET_PRICE_DIFF_LIMIT : BlockChain.INITIATOR_PRICE_DIFF_LIMIT).scale() + 1, RoundingMode.HALF_DOWN).abs();
-        if (signum > 0 && diff.compareTo(forTarget ? BlockChain.TARGET_PRICE_DIFF_LIMIT : BlockChain.INITIATOR_PRICE_DIFF_LIMIT) > 0
-                || signum < 0 && diff.compareTo(forTarget ? BlockChain.TARGET_PRICE_DIFF_LIMIT_NEG : BlockChain.INITIATOR_PRICE_DIFF_LIMIT_NEG) > 0)
-            return true;
+        if (true) {
+            diff = diff.abs().divide(price.min(priceForLeft), BigDecimal.ROUND_HALF_DOWN, MAX_PRICE_ACCURACY);
+            if (diff.compareTo(BlockChain.MAX_TRADE_DEVIATION) > 0)
+                return true;
+
+        } else {
+            diff = diff.divide(price.min(priceForLeft),
+                    (forTarget ? BlockChain.TARGET_PRICE_DIFF_LIMIT : BlockChain.INITIATOR_PRICE_DIFF_LIMIT).scale() + 1, RoundingMode.HALF_DOWN).abs();
+            if (signum > 0 && diff.compareTo(forTarget ? BlockChain.TARGET_PRICE_DIFF_LIMIT : BlockChain.INITIATOR_PRICE_DIFF_LIMIT) > 0
+                    || signum < 0 && diff.compareTo(forTarget ? BlockChain.TARGET_PRICE_DIFF_LIMIT_NEG : BlockChain.INITIATOR_PRICE_DIFF_LIMIT_NEG) > 0)
+                return true;
+        }
         return false;
+
+    }
+
+    /**
+     * как сильно изменится цена если добавить остаток со сделки
+     *
+     * @param tradeAmountHave
+     * @return
+     */
+    public boolean isLeftPriceOut(BigDecimal tradeAmountHave) {
+        return getAmountHaveLeft().subtract(tradeAmountHave).abs().divide(tradeAmountHave, 6, RoundingMode.HALF_DOWN)
+                .compareTo(BlockChain.MAX_ORDER_DEVIATION) > 0;
+    }
+
+    /**
+     * Обновим Осталось Имею и если цена сделки
+     *
+     * @param tradeAmountHave
+     * @return
+     */
+    public boolean isTradePriceOut(BigDecimal tradeAmountHave) {
+        return getAmountHaveLeft().subtract(tradeAmountHave).abs().divide(tradeAmountHave, 6, RoundingMode.HALF_DOWN)
+                .compareTo(BlockChain.MAX_TRADE_DEVIATION) > 0;
     }
 
     // BigDecimal.precision() - is WRONG calculating!!! Sometime = 0 for 100 or 10
