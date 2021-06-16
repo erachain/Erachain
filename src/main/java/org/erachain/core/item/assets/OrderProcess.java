@@ -74,10 +74,10 @@ public class OrderProcess {
                 //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
                 //// 	255979-3	255992-1
                 //|| height == 255992
-                Transaction.viewDBRef(id).equals("255992-1")
+                Transaction.viewDBRef(id).equals("1826-1")
                 || Transaction.viewDBRef(id).equals("255979-3")
-                || Transaction.viewDBRef(id).equals("791319-1")
-                || transaction.viewHeightSeq().equals("695143-1")
+                || Transaction.viewDBRef(id).equals("262765-1")
+                || transaction.viewHeightSeq().equals("262722-1")
             //id == 3644468729217028L
 
 
@@ -198,7 +198,7 @@ public class OrderProcess {
             if (debug ||
                     orderREF.equals("255992-1")
                     || orderREF.equals("255979-3")
-                    || orderREF.equals("695143-1")
+                    || orderREF.equals("262722-1")
                 //id == 1132136199356417L
             ) {
                 debug = true;
@@ -329,8 +329,8 @@ public class OrderProcess {
                 } else {
                     // возможно наш Заказ останется с маленьким остатком
                     if (orderThis.willUnResolvedFor(tradeAmountForWant, false)
-                            // и если цена не сильно у Нашего Заказа остаток большой
-                            && !orderThis.isInitiatorLeftDeviationOut(tradeAmountForWant)) {
+                            // и остаток небольшой для всего Заказа
+                            && !order.isTargetLeftDeviationOut(tradeAmountForHave)) {
                         tradeAmountForWant = thisAmountHaveLeft;
                         completedThisOrder = true;
                     }
