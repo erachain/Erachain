@@ -366,6 +366,17 @@ public class OrderProcess {
                     tradeAmountForHave, tradeAmountForWant,
                     haveAssetScale, wantAssetScale, index);
 
+            if (BlockChain.CHECK_BUGS > 1) {
+                boolean testDeviation = orderPrice.subtract(trade.calcPrice()).abs().divide(orderPrice, 6, RoundingMode.HALF_DOWN)
+                        .compareTo(new BigDecimal("0.001")) > 0;
+                if (testDeviation) {
+                    logger.error("TRADE Deviation fo big: " + orderPrice.subtract(trade.calcPrice()).abs()
+                            .divide(orderPrice, 6, RoundingMode.HALF_DOWN).toPlainString());
+                    Long error = null;
+                    error++;
+                }
+            }
+
             //ADD TRADE TO DATABASE
             tradesMap.put(trade);
 
