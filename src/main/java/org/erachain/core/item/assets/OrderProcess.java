@@ -257,9 +257,10 @@ public class OrderProcess {
                 tradeAmountForHave = orderAmountHaveLeft;
 
                 // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
-                // и при этом сильно цена сделки для него не изменится
+                // и при этом остаток для енго незначительный
                 if (orderThis.willUnResolvedFor(orderAmountWantLeft, false)
-                        && !orderThis.isInitLeftPriceOut(orderAmountWantLeft)) {
+                        // и если цена не сильно у Нашего Заказа остаток большой
+                        && !orderThis.isInitiatorLeftDeviationOut(orderAmountWantLeft)) {
                     tradeAmountForWant = thisAmountHaveLeft;
                     completedThisOrder = true;
                 } else {
@@ -287,7 +288,8 @@ public class OrderProcess {
                         // если текущий ордер станет не исполняемым, то попробуем его тут обработать особо
                         willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, true);
                         if (willOrderUnResolved
-                                && !order.isLeftPriceOut(tradeAmountForHave)) {
+                                // и остаток небольшой для всего Заказа
+                                && !order.isTargetLeftDeviationOut(tradeAmountForHave)) {
                             tradeAmountForHave = orderAmountHaveLeft;
                         }
                     }
@@ -308,7 +310,8 @@ public class OrderProcess {
                         // если текущий ордер станет не исполняемым, то попробуем его тут обработать особо
                         willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, true);
                         if (willOrderUnResolved
-                                && !order.isLeftPriceOut(tradeAmountForHave)) {
+                                // и остаток небольшой для всего Заказа
+                                && !order.isTargetLeftDeviationOut(tradeAmountForHave)) {
                             tradeAmountForHave = orderAmountHaveLeft;
                         }
                     }
@@ -362,12 +365,6 @@ public class OrderProcess {
             trade = new Trade(id, order.getId(), haveAssetKey, wantAssetKey,
                     tradeAmountForHave, tradeAmountForWant,
                     haveAssetScale, wantAssetScale, index);
-
-            if (BlockChain.CHECK_BUGS > 1 && Order.isPricesNotClose(trade.calcPrice(), orderPrice, true)) {
-                Order.isPricesNotClose(trade.calcPrice(), orderPrice, true);
-                Long error = null;
-                error++;
-            }
 
             //ADD TRADE TO DATABASE
             tradesMap.put(trade);

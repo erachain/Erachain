@@ -291,7 +291,7 @@ public class Order implements Comparable<Order> {
      * @param tradeAmountHave
      * @return
      */
-    public boolean isInitLeftPriceOut(BigDecimal tradeAmountHave) {
+    public boolean isInitiatorLeftDeviationOut(BigDecimal tradeAmountHave) {
         return getAmountHaveLeft().subtract(tradeAmountHave).abs().divide(tradeAmountHave, 6, RoundingMode.HALF_DOWN)
                 .compareTo(BlockChain.MAX_INIT_ORDER_DEVIATION) > 0;
     }
@@ -302,7 +302,7 @@ public class Order implements Comparable<Order> {
      * @param tradeAmountHave
      * @return
      */
-    public boolean isLeftPriceOut(BigDecimal tradeAmountHave) {
+    public boolean isTargetLeftDeviationOut(BigDecimal tradeAmountHave) {
         return getAmountHaveLeft().subtract(tradeAmountHave).abs().divide(tradeAmountHave, 6, RoundingMode.HALF_DOWN)
                 .compareTo(BlockChain.MAX_ORDER_DEVIATION) > 0;
     }
