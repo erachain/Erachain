@@ -295,7 +295,7 @@ public class OrderProcess {
                         // если исполняемый ордер станет не исполняемым, то попробуем его тут обработать особо
                         willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, true);
                         if (willOrderUnResolved
-                                && !order.isLeftPriceOut(orderAmountWantLeft)) {
+                                && !order.isLeftPriceOut(tradeAmountForHave)) {
                             tradeAmountForHave = orderAmountHaveLeft;
                         }
                     }
