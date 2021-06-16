@@ -268,10 +268,10 @@ public class Order implements Comparable<Order> {
         }
 
         if (true) {
-            diff = diff.abs().divide(price.min(priceForLeft),
-                    BigDecimal.ROUND_UP, // для получения макс потолка
+            diff = diff.abs().divide(price,
+                    BigDecimal.ROUND_HALF_UP, // для получения макс потолка
                     MAX_PRICE_ACCURACY);
-            if (diff.compareTo(BlockChain.MAX_TRADE_DEVIATION) > 0)
+            if (diff.compareTo(forTarget ? BlockChain.MAX_ORDER_DEVIATION : BlockChain.MAX_INIT_ORDER_DEVIATION) > 0)
                 return true;
 
         } else {
@@ -286,6 +286,17 @@ public class Order implements Comparable<Order> {
     }
 
     /**
+     * Обновим Осталось Имею и если цена сделки
+     *
+     * @param tradeAmountHave
+     * @return
+     */
+    public boolean isInitLeftPriceOut(BigDecimal tradeAmountHave) {
+        return getAmountHaveLeft().subtract(tradeAmountHave).abs().divide(tradeAmountHave, 6, RoundingMode.HALF_DOWN)
+                .compareTo(BlockChain.MAX_INIT_ORDER_DEVIATION) > 0;
+    }
+
+    /**
      * как сильно изменится цена если добавить остаток со сделки
      *
      * @param tradeAmountHave
@@ -294,17 +305,6 @@ public class Order implements Comparable<Order> {
     public boolean isLeftPriceOut(BigDecimal tradeAmountHave) {
         return getAmountHaveLeft().subtract(tradeAmountHave).abs().divide(tradeAmountHave, 6, RoundingMode.HALF_DOWN)
                 .compareTo(BlockChain.MAX_ORDER_DEVIATION) > 0;
-    }
-
-    /**
-     * Обновим Осталось Имею и если цена сделки
-     *
-     * @param tradeAmountHave
-     * @return
-     */
-    public boolean isTradePriceOut(BigDecimal tradeAmountHave) {
-        return getAmountHaveLeft().subtract(tradeAmountHave).abs().divide(tradeAmountHave, 6, RoundingMode.HALF_DOWN)
-                .compareTo(BlockChain.MAX_TRADE_DEVIATION) > 0;
     }
 
     // BigDecimal.precision() - is WRONG calculating!!! Sometime = 0 for 100 or 10

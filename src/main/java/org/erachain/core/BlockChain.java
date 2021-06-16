@@ -352,7 +352,7 @@ public class BlockChain {
     final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.0005");
     final public static BigDecimal TARGET_PRICE_DIFF_LIMIT_NEG = TARGET_PRICE_DIFF_LIMIT.multiply(new BigDecimal(5));
     final public static BigDecimal MAX_ORDER_DEVIATION = new BigDecimal("0.0005");
-    final public static BigDecimal MAX_TRADE_DEVIATION = new BigDecimal("0.0002");
+    final public static BigDecimal MAX_INIT_ORDER_DEVIATION = new BigDecimal("0.0002");
 
     /**
      * Если сыграло INITIATOR_PRICE_DIFF_LIMIT и цена сделки после скидывания в нее остатка ордера-цели не выйдет

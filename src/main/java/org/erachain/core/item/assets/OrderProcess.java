@@ -54,7 +54,7 @@ public class OrderProcess {
         long id = orderThis.getId();
         // GET HEIGHT from ID
         int height = (int) (id >> 32);
-
+        // нужно так как при сдвиге цены Заказ может быть уже початый и тут на ОстатокЦены проверку делаем
         BigDecimal price = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? orderThis.calcLeftPrice() : orderThis.getPrice();
         BigDecimal thisPriceReverse = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? orderThis.calcLeftPriceReverse() : orderThis.calcPriceReverse();
 
@@ -74,7 +74,9 @@ public class OrderProcess {
                 //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
                 //// 	255979-3	255992-1
                 //|| height == 255992
-                Transaction.viewDBRef(id).equals("791319-1")
+                Transaction.viewDBRef(id).equals("255992-1")
+                || Transaction.viewDBRef(id).equals("255979-3")
+                || Transaction.viewDBRef(id).equals("791319-1")
                 || transaction.viewHeightSeq().equals("695143-1")
             //id == 3644468729217028L
 
@@ -100,7 +102,7 @@ public class OrderProcess {
         List<Order> orders = ordersMap.getOrdersForTradeWithFork(wantAssetKey, haveAssetKey, thisPriceReverse);
 
         /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
-        if (id > BlockChain.LEFT_PRICE_HEIGHT_SEQ && (debug || BlockChain.CHECK_BUGS > 5) && !orders.isEmpty()) {
+        if (false && id > BlockChain.LEFT_PRICE_HEIGHT_SEQ && (debug || BlockChain.CHECK_BUGS > 5) && !orders.isEmpty()) {
             BigDecimal priceTst = orders.get(0).calcLeftPrice();
             Long timestamp = orders.get(0).getId();
             Long idTst = 0L;
@@ -194,7 +196,9 @@ public class OrderProcess {
 
             String orderREF = Transaction.viewDBRef(order.getId());
             if (debug ||
-                    orderREF.equals("695143-1")
+                    orderREF.equals("255992-1")
+                    || orderREF.equals("255979-3")
+                    || orderREF.equals("695143-1")
                 //id == 1132136199356417L
             ) {
                 debug = true;
@@ -255,7 +259,7 @@ public class OrderProcess {
                 // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
                 // и при этом сильно цена сделки для него не изменится
                 if (orderThis.willUnResolvedFor(orderAmountWantLeft, false)
-                        && !orderThis.isTradePriceOut(orderAmountWantLeft)) {
+                        && !orderThis.isInitLeftPriceOut(orderAmountWantLeft)) {
                     tradeAmountForWant = thisAmountHaveLeft;
                     completedThisOrder = true;
                 } else {
@@ -274,9 +278,18 @@ public class OrderProcess {
                 if (compare == 0) {
                     // цена совпала (возможно с округлением) то без пересчета берем что раньше посчитали
                     tradeAmountForHave = orderThis.getAmountWantLeft();
-                    if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
+                    if (tradeAmountForHave.compareTo(orderAmountHaveLeft) >= 0) {
                         // если вылазим после округления за предел то берем что есть
                         tradeAmountForHave = orderAmountHaveLeft;
+
+                    } else {
+                        // тут возможны округления и остатки неисполнимые
+                        // если текущий ордер станет не исполняемым, то попробуем его тут обработать особо
+                        willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, true);
+                        if (willOrderUnResolved
+                                && !order.isLeftPriceOut(tradeAmountForHave)) {
+                            tradeAmountForHave = orderAmountHaveLeft;
+                        }
                     }
 
                 } else {
@@ -292,7 +305,7 @@ public class OrderProcess {
                             debug = true;
                         }
 
-                        // если исполняемый ордер станет не исполняемым, то попробуем его тут обработать особо
+                        // если текущий ордер станет не исполняемым, то попробуем его тут обработать особо
                         willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, true);
                         if (willOrderUnResolved
                                 && !order.isLeftPriceOut(tradeAmountForHave)) {
@@ -349,6 +362,12 @@ public class OrderProcess {
             trade = new Trade(id, order.getId(), haveAssetKey, wantAssetKey,
                     tradeAmountForHave, tradeAmountForWant,
                     haveAssetScale, wantAssetScale, index);
+
+            if (BlockChain.CHECK_BUGS > 1 && Order.isPricesNotClose(trade.calcPrice(), orderPrice, true)) {
+                Order.isPricesNotClose(trade.calcPrice(), orderPrice, true);
+                Long error = null;
+                error++;
+            }
 
             //ADD TRADE TO DATABASE
             tradesMap.put(trade);
