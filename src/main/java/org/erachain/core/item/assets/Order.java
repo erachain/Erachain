@@ -465,6 +465,10 @@ public class Order implements Comparable<Order> {
         return this.fulfilledHave;
     }
 
+    public void fulfill(BigDecimal fulfilled) {
+        this.fulfilledHave = this.fulfilledHave.add(fulfilled);
+    }
+
     public void setFulfilledHave(BigDecimal fulfilled) {
         this.fulfilledHave = fulfilled;
     }

@@ -232,7 +232,7 @@ public class OrderProcess {
                 }
             }
 
-            boolean willUnResolvedFor = false;
+            boolean willOrderUnResolved = false;
             orderAmountHaveLeft = order.getAmountHaveLeft();
             if (order.getFulfilledHave().signum() == 0) {
                 orderAmountWantLeft = order.getAmountWant();
@@ -293,8 +293,8 @@ public class OrderProcess {
                         }
 
                         // если исполняемый ордер станет не исполняемым, то попробуем его тут обработать особо
-                        willUnResolvedFor = order.willUnResolvedFor(tradeAmountForHave, true);
-                        if (willUnResolvedFor
+                        willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, true);
+                        if (willOrderUnResolved
                                 && !order.isLeftPriceOut(orderAmountWantLeft)) {
                             tradeAmountForHave = orderAmountHaveLeft;
                         }
@@ -314,137 +314,133 @@ public class OrderProcess {
                 error++;
             }
 
-            //CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
-            //AND WE CAN BUY ANYTHING
-            if (tradeAmountForHave.compareTo(BigDecimal.ZERO) > 0) {
-                //CREATE TRADE
+            //CREATE TRADE
 
-                // CUT PRECISION in bytes
-                tradeAmountForHave = tradeAmountForHave.stripTrailingZeros();
-                byte[] amountBytes = tradeAmountForHave.unscaledValue().toByteArray();
-                while (amountBytes.length > Order.FULFILLED_LENGTH) {
-                    tradeAmountForHave.setScale(tradeAmountForHave.scale() - 1, BigDecimal.ROUND_HALF_UP);
-                    amountBytes = tradeAmountForHave.unscaledValue().toByteArray();
-                }
-                tradeAmountForWant = tradeAmountForWant.stripTrailingZeros();
+            // CUT PRECISION in bytes
+            tradeAmountForHave = tradeAmountForHave.stripTrailingZeros();
+            byte[] amountBytes = tradeAmountForHave.unscaledValue().toByteArray();
+            while (amountBytes.length > Order.FULFILLED_LENGTH) {
+                tradeAmountForHave.setScale(tradeAmountForHave.scale() - 1, BigDecimal.ROUND_HALF_UP);
+                amountBytes = tradeAmountForHave.unscaledValue().toByteArray();
+            }
+            tradeAmountForWant = tradeAmountForWant.stripTrailingZeros();
+            amountBytes = tradeAmountForWant.unscaledValue().toByteArray();
+            while (amountBytes.length > Order.FULFILLED_LENGTH) {
+                tradeAmountForWant.setScale(tradeAmountForWant.scale() - 1, BigDecimal.ROUND_HALF_UP);
                 amountBytes = tradeAmountForWant.unscaledValue().toByteArray();
-                while (amountBytes.length > Order.FULFILLED_LENGTH) {
-                    tradeAmountForWant.setScale(tradeAmountForWant.scale() - 1, BigDecimal.ROUND_HALF_UP);
-                    amountBytes = tradeAmountForWant.unscaledValue().toByteArray();
-                }
+            }
 
-                if (debug) {
-                    debug = true;
-                }
+            if (debug) {
+                debug = true;
+            }
 
-                //////////////////////////// TRADE /////////////////
-                if (tradeAmountForHave.scale() > wantAssetScale
-                        || tradeAmountForWant.scale() > haveAssetScale) {
-                    Long error = null;
-                    error++;
-                }
-                if (tradeAmountForHave.signum() <= 0
-                        || tradeAmountForWant.signum() < 0) {
-                    Long error = null;
-                    error++;
-                }
+            //////////////////////////// TRADE /////////////////
+            if (tradeAmountForHave.scale() > wantAssetScale
+                    || tradeAmountForWant.scale() > haveAssetScale) {
+                Long error = null;
+                error++;
+            }
+            if (tradeAmountForHave.signum() <= 0
+                    || tradeAmountForWant.signum() < 0) {
+                Long error = null;
+                error++;
+            }
 
-                trade = new Trade(id, order.getId(), haveAssetKey, wantAssetKey,
-                        tradeAmountForHave, tradeAmountForWant,
-                        haveAssetScale, wantAssetScale, index);
+            trade = new Trade(id, order.getId(), haveAssetKey, wantAssetKey,
+                    tradeAmountForHave, tradeAmountForWant,
+                    haveAssetScale, wantAssetScale, index);
 
-                //ADD TRADE TO DATABASE
-                tradesMap.put(trade);
+            //ADD TRADE TO DATABASE
+            tradesMap.put(trade);
 
-                /// так как у нас Индексы высчитываются по плавающей цене для остатков и она сейчас изменится
-                /// то сперва удалим Ордер - до изменения Остатков и цены по Остаткам
-                /// тогда можно ключи делать по цене на Остатки
-                //REMOVE FROM ORDERS
-                ordersMap.delete(order);
+            /// так как у нас Индексы высчитываются по плавающей цене для остатков и она сейчас изменится
+            /// то сперва удалим Ордер - до изменения Остатков и цены по Остаткам
+            /// тогда можно ключи делать по цене на Остатки
+            //REMOVE FROM ORDERS
+            ordersMap.delete(order);
 
-                //UPDATE FULFILLED HAVE
-                order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // amountHave));
-                // accounting on PLEDGE position
-                order.getCreator().changeBalance(dcSet, true,
-                        true, wantAssetKey, tradeAmountForHave, false, false,
-                        true
-                );
+            //UPDATE FULFILLED HAVE
+            order.fulfill(tradeAmountForHave); // amountHave));
+            // accounting on PLEDGE position
+            order.getCreator().changeBalance(dcSet, true,
+                    true, wantAssetKey, tradeAmountForHave, false, false,
+                    true
+            );
 
 
-                orderThis.setFulfilledHave(orderThis.getFulfilledHave().add(tradeAmountForWant)); //amountWant));
+            orderThis.fulfill(tradeAmountForWant); //amountWant));
 
-                if (order.isFulfilled()) {
+            if (order.isFulfilled()) {
+                //ADD TO COMPLETED ORDERS
+                completedMap.put(order);
+            } else {
+                //UPDATE ORDER
+                if (willOrderUnResolved) {
+                    // if left not enough for 1 buy by price this order
+                    order.dcSet = dcSet;
+                    order.processOnUnresolved(block, transaction, true);
+
                     //ADD TO COMPLETED ORDERS
                     completedMap.put(order);
                 } else {
-                    //UPDATE ORDER
-                    if (willUnResolvedFor) {
-                        // if left not enough for 1 buy by price this order
-                        order.dcSet = dcSet;
-                        order.processOnUnresolved(block, transaction, true);
-
-                        //ADD TO COMPLETED ORDERS
-                        completedMap.put(order);
-                    } else {
-                        // тут цена по остаткам поменяется
-                        ordersMap.put(order);
-                    }
+                    // тут цена по остаткам поменяется
+                    ordersMap.put(order);
                 }
+            }
 
-                //TRANSFER FUNDS
-                if (height > BlockChain.VERS_5_3) {
-                    AssetCls.processTrade(dcSet, block, order.getCreator(),
-                            false, assetWant, assetHave,
-                            false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
+            //TRANSFER FUNDS
+            if (height > BlockChain.VERS_5_3) {
+                AssetCls.processTrade(dcSet, block, order.getCreator(),
+                        false, assetWant, assetHave,
+                        false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
 
-                } else {
-                    order.getCreator().changeBalance(dcSet, false, false, haveAssetKey,
-                            tradeAmountForWant, false, false, false);
-                    transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
-                            "Trade Order @" + Transaction.viewDBRef(order.getId()));
-                }
+            } else {
+                order.getCreator().changeBalance(dcSet, false, false, haveAssetKey,
+                        tradeAmountForWant, false, false, false);
+                transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
+                        "Trade Order @" + Transaction.viewDBRef(order.getId()));
+            }
 
-                // Учтем что у стороны ордера обновилась форжинговая информация
-                if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
-                    block.addForgingInfoUpdate(order.getCreator());
-                }
+            // Учтем что у стороны ордера обновилась форжинговая информация
+            if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
+                block.addForgingInfoUpdate(order.getCreator());
+            }
 
-                // update new values
-                thisAmountHaveLeft = orderThis.getAmountHaveLeft();
-                processedAmountFulfilledWant = processedAmountFulfilledWant.add(tradeAmountForHave);
+            // update new values
+            thisAmountHaveLeft = orderThis.getAmountHaveLeft();
+            processedAmountFulfilledWant = processedAmountFulfilledWant.add(tradeAmountForHave);
+
+            if (debug) {
+                debug = true;
+            }
+
+            if (completedThisOrder)
+                break;
+
+            // возможно схлопнулся?
+            if (orderThis.isFulfilled()) {
+                completedThisOrder = true;
+                break;
+            }
+
+            // if can't trade by more good price than self - by orderOrice - then  auto cancel!
+            if (orderThis.isInitiatorUnResolved()) {
 
                 if (debug) {
-                    debug = true;
+                    debug = orderThis.isInitiatorUnResolved();
                 }
 
-                if (completedThisOrder)
-                    break;
+                // cancel order if it not fulfiled isDivisible
 
-                // возможно схлопнулся?
-                if (orderThis.isFulfilled()) {
-                    completedThisOrder = true;
-                    break;
-                }
-
-                // if can't trade by more good price than self - by orderOrice - then  auto cancel!
-                if (orderThis.isInitiatorUnResolved()) {
-
-                    if (debug) {
-                        debug = orderThis.isInitiatorUnResolved();
-                    }
-
-                    // cancel order if it not fulfiled isDivisible
-
-                    // or HAVE not enough to one WANT  = price
-                    ///CancelOrderTransaction.process_it(dcSet, this);
-                    //and stop resolve
-                    completedThisOrder = true;
-                    // REVERT not completed AMOUNT
-                    orderThis.processOnUnresolved(block, transaction, false);
-                    break;
-                }
-
+                // or HAVE not enough to one WANT  = price
+                ///CancelOrderTransaction.process_it(dcSet, this);
+                //and stop resolve
+                completedThisOrder = true;
+                // REVERT not completed AMOUNT
+                orderThis.processOnUnresolved(block, transaction, false);
+                break;
             }
+
         }
 
         if (debug) {
@@ -545,7 +541,7 @@ public class OrderProcess {
                 ordersMap.delete(target);
 
                 //REVERSE FULFILLED
-                target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
+                target.fulfill(tradeAmountHave.negate());
                 // accounting on PLEDGE position
                 target.getCreator().changeBalance(dcSet, false,
                         true, wantAssetKey, tradeAmountHave, false, false,
