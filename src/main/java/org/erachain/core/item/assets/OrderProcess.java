@@ -370,7 +370,7 @@ public class OrderProcess {
                 boolean testDeviation = orderPrice.subtract(trade.calcPrice()).abs().divide(orderPrice, 6, RoundingMode.HALF_DOWN)
                         .compareTo(new BigDecimal("0.001")) > 0;
                 if (testDeviation) {
-                    logger.error("TRADE Deviation fo big: " + orderPrice.subtract(trade.calcPrice()).abs()
+                    logger.error("TRADE Deviation so big: " + orderPrice.subtract(trade.calcPrice()).abs()
                             .divide(orderPrice, 6, RoundingMode.HALF_DOWN).toPlainString());
                     Long error = null;
                     error++;
