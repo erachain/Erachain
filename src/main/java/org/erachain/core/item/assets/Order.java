@@ -209,12 +209,15 @@ public class Order implements Comparable<Order> {
             return false;
 
         // сколько нам надо будет еще купить если эту сделку обработаем
-        BigDecimal willWant = getFulfilledWant(willHave, this.price, this.wantAssetScale);
+        //BigDecimal willWant = getFulfilledWant(willHave, this.price, this.wantAssetScale);
+        BigDecimal willWant = willHave.multiply(price).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
         if (willWant.signum() == 0) {
             return true;
         }
 
         BigDecimal priceForLeft = calcPrice(willHave, willWant, wantAssetScale);
+        if (priceForLeft.signum() == 0)
+            return true;
 
         return isPricesNotClose(price, priceForLeft, forTarget);
 
@@ -265,7 +268,9 @@ public class Order implements Comparable<Order> {
         }
 
         if (true) {
-            diff = diff.abs().divide(price.min(priceForLeft), BigDecimal.ROUND_HALF_DOWN, MAX_PRICE_ACCURACY);
+            diff = diff.abs().divide(price.min(priceForLeft),
+                    BigDecimal.ROUND_UP, // для получения макс потолка
+                    MAX_PRICE_ACCURACY);
             if (diff.compareTo(BlockChain.MAX_TRADE_DEVIATION) > 0)
                 return true;
 
