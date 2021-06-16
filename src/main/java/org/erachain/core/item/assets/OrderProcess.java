@@ -325,6 +325,15 @@ public class OrderProcess {
 
                     //THIS is COMPLETED
                     completedThisOrder = true;
+
+                } else {
+                    // возможно наш Заказ останется с маленьким остатком
+                    if (orderThis.willUnResolvedFor(tradeAmountForWant, false)
+                            // и если цена не сильно у Нашего Заказа остаток большой
+                            && !orderThis.isInitiatorLeftDeviationOut(tradeAmountForWant)) {
+                        tradeAmountForWant = thisAmountHaveLeft;
+                        completedThisOrder = true;
+                    }
                 }
 
             }
