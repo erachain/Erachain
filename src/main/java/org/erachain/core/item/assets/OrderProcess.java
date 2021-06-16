@@ -329,8 +329,13 @@ public class OrderProcess {
                 } else {
                     // возможно наш Заказ останется с маленьким остатком
                     if (orderThis.willUnResolvedFor(tradeAmountForWant, false)
-                            // и остаток небольшой для всего Заказа
-                            && !order.isTargetLeftDeviationOut(tradeAmountForHave)) {
+                            // и цена для Заказа не съедет далеко в Trade
+                            && !Order.isPricesNotClose(orderPrice,
+                            // считаем цену у будущей сделки
+                            Order.calcPrice(tradeAmountForHave, thisAmountHaveLeft,
+                                    haveAssetScale // reversed in Trade
+                            ),
+                            true)) {
                         tradeAmountForWant = thisAmountHaveLeft;
                         completedThisOrder = true;
                     }
