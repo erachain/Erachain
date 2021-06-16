@@ -326,7 +326,8 @@ public class Order implements Comparable<Order> {
             return BigDecimal.ONE.negate();
 
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
-        int scalePrice = calcPriceScale(amountHave, wantScale, 3);
+        //int scalePrice = calcPriceScale(amountHave, wantScale, 3);
+        int scalePrice = calcPriceScale(amountHave, wantScale, MAX_PRICE_ACCURACY);
 
         BigDecimal result = amountWant.divide(amountHave, scalePrice, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros();
 

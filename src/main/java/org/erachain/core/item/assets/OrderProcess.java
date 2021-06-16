@@ -317,8 +317,15 @@ public class OrderProcess {
                     }
                 }
 
-                //THIS is COMPLETED
-                completedThisOrder = true;
+                // теперь обязательно пересчет обратно по цене ордера делаем
+                tradeAmountForWant = tradeAmountForHave.multiply(orderPrice).setScale(haveAssetScale, BigDecimal.ROUND_HALF_UP);
+                if (tradeAmountForWant.compareTo(thisAmountHaveLeft) >= 0) {
+                    // если вылазим после округления за предел то берем что есть
+                    tradeAmountForWant = thisAmountHaveLeft;
+
+                    //THIS is COMPLETED
+                    completedThisOrder = true;
+                }
 
             }
 
@@ -472,6 +479,17 @@ public class OrderProcess {
 
         if (debug) {
             debug = true;
+        }
+
+        if (BlockChain.CHECK_BUGS > 1) {
+            boolean testDeviation = price.subtract(orderThis.calcLeftPrice()).abs().divide(price, 6, RoundingMode.HALF_DOWN)
+                    .compareTo(new BigDecimal("0.001")) > 0;
+            if (testDeviation) {
+                logger.error("TRADE Deviation so big: " + price.subtract(orderThis.calcLeftPrice()).abs()
+                        .divide(price, 6, RoundingMode.HALF_DOWN));
+                Long error = null;
+                error++;
+            }
         }
 
         if (completedThisOrder) {
