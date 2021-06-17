@@ -172,8 +172,10 @@ public class Order implements Comparable<Order> {
         int i = 0;
 
         BigDecimal t = value.abs();
-        if (t.compareTo(BigDecimal.TEN) > 0) {
-            while (t.compareTo(BigDecimal.TEN) > 0) {
+        if (t.compareTo(BigDecimal.ONE) == 0)
+            return 0;
+        else if (t.compareTo(BigDecimal.ONE) > 0) {
+            while (t.compareTo(BigDecimal.ONE) > 0) {
                 t = t.movePointLeft(1);
                 i++;
             }
