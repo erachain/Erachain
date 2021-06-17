@@ -266,21 +266,10 @@ public class Order implements Comparable<Order> {
             return false;
         }
 
-        if (true) {
-            diff = diff.abs().divide(price,
-                    BigDecimal.ROUND_HALF_UP, // для получения макс потолка
-                    MAX_PRICE_ACCURACY);
-            if (diff.compareTo(forTarget ? BlockChain.MAX_ORDER_DEVIATION : BlockChain.MAX_INIT_ORDER_DEVIATION) > 0)
-                return true;
-
-        } else {
-            diff = diff.divide(price.min(priceForLeft),
-                    (forTarget ? BlockChain.TARGET_PRICE_DIFF_LIMIT : BlockChain.INITIATOR_PRICE_DIFF_LIMIT).scale() + 1, BigDecimal.ROUND_HALF_UP).abs();
-            if (signum > 0 && diff.compareTo(forTarget ? BlockChain.TARGET_PRICE_DIFF_LIMIT : BlockChain.INITIATOR_PRICE_DIFF_LIMIT) > 0
-                    || signum < 0 && diff.compareTo(forTarget ? BlockChain.TARGET_PRICE_DIFF_LIMIT_NEG : BlockChain.INITIATOR_PRICE_DIFF_LIMIT_NEG) > 0)
-                return true;
-        }
-        return false;
+        diff = diff.abs().divide(price,
+                BigDecimal.ROUND_HALF_UP, // для получения макс потолка
+                MAX_PRICE_ACCURACY);
+        return diff.compareTo(forTarget ? BlockChain.MAX_ORDER_DEVIATION : BlockChain.MAX_INIT_ORDER_DEVIATION) > 0;
 
     }
 

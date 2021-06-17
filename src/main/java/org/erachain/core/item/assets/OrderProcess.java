@@ -73,7 +73,7 @@ public class OrderProcess {
                 //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
                 //// 	255979-3	255992-1
                 //|| height == 255992
-                Transaction.viewDBRef(id).equals("1826-1")
+                Transaction.viewDBRef(id).equals("40046-1")
                 || Transaction.viewDBRef(id).equals("255979-3")
                 || Transaction.viewDBRef(id).equals("262765-1")
                 || transaction.viewHeightSeq().equals("262722-1")
@@ -195,7 +195,7 @@ public class OrderProcess {
 
             String orderREF = Transaction.viewDBRef(order.getId());
             if (debug ||
-                    orderREF.equals("255992-1")
+                    orderREF.equals("40046-1")
                     || orderREF.equals("255979-3")
                     || orderREF.equals("262722-1")
                 //id == 1132136199356417L
@@ -304,25 +304,6 @@ public class OrderProcess {
                                 && !order.isTargetLeftDeviationOut(tradeAmountForHave)) {
                             tradeAmountForHave = orderAmountHaveLeft;
                         }
-                    }
-                }
-
-                // теперь обязательно пересчет обратно по цене ордера делаем
-                tradeAmountForWant = tradeAmountForHave.multiply(orderPrice).setScale(haveAssetScale, BigDecimal.ROUND_HALF_UP);
-                if (tradeAmountForWant.compareTo(thisAmountHaveLeft) >= 0) {
-                    // если вылазим после округления за предел то берем что есть
-                    tradeAmountForWant = thisAmountHaveLeft;
-
-                    //THIS is COMPLETED
-                    completedThisOrder = true;
-
-                } else {
-                    // возможно наш Заказ останется с маленьким остатком
-                    if (orderThis.willUnResolvedFor(tradeAmountForWant, false)
-                            // и отклонение будет небольшое для текущего Заказа
-                            && !order.isTargetLeftDeviationOut(thisAmountHaveLeft)) {
-                        tradeAmountForWant = thisAmountHaveLeft;
-                        completedThisOrder = true;
                     }
                 }
 
