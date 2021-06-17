@@ -257,10 +257,8 @@ public class OrderProcess {
                 tradeAmountForHave = orderAmountHaveLeft;
 
                 // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
-                // и при этом остаток для енго незначительный
-                if (orderThis.willUnResolvedFor(orderAmountWantLeft, false)
-                        // и если цена не сильно у Нашего Заказа остаток большой
-                        && !orderThis.isInitiatorLeftDeviationOut(orderAmountWantLeft)) {
+                // и при этом прочие остатки не проверяем - так как Наш Заказ - это по сути "по рынку"
+                if (orderThis.willUnResolvedFor(orderAmountWantLeft, false)) {
                     tradeAmountForWant = thisAmountHaveLeft;
                     completedThisOrder = true;
                 } else {
@@ -328,14 +326,8 @@ public class OrderProcess {
 
                 } else {
                     // возможно наш Заказ останется с маленьким остатком
-                    if (orderThis.willUnResolvedFor(tradeAmountForWant, false)
-                            // и цена для Заказа не съедет далеко в Trade
-                            && !Order.isPricesNotClose(orderPrice,
-                            // считаем цену у будущей сделки
-                            Order.calcPrice(tradeAmountForHave, thisAmountHaveLeft,
-                                    haveAssetScale // reversed in Trade
-                            ),
-                            true)) {
+                    // и при этом прочие остатки не проверяем - так как Наш Заказ - это по сути "по рынку"
+                    if (orderThis.willUnResolvedFor(tradeAmountForWant, false)) {
                         tradeAmountForWant = thisAmountHaveLeft;
                         completedThisOrder = true;
                     }
@@ -388,11 +380,11 @@ public class OrderProcess {
                     haveAssetScale, wantAssetScale, index);
 
             if (BlockChain.CHECK_BUGS > 1) {
-                boolean testDeviation = orderPrice.subtract(trade.calcPrice()).abs().divide(orderPrice, 6, RoundingMode.HALF_DOWN)
-                        .compareTo(new BigDecimal("0.001")) > 0;
+                boolean testDeviation = orderPrice.subtract(trade.calcPrice()).abs().divide(orderPrice, Order.MAX_PRICE_ACCURACY, RoundingMode.HALF_DOWN)
+                        .compareTo(BlockChain.MAX_TRADE_DEVIATION) > 0;
                 if (testDeviation) {
                     logger.error("TRADE Deviation so big: " + orderPrice.subtract(trade.calcPrice()).abs()
-                            .divide(orderPrice, 6, RoundingMode.HALF_DOWN).toPlainString());
+                            .divide(orderPrice, Order.MAX_PRICE_ACCURACY, RoundingMode.HALF_DOWN).toPlainString());
                     Long error = null;
                     error++;
                 }
