@@ -305,6 +305,27 @@ public class OrderProcess {
                             tradeAmountForHave = orderAmountHaveLeft;
                         }
                     }
+
+                    // теперь обязательно пересчет обратно по цене ордера делаем - так как у нас может быть ПО РЫНКУ
+                    // и цена с Имею не та если слишком чильно округлилось (для штучных товаров)
+                    tradeAmountForWant = tradeAmountForHave.multiply(orderPrice).setScale(haveAssetScale, BigDecimal.ROUND_HALF_UP);
+                    if (tradeAmountForWant.compareTo(thisAmountHaveLeft) >= 0) {
+                        // если вылазим после округления за предел то берем что есть
+                        tradeAmountForWant = thisAmountHaveLeft;
+
+                        //THIS is COMPLETED
+                        completedThisOrder = true;
+                    } else {
+                        // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
+                        if (orderThis.willUnResolvedFor(tradeAmountForWant, false)
+                                // и отклонение будет небольшое для нашего Заказа
+                                && !orderThis.isInitiatorLeftDeviationOut(tradeAmountForWant)) {
+                            tradeAmountForWant = thisAmountHaveLeft;
+                            completedThisOrder = true;
+                        }
+
+                    }
+
                 }
 
             }
