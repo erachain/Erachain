@@ -281,7 +281,7 @@ public class Order implements Comparable<Order> {
     }
 
     public static int calcPriceScale(int powerAmountHave, int wantScale, int addScale) {
-        return powerAmountHave + (wantScale > 0 ? wantScale : 0) + addScale;
+        return powerAmountHave + wantScale + addScale;
     }
 
     public static int calcPriceScale(BigDecimal amountHave, int wantScale, int addScale) {
