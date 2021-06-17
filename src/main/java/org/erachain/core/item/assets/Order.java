@@ -273,18 +273,6 @@ public class Order implements Comparable<Order> {
 
     }
 
-    /**
-     * как сильно изменится цена если добавить остаток со сделки
-     *
-     * @param tradeAmountHave
-     * @param accuracy
-     * @return
-     */
-    public boolean isLeftDeviationOut(BigDecimal tradeAmountHave, BigDecimal accuracy) {
-        return getAmountHaveLeft().subtract(tradeAmountHave).abs().divide(tradeAmountHave, 6, BigDecimal.ROUND_HALF_UP)
-                .compareTo(accuracy) > 0;
-    }
-
     // BigDecimal.precision() - is WRONG calculating!!! Sometime = 0 for 100 or 10
     public static int precision(BigDecimal value) {
         return powerTen(value) + value.scale() + 1;
