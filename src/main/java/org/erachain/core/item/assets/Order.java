@@ -200,17 +200,16 @@ public class Order implements Comparable<Order> {
      *
      * @param fulfillingHaveWill
      * @param accuracy
-     * @param extPrice
      * @return
      */
-    public boolean willUnResolvedFor(BigDecimal fulfillingHaveWill, BigDecimal accuracy, BigDecimal extPrice) {
+    public boolean willUnResolvedFor(BigDecimal fulfillingHaveWill, BigDecimal accuracy) {
         BigDecimal willHave = amountHave.subtract(fulfilledHave).subtract(fulfillingHaveWill);
         if (willHave.signum() == 0)
             return false;
 
         // сколько нам надо будет еще купить если эту сделку обработаем
         //BigDecimal willWant = getFulfilledWant(willHave, this.price, this.wantAssetScale);
-        BigDecimal willWant = willHave.multiply(extPrice == null ? price : extPrice).setScale(wantAssetScale, BigDecimal.ROUND_HALF_UP);
+        BigDecimal willWant = willHave.multiply(price).setScale(wantAssetScale, BigDecimal.ROUND_HALF_UP);
         if (willWant.signum() == 0) {
             return true;
         }
@@ -219,7 +218,7 @@ public class Order implements Comparable<Order> {
         if (priceForLeft.signum() == 0)
             return true;
 
-        return isPricesNotClose(extPrice == null ? price : extPrice, priceForLeft, accuracy);
+        return isPricesNotClose(price, priceForLeft, accuracy);
 
     }
 
