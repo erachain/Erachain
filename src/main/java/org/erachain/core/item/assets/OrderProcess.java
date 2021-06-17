@@ -256,7 +256,7 @@ public class OrderProcess {
                 tradeAmountForHave = orderAmountHaveLeft;
 
                 // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
-                if (orderThis.willUnResolvedFor(orderAmountWantLeft, BlockChain.MAX_ORDER_DEVIATION_LOW)
+                if (orderThis.willUnResolvedFor(orderAmountWantLeft, BlockChain.MAX_ORDER_DEVIATION_LOW, null)
                         // и отклонение будет небольшое для текущего Заказа
                         && !Order.isPricesNotClose(
                         orderPrice,
@@ -284,7 +284,7 @@ public class OrderProcess {
                     } else {
                         // тут возможны округления и остатки неисполнимые уже у Текущего Заказа
                         // если текущий ордер станет не исполняемым, то попробуем его тут обработать особо
-                        willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, BlockChain.MAX_ORDER_DEVIATION_LOW);
+                        willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, BlockChain.MAX_ORDER_DEVIATION_LOW, null);
                         if (willOrderUnResolved
                                 // и остаток небольшой для всего Заказа
                                 && !Order.isPricesNotClose(
@@ -308,7 +308,7 @@ public class OrderProcess {
                     } else {
 
                         // если текущий ордер станет не исполняемым, то попробуем его тут обработать особо
-                        willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, BlockChain.MAX_ORDER_DEVIATION_LOW);
+                        willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, BlockChain.MAX_ORDER_DEVIATION_LOW, null);
                         if (willOrderUnResolved
                                 // и остаток небольшой для всего Заказа
                                 && !Order.isPricesNotClose(
@@ -332,7 +332,7 @@ public class OrderProcess {
                         completedThisOrder = true;
                     } else {
                         // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
-                        if (orderThis.willUnResolvedFor(tradeAmountForWant, BlockChain.MAX_ORDER_DEVIATION_LOW)
+                        if (orderThis.willUnResolvedFor(tradeAmountForWant, BlockChain.MAX_ORDER_DEVIATION_LOW, orderPrice)
                                 // и такая сделка сильно ухудшит цену нашего Заказа (Инициатора)
                                 // и такая сделка сильно ухудшит цену текущего Заказа
                                 && !Order.isPricesNotClose(
