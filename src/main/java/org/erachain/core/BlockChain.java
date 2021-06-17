@@ -337,11 +337,11 @@ public class BlockChain {
     /**
      * Если после исполнения торговой сделки остается остаток у ордера-цели и
      * цена для остатка отклонится больше чем на эту величину то либо скидываем остаток в эту сделку либо ему возвращаем остаток
-     * Игициатор - "ПО РЫНКУ" - у него точность хуже делаем
+     * Инициатор - "ПО РЫНКУ" - у него точность хуже делаем
      */
-    final public static BigDecimal MAX_TRADE_DEVIATION = new BigDecimal("0.001");
-    final public static BigDecimal MAX_INIT_ORDER_DEVIATION = new BigDecimal("0.002");
-    final public static BigDecimal MAX_ORDER_DEVIATION = new BigDecimal("0.0002");
+    final public static BigDecimal MAX_TRADE_DEVIATION_HI = new BigDecimal("0.005");
+    final public static BigDecimal MAX_ORDER_DEVIATION = new BigDecimal("0.002");
+    final public static BigDecimal MAX_ORDER_DEVIATION_LOW = new BigDecimal("0.0005");
 
 
     public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : !MAIN_MODE ? 0 : VERS_4_11;

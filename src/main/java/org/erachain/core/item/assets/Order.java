@@ -199,10 +199,10 @@ public class Order implements Comparable<Order> {
      * Это вызывается только для ордера-Цели
      *
      * @param fulfillingHaveWill
-     * @param forTarget
+     * @param accuracy
      * @return
      */
-    public boolean willUnResolvedFor(BigDecimal fulfillingHaveWill, boolean forTarget) {
+    public boolean willUnResolvedFor(BigDecimal fulfillingHaveWill, BigDecimal accuracy) {
         BigDecimal willHave = amountHave.subtract(fulfilledHave).subtract(fulfillingHaveWill);
         if (willHave.signum() == 0)
             return false;
@@ -218,7 +218,7 @@ public class Order implements Comparable<Order> {
         if (priceForLeft.signum() == 0)
             return true;
 
-        return isPricesNotClose(price, priceForLeft, forTarget);
+        return isPricesNotClose(price, priceForLeft, accuracy);
 
     }
 
@@ -242,7 +242,7 @@ public class Order implements Comparable<Order> {
             // уже не сошлось
             return true;
 
-        return isPricesNotClose(price, priceForLeft, false);
+        return isPricesNotClose(price, priceForLeft, BlockChain.MAX_ORDER_DEVIATION);
 
     }
 
@@ -251,10 +251,10 @@ public class Order implements Comparable<Order> {
      *
      * @param price
      * @param priceForLeft
-     * @param forTarget
+     * @param accuracy
      * @return
      */
-    public static boolean isPricesNotClose(BigDecimal price, BigDecimal priceForLeft, boolean forTarget) {
+    public static boolean isPricesNotClose(BigDecimal price, BigDecimal priceForLeft, BigDecimal accuracy) {
 
         if (priceForLeft.signum() == 0)
             // новая цена посл округления уже ноль
@@ -269,30 +269,20 @@ public class Order implements Comparable<Order> {
         diff = diff.abs().divide(price,
                 BigDecimal.ROUND_HALF_UP, // для получения макс потолка
                 MAX_PRICE_ACCURACY);
-        return diff.compareTo(forTarget ? BlockChain.MAX_ORDER_DEVIATION : BlockChain.MAX_INIT_ORDER_DEVIATION) > 0;
+        return diff.compareTo(accuracy) > 0;
 
-    }
-
-    /**
-     * Обновим Осталось Имею и если цена сделки
-     *
-     * @param tradeAmountHave
-     * @return
-     */
-    public boolean isInitiatorLeftDeviationOut(BigDecimal tradeAmountHave) {
-        return getAmountHaveLeft().subtract(tradeAmountHave).abs().divide(tradeAmountHave, 6, BigDecimal.ROUND_HALF_UP)
-                .compareTo(BlockChain.MAX_INIT_ORDER_DEVIATION) > 0;
     }
 
     /**
      * как сильно изменится цена если добавить остаток со сделки
      *
      * @param tradeAmountHave
+     * @param accuracy
      * @return
      */
-    public boolean isTargetLeftDeviationOut(BigDecimal tradeAmountHave) {
+    public boolean isLeftDeviationOut(BigDecimal tradeAmountHave, BigDecimal accuracy) {
         return getAmountHaveLeft().subtract(tradeAmountHave).abs().divide(tradeAmountHave, 6, BigDecimal.ROUND_HALF_UP)
-                .compareTo(BlockChain.MAX_ORDER_DEVIATION) > 0;
+                .compareTo(accuracy) > 0;
     }
 
     // BigDecimal.precision() - is WRONG calculating!!! Sometime = 0 for 100 or 10
