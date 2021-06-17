@@ -332,7 +332,7 @@ public class OrderProcess {
                         completedThisOrder = true;
                     } else {
                         // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
-                        if (orderThis.willUnResolvedFor(tradeAmountForWant, BlockChain.MAX_ORDER_DEVIATION_LOW, orderPrice)
+                        if (orderThis.willUnResolvedFor(tradeAmountForWant, BlockChain.MAX_ORDER_DEVIATION_LOW, orderReversePrice)
                                 // и такая сделка сильно ухудшит цену текущего Заказа
                                 && !Order.isPricesNotClose(
                                 orderPrice,
