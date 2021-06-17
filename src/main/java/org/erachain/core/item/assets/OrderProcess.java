@@ -267,12 +267,7 @@ public class OrderProcess {
 
             } else {
                 // берем из нашего (OrderThis) заказа данные для сделки - он полностью будет исполнен
-
                 tradeAmountForWant = thisAmountHaveLeft;
-
-                if (debug) {
-                    debug = true;
-                }
 
                 if (compare == 0) {
                     // цена совпала (возможно с округлением) то без пересчета берем что раньше посчитали
@@ -282,7 +277,7 @@ public class OrderProcess {
                         tradeAmountForHave = orderAmountHaveLeft;
 
                     } else {
-                        // тут возможны округления и остатки неисполнимые
+                        // тут возможны округления и остатки неисполнимые уже у Текущего Заказа
                         // если текущий ордер станет не исполняемым, то попробуем его тут обработать особо
                         willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, true);
                         if (willOrderUnResolved
@@ -293,17 +288,14 @@ public class OrderProcess {
                     }
 
                 } else {
+                    // цена нашего Заказ - "по рынку", значит пересчитаем Хочу по цене текущего Заказа
+                    tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, BigDecimal.ROUND_HALF_UP);
 
-                    tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
                     if (tradeAmountForHave.compareTo(orderAmountHaveLeft) >= 0) {
                         // если вылазим после округления за предел то берем что есть
                         tradeAmountForHave = orderAmountHaveLeft;
 
                     } else {
-
-                        if (debug) {
-                            debug = true;
-                        }
 
                         // если текущий ордер станет не исполняемым, то попробуем его тут обработать особо
                         willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, true);
