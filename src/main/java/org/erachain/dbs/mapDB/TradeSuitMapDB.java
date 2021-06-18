@@ -6,6 +6,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
+import org.erachain.datachain.IndexIterator;
 import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
@@ -164,15 +165,15 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
             return null;
 
         if (descending)
-            return new IteratorCloseableImpl(
+            return IteratorCloseableImpl.make(new IndexIterator(
                     this.assetKeySet.descendingSet().subSet(
                             Fun.t2(assetKey, Long.MAX_VALUE),
-                            Fun.t2(assetKey, 0L)).iterator());
+                            Fun.t2(assetKey, 0L)).iterator()));
 
-        return new IteratorCloseableImpl(
+        return IteratorCloseableImpl.make(new IndexIterator(
                 this.assetKeySet.subSet(
                         Fun.t2(assetKey, 0L),
-                        Fun.t2(assetKey, Long.MAX_VALUE)).iterator());
+                        Fun.t2(assetKey, Long.MAX_VALUE)).iterator()));
     }
 
     @Override
