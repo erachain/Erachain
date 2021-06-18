@@ -11,6 +11,8 @@ public interface OrderSuit {
 
     Order getHaveWanFirst(long have, long want);
 
+    IteratorCloseable<Long> getIteratorByAssetKey(long assetKey, boolean descending);
+
     IteratorCloseable<Long> getHaveWantIterator(long have, long want);
 
     IteratorCloseable<Long> getHaveWantIterator(long have);

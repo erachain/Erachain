@@ -171,7 +171,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             return null;
         }
 
-        return ((TradeSuit) this.map).getAssetIterator(assetKey, descending);
+        return ((TradeSuit) this.map).getIteratorByAssetKey(assetKey, descending);
 
     }
 

@@ -151,7 +151,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getAssetIterator(long assetKey, boolean descending) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByAssetKey(long assetKey, boolean descending) {
         return map.getIndexIteratorFilter(assetIndex.getColumnFamilyHandle(), Longs.toByteArray(assetKey), descending, true);
     }
 

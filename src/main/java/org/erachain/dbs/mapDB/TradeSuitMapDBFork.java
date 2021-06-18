@@ -70,7 +70,7 @@ public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade>
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getAssetIterator(long have, boolean descending) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByAssetKey(long have, boolean descending) {
         return null;
     }
 

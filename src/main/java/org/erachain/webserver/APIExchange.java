@@ -536,13 +536,19 @@ public class APIExchange {
 
     @GET
     @Path("tradesbyasset/{key}")
-    public Response getTradesByAssetFrom(@PathParam("key") Long assetKey) {
+    public Response getTradesByAssetFrom(@PathParam("key") Long assetKey,
+                                         @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 200 || limit <= 0)
+                limit = 200;
+        }
 
         TradeMapImpl map = dcSet.getTradeMap();
         Trade trade;
         JSONArray out = new JSONArray();
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = map.iteratorByAssetKey(assetKey, true)) {
-            while (iterator.hasNext()) {
+            while (iterator.hasNext() && --limit > 0) {
                 trade = map.get(iterator.next());
                 out.add(trade.toJson(assetKey, true));
             }

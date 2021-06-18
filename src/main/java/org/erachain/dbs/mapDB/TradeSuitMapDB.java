@@ -16,6 +16,8 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import java.util.NavigableSet;
+
 /**
  * Хранит сделки на бирже
  * Ключ: ссылка на инициатора + ссылка на цель
@@ -26,7 +28,7 @@ import org.mapdb.Fun.Tuple3;
 public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
     private BTreeMap pairKeyMap;
-    private BTreeMap assetKeyMap;
+    private NavigableSet assetKeySet;
     private BTreeMap targetsKeyMap;
 
     public TradeSuitMapDB(DBASet databaseSet, DB database) {
@@ -82,12 +84,12 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         });
 
         //
-        this.assetKeyMap = database.createTreeMap("trades_key_asset")
+        this.assetKeySet = database.createTreeSet("trades_key_asset")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
         //BIND
-        Bind.secondaryKey(map, this.assetKeyMap, new Fun.Function2<Long[], Tuple2<Long, Long>, Trade>() {
+        Bind.secondaryKeys(map, this.assetKeySet, new Fun.Function2<Long[], Tuple2<Long, Long>, Trade>() {
             @Override
             public Long[] run(Tuple2<Long, Long> key, Trade value) {
                 return new Long[]{value.getHaveKey(), value.getWantKey()};
@@ -156,21 +158,21 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getAssetIterator(long assetKey, boolean descending) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByAssetKey(long assetKey, boolean descending) {
 
-        if (this.assetKeyMap == null)
+        if (this.assetKeySet == null)
             return null;
 
         if (descending)
-            return new IteratorCloseableImpl(((BTreeMap<Long, Tuple2<Long, Long>>)
-                    this.assetKeyMap).descendingMap().subMap(
-                    assetKey,
-                    assetKey).values().iterator());
+            return new IteratorCloseableImpl(
+                    this.assetKeySet.descendingSet().subSet(
+                            Fun.t2(assetKey, Long.MAX_VALUE),
+                            Fun.t2(assetKey, 0L)).iterator());
 
-        return new IteratorCloseableImpl(((BTreeMap<Long, Tuple2<Long, Long>>)
-                this.assetKeyMap).subMap(
-                assetKey,
-                assetKey).values().iterator());
+        return new IteratorCloseableImpl(
+                this.assetKeySet.subSet(
+                        Fun.t2(assetKey, 0L),
+                        Fun.t2(assetKey, Long.MAX_VALUE)).iterator());
     }
 
     @Override

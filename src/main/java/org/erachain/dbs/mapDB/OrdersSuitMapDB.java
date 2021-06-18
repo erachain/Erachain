@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NavigableSet;
 
 ;
 
@@ -33,7 +34,7 @@ import java.util.Map;
  * занчение: Блок<br>
  * <p>
  * Есть вторичный индекс, для отчетов (blockexplorer) - generatorMap
- * TODO - убрать длинный индек и вставить INT
+ * TODO - убрать длинный индекс и вставить INT
  *
  * @return
  */
@@ -47,6 +48,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     // TODO: cut index to WANT only
     private BTreeMap wantHaveKeyMap;
     private BTreeMap addressHaveWantKeyMap;
+    private NavigableSet assetKeySet;
 
     public OrdersSuitMapDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger);
@@ -129,6 +131,23 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                                 value.getId());
                     }
                 });
+
+        // WANT/HAVE KEY
+        this.assetKeySet = database.createTreeSet("orders_key_asset")
+                .comparator(Fun.COMPARATOR)
+                .makeOrGet();
+
+        //BIND HAVE/WANT KEY
+        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.assetKeySet,
+                new Fun.Function2<Long[], Long,
+                        Order>() {
+                    @Override
+                    public Long[] run(
+                            Long key, Order value) {
+                        return new Long[]{value.getWantAssetKey(), value.getHaveAssetKey()};
+                    }
+                });
+
     }
 
     //@Override
@@ -147,6 +166,25 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
             return null;
 
         return get(first.getValue());
+
+    }
+
+    @Override
+    public IteratorCloseable<Long> getIteratorByAssetKey(long assetKey, boolean descending) {
+
+        if (this.assetKeySet == null)
+            return null;
+
+        if (descending)
+            return new IteratorCloseableImpl(
+                    this.assetKeySet.descendingSet().subSet(
+                            Fun.t2(assetKey, Long.MAX_VALUE),
+                            Fun.t2(assetKey, 0L)).iterator());
+
+        return new IteratorCloseableImpl(
+                this.assetKeySet.subSet(
+                        Fun.t2(assetKey, 0L),
+                        Fun.t2(assetKey, Long.MAX_VALUE)).iterator());
 
     }
 
