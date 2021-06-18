@@ -171,9 +171,9 @@ function asset(data, forPrint) {
 
 
         output += '<td><a href="?asset=' + pair.base_id + '&asset=' + pair.quote_id  + get_lang() + '"><b>'
-                + addCommas(pair.last_price.toPrecision(8)) + '</a><br>';
+                + addCommas(pair.last_price.toPrecision(6)) + '</a><br>';
         output += '<a href="?asset=' + pair.quote_id + '&asset=' + pair.base_id  + get_lang() + '"><b>'
-                + addCommas((1.0 / pair.last_price).toPrecision(8));
+                + addCommas((1.0 / pair.last_price).toPrecision(6));
 
         output += '<td>';
         if (pair.price_change_percent_24h > 0) {
@@ -186,15 +186,15 @@ function asset(data, forPrint) {
         output += '<br>' + pair.count_24h;
 
         output += '<td>';
-        output += addCommas(pair.highest_bid.toPrecision(8)) + ' / ' + addCommas(pair.lowest_ask.toPrecision(8));
-        output += '<br>' + addCommas((1.0 / pair.lowest_ask).toPrecision(8)) + ' / ' + addCommas((1.0 / pair.highest_bid).toPrecision(8));
+        output += addCommas(pair.highest_bid.toPrecision(6)) + ' / ' + addCommas(pair.lowest_ask.toPrecision(6));
+        output += '<br>' + addCommas((1.0 / pair.lowest_ask).toPrecision(6)) + ' / ' + addCommas((1.0 / pair.highest_bid).toPrecision(6));
 
         output += '<td nowrap>';
-        output += addCommas(pair.quote_volume.toPrecision(8)) + '<br>' + addCommas(pair.base_volume.toPrecision(8));
+        output += addCommas(pair.quote_volume.toPrecision(6)) + '<br>' + addCommas(pair.base_volume.toPrecision(6));
 
         output += '<td>';
-        output += addCommas(pair.lowest_price_24h.toPrecision(8)) + ' / ' + addCommas(pair.highest_price_24h.toPrecision(8));
-        output += '<br>' + addCommas((1.0 / pair.highest_price_24h).toPrecision(8)) + ' / ' + addCommas((1.0 / pair.lowest_price_24h).toPrecision(8));
+        output += addCommas(pair.lowest_price_24h.toPrecision(6)) + ' / ' + addCommas(pair.highest_price_24h.toPrecision(6));
+        output += '<br>' + addCommas((1.0 / pair.highest_price_24h).toPrecision(6)) + ' / ' + addCommas((1.0 / pair.lowest_price_24h).toPrecision(6));
 
     }
     output += '<tr><td><b>' + data.Label_Total + ':';
