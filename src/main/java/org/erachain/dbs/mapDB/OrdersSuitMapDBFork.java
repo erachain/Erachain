@@ -119,6 +119,11 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
     }
 
     @Override
+    public IteratorCloseable<Long> getIteratorByAssetKey(long assetKey, boolean descending) {
+        return null;
+    }
+
+    @Override
     public IteratorCloseable<Long> getHaveWantIterator(long have, long want) {
         return null;
     }

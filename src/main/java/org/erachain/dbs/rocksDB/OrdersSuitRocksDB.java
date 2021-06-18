@@ -10,6 +10,7 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.OrderSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
+import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
@@ -36,6 +37,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
     SimpleIndexDB<Long, Order, byte[]> haveWantKeyIndex;
     SimpleIndexDB<Long, Order, Fun.Tuple4<Long, Long, BigDecimal, Long>> wantHaveKeyIndex;
     SimpleIndexDB<Long, Order, Fun.Tuple5<String, Long, Long, BigDecimal, Long>> addressHaveWantKeyIndex;
+    ArrayIndexDB<Long, Order, byte[]> assetIndex;
 
     IndexByteableBigDecimal bgToBytes = new IndexByteableBigDecimal();
     ByteableLong byteableLong = new ByteableLong();
@@ -108,6 +110,16 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                                     byteableLong.toBytesObject(result.e)));
                 });
 
+        String tradesAssetKeyIndexName = "tradesAssetKey";
+        assetIndex = new ArrayIndexDB<>(
+                tradesAssetKeyIndexName,
+                (key, order) -> {
+                    byte[][] keys = new byte[2][];
+                    keys[0] = Longs.toByteArray(order.getHaveAssetKey());
+                    keys[1] = Longs.toByteArray(order.getWantAssetKey());
+                    return keys;
+                }, (result) -> result);
+
         wantHaveKeyIndex = new SimpleIndexDB<>("orders_key_want_have",
                 (aLong, order) -> new Fun.Tuple4<>(
                         order.getWantAssetKey(),
@@ -125,6 +137,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                 });
 
         indexes.add(addressHaveWantKeyIndex);
+        indexes.add(assetIndex);
         indexes.add(wantHaveKeyIndex);
     }
 
@@ -144,6 +157,11 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
 
         return null;
 
+    }
+
+    @Override
+    public IteratorCloseable<Long> getIteratorByAssetKey(long assetKey, boolean descending) {
+        return map.getIndexIteratorFilter(assetIndex.getColumnFamilyHandle(), Longs.toByteArray(assetKey), descending, true);
     }
 
     @Override

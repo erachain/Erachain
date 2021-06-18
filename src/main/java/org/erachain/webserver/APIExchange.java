@@ -18,6 +18,7 @@ import org.erachain.core.web.ServletUtils;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
+import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.StrJSonFine;
@@ -551,6 +552,33 @@ public class APIExchange {
             while (iterator.hasNext() && --limit > 0) {
                 trade = map.get(iterator.next());
                 out.add(trade.toJson(assetKey, true));
+            }
+        } catch (IOException e) {
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("ordersbyasset/{key}")
+    public Response getOrdersByAssetFrom(@PathParam("key") Long assetKey,
+                                         @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 200 || limit <= 0)
+                limit = 200;
+        }
+
+        OrderMap map = dcSet.getOrderMap();
+        Order order;
+        JSONArray out = new JSONArray();
+        try (IteratorCloseable<Long> iterator = map.iteratorByAssetKey(assetKey, true)) {
+            while (iterator.hasNext() && --limit > 0) {
+                order = map.get(iterator.next());
+                out.add(order.toJson());
             }
         } catch (IOException e) {
         }
