@@ -720,6 +720,7 @@ public class Order implements Comparable<Order> {
                 false, this.haveAssetKey, left, false, false,
                 // accounting on PLEDGE position
                 true, Account.BALANCE_POS_PLEDGE);
+
         transaction.addCalculated(block, this.creator, this.haveAssetKey, left,
                 "Outprice " + (forTarget ? "close" : "ended") + " Order @" + transaction.viewDBRef(this.id));
 

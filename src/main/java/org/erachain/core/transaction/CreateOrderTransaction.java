@@ -696,7 +696,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         //   - если обработка остановлена по достижению порога Инкремента
         creator.changeBalance(dcSet, false, false, haveKey,
                 // так как внутри может сработать Unresolved by Outprice - и именно остаток недобитый тут тоже учтётся
-                order.getAmountHaveLeft(),
+                // этот осток от Неисполнения внутри OrderProcess.orphan делается
+                order.getAmountHave(),
                 false, false,
                 // accounting on PLEDGE position
                 true, Account.BALANCE_POS_PLEDGE);
