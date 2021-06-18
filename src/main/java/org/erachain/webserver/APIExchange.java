@@ -18,9 +18,12 @@ import org.erachain.core.web.ServletUtils;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
+import org.erachain.datachain.TradeMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -28,6 +31,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -530,4 +534,24 @@ public class APIExchange {
                 .build();
     }
 
+    @GET
+    @Path("tradesbyasset/{key}")
+    public Response getTradesByAssetFrom(@PathParam("key") Long assetKey) {
+
+        TradeMapImpl map = dcSet.getTradeMap();
+        Trade trade;
+        JSONArray out = new JSONArray();
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = map.iteratorByAssetKey(assetKey, true)) {
+            while (iterator.hasNext()) {
+                trade = map.get(iterator.next());
+                out.add(trade.toJson(assetKey, true));
+            }
+        } catch (IOException e) {
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
+    }
 }

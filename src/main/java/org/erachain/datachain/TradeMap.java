@@ -21,7 +21,7 @@ public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
     List<Trade> getTradesByOrderID(Long orderID, boolean useCancel, boolean descending);
 
 
-    List<Trade> iteratorByAssetKey(long have, long want, Object offset, int limit, boolean useCancel, boolean useChange);
+    List<Trade> getTradesByPair(long have, long want, Object offset, int limit, boolean useCancel, boolean useChange);
 
     Trade getLastTrade(long have, long want, boolean andCancel);
 

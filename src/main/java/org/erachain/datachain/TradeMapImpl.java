@@ -176,7 +176,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> iteratorByAssetKey(long have, long want, Object fromKey, int limit, boolean useCancel, boolean useChange) {
+    public List<Trade> getTradesByPair(long have, long want, Object fromKey, int limit, boolean useCancel, boolean useChange) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
