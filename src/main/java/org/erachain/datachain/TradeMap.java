@@ -14,19 +14,15 @@ public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
 
     IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByInitiator(Long orderID);
 
+    IteratorCloseable<Fun.Tuple2<Long, Long>> iteratorByAssetKey(long haveWant, boolean descending);
+
     List<Trade> getInitiatedTrades(Order order, boolean useCancel);
 
     List<Trade> getTradesByOrderID(Long orderID, boolean useCancel, boolean descending);
 
-    @SuppressWarnings("unchecked")
-    List<Trade> getTrades(long haveWant, boolean useCancel)
-        // get trades for order as HAVE and as WANT
-    ;
 
-    @SuppressWarnings("unchecked")
-    List<Trade> getTrades(long have, long want, Object offset, int limit, boolean useCancel, boolean useChange);
+    List<Trade> iteratorByAssetKey(long have, long want, Object offset, int limit, boolean useCancel, boolean useChange);
 
-    @SuppressWarnings("unchecked")
     Trade getLastTrade(long have, long want, boolean andCancel);
 
     List<Trade> getTradesByTimestamp(long startTimestamp, long stopTimestamp, int limit);

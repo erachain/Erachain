@@ -9,6 +9,7 @@ import org.erachain.datachain.TradeMap;
 import org.erachain.datachain.TradeMapImpl;
 import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.IteratorParent;
 import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.mapdb.BTreeMap;
@@ -69,12 +70,7 @@ public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade>
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getHaveIterator(long have) {
-        return null;
-    }
-
-    @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getWantIterator(long want) {
+    public IteratorCloseable<Tuple2<Long, Long>> getAssetIterator(long have, boolean descending) {
         return null;
     }
 
@@ -100,7 +96,10 @@ public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade>
 
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getPairOrderIDIterator(long startOrderID, long stopOrderID) {
-        return null;
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) this.map).subMap(
+                // обратная сортировка поэтому все вычитаем и -1 для всех getSequence
+                Fun.t2(startOrderID > 0 ? startOrderID : null, null),
+                Fun.t2(stopOrderID > 0 ? stopOrderID : Long.MAX_VALUE, Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override

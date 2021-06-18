@@ -9,9 +9,7 @@ public interface TradeSuit {
 
     IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByTarget(Long orderID, boolean descending);
 
-    IteratorCloseable<Fun.Tuple2<Long, Long>> getHaveIterator(long have);
-
-    IteratorCloseable<Fun.Tuple2<Long, Long>> getWantIterator(long want);
+    IteratorCloseable<Fun.Tuple2<Long, Long>> getAssetIterator(long assetKey, boolean descending);
 
     /**
      * Обратная сортировка - для просмотра последних
