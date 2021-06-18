@@ -29,7 +29,7 @@ function exchange(data){
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.orders + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
-            + '&asset=' + item.want.key + get_lang() + '"><b>' + (item.last > 100? item.last.toPrecision(10) : item.last > 1? item.last.toPrecision(8) : item.last.toPrecision(6)) + '</b></a>';
+            + '&asset=' + item.want.key + get_lang() + '"><b>' + (item.last > 100? item.last.toPrecision(6) : item.last > 1? item.last.toPrecision(6) : item.last.toPrecision(6)) + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.volume24 + '</b></a>';
 
@@ -79,7 +79,7 @@ function exchange(data){
             else {
                 output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>';
             }
-            output += '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice.toPrecision(10)) + '</span>';
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice.toPrecision(6)) + '</span>';
 
         } else {
             output += '<td align=right>' + addCommas(trade.amountHave);
@@ -89,7 +89,7 @@ function exchange(data){
             else {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>';
             }
-            output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice.toPrecision(10)) + '</span>';
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice.toPrecision(6)) + '</span>';
 
         }
 

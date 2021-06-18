@@ -103,8 +103,8 @@ public class ChangeOrderTransaction extends Transaction {
 
         orderID = dcSet.getTransactionFinalMapSigns().get(orderRef);
 
-        // при откате может быть НУЛЬ
         order = dcSet.getOrderMap().get(orderID);
+        // подтянем в любом случае даже из Completed, а ниже проверку вставим на Активен?
         if (order == null) {
             // возможно для блокэксплорера нужно - если ордер уже сыграл
             // и для кошелька тоже надо
@@ -355,8 +355,15 @@ public class ChangeOrderTransaction extends Transaction {
             return VALIDATE_OK;
         }
 
-        if (orderID == 0L) {
+        if (orderID == 0L
+                // в SetDC он в любом случае подтянется - даже из Completed, поэтому тут проверку
+                || order == null) {
             return ORDER_DOES_NOT_EXIST;
+        }
+
+        // в SetDC он в любом случае подтянется - даже из Completed, поэтому тут проверку
+        if (!order.isActive()) {
+            return ORDER_ALREADY_COMPLETED;
         }
 
         if (!order.getCreator().equals(creator)) {
@@ -437,7 +444,7 @@ public class ChangeOrderTransaction extends Transaction {
                 orderID, // номер оригинала?
                 order.getHaveAssetKey(), order.getWantAssetKey(),
                 order.getAmountHave(), amountWant,
-                order.getHaveAssetScale(), order.getWantAssetScale(), 1);
+                order.getHaveAssetScale(), order.getWantAssetScale(), 0);
 
         // нужно запомнить чтобы при откате обновить назад цену
         dcSet.getTradeMap().put(trade);

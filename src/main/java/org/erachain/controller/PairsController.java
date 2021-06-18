@@ -151,8 +151,8 @@ public class PairsController {
         int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
 
         int count24 = 0;
-        BigDecimal minPrice = new BigDecimal(Long.MAX_VALUE);
-        BigDecimal maxPrice = new BigDecimal(Long.MIN_VALUE);
+        BigDecimal minPrice = null;
+        BigDecimal maxPrice = null;
         BigDecimal lastPrice = null;
         BigDecimal baseVolume = BigDecimal.ZERO;
         BigDecimal quoteVolume = BigDecimal.ZERO;
@@ -194,9 +194,9 @@ public class PairsController {
                         lastTime = trade.getTimestamp();
                     }
 
-                    if (minPrice.compareTo(price) > 0)
+                    if (minPrice == null || minPrice.compareTo(price) > 0)
                         minPrice = price;
-                    if (maxPrice.compareTo(price) < 0)
+                    if (maxPrice == null || maxPrice.compareTo(price) < 0)
                         maxPrice = price;
 
                     baseVolume = baseVolume.add(reversed ? trade.getAmountHave() : trade.getAmountWant());
