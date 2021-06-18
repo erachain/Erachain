@@ -167,13 +167,13 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         if (descending)
             return IteratorCloseableImpl.make(new IndexIterator(
                     this.assetKeySet.descendingSet().subSet(
-                            Fun.t2(assetKey, Long.MAX_VALUE),
-                            Fun.t2(assetKey, 0L)).iterator()));
+                            Fun.t2(assetKey, Fun.HI),
+                            Fun.t2(assetKey, null)).iterator()));
 
         return IteratorCloseableImpl.make(new IndexIterator(
                 this.assetKeySet.subSet(
-                        Fun.t2(assetKey, 0L),
-                        Fun.t2(assetKey, Long.MAX_VALUE)).iterator()));
+                        Fun.t2(assetKey, null),
+                        Fun.t2(assetKey, Fun.HI)).iterator()));
     }
 
     @Override
