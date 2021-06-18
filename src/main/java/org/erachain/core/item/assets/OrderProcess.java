@@ -533,6 +533,13 @@ public class OrderProcess {
 
     }
 
+    /**
+     * @param dcSet
+     * @param id
+     * @param block
+     * @param blockTime
+     * @return Заказ перед откатом - чтоббы знать сколько у нго было исполнения
+     */
     public static Order orphan(DCSet dcSet, Long id, Block block, long blockTime) {
 
         CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
@@ -544,6 +551,7 @@ public class OrderProcess {
         // - на всякий случай удалим его в любом случае
         //// тут нужно получить остатки все из текущего состояния иначе индексы по измененной цене с остатков не удалятся
         /// поэтому смотрим что есть в таблице и если есть то его грузим с ценой по остаткам той что в базе
+        // Этот ордер передадим на верх БЕЗ ИЗМЕНЕНИЯ ТУТ - для восстановления остатков
         Order orderThis = completedMap.remove(id);
         if (orderThis == null) {
             orderThis = ordersMap.remove(id);
@@ -565,10 +573,8 @@ public class OrderProcess {
         }
 
 
+        BigDecimal thisAmountFulfilledHave = BigDecimal.ZERO;
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
-
-        BigDecimal thisAmountHaveLeft = orderThis.getAmountHaveLeft();
-        BigDecimal thisAmountHaveLeftEnd = thisAmountHaveLeft; //this.getAmountHaveLeft();
 
         AssetCls assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
         AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
@@ -604,6 +610,8 @@ public class OrderProcess {
                         true
                 );
 
+                // REVERSE THIS ORDER
+                thisAmountFulfilledHave = thisAmountFulfilledHave.add(tradeAmountWant);
                 thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
                 if (height > BlockChain.VERS_5_3) {
@@ -635,17 +643,15 @@ public class OrderProcess {
                     }
                 }
 
-
             }
         } catch (IOException e) {
         }
 
-        // с ордера сколько было продано моего актива? на это число уменьшаем залог
-        thisAmountHaveLeftEnd = orderThis.getAmountHaveLeft().subtract(thisAmountHaveLeftEnd);
-        if (thisAmountHaveLeftEnd.signum() > 0) {
+        // с ордера сколько было продано моего актива? на это число увеличим залог - обратно его вернем
+        if (thisAmountFulfilledHave.signum() > 0) {
             // change PLEDGE
             creator.changeBalance(dcSet, false, true, haveAssetKey,
-                    thisAmountHaveLeftEnd, false, false, true);
+                    thisAmountFulfilledHave, false, false, true);
         }
 
         //REVERT WANT
