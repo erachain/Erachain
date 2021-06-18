@@ -92,6 +92,14 @@ public class APIExchange {
                 "get list of ALL orders (in CAP and completed) by address from OrderID. "
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
 
+
+        help.put("GET apiexchange/ordersbyasset/[key]?limit=[limit]",
+                "Get last active orders in orderbook for asset Key, "
+                        + "limit is count record. The number of orders is limited by input param, default 20.");
+        help.put("GET apiexchange/tradesbyasset/[key]?limit=[limit]",
+                "Get last trades in orderbook for asset Key, "
+                        + "limit is count record. The number of orders is limited by input param, default 20.");
+
         help.put("GET apiexchange/trades/[amountAssetKey]/[priceAssetKey]?timestamp=[timestamp]&limit=[limit]",
                 "Get trades from timestamp for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 200, default 50.");
@@ -536,9 +544,36 @@ public class APIExchange {
     }
 
     @GET
+    @Path("ordersbyasset/{key}")
+    public Response getOrdersByAssetFrom(@PathParam("key") Long assetKey,
+                                         @DefaultValue("20") @QueryParam("limit") Integer limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 200 || limit <= 0)
+                limit = 200;
+        }
+
+        OrderMap map = dcSet.getOrderMap();
+        Order order;
+        JSONArray out = new JSONArray();
+        try (IteratorCloseable<Long> iterator = map.iteratorByAssetKey(assetKey, true)) {
+            while (iterator.hasNext() && --limit > 0) {
+                order = map.get(iterator.next());
+                out.add(order.toJson());
+            }
+        } catch (IOException e) {
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
+    }
+
+    @GET
     @Path("tradesbyasset/{key}")
     public Response getTradesByAssetFrom(@PathParam("key") Long assetKey,
-                                         @DefaultValue("50") @QueryParam("limit") Integer limit) {
+                                         @DefaultValue("20") @QueryParam("limit") Integer limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
             if (limit > 200 || limit <= 0)
@@ -562,30 +597,4 @@ public class APIExchange {
                 .build();
     }
 
-    @GET
-    @Path("ordersbyasset/{key}")
-    public Response getOrdersByAssetFrom(@PathParam("key") Long assetKey,
-                                         @DefaultValue("50") @QueryParam("limit") Integer limit) {
-
-        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 200 || limit <= 0)
-                limit = 200;
-        }
-
-        OrderMap map = dcSet.getOrderMap();
-        Order order;
-        JSONArray out = new JSONArray();
-        try (IteratorCloseable<Long> iterator = map.iteratorByAssetKey(assetKey, true)) {
-            while (iterator.hasNext() && --limit > 0) {
-                order = map.get(iterator.next());
-                out.add(order.toJson());
-            }
-        } catch (IOException e) {
-        }
-
-        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toJSONString())
-                .build();
-    }
 }
