@@ -56,7 +56,7 @@ public class OrderProcess {
         // нужно так как при сдвиге цены Заказ может быть уже початый и тут на ОстатокЦены проверку делаем
         BigDecimal price = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? orderThis.calcLeftPrice() : orderThis.getPrice();
         BigDecimal thisPriceReverse = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? orderThis.calcLeftPriceReverse() : orderThis.calcPriceReverse();
-        BigDecimal thisPriceReverseShifted = thisPriceReverse.multiply(BlockChain.MAX_TRADE_DEVIATION);
+        BigDecimal thisPriceReverseShifted = thisPriceReverse.multiply(BlockChain.COMPARE_TRADE_DEVIATION);
 
         Account creator = orderThis.getCreator();
 
