@@ -18,9 +18,7 @@ import java.util.List;
 @Slf4j
 public class Order implements Comparable<Order> {
 
-    //private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
-
-    public static final int MAX_PRICE_ACCURACY = 6;
+    public static final int MAX_PRICE_ACCURACY = BlockChain.COMPARE_TRADE_DEVIATION.scale();
 
     public static final int ID_LENGTH = 8;
     private static final int CREATOR_LENGTH = 20; // as SHORT (old - 25)
