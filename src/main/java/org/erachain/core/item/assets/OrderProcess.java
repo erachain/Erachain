@@ -56,6 +56,7 @@ public class OrderProcess {
         // нужно так как при сдвиге цены Заказ может быть уже початый и тут на ОстатокЦены проверку делаем
         BigDecimal price = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? orderThis.calcLeftPrice() : orderThis.getPrice();
         BigDecimal thisPriceReverse = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? orderThis.calcLeftPriceReverse() : orderThis.calcPriceReverse();
+        BigDecimal thisPriceReverseShifted = thisPriceReverse.multiply(BlockChain.MAX_TRADE_DEVIATION);
 
         Account creator = orderThis.getCreator();
 
@@ -66,29 +67,10 @@ public class OrderProcess {
 
         boolean debug = false;
 
-        if (BlockChain.CHECK_BUGS > 1 &&
-                //creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-                //id.equals(Transaction.makeDBRef(12435, 1))
-                //c id == 1132136199356417L // 174358 ---- 	255979-3	255992-1
-                //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
-                //// 	255979-3	255992-1
-                //|| height == 255992
-                Transaction.viewDBRef(id).equals("40046-1")
-                || Transaction.viewDBRef(id).equals("255979-3")
-                || Transaction.viewDBRef(id).equals("262765-1")
-                || transaction.viewHeightSeq().equals("262722-1")
-            //id == 3644468729217028L
-
-
-            //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
-            //|| height == 253841 // сработал NEW_FLOR 2-й
-            //|| height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
-            //|| (haveAssetKey == 12L && wantAssetKey == 95L)
-            //|| (wantAssetKey == 95L && haveAssetKey == 12L)
-            //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
-            //Arrays.equals(Base58.decode("2GnkzTNDJtMgDHmKKxkZSQP95S7DesENCR2HRQFQHcspFCmPStz6yn4XEnpdW4BmSYW5dkML6xYZm1xv7JXfbfNz"), transaction.getSignature()
-            //id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
-            //&& !db.isFork()
+        if (BlockChain.CHECK_BUGS > 3
+            //&& creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+            //|| height == 255992
+            //Transaction.viewDBRef(id).equals("40046-1")
         ) {
             debug = true;
         }
@@ -99,70 +81,6 @@ public class OrderProcess {
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
         List<Order> orders = ordersMap.getOrdersForTradeWithFork(wantAssetKey, haveAssetKey, thisPriceReverse);
-
-        /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
-        if (false && id > BlockChain.LEFT_PRICE_HEIGHT_SEQ && (debug || BlockChain.CHECK_BUGS > 5) && !orders.isEmpty()) {
-            BigDecimal priceTst = orders.get(0).calcLeftPrice();
-            Long timestamp = orders.get(0).getId();
-            Long idTst = 0L;
-            for (Order item : orders) {
-                if (item.getId().equals(idTst)) {
-                    // RISE ERROR
-                    List<Order> orders_test = ordersMap.getOrdersForTradeWithFork(wantAssetKey, haveAssetKey, thisPriceReverse);
-                    timestamp = null;
-                    ++timestamp;
-                }
-                idTst = item.getId();
-
-                if (item.getHaveAssetKey() != wantAssetKey
-                        || item.getWantAssetKey() != haveAssetKey) {
-                    // RISE ERROR
-                    timestamp = null;
-                    ++timestamp;
-                }
-                // потому что сранивается потом обратная цена то тут должно быть возрастание
-                // и если не так то ошибка
-                int comp = priceTst.compareTo(item.calcLeftPrice());
-                if (comp > 0) {
-                    // RISE ERROR
-                    timestamp = null;
-                    ++timestamp;
-                } else if (comp == 0) {
-                    // здесь так же должно быть возрастание
-                    // если не так то ошибка
-                    if (timestamp.compareTo(item.getId()) > 0) {
-                        // RISE ERROR
-                        timestamp = null;
-                        ++timestamp;
-                    }
-                }
-
-                priceTst = item.calcLeftPrice();
-                timestamp = item.getId();
-            }
-
-            List<Order> ordersAll = ordersMap.getOrdersForTradeWithFork(wantAssetKey, haveAssetKey, null);
-            priceTst = orders.get(0).calcLeftPrice();
-            timestamp = orders.get(0).getId();
-            for (Order item : ordersAll) {
-                int comp = priceTst.compareTo(item.calcLeftPrice()); // по остаткам цены());
-                if (comp > 0) {
-                    // RISE ERROR
-                    timestamp = null;
-                    ++timestamp;
-                } else if (comp == 0) {
-                    // здесь так же должно быть возрастание
-                    // если не так то ошибка
-                    if (timestamp.compareTo(item.getId()) > 0) {
-                        // RISE ERROR
-                        timestamp = null;
-                        ++timestamp;
-                    }
-                }
-                priceTst = item.calcLeftPrice();
-                timestamp = item.getId();
-            }
-        }
 
         BigDecimal thisAmountHaveLeft = orderThis.getAmountHaveLeft();
         BigDecimal thisAmountHaveLeftStart = thisAmountHaveLeft;
@@ -194,11 +112,8 @@ public class OrderProcess {
             index++;
 
             String orderREF = Transaction.viewDBRef(order.getId());
-            if (debug ||
-                    orderREF.equals("40046-1")
-                    || orderREF.equals("255979-3")
-                    || orderREF.equals("262722-1")
-                //id == 1132136199356417L
+            if (debug
+                //|| orderREF.equals("40046-1")
             ) {
                 debug = true;
             }
@@ -223,7 +138,8 @@ public class OrderProcess {
             /////////////// - разность точности цены из-за того что у одного ордера значение больше на порядки и этот порядок в точность уходит
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
             //////// old compare = thisPrice.compareTo(orderReversePrice);
-            compare = orderPrice.compareTo(thisPriceReverse);
+            //compare = orderPrice.compareTo(thisPriceReverse);
+            compare = orderPrice.compareTo(thisPriceReverseShifted);
             if (compare > 0) {
                 // Делаем просто проверку на обратную цену и все - без игр с округлением и проверки дополнительной
                 // и сравним так же по прямой цене со сниженной точностью у Заказа
