@@ -444,17 +444,10 @@ public class OrderProcess {
             }
 
             //TRANSFER FUNDS
-            if (height > BlockChain.VERS_5_3) {
-                AssetCls.processTrade(dcSet, block, order.getCreator(),
-                        false, assetWant, assetHave,
-                        false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
+            AssetCls.processTrade(dcSet, block, order.getCreator(),
+                    false, assetWant, assetHave,
+                    false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
 
-            } else {
-                order.getCreator().changeBalance(dcSet, false, false, haveAssetKey,
-                        tradeAmountForWant, false, false, false);
-                transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
-                        "Trade Order @" + Transaction.viewDBRef(order.getId()));
-            }
 
             // Учтем что у стороны ордера обновилась форжинговая информация
             if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
@@ -511,16 +504,9 @@ public class OrderProcess {
 
         //TRANSFER FUNDS
         if (processedAmountFulfilledWant.signum() > 0) {
-            if (height > BlockChain.VERS_5_3) {
-                AssetCls.processTrade(dcSet, block, creator,
-                        true, assetHave, assetWant,
-                        false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
-            } else {
-                creator.changeBalance(dcSet, false, false, wantAssetKey,
-                        processedAmountFulfilledWant, false, false, false);
-                transaction.addCalculated(block, creator, wantAssetKey, processedAmountFulfilledWant,
-                        "Resolve Order @" + Transaction.viewDBRef(id));
-            }
+            AssetCls.processTrade(dcSet, block, creator,
+                    true, assetHave, assetWant,
+                    false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
         }
 
         // с ордера сколько было продано моего актива? на это число уменьшаем залог
@@ -633,17 +619,12 @@ public class OrderProcess {
                 // REVERSE THIS ORDER
                 thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
-                if (height > BlockChain.VERS_5_3) {
-                    AssetCls.processTrade(dcSet, block, target.getCreator(),
-                            false, assetWant, assetHave,
-                            true, tradeAmountWant,
-                            blockTime,
-                            0L);
-                } else {
+                AssetCls.processTrade(dcSet, block, target.getCreator(),
+                        false, assetWant, assetHave,
+                        true, tradeAmountWant,
+                        blockTime,
+                        0L);
 
-                    target.getCreator().changeBalance(dcSet, true, false, haveAssetKey,
-                            tradeAmountWant, false, false, false);
-                }
                 // Учтем что у стороны ордера обновилась форжинговая информация
                 if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
                     block.addForgingInfoUpdate(target.getCreator());
@@ -673,14 +654,9 @@ public class OrderProcess {
         }
 
         //REVERT WANT
-        if (height > BlockChain.VERS_5_3) {
-            AssetCls.processTrade(dcSet, block, creator,
-                    true, assetHave, assetWant,
-                    true, thisAmountFulfilledWant, blockTime, 0L);
-        } else {
-            creator.changeBalance(dcSet, true, false, wantAssetKey,
-                    thisAmountFulfilledWant, false, false, false);
-        }
+        AssetCls.processTrade(dcSet, block, creator,
+                true, assetHave, assetWant,
+                true, thisAmountFulfilledWant, blockTime, 0L);
 
         return orderThis;
     }
