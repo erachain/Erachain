@@ -292,8 +292,7 @@ public class Order implements Comparable<Order> {
             return BigDecimal.ONE.negate();
 
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
-        //int scalePrice = calcPriceScale(amountHave, wantScale, 3);
-        int scalePrice = calcPriceScale(amountHave, wantScale, MAX_PRICE_ACCURACY);
+        int scalePrice = calcPriceScale(amountHave, wantScale, 3);
 
         BigDecimal result = amountWant.divide(amountHave, scalePrice, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros();
 
@@ -302,10 +301,11 @@ public class Order implements Comparable<Order> {
         if (scale < 0)
             return result.setScale(0);
         else if (scale > 0) {
-            int accuracy = powerTen(result) + scale + 1;
+            int power10 = powerTen(result);
+            int accuracy = power10 + scale;
             if (accuracy > MAX_PRICE_ACCURACY) {
                 // обрежем точность цены чтобы на бирже лишней точности не было
-                scale -= accuracy - MAX_PRICE_ACCURACY;
+                scale = MAX_PRICE_ACCURACY - power10;
                 result = result.setScale(scale, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros();
                 scale = result.scale();
                 // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
