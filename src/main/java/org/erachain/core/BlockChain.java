@@ -342,7 +342,7 @@ public class BlockChain {
     final public static BigDecimal MAX_TRADE_DEVIATION_HI = new BigDecimal("0.005");
     final public static BigDecimal MAX_ORDER_DEVIATION = new BigDecimal("0.002");
     final public static BigDecimal MAX_ORDER_DEVIATION_LOW = new BigDecimal("0.0005");
-    final public static BigDecimal COMPARE_TRADE_DEVIATION = new BigDecimal("1.00001");
+    final public static BigDecimal COMPARE_TRADE_DEVIATION = new BigDecimal("1.000001");
 
 
     public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : !MAIN_MODE ? 0 : VERS_4_11;
