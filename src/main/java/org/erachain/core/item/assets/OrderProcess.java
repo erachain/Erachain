@@ -533,20 +533,39 @@ public class OrderProcess {
 
     }
 
+    /**
+     * @param dcSet
+     * @param id
+     * @param block
+     * @param blockTime
+     * @return Заказ перед откатом - чтоббы знать сколько у нго было исполнения
+     */
     public static Order orphan(DCSet dcSet, Long id, Block block, long blockTime) {
 
         CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
         OrderMap ordersMap = dcSet.getOrderMap();
         TradeMap tradesMap = dcSet.getTradeMap();
 
-
         //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled
         // - на всякий случай удалим его в любом случае
         //// тут нужно получить остатки все из текущего состояния иначе индексы по измененной цене с остатков не удалятся
         /// поэтому смотрим что есть в таблице и если есть то его грузим с ценой по остаткам той что в базе
-        Order orderThis = completedMap.remove(id);
-        if (orderThis == null) {
+        // Этот ордер передадим на верх БЕЗ ИЗМЕНЕНИЯ ТУТ - для восстановления остатков
+        Order orderThis;
+        // сначала с малой базе быстрый поиск
+        if (ordersMap.contains(id)) {
             orderThis = ordersMap.remove(id);
+        } else {
+            orderThis = completedMap.remove(id);
+            if (orderThis.isCanceled()
+                    // возможно СТАТУС станет в будущем как Закрыт а не Отменен, тогда эта проверка сработает:
+                    || orderThis.getAmountHaveLeft().signum() > 0) {
+                // это значит что ордер был автоматически закрыт by Unresolved / outPrice
+                // назад вернем этот остаток
+                orderThis.getCreator().changeBalance(dcSet, true, false, orderThis.getHaveAssetKey(),
+                        orderThis.getAmountHaveLeft(), false, false,
+                        true, Account.BALANCE_POS_PLEDGE);
+            }
         }
 
         long haveAssetKey = orderThis.getHaveAssetKey();
@@ -567,34 +586,41 @@ public class OrderProcess {
 
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
 
-        BigDecimal thisAmountHaveLeft = orderThis.getAmountHaveLeft();
-        BigDecimal thisAmountHaveLeftEnd = thisAmountHaveLeft; //this.getAmountHaveLeft();
-
         AssetCls assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
         AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
 
         //ORPHAN TRADES
-        Trade trade;
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(id)) {
             while (iterator.hasNext()) {
 
-                trade = tradesMap.get(iterator.next());
+                final Trade trade = tradesMap.get(iterator.next());
                 if (!trade.isTrade()) {
                     continue;
                 }
-                Order target = trade.getTargetOrder(dcSet);
+                Order target;
+                // сначала с малой базе быстрый поиск
+                if (ordersMap.contains(trade.getTarget())) {
+                    //// Пока не изменились Остатки и цена по Остатки не съехала, удалим из таблицы ордеров
+                    /// иначе вторичный ключ останется так как он не будет найден из-за измененной "цены по остаткам"
+                    target = ordersMap.remove(trade.getTarget());
+                } else {
+                    //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
+                    // - на всякий случай удалим его в любом случае
+                    target = completedMap.remove(trade.getTarget());
+                    if (target.isCanceled()
+                            // возможно СТАТУС станет в будущем как Закрыт а не Отменен, тогда эта проверка сработает:
+                            || target.getAmountHaveLeft().signum() > 0) {
+                        // это значит что ордер быо автоматически закрыт by Unresolved / outPrice
+                        // назад вернем
+                        target.getCreator().changeBalance(dcSet, true, false, wantAssetKey,
+                                target.getAmountHaveLeft(), false, false,
+                                true, Account.BALANCE_POS_PLEDGE);
+                    }
+                }
 
                 //REVERSE FUNDS
                 BigDecimal tradeAmountHave = trade.getAmountHave();
                 BigDecimal tradeAmountWant = trade.getAmountWant();
-
-                //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
-                // - на всякий случай удалим его в любом случае
-                completedMap.delete(target);
-
-                //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
-                /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
-                ordersMap.delete(target);
 
                 //REVERSE FULFILLED
                 target.fulfill(tradeAmountHave.negate());
@@ -604,6 +630,7 @@ public class OrderProcess {
                         true
                 );
 
+                // REVERSE THIS ORDER
                 thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
                 if (height > BlockChain.VERS_5_3) {
@@ -635,17 +662,14 @@ public class OrderProcess {
                     }
                 }
 
-
             }
         } catch (IOException e) {
         }
 
-        // с ордера сколько было продано моего актива? на это число уменьшаем залог
-        thisAmountHaveLeftEnd = orderThis.getAmountHaveLeft().subtract(thisAmountHaveLeftEnd);
-        if (thisAmountHaveLeftEnd.signum() > 0) {
+        if (orderThis.getFulfilledHave().signum() > 0) {
             // change PLEDGE
             creator.changeBalance(dcSet, false, true, haveAssetKey,
-                    thisAmountHaveLeftEnd, false, false, true);
+                    orderThis.getFulfilledHave(), false, false, true);
         }
 
         //REVERT WANT

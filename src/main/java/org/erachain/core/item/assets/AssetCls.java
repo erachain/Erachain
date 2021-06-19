@@ -333,9 +333,6 @@ public abstract class AssetCls extends ItemCls {
             dexAwards = new ExLinkAddress[dexAwardsLen];
             for (int i = 0; i < dexAwardsLen; i++) {
 
-                dexAwards[i] = new ExLinkAddress(appData, pos);
-                pos += dexAwards[i].length();
-
                 if (pos >= appData.length) {
                     // старая версия с 255 числом
                     ExLinkAddress[] dexAwardsTMP = new ExLinkAddress[dexAwardsLen - 1];
@@ -345,6 +342,10 @@ public abstract class AssetCls extends ItemCls {
                     dexAwards = dexAwardsTMP;
                     break;
                 }
+
+                dexAwards[i] = new ExLinkAddress(appData, pos);
+                pos += dexAwards[i].length();
+
 
             }
         }

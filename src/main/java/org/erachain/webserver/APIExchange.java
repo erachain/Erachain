@@ -18,9 +18,13 @@ import org.erachain.core.web.ServletUtils;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
+import org.erachain.datachain.OrderMap;
+import org.erachain.datachain.TradeMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -28,6 +32,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +91,14 @@ public class APIExchange {
         help.put("GET apiexchange/allordersbyaddress/{address}?from={SeqNo}&limit=[20]&desc={false}",
                 "get list of ALL orders (in CAP and completed) by address from OrderID. "
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+
+
+        help.put("GET apiexchange/ordersbyasset/[key]?limit=[limit]",
+                "Get last active orders in orderbook for asset Key, "
+                        + "limit is count record. The number of orders is limited by input param, default 20.");
+        help.put("GET apiexchange/tradesbyasset/[key]?limit=[limit]",
+                "Get last trades in orderbook for asset Key, "
+                        + "limit is count record. The number of orders is limited by input param, default 20.");
 
         help.put("GET apiexchange/trades/[amountAssetKey]/[priceAssetKey]?timestamp=[timestamp]&limit=[limit]",
                 "Get trades from timestamp for amountAssetKey & priceAssetKey, "
@@ -527,6 +540,60 @@ public class APIExchange {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(arrayJSON.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("ordersbyasset/{key}")
+    public Response getOrdersByAssetFrom(@PathParam("key") Long assetKey,
+                                         @DefaultValue("20") @QueryParam("limit") Integer limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 200 || limit <= 0)
+                limit = 200;
+        }
+
+        OrderMap map = dcSet.getOrderMap();
+        Order order;
+        JSONArray out = new JSONArray();
+        try (IteratorCloseable<Long> iterator = map.iteratorByAssetKey(assetKey, true)) {
+            while (iterator.hasNext() && --limit > 0) {
+                order = map.get(iterator.next());
+                out.add(order.toJson());
+            }
+        } catch (IOException e) {
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("tradesbyasset/{key}")
+    public Response getTradesByAssetFrom(@PathParam("key") Long assetKey,
+                                         @DefaultValue("20") @QueryParam("limit") Integer limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 200 || limit <= 0)
+                limit = 200;
+        }
+
+        TradeMapImpl map = dcSet.getTradeMap();
+        Trade trade;
+        JSONArray out = new JSONArray();
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = map.iteratorByAssetKey(assetKey, true)) {
+            while (iterator.hasNext() && --limit > 0) {
+                trade = map.get(iterator.next());
+                out.add(trade.toJson(assetKey, true));
+            }
+        } catch (IOException e) {
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
                 .build();
     }
 

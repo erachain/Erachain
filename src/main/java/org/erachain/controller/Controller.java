@@ -40,7 +40,10 @@ import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DLSet;
-import org.erachain.datachain.*;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemMap;
+import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
@@ -97,7 +100,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.3.03";
+    public static String version = "5.3.03 dev 01";
     public static String buildTime = "2021-05-05 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -110,10 +113,7 @@ public class Controller extends Observable {
     public final static long MIN_MEMORY_TAIL = 64 * (1 << 20); // Машина Явы вылетает если меньше 50 МБ
 
     public static final Integer MUTE_PEER_COUNT = 6;
-    // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
-    // code!
-    // for reset DB if DB PROTOCOL is CHANGED
-    public static final String releaseVersion = "3.02.02";
+
     // TODO ENUM would be better here
     public static final int STATUS_NO_CONNECTIONS = 0;
     public static final int STATUS_SYNCHRONIZING = 1;
@@ -1015,37 +1015,6 @@ public class Controller extends Observable {
             }
         }
 
-    }
-
-    /**
-     * я так понял - это отслеживание версии базы данных - и если она новая то все удаляем и заново закачиваем
-     *
-     * @throws IOException
-     * @throws Exception
-     */
-    public void startFromScratchOnDemand() throws IOException, Exception {
-        String dataVersion = this.dcSet.getLocalDataMap().get(LocalDataMap.LOCAL_DATA_VERSION_KEY);
-
-        if (dataVersion == null || !dataVersion.equals(releaseVersion)) {
-            File dataDir = new File(Settings.getInstance().getDataChainPath());
-            File dataBak = getDataBakDir(dataDir);
-            this.dcSet.close();
-
-            if (dataDir.exists()) {
-                // delete data folder
-                java.nio.file.Files.walkFileTree(dataDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-
-            }
-
-            if (dataBak.exists()) {
-                // delete data folder
-                java.nio.file.Files.walkFileTree(dataBak.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-            }
-            DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
-
-            this.dcSet.getLocalDataMap().put(LocalDataMap.LOCAL_DATA_VERSION_KEY, Controller.releaseVersion);
-
-        }
     }
 
     private File getDataBakDir(File dataDir) {

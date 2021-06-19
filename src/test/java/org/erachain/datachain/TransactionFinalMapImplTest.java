@@ -174,7 +174,7 @@ public class TransactionFinalMapImplTest {
 
                 //Set<BlExpUnit> iteratorA = dcSet.getTransactionFinalCalculatedMap().getBlExpCalculatedsByAddress(accountA.getAddress());
 
-                List<Trade> iteratorT = dcSet.getTradeMap().getTrades(1L, useCancel);
+                List<Trade> iteratorT = dcSet.getTradeMap().iteratorByAssetKey(1L, descending);
 
                 //Iterator iteratorU = dcSet.getTransactionTab().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, desc, type, service, offset);
 

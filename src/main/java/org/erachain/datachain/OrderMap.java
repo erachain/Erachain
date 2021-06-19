@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.core.item.assets.Order;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -16,6 +17,8 @@ public interface OrderMap extends DBTab<Long, Order> {
     int getCount(long have, long want, int limit);
 
     int getCountHave(long have, int limit);
+
+    IteratorCloseable<Long> iteratorByAssetKey(long haveWant, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     int getCountWant(long want, int limit);

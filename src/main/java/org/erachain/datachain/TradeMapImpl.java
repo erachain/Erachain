@@ -1,6 +1,5 @@
 package org.erachain.datachain;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
@@ -16,7 +15,6 @@ import org.erachain.dbs.mapDB.TradeSuitMapDBFork;
 import org.erachain.dbs.rocksDB.TradeSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.io.IOException;
@@ -167,41 +165,18 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTrades(long haveWant, boolean useCancel)
-    // get trades for order as HAVE and as WANT
-    {
-
-        List<Trade> trades = new ArrayList<Trade>();
+    public IteratorCloseable<Tuple2<Long, Long>> iteratorByAssetKey(long assetKey, boolean descending) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
-            return trades;
+            return null;
         }
 
-        // обрамим для закрытия эти 2 итератора, а слитый Итератор не нужно тогда закрывать
-        try (IteratorCloseable<Tuple2<Long, Long>> iteratorHave = ((TradeSuit) this.map).getHaveIterator(haveWant)) {
-            try (IteratorCloseable<Tuple2<Long, Long>> iteratorWant = ((TradeSuit) this.map).getWantIterator(haveWant)) {
+        return ((TradeSuit) this.map).getIteratorByAssetKey(assetKey, descending);
 
-                // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
-                // но тут поидее не должно быть дублей по определению
-                /// тут нет дублей в любом случае iterator = new MergedOR_IteratorsNoDuplicates(ImmutableList.of(iterator, ((TradeSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
-                /// поэтому берем Гуглевский вариант
-                Iterator<Tuple2<Long, Long>> iteratorMerged = Iterators.mergeSorted(ImmutableList.of(iteratorHave, iteratorWant), Fun.COMPARATOR);
-
-                //GET ALL ORDERS FOR KEYS
-                while (iteratorMerged.hasNext()) {
-                    trades.add(this.get(iteratorMerged.next()));
-                }
-            } catch (IOException e) {
-            }
-        } catch (IOException e) {
-        }
-
-        //RETURN
-        return trades;
     }
 
     @Override
-    public List<Trade> getTrades(long have, long want, Object fromKey, int limit, boolean useCancel, boolean useChange) {
+    public List<Trade> getTradesByPair(long have, long want, Object fromKey, int limit, boolean useCancel, boolean useChange) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
