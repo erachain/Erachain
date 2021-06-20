@@ -133,12 +133,27 @@ public class OrderTest {
 
     }
 
+    @Test
+    public void powerTen() {
+        assertEquals(Order.powerTen(new BigDecimal(0)), 0);
+        assertEquals(Order.powerTen(new BigDecimal(500)), 2);
+        assertEquals(Order.powerTen(new BigDecimal(100)), 2);
+        assertEquals(Order.powerTen(new BigDecimal(50)), 1);
+        assertEquals(Order.powerTen(new BigDecimal(10)), 1);
+        assertEquals(Order.powerTen(new BigDecimal(5)), 0);
+        assertEquals(Order.powerTen(new BigDecimal(1)), 0);
+        assertEquals(Order.powerTen(new BigDecimal(0.5)), -1);
+        assertEquals(Order.powerTen(new BigDecimal(0.1)), -1);
+        assertEquals(Order.powerTen(new BigDecimal(0.05)), -2);
+        assertEquals(Order.powerTen(new BigDecimal(0.01)), -2);
+
+    }
+
     /**
      * Ситуация следующая - есть список ордеров которые подходят для текущего и один из них не поностью исполняется
-     *  - он переписывается в форкнутую базу
-     *  Затем второй ордер к этому списку обрабатывается. And в списке полявляется двойная запись
-     *  ранее покусанного ордера и его родитель из родительской таблицы. Надо сэмулировать такой случай и проверять тут
-     *
+     * - он переписывается в форкнутую базу
+     * Затем второй ордер к этому списку обрабатывается. And в списке появляется двойная запись
+     * ранее покусанного ордера и его родитель из родительской таблицы. Надо съэмулировать такой случай и проверять тут
      */
     @Test
     public void processDoubleInFork() {
@@ -494,6 +509,7 @@ public class OrderTest {
     @Test
     public void orphan() {
     }
+
 
 
 }

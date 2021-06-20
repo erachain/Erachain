@@ -4,7 +4,6 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
@@ -70,7 +69,7 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
 
                                 // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
                                 // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
-                                key > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice(),
+                                order.calcLeftPrice(),
                                 //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
 
                                 order.getId());

@@ -824,7 +824,7 @@ public class ExPays {
         // подсчитаем более точно сумму к выплате - по коэффициентам она округлится
         totalPay = BigDecimal.ZERO;
         BigDecimal coefficient = payMethodValue.divide(totalBalances,
-                scale + Order.powerTen(totalBalances) + 3, RoundingMode.HALF_DOWN);
+                Order.calcPriceScale(totalBalances, scale, 3), RoundingMode.HALF_DOWN);
         Fun.Tuple4 item;
         BigDecimal accrual;
         maxBal = BigDecimal.ZERO;

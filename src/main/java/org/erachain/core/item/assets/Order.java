@@ -18,9 +18,7 @@ import java.util.List;
 @Slf4j
 public class Order implements Comparable<Order> {
 
-    //private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
-
-    public static final int MAX_PRICE_ACCURACY = 6;
+    public static final int MAX_PRICE_ACCURACY = BlockChain.COMPARE_TRADE_DEVIATION.scale();
 
     public static final int ID_LENGTH = 8;
     private static final int CREATOR_LENGTH = 20; // as SHORT (old - 25)
@@ -169,21 +167,22 @@ public class Order implements Comparable<Order> {
      */
     public static int powerTen(BigDecimal value) {
 
+        if (value.signum() == 0)
+            return 0;
+
         int i = 0;
 
         BigDecimal t = value.abs();
-        if (t.compareTo(BigDecimal.ONE) == 0)
-            return 0;
-        else if (t.compareTo(BigDecimal.ONE) > 0) {
-            while (t.compareTo(BigDecimal.ONE) > 0) {
+        if (t.compareTo(BigDecimal.TEN) >= 0) {
+            do {
                 t = t.movePointLeft(1);
                 i++;
-            }
-            return i;
-        }
-        while (t.compareTo(BigDecimal.ONE) < 0) {
-            t = t.movePointRight(1);
-            i--;
+            } while (t.compareTo(BigDecimal.TEN) >= 0);
+        } else if (t.compareTo(BigDecimal.ONE) < 0) {
+            do {
+                t = t.movePointRight(1);
+                i--;
+            } while (t.compareTo(BigDecimal.ONE) < 0);
         }
         return i;
     }
@@ -294,27 +293,17 @@ public class Order implements Comparable<Order> {
             return BigDecimal.ONE.negate();
 
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
-        //int scalePrice = calcPriceScale(amountHave, wantScale, 3);
-        int scalePrice = calcPriceScale(amountHave, wantScale, MAX_PRICE_ACCURACY);
+        int priceScale = powerTen(amountHave) - powerTen(amountWant) + MAX_PRICE_ACCURACY;
 
-        BigDecimal result = amountWant.divide(amountHave, scalePrice, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros();
+        if (priceScale < 0)
+            priceScale = 0;
 
-        // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
-        int scale = result.scale();
-        if (scale < 0)
-            return result.setScale(0);
-        else if (scale > 0) {
-            int accuracy = powerTen(result) + scale + 1;
-            if (accuracy > MAX_PRICE_ACCURACY) {
-                // обрежем точность цены чтобы на бирже лишней точности не было
-                scale -= accuracy - MAX_PRICE_ACCURACY;
-                result = result.setScale(scale, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros();
-                scale = result.scale();
-                // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
-                if (scale < 0)
-                    return result.setScale(0);
-            }
-        }
+        BigDecimal result = amountWant.divide(amountHave, priceScale, BigDecimal.ROUND_HALF_DOWN);
+        priceScale = MAX_PRICE_ACCURACY - powerTen(result) - 1;
+        if (priceScale < 0)
+            priceScale = 0;
+        result = result.setScale(priceScale, BigDecimal.ROUND_HALF_DOWN);
+
         return result;
     }
 
@@ -331,7 +320,11 @@ public class Order implements Comparable<Order> {
         if (getAmountHaveLeft().signum() == 0)
             return price;
 
-        return calcPrice(getAmountHaveLeft(), getAmountWantLeft(), wantAssetScale);
+        BigDecimal wantLeft = getAmountWantLeft();
+        if (wantLeft.signum() == 0)
+            return BigDecimal.ZERO;
+
+        return calcPrice(getAmountHaveLeft(), wantLeft, wantAssetScale);
     }
 
     /**
