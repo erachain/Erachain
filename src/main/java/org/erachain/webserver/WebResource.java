@@ -14,7 +14,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.blockexplorer.WrongSearchException;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Base64;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.payment.Payment;
@@ -614,7 +613,7 @@ public class WebResource {
         try {
             InputStream valueAs = is.getValueAs(InputStream.class);
             byte[] byteArray = IOUtils.toByteArray(valueAs);
-            String encode = Base64.encode(byteArray);
+            String encode = Base64.getEncoder().encodeToString(byteArray);
             MediaType mediaType = is.getMediaType();
             String result = "data:" + mediaType.getType() + "/"
                     + mediaType.getSubtype() + ";base64, ";
@@ -3547,7 +3546,7 @@ public class WebResource {
 
                 String type = evaluate.replaceAll(pictureRegex, "$1");
                 String subtype = evaluate.replaceAll(pictureRegex, "$2");
-                byte[] dataOfImage = Base64.decode(evaluate.replaceAll(
+                byte[] dataOfImage = Base64.getDecoder().decode(evaluate.replaceAll(
                         pictureRegex, "$3"));
                 Response build = Response
                         .ok(dataOfImage,
