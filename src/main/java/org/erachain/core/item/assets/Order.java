@@ -167,6 +167,9 @@ public class Order implements Comparable<Order> {
      */
     public static int powerTen(BigDecimal value) {
 
+        if (value.signum() == 0)
+            return 0;
+
         int i = 0;
 
         BigDecimal t = value.abs();
@@ -317,7 +320,11 @@ public class Order implements Comparable<Order> {
         if (getAmountHaveLeft().signum() == 0)
             return price;
 
-        return calcPrice(getAmountHaveLeft(), getAmountWantLeft(), wantAssetScale);
+        BigDecimal wantLeft = getAmountWantLeft();
+        if (wantLeft.signum() == 0)
+            return BigDecimal.ZERO;
+
+        return calcPrice(getAmountHaveLeft(), wantLeft, wantAssetScale);
     }
 
     /**
