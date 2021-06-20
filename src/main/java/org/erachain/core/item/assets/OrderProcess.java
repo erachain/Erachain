@@ -52,10 +52,10 @@ public class OrderProcess {
 
         long id = orderThis.getId();
         // GET HEIGHT from ID
-        int height = (int) (id >> 32);
+        //int height = (int) (id >> 32);
         // нужно так как при сдвиге цены Заказ может быть уже початый и тут на ОстатокЦены проверку делаем
-        BigDecimal price = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? orderThis.calcLeftPrice() : orderThis.getPrice();
-        BigDecimal thisPriceReverse = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? orderThis.calcLeftPriceReverse() : orderThis.calcPriceReverse();
+        BigDecimal price = orderThis.calcLeftPrice();
+        BigDecimal thisPriceReverse = orderThis.calcLeftPriceReverse();
         BigDecimal thisPriceReverseShifted = thisPriceReverse.multiply(BlockChain.COMPARE_TRADE_DEVIATION);
 
         Account creator = orderThis.getCreator();
@@ -123,10 +123,10 @@ public class OrderProcess {
 
             // REVERSE
             ////////// по остаткам цену берем!
-            BigDecimal orderReversePrice = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPriceReverse() : order.calcPriceReverse();
+            BigDecimal orderReversePrice = order.calcLeftPriceReverse();
             // PRICE
             ////////// по остаткам цену берем!
-            BigDecimal orderPrice = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice();
+            BigDecimal orderPrice = order.calcLeftPrice();
 
             Trade trade;
             BigDecimal tradeAmountForHave;
