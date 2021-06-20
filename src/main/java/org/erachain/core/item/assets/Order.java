@@ -170,18 +170,16 @@ public class Order implements Comparable<Order> {
         int i = 0;
 
         BigDecimal t = value.abs();
-        if (t.compareTo(BigDecimal.ONE) == 0)
-            return 0;
-        else if (t.compareTo(BigDecimal.ONE) > 0) {
-            while (t.compareTo(BigDecimal.ONE) > 0) {
+        if (t.compareTo(BigDecimal.TEN) >= 0) {
+            do {
                 t = t.movePointLeft(1);
                 i++;
-            }
-            return i;
-        }
-        while (t.compareTo(BigDecimal.ONE) < 0) {
-            t = t.movePointRight(1);
-            i--;
+            } while (t.compareTo(BigDecimal.TEN) >= 0);
+        } else if (t.compareTo(BigDecimal.ONE) < 0) {
+            do {
+                t = t.movePointRight(1);
+                i--;
+            } while (t.compareTo(BigDecimal.ONE) < 0);
         }
         return i;
     }
@@ -292,27 +290,17 @@ public class Order implements Comparable<Order> {
             return BigDecimal.ONE.negate();
 
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
-        int scalePrice = calcPriceScale(amountHave, wantScale, 3);
+        int priceScale = powerTen(amountHave) - powerTen(amountWant) + MAX_PRICE_ACCURACY;
 
-        BigDecimal result = amountWant.divide(amountHave, scalePrice, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros();
+        if (priceScale < 0)
+            priceScale = 0;
 
-        // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
-        int scale = result.scale();
-        if (scale < 0)
-            return result.setScale(0);
-        else if (scale > 0) {
-            int power10 = powerTen(result);
-            int accuracy = power10 + scale;
-            if (accuracy > MAX_PRICE_ACCURACY) {
-                // обрежем точность цены чтобы на бирже лишней точности не было
-                scale = MAX_PRICE_ACCURACY - power10;
-                result = result.setScale(scale, BigDecimal.ROUND_HALF_DOWN).stripTrailingZeros();
-                scale = result.scale();
-                // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
-                if (scale < 0)
-                    return result.setScale(0);
-            }
-        }
+        BigDecimal result = amountWant.divide(amountHave, priceScale, BigDecimal.ROUND_HALF_DOWN);
+        priceScale = MAX_PRICE_ACCURACY - powerTen(result) - 1;
+        if (priceScale < 0)
+            priceScale = 0;
+        result = result.setScale(priceScale, BigDecimal.ROUND_HALF_DOWN);
+
         return result;
     }
 
