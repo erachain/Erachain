@@ -302,9 +302,8 @@ public class Order implements Comparable<Order> {
         priceScale = MAX_PRICE_ACCURACY - powerTen(result) - 1;
         if (priceScale < 0)
             priceScale = 0;
-        result = result.setScale(priceScale, BigDecimal.ROUND_HALF_DOWN);
+        return result.setScale(priceScale, BigDecimal.ROUND_HALF_DOWN);
 
-        return result;
     }
 
     public BigDecimal calcPrice() {
