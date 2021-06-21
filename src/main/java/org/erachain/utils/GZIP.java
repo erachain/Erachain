@@ -1,17 +1,15 @@
 package org.erachain.utils;
 
-import org.erachain.core.crypto.Base64;
-import org.erachain.gui.*;
 import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.erachain.gui.models.KeyValueTableModel;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -75,7 +73,7 @@ public class GZIP {
         if (value.startsWith("?gz!")) {
             value = value.substring(4, value.length());
 
-            byte[] compressed = Base64.decode(value);
+            byte[] compressed = Base64.getDecoder().decode(value);
 
             try {
                 value = GZIPdecompress(compressed);
@@ -90,7 +88,7 @@ public class GZIP {
         if (text.startsWith("?gz!")) {
             text = text.substring(4, text.length());
 
-            byte[] compressed = Base64.decode(text);
+            byte[] compressed = Base64.getDecoder().decode(text);
             try {
                 text = GZIPdecompress(compressed);
             } catch (Exception e) {
@@ -109,7 +107,7 @@ public class GZIP {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
-        return "?gz!" + Base64.encode(compressed);
+        return "?gz!" + Base64.getEncoder().encodeToString(compressed);
     }
 
     public static String compressOnDemand(String text) {
@@ -119,7 +117,7 @@ public class GZIP {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
-        String compressedVariant = "?gz!" + Base64.encode(compressed);
+        String compressedVariant = "?gz!" + Base64.getEncoder().encode(compressed);
 
         if (compressedVariant.length() >= text.length()) {
             compressedVariant = text;

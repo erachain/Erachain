@@ -8,11 +8,11 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IDB;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
@@ -174,7 +174,7 @@ public class TransactionFinalMapImplTest {
 
                 //Set<BlExpUnit> iteratorA = dcSet.getTransactionFinalCalculatedMap().getBlExpCalculatedsByAddress(accountA.getAddress());
 
-                List<Trade> iteratorT = dcSet.getTradeMap().iteratorByAssetKey(1L, descending);
+                IteratorCloseable<Fun.Tuple2<Long, Long>> iteratorT = dcSet.getTradeMap().iteratorByAssetKey(1L, true);
 
                 //Iterator iteratorU = dcSet.getTransactionTab().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, desc, type, service, offset);
 

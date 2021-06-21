@@ -4,7 +4,6 @@ import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Arrays;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.OrderSuit;
@@ -75,7 +74,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                                 // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
                                 //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
                                 // и включим это после переключения
-                                bgToBytes.toBytes(aLong > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice()),
+                                bgToBytes.toBytes(order.calcLeftPrice()),
                                 /////bgToBytes.toBytes(order.getPrice()),
                                 //bgToBytes.toBytes(Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0)),
 
