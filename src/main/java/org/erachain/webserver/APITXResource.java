@@ -46,6 +46,8 @@ public class APITXResource {
                 "GET transaction by Height and Sequence (SeqNo)");
         help.put("api/tx/signature/{height-sequence}",
                 "GET transaction Signature by Height and Sequence (SeqNo)");
+        help.put("api/tx/raw/{height-sequence or signature}",
+                "GET transaction RAW (Base64) by Height and Sequence (SeqNo) or signature (Base58)");
         help.put("api/tx/signs/{height-sequence}",
                 "GET Signs of transaction by Height and Sequence");
         help.put("api/tx/vouches/{height-sequence}",
@@ -216,6 +218,19 @@ public class APITXResource {
                     .entity(out.toJSONString())
                     .build();
         }
+    }
+
+    @GET
+    @Path("raw/{number}")
+    public Response raw(@PathParam("number") String numberStr) {
+
+        Transaction tx = DCSet.getInstance().getTransactionFinalMap().getRecord(numberStr);
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(Base64.getEncoder().encodeToString(tx.toBytes(Transaction.FOR_NETWORK, true)))
+                .build();
     }
 
     @GET

@@ -98,11 +98,6 @@ public class API {
         help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}?onlyhead&desc={false}");
         help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");
 
-        help.put("*** RECORD ***", "");
-        help.put("GET Record RAW", "recordraw/{signature}");
-        help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{block-seqNo]");
-        help.put("GET Record RAW by Height and Sequence 2", "recordrawbynumber/{block]/[seqNo]");
-
         help.put("*** ADDRESS ***", "");
         help.put("GET Address Validate", "addressvalidate/{address}");
         help.put("GET Address Last Reference", "addresslastreference/{address}");
@@ -759,6 +754,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("recordraw/{signature}")
     public Response recordRaw(@PathParam("signature") String signature) {
@@ -803,6 +799,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("recordrawbynumber/{number}")
     public Response recodRawByNumber(@PathParam("number") String numberStr) {
@@ -833,7 +830,6 @@ public class API {
                 out.put("message", e.getMessage());
         }
 
-
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -841,6 +837,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("recordrawbynumber/{block}/{seqNo}")
     public Response recodRawBySeqNo(@PathParam("block") int block, @PathParam("seqNo") int seqNo) {

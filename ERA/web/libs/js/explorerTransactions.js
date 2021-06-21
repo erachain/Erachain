@@ -43,7 +43,7 @@ function tx(data) {
         output += tx.links + '<br>';
     }
 
-    output += '<br><a href ="/api/recordrawbynumber/' + data.heightSeqNo + '"> RAW </a>';
+    output += '<br><a href ="/api/tx/raw/' + data.heightSeqNo + '">{ RAW }</a>';
 
     //	output += data.Json ;
 
