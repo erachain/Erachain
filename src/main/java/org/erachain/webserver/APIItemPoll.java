@@ -2,7 +2,6 @@ package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -17,6 +16,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class APIItemPoll {
 
         help.put("GET apipoll/last", "Get last ID");
         help.put("GET apipoll/{key}", "GET by ID");
-        help.put("GET apipoll/raw/{key}", "Returns RAW in Base58 of poll with the given key.");
+        help.put("GET apipoll/raw/{key}", "Returns RAW in Base64 of poll with the given key.");
         help.put("GET apipoll/find?filter={name_string}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use patterns from 5 chars in words. Default {descending} - true");
         help.put("Get apipoll/image/{key}", "GET Poll Image");
         help.put("Get apipoll/icon/{key}", "GET Poll Icon");
@@ -105,7 +105,7 @@ public class APIItemPoll {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(Base58.encode(issueBytes))
+                .entity(Base64.getEncoder().encodeToString(issueBytes))
                 .build();
     }
 

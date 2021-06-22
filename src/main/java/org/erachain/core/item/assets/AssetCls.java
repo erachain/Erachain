@@ -489,9 +489,9 @@ public abstract class AssetCls extends ItemCls {
             case AS_NON_FUNGIBLE:
                 //return "\uD83C\uDFFA"; // амфора
                 //return "💎"; // U+1F48E драгоценный камень
-                //return "\uD83C\uDFA8"; // палитра художника
-                //return "\uD83C\uDFAC"; // кино-хлопушка
-                return "\uD83D\uDC18"; // слон
+                return "\uD83C\uDFA8"; // палитра художника
+            //return "\uD83C\uDFAC"; // кино-хлопушка
+            //return "\uD83D\uDC18"; // слон
             case AS_INDEX:
                 return "⤴";
             case AS_INSIDE_VOTE:

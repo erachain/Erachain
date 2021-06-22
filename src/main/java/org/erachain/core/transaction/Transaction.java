@@ -1729,7 +1729,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         boolean isSigned = this.signature != null;
         transaction.put("signature", isSigned ? Base58.encode(this.signature) : "null");
 
-        transaction.put("raw", Base58.encode(this.toBytes(FOR_NETWORK, isSigned)));
+        transaction.put("raw", Base64.getEncoder().encodeToString(this.toBytes(FOR_NETWORK, isSigned)));
 
         return transaction;
     }
