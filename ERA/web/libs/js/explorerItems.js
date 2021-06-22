@@ -41,7 +41,7 @@ function itemHead(item, forPrint) {
 
     output += '</h3>';
     if (item.hasOwnProperty('tags')) {
-        output += item.tags;
+        output += '<br>' + item.tags;
     }
 
     if (item.hasOwnProperty('exLink')) {

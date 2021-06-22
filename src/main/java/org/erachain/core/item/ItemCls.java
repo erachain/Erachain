@@ -390,7 +390,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      */
     public String[] getTags() {
         if (tags != null && !tags.isEmpty()) {
-            return tags.split(",");
+            String[] array = tags.toLowerCase().split(",");
+            for (int i = 0; i < array.length; i++) {
+                array[i] = array[i].trim();
+            }
+            return array;
         }
         return null;
     }
