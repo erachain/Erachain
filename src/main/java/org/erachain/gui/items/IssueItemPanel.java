@@ -355,6 +355,7 @@ public abstract class IssueItemPanel extends IconPanel {
 
         fieldGBC.gridy = y++;
         jPanelMain.add(tagsField, fieldGBC);
+        tagsField.setToolTipText(Lang.T("Use ',' to separate the Tags"));
 
         fieldGBC.gridy = y++;
         jPanelMain.add(jPanelAdd, fieldGBC);
