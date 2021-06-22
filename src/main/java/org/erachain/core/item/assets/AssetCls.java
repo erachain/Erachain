@@ -609,7 +609,17 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public String[] getTags() {
-        return new String[]{":" + viewAssetTypeAbbrev().toLowerCase()};
+        String tagType = ":" + viewAssetTypeAbbrev().toLowerCase();
+
+        String[] tagsArray = super.getTags();
+        if (tagsArray == null)
+            return new String[]{tagType};
+
+        String[] tagsArrayNew = new String[tagsArray.length + 1];
+        System.arraycopy(tagsArray, 0, tagsArrayNew, 0, tagsArray.length);
+        tagsArrayNew[tagsArray.length] = tagType;
+
+        return tagsArrayNew;
     }
 
     @Override
