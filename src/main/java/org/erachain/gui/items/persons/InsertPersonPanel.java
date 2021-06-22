@@ -90,7 +90,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtBirthLongitudeLatitude.setText("");
         txtHeight.setText("");
         textFeePow.setSelectedItem("0");
-        textName.setEditable(false);
+        nameField.setEditable(false);
         textAreaDescription.setEditable(false);
         txtBirthday.setEnabled(false);
         txtDeathDay.setEnabled(false);
@@ -250,7 +250,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
             return;
         }
 
-        textName.setText(person.viewName());
+        nameField.setText(person.viewName());
         addImageLabel.set(person.getImage());
         addIconLabel.set(person.getIcon());
 
@@ -296,7 +296,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
     private void eraseFields() {
         textFeePow.setSelectedItem("0");
-        textName.setText("");
+        nameField.setText("");
         textAreaDescription.setText("");
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");

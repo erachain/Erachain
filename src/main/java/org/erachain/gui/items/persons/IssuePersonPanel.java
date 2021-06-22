@@ -269,7 +269,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
 
     protected void reset() {
-        textName.setText("");
+        nameField.setText("");
         textAreaDescription.setText("");
         addImageLabel.reset();
     }
@@ -390,10 +390,10 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
             // соберем данные общего класса
             itemAppData = ItemCls.makeAppData(0L,
                     !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType());
+                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(), tagsField.getText());
 
             Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, itemAppData, creator,
-                    exLink, textName.getText(), feePow, birthday, deathday, gender,
+                    exLink, nameField.getText(), feePow, birthday, deathday, gender,
                     "", //textPersonNumber.getText(),
                     birthLatitude,
                     birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),

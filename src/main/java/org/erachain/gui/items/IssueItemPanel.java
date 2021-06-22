@@ -37,13 +37,15 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JLabel titleJLabel = new JLabel();
     protected JLabel accountJLabel = new JLabel(Lang.T("Account") + ":");
     protected JLabel nameJLabel = new JLabel(Lang.T("Name") + ":");
+    protected JLabel tagsJLabel = new JLabel(Lang.T("Tags") + ":");
     protected JLabel descriptionJLabel = new JLabel(Lang.T("Description") + ":");
     protected JLabel feeJLabel = new JLabel(Lang.T("Fee Power") + ":");
     protected JComboBox<String> textFeePow = new JComboBox<>();
     protected JComboBox<Account> fromJComboBox = new JComboBox<>(new AccountsComboBoxModel());
     protected JButton issueJButton = new JButton(Lang.T("Issue"));
     protected JScrollPane jScrollPane1 = new JScrollPane();
-    protected JTextField textName = new JTextField("");
+    protected JTextField nameField = new JTextField("");
+    protected JTextField tagsField = new JTextField("");
     protected JTextArea textAreaDescription = new JTextArea("");
     protected AddImageLabel addIconLabel;
     protected AddImageLabel addImageLabel;
@@ -196,7 +198,7 @@ public abstract class IssueItemPanel extends IconPanel {
     protected void makeAppData() {
         itemAppData = ItemCls.makeAppData(0L,
                 !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType());
+                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(), tagsField.getText());
 
     }
 
@@ -346,7 +348,13 @@ public abstract class IssueItemPanel extends IconPanel {
         jPanelMain.add(nameJLabel, labelGBC);
 
         fieldGBC.gridy = y++;
-        jPanelMain.add(textName, fieldGBC);
+        jPanelMain.add(nameField, fieldGBC);
+
+        labelGBC.gridy = y;
+        jPanelMain.add(tagsJLabel, labelGBC);
+
+        fieldGBC.gridy = y++;
+        jPanelMain.add(tagsField, fieldGBC);
 
         fieldGBC.gridy = y++;
         jPanelMain.add(jPanelAdd, fieldGBC);

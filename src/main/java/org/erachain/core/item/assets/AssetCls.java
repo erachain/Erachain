@@ -353,9 +353,9 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static byte[] makeAppData(boolean iconAsURL, int iconType, boolean imageAsURL, int imageType,
-                                     ExLinkAddress[] dexAwards) {
+                                     String tags, ExLinkAddress[] dexAwards) {
         byte[] appData = ItemCls.makeAppData(dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK,
-                iconAsURL, iconType, imageAsURL, imageType);
+                iconAsURL, iconType, imageAsURL, imageType, tags);
 
         if (dexAwards == null)
             return appData;
