@@ -9,7 +9,6 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -23,7 +22,6 @@ import org.rocksdb.WriteOptions;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Set;
 
 @Slf4j
 public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
@@ -114,17 +112,10 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     }
 
-    // TODO - release it on Iterators
-
-    public Set<byte[]> assetKeys(long assetKey) {
-        return ((DBRocksDBTable)map).filterAppropriateValuesAsByteKeys(
-                Longs.toByteArray(assetKey),
-                balanceKeyAssetIndex.getColumnFamilyHandle());
-    }
-
     @Override
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
-        return new IteratorCloseableImpl(assetKeys(assetKey).iterator());
+        return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
+                Longs.toByteArray(assetKey), false, true);
     }
 
     @Override

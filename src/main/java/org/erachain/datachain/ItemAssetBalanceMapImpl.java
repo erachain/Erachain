@@ -22,7 +22,6 @@ import org.mapdb.Fun.Tuple5;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static org.erachain.database.IDB.DBS_MAP_DB;
@@ -156,27 +155,18 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (assetKey < 0)
             assetKey = -assetKey;
 
-        Collection<byte[]> keys;
-        if (map instanceof ItemAssetBalanceSuitRocksDB) {
-            //FILTER ALL KEYS
-            keys = new ArrayList<>();
-            try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey)) {
-                while (iterator.hasNext()) {
-                    keys.add(iterator.next());
-                }
-            } catch (IOException e) {
-            }
-        } else {
-            keys = ((ItemAssetBalanceSuit) map).assetKeys(assetKey);
-        }
-
         List<Tuple2<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
                 list = new ArrayList<>();
 
-        for (byte[] key : keys) {
-            list.add(new Tuple2<>(key, map.get(key)));
+        byte[] key;
+        try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey)) {
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                list.add(new Tuple2<>(key, map.get(key)));
+            }
+        } catch (IOException e) {
         }
 
         return list;
@@ -190,18 +180,16 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> getBalancesList(Account account) {
 
-        if (Controller.getInstance().onlyProtocolIndexing || parent != null)
-            return null;
-
         List<Tuple2<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
                 list = new ArrayList<>();
 
-        //FILTER ALL KEYS
+        byte[] key;
         try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).accountIterator(account)) {
             while (iterator.hasNext()) {
-                list.add(new Tuple2<>(iterator.next(), map.get(iterator.next())));
+                key = iterator.next();
+                list.add(new Tuple2<>(key, map.get(key)));
             }
         } catch (IOException e) {
         }
