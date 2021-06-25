@@ -12,6 +12,5 @@ public interface ItemAssetBalanceSuit {
     Collection<byte[]> assetKeys(long assetKey);
 
     IteratorCloseable<byte[]> accountIterator(Account account);
-    Collection<byte[]> accountKeys(Account account);
 
 }
