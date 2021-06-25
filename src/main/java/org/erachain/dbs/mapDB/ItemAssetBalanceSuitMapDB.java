@@ -141,7 +141,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     @Override
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
         return new IndexIterator((NavigableSet) this.assetKeySet.subSet(
-                Fun.t2(Fun.t2(assetKey, null), ADDR_KEY2_MIN), Fun.t2(Fun.t2(assetKey, HI), ADDR_KEY2_MAX)));
+                Fun.t2(Fun.t2(assetKey, null), ADDR_KEY2_MIN), Fun.t2(Fun.t2(assetKey, Fun.HI), ADDR_KEY2_MAX)));
     }
 
     @Override
