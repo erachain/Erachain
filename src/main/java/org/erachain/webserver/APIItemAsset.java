@@ -8,7 +8,6 @@ package org.erachain.webserver;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.ItemAssetsResource;
 import org.erachain.controller.Controller;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
@@ -26,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class APIItemAsset {
 
         help.put("GET apiasset/last", "Get last ID");
         help.put("GET apiasset/{key}", "Get by ID");
-        help.put("GET apiasset/raw/{key}", "Returns RAW in Base58 of asset with the given key.");
+        help.put("GET apiasset/raw/{key}", "Returns RAW in Base64 of asset with the given key.");
         help.put("GET apiasset/find?filter={name_string}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use patterns from 5 chars in words. Default {descending} - true");
         help.put("Get apiasset/image/{key}?preview", "Get Asset Image. Use 'preview' for see as small video (use it for the tiles list for example). Install `ffmpeg` for preview option, see makePreview.bat for Windows or install ffmpeg on Unix");
         help.put("Get apiasset/icon/{key}", "Get Asset Icon");
@@ -120,7 +120,7 @@ public class APIItemAsset {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(Base58.encode(issueBytes))
+                .entity(Base64.getEncoder().encodeToString(issueBytes))
                 .build();
 
     }
