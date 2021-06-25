@@ -124,62 +124,28 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
             // NOT USE SECONDARY INDEXES
             return;
 
-        if (true) {
-            this.addressKeyMap2 = database.createTreeSet("balances_address_asset_2_bal")
-                    .comparator(new Fun.Tuple2Comparator<>(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR)) // у вторичных ключей всегда там Tuple2
-                    //.valuesOutsideNodesEnable()
-                    .makeOrGet();
+        this.addressKeyMap2 = database.createTreeSet("balances_address_asset_2_bal")
+                .comparator(new Fun.Tuple2Comparator<>(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR)) // у вторичных ключей всегда там Tuple2
+                //.valuesOutsideNodesEnable()
+                .makeOrGet();
 
-            Bind.secondaryKey(hashMap, this.addressKeyMap2, new Fun.Function2<byte[],
-                    byte[],
-                    Tuple5<
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                    () {
-                @Override
-                public byte[]
-                run(byte[] key, Tuple5 value) {
-
-                    // first 20 bytes - short address
-                    byte[] secondary = new byte[ADDR_KEY2_LEN];
-                    System.arraycopy(key, 0, secondary, 0, ADDR_KEY2_LEN);
-                    return secondary;
-
-                }
-            });
-
-        } else {
-            // медленный и ненужный
-            this.addressKeyMap = database.createTreeMap("balances_address_asset_bal")
-                    .comparator(Fun.COMPARATOR)
-                    .makeOrGet();
-
-            Bind.secondaryKey(hashMap, this.addressKeyMap, new Fun.Function2<Tuple2<String, Long>,
-                    byte[],
-                    Tuple5<
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                    () {
-                @Override
-                public Tuple2<String, Long>
-                run(byte[] key, Tuple5<
+        Bind.secondaryKey(hashMap, this.addressKeyMap2, new Fun.Function2<byte[],
+                byte[],
+                Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                () {
+            @Override
+            public byte[]
+            run(byte[] key, Tuple5 value) {
 
-                    // Address
-                    byte[] shortAddress = new byte[20];
-                    System.arraycopy(key, 0, shortAddress, 0, 20);
-                    // ASSET KEY
-                    byte[] assetKeyBytes = new byte[8];
-                    System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+                // first 20 bytes - short address
+                byte[] secondary = new byte[ADDR_KEY2_LEN];
+                System.arraycopy(key, 0, secondary, 0, ADDR_KEY2_LEN);
+                return secondary;
 
-                    return new Tuple2<String, Long>(
-                            Crypto.getInstance().getAddressFromShort(shortAddress),
-                            Longs.fromByteArray(assetKeyBytes)
-                    );
-                }
-            });
-        }
+            }
+        });
 
     }
 
