@@ -17,6 +17,7 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.NavigableSet;
 
@@ -29,6 +30,9 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
         implements ItemAssetBalanceSuit {
 
     static final int ADDR_KEY2_LEN = 10;
+    static final byte[] ADDR_KEY2_MIN = new byte[ADDR_KEY2_LEN];
+    static final byte[] ADDR_KEY2_MAX = new byte[ADDR_KEY2_LEN];
+
 
     @SuppressWarnings("rawtypes")
     protected BTreeMap assetKeyMap;
@@ -38,6 +42,8 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     public ItemAssetBalanceSuitMapDB(DBASet databaseSet, DB database, DBTab cover) {
         super(databaseSet, database, logger, false, cover);
 
+        Arrays.fill(ADDR_KEY2_MIN, (byte) -128);
+        Arrays.fill(ADDR_KEY2_MAX, (byte) 127);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -195,7 +201,9 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
         byte[] secondary = new byte[ADDR_KEY2_LEN];
         System.arraycopy(account.getShortAddressBytes(), 0, secondary, 0, ADDR_KEY2_LEN);
 
-        return new IndexIterator((NavigableSet) this.addressKeyMap2.subSet(secondary, secondary));
+        // WRONG - return new IndexIterator(Fun.filter((NavigableSet) this.addressKeyMap2, secondary).iterator());
+        return new IndexIterator((NavigableSet) this.addressKeyMap2.subSet(
+                Fun.t2(secondary, ADDR_KEY2_MIN), Fun.t2(secondary, ADDR_KEY2_MAX)));
     }
 
 
