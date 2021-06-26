@@ -66,10 +66,12 @@ public class SecureWalletDatabase {
 
     public synchronized int addPrivateKey(PrivateKeyAccount privateKey) {
 
-        int nonce = getAndIncrementNonce();
-
         // ADD TO DATABASE
         getAccountSeedMap().add(privateKey);
+
+        int nonce = getAndIncrementNonce() + 1;
+
+        commit();
 
         return nonce;
     }

@@ -90,7 +90,6 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
 
         synchronized (this.publickKeys) {
 
-
             for (byte[] publickKey : this.publickKeys) {
                 accounts.add(new PublicKeyAccount(publickKey));
             }
@@ -114,7 +113,7 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     }
 
     // collect address + assets in wallet
-    public Set<Tuple2<String, Long>> getAddressessAssets() {
+    public Set<Tuple2<String, Long>> getAddressesAssets() {
 
         Set<Tuple2<String, Long>> keys = this.assetsBalanceMap.keySet();
 
@@ -240,7 +239,7 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
                 this.accounts.add((Account) pubKeyAccount);
 
                 if (number < 0 && Controller.getInstance().doesWalletExists()) {
-                    number = Controller.getInstance().getWallet().getAccountNonce() - 1;
+                    number = Controller.getInstance().getWallet().getAccountNonce();
                 }
 
                 // USE NOTIFY
