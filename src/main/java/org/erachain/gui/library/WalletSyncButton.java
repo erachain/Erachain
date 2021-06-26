@@ -12,6 +12,7 @@ public class WalletSyncButton extends WalletButton {
         new Thread() {
             @Override
             public void run() {
+                Controller.getInstance().getWallet().updateAccountsFromSecretKeys();
                 Controller.getInstance().getWallet().synchronizeFull();
             }
         }.start();

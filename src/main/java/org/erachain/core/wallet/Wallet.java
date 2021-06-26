@@ -49,11 +49,13 @@ public class Wallet extends Observable implements Observer {
 	private static final long RIGHTS_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	static Logger LOGGER = LoggerFactory.getLogger(Wallet.class.getSimpleName());
+
 	public DWSet database;
+	private SecureWalletDatabase secureDatabase;
+
 	AssetsFavorites assetsFavorites;
 	TemplatesFavorites templatesFavorites;
 	PersonsFavorites personsFavorites;
-	private SecureWalletDatabase secureDatabase;
 	private int secondsToUnlock = 100;
 	private Timer lockTimer; // = new Timer();
 	private int syncHeight;
@@ -151,10 +153,10 @@ public class Wallet extends Observable implements Observer {
 			return new ArrayList<>();
 
 
-        AccountMap mapAccs = this.database.getAccountMap();
-        synchronized (mapAccs) { // else deadlock in org.erachain.database.wallet.AccountMap.add
-            return mapAccs.getPublicKeyAccounts();
-		}
+		AccountMap mapAccs = this.database.getAccountMap();
+		//synchronized (mapAccs) { // else deadlock in org.erachain.database.wallet.AccountMap.add
+		return mapAccs.getPublicKeyAccounts();
+		//}
 	}
 
 	public List<Tuple2<Account, Long>> getAccountsAssets() {
@@ -1099,7 +1101,7 @@ public class Wallet extends Observable implements Observer {
 
         // FOR ALL ACCOUNTS
         List<Account> accounts = this.getAccounts();
-        synchronized (accounts) {
+		//synchronized (accounts) {
             for (Account account : accounts) {
                 // CHECK IF INVOLVED
                 if (transaction.isInvolved(account)) {
@@ -1107,7 +1109,7 @@ public class Wallet extends Observable implements Observer {
                     return account;
                 }
             }
-        }
+		//}
         return null;
 
     }
