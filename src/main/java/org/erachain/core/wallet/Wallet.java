@@ -862,41 +862,41 @@ public class Wallet extends Observable implements Observer {
 		return "";
 	}
 
-	public String importPrivateKey(byte[] privateKey64) {
+	public Tuple3<String, Integer, String> importPrivateKey(byte[] privateKey64) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.isUnlocked()) {
-			return "Wallet is locked";
+			return new Tuple3<>(null, -1, "Wallet is locked");
 		}
 
 		// CHECK LENGTH
 		if (privateKey64.length != Crypto.SIGNATURE_LENGTH) {
-			return "Wrong length != 64";
+			return new Tuple3<>(null, -1, "Wrong length != 64");
 		}
 
 		// CREATE ACCOUNT
 		PrivateKeyAccount account = new PrivateKeyAccount(privateKey64);
 
 		// CHECK IF ACCOUNT ALREADY EXISTS
-		if (!this.accountExists(account)) {
-			// ADD TO DATABASE
-			this.secureDatabase.getAccountSeedMap().add(account);
-			this.database.getAccountMap().add(account, -1);
+		if (this.accountExists(account))
+			return new Tuple3<>(null, 0, "Already exist");
 
-			// SAVE TO DISK
-			this.database.hardFlush();
+		// ADD TO DATABASE
+		this.secureDatabase.getAccountSeedMap().add(account);
+		this.database.getAccountMap().add(account, -1);
 
-			// SYNCHRONIZE
-			this.synchronizeFull();
+		// SAVE TO DISK
+		this.database.hardFlush();
 
-			// NOTIFY
-			this.setChanged();
-			this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
+		// SYNCHRONIZE
+		this.synchronizeFull();
 
-			// RETURN
-			return account.getAddress();
-		}
+		// NOTIFY
+		this.setChanged();
+		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
 
-		return "";
+		// RETURN
+		return new Tuple3<>(account.getAddress(), null, null);
+
 	}
 
 	public byte[] exportAccountSeed(String address) {

@@ -2381,7 +2381,7 @@ public class Controller extends Observable {
         return this.wallet.importAccountSeed(accountSeed);
     }
 
-    public String importPrivateKey(byte[] accountSeed) {
+    public Tuple3<String, Integer, String> importPrivateKey(byte[] accountSeed) {
         return this.wallet.importPrivateKey(accountSeed);
     }
 

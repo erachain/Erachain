@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.lang.Lang;
+import org.mapdb.Fun;
 
 import javax.swing.*;
 import java.awt.*;
@@ -81,11 +82,17 @@ public class WalletImportButton extends WalletButton {
         new Thread() {
             @Override
             public void run() {
-                String mess = Controller.getInstance().importPrivateKey(privateKeyBytes64);
-                if (mess.isEmpty())
-                    return;
-
-                JOptionPane.showMessageDialog(null, Lang.T(mess), Lang.T("ERROR"), JOptionPane.ERROR_MESSAGE);
+                Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importPrivateKey(privateKeyBytes64);
+                if (result.a == null) {
+                    if (result.b < 0)
+                        JOptionPane.showMessageDialog(null, Lang.T(result.c), Lang.T("ERROR"),
+                                JOptionPane.ERROR_MESSAGE);
+                    else
+                        JOptionPane.showMessageDialog(null, Lang.T(result.c), Lang.T("WARN"),
+                                JOptionPane.WARNING_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, Lang.T(result.a), Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         }.start();
 

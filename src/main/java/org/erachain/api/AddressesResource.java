@@ -14,6 +14,7 @@ import org.erachain.utils.APIUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -682,7 +683,10 @@ public class AddressesResource {
         }
 
         // CONVERT TO BYTE
-        return Controller.getInstance().importPrivateKey(privatekeyBytes64);
+        Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importPrivateKey(privatekeyBytes64);
+        if (result.a == null)
+            return result.c;
+        return result.a;
     }
 
 }
