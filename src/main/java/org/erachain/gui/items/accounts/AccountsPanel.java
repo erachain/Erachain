@@ -5,10 +5,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.Gui;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
-import org.erachain.gui.library.DealsPopupMenu;
-import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.WalletCreateAccountButton;
-import org.erachain.gui.library.WalletSyncButton;
+import org.erachain.gui.library.*;
 import org.erachain.gui.models.AccountsTableModel;
 import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.lang.Lang;
@@ -40,8 +37,8 @@ public class AccountsPanel extends JPanel // implements ItemListener
 
     public JComboBox<ItemCls> cbxFavorites;
     public AccountsTableModel tableModel;
-    public WalletCreateAccountButton newAccount_Button;
-    public WalletSyncButton reload_Button;
+    public WalletCreateAccountButton newAccountButton;
+    public WalletSyncButton updateButton;
     protected AssetCls asset;
     //protected Account account;
     protected PublicKeyAccount pub_Key;
@@ -57,62 +54,38 @@ public class AccountsPanel extends JPanel // implements ItemListener
         //PADDING
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-
-        //TABLE GBC
-        GridBagConstraints tableGBC = new GridBagConstraints();
-        tableGBC.fill = GridBagConstraints.BOTH;
-        tableGBC.anchor = GridBagConstraints.NORTHWEST;
-        tableGBC.gridwidth = 3;
-        tableGBC.weightx = 1.0;
-        tableGBC.weighty = 0.1;
-        tableGBC.gridx = 1;
-        tableGBC.gridy = 1;
-
         //BUTTON GBC
         GridBagConstraints buttonGBC = new GridBagConstraints();
-        buttonGBC.insets = new Insets(10, 0, 0, 0);
-        buttonGBC.fill = GridBagConstraints.NONE;
+        buttonGBC.insets = new Insets(10, 0, 10, 10);
+        buttonGBC.fill = GridBagConstraints.BOTH;
         buttonGBC.anchor = GridBagConstraints.NORTHWEST;
+        buttonGBC.gridwidth = 3;
+        buttonGBC.weightx = 0.8;
         buttonGBC.gridx = 1;
-        buttonGBC.gridy = 2;
-
-        //FAVORITES GBC
-        GridBagConstraints favoritesGBC = new GridBagConstraints();
-        favoritesGBC.insets = new Insets(10, 0, 10, 0);
-        favoritesGBC.fill = GridBagConstraints.BOTH;
-        favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
-        favoritesGBC.weightx = 0.8;
-        favoritesGBC.gridx = 1;
-        favoritesGBC.gridy = 0;
+        buttonGBC.gridy = 0;
 
         //ASSET FAVORITES
         cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
         cbxFavorites.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
-        this.add(cbxFavorites, favoritesGBC);
+        this.add(cbxFavorites, buttonGBC);
 
+        newAccountButton = new WalletCreateAccountButton();
+        buttonGBC.insets = new Insets(10, 10, 10, 0);
+        buttonGBC.gridx += 3;
+        buttonGBC.gridwidth = 1;
+        buttonGBC.weightx = 0;
+        buttonGBC.fill = GridBagConstraints.BASELINE_TRAILING;
+        buttonGBC.anchor = GridBagConstraints.EAST;
+        ++buttonGBC.gridx;
+        this.add(newAccountButton, buttonGBC);
 
-        favoritesGBC.insets = new Insets(10, 10, 10, 0);
-        favoritesGBC.fill = GridBagConstraints.BOTH;
-        favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
-        favoritesGBC.weightx = 0.1;
-        favoritesGBC.gridx = 2;
-        favoritesGBC.gridy = 0;
+        ++buttonGBC.gridx;
+        WalletImportButton walletImportButton = new WalletImportButton();
+        this.add(walletImportButton, buttonGBC);
 
-
-        newAccount_Button = new WalletCreateAccountButton();
-        this.add(newAccount_Button, favoritesGBC);
-
-
-        reload_Button = new WalletSyncButton();
-        favoritesGBC.insets = new Insets(10, 10, 10, 0);
-        favoritesGBC.fill = GridBagConstraints.BOTH;
-        favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
-        favoritesGBC.weightx = 0.1;
-        favoritesGBC.gridx = 3;
-        favoritesGBC.gridy = 0;
-
-        this.add(reload_Button, favoritesGBC);
-
+        ++buttonGBC.gridx;
+        updateButton = new WalletSyncButton();
+        this.add(updateButton, buttonGBC);
 
         //TABLE
         tableModel = new AccountsTableModel();
@@ -180,6 +153,11 @@ public class AccountsPanel extends JPanel // implements ItemListener
 
 
         //ADD TOTAL BALANCE
+        buttonGBC.insets = new Insets(10, 0, 0, 0);
+        buttonGBC.fill = GridBagConstraints.NONE;
+        buttonGBC.anchor = GridBagConstraints.NORTHWEST;
+        buttonGBC.gridx = 1;
+        buttonGBC.gridy = 2;
         final JLabel totalBalance = new JLabel(getTotals());
         this.add(totalBalance, buttonGBC);
 
@@ -192,6 +170,15 @@ public class AccountsPanel extends JPanel // implements ItemListener
         });
 
         //ADD ACCOUNTS TABLE
+        //TABLE GBC
+        GridBagConstraints tableGBC = new GridBagConstraints();
+        tableGBC.fill = GridBagConstraints.BOTH;
+        tableGBC.anchor = GridBagConstraints.NORTHWEST;
+        tableGBC.gridwidth = 10;
+        tableGBC.weightx = 1.0;
+        tableGBC.weighty = 0.1;
+        tableGBC.gridx = 1;
+        tableGBC.gridy = 1;
         this.add(new JScrollPane(table), tableGBC);
 
     }

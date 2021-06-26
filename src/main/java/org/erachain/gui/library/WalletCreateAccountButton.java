@@ -7,7 +7,7 @@ import org.erachain.controller.Controller;
 public class WalletCreateAccountButton extends WalletButton {
 
     public WalletCreateAccountButton() {
-        super("Create");
+        super("Create", "Create new account from wallet SEED");
     }
 
     void action() {

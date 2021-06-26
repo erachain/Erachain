@@ -415,8 +415,8 @@ public class TelegramSplitPanel extends SplitPanel {
     public void onClose() {
         //  rightPanel.tableModel.deleteObserver();
         accountPanel.tableModel.deleteObservers();
-        Controller.getInstance().deleteObserver(accountPanel.reload_Button);
-        Controller.getInstance().deleteObserver(accountPanel.newAccount_Button);
+        Controller.getInstance().deleteObserver(accountPanel.updateButton);
+        Controller.getInstance().deleteObserver(accountPanel.newAccountButton);
     }
 
     public void onSendClick() {

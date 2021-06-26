@@ -19,9 +19,11 @@ public abstract class WalletButton extends JButton implements Observer {
 
     private WalletButton th;
 
-    public WalletButton(String label) {
+    public WalletButton(String label, String toolTip) {
 
         super(Lang.T(label));
+        setToolTipText(Lang.T(toolTip));
+
         th = this;
 
         Controller.getInstance().addObserver(this);

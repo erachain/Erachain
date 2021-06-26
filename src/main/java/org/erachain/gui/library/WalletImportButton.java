@@ -2,10 +2,10 @@ package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
 
-public class WalletSyncButton extends WalletButton {
+public class WalletImportButton extends WalletButton {
 
-    public WalletSyncButton() {
-        super("Update", "Update accounts and synchronize wallet");
+    public WalletImportButton() {
+        super("Import", "Import private key");
     }
 
     void action() {
