@@ -136,7 +136,8 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
             return false;
 
         for (Account myAaccount : this.accounts) {
-            if (myAaccount.equals(account)) return true;
+            if (myAaccount.equals(account))
+                return true;
         }
         return false;
     }

@@ -78,12 +78,16 @@ public class WalletImportButton extends WalletButton {
         }
 
         // CONVERT TO BYTE
-        String mess = Controller.getInstance().importPrivateKey(privateKeyBytes64);
-        if (mess.isEmpty())
-            return;
+        new Thread() {
+            @Override
+            public void run() {
+                String mess = Controller.getInstance().importPrivateKey(privateKeyBytes64);
+                if (mess.isEmpty())
+                    return;
 
-        JOptionPane.showMessageDialog(null, Lang.T(mess), Lang.T("ERROR"), JOptionPane.ERROR_MESSAGE);
-
+                JOptionPane.showMessageDialog(null, Lang.T(mess), Lang.T("ERROR"), JOptionPane.ERROR_MESSAGE);
+            }
+        }.start();
 
     }
 }
