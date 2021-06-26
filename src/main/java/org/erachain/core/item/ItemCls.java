@@ -298,6 +298,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             return Transaction.INVALID_DESCRIPTION_LENGTH_MAX;
         }
 
+        if (iconAsURL && (icon == null || icon.length > 512)) {
+            errorValue = "icon";
+            return Transaction.INVALID_URL_LENGTH;
+        }
+
+        if (imageAsURL && (image == null || image.length > 512)) {
+            errorValue = "image";
+            return Transaction.INVALID_URL_LENGTH;
+        }
         return Transaction.VALIDATE_OK;
     }
 

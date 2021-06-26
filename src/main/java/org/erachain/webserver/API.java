@@ -107,7 +107,7 @@ public class API {
         help.put("GET Address FEE Statistics", "addressfeestats/{address}");
 
         help.put("GET Address Assets", "addressassets/{address}");
-        help.put("GET Address Public Key", "addresspublickey/{address}");
+        help.put("GET Public Key by Address", "addresspublickey/{address}");
         help.put("GET Address Forging Info", "addressforge/{address}");
         help.put("GET Address Person Info", "addressasperson/{address}");
         help.put("GET Address Person Name", "addressaspersonlite/{address}");
