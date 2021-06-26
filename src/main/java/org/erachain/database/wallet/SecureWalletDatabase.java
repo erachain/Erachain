@@ -43,6 +43,7 @@ public class SecureWalletDatabase {
         return this.accountSeedMap;
     }
 
+
     public byte[] getSeed() {
         return (byte[]) this.database.getAtomicVar(SEED).get();
     }
@@ -59,12 +60,18 @@ public class SecureWalletDatabase {
         this.database.getAtomicInteger(NONCE).set(nonce);
     }
 
-    public int getAndIncrementNonce() {
+    private int getAndIncrementNonce() {
         return this.database.getAtomicInteger(NONCE).getAndIncrement();
     }
 
-    public void delete(PrivateKeyAccount account) {
-        this.accountSeedMap.delete(account);
+    public synchronized int addPrivateKey(PrivateKeyAccount privateKey) {
+
+        int nonce = getAndIncrementNonce();
+
+        // ADD TO DATABASE
+        getAccountSeedMap().add(privateKey);
+
+        return nonce;
     }
 
     public void commit() {

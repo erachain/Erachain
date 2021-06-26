@@ -100,15 +100,15 @@ public class AccountSeedMap {
     }
 
     public void add(PrivateKeyAccount account) {
-        //if ()
+
         this.accountSeedsSet.add(account.getSeed());
 
         if (this.privateKeyAccounts == null) {
             this.loadPrivateKeyAccounts();
-        }
-
-        synchronized (this.privateKeyAccounts) {
-            this.privateKeyAccounts.add(account);
+        } else {
+            synchronized (this.privateKeyAccounts) {
+                this.privateKeyAccounts.add(account);
+            }
         }
     }
 

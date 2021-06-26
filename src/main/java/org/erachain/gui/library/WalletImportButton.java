@@ -91,7 +91,7 @@ public class WalletImportButton extends WalletButton {
                         JOptionPane.showMessageDialog(null, Lang.T(result.c), Lang.T("WARN"),
                                 JOptionPane.WARNING_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null, Lang.T(result.a), Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Lang.T("Account imported") + ": " + result.a, Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         }.start();

@@ -449,7 +449,7 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		// ADD NONCE
-		this.secureDatabase.setNonce(0);
+		//this.secureDatabase.setNonce(0);
 
 		// CREATE ACCOUNTS
 		for (int i = 1; i <= depth; i++) {
@@ -495,19 +495,21 @@ public class Wallet extends Observable implements Observer {
 		byte[] seed = this.secureDatabase.getSeed();
 
 		// READ NONCE
-		int nonce = this.secureDatabase.getAndIncrementNonce();
+		int nonce = this.secureDatabase.getNonce() + 1;
 
-		// GENERATE ACCOUNT SEED
+		// GENERATE ACCOUNT SEED for next NONCE
 		byte[] accountSeed = generateAccountSeed(seed, nonce);
 		PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
+
 		JSONObject ob = new JSONObject();
 		// CHECK IF ACCOUNT ALREADY EXISTS
 		if (!this.accountExists(account)) {
+
 			// ADD TO DATABASE
-			this.secureDatabase.getAccountSeedMap().add(account);
-			this.database.getAccountMap().add(account, -1);
+			this.database.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
+
 			// set name
-			ob.put("description", Lang.T("Created by default Account") + " " + (nonce + 1));
+			ob.put("description", Lang.T("Created by default Account") + " " + (nonce));
 			LOGGER.info("Added account #" + nonce);
 
 			this.commit();
@@ -842,8 +844,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF ACCOUNT ALREADY EXISTS
 		if (!this.accountExists(account)) {
 			// ADD TO DATABASE
-			this.secureDatabase.getAccountSeedMap().add(account);
-			this.database.getAccountMap().add(account, -1);
+			this.database.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
 
 			// SAVE TO DISK
 			this.database.hardFlush();
@@ -881,8 +882,7 @@ public class Wallet extends Observable implements Observer {
 			return new Tuple3<>(null, 0, "Already exist");
 
 		// ADD TO DATABASE
-		this.secureDatabase.getAccountSeedMap().add(account);
-		this.database.getAccountMap().add(account, -1);
+		this.database.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
 
 		// SAVE TO DISK
 		this.database.hardFlush();

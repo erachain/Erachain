@@ -240,7 +240,7 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
                 this.accounts.add((Account) pubKeyAccount);
 
                 if (number < 0 && Controller.getInstance().doesWalletExists()) {
-                    number = Controller.getInstance().getWallet().getAccountNonce();
+                    number = Controller.getInstance().getWallet().getAccountNonce() - 1;
                 }
 
                 // USE NOTIFY
