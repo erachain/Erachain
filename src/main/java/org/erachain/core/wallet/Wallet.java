@@ -448,9 +448,6 @@ public class Wallet extends Observable implements Observer {
 			return false;
 		}
 
-		// ADD NONCE
-		//this.secureDatabase.setNonce(0);
-
 		// CREATE ACCOUNTS
 		for (int i = 1; i <= depth; i++) {
 			this.generateNewAccount();
