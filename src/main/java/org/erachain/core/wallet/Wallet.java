@@ -821,7 +821,7 @@ public class Wallet extends Observable implements Observer {
 		if (this.lockTimer != null)
 			this.lockTimer.cancel();
 
-		// LOCK SUCCESSFULL
+		// LOCK SUCCESSFUL
 		return true;
 	}
 
