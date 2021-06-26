@@ -99,7 +99,7 @@ public class AccountsPanel extends JPanel // implements ItemListener
         favoritesGBC.gridy = 0;
 
 
-        newAccount_Button = new WalletCreateAccountButton(table);
+        newAccount_Button = new WalletCreateAccountButton();
         this.add(newAccount_Button, favoritesGBC);
 
 
