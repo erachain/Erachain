@@ -187,7 +187,7 @@ public class DWSet extends DBASet {
 
         if (DBASet.getVersion(database) < CURRENT_VERSION) {
             database.close();
-            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake datachain Set " + dbFile.getParentFile().toPath());
+            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DWSet in " + dbFile.getParentFile().toPath());
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());

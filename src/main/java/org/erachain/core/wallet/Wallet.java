@@ -407,7 +407,7 @@ public class Wallet extends Observable implements Observer {
 			this.dwSet.close();
 		}
 		// OPEN WALLET
-		DWSet database = DWSet.reCreateDB(dcSet, withObserver, dynamicGUI);
+		this.dwSet = DWSet.reCreateDB(dcSet, withObserver, dynamicGUI);
 
 		if (this.secureDatabase != null) {
 			// CLOSE secured WALLET
@@ -418,7 +418,7 @@ public class Wallet extends Observable implements Observer {
 		SecureWalletDatabase secureDatabase = new SecureWalletDatabase(password);
 
 		// CREATE
-		boolean res = this.create(database, secureDatabase, seed, depth, synchronize, withObserver);
+		boolean res = this.create(secureDatabase, seed, depth, synchronize, withObserver);
 		if (res) {
 			// save wallet dir
 			Settings.getInstance().updateSettingsValue();
@@ -428,16 +428,11 @@ public class Wallet extends Observable implements Observer {
 		return res;
 	}
 
-	public synchronized boolean create(DWSet database, SecureWalletDatabase secureDatabase, byte[] seed, int depth,
+	public synchronized boolean create(SecureWalletDatabase secureDatabase, byte[] seed, int depth,
 									   boolean synchronize, boolean withObserver) {
-		// CREATE WALLET
-		this.dwSet = database;
 
 		// CREATE SECURE WALLET
 		this.secureDatabase = secureDatabase;
-
-		// ADD VERSION
-		this.dwSet.setVersion(1);
 
 		// SET LICENSE KEY
 		this.setLicenseKey(Controller.LICENSE_VERS);
