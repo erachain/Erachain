@@ -575,8 +575,8 @@ public class Wallet extends Observable implements Observer {
 			walletUpdater.lastBlocks.clear();
 
 			// SAVE transactions file
-			this.database.clearCache();
 			this.database.hardFlush();
+			this.database.clearCache();
 
 			// RESET MAPS
 			this.database.getTransactionMap().clear();
@@ -616,9 +616,9 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-        // SAVE transactions file
-        this.database.clearCache();
-        this.database.hardFlush();
+		// SAVE transactions file
+		this.database.hardFlush();
+		this.database.clearCache();
 
 		if (Controller.getInstance().isOnStopping())
 			return;
@@ -629,8 +629,6 @@ public class Wallet extends Observable implements Observer {
 
 		long timePoint = System.currentTimeMillis();
 		BlockMap blockMap = dcSet.getBlockMap();
-
-		this.database.clearCache();
 
 		LOGGER.info("   >>>>  WALLET SYNCHRONIZE from: " + height);
 
@@ -698,17 +696,17 @@ public class Wallet extends Observable implements Observer {
 			if (Controller.getInstance().isOnStopping())
 				return;
 
-            this.syncHeight = height;
+			this.syncHeight = height;
+
+			// тут возможно цепочка синхронизировалась или начала синхронизироваться и КОММИТ вызовет ошибку
+			//  java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
+			this.database.hardFlush();
 
 			// обязательно нужно чтобы память освобождать
 			// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
 			// при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызывают
-            // вдобавое отчищает полностью память - много свободной памяти получаем
+			// вдобавое отчищает полностью память - много свободной памяти получаем
 			dcSet.clearCache();
-
-            // тут возможно цепочка синхронизировалась или начала синхронизироваться и КОММИТ вызовет ошибку
-			//  java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
-			this.database.hardFlush();
 
 			this.database.clearCache();
 
