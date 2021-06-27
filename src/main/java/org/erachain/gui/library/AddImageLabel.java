@@ -110,13 +110,15 @@ public class AddImageLabel extends JPanel {
 
                 if (urlTxt.toLowerCase().endsWith(".mp4")) {
                     externalURLType.setSelectedIndex(ItemCls.MEDIA_TYPE_VIDEO);
+                } else if (urlTxt.toLowerCase().endsWith(".mp3")) {
+                    externalURLType.setSelectedIndex(ItemCls.MEDIA_TYPE_AUDIO);
                 } else if (urlTxt.toLowerCase().endsWith(".gif")
                         || urlTxt.toLowerCase().endsWith(".png")
                         || urlTxt.toLowerCase().endsWith(".jpg")) {
                     externalURLType.setSelectedIndex(ItemCls.MEDIA_TYPE_IMG);
                 } else {
                     JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid type") + "! "
-                            + Lang.T("Need # нужно") + ": .jpg, .gif, .png, .mp4", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                            + Lang.T("Need # нужно") + ": .jpg, .gif, .png, .mp4, .mp3", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -190,7 +192,7 @@ public class AddImageLabel extends JPanel {
         FileChooser chooser = new FileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(false);
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Media", "mp4", "png", "jpg", "gif");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Media", "mp4", "png", "jpg", "gif", "mp3");
         chooser.setFileFilter(filter);
         chooser.setDialogTitle(Lang.T("Open Media") + "...");
         int returnVal = chooser.showOpenDialog(getParent());
@@ -204,6 +206,15 @@ public class AddImageLabel extends JPanel {
                     mediaType = ItemCls.MEDIA_TYPE_VIDEO;
                     labelSize.setText(Lang.T("Size") + ": " + (mediaBytes.length >> 10) + " kB");
                     mainLabel.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("images/icons/video.png")));
+                } catch (Exception e) {
+                }
+            } else if (file.getName().toLowerCase().endsWith("mp3")) {
+                // AUDIO
+                try {
+                    mediaBytes = Files.readAllBytes(chooser.getSelectedFile().toPath());
+                    mediaType = ItemCls.MEDIA_TYPE_AUDIO;
+                    labelSize.setText(Lang.T("Size") + ": " + (mediaBytes.length >> 10) + " kB");
+                    mainLabel.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage("images/icons/audio.png")));
                 } catch (Exception e) {
                 }
 

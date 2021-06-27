@@ -57,7 +57,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public static final int MEDIA_TYPE_IMG = 0;
     public static final int MEDIA_TYPE_VIDEO = 1;
-    public static final int MEDIA_TYPE_SOUND = 2;
+    public static final int MEDIA_TYPE_AUDIO = 2;
     public static final int MEDIA_TYPE_FRAME = 10; // POST
 
     protected static final int TYPE_LENGTH = 2;
@@ -307,6 +307,12 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             errorValue = "image";
             return Transaction.INVALID_URL_LENGTH;
         }
+
+        if (iconType == MEDIA_TYPE_AUDIO) {
+            errorValue = "!=audio";
+            return Transaction.INVALID_ICON_TYPE;
+        }
+
         return Transaction.VALIDATE_OK;
     }
 
@@ -426,7 +432,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
                 return "img";
             case MEDIA_TYPE_VIDEO:
                 return "video";
-            case MEDIA_TYPE_SOUND:
+            case MEDIA_TYPE_AUDIO:
                 return "audio";
             case MEDIA_TYPE_FRAME:
                 return "frame";
@@ -451,7 +457,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         } else if (mediaType == ItemCls.MEDIA_TYPE_VIDEO) {
             return new MediaType("video", "mp4");
-        } else if (mediaType == ItemCls.MEDIA_TYPE_SOUND) {
+        } else if (mediaType == ItemCls.MEDIA_TYPE_AUDIO) {
             return new MediaType("audio", "mp3");
         }
         return null;

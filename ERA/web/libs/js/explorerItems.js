@@ -19,7 +19,7 @@ function itemHead(item, forPrint) {
 
         } else if (item.imageTypeName == 'audio') {
             output += '<audio style="display:none;" onclick="style.display=\'none\';this.stop()" id="audio-holder" loop controls >';
-            output += '<td><audio autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
+            output += '<td><audio autoplay muted playsinline loop width="350" onclick="this.pause();showWindowAudio(\'' + source + '\')"><source src="' + source + '"></audio>';
         } else {
             output += '<img id="image-holder" onclick="style.display=\'none\'">';
             output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';

@@ -24,20 +24,25 @@ public class APIItems {
 
         ItemCls item = map.get(key);
 
-        byte[] image = item.getImage();
-        if (image == null || image.length == 0) {
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity("")
-                    .build();
-        }
-
+        byte[] image;
         MediaType mediaType;
 
-        if (item.getImageType() == ItemCls.MEDIA_TYPE_SOUND && preView) {
-            mediaType = item.getIconMediaType();
-            image = item.getIcon();
+        if (item.getImageType() == ItemCls.MEDIA_TYPE_AUDIO) {
+            if (preView) {
+                image = item.getIcon();
+                mediaType = item.getIconMediaType();
+            } else {
+                image = item.getImage();
+                mediaType = item.getImageMediaType();
+            }
         } else {
+            image = item.getImage();
+            if (image == null || image.length == 0) {
+                return Response.status(200)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity("")
+                        .build();
+            }
             if (PreviewMaker.notNeedPreview(item, image)) {
                 mediaType = item.getImageMediaType();
             } else {
