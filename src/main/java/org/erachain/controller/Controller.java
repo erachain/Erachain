@@ -2387,9 +2387,10 @@ public class Controller extends Observable {
 
     public Tuple3<String, Integer, String> importPrivateKey(byte[] privateKey) {
         if (privateKey.length > 34) {
+            // 64 bytes - from mobile
             return this.wallet.importPrivateKey(privateKey);
         } else {
-            // as accounr pair SEED
+            // as account pair SEED - 32 bytes
             return new Tuple3<>(this.wallet.importAccountSeed(privateKey), null, null);
         }
     }
