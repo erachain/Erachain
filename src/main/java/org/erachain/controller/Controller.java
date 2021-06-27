@@ -822,8 +822,9 @@ public class Controller extends Observable {
                 this.wallet.initiateItemsFavorites();
             }
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wallet OK" + " " + Settings.getInstance().getDataWalletPath()));
-            LOGGER.info("Wallet OK" + " " + Settings.getInstance().getDataWalletPath());
+            String mess = "Wallet OK" + " " + Settings.getInstance().getDataWalletPath();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, mess));
+            LOGGER.info(mess);
 
             // create telegtam
 
@@ -897,7 +898,10 @@ public class Controller extends Observable {
         Settings.getInstance().setWalletKeysPath(selectedDir);
 
         // open wallet
-        Controller.getInstance().wallet = new Wallet(dcSet, dcSetWithObserver, dynamicGUI);
+        if (Controller.getInstance().wallet == null) {
+            Controller.getInstance().wallet = new Wallet(dcSet, dcSetWithObserver, dynamicGUI);
+        }
+
         // not wallet return 0;
         if (!Controller.getInstance().wallet.walletKeysExists()) {
             Settings.getInstance().setWalletKeysPath(pathOld);

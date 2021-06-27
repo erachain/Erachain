@@ -767,7 +767,15 @@ public class Wallet extends Observable implements Observer {
 	*/
 
 	public boolean unlock(SecureWalletDatabase secureDatabase) {
-		this.secureDatabase = secureDatabase;
+
+		synchronized (secureDatabase) {
+			if (this.secureDatabase != null) {
+				this.secureDatabase.close();
+				this.secureDatabase = null;
+			}
+
+			this.secureDatabase = secureDatabase;
+		}
 
 		if (Controller.getInstance().useGui) {
 			// NOTIFY
@@ -805,10 +813,12 @@ public class Wallet extends Observable implements Observer {
 			return true;
 		}
 
-		// CLOSE
-		if (this.secureDatabase != null) {
-			this.secureDatabase.close();
-			this.secureDatabase = null;
+		synchronized (secureDatabase) {
+			// CLOSE
+			if (this.secureDatabase != null) {
+				this.secureDatabase.close();
+				this.secureDatabase = null;
+			}
 		}
 
 		if (Controller.getInstance().useGui) {

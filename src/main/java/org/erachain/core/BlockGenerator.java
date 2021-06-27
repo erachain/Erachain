@@ -958,30 +958,28 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                             //PREVENT CONCURRENT MODIFY EXCEPTION
                             List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
-                            synchronized (knownAccounts) {
 
-                                local_status = 5;
-                                this.setMonitorStatus("local_status " + viewStatus());
+                            local_status = 5;
+                            this.setMonitorStatus("local_status " + viewStatus());
 
-                                for (PrivateKeyAccount account : knownAccounts) {
+                            for (PrivateKeyAccount account : knownAccounts) {
 
-                                    forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
-                                    if (winValue < 1)
-                                        continue;
+                                forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+                                winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
+                                if (winValue < 1)
+                                    continue;
 
-                                    targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
-                                    if (targetedWinValue < 1)
-                                        continue;
+                                targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
+                                if (targetedWinValue < 1)
+                                    continue;
 
-                                    if (winValue > winned_winValue) {
-                                        //this.winners.put(account, winned_value);
-                                        acc_winner = account;
-                                        winned_winValue = winValue;
-                                        winned_forgingValue = forgingValue;
-                                        //max_winned_value_account = winned_value_account;
+                                if (winValue > winned_winValue) {
+                                    //this.winners.put(account, winned_value);
+                                    acc_winner = account;
+                                    winned_winValue = winValue;
+                                    winned_forgingValue = forgingValue;
+                                    //max_winned_value_account = winned_value_account;
 
-                                    }
                                 }
                             }
 
