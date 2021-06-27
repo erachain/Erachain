@@ -40,7 +40,7 @@ public class AddImageLabel extends JPanel {
     private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
     public JTextField externalURL = new JTextField();
-    public JComboBox externalURLType = new JComboBox(new String[]{Lang.T("Image"), Lang.T("Video")});
+    public JComboBox externalURLType = new JComboBox(new String[]{Lang.T("Image"), Lang.T("Video"), Lang.T("Audio")});
 
     private boolean editable = true;
 
@@ -125,19 +125,6 @@ public class AddImageLabel extends JPanel {
                 JOptionPane.showMessageDialog(new JFrame(), Lang.T("URL is valid") + ". "
                         + Lang.T("Please set valid media type"), Lang.T("Message"), JOptionPane.INFORMATION_MESSAGE);
 
-                if (false) {
-                    // иногда ссылка не читается даже у JPG
-                    if (externalURLType.getSelectedIndex() == 0) {
-                        if (externalURL.getText().toLowerCase().endsWith(".gif")
-                                || externalURL.getText().toLowerCase().endsWith(".png")) {
-                            mainLabel.setIcon(new ImageIcon(url));
-                        } else {
-                            mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
-                        }
-                    } else {
-                        mainLabel.setIcon(createEmptyImage(Color.WHITE, initialWidth, initialHeight));
-                    }
-                }
             }
         });
 
