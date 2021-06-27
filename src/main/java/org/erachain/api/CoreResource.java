@@ -285,7 +285,7 @@ public class CoreResource {
     @GET
     @Path("/dw/clearcache")
     public String dwClearCache() {
-        Controller.getInstance().getWallet().database.clearCache();
+        Controller.getInstance().getWallet().dwSet.clearCache();
         return "run";
     }
 

@@ -50,7 +50,7 @@ public class Wallet extends Observable implements Observer {
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	static Logger LOGGER = LoggerFactory.getLogger(Wallet.class.getSimpleName());
 
-	public DWSet database;
+	public DWSet dwSet;
 	private SecureWalletDatabase secureDatabase;
 
 	AssetsFavorites assetsFavorites;
@@ -73,7 +73,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF EXISTS
 		if (this.walletKeysExists()) {
 			// OPEN WALLET
-			this.database = DWSet.reCreateDB(dcSet, withObserver, dynamicGUI);
+			this.dwSet = DWSet.reCreateDB(dcSet, withObserver, dynamicGUI);
 
 			linkWaitingObservers(withObserver);
 
@@ -118,7 +118,7 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public int getVersion() {
-		return this.database.getVersion();
+		return this.dwSet.getVersion();
 	}
 
 	public boolean isUnlocked() {
@@ -130,18 +130,18 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public List<Account> getAccounts() {
-		if (this.database == null)
+		if (this.dwSet == null)
 			return new ArrayList<>();
 
-		return this.database.getAccountMap().getAccounts();
+		return this.dwSet.getAccountMap().getAccounts();
 	}
 
 	public List<Account> getAccountsAndSetBalancePosition(int position) {
-		if (this.database == null)
+		if (this.dwSet == null)
 			return new ArrayList<>();
 
-		List<Account> accounts = this.database.getAccountMap().getAccounts();
-		for (Account account: accounts) {
+		List<Account> accounts = this.dwSet.getAccountMap().getAccounts();
+		for (Account account : accounts) {
 			account.setViewBalancePosition(position);
 		}
 
@@ -149,34 +149,34 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public List<PublicKeyAccount> getPublicKeyAccounts() {
-		if (this.database == null)
+		if (this.dwSet == null)
 			return new ArrayList<>();
 
 
-		AccountMap mapAccs = this.database.getAccountMap();
+		AccountMap mapAccs = this.dwSet.getAccountMap();
 		//synchronized (mapAccs) { // else deadlock in org.erachain.database.wallet.AccountMap.add
 		return mapAccs.getPublicKeyAccounts();
 		//}
 	}
 
 	public List<Tuple2<Account, Long>> getAccountsAssets() {
-		return this.database.getAccountMap().getAccountsAssets();
+		return this.dwSet.getAccountMap().getAccountsAssets();
 	}
 
 	public boolean accountExists(String address) {
-		return this.database.getAccountMap().exists(address);
+		return this.dwSet.getAccountMap().exists(address);
 	}
 
 	public boolean accountExists(Account account) {
-		return this.database.getAccountMap().exists(account);
+		return this.dwSet.getAccountMap().exists(account);
 	}
 
 	public Account getAccount(String address) {
-		return this.database.getAccountMap().getAccount(address);
+		return this.dwSet.getAccountMap().getAccount(address);
 	}
 
 	public boolean isWalletDatabaseExisting() {
-		return database != null;
+		return dwSet != null;
 	}
 
 	// public BigDecimal getUnconfirmedBalance(String address, long key)
@@ -191,7 +191,7 @@ public class Wallet extends Observable implements Observer {
 	 */
 	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(Account account, long key) {
 
-		return this.database.getAccountMap().getBalance(account, key);
+		return this.dwSet.getAccountMap().getBalance(account, key);
 	}
 
 	public List<PrivateKeyAccount> getprivateKeyAccounts() {
@@ -249,7 +249,7 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		List<Account> accounts = this.getAccounts();
-		return this.database.getTransactionMap().get(accounts, limit);
+		return this.dwSet.getTransactionMap().get(accounts, limit);
 	}
 
 	public Iterator<Tuple2<Long, Integer>> getTransactionsIteratorByType(int type, boolean descending) {
@@ -257,7 +257,7 @@ public class Wallet extends Observable implements Observer {
 			return null;
 		}
 
-		return this.database.getTransactionMap().getTypeIterator((byte) type, descending);
+		return this.dwSet.getTransactionMap().getTypeIterator((byte) type, descending);
 
 	}
 
@@ -266,7 +266,7 @@ public class Wallet extends Observable implements Observer {
 			return null;
 		}
 
-		return this.database.getTransactionMap().get(key);
+		return this.dwSet.getTransactionMap().get(key);
 
 	}
 
@@ -275,7 +275,7 @@ public class Wallet extends Observable implements Observer {
 			return new ArrayList<Transaction>();
 		}
 
-		return this.database.getTransactionMap().get(account, limit);
+		return this.dwSet.getTransactionMap().get(account, limit);
 	}
 
 	public List<Pair<Account, Block.BlockHead>> getLastBlocks(int limit) {
@@ -284,7 +284,7 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		List<Account> accounts = this.getAccounts();
-		return this.database.getBlocksHeadMap().get(accounts, limit);
+		return this.dwSet.getBlocksHeadMap().get(accounts, limit);
 	}
 
 	public List<Block.BlockHead> getLastBlocks(Account account, int limit) {
@@ -292,7 +292,7 @@ public class Wallet extends Observable implements Observer {
 			return new ArrayList<Block.BlockHead>();
 		}
 
-		return this.database.getBlocksHeadMap().get(account, limit);
+		return this.dwSet.getBlocksHeadMap().get(account, limit);
 	}
 
 	// тут нужно понять где это используется
@@ -304,15 +304,15 @@ public class Wallet extends Observable implements Observer {
 		switch (type) {
 			case ItemCls.ASSET_TYPE:
 				if (this.assetsFavorites != null) {
-					this.database.getAssetFavoritesSet().replace(this.assetsFavorites.getKeys());
+					this.dwSet.getAssetFavoritesSet().replace(this.assetsFavorites.getKeys());
 				}
 			case ItemCls.TEMPLATE_TYPE:
 				if (this.templatesFavorites != null) {
-					this.database.getTemplateFavoritesSet().replace(this.templatesFavorites.getKeys());
+					this.dwSet.getTemplateFavoritesSet().replace(this.templatesFavorites.getKeys());
 				}
 			case ItemCls.PERSON_TYPE:
 				if (this.personsFavorites != null) {
-					this.database.getPersonFavoritesSet().replace(this.personsFavorites.getKeys());
+					this.dwSet.getPersonFavoritesSet().replace(this.personsFavorites.getKeys());
 				}
 		}
 	}
@@ -322,7 +322,7 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		this.database.addAddressFavorite(address, pubKey, name, description);
+		this.dwSet.addAddressFavorite(address, pubKey, name, description);
 	}
 
 	public void addItemFavorite(ItemCls item) {
@@ -330,7 +330,7 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		this.database.addItemToFavorite(item);
+		this.dwSet.addItemToFavorite(item);
 	}
 
 	public void removeItemFavorite(ItemCls item) {
@@ -338,14 +338,14 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		this.database.removeItemFromFavorite(item);
+		this.dwSet.removeItemFromFavorite(item);
 	}
 
 	public boolean isItemFavorite(ItemCls item) {
 		if (!walletKeysExists()) {
 			return false;
 		}
-		return database.isItemFavorite(item);
+		return dwSet.isItemFavorite(item);
 	}
 
 	public void addDocumentFavorite(Transaction transaction) {
@@ -353,7 +353,7 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		this.database.addDocumentToFavorite(transaction);
+		this.dwSet.addDocumentToFavorite(transaction);
 	}
 
 	public void removeDocumentFavorite(Transaction transaction) {
@@ -361,7 +361,7 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		this.database.removeDocumentFromFavorite(transaction);
+		this.dwSet.removeDocumentFromFavorite(transaction);
 	}
 
 	public boolean isDocumentFavorite(Transaction transaction) {
@@ -369,7 +369,7 @@ public class Wallet extends Observable implements Observer {
 			return false;
 		}
 
-		return this.database.isDocumentFavorite(transaction);
+		return this.dwSet.isDocumentFavorite(transaction);
 	}
 
 	public void addTransactionFavorite(Transaction transaction) {
@@ -377,7 +377,7 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		this.database.addTransactionToFavorite(transaction);
+		this.dwSet.addTransactionToFavorite(transaction);
 	}
 
 	public void removeTransactionFavorite(Transaction transaction) {
@@ -385,7 +385,7 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		this.database.removeTransactionFromFavorite(transaction);
+		this.dwSet.removeTransactionFromFavorite(transaction);
 	}
 
 	public boolean isTransactionFavorite(Transaction transaction) {
@@ -393,7 +393,7 @@ public class Wallet extends Observable implements Observer {
 			return false;
 		}
 
-		return this.database.isTransactionFavorite(transaction);
+		return this.dwSet.isTransactionFavorite(transaction);
 	}
 
 	// CREATE
@@ -403,8 +403,8 @@ public class Wallet extends Observable implements Observer {
 		// set wallet dir
 		Settings.getInstance().setWalletKeysPath(path);
 
-		if (this.database != null) {
-			this.database.close();
+		if (this.dwSet != null) {
+			this.dwSet.close();
 		}
 		// OPEN WALLET
 		DWSet database = DWSet.reCreateDB(dcSet, withObserver, dynamicGUI);
@@ -431,13 +431,13 @@ public class Wallet extends Observable implements Observer {
 	public synchronized boolean create(DWSet database, SecureWalletDatabase secureDatabase, byte[] seed, int depth,
 									   boolean synchronize, boolean withObserver) {
 		// CREATE WALLET
-		this.database = database;
+		this.dwSet = database;
 
 		// CREATE SECURE WALLET
 		this.secureDatabase = secureDatabase;
 
 		// ADD VERSION
-		this.database.setVersion(1);
+		this.dwSet.setVersion(1);
 
 		// SET LICENSE KEY
 		this.setLicenseKey(Controller.LICENSE_VERS);
@@ -505,7 +505,7 @@ public class Wallet extends Observable implements Observer {
 		if (!this.accountExists(account)) {
 
 			// ADD TO DATABASE
-			this.database.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
+			this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
 
 			// set name
 			ob.put("description", Lang.T("Created by default Account") + " " + (nonce));
@@ -527,12 +527,12 @@ public class Wallet extends Observable implements Observer {
 	 */
 	public void updateAccountsFromSecretKeys() {
 
-		if (database == null)
+		if (dwSet == null)
 			return;
 
 		int number = 0;
 		/// deadlock org.erachain.database.wallet.AccountMap
-		AccountMap mapAccs = database.getAccountMap();
+		AccountMap mapAccs = dwSet.getAccountMap();
 		synchronized (mapAccs) {
 			mapAccs.clear();
 			for (PrivateKeyAccount privateAccount : getprivateKeyAccounts()) {
@@ -540,7 +540,7 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-		database.hardFlush();
+		dwSet.hardFlush();
 
 	}
 
@@ -551,7 +551,7 @@ public class Wallet extends Observable implements Observer {
 		List<Tuple2<Account, Long>> accounts_assets = this.getAccountsAssets();
 
 		for (Tuple2<Account, Long> account_asset : accounts_assets) {
-			this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
+			this.dwSet.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
 					BigDecimal.ZERO, false, false);
 		}
 
@@ -575,29 +575,21 @@ public class Wallet extends Observable implements Observer {
 			walletUpdater.lastBlocks.clear();
 
 			// SAVE transactions file
-			this.database.hardFlush();
-			this.database.clearCache();
+			this.dwSet.hardFlush();
+			this.dwSet.clearCache();
 
 			// RESET MAPS
-			this.database.getTransactionMap().clear();
-			this.database.getBlocksHeadMap().clear();
-			this.database.getAssetMap().clear();
-			this.database.getImprintMap().clear();
-			this.database.getTemplateMap().clear();
-			this.database.getPersonMap().clear();
-			this.database.getStatusMap().clear();
-			this.database.getUnionMap().clear();
-			this.database.getOrderMap().clear();
+			dwSet.clear(false);
 
-            LOGGER.info("   >>>>  Maps was Resetted");
+			LOGGER.info("   >>>>  Maps was Resetted");
 
 			// REPROCESS BLOCKS
-            blockStart = new GenesisBlock();
-			this.database.setLastBlockSignature(blockStart.getReference());
+			blockStart = new GenesisBlock();
+			this.dwSet.setLastBlockSignature(blockStart.getReference());
 
-        } else {
+		} else {
 
-			byte[] lastSignature = this.database.getLastBlockSignature();
+			byte[] lastSignature = this.dwSet.getLastBlockSignature();
 
 			if (lastSignature == null) {
 				LOGGER.debug("   >>>>  WALLET SYNCHRONIZE cancel by lastSignature = null");
@@ -617,8 +609,8 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		// SAVE transactions file
-		this.database.hardFlush();
-		this.database.clearCache();
+		this.dwSet.hardFlush();
+		this.dwSet.clearCache();
 
 		if (Controller.getInstance().isOnStopping())
 			return;
@@ -662,17 +654,17 @@ public class Wallet extends Observable implements Observer {
 						this.syncHeight = height;
 
 						//logger.debug("try Commit");
-						this.database.commit();
+						this.dwSet.commit();
 
-                        if (Controller.getInstance().isOnStopping())
-                            return;
+						if (Controller.getInstance().isOnStopping())
+							return;
 
 						// обязательно нужно чтобы память освобождать
 						// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
 						// при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
 						// БЕЗ очистки КЭША HEAP забивается под завязку
 						dcSet.clearCache();
-						this.database.clearCache();
+						this.dwSet.clearCache();
 
 						// не нужно - Ява сама норм делает вызов очистки
 						//System.gc();
@@ -700,7 +692,7 @@ public class Wallet extends Observable implements Observer {
 
 			// тут возможно цепочка синхронизировалась или начала синхронизироваться и КОММИТ вызовет ошибку
 			//  java.io.IOException: Запрошенную операцию нельзя выполнить для файла с открытой пользователем сопоставленной секцией
-			this.database.hardFlush();
+			this.dwSet.hardFlush();
 
 			// обязательно нужно чтобы память освобождать
 			// и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
@@ -708,7 +700,7 @@ public class Wallet extends Observable implements Observer {
 			// вдобавое отчищает полностью память - много свободной памяти получаем
 			dcSet.clearCache();
 
-			this.database.clearCache();
+			this.dwSet.clearCache();
 
 			System.gc();
 
@@ -720,7 +712,7 @@ public class Wallet extends Observable implements Observer {
 			Controller.getInstance().walletSyncStatusUpdate(0);
 
 			LOGGER.info("Update Orders");
-			this.database.getOrderMap().updateLefts();
+			this.dwSet.getOrderMap().updateLefts();
 
 			LOGGER.info(" >>>>>>>>>>>>>>> *** Synchronizing wallet DONE on: " + height);
 
@@ -851,10 +843,10 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF ACCOUNT ALREADY EXISTS
 		if (!this.accountExists(account)) {
 			// ADD TO DATABASE
-			this.database.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
+			this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
 
 			// SAVE TO DISK
-			this.database.hardFlush();
+			this.dwSet.hardFlush();
 
 			// SYNCHRONIZE
 			this.synchronizeFull();
@@ -889,10 +881,10 @@ public class Wallet extends Observable implements Observer {
 			return new Tuple3<>(null, 0, "Already exist");
 
 		// ADD TO DATABASE
-		this.database.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
+		this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
 
 		// SAVE TO DISK
-		this.database.hardFlush();
+		this.dwSet.hardFlush();
 
 		// SYNCHRONIZE
 		this.synchronizeFull();
@@ -956,8 +948,8 @@ public class Wallet extends Observable implements Observer {
 
 
 			// REGISTER ON ORDERS - foe BELLs on incomed TRADES
-			this.database.getOrderMap().addObserver(this);
-			this.database.getTelegramsMap().addObserver(this);
+			this.dwSet.getOrderMap().addObserver(this);
+			this.dwSet.getTelegramsMap().addObserver(this);
 
 		}
 
@@ -971,31 +963,31 @@ public class Wallet extends Observable implements Observer {
 		if (false && Controller.getInstance().doesWalletDatabaseExists()) {
 
 			// REGISTER ON ACCOUNTS
-			this.database.getAccountMap().addObserver(o);
+			this.dwSet.getAccountMap().addObserver(o);
 
 			// REGISTER ON TRANSACTIONS
-			this.database.getTransactionMap().addObserver(o);
+			this.dwSet.getTransactionMap().addObserver(o);
 
 			// REGISTER ON BLOCKS
-			this.database.getBlocksHeadMap().addObserver(o);
+			this.dwSet.getBlocksHeadMap().addObserver(o);
 
 			// REGISTER ON ASSETS
-			this.database.getAssetMap().addObserver(o);
+			this.dwSet.getAssetMap().addObserver(o);
 
 			// REGISTER ON IMPRINTS
-			this.database.getImprintMap().addObserver(o);
+			this.dwSet.getImprintMap().addObserver(o);
 
 			// REGISTER ON TEMPLATES
-			this.database.getTemplateMap().addObserver(o);
+			this.dwSet.getTemplateMap().addObserver(o);
 
 			// REGISTER ON PERSONS
-			this.database.getPersonMap().addObserver(o);
+			this.dwSet.getPersonMap().addObserver(o);
 
 			// REGISTER ON STATUS
-			this.database.getStatusMap().addObserver(o);
+			this.dwSet.getStatusMap().addObserver(o);
 
 			// REGISTER ON UNION
-			this.database.getUnionMap().addObserver(o);
+			this.dwSet.getUnionMap().addObserver(o);
 
 		}
 
@@ -1015,19 +1007,19 @@ public class Wallet extends Observable implements Observer {
 		if (Controller.getInstance().doesWalletDatabaseExists()) {
 
 			// REGISTER ON ASSET FAVORITES
-			this.database.getAssetFavoritesSet().addObserver(o);
+			this.dwSet.getAssetFavoritesSet().addObserver(o);
 
 			// REGISTER ON PLATE FAVORITES
-			this.database.getTemplateFavoritesSet().addObserver(o);
+			this.dwSet.getTemplateFavoritesSet().addObserver(o);
 
 			// REGISTER ON PERSON FAVORITES
-			this.database.getPersonFavoritesSet().addObserver(o);
+			this.dwSet.getPersonFavoritesSet().addObserver(o);
 
 			// REGISTER ON STATUS FAVORITES
-			this.database.getStatusFavoritesSet().addObserver(o);
+			this.dwSet.getStatusFavoritesSet().addObserver(o);
 
 			// REGISTER ON UNION FAVORITES
-			this.database.getUnionFavoritesSet().addObserver(o);
+			this.dwSet.getUnionFavoritesSet().addObserver(o);
 
 		}
 	}
@@ -1042,8 +1034,8 @@ public class Wallet extends Observable implements Observer {
 
 		if (!asOrphan && transaction instanceof RSend) {
 			// ADD to FAVORITES
-			if (absKey > 0 && !this.database.getAssetFavoritesSet().contains(transaction.getAbsKey()))
-				this.database.getAssetFavoritesSet().add(transaction.getAbsKey());
+			if (absKey > 0 && !this.dwSet.getAssetFavoritesSet().contains(transaction.getAbsKey()))
+				this.dwSet.getAssetFavoritesSet().add(transaction.getAbsKey());
 
 		}
 
@@ -1064,11 +1056,11 @@ public class Wallet extends Observable implements Observer {
 					amount = amount.subtract(fee);
 				}
 			}
-			this.database.getAccountMap().changeBalance(address, !asOrphan, transaction.getKey(), amount, isBackward, isDirect);
+			this.dwSet.getAccountMap().changeBalance(address, !asOrphan, transaction.getKey(), amount, isBackward, isDirect);
 		} else {
 			// ONLY FEE
 			if (fee.compareTo(BigDecimal.ZERO) != 0) {
-				this.database.getAccountMap().changeBalance(address, !asOrphan, FEE_KEY, fee, isBackward, false);
+				this.dwSet.getAccountMap().changeBalance(address, !asOrphan, FEE_KEY, fee, isBackward, false);
 			}
 		}
 
@@ -1172,7 +1164,7 @@ public class Wallet extends Observable implements Observer {
 			if (transaction.isInvolved(account)) {
 				isInvolved = true;
 				// ADD TO ACCOUNT TRANSACTIONS
-				if (!this.database.getTransactionMap().set(account, transaction)) {
+				if (!this.dwSet.getTransactionMap().set(account, transaction)) {
 					// UPDATE UNCONFIRMED BALANCE for ASSET
 					deal_transaction(account, transaction, false);
 				}
@@ -1182,7 +1174,7 @@ public class Wallet extends Observable implements Observer {
 		// ADD SENDER to FAVORITES
 		if (isInvolved) {
 			PublicKeyAccount creator = transaction.getCreator();
-			if (creator != null && !accountExists(creator) && !this.database.getAccountMap().exists(creator)) {
+			if (creator != null && !accountExists(creator) && !this.dwSet.getAccountMap().exists(creator)) {
 				String title = transaction.getTitle();
 				Tuple2<Integer, PersonCls> personItem = creator.getPerson();
 				if (personItem != null && personItem.b != null)
@@ -1221,7 +1213,7 @@ public class Wallet extends Observable implements Observer {
 				// if(atTx.b.getRecipient().equalsIgnoreCase(
 				// account.getAddress() ))
 				if (atTx.b.getRecipient() == account.getAddress()) {
-					this.database.getAccountMap().changeBalance(account.getAddress(), false, atTx.b.getKey(),
+					this.dwSet.getAccountMap().changeBalance(account.getAddress(), false, atTx.b.getKey(),
 							BigDecimal.valueOf(atTx.b.getAmount()), false, false);
 
 				}
@@ -1246,11 +1238,11 @@ public class Wallet extends Observable implements Observer {
 					deal_transaction(account, transaction, true);
 
 					// 1. DELETE FROM ACCOUNT TRANSACTIONS - с нарощенным мясом
-					this.database.getTransactionMap().delete(account, transaction);
+					this.dwSet.getTransactionMap().delete(account, transaction);
 
 					// 2. а теперь сбросим все и сахраним без ссылки на блок
 					transaction.resetSeqNo();
-					this.database.getTransactionMap().put(account, transaction);
+					this.dwSet.getTransactionMap().put(account, transaction);
 
 				}
 			}
@@ -1269,7 +1261,7 @@ public class Wallet extends Observable implements Observer {
 			for (Account account : accounts) {
 				// CHECK IF INVOLVED
 				if (atTx.b.getRecipient().equalsIgnoreCase(account.getAddress())) {
-					this.database.getAccountMap().changeBalance(account.getAddress(), true, atTx.b.getKey(),
+					this.dwSet.getAccountMap().changeBalance(account.getAddress(), true, atTx.b.getKey(),
 							BigDecimal.valueOf(atTx.b.getAmount()), false, false);
 				}
 			}
@@ -1280,7 +1272,7 @@ public class Wallet extends Observable implements Observer {
 	public boolean checkNeedSyncWallet(byte[] signatureORreference) {
 
 		// CHECK IF WE NEED TO RESYNC
-		byte[] lastBlockSignature = this.database.getLastBlockSignature();
+		byte[] lastBlockSignature = this.dwSet.getLastBlockSignature();
 		if (lastBlockSignature == null
 				|| !Arrays.equals(lastBlockSignature, signatureORreference)) {
 			////walletUpdater.setGoSynchronize(false);
@@ -1318,7 +1310,7 @@ public class Wallet extends Observable implements Observer {
         }
 
         */
-		this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY,
+		this.dwSet.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY,
 				new BigDecimal(blockFee).movePointLeft(BlockChain.FEE_SCALE), false, false);
 
 	}
@@ -1376,7 +1368,7 @@ public class Wallet extends Observable implements Observer {
 		long start = System.currentTimeMillis();
 
 		// SET AS LAST BLOCK
-		this.database.setLastBlockSignature(block.blockHead.signature);
+		this.dwSet.setLastBlockSignature(block.blockHead.signature);
 
 		Account blockGenerator = block.blockHead.creator;
 
@@ -1391,7 +1383,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGenerator)) {
 			// ADD BLOCK
-			this.database.getBlocksHeadMap().add(block.blockHead);
+			this.dwSet.getBlocksHeadMap().add(block.blockHead);
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
 			// PROCESS FEE
@@ -1473,7 +1465,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGenerator)) {
 			// DELETE BLOCK
-			this.database.getBlocksHeadMap().delete(block.blockHead);
+			this.dwSet.getBlocksHeadMap().delete(block.blockHead);
 
 			// SET AS LAST BLOCK
 			// this.database.setLastBlockSignature(block.getReference());
@@ -1484,7 +1476,7 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		// SET AS LAST BLOCK
-        this.database.setLastBlockSignature(block.blockHead.reference); // .reference
+		this.dwSet.setLastBlockSignature(block.blockHead.reference); // .reference
 
         // long tickets = System.currentTimeMillis() - start;
 		// logger.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
@@ -1506,9 +1498,9 @@ public class Wallet extends Observable implements Observer {
 			return;
 
 		// ADD ASSET
-		this.database.putItem(item);
+		this.dwSet.putItem(item);
 		// ADD to FAVORITES
-		this.database.addItemFavorite(item);
+		this.dwSet.addItemFavorite(item);
 
 	}
 
@@ -1522,9 +1514,9 @@ public class Wallet extends Observable implements Observer {
 		ItemCls item = issueItem.getItem();
 
 		// DELETE ASSET
-		this.database.deleteItem(item);
+		this.dwSet.deleteItem(item);
 		// DELETE FAVORITE
-		this.database.deleteItemFavorite(item);
+		this.dwSet.deleteItemFavorite(item);
 
 	}
 
@@ -1563,18 +1555,18 @@ public class Wallet extends Observable implements Observer {
 
 				// GIFTs
 				if (this.accountExists(transPersonIssue.getCreator())) {
-					this.database.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
+					this.dwSet.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
 							false, FEE_KEY, issued_FEE_BD, false, false);
 				}
 
 				// GIFTs
 				if (this.accountExists(creator)) {
-					this.database.getAccountMap().changeBalance(creator.getAddress(), false, FEE_KEY, issued_FEE_BD, false, false);
+					this.dwSet.getAccountMap().changeBalance(creator.getAddress(), false, FEE_KEY, issued_FEE_BD, false, false);
 				}
 
 				PublicKeyAccount pkAccount = certifyPubKeys.getCertifiedPublicKeys().get(0);
 				if (this.accountExists(pkAccount)) {
-					this.database.getAccountMap().changeBalance(pkAccount.getAddress(), false, FEE_KEY, issued_FEE_BD, false, false);
+					this.dwSet.getAccountMap().changeBalance(pkAccount.getAddress(), false, FEE_KEY, issued_FEE_BD, false, false);
 				}
 			}
 		}
@@ -1586,7 +1578,7 @@ public class Wallet extends Observable implements Observer {
 		for (PublicKeyAccount key : certifiedPublicKeys) {
 			if (this.accountExists(key)) {
 				long personKey = certifyPubKeys.getKey();
-				this.database.getPersonFavoritesSet().add(personKey);
+				this.dwSet.getPersonFavoritesSet().add(personKey);
 				break;
 			}
 		}
@@ -1628,18 +1620,18 @@ public class Wallet extends Observable implements Observer {
 
 			// GIFTs
 			if (this.accountExists(transPersonIssue.getCreator())) {
-				this.database.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
+				this.dwSet.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
 						true, FEE_KEY, issued_FEE_BD, false, false);
 			}
 
 			// GIFTs
 			if (this.accountExists(creator)) {
-				this.database.getAccountMap().changeBalance(creator.getAddress(), true, FEE_KEY, issued_FEE_BD, false, false);
+				this.dwSet.getAccountMap().changeBalance(creator.getAddress(), true, FEE_KEY, issued_FEE_BD, false, false);
 			}
 
 			PublicKeyAccount pkAccount = certifyPubKeys.getCertifiedPublicKeys().get(0);
 			if (this.accountExists(creator)) {
-				this.database.getAccountMap().changeBalance(pkAccount.getAddress(), true, FEE_KEY, issued_FEE_BD, false, false);
+				this.dwSet.getAccountMap().changeBalance(pkAccount.getAddress(), true, FEE_KEY, issued_FEE_BD, false, false);
 			}
 		}
 	}
@@ -1653,7 +1645,7 @@ public class Wallet extends Observable implements Observer {
 		if (orderCreation.getOrderId() == null)
 			return;
 
-		this.database.getOrderMap().add(Order.getOrder(dcSet, orderCreation.getOrderId()));
+		this.dwSet.getOrderMap().add(Order.getOrder(dcSet, orderCreation.getOrderId()));
 
 	}
 
@@ -1663,8 +1655,8 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		this.database.getOrderMap().add(Order.getOrder(dcSet, orderChanging.getOrderId()));
-		this.database.getOrderMap().add(Order.getOrder(dcSet, orderChanging.getDBRef()));
+		this.dwSet.getOrderMap().add(Order.getOrder(dcSet, orderChanging.getOrderId()));
+		this.dwSet.getOrderMap().add(Order.getOrder(dcSet, orderChanging.getDBRef()));
 
 	}
 
@@ -1679,7 +1671,7 @@ public class Wallet extends Observable implements Observer {
 			return;
 
 		try {
-			if (this.database == null)
+			if (this.dwSet == null)
 				return;
 
 			ObserverMessage message = (ObserverMessage) arg;
@@ -1710,7 +1702,7 @@ public class Wallet extends Observable implements Observer {
 							// CHECK IF INVOLVED
 							if (transaction.isInvolved(account)) {
 								// ADD TO ACCOUNT TRANSACTIONS
-								if (!this.database.getTransactionMap().set(account, transaction)) {
+								if (!this.dwSet.getTransactionMap().set(account, transaction)) {
 									// UPDATE UNCONFIRMED BALANCE for ASSET
 								}
 							}
@@ -1746,8 +1738,8 @@ public class Wallet extends Observable implements Observer {
 		if (this.lockTimer != null)
 			this.lockTimer.cancel();
 
-		if (this.database != null) {
-			this.database.close();
+		if (this.dwSet != null) {
+			this.dwSet.close();
 		}
 
 		if (this.secureDatabase != null) {
@@ -1756,8 +1748,8 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public void commit() {
-		if (this.database != null) {
-			this.database.hardFlush();
+		if (this.dwSet != null) {
+			this.dwSet.hardFlush();
 		}
 
 		if (this.secureDatabase != null) {
@@ -1767,19 +1759,19 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public byte[] getLastBlockSignature() {
-		return this.database.getLastBlockSignature();
+		return this.dwSet.getLastBlockSignature();
 	}
 
 	public long getLicenseKey() {
-		if (this.database == null || this.database.getLicenseKey() == null) {
+		if (this.dwSet == null || this.dwSet.getLicenseKey() == null) {
 			return 2L;
 		}
 
-		return this.database.getLicenseKey();
+		return this.dwSet.getLicenseKey();
 	}
 
 	public void setLicenseKey(long key) {
-		this.database.setLicenseKey(key);
+		this.dwSet.setLicenseKey(key);
 	}
 
 	/**

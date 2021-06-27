@@ -1731,8 +1731,8 @@ public class Controller extends Observable {
             // BROADCAST MESSAGE
             this.network.broadcast(telegram, false);
             // save DB
-            if (wallet != null && wallet.database != null) {
-                wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
+            if (wallet != null && wallet.dwSet != null) {
+                wallet.dwSet.getTelegramsMap().add(transaction.viewSignature(), transaction);
             }
         }
 
@@ -2593,7 +2593,7 @@ public class Controller extends Observable {
     }
 
     public void addTelegramToWallet(Transaction transaction, String signatureKey) {
-        if (wallet == null || wallet.database == null) {
+        if (wallet == null || wallet.dwSet == null) {
             return;
         }
 
@@ -2603,8 +2603,8 @@ public class Controller extends Observable {
         String creatorPubKey58 = creator.getBase58();
         for (Account recipient : recipients) {
             if (wallet.accountExists(recipient)) {
-                wallet.database.getTelegramsMap().add(signatureKey, transaction);
-                if (!wallet.database.getFavoriteAccountsMap().contains(creator58)) {
+                wallet.dwSet.getTelegramsMap().add(signatureKey, transaction);
+                if (!wallet.dwSet.getFavoriteAccountsMap().contains(creator58)) {
                     String title = transaction.getTitle();
                     String description = "";
                     if (transaction instanceof RSend) {
@@ -3784,8 +3784,8 @@ public class Controller extends Observable {
             return null;
         }
 
-        if (wallet != null && wallet.database != null) {
-            Tuple3<String, String, String> favorite = wallet.database.getFavoriteAccountsMap().get(address);
+        if (wallet != null && wallet.dwSet != null) {
+            Tuple3<String, String, String> favorite = wallet.dwSet.getFavoriteAccountsMap().get(address);
             if (favorite != null && favorite.a != null) {
                 return Base58.decode(favorite.a);
             }

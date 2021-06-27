@@ -45,7 +45,7 @@ public class MyOrderTab extends SplitPanel {
         jButton2_jToolBar_RightPanel.setVisible(false);
 
         // set interval panel
-        setIntervalPanel = new SetIntervalPanel(Controller.getInstance().getWallet().database.getOrderMap());
+        setIntervalPanel = new SetIntervalPanel(Controller.getInstance().getWallet().dwSet.getOrderMap());
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;

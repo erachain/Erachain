@@ -26,7 +26,7 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel implements Obser
     public AccountsComboBoxModel(long personKey) {
         this.personKey = personKey;
         addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey);
-        observable = Controller.getInstance().getWallet().database.getAccountMap();
+        observable = Controller.getInstance().getWallet().dwSet.getAccountMap();
 
         synchronized (addresses) {
             sortAndAdd();

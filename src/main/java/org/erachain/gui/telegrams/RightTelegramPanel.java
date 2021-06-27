@@ -511,7 +511,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
 
                 Tuple3<Long, Long, Transaction> tt = (Tuple3<Long, Long, Transaction>) walletTelegramsFilterTableModel.getValueAt(row, 0);
-                Controller.getInstance().getWallet().database.getTelegramsMap().delete(tt.c.viewSignature());
+                Controller.getInstance().getWallet().dwSet.getTelegramsMap().delete(tt.c.viewSignature());
                 //     System.out.println(row);
             }
         });

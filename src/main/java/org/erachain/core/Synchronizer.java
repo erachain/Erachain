@@ -394,7 +394,7 @@ public class Synchronizer extends Thread {
             // освободим всю память
             dcSet.clearCache();
             if (ctrl.doesWalletExists()) {
-                ctrl.getWallet().database.clearCache();
+                ctrl.getWallet().dwSet.clearCache();
             }
 
             ConcurrentHashMap<Long, Transaction> orphanedTransactions

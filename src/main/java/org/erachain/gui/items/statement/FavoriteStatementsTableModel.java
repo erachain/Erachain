@@ -21,7 +21,7 @@ public class FavoriteStatementsTableModel extends FavoriteItemModelTable {
 
     public FavoriteStatementsTableModel() {
         super(DCSet.getInstance().getTransactionFinalMap(),
-                Controller.getInstance().getWallet().database.getDocumentFavoritesSet(),
+                Controller.getInstance().getWallet().dwSet.getDocumentFavoritesSet(),
                 new String[]{"№", "Timestamp", "Creator", "Title", "Template", "Favorite"},
                 new Boolean[]{false, true, true, true, false, false},
                 ObserverMessage.RESET_STATEMENT_FAVORITES_TYPE,

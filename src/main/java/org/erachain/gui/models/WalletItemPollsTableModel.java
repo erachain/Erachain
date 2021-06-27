@@ -18,7 +18,7 @@ public class WalletItemPollsTableModel extends WalletTableModel<PollCls> {
     private Fun.Tuple4<Integer, long[], BigDecimal, BigDecimal[]> votesWithPersons;
 
     public WalletItemPollsTableModel() {
-        super(Controller.getInstance().getWallet().database.getPollMap(),
+        super(Controller.getInstance().getWallet().dwSet.getPollMap(),
                 new String[]{"Key", "Name", "Creator", "Total Votes", "Favorite"},
                 null, true, COLUMN_FAVORITE);
     }

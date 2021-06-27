@@ -12,7 +12,7 @@ public class ComboBoxModelItemsTemplates extends FavoriteComboBoxModel {
     }
 
     public void setObservable() {
-        this.observable = Controller.getInstance().getWallet().database.getTemplateFavoritesSet();
+        this.observable = Controller.getInstance().getWallet().dwSet.getTemplateFavoritesSet();
     }
 
 }
