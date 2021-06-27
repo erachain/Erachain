@@ -285,7 +285,7 @@ public class APIItemPerson {
 
     @Path("icon/{key}")
     @GET
-    @Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response personIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {

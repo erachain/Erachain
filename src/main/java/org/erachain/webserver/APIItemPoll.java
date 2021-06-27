@@ -161,7 +161,7 @@ public class APIItemPoll {
 
     @Path("image/{key}")
     @GET
-    @Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response pollImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -185,7 +185,7 @@ public class APIItemPoll {
 
     @Path("icon/{key}")
     @GET
-    @Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response pollIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {

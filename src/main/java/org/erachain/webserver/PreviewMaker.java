@@ -22,7 +22,7 @@ public class PreviewMaker {
 
         // так как даже маленькие картинки будут обрамлены в теге ВИДЕО на сайте то все IMG
         // и только большие ВИДЕО
-        return item.getImageType() == AssetCls.MEDIA_TYPE_VIDEO && image.length < VIDEO_USE_ORIG_LEN;
+        return item.getImageType() == AssetCls.MEDIA_TYPE_AUDIO || item.getImageType() == AssetCls.MEDIA_TYPE_VIDEO && image.length < VIDEO_USE_ORIG_LEN;
 
     }
 
