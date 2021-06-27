@@ -34,25 +34,30 @@ public class APIItems {
 
         MediaType mediaType;
 
-        if (PreviewMaker.notNeedPreview(item, image)) {
-            mediaType = item.getImageMediaType();
+        if (item.getImageType() == ItemCls.MEDIA_TYPE_SOUND && preView) {
+            mediaType = item.getIconMediaType();
+            image = item.getIcon();
         } else {
-            PreviewMaker preViewMaker = new PreviewMaker();
-            preViewMaker.makePreview(item, image);
-            if (preView) {
-                image = preViewMaker.getPreview((item), image);
-                if (image == null) {
-                    if (preViewMaker.errorMess == null) {
-                        throw ApiErrorFactory.getInstance().createError(
-                                "Some error - see in dataPreviews" + File.separator + "orig" + File.separator + PreviewMaker.getItemName(item) + ".log");
-                    } else {
-                        throw ApiErrorFactory.getInstance().createError(
-                                preViewMaker.errorMess);
-                    }
-                }
-                mediaType = new MediaType("video", "mp4");
-            } else {
+            if (PreviewMaker.notNeedPreview(item, image)) {
                 mediaType = item.getImageMediaType();
+            } else {
+                PreviewMaker preViewMaker = new PreviewMaker();
+                preViewMaker.makePreview(item, image);
+                if (preView) {
+                    image = preViewMaker.getPreview((item), image);
+                    if (image == null) {
+                        if (preViewMaker.errorMess == null) {
+                            throw ApiErrorFactory.getInstance().createError(
+                                    "Some error - see in dataPreviews" + File.separator + "orig" + File.separator + PreviewMaker.getItemName(item) + ".log");
+                        } else {
+                            throw ApiErrorFactory.getInstance().createError(
+                                    preViewMaker.errorMess);
+                        }
+                    }
+                    mediaType = new MediaType("video", "mp4");
+                } else {
+                    mediaType = item.getImageMediaType();
+                }
             }
         }
 

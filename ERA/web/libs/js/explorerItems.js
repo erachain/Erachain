@@ -17,6 +17,9 @@ function itemHead(item, forPrint) {
             output += '<video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls >';
             output += '<td><video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
 
+        } else if (item.imageTypeName == 'audio') {
+            output += '<audio style="display:none;" onclick="style.display=\'none\';this.stop()" id="audio-holder" loop controls >';
+            output += '<td><audio autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
         } else {
             output += '<img id="image-holder" onclick="style.display=\'none\'">';
             output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';

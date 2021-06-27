@@ -427,7 +427,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             case MEDIA_TYPE_VIDEO:
                 return "video";
             case MEDIA_TYPE_SOUND:
-                return "sound";
+                return "audio";
             case MEDIA_TYPE_FRAME:
                 return "frame";
             default:
@@ -451,6 +451,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         } else if (mediaType == ItemCls.MEDIA_TYPE_VIDEO) {
             return new MediaType("video", "mp4");
+        } else if (mediaType == ItemCls.MEDIA_TYPE_SOUND) {
+            return new MediaType("audio", "mp3");
         }
         return null;
     }
