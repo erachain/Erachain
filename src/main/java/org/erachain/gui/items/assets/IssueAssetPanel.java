@@ -186,7 +186,7 @@ public class IssueAssetPanel extends IssueItemPanel {
     protected void makeAppData() {
         itemAppData = AssetCls.makeAppData(!addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
                 !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
-                multipleRoyaltyPanel.recipientsTableModel.getRecipients());
+                tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients());
 
     }
 
@@ -194,11 +194,11 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         AssetCls asset;
         if (AssetCls.isTypeUnique(assetType, quantity)) {
-            asset = new AssetUnique(itemAppData, creator, textName.getText(), addIconLabel.getMediaBytes(),
+            asset = new AssetUnique(itemAppData, creator, nameField.getText(), addIconLabel.getMediaBytes(),
                     addImageLabel.getMediaBytes(), textAreaDescription.getText(),
                     assetType);
         } else {
-            asset = new AssetVenture(itemAppData, creator, textName.getText(), addIconLabel.getMediaBytes(),
+            asset = new AssetVenture(itemAppData, creator, nameField.getText(), addIconLabel.getMediaBytes(),
                     addImageLabel.getMediaBytes(), textAreaDescription.getText(),
                     assetType, scale, quantity);
         }

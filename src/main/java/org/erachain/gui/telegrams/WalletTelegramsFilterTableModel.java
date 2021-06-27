@@ -34,7 +34,7 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
     static Logger LOGGER = LoggerFactory.getLogger(WalletTelegramsFilterTableModel.class);
 
     public WalletTelegramsFilterTableModel() {
-        super(Controller.getInstance().getWallet().database.getTelegramsMap(),
+        super(Controller.getInstance().getWallet().dwSet.getTelegramsMap(),
                 new String[]{"Date", "Sender", "Recipient", "Title", "Message"},
                 new Boolean[]{true, true, true, true, false}, false, -1);
 

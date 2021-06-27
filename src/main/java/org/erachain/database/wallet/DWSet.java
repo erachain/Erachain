@@ -14,6 +14,7 @@ import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.DBTab;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.json.simple.JSONObject;
@@ -186,7 +187,7 @@ public class DWSet extends DBASet {
 
         if (DBASet.getVersion(database) < CURRENT_VERSION) {
             database.close();
-            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake datachain Set " + dbFile.getParentFile().toPath());
+            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DWSet in " + dbFile.getParentFile().toPath());
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
@@ -476,8 +477,18 @@ public class DWSet extends DBASet {
         hardFlush();
     }
 
+    public void clear(boolean andAccountsMap) {
+        for (DBTab table : tables) {
+            if (!andAccountsMap && table instanceof AccountMap)
+                continue;
+
+            table.clear();
+        }
+    }
+
+
     /**
-     * закрываем без коммита! - чтобы при запуске продолжитть?
+     * закрываем без коммита! - чтобы при запуске продолжить?
      */
     @Override
     public void close() {

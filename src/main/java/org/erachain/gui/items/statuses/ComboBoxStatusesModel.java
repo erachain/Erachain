@@ -12,7 +12,7 @@ public class ComboBoxStatusesModel extends FavoriteComboBoxModel {
     }
 
     public void setObservable() {
-        this.observable = Controller.getInstance().getWallet().database.getStatusFavoritesSet();
+        this.observable = Controller.getInstance().getWallet().dwSet.getStatusFavoritesSet();
     }
 
 }

@@ -186,6 +186,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int INVALID_VALUE_LENGTH_MAX = 160;
     public static final int INVALID_TITLE_LENGTH_MIN = 161;
     public static final int INVALID_TITLE_LENGTH_MAX = 162;
+    public static final int INVALID_TAGS_LENGTH_MAX = 163;
+
 
     public static final int NOT_DEBTABLE_ASSET = 171;
     public static final int NOT_HOLDABLE_ASSET = 172;
@@ -1729,7 +1731,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         boolean isSigned = this.signature != null;
         transaction.put("signature", isSigned ? Base58.encode(this.signature) : "null");
 
-        transaction.put("raw", Base58.encode(this.toBytes(FOR_NETWORK, isSigned)));
+        transaction.put("raw", Base64.getEncoder().encodeToString(this.toBytes(FOR_NETWORK, isSigned)));
 
         return transaction;
     }

@@ -56,13 +56,13 @@ public class AccountSeedMap {
             this.loadPrivateKeyAccounts();
         }
 
-        synchronized (this.privateKeyAccounts) {
+        //synchronized (this.privateKeyAccounts) {
             for (PrivateKeyAccount privateKeyAccount : this.privateKeyAccounts) {
                 if (privateKeyAccount.getAddress().equals(address)) {
                     return privateKeyAccount;
                 }
             }
-        }
+        //}
 
         return null;
     }
@@ -72,13 +72,13 @@ public class AccountSeedMap {
             this.loadPrivateKeyAccounts();
         }
 
-        synchronized (this.privateKeyAccounts) {
+        //synchronized (this.privateKeyAccounts) {
             for (PrivateKeyAccount privateKeyAccount : this.privateKeyAccounts) {
                 if (privateKeyAccount.equals(account)) {
                     return privateKeyAccount;
                 }
             }
-        }
+        //}
 
         return null;
     }
@@ -88,27 +88,27 @@ public class AccountSeedMap {
             this.loadPrivateKeyAccounts();
         }
 
-        synchronized (this.privateKeyAccounts) {
+        //synchronized (this.privateKeyAccounts) {
             for (PrivateKeyAccount privateKeyAccount : this.privateKeyAccounts) {
                 if (privateKeyAccount.getAddress().equals(address)) {
                     return new PublicKeyAccount(privateKeyAccount.getPublicKey());
                 }
             }
-        }
+        //}
 
         return null;
     }
 
     public void add(PrivateKeyAccount account) {
-        //if ()
+
         this.accountSeedsSet.add(account.getSeed());
 
         if (this.privateKeyAccounts == null) {
             this.loadPrivateKeyAccounts();
-        }
-
-        synchronized (this.privateKeyAccounts) {
-            this.privateKeyAccounts.add(account);
+        } else {
+            synchronized (this.privateKeyAccounts) {
+                this.privateKeyAccounts.add(account);
+            }
         }
     }
 

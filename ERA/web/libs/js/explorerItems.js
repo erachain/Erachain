@@ -40,6 +40,10 @@ function itemHead(item, forPrint) {
         output += '</a>';
 
     output += '</h3>';
+    if (item.hasOwnProperty('tags')) {
+        output += '<br>' + item.tags;
+    }
+
     if (item.hasOwnProperty('exLink')) {
         output += '<h3>'
             + '<img src="img/parentTx.png" style="height:1.5em"> ' + item.exLink_Name + ' '

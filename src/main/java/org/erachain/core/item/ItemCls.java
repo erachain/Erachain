@@ -92,7 +92,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected static final int DB_DATA_MASK = 1 << 30;
 
     protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
-    // ITEM_FLAGS[0]
+    protected static final long ITEM_FLAGS_HAS_TAGS = 1L << (Long.SIZE - 1);
+
+    // appDATA [10]
     protected static final byte ITEM_HAS_URL_MASK = (byte) -128;
     //protected static final byte ITEM_HAS_IMAGE_URL_MASK = (byte) -128;
     //protected static final long ITEM_ICON_TYPE_MASK = (4L + 2L + 1L) << 59; // маска Типа на 3 бита - 8 значений разных
@@ -119,6 +121,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected byte[] image;
     protected boolean imageAsURL;
     protected int imageType;
+
+    protected String tags;
 
     public Transaction referenceTx = null;
 
@@ -172,17 +176,22 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             }
             imageType = imageTypeByte;
 
+            if ((flags & ITEM_FLAGS_HAS_TAGS) != 0) {
+                int len = Byte.toUnsignedInt(appData[pos++]);
+                tags = new String(Arrays.copyOfRange(appData, pos, pos + len), StandardCharsets.UTF_8);
+                pos += len;
+            }
+
         }
 
         return pos;
     }
 
-    public static byte[] makeAppData(long flags, boolean iconAsURL, int iconType, boolean imageAsURL, int imageType) {
-        if (flags != 0 || iconAsURL || imageAsURL || iconType != 0 || imageType != 0) {
+    public static byte[] makeAppData(long flags, boolean iconAsURL, int iconType, boolean imageAsURL, int imageType, String tags) {
+        if (flags != 0 || iconAsURL || imageAsURL || iconType != 0 || imageType != 0
+                || tags != null && !tags.isEmpty()) {
             byte[] appData = new byte[12];
             appData[0] = APP_DATA_ITEM_FLAGS_MASK;
-            // 2 байта пропустим, потом флаги
-            System.arraycopy(Longs.toByteArray(flags), 0, appData, 2, Long.BYTES);
 
             // байт по Иконке
             appData[10] = (byte) iconType;
@@ -192,6 +201,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             appData[11] = (byte) imageType;
             if (imageAsURL)
                 appData[11] |= ITEM_HAS_URL_MASK;
+
+            if (tags != null && !tags.isEmpty()) {
+                flags |= ITEM_FLAGS_HAS_TAGS;
+                appData = Bytes.concat(appData, new byte[]{(byte) tags.length()});
+                appData = Bytes.concat(appData, tags.getBytes(StandardCharsets.UTF_8));
+            }
+
+            // Теперь Флаги собранные - (2 байта пропустим)
+            System.arraycopy(Longs.toByteArray(flags), 0, appData, 2, Long.BYTES);
 
             return appData;
 
@@ -269,6 +287,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             return Transaction.INVALID_IMAGE_LENGTH_MAX;
         }
 
+        if (tags != null && tags.getBytes(StandardCharsets.UTF_8).length > 255) {
+            return Transaction.INVALID_TAGS_LENGTH_MAX;
+        }
+
         //CHECK DESCRIPTION LENGTH
         int descriptionLength = description == null ? 0 : description.getBytes(StandardCharsets.UTF_8).length;
         if (descriptionLength > Transaction.MAX_DATA_BYTES_LENGTH) {
@@ -276,6 +298,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             return Transaction.INVALID_DESCRIPTION_LENGTH_MAX;
         }
 
+        if (iconAsURL && (icon == null || icon.length > 512)) {
+            errorValue = "icon";
+            return Transaction.INVALID_URL_LENGTH;
+        }
+
+        if (imageAsURL && (image == null || image.length > 512)) {
+            errorValue = "image";
+            return Transaction.INVALID_URL_LENGTH;
+        }
         return Transaction.VALIDATE_OK;
     }
 
@@ -367,6 +398,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      * @return
      */
     public String[] getTags() {
+        if (tags != null && !tags.isEmpty()) {
+            String[] array = tags.toLowerCase().split(",");
+            for (int i = 0; i < array.length; i++) {
+                array[i] = array[i].trim();
+            }
+            return array;
+        }
         return null;
     }
 
@@ -900,6 +938,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public JSONObject toJson() {
 
         JSONObject itemJSON = toJsonLite(false, false);
+
+        if (tags != null)
+            itemJSON.put("tags", tags);
 
         itemJSON.put("charKey", getItemTypeAndKey());
 

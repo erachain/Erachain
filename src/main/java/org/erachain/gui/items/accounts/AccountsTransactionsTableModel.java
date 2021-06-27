@@ -40,7 +40,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
     private DCSet dcSet = DCSet.getInstance();
 
     public AccountsTransactionsTableModel() {
-        super(Controller.getInstance().getWallet().database.getTransactionMap(),
+        super(Controller.getInstance().getWallet().dwSet.getTransactionMap(),
                 new String[]{"№", "Date", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Favorite"},
                 new Boolean[]{false, true, true, false, false, true, true, true, true, true}, false, COLUMN_FAVORITE);
 

@@ -34,7 +34,7 @@ public class IssueImprintPanel extends IssueItemPanel {
         int gridy = y;
 
         nameJLabel.setVisible(false);
-        textName.setVisible(false);
+        nameField.setVisible(false);
 
         //LABEL NUMBER
         labelGBC.gridy = gridy;

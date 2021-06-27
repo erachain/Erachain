@@ -14,6 +14,7 @@ import org.erachain.utils.APIUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -650,6 +651,46 @@ public class AddressesResource {
     }
 
     @GET
+    @Path("/importaccountseed/{accountseed}")
+    public String importAccountSeed(@PathParam("accountseed") String accountSeed) {
+        // CHECK IF CONTENT IS EMPTY
+        String password = null;
+
+        APIUtils.askAPICallAllowed(password, "GET addresses import Account seed", request, true);
+
+        // CHECK IF WALLET EXISTS
+        if (!Controller.getInstance().doesWalletExists()) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+        }
+
+        // CHECK WALLET UNLOCKED
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_WALLET_LOCKED);
+        }
+
+        // DECODE SEED
+        byte[] seedBytes;
+        try {
+            seedBytes = Base58.decode(accountSeed, Crypto.HASH_LENGTH);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_INVALID_SEED);
+        }
+
+        // CHECK SEED LENGTH
+        if (seedBytes == null || seedBytes.length != 32) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_INVALID_SEED);
+
+        }
+
+        // CONVERT TO BYTE
+        return Controller.getInstance().importAccountSeed(seedBytes);
+    }
+
+    @GET
     @Path("/importprivatekey/{privatekey}")
     public String importPrivate(@PathParam("privatekey") String privateKey) {
 
@@ -682,7 +723,10 @@ public class AddressesResource {
         }
 
         // CONVERT TO BYTE
-        return Controller.getInstance().importPrivateKey(privatekeyBytes64);
+        Fun.Tuple3<String, Integer, String> result = Controller.getInstance().importPrivateKey(privatekeyBytes64);
+        if (result.a == null)
+            return result.c;
+        return result.a;
     }
 
 }

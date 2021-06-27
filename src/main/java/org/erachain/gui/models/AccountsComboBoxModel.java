@@ -28,7 +28,7 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> impleme
         }
 
         if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().getWallet().database.getAccountMap().addObserver(this);
+            Controller.getInstance().getWallet().dwSet.getAccountMap().addObserver(this);
     }
 
     /**
@@ -83,6 +83,6 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> impleme
 
     public void removeObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists())
-            Controller.getInstance().getWallet().database.getAccountMap().deleteObserver(this);
+            Controller.getInstance().getWallet().dwSet.getAccountMap().deleteObserver(this);
     }
 }

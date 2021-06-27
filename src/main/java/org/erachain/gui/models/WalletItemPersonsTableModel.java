@@ -16,7 +16,7 @@ public class WalletItemPersonsTableModel extends WalletItemTableModel<PersonCls>
     DCSet dcSet = DCSet.getInstance();
 
     public WalletItemPersonsTableModel() {
-        super(Controller.getInstance().getWallet().database.getPersonMap(),
+        super(Controller.getInstance().getWallet().dwSet.getPersonMap(),
                 new String[]{"Key", "Name", "Publisher", "Favorite"},
                 new Boolean[]{true, true, false, false}, COLUMN_FAVORITE, true);
 

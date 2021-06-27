@@ -57,7 +57,7 @@ public class IssueStatusPanel extends IssueItemPanel {
     protected void makeTransaction() {
 
         transaction = (IssueStatusRecord) Controller.getInstance().issueStatus(itemAppData, creator,
-                exLink, textName.getText(), textAreaDescription.getText(), unique,
+                exLink, nameField.getText(), textAreaDescription.getText(), unique,
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
                 feePow);
 
