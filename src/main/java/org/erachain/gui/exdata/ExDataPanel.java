@@ -2,6 +2,7 @@ package org.erachain.gui.exdata;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.exdata.ExAirdrop;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.*;
@@ -77,6 +78,7 @@ public class ExDataPanel extends JPanel {
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
     public DocTypeAppendixPanel docTypeAppendixPanel;
     public ExAccrualsPanel exAccrualsPanel;
+    public ExAirdrop exAirDropPanel;
 
     /**
      * Creates new form IssueDocumentPanel
@@ -286,6 +288,7 @@ public class ExDataPanel extends JPanel {
         jButton_Input_Hashes_From_File_Other_Hashes = new MButton();
         docTypeAppendixPanel = new DocTypeAppendixPanel(this);
         exAccrualsPanel = new ExAccrualsPanel(this);
+        exAirDropPanel = new ExAirDropPanel();
 
         GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = new int[]{0, 0, 0};
@@ -774,11 +777,12 @@ public class ExDataPanel extends JPanel {
             return new Fun.Tuple2(null, exAccrualsResult.b);
         }
 
+
         Long templateKey = fill_Template_Panel.sel_Template == null ? null : fill_Template_Panel.sel_Template.getKey();
 
         byte[] exData;
         try {
-            exData = ExData.make(exLink, exAccrualsResult.a, creator, jTextField_Title_Message.getText(),
+            exData = ExData.make(exLink, exAccrualsResult.a, exAirDrop, creator, jTextField_Title_Message.getText(),
                     signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
                     templateKey, fill_Template_Panel.get_Params(),
                     fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),

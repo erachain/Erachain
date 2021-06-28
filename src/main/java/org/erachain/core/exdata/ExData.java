@@ -223,7 +223,7 @@ public class ExData {
      * @param flags
      * @param exLink
      * @param exPays
-     * @param airdrop
+     * @param exAirDrop
      * @param title
      * @param recipients
      * @param authorsFlags
@@ -233,7 +233,7 @@ public class ExData {
      * @param tags
      * @param encryptedData
      */
-    public ExData(byte[] flags, ExLink exLink, ExPays exPays, ExAirdrop airdrop, String title,
+    public ExData(byte[] flags, ExLink exLink, ExPays exPays, ExAirdrop exAirDrop, String title,
                   byte recipientsFlags, Account[] recipients,
                   byte authorsFlags, ExLinkAuthor[] authors, byte sourcesFlags, ExLinkSource[] sources,
                   byte[] tags, byte secretsFlags, byte[][] secrets,
@@ -252,8 +252,8 @@ public class ExData {
             this.flags[1] |= PAYS_FLAG_MASK;
         }
 
-        this.airdrop = airdrop;
-        if (airdrop != null) {
+        this.airdrop = exAirDrop;
+        if (exAirDrop != null) {
             this.flags[2] |= AIRDROP_FLAG_MASK;
         }
 
@@ -669,8 +669,7 @@ public class ExData {
             len += exPays.getLengthDBData();
 
         if (airdrop != null)
-            // LEN + AMOUNT + ASSET + LEN * ACC
-            len += 4 + 8 + 8 + airdrop.length * Account.ADDRESS_SHORT_LENGTH;
+            len += airdrop.length();
 
         return len;
     }
@@ -712,11 +711,7 @@ public class ExData {
         }
 
         if (airdrop != null) {
-            outStream.write(airdrop.length);
-            outStream.write();
-            for (byte[] short:airdrop){
-                outStream.write(exPays.toBytes());
-            }
+            outStream.write(airdrop.toBytes());
         }
 
         if ((flags[1] & RECIPIENTS_FLAG_MASK) > 0) {
@@ -946,6 +941,7 @@ public class ExData {
                 int titleSize;
                 ExLink exLink;
                 ExPays exPays;
+                ExAirdrop exAirdrop;
                 byte recipientsFlags;
                 Account[] recipients;
                 byte authorsFlags;
@@ -1003,6 +999,14 @@ public class ExData {
                         position += exPays.length();
                     } else {
                         exPays = null;
+                    }
+
+                    if ((flags[2] & AIRDROP_FLAG_MASK) > 0) {
+                        // ExLink READ
+                        exAirdrop = ExAirdrop.parse(data, position);
+                        position += exAirdrop.length();
+                    } else {
+                        exAirdrop = null;
                     }
 
                     int recipientsSize;
@@ -1094,6 +1098,8 @@ public class ExData {
                 } else {
                     exLink = null;
                     exPays = null;
+                    exAirdrop = null;
+
                     isEncrypted = false;
                     flags = new byte[]{(byte) version, 0, 0, 0};
 
@@ -1114,7 +1120,7 @@ public class ExData {
 
                 if (data.length == position) {
                     if (version > 2) {
-                        return new ExData(flags, exLink, exPays, airdrop, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, null, null);
+                        return new ExData(flags, exLink, exPays, exAirdrop, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, null, null);
                     } else {
                         // version 2.0 - 2.1
                         return new ExData(version, exLink, title, null, null);
@@ -1124,12 +1130,12 @@ public class ExData {
 
                     if (isEncrypted) {
                         // version 3 - with SECRETS
-                        return new ExData(flags, exLink, exPays, airdrop, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, secretsFlags, secrets,
+                        return new ExData(flags, exLink, exPays, exAirdrop, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, secretsFlags, secrets,
                                 Arrays.copyOfRange(data, position, data.length));
                     } else {
 
                         Fun.Tuple2<JSONObject, HashMap> jsonAndFiles = parseJsonAndFiles(Arrays.copyOfRange(data, position, data.length), andFiles);
-                        return new ExData(flags, exLink, exPays, airdrop, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, jsonAndFiles.a,
+                        return new ExData(flags, exLink, exPays, exAirdrop, title, recipientsFlags, recipients, authorsFlags, authors, sourcesFlags, sources, tags, jsonAndFiles.a,
                                 jsonAndFiles.b);
                     }
                 }
@@ -1201,7 +1207,7 @@ public class ExData {
         return allHashes;
     }
 
-    public static byte[] make(ExLink exLink, ExPays exPays, PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients,
+    public static byte[] make(ExLink exLink, ExPays exPays, ExAirdrop exAirDrop, PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients,
                               ExLinkAuthor[] authors, ExLinkSource[] sources, String tagsStr, boolean isEncrypted,
                               Long templateKey, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,
@@ -1308,7 +1314,7 @@ public class ExData {
         }
 
         if (isEncrypted) {
-            // случайный парольmake и его для всех шифруем
+            // случайный пароль make и его для всех шифруем
             flags[1] = (byte) (flags[1] | ENCRYPT_FLAG_MASK);
 
             int recipientsLen = recipients == null ? 0 : recipients.length;
@@ -1355,11 +1361,11 @@ public class ExData {
 
             secrets[recipientsLen] = AEScrypto.dataEncrypt(password, privateKey, creator.getPublicKey());
 
-            return new ExData(flags, exLink, exPays, airdrop, title, recipientsFlags, recipients, authorsFlags, authors,
+            return new ExData(flags, exLink, exPays, exAirDrop, title, recipientsFlags, recipients, authorsFlags, authors,
                     sourcesFlags, sources, tags, (byte) 0, secrets, encryptedData).toByte();
         }
 
-        return new ExData(flags, exLink, exPays, airdrop, title, recipientsFlags, recipients, authorsFlags, authors,
+        return new ExData(flags, exLink, exPays, exAirDrop, title, recipientsFlags, recipients, authorsFlags, authors,
                 sourcesFlags, sources, tags, new JSONObject(out_Map), filesMap).toByte();
 
     }

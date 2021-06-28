@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.exdata.ExAirdrop;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.*;
@@ -272,6 +273,8 @@ public class RSignNoteResource {
 
         }
 
+        ExAirdrop exAirdrop = null;
+
         if (!test && !BlockChain.TEST_MODE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
             return "not LOCAL && not testnet";
@@ -365,7 +368,7 @@ public class RSignNoteResource {
 
             byte[] exDataBytes;
             try {
-                exDataBytes = ExData.make(exLink, accruals, privateKeyAccount, title,
+                exDataBytes = ExData.make(exLink, accruals, exAirdrop, privateKeyAccount, title,
                         onlyRecipients, recipients, authors, sources, tags, isEncrypted,
                         templateKey, templateParams, templateUnique,
                         message, messageUnique,

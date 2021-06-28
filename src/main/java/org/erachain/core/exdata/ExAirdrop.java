@@ -7,12 +7,14 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
@@ -24,11 +26,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
- * StandardCharsets.UTF_8 JSON "TM" - template key "PR" - template params
- * "HS" - Hashes "MS" - message
- * <p>
- * PARAMS template:TemplateCls param_keys: [id:text] hashes_Set: [name:hash]
- * mess: message title: Title file_Set: [file Name, ZIP? , file byte[]]
+ * Simple pay - for all same amount
  */
 
 public class ExAirdrop {
@@ -42,13 +40,13 @@ public class ExAirdrop {
     /**
      * 0 - version; 1 - flags;
      */
-    private int flags; // byte[2]
+    private final int flags; // byte[2]
 
-    private byte[][] addresses;
     private long assetKey;
-    private BigDecimal amount;
-    private int balancePos;
-    boolean backward;
+    private final BigDecimal amount;
+    private final int balancePos;
+    final boolean backward;
+    private final byte[][] addresses;
 
     /////////////////
     DCSet dcSet;
@@ -58,10 +56,12 @@ public class ExAirdrop {
 
     public String errorValue;
 
-    public ExAirdrop(int flags, long assetKey, BigDecimal amount, byte[][] addresses) {
+    public ExAirdrop(int flags, long assetKey, BigDecimal amount, int balancePos, boolean backward, byte[][] addresses) {
         this.flags = flags;
         this.assetKey = assetKey;
         this.amount = amount;
+        this.balancePos = balancePos;
+        this.backward = backward;
         this.addresses = addresses;
 
         totalPay = amount.multiply(BigDecimal.valueOf(addresses.length));
@@ -102,6 +102,11 @@ public class ExAirdrop {
         outStream.write(buff.length);
         outStream.write(buff);
 
+        outStream.write(Ints.toByteArray(addresses.length));
+        for (int i = 0; i < addresses.length; i++) {
+            outStream.write(addresses[i]);
+        }
+
         return outStream.toByteArray();
 
     }
@@ -111,36 +116,39 @@ public class ExAirdrop {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static ExAirdrop parse(byte[] data, int position) throws Exception {
+    public static ExAirdrop parse(byte[] data, int pos) throws Exception {
 
         int scale;
         int len;
 
-        int flags = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + Integer.BYTES));
-        position += Integer.BYTES;
+        int flags = Ints.fromByteArray(Arrays.copyOfRange(data, pos, pos + Integer.BYTES));
+        pos += Integer.BYTES;
 
         Long assetKey = null;
         int balancePos = 0;
         boolean backward = false;
-        BigDecimal amountMin = null;
-        BigDecimal amountMax = null;
-        int payMethod = 0;
-        BigDecimal payMethodValue = null;
 
-        assetKey = Longs.fromByteArray(Arrays.copyOfRange(data, position, position + Long.BYTES));
-        position += Long.BYTES;
+        assetKey = Longs.fromByteArray(Arrays.copyOfRange(data, pos, pos + Long.BYTES));
+        pos += Long.BYTES;
 
-        balancePos = data[position++];
-        backward = data[position++] > 0;
-        payMethod = data[position++];
+        balancePos = data[pos++];
+        backward = data[pos++] > 0;
 
-        scale = data[position++];
-        len = data[position++];
-        payMethodValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, position, position + len)), scale);
-        position += len;
+        scale = data[pos++];
+        len = data[pos++];
+        BigDecimal payValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, pos, pos + len)), scale);
+        pos += len;
 
-        return new ExAirdrop(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
-                );
+        len = Ints.fromByteArray(Arrays.copyOfRange(data, pos, pos + Integer.BYTES));
+        pos += Integer.BYTES;
+
+        byte[][] addresses = new byte[len][];
+        for (int i = 0; i < len; i++) {
+            System.arraycopy(data, pos, addresses[i], 0, Account.ADDRESS_SHORT_LENGTH);
+            pos += Account.ADDRESS_SHORT_LENGTH;
+        }
+
+        return new ExAirdrop(flags, assetKey, payValue, balancePos, backward, addresses);
     }
 
     public static Fun.Tuple2<ExAirdrop, String> make(Long assetKey, int balancePos, boolean backward,
@@ -153,31 +161,12 @@ public class ExAirdrop {
         BlockChain chain = cntr.getBlockChain();
 
         try {
-            ++steep;
             amount = amountStr == null || amountStr.isEmpty() ? null : new BigDecimal(amountStr);
         } catch (Exception e) {
             String error;
             switch (steep) {
                 case 0:
-                    error = "Wrong amountMin";
-                    break;
-                case 1:
-                    error = "Wrong amountMax";
-                    break;
-                case 2:
-                    error = "Wrong payMethodValue";
-                    break;
-                case 3:
-                    error = "Wrong filterBalanceMoreThen";
-                    break;
-                case 4:
-                    error = "Wrong filterBalanceLessThen";
-                    break;
-                case 5:
-                    error = "Wrong filterTimeStartStr";
-                    break;
-                case 6:
-                    error = "Wrong filterTimeXEndStr";
+                    error = "Wrong amount";
                     break;
                 default:
                     error = e.getMessage();
@@ -187,18 +176,22 @@ public class ExAirdrop {
 
         if (assetKey == null || assetKey == 0L) {
             return new Fun.Tuple2<>(null, "Wrong assetKey (null or ZERO)");
-        } else if (filterAssetKey == null || filterAssetKey == 0L) {
-            return new Fun.Tuple2<>(null, "Wrong filterAssetKey (null or ZERO)");
         } else if (amount == null || amount.signum() == 0) {
             return new Fun.Tuple2<>(null, "Wrong payMethodValue (null or ZERO)");
         }
 
+        Fun.Tuple2<Account, String> result;
+        byte[][] addresses = new byte[addressesStr.length][];
+        for (int i = 0; i < addressesStr.length; i++) {
+            result = Account.tryMakeAccount(addressesStr[i]);
+            if (result.a == null) {
+                return new Fun.Tuple2<>(null, i + ":" + addressesStr[i] + " - " + result.b);
+            }
+            addresses[i] = result.a.getShortAddressBytes();
+        }
+
         int flags = 0;
-        return new Fun.Tuple2<>(new ExAirdrop(flags, assetKey, balancePos, backward, payMethod, amount, amountMinBG, amountMaxBG,
-                filterAssetKey, filterBalancePos, filterBalanceSide,
-                filterBalanceMoreThenBG, filterBalanceLessThenBG,
-                filterTXType, filterTimeStart, filterTimeEnd,
-                filterByPerson, selfPay), null);
+        return new Fun.Tuple2<>(new ExAirdrop(flags, assetKey, amount, balancePos, backward, addresses), null);
 
     }
 
@@ -224,13 +217,20 @@ public class ExAirdrop {
 
         toJson.put("flags", flags);
         toJson.put("assetKey", assetKey);
-
         toJson.put("amount", amount);
+        toJson.put("balancePosition", balancePos);
+        toJson.put("backward", backward);
+
+        JSONArray array = new JSONArray();
+        for (byte[] address : addresses) {
+            array.add(Base58.encode(address));
+        }
+        toJson.put("addresses", array);
 
         return toJson;
     }
 
-    public int checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {
+    public Fun.Tuple2<Integer, String> checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {
 
         Account recipient;
         //byte[] signature = rNote.getSignature();
@@ -243,7 +243,7 @@ public class ExAirdrop {
         // комиссию не проверяем так как она не правильно считается внутри?
         long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
 
-        int result;
+        Fun.Tuple2<Integer, String> result;
         byte[] signature = new byte[0];
         int index = 0;
         for (byte[] recipientShort : addresses) {
@@ -254,13 +254,15 @@ public class ExAirdrop {
                     key, asset, amount, recipient,
                     backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
 
-            if (result != Transaction.VALIDATE_OK) {
+            if (result.a != Transaction.VALIDATE_OK) {
                 errorValue = "Airdrop: address[" + index + "] -> " + recipient.getAddress();
                 return result;
             }
 
             ++index;
         }
+
+        return new Fun.Tuple2<>(Transaction.VALIDATE_OK, null);
     }
 
     public int isValid(RSignNote rNote) {
@@ -279,14 +281,6 @@ public class ExAirdrop {
 
         height = rNote.getBlockHeight();
 
-        // просчитаем значения для точного округления Общей Суммы
-        calcTotal();
-        if (false) {
-            // ошибка подсчета Общего значения - был взят в учет минус общий
-            errorValue = "Accruals: PayTotal == 0 && payMethod == PAYMENT_METHOD_TOTAL";
-            return Transaction.INVALID_AMOUNT;
-        }
-
         Account recipient = new Account(addresses[0]);
         PublicKeyAccount creator = rNote.getCreator();
         byte[] signature = rNote.getSignature();
@@ -300,14 +294,13 @@ public class ExAirdrop {
         long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
 
         BigDecimal totalFeeBG = rNote.getFee();
-        int result;
         // проверим как будто всю сумму одному переводим - с учетом комиссии полной
-        result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+        Fun.Tuple2<Integer, String> result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                 key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
                 backward, totalFeeBG, null, creatorIsPerson, actionFlags);
-        if (result != Transaction.VALIDATE_OK) {
+        if (result.a != Transaction.VALIDATE_OK) {
             errorValue = "Airdrop: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
-            return result;
+            return result.a;
         }
 
         ////////// TODO NEED CHECK ALL
@@ -315,8 +308,8 @@ public class ExAirdrop {
         if (needCheckAllList) {
 
             result = checkValidList(dcSet, height, asset, creator);
-            if (result != Transaction.VALIDATE_OK) {
-                return result;
+            if (result.a != Transaction.VALIDATE_OK) {
+                return result.a;
             }
         }
 
