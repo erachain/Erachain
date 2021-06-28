@@ -49,8 +49,9 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         this.cropWidth = this.originalCropWidth = cropWidth;
         this.cropHeight = this.originalCropHeight = cropHeight;
 
-        if (imageFile.getName().toLowerCase().endsWith(".mp4")) {
-            // VIDEO MP4
+        String ext = imageFile.getName().toLowerCase();
+        if (ext.endsWith(".mp4") || ext.endsWith(".mp3")) {
+            // VIDEO MP4 or AUDIO
             return;
         }
 

@@ -24,35 +24,45 @@ public class APIItems {
 
         ItemCls item = map.get(key);
 
-        byte[] image = item.getImage();
-        if (image == null || image.length == 0) {
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity("")
-                    .build();
-        }
-
+        byte[] image;
         MediaType mediaType;
 
-        if (PreviewMaker.notNeedPreview(item, image)) {
-            mediaType = item.getImageMediaType();
-        } else {
-            PreviewMaker preViewMaker = new PreviewMaker();
-            preViewMaker.makePreview(item, image);
+        if (item.getImageType() == ItemCls.MEDIA_TYPE_AUDIO) {
             if (preView) {
-                image = preViewMaker.getPreview((item), image);
-                if (image == null) {
-                    if (preViewMaker.errorMess == null) {
-                        throw ApiErrorFactory.getInstance().createError(
-                                "Some error - see in dataPreviews" + File.separator + "orig" + File.separator + PreviewMaker.getItemName(item) + ".log");
-                    } else {
-                        throw ApiErrorFactory.getInstance().createError(
-                                preViewMaker.errorMess);
-                    }
-                }
-                mediaType = new MediaType("video", "mp4");
+                image = item.getIcon();
+                mediaType = item.getIconMediaType();
             } else {
+                image = item.getImage();
                 mediaType = item.getImageMediaType();
+            }
+        } else {
+            image = item.getImage();
+            if (image == null || image.length == 0) {
+                return Response.status(200)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity("")
+                        .build();
+            }
+            if (PreviewMaker.notNeedPreview(item, image)) {
+                mediaType = item.getImageMediaType();
+            } else {
+                PreviewMaker preViewMaker = new PreviewMaker();
+                preViewMaker.makePreview(item, image);
+                if (preView) {
+                    image = preViewMaker.getPreview((item), image);
+                    if (image == null) {
+                        if (preViewMaker.errorMess == null) {
+                            throw ApiErrorFactory.getInstance().createError(
+                                    "Some error - see in dataPreviews" + File.separator + "orig" + File.separator + PreviewMaker.getItemName(item) + ".log");
+                        } else {
+                            throw ApiErrorFactory.getInstance().createError(
+                                    preViewMaker.errorMess);
+                        }
+                    }
+                    mediaType = new MediaType("video", "mp4");
+                } else {
+                    mediaType = item.getImageMediaType();
+                }
             }
         }
 

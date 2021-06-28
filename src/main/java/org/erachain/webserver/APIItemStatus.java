@@ -158,7 +158,7 @@ public class APIItemStatus {
 
     @Path("image/{key}")
     @GET
-    @Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response statusImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -182,7 +182,7 @@ public class APIItemStatus {
 
     @Path("icon/{key}")
     @GET
-    @Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response statusIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {

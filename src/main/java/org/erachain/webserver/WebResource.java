@@ -80,7 +80,10 @@ public class WebResource {
             "bar_right.gif", "locked.png", "unlocked.png", "exchange.png"
     };
     String[] videoArray = {
-            "video01.mp4"
+            //"video01.mp4"
+    };
+    String[] audioArray = {
+            //"audi01.mp3"
     };
 
     public static String selectTitleOpt(Document htmlDoc) {
@@ -1122,7 +1125,6 @@ public class WebResource {
     @GET
     public Response video(@PathParam("filename") String filename) {
         ArrayList<String> videos = new ArrayList<String>();
-
         videos.addAll(Arrays.asList(videoArray));
 
         int index = videos.indexOf(filename);
