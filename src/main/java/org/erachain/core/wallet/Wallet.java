@@ -839,7 +839,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF ACCOUNT ALREADY EXISTS
 		if (!this.accountExists(account)) {
 			// ADD TO DATABASE
-			this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account) - 1);
+			this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
 
 			// SAVE TO DISK
 			this.dwSet.hardFlush();
@@ -877,7 +877,7 @@ public class Wallet extends Observable implements Observer {
 			return new Tuple3<>(null, 0, "Already exist");
 
 		// ADD TO DATABASE
-		this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account) - 1);
+		this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
 
 		// SAVE TO DISK
 		this.dwSet.hardFlush();
