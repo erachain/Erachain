@@ -24,18 +24,19 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Simple pay - for all same amount
  */
 
-public class ExAirdrop {
+public class ExAirDrop {
 
     public static final byte BASE_LENGTH = 4 + 8 + 8 + 2;
 
     public static final int MAX_COUNT = Short.MAX_VALUE;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExAirdrop.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExAirDrop.class);
 
     /**
      * 0 - version; 1 - flags;
@@ -54,9 +55,14 @@ public class ExAirdrop {
     AssetCls asset;
     BigDecimal totalPay;
 
+    /**
+     * recipient + accrual
+     */
+    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> checkedAccruals;
+
     public String errorValue;
 
-    public ExAirdrop(int flags, long assetKey, BigDecimal amount, int balancePos, boolean backward, byte[][] addresses) {
+    public ExAirDrop(int flags, long assetKey, BigDecimal amount, int balancePos, boolean backward, byte[][] addresses) {
         this.flags = flags;
         this.assetKey = assetKey;
         this.amount = amount;
@@ -80,12 +86,43 @@ public class ExAirdrop {
         return asset;
     }
 
+    public byte[][] getAddresses() {
+        return addresses;
+    }
+
+    public int getAddressesCount() {
+        return addresses.length;
+    }
+
+    public long getTotalFeeBytes() {
+        return addresses.length * 25;
+    }
+
+    public BigDecimal getTotalPay() {
+        return totalPay;
+    }
 
     public void setDC(DCSet dcSet) {
         if (this.dcSet == null || !this.dcSet.equals(dcSet)) {
             this.dcSet = dcSet;
             this.asset = this.dcSet.getItemAssetMap().get(this.assetKey);
         }
+    }
+
+    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> makeCheckedList(Transaction transaction, boolean andValidate) {
+        return makeCheckedList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
+    }
+
+    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> getCheckedAccruals(Transaction statement) {
+        if (checkedAccruals == null) {
+            checkedAccruals = makeCheckedList(statement, false);
+        }
+        return checkedAccruals;
+    }
+
+    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> precalcCheckedAccruals(int height, Account creator) {
+        checkValidList(dcSet, height, asset, creator);
+        return checkedAccruals;
     }
 
     public byte[] toBytes() throws Exception {
@@ -116,7 +153,7 @@ public class ExAirdrop {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static ExAirdrop parse(byte[] data, int pos) throws Exception {
+    public static ExAirDrop parse(byte[] data, int pos) throws Exception {
 
         int scale;
         int len;
@@ -148,11 +185,12 @@ public class ExAirdrop {
             pos += Account.ADDRESS_SHORT_LENGTH;
         }
 
-        return new ExAirdrop(flags, assetKey, payValue, balancePos, backward, addresses);
+        return new ExAirDrop(flags, assetKey, payValue, balancePos, backward, addresses);
     }
 
-    public static Fun.Tuple2<ExAirdrop, String> make(Long assetKey, int balancePos, boolean backward,
-                                                     String amountStr, String[] addressesStr) {
+    public static Fun.Tuple2<ExAirDrop, String> make(Long assetKey, String amountStr,
+                                                     int balancePos, boolean backward,
+                                                     String[] addressesStr) {
 
         int steep = 0;
         BigDecimal amount;
@@ -191,7 +229,7 @@ public class ExAirdrop {
         }
 
         int flags = 0;
-        return new Fun.Tuple2<>(new ExAirdrop(flags, assetKey, amount, balancePos, backward, addresses), null);
+        return new Fun.Tuple2<>(new ExAirDrop(flags, assetKey, amount, balancePos, backward, addresses), null);
 
     }
 

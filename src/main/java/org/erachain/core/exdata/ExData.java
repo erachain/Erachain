@@ -95,7 +95,7 @@ public class ExData {
 
     private final ExPays exPays;
 
-    private final ExAirdrop airdrop;
+    private final ExAirDrop airdrop;
 
     private final String title;
     private JSONObject json;
@@ -177,7 +177,7 @@ public class ExData {
      * @param json
      * @param files
      */
-    public ExData(byte[] flags, ExLink exLink, ExPays exPays, ExAirdrop airdrop, String title,
+    public ExData(byte[] flags, ExLink exLink, ExPays exPays, ExAirDrop airdrop, String title,
                   byte recipientsFlags, Account[] recipients,
                   byte authorsFlags, ExLinkAuthor[] authors, byte sourcesFlags, ExLinkSource[] sources,
                   byte[] tags, JSONObject json, HashMap<String, Tuple3<byte[], Boolean, byte[]>> files) {
@@ -233,7 +233,7 @@ public class ExData {
      * @param tags
      * @param encryptedData
      */
-    public ExData(byte[] flags, ExLink exLink, ExPays exPays, ExAirdrop exAirDrop, String title,
+    public ExData(byte[] flags, ExLink exLink, ExPays exPays, ExAirDrop exAirDrop, String title,
                   byte recipientsFlags, Account[] recipients,
                   byte authorsFlags, ExLinkAuthor[] authors, byte sourcesFlags, ExLinkSource[] sources,
                   byte[] tags, byte secretsFlags, byte[][] secrets,
@@ -941,7 +941,7 @@ public class ExData {
                 int titleSize;
                 ExLink exLink;
                 ExPays exPays;
-                ExAirdrop exAirdrop;
+                ExAirDrop exAirdrop;
                 byte recipientsFlags;
                 Account[] recipients;
                 byte authorsFlags;
@@ -1003,7 +1003,7 @@ public class ExData {
 
                     if ((flags[2] & AIRDROP_FLAG_MASK) > 0) {
                         // ExLink READ
-                        exAirdrop = ExAirdrop.parse(data, position);
+                        exAirdrop = ExAirDrop.parse(data, position);
                         position += exAirdrop.length();
                     } else {
                         exAirdrop = null;
@@ -1207,7 +1207,7 @@ public class ExData {
         return allHashes;
     }
 
-    public static byte[] make(ExLink exLink, ExPays exPays, ExAirdrop exAirDrop, PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients,
+    public static byte[] make(ExLink exLink, ExPays exPays, ExAirDrop exAirDrop, PrivateKeyAccount creator, String title, boolean signCanOnlyRecipients, Account[] recipients,
                               ExLinkAuthor[] authors, ExLinkSource[] sources, String tagsStr, boolean isEncrypted,
                               Long templateKey, HashMap<String, String> params_Template, boolean uniqueTemplate,
                               String message, boolean uniqueMessage,

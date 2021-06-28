@@ -2,6 +2,7 @@ package org.erachain.gui.exdata;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.exdata.ExAirDrop;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.*;
@@ -775,13 +776,17 @@ public class ExDataPanel extends JPanel {
         if (exAccrualsResult.b != null) {
             return new Fun.Tuple2(null, exAccrualsResult.b);
         }
+        Fun.Tuple2<ExAirDrop, String> exAirDropResult = exAirDropPanel.getAccruals();
+        if (exAirDropResult.b != null) {
+            return new Fun.Tuple2(null, exAirDropResult.b);
+        }
 
 
         Long templateKey = fill_Template_Panel.sel_Template == null ? null : fill_Template_Panel.sel_Template.getKey();
 
         byte[] exData;
         try {
-            exData = ExData.make(exLink, exAccrualsResult.a, exAirDrop, creator, jTextField_Title_Message.getText(),
+            exData = ExData.make(exLink, exAccrualsResult.a, exAirDropResult.a, creator, jTextField_Title_Message.getText(),
                     signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
                     templateKey, fill_Template_Panel.get_Params(),
                     fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),

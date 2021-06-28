@@ -1,20 +1,17 @@
 package org.erachain.gui.exdata;
 
 
-import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.exdata.ExPays;
+import org.erachain.core.exdata.ExAirDrop;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.models.RenderComboBoxActionFilter;
 import org.erachain.gui.models.RenderComboBoxAssetActions;
 import org.erachain.gui.models.RenderComboBoxViewBalance;
 import org.erachain.lang.Lang;
@@ -31,7 +28,6 @@ import java.awt.event.ItemListener;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 
 
 public class ExAirDropPanel extends IconPanel {
@@ -41,7 +37,6 @@ public class ExAirDropPanel extends IconPanel {
 
     private ExDataPanel parent;
     public ComboBoxAssetsModel assetsModel;
-    public ComboBoxAssetsModel assetsModel1;
     private Boolean lock = new Boolean(false);
 
     public ExAirDropPanel(ExDataPanel parent) {
@@ -50,9 +45,7 @@ public class ExAirDropPanel extends IconPanel {
         initComponents();
 
         assetsModel = new ComboBoxAssetsModel();
-        assetsModel1 = new ComboBoxAssetsModel();
         this.jComboBoxAccrualAsset.setModel(assetsModel);
-        this.jComboBoxFilterAsset.setModel(assetsModel1);
         jComboBoxFilterBalancePosition.setModel(new DefaultComboBoxModel(new Integer[]{
                 TransactionAmount.ACTION_SEND,
                 TransactionAmount.ACTION_DEBT,
@@ -61,16 +54,13 @@ public class ExAirDropPanel extends IconPanel {
                 //TransactionAmount.ACTION_PLEDGE,
         }));
         jComboBoxFilterBalancePosition.setRenderer(new RenderComboBoxViewBalance());
+
         jComboBoxFilterSideBalance.setModel(new DefaultComboBoxModel(new String[]{
                 Lang.T("Total Debit"), // Transaction.BALANCE_SIDE_DEBIT = 1
                 Lang.T("Left # Остаток"), // BALANCE_SIDE_LEFT = 2
                 Lang.T("Total Credit") // BALANCE_SIDE_CREDIT = 3
         }));
         jComboBoxFilterSideBalance.setSelectedIndex(1);
-
-        jComboBoxTXTypeFilter.setModel(new DefaultComboBoxModel<Integer>(Transaction.getTransactionTypes(true)));
-        ///jComboBoxTXTypeFilter.addItem(-1);
-        jComboBoxTXTypeFilter.setRenderer(new RenderComboBoxActionFilter());
 
         jComboBoxAccrualAction.setRenderer(new RenderComboBoxAssetActions());
         jComboBoxAccrualAsset.addItemListener(new ItemListener() {
@@ -81,20 +71,13 @@ public class ExAirDropPanel extends IconPanel {
         });
         updateAction();
 
-        jComboBoxMethodPaymentType.addItemListener(new ItemListener() {
+        jComboBoxAccrualAsset.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                updateLabelsByMethod();
+                updateAction();
             }
         });
-        updateLabelsByMethod();
-
-        jLabelMethodPaymentDescription.setHorizontalAlignment(SwingConstants.LEFT);
-        jComboBoxPersonFilter.setModel(new DefaultComboBoxModel<>(new String[]{
-                Lang.T(ExPays.viewFilterPersMode(0)),
-                Lang.T(ExPays.viewFilterPersMode(1)),
-                Lang.T(ExPays.viewFilterPersMode(2)),
-                Lang.T(ExPays.viewFilterPersMode(3))}));
+        updateAction();
 
         jCheckBoxAccrualsUse.setSelected(false);
         jCheckBoxAccrualsUse.addActionListener(new ActionListener() {
@@ -118,26 +101,25 @@ public class ExAirDropPanel extends IconPanel {
 
                         jScrollPaneAccruals.setVisible(false);
 
-                        Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
+                        Fun.Tuple2<ExAirDrop, String> exPaysRes = getAccruals();
                         if (exPaysRes.b != null) {
                             jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
                                     Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
                             return;
                         }
 
-                        ExPays pays = exPaysRes.a;
+                        ExAirDrop pays = exPaysRes.a;
                         pays.setDC(DCSet.getInstance());
-                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.precalcFilteredAccruals(
+                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.precalcCheckedAccruals(
                                 Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                        pays.calcTotalFeeBytes();
-                        jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
+
+                        jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getAddressesCount()
                                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
                                 + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay());
                     } finally {
                         jButtonCalcCompu.setEnabled(true);
                         jButtonViewResult.setEnabled(true);
 
-                        //jScrollPaneAccruals.setVisible(true);
                         lock = new Boolean(false);
                     }
                 }
@@ -157,7 +139,7 @@ public class ExAirDropPanel extends IconPanel {
 
                         jScrollPaneAccruals.setVisible(false);
 
-                        Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
+                        Fun.Tuple2<ExAirDrop, String> exPaysRes = getAccruals();
                         if (exPaysRes.b != null) {
                             jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
                                     Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
@@ -165,17 +147,17 @@ public class ExAirDropPanel extends IconPanel {
                             return;
                         }
 
-                        ExPays pays = exPaysRes.a;
+                        ExAirDrop pays = exPaysRes.a;
                         pays.setDC(DCSet.getInstance());
-                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.precalcFilteredAccruals(
+                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.caprecalcFilteredAccruals(
                                 Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                        pays.calcTotalFeeBytes();
-                        String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
-                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
+
+                        String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getAddressesCount()
+                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getAddressesCount())
                                 + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
                         jLabel_FeesResult.setText(result);
 
-                        AccrualsModel model = new AccrualsModel(accrual);
+                        AirDropsModel model = new AirDropsModel(accrual);
                         jTablePreviewAccruals.setModel(model);
                         TableColumnModel columnModel = jTablePreviewAccruals.getColumnModel();
 
@@ -224,92 +206,26 @@ public class ExAirDropPanel extends IconPanel {
             return;
 
         int selected = jComboBoxAccrualAction.getSelectedIndex();
-        jComboBoxAccrualAction.setModel(new DefaultComboBoxModel(
+        jComboBoxAccrualAction.setModel(new javax.swing.DefaultComboBoxModel(
                 asset.viewAssetTypeActionsList(creator.equals(asset.getMaker()), false).toArray()));
         if (selected >= 0)
             jComboBoxAccrualAction.setSelectedIndex(selected);
 
     }
 
-    private void updateLabelsByMethod() {
-        switch (jComboBoxMethodPaymentType.getSelectedIndex()) {
-            case ExPays.PAYMENT_METHOD_TOTAL:
-                jLabelMethodPaymentDescription.setText("<html>" +
-                        Lang.T("PAY_METHOD_0_D"));
-                jLabelAmount.setText(Lang.T("Total Amount"));
-                jTextFieldPaymentMin.setEnabled(false);
-                jTextFieldPaymentMax.setEnabled(false);
-
-                jCheckBoxSelfPay.setVisible(true);
-                return;
-            case ExPays.PAYMENT_METHOD_COEFF:
-                jLabelMethodPaymentDescription.setText("<html>" +
-                        Lang.T("PAY_METHOD_1_D"));
-                jLabelAmount.setText(Lang.T("Coefficient"));
-                jTextFieldPaymentMin.setEnabled(true);
-                jTextFieldPaymentMax.setEnabled(true);
-
-                jCheckBoxSelfPay.setSelected(false);
-                jCheckBoxSelfPay.setVisible(false);
-
-                return;
-            case ExPays.PAYMENT_METHOD_ABSOLUTE:
-                jLabelMethodPaymentDescription.setText("<html>" +
-                        Lang.T("PAY_METHOD_2_D"));
-                jLabelAmount.setText(Lang.T("Amount"));
-                jTextFieldPaymentMin.setEnabled(false);
-                jTextFieldPaymentMax.setEnabled(false);
-
-                jCheckBoxSelfPay.setSelected(false);
-                jCheckBoxSelfPay.setVisible(false);
-                return;
-        }
-    }
-
 
     private void initComponents() {
 
         jPanelMain = new JPanel();
-        jLabel13 = new JLabel();
-        jLabelActionAssetTitle = new JLabel();
-        jLabelFilterAsset = new JLabel();
         jComboBoxAccrualAsset = new JComboBox<>();
-        jComboBoxAccrualAction = new JComboBox<>();
-        jComboBoxFilterAsset = new JComboBox<>();
         jLabelBalancePosition = new JLabel();
         jComboBoxFilterBalancePosition = new JComboBox<>();
-        jLabel8 = new JLabel();
-        jTextFieldBQ = new JTextField();
-        jTextFieldLQ = new JTextField();
-        jLabel9 = new JLabel();
-        jLabelAssetToPay = new JLabel();
-        jLabelAction = new JLabel();
-        jLabelTitlemetod = new JLabel();
-        jLabelMethodPaymentDescription = new JLabel();
-        jLabelPaymentMin = new JLabel();
-        jTextFieldPaymentMin = new JTextField();
-        jLabelPaymentMax = new JLabel();
         jLabel_FeesResult = new JLabel();
-        jTextFieldPaymentMax = new JTextField();
-        jPanelMinMaxAmounts = new JPanel();
-        jPanelFilterBalance = new JPanel();
-        jPanelStartEndActions = new JPanel();
-        jLabelDataStart = new JLabel();
-        jLabelDateEnd = new JLabel();
-        jLabel19 = new JLabel();
         jComboBoxFilterSideBalance = new JComboBox<>();
-        jLabel20 = new JLabel();
-        jComboBoxTXTypeFilter = new JComboBox<>();
         jPanelMain = new JPanel();
         jPanel3 = new JPanel();
         jButtonViewResult = new JButton();
-        jLabel1 = new JLabel();
-        jCheckBoxSelfPay = new JCheckBox();
         jCheckBoxAccrualsUse = new JCheckBox();
-        jLabel2 = new JLabel();
-        jLabel3 = new JLabel();
-        jLabel4 = new JLabel();
-        jLabelMethod = new JLabel();
         jLabelAmount = new JLabel();
         jSeparator1 = new JSeparator();
         jSeparator2 = new JSeparator();
@@ -318,20 +234,13 @@ public class ExAirDropPanel extends IconPanel {
         jSeparator5 = new JSeparator();
         jTextFieldAmount = new JTextField();
         jButtonCalcCompu = new JButton();
-        jComboBoxMethodPaymentType = new JComboBox<>();
-        jComboBoxPersonFilter = new JComboBox<>();
+
+        java.awt.GridBagLayout jPanelLayout = new java.awt.GridBagLayout();
+        jPanelLayout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0};
+        jPanelLayout.rowHeights = new int[]{0};
 
         Font ff = (Font) UIManager.get("Label.font");
         Font headFont = new Font(ff.getFontName(), Font.BOLD, ff.getSize() + 1);
-
-        TimeZone tz = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        jTextFieldDateStart = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
-        jTextFieldDateEnd = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
-        TimeZone.setDefault(tz);
-
-        jTextFieldDateStart.setFont(UIManager.getFont("TextField.font"));
-        jTextFieldDateEnd.setFont(UIManager.getFont("TextField.font"));
 
         GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
@@ -391,14 +300,7 @@ public class ExAirDropPanel extends IconPanel {
         y = (int) ((double) y / k);
         helpIcon = new ImageIcon(helpIcon.getImage().getScaledInstance(x1, y, Image.SCALE_SMOOTH));
 
-        jLabelActionAssetTitle.setFont(headFont); // NOI18N
-        jLabelActionAssetTitle.setHorizontalAlignment(SwingConstants.CENTER);
-        jLabelActionAssetTitle.setText(Lang.T("Action for Asset"));
-
-        jPanelMain.add(jLabelActionAssetTitle, headBGC);
-
-        jLabelAssetToPay.setText(Lang.T("Asset"));
-        //jLabelAssetToPay.setIcon(helpIcon);
+        JLabel jLabelAssetToPay = new JLabel(Lang.T("Asset"));
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelAssetToPay, labelGBC);
 
@@ -406,248 +308,12 @@ public class ExAirDropPanel extends IconPanel {
         jComboBoxAccrualAsset.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxAccrualAsset"));
         jPanelMain.add(jComboBoxAccrualAsset, fieldGBC);
 
-        jLabelAction.setText(Lang.T("Action"));
-        labelGBC.gridy = ++gridy;
-        jPanelMain.add(jLabelAction, labelGBC);
-
-        fieldGBC.gridy = gridy;
-        jComboBoxAccrualAction.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxAccrualAction"));
-        jPanelMain.add(jComboBoxAccrualAction, fieldGBC);
-
-        ////////// PAYMENT METHOD
-
-        jLabelTitlemetod.setFont(headFont); // NOI18N
-        jLabelTitlemetod.setHorizontalAlignment(SwingConstants.CENTER);
-        jLabelTitlemetod.setText(Lang.T("Method of calculation"));
-        headBGC.gridy = ++gridy;
-        jPanelMain.add(jLabelTitlemetod, headBGC);
-
-        jLabelMethod.setText(Lang.T("Method"));
-        labelGBC.gridy = ++gridy;
-        jPanelMain.add(jLabelMethod, labelGBC);
-        jComboBoxMethodPaymentType.setModel(new DefaultComboBoxModel<>(new String[]{
-                Lang.T(ExPays.viewPayMethod(0)),
-                Lang.T(ExPays.viewPayMethod(1)),
-                Lang.T(ExPays.viewPayMethod(2)),
-        }));
-        fieldGBC.gridy = gridy;
-        jPanelMain.add(jComboBoxMethodPaymentType, fieldGBC);
-        jComboBoxMethodPaymentType.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxMethodPaymentType"));
 
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelAmount, labelGBC);
         fieldGBC.gridy = gridy;
         jPanelMain.add(jTextFieldAmount, fieldGBC);
         jTextFieldAmount.setToolTipText(Lang.T("ExAccrualsPanel.jTextFieldAmount"));
-
-
-        fieldGBC.gridy = ++gridy;
-        jPanelMain.add(jLabelMethodPaymentDescription, fieldGBC);
-
-        GridBagLayout jPanelLayout = new GridBagLayout();
-        jPanelLayout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0};
-        jPanelLayout.rowHeights = new int[]{0};
-        jPanelMinMaxAmounts.setLayout(jPanelLayout);
-
-        jLabelPaymentMin.setText(Lang.T("Minimal Accrual"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = labelGBC.insets;
-        jPanelMinMaxAmounts.add(jLabelPaymentMin, gridBagConstraints);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 50;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = fieldGBC.insets;
-        jPanelMinMaxAmounts.add(jTextFieldPaymentMin, gridBagConstraints);
-
-        jLabelPaymentMax.setText(Lang.T("Maximum Accrual"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = labelGBC.insets;
-        jPanelMinMaxAmounts.add(jLabelPaymentMax, gridBagConstraints);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 50;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = fieldGBC.insets;
-        jPanelMinMaxAmounts.add(jTextFieldPaymentMax, gridBagConstraints);
-
-        fieldGBC.gridy = ++gridy;
-        jPanelMain.add(jPanelMinMaxAmounts, fieldGBC);
-
-        separateBGC.gridy = ++gridy;
-        jPanelMain.add(jSeparator2, separateBGC);
-
-        /////////////////////
-        jLabelFilterAsset.setFont(headFont); // NOI18N
-        jLabelFilterAsset.setHorizontalAlignment(SwingConstants.CENTER);
-        jLabelFilterAsset.setText(Lang.T("Filter By Asset and Balance"));
-        headBGC.gridy = ++gridy;
-        jPanelMain.add(jLabelFilterAsset, headBGC);
-
-        jLabel2.setText(Lang.T("Asset"));
-        labelGBC.gridy = ++gridy;
-        jPanelMain.add(jLabel2, labelGBC);
-        fieldGBC.gridy = gridy;
-        jPanelMain.add(jComboBoxFilterAsset, fieldGBC);
-        jComboBoxFilterAsset.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxFilterAsset"));
-
-        jPanelFilterBalance.setLayout(jPanelLayout);
-
-        jLabelBalancePosition.setText(Lang.T("Balance Position"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = labelGBC.insets;
-        jPanelFilterBalance.add(jLabelBalancePosition, gridBagConstraints);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 50;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = fieldGBC.insets;
-        jPanelFilterBalance.add(jComboBoxFilterBalancePosition, gridBagConstraints);
-
-        jLabel19.setText(Lang.T("Balance Side"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = labelGBC.insets;
-        jPanelFilterBalance.add(jLabel19, gridBagConstraints);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 50;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = fieldGBC.insets;
-        jPanelFilterBalance.add(jComboBoxFilterSideBalance, gridBagConstraints);
-
-        jLabel8.setText(Lang.T("More or Equal"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = labelGBC.insets;
-        jPanelFilterBalance.add(jLabel8, gridBagConstraints);
-        jTextFieldBQ.setToolTipText(Lang.T(""));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 50;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = fieldGBC.insets;
-        jPanelFilterBalance.add(jTextFieldBQ, gridBagConstraints);
-
-        jLabel9.setText(Lang.T("Less or Equal"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = labelGBC.insets;
-        jPanelFilterBalance.add(jLabel9, gridBagConstraints);
-        jTextFieldLQ.setToolTipText(Lang.T(""));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 50;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = fieldGBC.insets;
-        jPanelFilterBalance.add(jTextFieldLQ, gridBagConstraints);
-
-        fieldGBC.gridy = ++gridy;
-        jPanelMain.add(jPanelFilterBalance, fieldGBC);
-
-        separateBGC.gridy = ++gridy;
-        jPanelMain.add(jSeparator3, separateBGC);
-
-        jLabel20.setFont(headFont); // NOI18N
-        jLabel20.setHorizontalAlignment(SwingConstants.CENTER);
-        jLabel20.setText(Lang.T("Filter by Actions and Period"));
-        headBGC.gridy = ++gridy;
-        jPanelMain.add(jLabel20, headBGC);
-
-        jLabel3.setText(Lang.T("Action"));
-        labelGBC.gridy = ++gridy;
-        jPanelMain.add(jLabel3, labelGBC);
-
-        fieldGBC.gridy = gridy;
-        jPanelMain.add(jComboBoxTXTypeFilter, fieldGBC);
-        jComboBoxTXTypeFilter.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxTXTypeFilter"));
-
-        jPanelStartEndActions.setLayout(jPanelLayout);
-
-        jLabelDataStart.setText(Lang.T("Data start"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = labelGBC.insets;
-        jPanelStartEndActions.add(jLabelDataStart, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 50;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = fieldGBC.insets;
-        jPanelStartEndActions.add(jTextFieldDateStart, gridBagConstraints);
-        //jTextFieldDateStart.setToolTipText(Lang.T(
-        //        "Empty or %1 or as timestamp in seconds").replace("%1","yyyy-MM-dd hh:mm:00"));
-
-        jLabelDateEnd.setText(Lang.T("Date end"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = labelGBC.insets;
-        jPanelStartEndActions.add(jLabelDateEnd, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 50;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = fieldGBC.insets;
-        //jTextFieldDateEnd.setToolTipText(Lang.T(
-        //        "Empty or %1 or as timestamp in seconds").replace("%1","yyyy-MM-dd hh:mm:00"));
-        jPanelStartEndActions.add(jTextFieldDateEnd, gridBagConstraints);
-
-        fieldGBC.gridy = ++gridy;
-        jPanelMain.add(jPanelStartEndActions, fieldGBC);
-
-        separateBGC.gridy = ++gridy;
-        jPanelMain.add(jSeparator4, separateBGC);
-
-        jLabel4.setFont(headFont); // NOI18N
-        jLabel4.setHorizontalAlignment(SwingConstants.CENTER);
-        jLabel4.setText(Lang.T("Filter by Persons"));
-        headBGC.gridy = ++gridy;
-        jPanelMain.add(jLabel4, headBGC);
-
-        jLabel1.setText(Lang.T("Filter"));
-        labelGBC.gridy = ++gridy;
-        jPanelMain.add(jLabel1, labelGBC);
-
-        fieldGBC.gridy = gridy;
-        jPanelMain.add(jComboBoxPersonFilter, fieldGBC);
-        jComboBoxPersonFilter.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxPersonFilter"));
-
-        separateBGC.gridy = ++gridy;
-        jPanelMain.add(jSeparator5, separateBGC);
-
-        jCheckBoxSelfPay.setText(Lang.T("Accrual by creator account too"));
-        jCheckBoxSelfPay.setSelected(true);
-        fieldGBC.gridy = ++gridy;
-        jPanelMain.add(jCheckBoxSelfPay, fieldGBC);
 
         /////////////////////// BUTTONS
 
@@ -699,7 +365,7 @@ public class ExAirDropPanel extends IconPanel {
 
     }
 
-    public Fun.Tuple2<ExPays, String> getAccruals() {
+    public Fun.Tuple2<ExAirDrop, String> getAccruals() {
 
         if (!jPanelMain.isVisible())
             return new Fun.Tuple2<>(null, null);
@@ -707,76 +373,24 @@ public class ExAirDropPanel extends IconPanel {
         Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> balancePosition
                 = (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>) jComboBoxAccrualAction.getSelectedItem();
 
-        Integer txTypeFilter = (Integer) jComboBoxTXTypeFilter.getSelectedItem();
-
-        String jTextFieldDateStartStr;
-        try {
-            jTextFieldDateStartStr = "" + jTextFieldDateStart.getCalendar().getTimeInMillis() / 1000L;
-        } catch (Exception ed1) {
-            jTextFieldDateStartStr = null;
-        }
-        String jTextFieldDateEndStr;
-        try {
-            jTextFieldDateEndStr = "" + jTextFieldDateEnd.getCalendar().getTimeInMillis() / 1000L;
-        } catch (Exception ed1) {
-            jTextFieldDateEndStr = null;
-        }
-
-        boolean minMaxUse = jComboBoxMethodPaymentType.getSelectedIndex() == ExPays.PAYMENT_METHOD_COEFF;
-        return ExPays.make(
+        return ExAirDrop.make(
                 ((AssetCls) jComboBoxAccrualAsset.getSelectedItem()).getKey(),
-                balancePosition.a.a, balancePosition.a.b,
-                jComboBoxMethodPaymentType.getSelectedIndex(),
                 jTextFieldAmount.getText(),
-                minMaxUse ? jTextFieldPaymentMin.getText() : null,
-                minMaxUse ? jTextFieldPaymentMax.getText() : null,
-                ((AssetCls) jComboBoxFilterAsset.getSelectedItem()).getKey(),
-                jComboBoxFilterBalancePosition.getSelectedIndex() + 1, jComboBoxFilterSideBalance.getSelectedIndex() + 1,
-                jTextFieldBQ.getText(), jTextFieldLQ.getText(),
-                txTypeFilter,
-                jTextFieldDateStartStr, jTextFieldDateEndStr,
-                jComboBoxPersonFilter.getSelectedIndex(), jCheckBoxSelfPay.isSelected());
+                balancePosition.a.a, balancePosition.a.b,
+                null);
     }
 
     private JButton jButtonCalcCompu;
     private JButton jButtonViewResult;
-    private JLabel jLabelFilterAsset;
     public JCheckBox jCheckBoxAccrualsUse;
     private JLabel jLabel_Help = new JLabel();
-    private JCheckBox jCheckBoxSelfPay;
-    private JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxAccrualAction;
     public JComboBox<ItemCls> jComboBoxAccrualAsset;
-    private JComboBox<String> jComboBoxMethodPaymentType;
-    public JComboBox<ItemCls> jComboBoxFilterAsset;
-    private JComboBox<Integer> jComboBoxTXTypeFilter;
-    private JComboBox<String> jComboBoxPersonFilter;
-    private JComboBox<String> jComboBoxFilterSideBalance;
-    private JComboBox<Integer> jComboBoxFilterBalancePosition;
-    private JLabel jLabel1;
-    private JLabel jLabel13;
-    private JLabel jLabel19;
-    private JLabel jLabel2;
-    private JLabel jLabel20;
-    private JLabel jLabel3;
-    private JLabel jLabel4;
-    private JLabel jLabelMethod;
-    private JLabel jLabelActionAssetTitle;
+    private javax.swing.JComboBox<Integer> jComboBoxFilterBalancePosition;
+    private javax.swing.JComboBox<String> jComboBoxFilterSideBalance;
+    private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxAccrualAction;
     private JLabel jLabelAmount;
-    private JLabel jLabel8;
-    private JLabel jLabel9;
-    private JLabel jLabelAssetToPay;
-    private JLabel jLabelAction;
-    private JLabel jLabelDataStart;
-    private JLabel jLabelDateEnd;
-    private JLabel jLabelMethodPaymentDescription;
-    private JLabel jLabelPaymentMax;
-    private JLabel jLabelPaymentMin;
-    private JLabel jLabelTitlemetod;
     private JLabel jLabel_FeesResult;
     private JLabel jLabelBalancePosition;
-    private JPanel jPanelMinMaxAmounts;
-    private JPanel jPanelFilterBalance;
-    private JPanel jPanelStartEndActions;
     public JPanel jPanelMain;
     private JPanel jPanel3;
     private JSeparator jSeparator1;
@@ -785,13 +399,6 @@ public class ExAirDropPanel extends IconPanel {
     private JSeparator jSeparator4;
     private JSeparator jSeparator5;
     private JTextField jTextFieldAmount;
-    private JTextField jTextFieldBQ;
-    private JDateChooser jTextFieldDateStart;
-    private JDateChooser jTextFieldDateEnd;
-
-    private JTextField jTextFieldLQ;
-    private JTextField jTextFieldPaymentMax;
-    private JTextField jTextFieldPaymentMin;
 
     private MTable jTablePreviewAccruals;
     private JScrollPane jScrollPaneAccruals = new JScrollPane();
