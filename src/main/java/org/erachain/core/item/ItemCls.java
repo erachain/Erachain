@@ -1052,8 +1052,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJSON.put("key", this.getKey());
         itemJSON.put("nameOrig", getName());
         itemJSON.put("name", this.viewName());
-        if (tags != null && !tags.isEmpty())
-            itemJSON.put("tags", this.tags);
+        if (tags != null && !tags.isEmpty()) {
+            JSONArray tagsArray = new JSONArray();
+            for (String tag : getTags()) {
+                tagsArray.add(tag);
+            }
+            itemJSON.put("tags", tagsArray);
+        }
         itemJSON.put("item_type", this.getItemTypeName());
 
         if (description != null && !description.isEmpty()) {
