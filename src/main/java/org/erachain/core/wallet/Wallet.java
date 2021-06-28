@@ -501,11 +501,11 @@ public class Wallet extends Observable implements Observer {
 
 			// ADD TO DATABASE
 			this.secureDatabase.addPrivateKey(account);
-			this.dwSet.getAccountMap().add(account, nonce);
+			this.dwSet.getAccountMap().add(account, nonce + 1);
 
 			// set name
-			ob.put("description", Lang.T("Created by default Account") + " " + (nonce));
-			LOGGER.info("Added account #" + nonce);
+			ob.put("description", Lang.T("Created by default Account") + " " + (nonce + 1));
+			LOGGER.info("Added account #" + nonce + 1);
 
 			this.commit();
 
