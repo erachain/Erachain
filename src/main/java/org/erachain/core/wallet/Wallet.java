@@ -489,7 +489,7 @@ public class Wallet extends Observable implements Observer {
 		byte[] seed = this.secureDatabase.getSeed();
 
 		// READ NONCE
-		int nonce = this.secureDatabase.getNonce() + 1;
+		int nonce = this.secureDatabase.getNonce();
 
 		// GENERATE ACCOUNT SEED for next NONCE
 		byte[] accountSeed = generateAccountSeed(seed, nonce);
@@ -500,11 +500,12 @@ public class Wallet extends Observable implements Observer {
 		if (!this.accountExists(account)) {
 
 			// ADD TO DATABASE
-			this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
+			this.secureDatabase.addPrivateKey(account);
+			this.dwSet.getAccountMap().add(account, nonce + 1);
 
 			// set name
-			ob.put("description", Lang.T("Created by default Account") + " " + (nonce));
-			LOGGER.info("Added account #" + nonce);
+			ob.put("description", Lang.T("Created by default Account") + " " + (nonce + 1));
+			LOGGER.info("Added account #" + (nonce + 1));
 
 			this.commit();
 
