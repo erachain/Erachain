@@ -489,7 +489,7 @@ public class Wallet extends Observable implements Observer {
 		byte[] seed = this.secureDatabase.getSeed();
 
 		// READ NONCE
-		int nonce = this.secureDatabase.getNonce() + 1;
+		int nonce = this.secureDatabase.getNonce();
 
 		// GENERATE ACCOUNT SEED for next NONCE
 		byte[] accountSeed = generateAccountSeed(seed, nonce);
@@ -500,7 +500,8 @@ public class Wallet extends Observable implements Observer {
 		if (!this.accountExists(account)) {
 
 			// ADD TO DATABASE
-			this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
+			this.secureDatabase.addPrivateKey(account);
+			this.dwSet.getAccountMap().add(account, nonce);
 
 			// set name
 			ob.put("description", Lang.T("Created by default Account") + " " + (nonce));
@@ -838,7 +839,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF ACCOUNT ALREADY EXISTS
 		if (!this.accountExists(account)) {
 			// ADD TO DATABASE
-			this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
+			this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account) - 1);
 
 			// SAVE TO DISK
 			this.dwSet.hardFlush();
@@ -876,7 +877,7 @@ public class Wallet extends Observable implements Observer {
 			return new Tuple3<>(null, 0, "Already exist");
 
 		// ADD TO DATABASE
-		this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account));
+		this.dwSet.getAccountMap().add(account, this.secureDatabase.addPrivateKey(account) - 1);
 
 		// SAVE TO DISK
 		this.dwSet.hardFlush();
