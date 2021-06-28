@@ -76,6 +76,18 @@ public class ItemInfo extends JPanel {
         fieldGBC.gridy = labelGBC.gridy;
         add(textName, fieldGBC);
 
+        if (item.getTagsStr() != null) {
+            ++labelGBC.gridy;
+            add(new JLabel(Lang.T("Tags") + ":"), labelGBC);
+
+            JTextField textTags = new JTextField();
+            textTags.setText(item.getTagsStr());
+            textTags.setToolTipText("");
+            textTags.setEditable(false);
+            fieldGBC.gridy = labelGBC.gridy;
+            add(textTags, fieldGBC);
+        }
+
         ++labelGBC.gridy;
         if (useIcon) {
             byte[] iconBytes = item.getIcon();
