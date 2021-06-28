@@ -3,6 +3,7 @@ package org.erachain.core.account;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.json.simple.JSONObject;
 
 //import org.erachain.core.crypto.Base64;
 
@@ -100,6 +101,12 @@ public class PublicKeyAccount extends Account {
         return false;
     }
     */
+
+    public JSONObject toJson() {
+        JSONObject json = super.toJson();
+        json.put("pubkey", getBase58());
+        return json;
+    }
 
     public String getBase58() {
         return Base58.encode(publicKey);
