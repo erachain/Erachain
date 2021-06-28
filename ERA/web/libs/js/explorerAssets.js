@@ -30,15 +30,19 @@ function assets(data) {
     for (var i in data.pageItems) {
         var item = data.pageItems[i];
         output += '<tr>';
-        output += '<td> <a href=?asset=' + item.key + get_lang() + '>';
+        output += '<td>';
         //output += makeMediaIcon(item, '', 'width:2em')
-        output += '<div class="row"><div class="col-lg-2">' + makeMediaIcon(item, '', 'width:3em') + '</div><div class="col-lg-10">';
-        output += '<div class="row">' + cutBlank(escapeHtml(item.nameOrig), 70) + '</div>';
-        output += '<div class="row" style="font-size:0.8em">' + item.key + (item.tags? (' ' + item.tags) : '') + '</div>';
+        output += '<div class="row"><div class="col-lg-2"><a href=?asset=' + item.key + get_lang() + '>' + makeMediaIcon(item, '', 'width:3em') + '</a></div><div class="col-lg-10">';
+        output += '<div class="row"><a href=?asset=' + item.key + get_lang() + '>' + cutBlank(escapeHtml(item.nameOrig), 70) + '</a></div>';
+        output += '<div class="row" style="font-size:0.8em">' + item.key;
 
-        output += '</div></div>';
+        if (item.tags) {
+            for (var i in item.tags) {
+                output += ' <a href=?q=' + item.tags[i] + '&lang=ru&search=assets>' + item.tags[i] + '</a> ';
+            }
+        }
 
-        output += '</a>';
+        output += '</div></div></div>';
         output += '<td style="font-size:0.8em">' + item.assetTypeNameFull;
 
         output += '<br><a href=?address=' + item.maker + get_lang() + '>';
