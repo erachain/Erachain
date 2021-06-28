@@ -2,7 +2,6 @@ package org.erachain.gui.exdata;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.exdata.ExAirdrop;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.*;
@@ -78,7 +77,7 @@ public class ExDataPanel extends JPanel {
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
     public DocTypeAppendixPanel docTypeAppendixPanel;
     public ExAccrualsPanel exAccrualsPanel;
-    public ExAirdrop exAirDropPanel;
+    public ExAirDropPanel exAirDropPanel;
 
     /**
      * Creates new form IssueDocumentPanel
@@ -288,7 +287,7 @@ public class ExDataPanel extends JPanel {
         jButton_Input_Hashes_From_File_Other_Hashes = new MButton();
         docTypeAppendixPanel = new DocTypeAppendixPanel(this);
         exAccrualsPanel = new ExAccrualsPanel(this);
-        exAirDropPanel = new ExAirDropPanel();
+        exAirDropPanel = new ExAirDropPanel(this);
 
         GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = new int[]{0, 0, 0};
