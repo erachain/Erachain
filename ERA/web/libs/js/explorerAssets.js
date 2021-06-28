@@ -18,9 +18,9 @@ function assets(data) {
     }
 
     output += '<table BORDER=0 cellpadding=10 cellspacing=0 ' +
-        'class="tiny table table-striped" style="font-size:1.2em; border: 1px solid #ddd;"><tr>';
-    output += '<td><b>' + data.Label_table_asset_key + ': <b>' + data.Label_table_asset_name +
-        '<td><b>' + data.Label_table_asset_type + '<td><b>' + data.Label_table_asset_maker;
+        'class="tiny table-striped" style="max-width:1380px; font-size:1.2em; border: 1px solid #ddd;"><tr>';
+    output += '<td width="50%"><b>' + data.Label_table_asset_name + ' / ' + data.Label_table_asset_key +
+        '<td><b>' + data.Label_table_asset_type + ' / <b>' + data.Label_table_asset_maker;
     output += '<td><b>' + data.Label_table_asset_quantity + '<td><b>' + data.Label_table_asset_released
          + '<td><b>' + data.Label_table_asset_lastPrice
          + '<td><b>' + data.Label_table_asset_changePrice
@@ -31,14 +31,17 @@ function assets(data) {
         var item = data.pageItems[i];
         output += '<tr>';
         output += '<td> <a href=?asset=' + item.key + get_lang() + '>';
-        output += '<b>' + item.key + '</b>: ';
-        output += makeMediaIcon(item, '', 'width:2em')
+        //output += makeMediaIcon(item, '', 'width:2em')
+        output += '<div class="row"><div class="col-lg-2">' + makeMediaIcon(item, '', 'width:3em') + '</div><div class="col-lg-10">';
+        output += '<div class="row">' + cutBlank(escapeHtml(item.nameOrig), 70) + '</div>';
+        output += '<div class="row" style="font-size:0.8em">' + item.key + (item.tags? (' ' + item.tags) : '') + '</div>';
 
-        output += cutBlank(escapeHtml(item.name), 50);
+        output += '</div></div>';
+
         output += '</a>';
-        output += '<td>' + item.assetTypeNameFull;
+        output += '<td style="font-size:0.8em">' + item.assetTypeNameFull;
 
-        output += '<td><a href=?address=' + item.maker + get_lang() + '>';
+        output += '<br><a href=?address=' + item.maker + get_lang() + '>';
         if (item.hasOwnProperty('person'))
             output += '[' + item.person_key + ']' + cutBlank(escapeHtml(item.person), 25);
         else
