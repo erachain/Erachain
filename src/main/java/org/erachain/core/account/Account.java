@@ -22,6 +22,7 @@ import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -1609,6 +1610,20 @@ public class Account {
             person = getPerson(DCSet.getInstance(), Controller.getInstance().getMyHeight());
         }
         return person;
+    }
+
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("address", getAddress());
+        Tuple2<Integer, PersonCls> personRes = this.getPerson();
+        if (personRes != null) {
+            JSONObject personJson = new JSONObject();
+            personJson.put("key", personRes.b.getKey());
+            personJson.put("name", personRes.b.getName());
+            personJson.put("birthday", personRes.b.getBirthdayStr());
+            json.put("person", personJson);
+        }
+        return json;
     }
 
     // previous forging block or changed ERA volume

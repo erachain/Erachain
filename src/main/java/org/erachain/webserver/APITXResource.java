@@ -275,12 +275,20 @@ public class APITXResource {
             out.put("error", step);
             out.put("message", "height-sequence error, use integer-integer value");
         } else {
+            TransactionFinalMapImpl txMap = DCSet.getInstance().getTransactionFinalMap();
             Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = DCSet.getInstance().getVouchRecordMap().get(dbRef);
             JSONArray values = new JSONArray();
             if (vouchesItem != null) {
                 out.put("sum", vouchesItem.a.toPlainString());
                 for (Long dbRefVoucher : vouchesItem.b) {
-                    values.add(Transaction.viewDBRef(dbRefVoucher));
+                    Transaction transaction = txMap.get(dbRefVoucher);
+                    if (transaction == null)
+                        continue;
+
+                    JSONObject json = new JSONObject();
+                    json.put("tx", transaction.viewHeightSeq());
+                    json.put("creator", transaction.getCreator().toJson());
+                    values.add(json);
                 }
                 out.put("vouches", values);
             }
