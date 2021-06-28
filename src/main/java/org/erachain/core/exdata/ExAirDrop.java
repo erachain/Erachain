@@ -13,6 +13,8 @@ import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -109,8 +112,90 @@ public class ExAirDrop {
         }
     }
 
+    public int makePayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
+
+        checkedAccruals = new ArrayList<>();
+
+        int scale = asset.getScale();
+
+        byte[] accountFrom = creator.getShortAddressBytes();
+
+        ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
+        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
+
+        // определим - меняется ли позиция баланса если направление сменим
+        // это нужно чтобы отсекать смену знака у балансов для тек активов у кого меняется позиция от знака
+        // настроим данные платежа по знакам Актива ИКоличества, так как величина коэффициента способа всегда положительная
+        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
+        int balancePosDirect = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), false, asset.isSelfManaged());
+        int balancePosBackward = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), true, asset.isSelfManaged());
+        int filterBySigNum;
+        if (balancePosDirect != balancePosBackward) {
+            if (balancePosDirect == TransactionAmount.ACTION_SPEND) {
+                // используем только отрицательные балансы
+                filterBySigNum = -1;
+            } else {
+                // используем только положительные балансы
+                filterBySigNum = 1;
+            }
+        } else {
+            filterBySigNum = 0;
+        }
+
+        boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
+        // сменим знак балансов для отрицательных
+        if (reversedBalancesInPosition) {
+            filterBySigNum *= -1;
+        }
+
+        BigDecimal accrual = amount;
+
+        int count = 0;
+
+        boolean creatorIsPerson = creator.isPerson(dcSet, height);
+
+        for (byte[] recipientShort : addresses) {
+
+            Account recipient = new Account(recipientShort);
+            count++;
+
+            // IF send from PERSON to ANONYMOUS
+            if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
+                    creatorIsPerson, assetKey, balancePos,
+                    asset)) {
+                errorValue = recipient.getAddress();
+                return (count = -Transaction.RECEIVER_NOT_PERSONALIZED);
+            }
+
+            // не проверяем на 0 - так это может быть рассылка писем всем
+            checkedAccruals.add(new Fun.Tuple3(recipient, accrual, null));
+
+            count++;
+            if (andValidate && count > MAX_COUNT) {
+                errorValue = "MAX count over: " + MAX_COUNT;
+                return (count = -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+            }
+
+        }
+
+        totalPay = amount.multiply(new BigDecimal(addresses.length));
+
+        return count;
+
+    }
+
+    public int makeFilterPayList(Transaction transaction, boolean andValidate) {
+        return makePayList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
+    }
+
     public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> makeCheckedList(Transaction transaction, boolean andValidate) {
         return makeCheckedList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
+    }
+
+    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> precalcAccrualList(
+            int height, Account creator) {
+        checkValidList(dcSet, height, asset, creator);
+        return checkedAccruals;
     }
 
     public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> getCheckedAccruals(Transaction statement) {

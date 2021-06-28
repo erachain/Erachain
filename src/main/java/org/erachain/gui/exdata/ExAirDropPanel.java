@@ -149,7 +149,7 @@ public class ExAirDropPanel extends IconPanel {
 
                         ExAirDrop pays = exPaysRes.a;
                         pays.setDC(DCSet.getInstance());
-                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.caprecalcFilteredAccruals(
+                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.precalcAccrualList(
                                 Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
 
                         String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getAddressesCount()
