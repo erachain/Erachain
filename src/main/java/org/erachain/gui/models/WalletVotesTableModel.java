@@ -13,7 +13,7 @@ public class WalletVotesTableModel extends WalletTableModel<Poll> {
     private static final int COLUMN_CONFIRMED = 3;
 
     public WalletVotesTableModel() {
-        super(Controller.getInstance().getWallet().database.getPollMap(),
+        super(Controller.getInstance().getWallet().dwSet.getPollMap(),
                 new String[]{"Name", "Creator", "Total Votes", "Confirmed"}, null, true, -1);
     }
 

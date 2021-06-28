@@ -174,6 +174,10 @@ public class BlockExplorerTest {
 
         DCSet.getInstance().getTransactionFinalMap().contains(Transaction.makeDBRef(1, 1));
 
+        int type = 31;
+        Boolean isCreator = null;
+        Long fromID = null;
+
         Stopwatch stopwatchAll = new Stopwatch();
 
         List<Object> all = new ArrayList<Object>();
@@ -195,9 +199,13 @@ public class BlockExplorerTest {
 
     }
 
+
     public void getTransactionsByTypeAndAddress() {
 
         DCSet.getInstance().getTransactionFinalMap().contains(Transaction.makeDBRef(1, 1));
+
+        Boolean isCreator = null;
+        Long fromID = null;
 
         Stopwatch stopwatchAll = new Stopwatch();
 
@@ -261,7 +269,7 @@ public class BlockExplorerTest {
         stopwatchAll = new Stopwatch();
 
         all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(
-                Crypto.getInstance().getShortBytesFromAddress("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"), type, isCreator, fromID, 0, 555, true, false));
+                Crypto.getInstance().getShortBytesFromAddress("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"), 31, isCreator, fromID, 0, 555, true, false));
 
         LOGGER.error("getTransactionsByAddress QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ. " + all.size() + " " + stopwatchAll.elapsedTime());
 

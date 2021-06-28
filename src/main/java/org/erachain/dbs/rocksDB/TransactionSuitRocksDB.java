@@ -35,7 +35,6 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE";
     private final String timestampIndexName = "timestamp_unc_txs";
     private final String senderIndexName = "sender_unc_txs";
-    private final String recipientsIndexName = "recipient_unc_txs";
     private final String addressTypeIndexName = "address_type_unc_txs";
 
     private SimpleIndexDB<Long, Transaction, Long> timestampIndex;
@@ -94,6 +93,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 new ByteableString().toBytesObject(result.a),
                 new ByteableLong().toBytesObject(result.b)));
 
+        String recipientsIndexName = "recipient_unc_txs";
         recipientsIndex = new ArrayIndexDB<>(recipientsIndexName,
                 (aLong, transaction) -> {
                     if (transaction.noDCSet()) {

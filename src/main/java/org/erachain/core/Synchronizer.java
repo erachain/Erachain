@@ -394,7 +394,7 @@ public class Synchronizer extends Thread {
             // освободим всю память
             dcSet.clearCache();
             if (ctrl.doesWalletExists()) {
-                ctrl.getWallet().database.clearCache();
+                ctrl.getWallet().dwSet.clearCache();
             }
 
             ConcurrentHashMap<Long, Transaction> orphanedTransactions
@@ -802,7 +802,7 @@ public class Synchronizer extends Thread {
                 Block lastCommonBlock = dcSet.getBlockSignsMap().getBlock(lastCommonBlockSignature);
 
                 // SYNCHRONIZE BLOCKS
-                LOGGER.info("synchronize with OPRHAN from common block [" + lastCommonBlock.getHeight()
+                LOGGER.info("synchronize with ORPHAN from common block [" + lastCommonBlock.getHeight()
                         + "] for blocks: " + blocks.size());
                 synchronizeNewBlocks(dcSet, lastCommonBlock, checkPointHeight, blocks, peer);
 

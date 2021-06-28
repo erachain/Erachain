@@ -629,7 +629,7 @@ public class TradeResource {
                 if (false) {
                     // сейчас из Карты уже со статусом берется
                     if (order.isNotTraded()) {
-                        order.setStatus(Order.ACTIVE);
+                        order.setStatus(Order.OPENED);
                     } else {
                         order.setStatus(Order.FULFILLED);
                     }

@@ -161,7 +161,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         });
 
         // set interval panel
-        setIntervalPanel = new SetIntervalPanel(wallet.database.getTransactionMap());
+        setIntervalPanel = new SetIntervalPanel(wallet.dwSet.getTransactionMap());
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -247,7 +247,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                     return;
 
                 // code delete
-                Controller.getInstance().getWallet().database.getTransactionMap()
+                Controller.getInstance().getWallet().dwSet.getTransactionMap()
                         .delete(selectedTransaction);
 
             }

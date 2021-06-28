@@ -85,7 +85,20 @@ public class APIUtils {
     }
 
     public static String errorMess(int error, String message, Transaction transaction) {
+
         String errorMsg = "{ \"error\":" + error + ", \"message\": \"" + message + "\"";
+        if (transaction != null && transaction.errorValue != null) {
+            errorMsg += ", \"value\":\"" + transaction.errorValue + "\"";
+        }
+        return errorMsg + " }";
+    }
+
+    public static String errorMess(int error, String message, Transaction transaction, String lang) {
+
+        JSONObject langObj = Lang.getInstance().getLangJson(lang);
+
+        String errorMsg = "{ \"error\":" + error + ", \"message\": \"" +
+                (langObj == null ? message : Lang.T(message, langObj)) + "\"";
         if (transaction != null && transaction.errorValue != null) {
             errorMsg += ", \"value\":\"" + transaction.errorValue + "\"";
         }

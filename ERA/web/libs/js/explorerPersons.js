@@ -62,6 +62,11 @@ function person_asset(data) {
     else
         output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=4&side=' + data.side + get_lang()
                                         + '">' + data.Label_Balance_4 + '</a>';
+    if (data.position == 5)
+        output +=  ' &nbsp&nbsp <b><span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_Balance_5 + '</span></b>';
+    else
+        output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=5&side=' + data.side + get_lang()
+                                        + '">' + data.Label_Balance_5 + '</a>';
 
     output += '</h4>';
 

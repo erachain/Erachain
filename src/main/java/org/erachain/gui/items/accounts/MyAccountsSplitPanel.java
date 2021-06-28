@@ -52,8 +52,8 @@ public class MyAccountsSplitPanel extends SplitPanel {
     public void onClose() {
         rightPanel.tableModel.deleteObservers();
         accountPanel.tableModel.deleteObservers();
-        Controller.getInstance().deleteObserver(accountPanel.reload_Button);
-        Controller.getInstance().deleteObserver(accountPanel.newAccount_Button);
+        Controller.getInstance().deleteObserver(accountPanel.updateButton);
+        Controller.getInstance().deleteObserver(accountPanel.newAccountButton);
     }
 
     class Account_Tab_Listener implements ListSelectionListener {

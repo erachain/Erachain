@@ -3,6 +3,7 @@ package org.erachain.core.item.assets;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
@@ -56,6 +57,7 @@ public class OrderTest {
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balanceA;
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balanceB;
     DCSet dcSet;
+    BlockChain chain;
     GenesisBlock gb;
     // CREATE KNOWN ACCOUNT
     PrivateKeyAccount accountA;
@@ -83,11 +85,11 @@ public class OrderTest {
         BlockChain.CHECK_BUGS = 10;
         height = BlockChain.ALL_BALANCES_OK_TO + 2;
 
-        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
-        gb = new GenesisBlock();
+        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(tempDir.getPath(), dbs);
 
         try {
-            gb.process(dcSet);
+            chain = new BlockChain(dcSet);
+            gb = chain.getGenesisBlock();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -109,19 +111,19 @@ public class OrderTest {
         accountB.changeBalance(dcSet, false, false, ERM_KEY, BigDecimal.valueOf(100), false, false, false);
         accountB.changeBalance(dcSet, false, false, FEE_KEY, BigDecimal.valueOf(10), false, false, false);
 
-        assetA = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
+        assetA = new AssetVenture(itemAppData, gb.getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
         keyA = issueAssetTransaction.getAssetKey(dcSet);
         balanceA = accountA.getBalance(dcSet, keyA);
 
-        assetB = new AssetVenture(itemAppData, new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
+        assetB = new AssetVenture(itemAppData, gb.getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 0L, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, false);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
         keyB = issueAssetTransaction.getAssetKey(dcSet);
 
@@ -131,34 +133,27 @@ public class OrderTest {
 
     }
 
-    // reload from DB
-    private Order reloadOrder(Order order) {
-
-        return dcSet.getCompletedOrderMap().contains(order.getId()) ? dcSet.getCompletedOrderMap().get(order.getId())
-                : dcSet.getOrderMap().get(order.getId());
-
-    }
-
-    private Order reloadOrder(Long orderId) {
-
-        return dcSet.getCompletedOrderMap().contains(orderId) ? dcSet.getCompletedOrderMap().get(orderId)
-                : dcSet.getOrderMap().get(orderId);
-
-    }
-
-    private void removeOrder(Long orderId) {
-
-        dcSet.getCompletedOrderMap().delete(orderId);
-        dcSet.getOrderMap().delete(orderId);
+    @Test
+    public void powerTen() {
+        assertEquals(Order.powerTen(new BigDecimal(0)), 0);
+        assertEquals(Order.powerTen(new BigDecimal(500)), 2);
+        assertEquals(Order.powerTen(new BigDecimal(100)), 2);
+        assertEquals(Order.powerTen(new BigDecimal(50)), 1);
+        assertEquals(Order.powerTen(new BigDecimal(10)), 1);
+        assertEquals(Order.powerTen(new BigDecimal(5)), 0);
+        assertEquals(Order.powerTen(new BigDecimal(1)), 0);
+        assertEquals(Order.powerTen(new BigDecimal(0.5)), -1);
+        assertEquals(Order.powerTen(new BigDecimal(0.1)), -1);
+        assertEquals(Order.powerTen(new BigDecimal(0.05)), -2);
+        assertEquals(Order.powerTen(new BigDecimal(0.01)), -2);
 
     }
 
     /**
      * Ситуация следующая - есть список ордеров которые подходят для текущего и один из них не поностью исполняется
-     *  - он переписывается в форкнутую базу
-     *  Затем второй ордер к этому списку обрабатывается. And в списке полявляется двойная запись
-     *  ранее покусанного ордера и его родитель из родительской таблицы. Надо сэмулировать такой случай и проверять тут
-     *
+     * - он переписывается в форкнутую базу
+     * Затем второй ордер к этому списку обрабатывается. And в списке появляется двойная запись
+     * ранее покусанного ордера и его родитель из родительской таблицы. Надо съэмулировать такой случай и проверять тут
      */
     @Test
     public void processDoubleInFork() {
@@ -467,7 +462,54 @@ public class OrderTest {
     }
 
     @Test
+    public void pledge1() {
+
+
+        for (int dbs : TESTED_DBS) {
+            try {
+                init(dbs);
+
+                TransactionFinalMapSigns transSignsMap = dcSet.getTransactionFinalMapSigns();
+                TransactionFinalMapImpl transFinMap = dcSet.getTransactionFinalMap();
+
+
+                BigDecimal amount1 = BigDecimal.ONE;
+                BigDecimal amount10 = BigDecimal.TEN;
+                BigDecimal amount100 = new BigDecimal("100");
+                CreateOrderTransaction orderCreation1 = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                        amount10, amount100,
+                        (byte) 0, timestamp++, 0L);
+                orderCreation1.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation1.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                orderCreation1.process(null, Transaction.FOR_NETWORK);
+
+                assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, amount10);
+
+                CreateOrderTransaction orderCreation2 = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet),
+                        amount10,
+                        amount1, (byte) 0, timestamp++, 0L);
+                orderCreation2.sign(accountB, Transaction.FOR_NETWORK);
+                orderCreation2.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
+                orderCreation2.process(null, Transaction.FOR_NETWORK);
+
+                assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, amount10.subtract(amount1));
+
+                orderCreation2.orphan(null, Transaction.FOR_NETWORK);
+                assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, amount10);
+
+                orderCreation1.orphan(null, Transaction.FOR_NETWORK);
+                assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, BigDecimal.ZERO);
+
+            } finally {
+                dcSet.close();
+            }
+        }
+    }
+
+    @Test
     public void orphan() {
     }
+
+
 
 }

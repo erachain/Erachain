@@ -329,25 +329,38 @@ public abstract class AssetCls extends ItemCls {
     protected int parseAppData() {
         int pos = super.parseAppData();
         if ((flags & APP_DATA_DEX_AWARDS_MASK) != 0) {
-            int dexAwardsLen = appData[pos++];
+            int dexAwardsLen = Byte.toUnsignedInt(appData[pos++]) + 1;
             dexAwards = new ExLinkAddress[dexAwardsLen];
             for (int i = 0; i < dexAwardsLen; i++) {
+
+                if (pos >= appData.length) {
+                    // старая версия с 255 числом
+                    ExLinkAddress[] dexAwardsTMP = new ExLinkAddress[dexAwardsLen - 1];
+                    for (int k = 0; k < dexAwardsTMP.length; k++) {
+                        dexAwardsTMP[k] = dexAwards[k];
+                    }
+                    dexAwards = dexAwardsTMP;
+                    break;
+                }
+
                 dexAwards[i] = new ExLinkAddress(appData, pos);
                 pos += dexAwards[i].length();
+
+
             }
         }
         return pos;
     }
 
     public static byte[] makeAppData(boolean iconAsURL, int iconType, boolean imageAsURL, int imageType,
-                                     ExLinkAddress[] dexAwards) {
+                                     String tags, ExLinkAddress[] dexAwards) {
         byte[] appData = ItemCls.makeAppData(dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK,
-                iconAsURL, iconType, imageAsURL, imageType);
+                iconAsURL, iconType, imageAsURL, imageType, tags);
 
         if (dexAwards == null)
             return appData;
 
-        appData = Bytes.concat(appData, new byte[]{(byte) dexAwards.length});
+        appData = Bytes.concat(appData, new byte[]{(byte) (dexAwards.length - 1)});
         for (ExLinkAddress exAddress : dexAwards) {
             appData = Bytes.concat(appData, exAddress.toBytes());
         }
@@ -475,7 +488,10 @@ public abstract class AssetCls extends ItemCls {
                 return "±";
             case AS_NON_FUNGIBLE:
                 //return "\uD83C\uDFFA"; // амфора
-                return "\uD83D\uDC18"; // слон
+                //return "💎"; // U+1F48E драгоценный камень
+                return "\uD83C\uDFA8"; // палитра художника
+            //return "\uD83C\uDFAC"; // кино-хлопушка
+            //return "\uD83D\uDC18"; // слон
             case AS_INDEX:
                 return "⤴";
             case AS_INSIDE_VOTE:
@@ -593,7 +609,17 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public String[] getTags() {
-        return new String[]{":" + viewAssetTypeAbbrev().toLowerCase()};
+        String tagType = ":" + viewAssetTypeAbbrev().toLowerCase();
+
+        String[] tagsArray = super.getTags();
+        if (tagsArray == null)
+            return new String[]{tagType};
+
+        String[] tagsArrayNew = new String[tagsArray.length + 1];
+        System.arraycopy(tagsArray, 0, tagsArrayNew, 0, tagsArray.length);
+        tagsArrayNew[tagsArray.length] = tagType;
+
+        return tagsArrayNew;
     }
 
     @Override
@@ -2168,6 +2194,10 @@ public abstract class AssetCls extends ItemCls {
             if (isAccounting()) {
                 errorValue = "Award is denied for Accounting Asset";
                 return Transaction.INVALID_AWARD;
+            }
+
+            if (dexAwards.length > 256) {
+                return Transaction.INVALID_MAX_AWARD_COUNT;
             }
 
             // нельзя делать ссылку на иконку у Персон

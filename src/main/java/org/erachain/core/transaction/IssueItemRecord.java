@@ -227,7 +227,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         }
 
         if (BlockChain.startKeys[this.item.getItemType()] < 0) {
-            if (this.item.isNovaAsset(this.creator, this.dcSet) <= 0) {
+            if (this.item.isNovaItem(this.dcSet) <= 0) {
                 return INVALID_ISSUE_PROHIBITED;
             }
         }
@@ -245,7 +245,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
         if (nameLen < item.getMinNameLen()) {
             // IF is NEW NOVA
-            if (this.item.isNovaAsset(this.creator, this.dcSet) <= 0) {
+            if (this.item.isNovaItem(this.dcSet) <= 0) {
                 errorValue = "So short: " + nameLen;
                 return INVALID_NAME_LENGTH_MIN;
             }

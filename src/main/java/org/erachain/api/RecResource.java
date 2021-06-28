@@ -14,9 +14,9 @@ import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +113,12 @@ public class RecResource {
 
                     //PARSE ORDER CANCEL
                     //return CancelOrderTransaction.Parse(data, releaserReference);
+                    break;
+
+                case Transaction.CHANGE_ORDER_TRANSACTION:
+
+                    //PARSE ORDER CREATION TRANSACTION
+                    //return CreateOrderTransaction.Parse(data, releaserReference);
                     break;
 
                 case Transaction.MULTI_PAYMENT_TRANSACTION:
@@ -518,11 +524,11 @@ public class RecResource {
             byte[] transactionBytes = Base58.decode(rawDataBase58);
 
             step++;
-            Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
-            if (result.getB() == Transaction.VALIDATE_OK) {
+            Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, false);
+            if (result.b == Transaction.VALIDATE_OK) {
                 return "+";
             } else {
-                return APIUtils.errorMess(result.getB(), OnDealClick.resultMess(result.getB()), result.getA());
+                return APIUtils.errorMess(result.b, OnDealClick.resultMess(result.b), result.a);
             }
 
         } catch (Exception e) {

@@ -40,7 +40,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
     private DCSet dcSet = DCSet.getInstance();
 
     public AccountsTransactionsTableModel() {
-        super(Controller.getInstance().getWallet().database.getTransactionMap(),
+        super(Controller.getInstance().getWallet().dwSet.getTransactionMap(),
                 new String[]{"№", "Date", "Amount", "Asset", "Type", "Sender", "Recipient", "Title", "Favorite"},
                 new Boolean[]{false, true, true, false, false, true, true, true, true, true}, false, COLUMN_FAVORITE);
 
@@ -244,6 +244,13 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             trr.recipient = "" + cancelOrder.getOrderID();
             trr.title = "";
 
+        } else if (transaction.getType() == Transaction.CHANGE_ORDER_TRANSACTION) {
+            ChangeOrderTransaction updateOrder = (ChangeOrderTransaction) transaction;
+
+            trr.amount = updateOrder.getAmountWant();
+            trr.recipient = ""; // + updateOrder.getAmountWant();
+            trr.title = "" + updateOrder.getAmountWant().toPlainString();
+
         } else {
             trr.recipient = "";
             trr.title = transaction.getTitle();
@@ -268,6 +275,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
         public String title;
 
         Trans(Fun.Tuple2<Long, Integer> walletKey, Transaction transaction) {
+            transaction.setDC(dcSet, true);
             this.transaction = transaction;
             this.walletKey = walletKey;
             isUnViewed = ((WTransactionMap) map).isUnViewed(transaction);

@@ -161,6 +161,16 @@ public class TransactionDetailsFactory {
 
                 return cancelOrderDetailsFrame;
 
+            case Transaction.CHANGE_ORDER_TRANSACTION:
+
+                ChangeOrderTransaction changeOrderTransaction = (ChangeOrderTransaction) transaction;
+
+                UpdateOrderDetailsFrame updateOrderDetailsFrame = new UpdateOrderDetailsFrame(changeOrderTransaction);
+                gridBagConstraints.gridy = updateOrderDetailsFrame.labelGBC.gridy + 1;
+                updateOrderDetailsFrame.add(jLabel9, gridBagConstraints);
+
+                return updateOrderDetailsFrame;
+
             case Transaction.MULTI_PAYMENT_TRANSACTION:
 
                 MultiPaymentTransaction MultiPaymentTransaction = (MultiPaymentTransaction) transaction;

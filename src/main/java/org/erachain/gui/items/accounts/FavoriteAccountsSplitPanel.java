@@ -66,7 +66,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0};
 
         if (Controller.getInstance().doesWalletDatabaseExists())
-            accountsMap = Controller.getInstance().getWallet().database.getFavoriteAccountsMap();
+            accountsMap = Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap();
 
         searthLabelSearchToolBarLeftPanel.setVisible(true);
         // this.searchTextFieldSearchToolBarLeftPanelDocument.setVisible(true);

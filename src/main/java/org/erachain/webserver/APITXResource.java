@@ -22,10 +22,7 @@ import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -49,6 +46,8 @@ public class APITXResource {
                 "GET transaction by Height and Sequence (SeqNo)");
         help.put("api/tx/signature/{height-sequence}",
                 "GET transaction Signature by Height and Sequence (SeqNo)");
+        help.put("api/tx/raw/{height-sequence or signature}",
+                "GET transaction RAW (Base64) by Height and Sequence (SeqNo) or signature (Base58)");
         help.put("api/tx/signs/{height-sequence}",
                 "GET Signs of transaction by Height and Sequence");
         help.put("api/tx/vouches/{height-sequence}",
@@ -97,18 +96,24 @@ public class APITXResource {
 
         help.put("GET api/tx/types", "Return array of transaction types.");
 
+        help.put("GET api/tx/parse/{raw in BaseXX}?check&lang=en&base58", "Parse RAW (transaction byte-code) and check. Param [lang] for localize error message. For validate use [check]. If RAW in Base58 use [base58]. Base58 is slow - use it for test only.");
+        help.put("POST api/tx/parse?check&lang=en", "See 'GET parse'. Body: [RAW in Base64 only]");
+
+        help.put("GET api/tx/broadcast/{raw in BaseXX}?lang=en&base58", "Broadcast RAW in Base58 or Base64. Base58 is slow - use it for test only. Use [lang] for localize error message. If RAW in Base58 use [base58]");
+        help.put("POST api/tx/broadcast?lang=en", "See 'GET broadcast'. Body: [RAW in Base64 only]");
+        help.put("POST api/tx/broadcastjson JSON", "See 'GET broadcast'. Body is JSON: {\"raw\":\"Base64\", \"lang\":\"en|ru\"}");
+
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(StrJSonFine.convert(help)).build();
 
     }
 
-
     @GET
     @Path("{signature}")
     public Response getBySign(@PathParam("signature") String signature) {
 
-        Map out = new LinkedHashMap();
+        Map out = new JSONObject();
 
         int step = 1;
 
@@ -133,7 +138,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toString())
+                .entity(StrJSonFine.convert(out))
                 .build();
     }
 
@@ -141,7 +146,7 @@ public class APITXResource {
     @Path("bynumber/{number}")
     public Response getByNumber(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        Map out = new JSONObject();
         int step = 1;
 
         try {
@@ -169,7 +174,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toString())
+                .entity(StrJSonFine.convert(out))
                 .build();
     }
 
@@ -216,10 +221,23 @@ public class APITXResource {
     }
 
     @GET
+    @Path("raw/{number}")
+    public Response raw(@PathParam("number") String numberStr) {
+
+        Transaction tx = DCSet.getInstance().getTransactionFinalMap().getRecord(numberStr);
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(Base64.getEncoder().encodeToString(tx.toBytes(Transaction.FOR_NETWORK, true)))
+                .build();
+    }
+
+    @GET
     @Path("signs/{number}")
     public Response getSigns(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        Map out = new JSONObject();
         int step = 1;
 
         Long dbRef = Transaction.parseDBRef(numberStr);
@@ -241,7 +259,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toString())
+                .entity(StrJSonFine.convert(out))
                 .build();
     }
 
@@ -249,7 +267,7 @@ public class APITXResource {
     @Path("vouches/{number}")
     public Response getVouches(@PathParam("number") String numberStr) {
 
-        Map out = new LinkedHashMap();
+        Map out = new JSONObject();
         int step = 1;
 
         Long dbRef = Transaction.parseDBRef(numberStr);
@@ -271,7 +289,7 @@ public class APITXResource {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(out.toString())
+                .entity(StrJSonFine.convert(out))
                 .build();
     }
 
@@ -900,6 +918,148 @@ public class APITXResource {
         }
 
         return (getTypesCACHE = jsonArray.toJSONString());
+    }
+
+    public Response parse(String raw, boolean base64, boolean check, String lang) {
+
+        JSONObject out = new JSONObject();
+
+        JSONObject langObj = null;
+        if (lang != null) {
+            out.put("lang", lang);
+            langObj = Lang.getInstance().getLangJson(lang);
+        }
+
+        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().parseAndCheck(raw, base64, check);
+        if (result.a == null) {
+            Transaction.updateMapByErrorSimple2(out, result.b,
+                    langObj == null || result.c == null ? result.c : Lang.T(result.c, langObj), lang);
+
+        } else {
+            try {
+                out = result.a.toJson();
+            } catch (Exception e) {
+                result.a.updateMapByError2(out, Transaction.JSON_ERROR, e.toString());
+            }
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
+    }
+
+    @GET
+    @Path("parse/{raw}")
+    public Response parse(@Context UriInfo info,
+                          @PathParam("raw") String raw,
+                          @QueryParam("lang") String lang) {
+
+        boolean base58 = API.checkBoolean(info, "base58");
+        boolean check = API.checkBoolean(info, "check");
+
+        return parse(raw, !base58, check, lang);
+    }
+
+    @POST
+    @Path("parse")
+    public Response parsePost(@Context UriInfo info,
+                              @QueryParam("lang") String lang,
+                              String raw) {
+
+        boolean check = API.checkBoolean(info, "check");
+        return parse(raw, true, check, lang);
+    }
+
+    /////////////////// BROADCAST
+
+    public static JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
+        Fun.Tuple3<Transaction, Integer, String> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, false);
+        if (result.a == null) {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple2(out, result.b, result.c, lang);
+            return out;
+
+        }
+
+        JSONObject out = result.a.toJson();
+        if (result.b == Transaction.VALIDATE_OK) {
+            out.put("status", "ok");
+            return out;
+        }
+
+        result.a.updateMapByError2(out, result.b, lang);
+
+        return out;
+
+    }
+
+    public static JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
+        JSONObject out = new JSONObject();
+        byte[] transactionBytes;
+        try {
+            if (base64) {
+                transactionBytes = Base64.getDecoder().decode(rawDataStr);
+            } else {
+                transactionBytes = Base58.decode(rawDataStr);
+            }
+        } catch (Exception e) {
+            Transaction.updateMapByErrorSimple2(out, Transaction.JSON_ERROR, e.getMessage(), lang);
+            return out;
+        }
+
+        if (transactionBytes == null) {
+            Transaction.updateMapByErrorSimple2(out, Transaction.JSON_ERROR, "", lang);
+            return out;
+        }
+
+        return broadcastFromRawByte(transactionBytes, lang);
+    }
+
+    @GET
+    @Path("broadcast/{raw}")
+    public Response broadcast(@Context UriInfo info,
+                              @PathParam("raw") String raw,
+                              @QueryParam("lang") String lang) {
+
+        boolean base58 = API.checkBoolean(info, "base58");
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, !base58, lang).toJSONString())
+                .build();
+    }
+
+    @POST
+    @Path("broadcast")
+    public Response broadcastPost(@Context UriInfo info,
+                                  @QueryParam("lang") String lang,
+                                  String raw) {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, true, lang).toJSONString())
+                .build();
+
+    }
+
+    @POST
+    @Path("broadcastjson")
+    public Response broadcastFromRawJsonPost(@Context UriInfo info,
+                                             @Context HttpServletRequest request,
+                                             MultivaluedMap<String, String> form) {
+
+        String raw = form.getFirst("raw");
+        String lang = form.getFirst("lang");
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(broadcastFromRawString(raw, true, lang).toJSONString())
+                .build();
+
     }
 
 }

@@ -131,9 +131,9 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
-        if (this.amount != null) {
+        if (this.amount != null && this.amount.signum() != 0) {
             long assetKey = this.getAbsKey();
-            AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(assetKey);
+            AssetCls asset = this.dcSet.getItemAssetMap().get(assetKey);
             if (asset == null || assetKey > BlockChain.AMOUNT_SCALE_FROM) {
                 int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
                 if (different_scale != 0) {

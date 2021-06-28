@@ -18,11 +18,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -79,9 +76,9 @@ public class API {
         //help.put("see /apirecords", "Help for transactions API"); // @Deprecated
         help.put("see /apidocuments", "Help for documents API");
 
-        help.put("*** BALANCE SYSTEM ***", "");
-        help.put("bal 1", "Balance Components - {Total_Income, Remaining_Balance]");
-        help.put("bal 2", "Balances Array - [Balance in Own, Balance in Debt, Balance on Hold, Balance of Consumer]");
+        help.put("*** BALANCE STRUCTURE ***", "");
+        help.put("balance Side", "Balance has Sides: - BigDecimal array: [Total_Income (side 1), Remaining_Balance (side 2)]. Side 3 - Total Outcome as difference: Side1 - Side2");
+        help.put("balance Positions", "Balances Array - BigDecimal array: [Balance in Own (pos 1), Balance in Debt (pos 2), Balance on Hold (pos 2), Balance of Spend/Consumer 9pos4), Balance of Pledge (pos 5)]. Pledge balance used for DEX orders too");
 
         help.put("*** CHAIN ***", "");
         help.put("GET Height", "height");
@@ -101,23 +98,16 @@ public class API {
         help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}?onlyhead&desc={false}");
         help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");
 
-        help.put("*** RECORD ***", "");
-        help.put("GET Record Parse from RAW", "recordparse/{RAW}");
-        help.put("POST Record Parse from RAW", "recordparse RAW");
-        //help.put("GET Record", "record/{signature}");
-        //help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
-        help.put("GET Record RAW", "recordraw/{signature}");
-        help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{block-seqNo]");
-        help.put("GET Record RAW by Height and Sequence 2", "recordrawbynumber/{block]/[seqNo]");
-
         help.put("*** ADDRESS ***", "");
         help.put("GET Address Validate", "addressvalidate/{address}");
         help.put("GET Address Last Reference", "addresslastreference/{address}");
         help.put("GET Address Unconfirmed Last Reference", "addressunconfirmedlastreference/{address}/{from}/{count}");
         help.put("GET Address Generating Balance", "addressgeneratingbalance/{address}");
         help.put("GET Address Asset Balance", "addressassetbalance/{address}/{assetid}");
+        help.put("GET Address FEE Statistics", "addressfeestats/{address}");
+
         help.put("GET Address Assets", "addressassets/{address}");
-        help.put("GET Address Public Key", "addresspublickey/{address}");
+        help.put("GET Public Key by Address", "addresspublickey/{address}");
         help.put("GET Address Forging Info", "addressforge/{address}");
         help.put("GET Address Person Info", "addressasperson/{address}");
         help.put("GET Address Person Name", "addressaspersonlite/{address}");
@@ -141,13 +131,6 @@ public class API {
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
         help.put("GET info by node", " GET api/info");
         help.put("GET benchmark info by node", " GET api/bench");
-
-        help.put("GET Broadcast", "/broadcast/{raw(Base58)}?lang=en|ru - lang for localize error message");
-        help.put("GET Broadcast64", "/broadcast64/{raw(Base64)}?lang=en|ru - lang for localize error message");
-        help.put("POST Broadcast", "/broadcast?lang=en|ru raw(Base58) - lang for localize error message");
-        help.put("POST Broadcast64", "/broadcast64?lang=en|ru raw(Base64) - lang for localize error message");
-        help.put("POST Broadcastjson", "/broadcastjson?lang=en|ru JSON - JSON: {raw:raw(Base58), lang:en|ru} - lang for localize error message");
-        help.put("POST Broadcastjson64", "/broadcastjson64?lang=en|ru JSON - JSON: {raw:raw(Base64), lang:en|ru} - lang for localize error message");
 
         help.put("POST Broadcasttelegram", "/broadcasttelegram?lang=en|ru JSON {'raw': raw(Base58)}");
         help.put("POST Broadcasttelegram64", "/broadcasttelegram64?lang=en|ru JSON {'raw': raw(Base64)}");
@@ -662,6 +645,7 @@ public class API {
      * ************** RECORDS **********
      */
 
+    @Deprecated
     @POST
     @Path("recordparse")
     public Response recordParse(String raw) // throws JSONException
@@ -676,8 +660,6 @@ public class API {
             try {
                 out = transaction.toJson();
             } catch (Exception e) {
-                out.put("error", -1);
-                out.put("message", APIUtils.errorMess(-1, e.toString(), transaction));
                 transaction.updateMapByError(-1, e.toString(), out);
             }
         } catch (Exception e) {
@@ -693,6 +675,8 @@ public class API {
                 .build();
     }
 
+
+    @Deprecated
     @GET
     @Path("recordparse/{raw}")
     public Response recordParseGET(@PathParam("raw") String raw) // throws JSONException
@@ -770,6 +754,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("recordraw/{signature}")
     public Response recordRaw(@PathParam("signature") String signature) {
@@ -814,6 +799,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("recordrawbynumber/{number}")
     public Response recodRawByNumber(@PathParam("number") String numberStr) {
@@ -844,7 +830,6 @@ public class API {
                 out.put("message", e.getMessage());
         }
 
-
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -852,6 +837,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("recordrawbynumber/{block}/{seqNo}")
     public Response recodRawBySeqNo(@PathParam("block") int block, @PathParam("seqNo") int seqNo) {
@@ -875,6 +861,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("broadcast/{raw}")
     // http://127.0.0.1:9047/api/broadcast/DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
@@ -888,6 +875,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @GET
     @Path("broadcast64/{raw}")
     public Response broadcastRaw64(@PathParam("raw") String raw, @QueryParam("lang") String lang) {
@@ -900,6 +888,7 @@ public class API {
                 .build();
     }
 
+    @Deprecated
     @POST
     @Path("broadcastjson")
     public Response broadcastFromRawJsonPost(@Context HttpServletRequest request,
@@ -916,6 +905,7 @@ public class API {
 
     }
 
+    @Deprecated
     @POST
     @Path("broadcastjson64")
     public Response broadcastFromRaw64JsonPost(@Context HttpServletRequest request,
@@ -932,6 +922,7 @@ public class API {
 
     }
 
+    @Deprecated
     @POST
     @Path("broadcast")
     public Response broadcastFromRawPost(@Context HttpServletRequest request,
@@ -946,6 +937,7 @@ public class API {
 
     }
 
+    @Deprecated
     @POST
     @Path("broadcast64")
     public Response broadcastFromRaw64Post(@Context HttpServletRequest request,
@@ -961,36 +953,32 @@ public class API {
     }
 
     // http://127.0.0.1:9047/api/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-    public JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
-        int step = 1;
-        JSONObject out = new JSONObject();
-        try {
+    @Deprecated
+    public static JSONObject broadcastFromRawByte(byte[] transactionBytes, String lang) {
+        Tuple3<Transaction, Integer, String> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, false);
+        if (result.a == null) {
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByErrorSimple(result.b, langObj == null || result.c == null ?
+                    result.c : Lang.T(result.c, langObj), out);
+            return out;
 
-            step++;
-            Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
-            if (result.getB() == Transaction.VALIDATE_OK) {
-                out.put("status", "ok");
-                return out;
-            } else {
-                JSONObject langObj = Lang.getInstance().getLangJson(lang);
+        }
 
-                out.put("error", result.getB());
-                out.put("message", langObj == null ? OnDealClick.resultMess(result.getB()) : Lang.T(OnDealClick.resultMess(result.getB()), langObj));
-                out.put("lang", lang);
-                if (result.getA() != null && result.getA().errorValue != null) {
-                    out.put("value", langObj == null ? result.getA().errorValue : Lang.T(result.getA().errorValue, langObj));
-                }
-                return out;
-            }
-
-        } catch (Exception e) {
-            LOGGER.warn(" on step: " + step + " - " + e.toString() + " - " + e.getMessage(), e);
-            Transaction.updateMapByErrorSimple(-1, e.toString() + " on step: " + step, out);
+        JSONObject out = result.a.toJson();
+        if (result.b == Transaction.VALIDATE_OK) {
+            out.put("status", "ok");
             return out;
         }
+
+        result.a.updateMapByError(result.b, out, lang);
+
+        return out;
+
     }
 
-    public JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
+    @Deprecated
+    public static JSONObject broadcastFromRawString(String rawDataStr, boolean base64, String lang) {
         JSONObject out = new JSONObject();
         byte[] transactionBytes;
         try {
@@ -1012,6 +1000,7 @@ public class API {
         return broadcastFromRawByte(transactionBytes, lang);
     }
 
+    @Deprecated
     public JSONObject broadcastTelegramBytes(byte[] transactionBytes, String lang) {
         JSONObject out = new JSONObject();
         Transaction transaction;
@@ -1348,6 +1337,36 @@ public class API {
     }
 
     @GET
+    @Path("addressfeestats/{address}")
+    public Response getAddressFEEStats(@PathParam("address") String address) {
+        // CHECK IF VALID ADDRESS
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_ADDRESS);
+
+        }
+
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                = result.a.getBalance(AssetCls.FEE_KEY);
+
+        JSONObject out = new JSONObject();
+
+        out.put("referalAndGift", balance.c.a);
+        out.put("totalEarn", balance.c.b);
+        out.put("forged", balance.c.b.subtract(balance.c.a));
+        out.put("totalSpend", balance.d.b);
+        out.put("result", balance.c.b.subtract(balance.d.b));
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
+    }
+
+    @GET
     @Path("addressassets/{address}")
     public Response getAddressAssetBalance(@PathParam("address") String address) {
         // CHECK IF VALID ADDRESS
@@ -1394,7 +1413,7 @@ public class API {
                 .build();
     }
 
-    private JSONArray setJSONArray(Tuple2 t) {
+    public static JSONArray setJSONArray(Tuple2 t) {
         JSONArray array = new JSONArray();
         array.add(t.a);
         array.add(t.b);
@@ -1408,7 +1427,6 @@ public class API {
         // CHECK IF VALID ADDRESS
         if (PublicKeyAccount.isValidPublicKey(address)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
                     Transaction.INVALID_ADDRESS);
 
         }
@@ -1417,7 +1435,7 @@ public class API {
 
         if (publicKey == null) {
             throw ApiErrorFactory.getInstance().createError(
-                    Transaction.INVALID_PUBLIC_KEY);
+                    Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT);
         } else {
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")

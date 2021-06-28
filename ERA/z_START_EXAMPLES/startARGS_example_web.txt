@@ -14,3 +14,5 @@ nousewallet
 web=on
 weballowed=*
 
+// soft | weak | off | hard (default)
+cache=hard

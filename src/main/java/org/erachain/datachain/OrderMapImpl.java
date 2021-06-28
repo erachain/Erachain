@@ -75,7 +75,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
-    public long getCount(long have, long want) {
+    public int getCount(long have, long want) {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
@@ -87,7 +87,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
-    public long getCount(long have, long want, int limit) {
+    public int getCount(long have, long want, int limit) {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
@@ -238,6 +238,17 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         return ((OrderSuit) map).getHaveWanFirst(have, want);
     }
 
+    @Override
+    public IteratorCloseable<Long> iteratorByAssetKey(long assetKey, boolean descending) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        return ((OrderSuit) this.map).getIteratorByAssetKey(assetKey, descending);
+
+    }
+
 
     @Override
     public List<Order> getOrdersForAddress(
@@ -344,7 +355,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         Order order = super.get(id);
         if (order != null) {
             if (order.isNotTraded()) {
-                order.setStatus(Order.ACTIVE);
+                order.setStatus(Order.OPENED);
             } else {
                 order.setStatus(Order.FULFILLED);
             }

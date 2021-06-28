@@ -1556,7 +1556,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 
         this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
-        if (this.winValue < 1 && this.heightBlock > BlockChain.ALL_VALID_BEFORE) {
+        // если по ALL_VALID_BEFORE пройдет дальше то там корректировка значения стоит!
+        if (this.winValue < 1 && this.heightBlock > BlockChain.WIN_VAL_ALL_VALID && this.heightBlock > BlockChain.ALL_VALID_BEFORE) {
             this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
             this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
 
@@ -1578,7 +1579,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (this.winValue < 1) {
             // значит проскочило по BlockChain.ALL_VALID_BEFORE
             // присвоим его как предыдущее значение
-            this.winValue = parentBlockHead.winValue;
+            this.winValue = parentBlockHead.winValue
+                    // на всякий случай поднимем немного иначе может не пройти если цель увеличится малость
+                    + (parentBlockHead.winValue >> 4);
         }
 
         // вычислив всю силу цепочки
@@ -2161,7 +2164,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     forgerEarn, false, false, true);
 
             // учтем что нафоржили
-            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Account.BALANCE_SIDE_FORGED);
+            this.creator.changeCOMPUStatsBalances(dcSet, asOrphan, forgerEarn, Account.FEE_BALANCE_SIDE_FORGED);
 
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && this.txCalculated != null) {
@@ -2413,12 +2416,12 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 holder.changeBalance(dcSet, asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, false, false);
                 // учтем что получили бонусы
-                holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Account.BALANCE_SIDE_DEBIT);
+                holder.changeCOMPUStatsBalances(dcSet, asOrphan, balanceHold, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
 
                 // у эмитента снимем
                 BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.FEE_KEY, balanceHold,
                         false, false, false);
-                BlockChain.FEE_ASSET_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Account.BALANCE_SIDE_DEBIT);
+                BlockChain.FEE_ASSET_EMITTER.changeCOMPUStatsBalances(dcSet, !asOrphan, balanceHold, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
 
                 if (this.txCalculated != null) {
                     txCalculated.add(new RCalculated(holder, BlockChain.FEE_KEY, balanceHold,

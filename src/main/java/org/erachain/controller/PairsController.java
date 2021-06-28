@@ -59,7 +59,7 @@ public class PairsController {
         File file = new File(Settings.getInstance().getUserPath() + "market.json");
 
         //CREATE FILE IF IT DOESNT EXIST
-        if (BlockChain.MAIN_MODE && file.exists()) {
+        if (!BlockChain.CLONE_MODE && file.exists()) {
             String jsonString = "";
             try {
                 //READ PEERS FILE
@@ -151,8 +151,8 @@ public class PairsController {
         int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
 
         int count24 = 0;
-        BigDecimal minPrice = new BigDecimal(Long.MAX_VALUE);
-        BigDecimal maxPrice = new BigDecimal(Long.MIN_VALUE);
+        BigDecimal minPrice = null;
+        BigDecimal maxPrice = null;
         BigDecimal lastPrice = null;
         BigDecimal baseVolume = BigDecimal.ZERO;
         BigDecimal quoteVolume = BigDecimal.ZERO;
@@ -171,7 +171,7 @@ public class PairsController {
                         continue;
                     }
 
-                    if (trade.isCancel())
+                    if (!trade.isTrade())
                         continue;
 
                     if (currentPair != null && lastTrade == null) {
@@ -194,9 +194,9 @@ public class PairsController {
                         lastTime = trade.getTimestamp();
                     }
 
-                    if (minPrice.compareTo(price) > 0)
+                    if (minPrice == null || minPrice.compareTo(price) > 0)
                         minPrice = price;
-                    if (maxPrice.compareTo(price) < 0)
+                    if (maxPrice == null || maxPrice.compareTo(price) < 0)
                         maxPrice = price;
 
                     baseVolume = baseVolume.add(reversed ? trade.getAmountHave() : trade.getAmountWant());
@@ -227,8 +227,8 @@ public class PairsController {
         Order askLastOrder = ordersMap.getHaveWanFirst(key1, key2);
         BigDecimal lower_askPrice = askLastOrder == null ? BigDecimal.ZERO : askLastOrder.calcLeftPrice();
 
-        int countOrdersBid = ordersMap.getCountHave(key2, 100);
-        int countOrdersAsk = ordersMap.getCountHave(key1, 100);
+        int countOrdersBid = ordersMap.getCount(key2, key1, 200);
+        int countOrdersAsk = ordersMap.getCount(key1, key2, 200);
 
         return new TradePair(asset1, asset2, lastPrice, lastTime,
                 highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, price,
@@ -273,7 +273,7 @@ public class PairsController {
                 if (trade == null)
                     continue;
 
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 if (lastTrade == null)

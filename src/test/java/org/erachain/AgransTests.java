@@ -4,7 +4,6 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Base64;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.network.Peer;
 import org.erachain.utils.Pair;
@@ -17,6 +16,7 @@ import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -194,8 +194,8 @@ public class AgransTests {
         String result = new String(Base58.decode(base58), StandardCharsets.UTF_8);
         assertEquals(source, result);
 
-        String base64 = Base64.encode(source.getBytes(StandardCharsets.UTF_8));
-        result = new String(Base64.decode(base64), StandardCharsets.UTF_8);
+        String base64 = Base64.getEncoder().encodeToString(source.getBytes(StandardCharsets.UTF_8));
+        result = new String(Base64.getDecoder().decode(base64), StandardCharsets.UTF_8);
         assertEquals(source, result);
     }
 }

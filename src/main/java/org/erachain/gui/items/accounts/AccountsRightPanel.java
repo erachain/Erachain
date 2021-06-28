@@ -72,7 +72,7 @@ public class AccountsRightPanel extends JPanel {
      * Creates new form НовыйJPanel
      */
     public AccountsRightPanel() {
-        wTxMap = wallet.database.getTransactionMap();
+        wTxMap = wallet.dwSet.getTransactionMap();
         initComponents();
     }
 

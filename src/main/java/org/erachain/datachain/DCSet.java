@@ -42,7 +42,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 531; // vers 5.3.02 (trade.type)
+    final static int CURRENT_VERSION = 532; // vers 5.3.03
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
@@ -343,10 +343,12 @@ public class DCSet extends DBASet implements Closeable {
     protected DCSet(DCSet parent, DB idDatabase) {
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
-            // System.out.println("########################### Free Memory:"
-            // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                     + (Controller.MIN_MEMORY_TAIL)) {
+
+                //logger.debug("########################### Max=Total Memory [MB]:" + (Runtime.getRuntime().totalMemory() >> 20));
+                //logger.debug("########################### Free Memory [MB]:" + (Runtime.getRuntime().freeMemory() >> 20));
+
                 // у родителя чистим - у себя нет, так как только создали
                 parent.clearCache();
                 System.gc();
@@ -675,7 +677,7 @@ public class DCSet extends DBASet implements Closeable {
 
         if (DBASet.getVersion(database) < CURRENT_VERSION) {
             database.close();
-            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake dataWallet Set " + dbFile.getParentFile().toPath());
+            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DCSet in " + dbFile.getParentFile().toPath());
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());

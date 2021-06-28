@@ -60,6 +60,11 @@ public class TransactionFactory {
                 //PARSE ORDER CANCEL
                 return CancelOrderTransaction.Parse(data, forDeal);
 
+            case Transaction.CHANGE_ORDER_TRANSACTION:
+
+                //PARSE UPDATE CREATION TRANSACTION
+                return ChangeOrderTransaction.Parse(data, forDeal);
+
             case Transaction.MULTI_PAYMENT_TRANSACTION:
 
                 //PARSE MULTI PAYMENT

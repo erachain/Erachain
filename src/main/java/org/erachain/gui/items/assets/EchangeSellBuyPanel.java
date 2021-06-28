@@ -1,16 +1,14 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.core.transaction.CreateOrderTransaction;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.transaction.CreateOrderDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -198,18 +196,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 row = sellOrdersTable.convertRowIndexToModel(row);
 
                 Order order = sellOrdersTableModel.getItem(row);
-                
-                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
-                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, createOrder,
-                        (int) (MainFrame.getInstance().getWidth() / 1.2),
-                        (int) (MainFrame.getInstance().getHeight() / 1.2),
-                        "");
+                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), "Order Info");
 
-                CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
-                dd.jScrollPane1.setViewportView(ww);
-                dd.setLocationRelativeTo(null);
-                dd.setVisible(true);
+                JPanel panel = new OrderInfoPanel(order);
+                dialog.jScrollPane1.setViewportView(panel);
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
 
             }
         });
@@ -234,6 +228,25 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         });
         sellOrdersMenu.add(trades);
 
+        JMenuItem sellChange = new JMenuItem(Lang.T("Change"));
+        sellChange.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+
+                if (sellOrdersTableModel.isEmpty())
+                    return;
+                int row = sellOrdersTable.getSelectedRow();
+                if (row < 0)
+                    return;
+                int row1 = sellOrdersTable.convertRowIndexToModel(row);
+
+                Order order = sellOrdersTableModel.getItem(row1);
+                new ChangeOrderFrame(order, false);
+            }
+        });
+        if (BlockChain.TEST_MODE)
+            sellOrdersMenu.add(sellChange);
+
         JMenuItem cancel = new JMenuItem(Lang.T("Cancel"));
         cancel.addActionListener(new ActionListener() {
 
@@ -251,6 +264,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
             }
         });
         sellOrdersMenu.add(cancel);
+
     //    sellOrdersTable.setComponentPopupMenu(sellOrdersMenu);
         TableMenuPopupUtil.installContextMenu(sellOrdersTable, sellOrdersMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
@@ -364,18 +378,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
                 Order order = buyOrdersTableModel.getItem(row);
-                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
-                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, createOrder,
-                        (int) (MainFrame.getInstance().getWidth() / 1.2),
-                        (int) (MainFrame.getInstance().getHeight() / 1.2),
-                        "");
+                IssueConfirmDialog dialog = new IssueConfirmDialog(MainFrame.getInstance(), "Order Info");
 
-                CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
-                dd.jScrollPane1.setViewportView(ww);
-                dd.setLocationRelativeTo(null);
-                dd.pack();
-                dd.setVisible(true);
+                JPanel panel = new OrderInfoPanel(order);
+                dialog.jScrollPane1.setViewportView(panel);
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
 
             }
         });
@@ -401,6 +411,25 @@ public class EchangeSellBuyPanel extends JTabbedPane {
             }
         });
         buyOrdersMenu.add(buyTrades);
+
+        JMenuItem buyChange = new JMenuItem(Lang.T("Change"));
+        buyChange.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (buyOrdersTableModel.isEmpty())
+                    return;
+                int row = buyOrdersTable.getSelectedRow();
+                if (row < 0)
+                    return;
+                int row1 = buyOrdersTable.convertRowIndexToModel(row);
+
+                Order order = buyOrdersTableModel.getItem(row1);
+                new ChangeOrderFrame(order, true);
+            }
+        });
+        if (BlockChain.TEST_MODE)
+            buyOrdersMenu.add(buyChange);
+
         JMenuItem buyCancel = new JMenuItem(Lang.T("Cancel"));
         buyCancel.addActionListener(new ActionListener() {
             @Override
@@ -419,7 +448,8 @@ public class EchangeSellBuyPanel extends JTabbedPane {
             }
         });
         buyOrdersMenu.add(buyCancel);
-  //      buyOrdersTable.setComponentPopupMenu(buyOrdersMenu);
+
+        //      buyOrdersTable.setComponentPopupMenu(buyOrdersMenu);
         TableMenuPopupUtil.installContextMenu(buyOrdersTable, buyOrdersMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 

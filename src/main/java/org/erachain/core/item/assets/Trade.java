@@ -24,26 +24,28 @@ public class Trade {
     private static final int BASE_LENGTH = 1 + 2 * ORDER_LENGTH + 2 * ASSET_KEY_LENGTH
             + 4 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + SEQUENCE_LENGTH;
 
-    private byte type;
-    private long initiator;
-    private long target;
-    private long haveKey;
-    private long wantKey;
-    private BigDecimal amountHave;
-    private BigDecimal amountWant;
-    private int haveAssetScale;
-    private int wantAssetScale;
+    private final byte type;
+    private final long initiator;
+    private final long target;
+    private final long haveKey;
+    private final long wantKey;
+    private final BigDecimal amountHave;
+    private final BigDecimal amountWant;
+    private final int haveAssetScale;
+    private final int wantAssetScale;
 
     /**
      * Used only for inintiator Order - for make sorted secondary INDEX
      */
-    private int sequence;
+    private final int sequence;
 
     public static final byte TYPE_TRADE = 0;
     public static final byte TYPE_CANCEL = 1;
+    public static final byte TYPE_CHANGE = 2;
 
     // make trading if two orders is seeked
     public Trade(long initiator, long target, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, int haveAssetScale, int wantAssetScale, int sequence) {
+        this.type = TYPE_TRADE;
         this.initiator = initiator;
         this.target = target;
         this.haveKey = haveKey;
@@ -76,12 +78,22 @@ public class Trade {
                 return "trade";
             case TYPE_CANCEL:
                 return "cancel";
+            case TYPE_CHANGE:
+                return "change";
         }
         return "unknown";
     }
 
+    public boolean isTrade() {
+        return type == TYPE_TRADE;
+    }
+
     public boolean isCancel() {
         return type == TYPE_CANCEL;
+    }
+
+    public boolean isChange() {
+        return type == TYPE_CHANGE;
     }
 
     public String viewID() {
@@ -205,12 +217,12 @@ public class Trade {
         }
 
         if (withCreators) {
-            if (isCancel()) {
-                Transaction cancelTX = DCSet.getInstance().getTransactionFinalMap().get(initiator);
-                trade.put("initiatorCreator", cancelTX.getCreator().getAddress());
-            } else {
+            if (isTrade()) {
                 Order order = getInitiatorOrder(DCSet.getInstance());
                 trade.put("initiatorCreator", order.getCreator().getAddress());
+            } else {
+                Transaction cancelTX = DCSet.getInstance().getTransactionFinalMap().get(initiator);
+                trade.put("initiatorCreator", cancelTX.getCreator().getAddress());
             }
 
             Order orderTarget = getTargetOrder(DCSet.getInstance());
