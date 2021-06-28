@@ -505,7 +505,7 @@ public class Wallet extends Observable implements Observer {
 
 			// set name
 			ob.put("description", Lang.T("Created by default Account") + " " + (nonce + 1));
-			LOGGER.info("Added account #" + nonce + 1);
+			LOGGER.info("Added account #" + (nonce + 1));
 
 			this.commit();
 
