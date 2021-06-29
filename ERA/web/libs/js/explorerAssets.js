@@ -91,7 +91,11 @@ function asset(data, forPrint) {
 
     var item = data.item;
     ////// HEAD
-    output += itemHead(item, forPrint);
+    if (item.imageTypeName == 'audio') {
+        output += itemHead(item, forPrint, item.maker_person_image_url, item.maker_person_image_type);
+    } else {
+        output += itemHead(item, forPrint);
+    }
 
     //////// BODY
     output += '<p style="font-size:1.3em; margin-top:0.5em; margin-bottom:0px">';
