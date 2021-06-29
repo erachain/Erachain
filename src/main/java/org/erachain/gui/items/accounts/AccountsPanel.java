@@ -91,7 +91,7 @@ public class AccountsPanel extends JPanel // implements ItemListener
         tableModel = new AccountsTableModel();
         // start data in model
         tableModel.setAsset((AssetCls) cbxFavorites.getSelectedItem());
-        table = Gui.createSortableTable(tableModel, 1);
+        table = Gui.createSortableTable(tableModel, 0);
 
         if (false) {
             //TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
