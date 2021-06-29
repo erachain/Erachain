@@ -540,7 +540,7 @@ public class API {
     public Response getBlocksFromHeightV1(@Context UriInfo info,
                                           @QueryParam("from") Integer fromHeight,
                                           @QueryParam("offset") int offset,
-                                          @QueryParam("limit") int limit) {
+                                          @DefaultValue("10") @QueryParam("limit") int limit) {
         boolean onlyHead = checkBoolean(info, "onlyhead");
         boolean desc = checkBoolean(info, "desc");
 
