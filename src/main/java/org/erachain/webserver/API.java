@@ -536,7 +536,7 @@ public class API {
     }
 
     @GET
-    @Path("/blocks")
+    @Path("blocks")
     public Response getBlocksFromHeightV1(@Context UriInfo info,
                                           @QueryParam("from") Integer fromHeight,
                                           @QueryParam("offset") int offset,

@@ -192,28 +192,29 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
         this.addUses();
 
-        if (descending) {
-            IteratorCloseable result =
+        try {
+            if (descending) {
+                return
+                        // делаем закрываемый Итератор
+                        IteratorCloseableImpl.make(
+                                // берем индекс с обратным отсчетом
+                                ((NavigableMap) this.map).descendingMap()
+                                        // задаем границы, так как он обратный границы меняем местами
+                                        .subMap(fromKey == null || fromKey.equals(LO) ? HI : fromKey, LO).keySet().iterator());
+            }
+
+            return
                     // делаем закрываемый Итератор
                     IteratorCloseableImpl.make(
-                            // берем индекс с обратным отсчетом
-                            ((NavigableMap) this.map).descendingMap()
+                            ((NavigableMap) this.map)
                                     // задаем границы, так как он обратный границы меняем местами
-                                    .subMap(fromKey == null || fromKey.equals(LO) ? HI : fromKey, LO).keySet().iterator());
-            return result;
+                                    .subMap(fromKey == null ? LO : fromKey,
+                                            HI).keySet().iterator());
+
+        } finally {
+            this.outUses();
         }
 
-        IteratorCloseable result =
-                // делаем закрываемый Итератор
-                IteratorCloseableImpl.make(
-                        ((NavigableMap) this.map)
-                                // задаем границы, так как он обратный границы меняем местами
-                                .subMap(fromKey == null ? LO : fromKey,
-                                        HI).keySet().iterator());
-
-
-        this.outUses();
-        return new IteratorCloseableImpl(result);
 
     }
 
