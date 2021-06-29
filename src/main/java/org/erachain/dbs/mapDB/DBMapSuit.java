@@ -144,48 +144,55 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     @Override
     public IteratorCloseable<T> getIndexIterator(int index, boolean descending) {
         this.addUses();
+        try {
 
-        // 0 - это главный индекс - он не в списке indexes
-        NavigableSet<Tuple2<?, T>> indexSet = getIndex(index, descending);
-        if (indexSet != null) {
+            // 0 - это главный индекс - он не в списке indexes
+            NavigableSet<Tuple2<?, T>> indexSet = getIndex(index, descending);
+            if (indexSet != null) {
 
-            IndexIterator<T> u = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
-            this.outUses();
-            return u;
+                IndexIterator<T> u = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
+                return u;
 
-        } else {
-            if (descending) {
-                Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
-                this.outUses();
+            } else {
+                if (descending) {
+                    Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+                    return new IteratorCloseableImpl(u);
+                }
+
+                Iterator<T> u = this.map.keySet().iterator();
                 return new IteratorCloseableImpl(u);
+
             }
-
-            Iterator<T> u = this.map.keySet().iterator();
-            this.outUses();
-            return new IteratorCloseableImpl(u);
-
+        } finally {
+            outUses();
         }
     }
 
     @Override
     public IteratorCloseable<T> getIterator() {
         this.addUses();
+        try {
 
-        Iterator<T> u = map.keySet().iterator();
+            Iterator<T> u = map.keySet().iterator();
 
-        this.outUses();
-        return new IteratorCloseableImpl(u);
+            return new IteratorCloseableImpl(u);
+        } finally {
+            this.outUses();
+        }
 
     }
 
     @Override
     public IteratorCloseable<T> getDescendingIterator() {
         this.addUses();
+        try {
 
-        Iterator<T> u = ((NavigableMap) map).descendingMap().keySet().iterator();
+            Iterator<T> u = ((NavigableMap) map).descendingMap().keySet().iterator();
 
-        this.outUses();
-        return new IteratorCloseableImpl(u);
+            return new IteratorCloseableImpl(u);
+        } finally {
+            this.outUses();
+        }
 
     }
 
@@ -236,58 +243,70 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
             return -1;
 
         this.addUses();
-        int u = this.map.size();
-        this.outUses();
-        return u;
+        try {
+            int u = this.map.size();
+            return u;
+        } finally {
+            this.outUses();
+        }
     }
 
     @Override
     public U get(T key) {
 
         this.addUses();
-
         try {
-            if (this.map.containsKey(key)) {
-                U u = this.map.get(key);
-                this.outUses();
-                return u;
+
+            try {
+                if (this.map.containsKey(key)) {
+                    U u = this.map.get(key);
+                    return u;
+                }
+
+                return this.getDefaultValue();
+
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                return this.getDefaultValue();
             }
-
+        } finally {
             this.outUses();
-            return this.getDefaultValue();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-
-            this.outUses();
-            return this.getDefaultValue();
         }
     }
 
     @Override
     public Set<T> keySet() {
         this.addUses();
-        Set<T> u = this.map.keySet();
-        this.outUses();
-        return u;
+        try {
+            Set<T> u = this.map.keySet();
+            return u;
+        } finally {
+            this.outUses();
+        }
     }
 
     @Override
     public Collection<U> values() {
         this.addUses();
-        Collection<U> u = this.map.values();
-        this.outUses();
-        return u;
+        try {
+            Collection<U> u = this.map.values();
+            return u;
+        } finally {
+            this.outUses();
+        }
     }
 
     @Override
     public boolean set(T key, U value) {
         this.addUses();
+        try {
 
-        U old = this.map.put(key, value);
+            U old = this.map.put(key, value);
 
-        this.outUses();
-
-        return old != null;
+            return old != null;
+        } finally {
+            this.outUses();
+        }
     }
 
     @Override
@@ -298,26 +317,30 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
         /// -----> set(key, value);
         ///
         this.addUses();
+        try {
+            this.map.put(key, value);
 
-        this.map.put(key, value);
-
-        this.outUses();
+        } finally {
+            this.outUses();
+        }
     }
 
     @Override
     public U remove(T key) {
 
         this.addUses();
+        try {
 
-        //REMOVE
-        if (this.map.containsKey(key)) {
-            U value = this.map.remove(key);
+            //REMOVE
+            if (this.map.containsKey(key)) {
+                U value = this.map.remove(key);
+                return value;
+            }
+
+            return null;
+        } finally {
             this.outUses();
-            return value;
         }
-
-        this.outUses();
-        return null;
 
     }
 
@@ -330,16 +353,18 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
         ///
 
         this.addUses();
+        try {
 
-        //REMOVE
-        if (this.map.containsKey(key)) {
-            U value = this.map.remove(key);
+            //REMOVE
+            if (this.map.containsKey(key)) {
+                U value = this.map.remove(key);
+                return value;
+            }
+
+            return null;
+        } finally {
             this.outUses();
-            return value;
         }
-
-        this.outUses();
-        return null;
     }
 
     /**
@@ -356,8 +381,11 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
         ///
 
         this.addUses();
-        this.map.remove(key);
-        this.outUses();
+        try {
+            this.map.remove(key);
+        } finally {
+            this.outUses();
+        }
 
     }
 
@@ -370,8 +398,11 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
         ///
 
         this.addUses();
-        this.map.remove(key);
-        this.outUses();
+        try {
+            this.map.remove(key);
+        } finally {
+            this.outUses();
+        }
     }
 
 
@@ -379,14 +410,16 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     public boolean contains(T key) {
 
         this.addUses();
+        try {
 
-        if (this.map.containsKey(key)) {
+            if (this.map.containsKey(key)) {
+                return true;
+            }
+
+            return false;
+        } finally {
             this.outUses();
-            return true;
         }
-
-        this.outUses();
-        return false;
     }
 
     /**
@@ -399,16 +432,19 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
             return;
 
         this.addUses();
+        try {
 
-        //RESET MAP
-        this.map.clear();
+            //RESET MAP
+            this.map.clear();
 
-        //RESET INDEXES
-        for (Set<Tuple2<?, T>> set : this.indexes.values()) {
-            set.clear();
+            //RESET INDEXES
+            for (Set<Tuple2<?, T>> set : this.indexes.values()) {
+                set.clear();
+            }
+
+        } finally {
+            this.outUses();
         }
-
-        this.outUses();
 
     }
 
