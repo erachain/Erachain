@@ -52,7 +52,7 @@ import java.util.*;
 @Path("api")
 public class API {
 
-    private static final Logger LOGGER = LoggerFactory            .getLogger(API.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(API.class);
     @Context
     private UriInfo uriInfo;
     private HttpServletRequest request;
