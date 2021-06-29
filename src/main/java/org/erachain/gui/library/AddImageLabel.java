@@ -43,8 +43,13 @@ public class AddImageLabel extends JPanel {
     public JComboBox externalURLType = new JComboBox(new String[]{Lang.T("Image"), Lang.T("Video"), Lang.T("Audio")});
 
     private boolean editable = true;
+    Image emptyImage;
 
-    public AddImageLabel(String text, int baseWidth, int baseHeight, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize, boolean useExtURL) {
+    public AddImageLabel(String text, int baseWidth, int baseHeight, int minSize, int maxSize, int initialWidth,
+                         int initialHeight, boolean originalSize, boolean useExtURL, Image emptyImage) {
+
+        this.emptyImage = emptyImage;
+
         setLayout(new BorderLayout());
         JPanel panelTop = new JPanel();
         panelTop.setLayout(new BorderLayout());
@@ -167,11 +172,15 @@ public class AddImageLabel extends JPanel {
     }
 
     private ImageIcon createEmptyImage(Color color, int width, int height) {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = image.createGraphics();
-        graphics.setPaint(color);
-        graphics.fillRect(0, 0, width, height);
-        return new ImageIcon(image);
+        if (true) {
+            return new ImageIcon(emptyImage);
+        } else {
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = image.createGraphics();
+            graphics.setPaint(color);
+            graphics.fillRect(0, 0, width, height);
+            return new ImageIcon(image);
+        }
     }
 
     private void addImage(int minSize, int maxSize, boolean originalSize) {
