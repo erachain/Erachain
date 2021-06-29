@@ -31,6 +31,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     protected DB database;
 
     protected Map<T, U> map;
+    // USE for .subMap iterator
     protected T HI;
     protected T LO;
 
@@ -198,7 +199,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
                             // берем индекс с обратным отсчетом
                             ((NavigableMap) this.map).descendingMap()
                                     // задаем границы, так как он обратный границы меняем местами
-                                    .subMap(fromKey == null || fromKey.equals(0L) ? Long.MAX_VALUE : fromKey, 0L).keySet().iterator());
+                                    .subMap(fromKey == null || fromKey.equals(LO) ? HI : fromKey, LO).keySet().iterator());
             return result;
         }
 
@@ -207,8 +208,8 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
                 IteratorCloseableImpl.make(
                         ((NavigableMap) this.map)
                                 // задаем границы, так как он обратный границы меняем местами
-                                .subMap(fromKey == null || fromKey.equals(0L) ? 0L : fromKey,
-                                        Long.MAX_VALUE).keySet().iterator());
+                                .subMap(fromKey == null ? LO : fromKey,
+                                        HI).keySet().iterator());
 
 
         this.outUses();

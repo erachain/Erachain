@@ -250,8 +250,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                             // берем индекс с обратным отсчетом
                             ((NavigableMap) this.map).descendingMap()
                                     // задаем границы, так как он обратный границы меняем местами
-                                    .subMap(fromKey == null ?
-                                            HI : fromKey, LO).keySet().iterator());
+                                    .subMap(fromKey == null ? HI : fromKey, LO).keySet().iterator());
             return result;
         }
 

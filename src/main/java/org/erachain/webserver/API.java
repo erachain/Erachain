@@ -541,17 +541,17 @@ public class API {
                                           @QueryParam("from") Integer fromHeight,
                                           @QueryParam("offset") int offset,
                                           @QueryParam("limit") int limit) {
-        boolean onlyhead = checkBoolean(info, "onlyhead");
+        boolean onlyHead = checkBoolean(info, "onlyhead");
         boolean desc = checkBoolean(info, "desc");
 
-        int limitMax = onlyhead ? 200 : 50;
+        int limitMax = onlyHead ? 200 : 50;
         if (limit > limitMax)
             limit = limitMax;
         if (offset > limitMax)
             offset = limitMax;
 
         JSONArray array = new JSONArray();
-        if (onlyhead) {
+        if (onlyHead) {
             BlocksHeadsMap blockHeadsMap = dcSet.getBlocksHeadsMap();
             try {
                 try (IteratorCloseable<Integer> iterator = blockHeadsMap.getIterator(fromHeight, desc)) {
