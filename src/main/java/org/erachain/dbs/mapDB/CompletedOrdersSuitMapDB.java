@@ -31,6 +31,10 @@ public class CompletedOrdersSuitMapDB extends DBMapSuit<Long, Order> implements 
 
     @Override
     public void openMap() {
+
+        HI = Long.MAX_VALUE;
+        LO = 0L;
+
         //OPEN MAP
         map = database.createTreeMap("completed_orders")
                 .valueSerializer(new OrderSerializer())

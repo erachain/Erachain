@@ -27,6 +27,10 @@ public class OrderMap extends DCUMapImpl<Long, Order> {
 
     @Override
     public void openMap() {
+
+        HI = Long.MAX_VALUE;
+        LO = 0L;
+
         //OPEN MAP
         map = this.openMap(database);
     }
