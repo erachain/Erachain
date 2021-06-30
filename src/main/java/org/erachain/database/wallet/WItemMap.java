@@ -59,6 +59,10 @@ public class WItemMap extends DCUMapImpl<Long, ItemCls> {
 
     @Override
     public void openMap() {
+
+        HI = Long.MAX_VALUE;
+        LO = 0L;
+
         //OPEN MAP
         if (this.name == null)
             return;
