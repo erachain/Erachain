@@ -36,14 +36,15 @@ public class BlocksSuitMapDB extends DBMapSuit<Integer, Block> implements Blocks
 
     @Override
     public void openMap() {
+        HI = Integer.MAX_VALUE;
+        LO = 0;
+
         // OPEN MAP
         map = database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .valueSerializer(new BlockSerializer())
                 .valuesOutsideNodesEnable()
                 .makeOrGet();
-        HI = Integer.MAX_VALUE;
-        LO = 0;
 
     }
 

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.ws.rs.core.MediaType;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -43,8 +45,13 @@ public class AddImageLabel extends JPanel {
     public JComboBox externalURLType = new JComboBox(new String[]{Lang.T("Image"), Lang.T("Video"), Lang.T("Audio")});
 
     private boolean editable = true;
+    Image emptyImage;
 
-    public AddImageLabel(String text, int baseWidth, int baseHeight, int minSize, int maxSize, int initialWidth, int initialHeight, boolean originalSize, boolean useExtURL) {
+    public AddImageLabel(String text, int baseWidth, int baseHeight, int minSize, int maxSize, int initialWidth,
+                         int initialHeight, boolean originalSize, boolean useExtURL, Image emptyImage) {
+
+        this.emptyImage = emptyImage;
+
         setLayout(new BorderLayout());
         JPanel panelTop = new JPanel();
         panelTop.setLayout(new BorderLayout());
@@ -104,26 +111,41 @@ public class AddImageLabel extends JPanel {
                 try {
                     url = new URL(urlTxt);
                 } catch (MalformedURLException e) {
-                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid URL") + "!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid URL")
+                            + " '" + e.getMessage() + "'!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (urlTxt.toLowerCase().endsWith(".mp4")) {
-                    externalURLType.setSelectedIndex(ItemCls.MEDIA_TYPE_VIDEO);
-                } else if (urlTxt.toLowerCase().endsWith(".mp3")) {
-                    externalURLType.setSelectedIndex(ItemCls.MEDIA_TYPE_AUDIO);
-                } else if (urlTxt.toLowerCase().endsWith(".gif")
-                        || urlTxt.toLowerCase().endsWith(".png")
-                        || urlTxt.toLowerCase().endsWith(".jpg")) {
-                    externalURLType.setSelectedIndex(ItemCls.MEDIA_TYPE_IMG);
+                MediaType mediaTypeResp;
+                int mediaTypeRespInt;
+                try {
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("GET");
+                    //int result = con.getResponseCode();
+                    mediaTypeResp = MediaType.valueOf(con.getHeaderField("Content-Type"));
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(new JFrame(), Lang.T("Connection error")
+                            + " '" + e.getMessage() + "'!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                String mediaTypeMainResp = mediaTypeResp.getType();
+                if (mediaTypeMainResp.equals("video")) {
+                    mediaTypeRespInt = ItemCls.MEDIA_TYPE_VIDEO;
+                } else if (mediaTypeMainResp.equals("image")) {
+                    mediaTypeRespInt = ItemCls.MEDIA_TYPE_IMG;
+                } else if (mediaTypeMainResp.equals("audio")) {
+                    mediaTypeRespInt = ItemCls.MEDIA_TYPE_AUDIO;
                 } else {
                     JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid type") + "! "
                             + Lang.T("Need # нужно") + ": .jpg, .gif, .png, .mp4, .mp3", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                JOptionPane.showMessageDialog(new JFrame(), Lang.T("URL is valid") + ". "
-                        + Lang.T("Please set valid media type"), Lang.T("Message"), JOptionPane.INFORMATION_MESSAGE);
+                externalURLType.setSelectedIndex(mediaTypeRespInt);
+
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T("URL is valid") + ": "
+                        + mediaTypeResp.toString(), Lang.T("Message"), JOptionPane.INFORMATION_MESSAGE);
 
             }
         });
@@ -167,11 +189,15 @@ public class AddImageLabel extends JPanel {
     }
 
     private ImageIcon createEmptyImage(Color color, int width, int height) {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = image.createGraphics();
-        graphics.setPaint(color);
-        graphics.fillRect(0, 0, width, height);
-        return new ImageIcon(image);
+        if (true) {
+            return new ImageIcon(emptyImage);
+        } else {
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = image.createGraphics();
+            graphics.setPaint(color);
+            graphics.fillRect(0, 0, width, height);
+            return new ImageIcon(image);
+        }
     }
 
     private void addImage(int minSize, int maxSize, boolean originalSize) {
