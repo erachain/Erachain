@@ -189,7 +189,8 @@ public class ExAirDrop {
     }
 
     public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> makeCheckedList(Transaction transaction, boolean andValidate) {
-        return makeCheckedList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
+        makePayList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
+        return checkedAccruals;
     }
 
     public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> precalcAccrualList(
