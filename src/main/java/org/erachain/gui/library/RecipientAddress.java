@@ -116,7 +116,7 @@ public class RecipientAddress extends JComboBox {
         protected FavoriteAccountsMap favoriteMap;
 
         public RecipientModel() {
-            favoriteMap = Controller.getInstance().getWallet().database.getFavoriteAccountsMap();
+            favoriteMap = Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap();
             addObservers();
 
         }

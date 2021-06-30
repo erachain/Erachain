@@ -40,7 +40,10 @@ import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DLSet;
-import org.erachain.datachain.*;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemMap;
+import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
@@ -110,10 +113,7 @@ public class Controller extends Observable {
     public final static long MIN_MEMORY_TAIL = 64 * (1 << 20); // Машина Явы вылетает если меньше 50 МБ
 
     public static final Integer MUTE_PEER_COUNT = 6;
-    // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
-    // code!
-    // for reset DB if DB PROTOCOL is CHANGED
-    public static final String releaseVersion = "3.02.02";
+
     // TODO ENUM would be better here
     public static final int STATUS_NO_CONNECTIONS = 0;
     public static final int STATUS_SYNCHRONIZING = 1;
@@ -822,8 +822,9 @@ public class Controller extends Observable {
                 this.wallet.initiateItemsFavorites();
             }
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wallet OK" + " " + Settings.getInstance().getDataWalletPath()));
-            LOGGER.info("Wallet OK" + " " + Settings.getInstance().getDataWalletPath());
+            String mess = "Wallet OK" + " " + Settings.getInstance().getDataWalletPath();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, mess));
+            LOGGER.info(mess);
 
             // create telegtam
 
@@ -897,7 +898,10 @@ public class Controller extends Observable {
         Settings.getInstance().setWalletKeysPath(selectedDir);
 
         // open wallet
-        Controller.getInstance().wallet = new Wallet(dcSet, dcSetWithObserver, dynamicGUI);
+        if (Controller.getInstance().wallet == null) {
+            Controller.getInstance().wallet = new Wallet(dcSet, dcSetWithObserver, dynamicGUI);
+        }
+
         // not wallet return 0;
         if (!Controller.getInstance().wallet.walletKeysExists()) {
             Settings.getInstance().setWalletKeysPath(pathOld);
@@ -1015,37 +1019,6 @@ public class Controller extends Observable {
             }
         }
 
-    }
-
-    /**
-     * я так понял - это отслеживание версии базы данных - и если она новая то все удаляем и заново закачиваем
-     *
-     * @throws IOException
-     * @throws Exception
-     */
-    public void startFromScratchOnDemand() throws IOException, Exception {
-        String dataVersion = this.dcSet.getLocalDataMap().get(LocalDataMap.LOCAL_DATA_VERSION_KEY);
-
-        if (dataVersion == null || !dataVersion.equals(releaseVersion)) {
-            File dataDir = new File(Settings.getInstance().getDataChainPath());
-            File dataBak = getDataBakDir(dataDir);
-            this.dcSet.close();
-
-            if (dataDir.exists()) {
-                // delete data folder
-                java.nio.file.Files.walkFileTree(dataDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-
-            }
-
-            if (dataBak.exists()) {
-                // delete data folder
-                java.nio.file.Files.walkFileTree(dataBak.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-            }
-            DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
-
-            this.dcSet.getLocalDataMap().put(LocalDataMap.LOCAL_DATA_VERSION_KEY, Controller.releaseVersion);
-
-        }
     }
 
     private File getDataBakDir(File dataDir) {
@@ -1758,8 +1731,8 @@ public class Controller extends Observable {
             // BROADCAST MESSAGE
             this.network.broadcast(telegram, false);
             // save DB
-            if (wallet != null && wallet.database != null) {
-                wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
+            if (wallet != null && wallet.dwSet != null) {
+                wallet.dwSet.getTelegramsMap().add(transaction.viewSignature(), transaction);
             }
         }
 
@@ -2412,8 +2385,14 @@ public class Controller extends Observable {
         return this.wallet.importAccountSeed(accountSeed);
     }
 
-    public String importPrivateKey(byte[] accountSeed) {
-        return this.wallet.importPrivateKey(accountSeed);
+    public Tuple3<String, Integer, String> importPrivateKey(byte[] privateKey) {
+        if (privateKey.length > 34) {
+            // 64 bytes - from mobile
+            return this.wallet.importPrivateKey(privateKey);
+        } else {
+            // as account pair SEED - 32 bytes
+            return new Tuple3<>(this.wallet.importAccountSeed(privateKey), null, null);
+        }
     }
 
     public byte[] exportAccountSeed(String address) {
@@ -2620,7 +2599,7 @@ public class Controller extends Observable {
     }
 
     public void addTelegramToWallet(Transaction transaction, String signatureKey) {
-        if (wallet == null || wallet.database == null) {
+        if (wallet == null || wallet.dwSet == null) {
             return;
         }
 
@@ -2630,8 +2609,8 @@ public class Controller extends Observable {
         String creatorPubKey58 = creator.getBase58();
         for (Account recipient : recipients) {
             if (wallet.accountExists(recipient)) {
-                wallet.database.getTelegramsMap().add(signatureKey, transaction);
-                if (!wallet.database.getFavoriteAccountsMap().contains(creator58)) {
+                wallet.dwSet.getTelegramsMap().add(signatureKey, transaction);
+                if (!wallet.dwSet.getFavoriteAccountsMap().contains(creator58)) {
                     String title = transaction.getTitle();
                     String description = "";
                     if (transaction instanceof RSend) {
@@ -3811,8 +3790,8 @@ public class Controller extends Observable {
             return null;
         }
 
-        if (wallet != null && wallet.database != null) {
-            Tuple3<String, String, String> favorite = wallet.database.getFavoriteAccountsMap().get(address);
+        if (wallet != null && wallet.dwSet != null) {
+            Tuple3<String, String, String> favorite = wallet.dwSet.getFavoriteAccountsMap().get(address);
             if (favorite != null && favorite.a != null) {
                 return Base58.decode(favorite.a);
             }

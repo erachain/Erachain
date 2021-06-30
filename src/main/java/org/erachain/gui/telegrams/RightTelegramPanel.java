@@ -391,11 +391,15 @@ public class RightTelegramPanel extends javax.swing.JPanel {
                             try {
                                 dataMess = Base58.decode(message);
                             } catch (NumberFormatException e1) {
-                                message = "error Base58 decode";
-                                JOptionPane.showMessageDialog(new JFrame(),
-                                        Lang.T(message),
-                                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                                return;
+                                try {
+                                    dataMess = Base64.getDecoder().decode(message);
+                                } catch (NumberFormatException e2) {
+                                    message = "error Base58 decode";
+                                    JOptionPane.showMessageDialog(new JFrame(),
+                                            Lang.T(message),
+                                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                                    return;
+                                }
                             }
                         }
 
@@ -507,7 +511,7 @@ public class RightTelegramPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
 
                 Tuple3<Long, Long, Transaction> tt = (Tuple3<Long, Long, Transaction>) walletTelegramsFilterTableModel.getValueAt(row, 0);
-                Controller.getInstance().getWallet().database.getTelegramsMap().delete(tt.c.viewSignature());
+                Controller.getInstance().getWallet().dwSet.getTelegramsMap().delete(tt.c.viewSignature());
                 //     System.out.println(row);
             }
         });

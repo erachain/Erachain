@@ -26,6 +26,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.util.Base64;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -89,7 +90,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtBirthLongitudeLatitude.setText("");
         txtHeight.setText("");
         textFeePow.setSelectedItem("0");
-        textName.setEditable(false);
+        nameField.setEditable(false);
         textAreaDescription.setEditable(false);
         txtBirthday.setEnabled(false);
         txtDeathDay.setEnabled(false);
@@ -126,14 +127,19 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
         pasteButton = new MButton(Lang.T("Paste Person from clipboard"), 2);
         pasteButton.addActionListener(arg0 -> {
-            String base58str = getClipboardContents();
+            String baseXXstr = getClipboardContents();
             try {
-                byte[] dataPerson = Base58.decode(base58str);
+                byte[] dataPerson = Base58.decode(baseXXstr);
                 setByteCode(dataPerson);
             } catch (Exception ee) {
-                JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.T("Error"),
-                        JOptionPane.ERROR_MESSAGE);
-                return;
+                try {
+                    byte[] dataPerson = Base64.getDecoder().decode(baseXXstr);
+                    setByteCode(dataPerson);
+                } catch (Exception eee) {
+                    JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.T("Error"),
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
             }
 
         });
@@ -244,7 +250,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
             return;
         }
 
-        textName.setText(person.viewName());
+        nameField.setText(person.viewName());
         addImageLabel.set(person.getImage());
         addIconLabel.set(person.getIcon());
 
@@ -290,7 +296,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
     private void eraseFields() {
         textFeePow.setSelectedItem("0");
-        textName.setText("");
+        nameField.setText("");
         textAreaDescription.setText("");
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");

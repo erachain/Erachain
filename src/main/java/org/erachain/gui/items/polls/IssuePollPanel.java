@@ -79,7 +79,7 @@ public class IssuePollPanel extends IssueItemPanel {
     protected void makeTransaction() {
 
         transaction = (IssuePollRecord) Controller.getInstance().issuePoll(itemAppData, creator,
-                exLink, textName.getText(), textAreaDescription.getText(),
+                exLink, nameField.getText(), textAreaDescription.getText(),
                 optionsTableModel.getOptions(),
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(), feePow);
 

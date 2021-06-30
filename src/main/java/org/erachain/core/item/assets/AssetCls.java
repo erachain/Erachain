@@ -333,9 +333,6 @@ public abstract class AssetCls extends ItemCls {
             dexAwards = new ExLinkAddress[dexAwardsLen];
             for (int i = 0; i < dexAwardsLen; i++) {
 
-                dexAwards[i] = new ExLinkAddress(appData, pos);
-                pos += dexAwards[i].length();
-
                 if (pos >= appData.length) {
                     // старая версия с 255 числом
                     ExLinkAddress[] dexAwardsTMP = new ExLinkAddress[dexAwardsLen - 1];
@@ -346,15 +343,19 @@ public abstract class AssetCls extends ItemCls {
                     break;
                 }
 
+                dexAwards[i] = new ExLinkAddress(appData, pos);
+                pos += dexAwards[i].length();
+
+
             }
         }
         return pos;
     }
 
     public static byte[] makeAppData(boolean iconAsURL, int iconType, boolean imageAsURL, int imageType,
-                                     ExLinkAddress[] dexAwards) {
+                                     String tags, ExLinkAddress[] dexAwards) {
         byte[] appData = ItemCls.makeAppData(dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK,
-                iconAsURL, iconType, imageAsURL, imageType);
+                iconAsURL, iconType, imageAsURL, imageType, tags);
 
         if (dexAwards == null)
             return appData;
@@ -487,7 +488,10 @@ public abstract class AssetCls extends ItemCls {
                 return "±";
             case AS_NON_FUNGIBLE:
                 //return "\uD83C\uDFFA"; // амфора
-                return "\uD83D\uDC18"; // слон
+                //return "💎"; // U+1F48E драгоценный камень
+                return "\uD83C\uDFA8"; // палитра художника
+            //return "\uD83C\uDFAC"; // кино-хлопушка
+            //return "\uD83D\uDC18"; // слон
             case AS_INDEX:
                 return "⤴";
             case AS_INSIDE_VOTE:
@@ -605,7 +609,17 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public String[] getTags() {
-        return new String[]{":" + viewAssetTypeAbbrev().toLowerCase()};
+        String tagType = ":" + viewAssetTypeAbbrev().toLowerCase();
+
+        String[] tagsArray = super.getTags();
+        if (tagsArray == null)
+            return new String[]{tagType};
+
+        String[] tagsArrayNew = new String[tagsArray.length + 1];
+        System.arraycopy(tagsArray, 0, tagsArrayNew, 0, tagsArray.length);
+        tagsArrayNew[tagsArray.length] = tagType;
+
+        return tagsArrayNew;
     }
 
     @Override

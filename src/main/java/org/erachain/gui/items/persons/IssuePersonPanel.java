@@ -5,7 +5,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
@@ -36,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -239,10 +239,10 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     return;
                 }
                 try {
-                    String dataBase58 = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-                    dataBase58 = dataBase58.trim();
-                    dataBase58 = dataBase58.replaceAll("\n", "");
-                    txtBirthLatitude.setText(dataBase58);
+                    String dataBaseXX = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+                    dataBaseXX = dataBaseXX.trim();
+                    dataBaseXX = dataBaseXX.replaceAll("\n", "");
+                    txtBirthLatitude.setText(dataBaseXX);
                 } catch (Exception exception) {
                     logger.error("Error menu paste", exception);
                 }
@@ -269,7 +269,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
 
     protected void reset() {
-        textName.setText("");
+        nameField.setText("");
         textAreaDescription.setText("");
         addImageLabel.reset();
     }
@@ -390,10 +390,10 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
             // соберем данные общего класса
             itemAppData = ItemCls.makeAppData(0L,
                     !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType());
+                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(), tagsField.getText());
 
             Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, itemAppData, creator,
-                    exLink, textName.getText(), feePow, birthday, deathday, gender,
+                    exLink, nameField.getText(), feePow, birthday, deathday, gender,
                     "", //textPersonNumber.getText(),
                     birthLatitude,
                     birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),
@@ -409,13 +409,13 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     // SIGN
                     personHuman.sign(creator);
                     byte[] issueBytes = personHuman.toBytes(Transaction.FOR_NETWORK, false, false);
-                    String base58str = Base58.encode(issueBytes);
+                    String base64str = Base64.getEncoder().encodeToString(issueBytes);
                     if (registrar == null) {
                         // copy to clipBoard
 
                         // This method writes a string to the system clipboard.
                         // otherwise it returns null.
-                        StringSelection stringSelection = new StringSelection(base58str);
+                        StringSelection stringSelection = new StringSelection(base64str);
                         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
                         JOptionPane.showMessageDialog(new JFrame(),
                                 Lang.T("Person bytecode has been copy to buffer") + "!",

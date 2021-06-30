@@ -477,7 +477,7 @@ public class ChangeOrderTransaction extends Transaction {
 
         if (orderOrig.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - откатим, ведь может он сработал
-            Order updatedOrder = OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
+            OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
         } else {
             dcSet.getOrderMap().delete(dbRef);
         }

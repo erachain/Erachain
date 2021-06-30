@@ -9,7 +9,6 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -19,15 +18,10 @@ import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 import org.rocksdb.ReadOptions;
-import org.rocksdb.RocksIterator;
 import org.rocksdb.WriteOptions;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import static org.erachain.utils.ByteArrayUtils.areEqualMask;
 
 @Slf4j
 public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
@@ -37,12 +31,13 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // it DO
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >>
-            implements ItemAssetBalanceSuit {
+        implements ItemAssetBalanceSuit {
+
+    static final int ADDR_KEY2_LEN = 10;
 
     private IndexByteableBigDecimal seralizerBigDecimal = new IndexByteableBigDecimal();
     private final String NAME_TABLE = "ITEM_ASSET_BALANCE_TABLE";
     private final String balanceKeyAssetIndexName = "balances_by_asset";
-    private final String balanceAddressIndexName = "balances_by_address";
     private SimpleIndexDB<
             byte[],
             Tuple5<
@@ -52,16 +47,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     Tuple2<BigDecimal, BigDecimal>,
                     Tuple2<BigDecimal, BigDecimal>>,
             byte[]> balanceKeyAssetIndex;
-
-    private SimpleIndexDB<
-            byte[],
-            Tuple5<
-                    Tuple2<BigDecimal, BigDecimal>,
-                    Tuple2<BigDecimal, BigDecimal>,
-                    Tuple2<BigDecimal, BigDecimal>,
-                    Tuple2<BigDecimal, BigDecimal>,
-                    Tuple2<BigDecimal, BigDecimal>>,
-            byte[]> balanceAddressIndex;
 
     public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database, DBTab cover) {
         super(databaseSet, database, logger, false, cover);
@@ -125,55 +110,20 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
             // NOT USE SECONDARY INDEXES
             return;
 
-        balanceAddressIndex = new SimpleIndexDB<>(balanceAddressIndexName,
-                (key, value) -> {
-                    // Address
-                    byte[] shortAddress = new byte[20];
-                    System.arraycopy(key, 0, shortAddress, 0, 20);
-                    // ASSET KEY
-                    byte[] assetKeyBytes = new byte[8];
-                    System.arraycopy(key, 20, assetKeyBytes, 0, 8);
-
-                    return org.bouncycastle.util.Arrays.concatenate(
-                            shortAddress,
-                            assetKeyBytes);
-                },
-                (result) -> result); // ByteableTrivial
-
-        indexes.add(balanceAddressIndex);
-    }
-
-    // TODO - release it on Iterators
-
-    public Set<byte[]> assetKeys(long assetKey) {
-        return ((DBRocksDBTable)map).filterAppropriateValuesAsByteKeys(
-                Longs.toByteArray(assetKey),
-                balanceKeyAssetIndex.getColumnFamilyHandle());
     }
 
     @Override
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
-        return new IteratorCloseableImpl(assetKeys(assetKey).iterator());
-    }
-
-    public List<byte[]> accountKeys(Account account) {
-
-        List<byte[]> result = new ArrayList<>();
-
-        try (final RocksIterator iterator = map.dbSource.getDbCore().newIterator(
-                balanceAddressIndex.getColumnFamilyHandle())) {
-            for (iterator.seek(account.getShortAddressBytes()); iterator.isValid()
-                    && areEqualMask(iterator.key(), account.getShortAddressBytes()); iterator.next()) {
-                result.add(iterator.value());
-            }
-        }
-
-        return result;
+        return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
+                Longs.toByteArray(assetKey), false, true);
     }
 
     @Override
     public IteratorCloseable<byte[]> accountIterator(Account account) {
-        return ((DBRocksDBTable) map).getIndexIteratorFilter(balanceAddressIndex.getColumnFamilyHandle(), account.getShortAddressBytes(), false, true);
+        byte[] secondary = new byte[ADDR_KEY2_LEN];
+        System.arraycopy(account.getShortAddressBytes(), 0, secondary, 0, ADDR_KEY2_LEN);
+
+        return ((DBRocksDBTable) map).getIndexIteratorFilter(secondary, false, false);
     }
 
 }

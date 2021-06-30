@@ -5,18 +5,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.IndexIterator;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.NavigableSet;
 
 // TODO SOFT HARD TRUE
 
@@ -26,13 +26,20 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
         implements ItemAssetBalanceSuit {
 
+    static final int ADDR_KEY2_LEN = 10;
+    static final byte[] ADDR_KEY2_MIN = new byte[ADDR_KEY2_LEN];
+    static final byte[] ADDR_KEY2_MAX = new byte[ADDR_KEY2_LEN];
+
+
     @SuppressWarnings("rawtypes")
-    protected BTreeMap assetKeyMap;
-    protected BTreeMap addressKeyMap;
+    protected NavigableSet assetKeySet;
+    protected NavigableSet addressKeySet;
 
     public ItemAssetBalanceSuitMapDB(DBASet databaseSet, DB database, DBTab cover) {
         super(databaseSet, database, logger, false, cover);
 
+        Arrays.fill(ADDR_KEY2_MIN, (byte) -128);
+        Arrays.fill(ADDR_KEY2_MAX, (byte) 127);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -76,34 +83,27 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
             //BIND ASSET KEY
             /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
             // - иначе она не сработает так как тут дерево с поиском
-            this.assetKeyMap = database.createTreeMap("balances_key_asset_bal_address")
-                    .comparator(Fun.COMPARATOR)
-                    //.valuesOutsideNodesEnable()
+            this.assetKeySet = database.createTreeSet("balances_key_asset_bal_address")
+                    .comparator(new Fun.Tuple2Comparator<>(Fun.TUPLE2_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
                     .makeOrGet();
 
-            Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple2<Tuple2<Long, BigDecimal>, String>,
+            Bind.secondaryKey(hashMap, this.assetKeySet, new Fun.Function2<Tuple2<Long, BigDecimal>,
                     byte[],
                     Tuple5<
                             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                     () {
                 @Override
-                public Tuple2<Tuple2<Long, BigDecimal>, String>
+                public Tuple2<Long, BigDecimal>
                 run(byte[] key, Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
-                    // Address
-                    byte[] shortAddress = new byte[20];
-                    System.arraycopy(key, 0, shortAddress, 0, 20);
                     // ASSET KEY
                     byte[] assetKeyBytes = new byte[8];
                     System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                    return new Tuple2<Tuple2<Long, BigDecimal>, String>(
-                            new Tuple2<>(Longs.fromByteArray(assetKeyBytes), value.a.b.negate()),
-                            Crypto.getInstance().getAddressFromShort(shortAddress)
-                    );
+                    return new Tuple2<Long, BigDecimal>(Longs.fromByteArray(assetKeyBytes), value.a.b.negate());
                 }
             });
 
@@ -113,63 +113,45 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
             // NOT USE SECONDARY INDEXES
             return;
 
-        this.addressKeyMap = database.createTreeMap("balances_address_asset_bal")
-                .comparator(Fun.COMPARATOR)
+        this.addressKeySet = database.createTreeSet("balances_address_asset_2_bal")
+                .comparator(new Fun.Tuple2Comparator<>(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR)) // у вторичных ключей всегда там Tuple2
                 //.valuesOutsideNodesEnable()
                 .makeOrGet();
 
-        Bind.secondaryKey(hashMap, this.addressKeyMap, new Fun.Function2<Tuple2<String, Long>,
+        Bind.secondaryKey(hashMap, this.addressKeySet, new Fun.Function2<byte[],
                 byte[],
                 Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                 () {
             @Override
-            public Tuple2<String, Long>
-            run(byte[] key, Tuple5<
-                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+            public byte[]
+            run(byte[] key, Tuple5 value) {
 
-                // Address
-                byte[] shortAddress = new byte[20];
-                System.arraycopy(key, 0, shortAddress, 0, 20);
-                // ASSET KEY
-                byte[] assetKeyBytes = new byte[8];
-                System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+                // first 20 bytes - short address
+                byte[] secondary = new byte[ADDR_KEY2_LEN];
+                System.arraycopy(key, 0, secondary, 0, ADDR_KEY2_LEN);
+                return secondary;
 
-                return new Tuple2<String, Long>(
-                        Crypto.getInstance().getAddressFromShort(shortAddress),
-                        Longs.fromByteArray(assetKeyBytes)
-                );
             }
         });
 
     }
 
     @Override
-    public Collection<byte[]> assetKeys(long assetKey) {
-        //FILTER ALL KEYS
-        return this.assetKeyMap.subMap(
-                Fun.t2(Fun.t2(assetKey, null), null),
-                Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI())).values();
-    }
-
-    @Override
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
-        return new IteratorCloseableImpl(assetKeys(assetKey).iterator());
-    }
-
-    @Override
-    public Collection<byte[]> accountKeys(Account account) {
-        //FILTER ALL KEYS
-        return this.addressKeyMap.subMap(
-                Fun.t2(account.getAddress(), null),
-                Fun.t2(account.getAddress(), Fun.HI())).values();
+        return new IndexIterator((NavigableSet) this.assetKeySet.subSet(
+                Fun.t2(Fun.t2(assetKey, null), ADDR_KEY2_MIN), Fun.t2(Fun.t2(assetKey, Fun.HI), ADDR_KEY2_MAX)));
     }
 
     @Override
     public IteratorCloseable<byte[]> accountIterator(Account account) {
-        return new IteratorCloseableImpl(accountKeys(account).iterator());
+        byte[] secondary = new byte[ADDR_KEY2_LEN];
+        System.arraycopy(account.getShortAddressBytes(), 0, secondary, 0, ADDR_KEY2_LEN);
+
+        // WRONG - return new IndexIterator(Fun.filter((NavigableSet) this.addressKeyMap2, secondary).iterator());
+        return new IndexIterator((NavigableSet) this.addressKeySet.subSet(
+                Fun.t2(secondary, ADDR_KEY2_MIN), Fun.t2(secondary, ADDR_KEY2_MAX)));
     }
 
 

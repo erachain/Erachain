@@ -46,6 +46,8 @@ public class APITXResource {
                 "GET transaction by Height and Sequence (SeqNo)");
         help.put("api/tx/signature/{height-sequence}",
                 "GET transaction Signature by Height and Sequence (SeqNo)");
+        help.put("api/tx/raw/{height-sequence or signature}",
+                "GET transaction RAW (Base64) by Height and Sequence (SeqNo) or signature (Base58)");
         help.put("api/tx/signs/{height-sequence}",
                 "GET Signs of transaction by Height and Sequence");
         help.put("api/tx/vouches/{height-sequence}",
@@ -219,6 +221,19 @@ public class APITXResource {
     }
 
     @GET
+    @Path("raw/{number}")
+    public Response raw(@PathParam("number") String numberStr) {
+
+        Transaction tx = DCSet.getInstance().getTransactionFinalMap().getRecord(numberStr);
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(Base64.getEncoder().encodeToString(tx.toBytes(Transaction.FOR_NETWORK, true)))
+                .build();
+    }
+
+    @GET
     @Path("signs/{number}")
     public Response getSigns(@PathParam("number") String numberStr) {
 
@@ -260,12 +275,20 @@ public class APITXResource {
             out.put("error", step);
             out.put("message", "height-sequence error, use integer-integer value");
         } else {
+            TransactionFinalMapImpl txMap = DCSet.getInstance().getTransactionFinalMap();
             Fun.Tuple2<BigDecimal, List<Long>> vouchesItem = DCSet.getInstance().getVouchRecordMap().get(dbRef);
             JSONArray values = new JSONArray();
             if (vouchesItem != null) {
                 out.put("sum", vouchesItem.a.toPlainString());
                 for (Long dbRefVoucher : vouchesItem.b) {
-                    values.add(Transaction.viewDBRef(dbRefVoucher));
+                    Transaction transaction = txMap.get(dbRefVoucher);
+                    if (transaction == null)
+                        continue;
+
+                    JSONObject json = new JSONObject();
+                    json.put("tx", transaction.viewHeightSeq());
+                    json.put("creator", transaction.getCreator().toJson());
+                    values.add(json);
                 }
                 out.put("vouches", values);
             }

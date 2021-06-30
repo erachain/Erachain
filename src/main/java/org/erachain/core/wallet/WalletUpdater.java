@@ -164,7 +164,7 @@ public class WalletUpdater extends MonitoredThread {
 
         } else {
 
-            byte[] lastSignature = wallet.database.getLastBlockSignature();
+            byte[] lastSignature = wallet.dwSet.getLastBlockSignature();
             if (lastSignature == null) {
                 LOGGER.debug(" >>>>>>>>>>>>>>> *** Synchronizing wallet... by lastSignature = null");
 
@@ -232,7 +232,7 @@ public class WalletUpdater extends MonitoredThread {
     public void run() {
 
         // начальная загрузка
-        byte[] lastWalletBlockSign = wallet.database.getLastBlockSignature();
+        byte[] lastWalletBlockSign = wallet.dwSet.getLastBlockSignature();
         if (lastWalletBlockSign != null) {
             // по последнему в этом кошельке смотрим
             Integer walletHeight = dcSet.getBlockSignsMap().get(lastWalletBlockSign);

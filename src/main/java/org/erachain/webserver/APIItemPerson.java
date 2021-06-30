@@ -5,7 +5,6 @@ import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.GenesisBlock;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
@@ -45,7 +44,7 @@ public class APIItemPerson {
 
         help.put("GET apiperson/last", "Get last ID");
         help.put("GET apiperson/{key}", "GET by ID");
-        help.put("GET apiperson/raw/{key}", "Returns RAW in Base58 of person with the given key.");
+        help.put("GET apiperson/raw/{key}", "Returns RAW in Base64 of person with the given key.");
         help.put("GET apiperson/find?filter={name_string}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use patterns from 5 chars in words. Default {descending} - true");
         help.put("Get apiperson/image/{key}", "GET Person Image");
         help.put("Get apiperson/icon/{key}", "GET Person Icon");
@@ -117,7 +116,7 @@ public class APIItemPerson {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(Base58.encode(issueBytes))
+                .entity(java.util.Base64.getEncoder().encodeToString(issueBytes))
                 .build();
     }
 
@@ -286,7 +285,7 @@ public class APIItemPerson {
 
     @Path("icon/{key}")
     @GET
-    @Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response personIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {

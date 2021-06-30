@@ -22,6 +22,7 @@ import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -1611,6 +1612,20 @@ public class Account {
         return person;
     }
 
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("address", getAddress());
+        Tuple2<Integer, PersonCls> personRes = this.getPerson();
+        if (personRes != null) {
+            JSONObject personJson = new JSONObject();
+            personJson.put("key", personRes.b.getKey());
+            personJson.put("name", personRes.b.getName());
+            personJson.put("birthday", personRes.b.getBirthdayStr());
+            json.put("person", personJson);
+        }
+        return json;
+    }
+
     // previous forging block or changed ERA volume
     public Tuple3<Integer, Integer, Integer> getForgingData(DCSet db, int height) {
         return db.getAddressForging().get(getAddress(), height);
@@ -1629,7 +1644,7 @@ public class Account {
     }
 
     public static Tuple3<String, String, String> getFromFavorites(String address) {
-        return Controller.getInstance().getWallet().database.getFavoriteAccountsMap().get(address);
+        return Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap().get(address);
 
     }
 
@@ -1638,7 +1653,7 @@ public class Account {
     }
 
     public Integer getAccountNo() {
-        return Controller.getInstance().getWallet().database.getAccountMap().getAccountNo(getAddress());
+        return Controller.getInstance().getWallet().dwSet.getAccountMap().getAccountNo(getAddress());
     }
 
 }

@@ -116,6 +116,10 @@ public class AssetInfo extends JTextPane {
             if (record != null)
                 text += "<td><div  style='float:left'><div><b>" + Lang.T("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
             text += "<div><b>" + Lang.T("Name") + ": </b>" + asset.viewName() + "</div>";
+            if (asset.getTagsStr() != null) {
+                text += "<div><b>" + Lang.T("Tags") + ": </b>" + asset.getTagsStr() + "</div>";
+            }
+
             text += "<div   style='word-wrap: break-word; '>";
 
             text += "<div>" + Lang.T("Maker") + ": <a href = '!!Maker'><b>" + hl_Maker.get_Text() + "</b></a></div>";

@@ -10,6 +10,7 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
+import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrade;
@@ -31,15 +32,8 @@ import java.util.ArrayList;
 @Slf4j
 public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
-    private final String NAME_TABLE = "TRADES_TABLE";
-    private final String tradesKeyPairIndexName = "tradesKeyPair";
-    private final String tradesKeyWantIndexName = "tradesKeyWant";
-    private final String tradesKeyHaveIndexName = "tradesKeyHave";
-    private final String tradesKeyReverseIndexName = "tradesKeyReverse";
-
     SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> pairIndex;
-    SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> wantIndex;
-    SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> haveIndex;
+    ArrayIndexDB<Tuple2<Long, Long>, Trade, byte[]> assetIndex;
     SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> reverseIndex;
 
     public TradeSuitRocksDB(DBASet databaseSet, DB database) {
@@ -49,6 +43,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     @Override
     public void openMap() {
 
+        String NAME_TABLE = "TRADES_TABLE";
         map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableTuple2LongLong(), new ByteableTrade(),
                 NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
@@ -72,6 +67,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
         //////////////// NOT PROTOCOL INDEXES
 
+        String tradesKeyPairIndexName = "tradesKeyPair";
         pairIndex = new SimpleIndexDB<>(
                 tradesKeyPairIndexName,
                 (key, value) -> {
@@ -99,36 +95,17 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                     return filter;
                 }, (result) -> result);
 
-        haveIndex = new SimpleIndexDB<>(
-                tradesKeyHaveIndexName,
-                (key, value) -> {
-                    byte[] buffer = new byte[20];
-                    // обратная сортировка поэтому все вычитаем Однако тут по другому минусы учитываются - они больше чем положительные числа!
-                    // поэтому нужно еще делать корректировку как у Чисел
-                    System.arraycopy(Longs.toByteArray(value.getHaveKey()),
-                            0, buffer, 0, 8);
-                    System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - value.getInitiator()),
-                            0, buffer, 8, 8);
-                    System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - value.getSequence()),
-                            0, buffer, 16, 4);
-                    return buffer;
+        String tradesAssetKeyIndexName = "tradesAssetKey";
+        assetIndex = new ArrayIndexDB<>(
+                tradesAssetKeyIndexName,
+                (key, trade) -> {
+                    byte[][] keys = new byte[2][];
+                    keys[0] = Longs.toByteArray(trade.getHaveKey());
+                    keys[1] = Longs.toByteArray(trade.getWantKey());
+                    return keys;
                 }, (result) -> result);
 
-        wantIndex = new SimpleIndexDB<>(
-                tradesKeyWantIndexName,
-                (key, value) -> {
-                    byte[] buffer = new byte[20];
-                    // обратная сортировка поэтому все вычитаем Однако тут по другому минусы учитываются - они больше чем положительные числа!
-                    // поэтому нужно еще делать корректировку как у Чисел
-                    System.arraycopy(Longs.toByteArray(value.getWantKey()),
-                            0, buffer, 0, 8);
-                    System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - value.getInitiator()),
-                            0, buffer, 8, 8);
-                    System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - value.getSequence()),
-                            0, buffer, 16, 4);
-                    return buffer;
-                }, (result) -> result);
-
+        String tradesKeyReverseIndexName = "tradesKeyReverse";
         reverseIndex = new SimpleIndexDB<>(
                 tradesKeyReverseIndexName,
                 (key, value) -> {
@@ -139,8 +116,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                 }, (result) -> result);
 
         indexes.add(pairIndex);
-        indexes.add(haveIndex);
-        indexes.add(wantIndex);
+        indexes.add(assetIndex);
         indexes.add(reverseIndex);
     }
 
@@ -175,13 +151,8 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getHaveIterator(long have) {
-        return map.getIndexIteratorFilter(haveIndex.getColumnFamilyHandle(), Longs.toByteArray(have), false, true);
-    }
-
-    @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getWantIterator(long want) {
-        return map.getIndexIteratorFilter(wantIndex.getColumnFamilyHandle(), Longs.toByteArray(want), false, true);
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByAssetKey(long assetKey, boolean descending) {
+        return map.getIndexIteratorFilter(assetIndex.getColumnFamilyHandle(), Longs.toByteArray(assetKey), descending, true);
     }
 
     @Override

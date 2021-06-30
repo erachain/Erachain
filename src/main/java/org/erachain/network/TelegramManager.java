@@ -585,7 +585,7 @@ public class TelegramManager extends Thread {
             // save telegram to wallet DB
             if (controller.getWallet().accountExists(transaction.getCreator())) {
                 // add as my OUTCOME
-                controller.getWallet().database.getTelegramsMap().add(signatureKey, transaction);
+                controller.getWallet().dwSet.getTelegramsMap().add(signatureKey, transaction);
             } else {
                 // TRY ADD as my INCOME
                 controller.addTelegramToWallet(transaction, signatureKey);

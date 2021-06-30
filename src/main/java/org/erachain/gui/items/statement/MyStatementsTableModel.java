@@ -29,7 +29,7 @@ public class MyStatementsTableModel extends WalletTableModel<Tuple2<Tuple2<Long,
     Wallet wallet = Controller.getInstance().getWallet();
 
     public MyStatementsTableModel() {
-        super(Controller.getInstance().getWallet().database.getTransactionMap(),
+        super(Controller.getInstance().getWallet().dwSet.getTransactionMap(),
                 new String[]{"№", "Timestamp", "Creator", "Title", "Template", "Favorite"},
                 new Boolean[]{false, true, true, true, false, false}, true, COLUMN_FAVORITE);
 

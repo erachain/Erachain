@@ -688,26 +688,19 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
         // ORPHAN ORDER
 
-        // изменяемые объекты нужно заново создавать
-        //this.order.copy().orphan();
+        // тут получаем Заказ не измененный - который был до отката
+        Order order = OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
 
-        if (true) {
-            Order order = OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
-
-            // RESTORE HAVE
-            // GET HAVE LEFT - if it CANCELED by Outprice or not completed
-            //   - если обработка остановлена по достижению порога Инкремента
-            creator.changeBalance(dcSet, false, false, haveKey,
-                    order.getAmountHaveLeft(), // так как внутри может сработать Unresolved by Outprice
-                    false, false,
-                    // accounting on PLEDGE position
-                    true, Account.BALANCE_POS_PLEDGE);
-
-        } else {
-            // изменяемые объекты нужно заново создавать
-            Order order = makeOrder();
-            order.orphan(block, block == null ? timestamp : block.getTimestamp(), false);
-        }
+        // RESTORE HAVE
+        // GET HAVE LEFT - if it CANCELED by Outprice or not completed
+        //   - если обработка остановлена по достижению порога Инкремента
+        creator.changeBalance(dcSet, false, false, haveKey,
+                // так как внутри может сработать Unresolved by Outprice - и именно остаток недобитый тут тоже учтётся
+                // этот осток от Неисполнения внутри OrderProcess.orphan делается
+                order.getAmountHave(),
+                false, false,
+                // accounting on PLEDGE position
+                true, Account.BALANCE_POS_PLEDGE);
 
     }
 

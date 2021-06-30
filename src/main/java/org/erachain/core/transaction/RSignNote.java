@@ -9,7 +9,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.ExPays;
 import org.erachain.core.exdata.exLink.ExLink;
@@ -30,6 +29,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashSet;
 
 //import java.math.BigDecimal;
@@ -482,7 +482,7 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         if (data != null && data.length > 0) {
-            transaction.put("data64", Base64.encode(this.data));
+            transaction.put("data64", Base64.getEncoder().encodeToString(this.data));
         }
 
         return transaction;
@@ -967,7 +967,7 @@ public class RSignNote extends Transaction implements Itemable {
 
     public boolean isFavorite() {
         if (Controller.getInstance().doesWalletExists()) {
-            return Controller.getInstance().getWallet().database.getDocumentFavoritesSet().contains(this.dbRef);
+            return Controller.getInstance().getWallet().dwSet.getDocumentFavoritesSet().contains(this.dbRef);
         }
         return false;
     }

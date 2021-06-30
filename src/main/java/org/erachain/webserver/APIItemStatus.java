@@ -2,7 +2,6 @@ package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -17,6 +16,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class APIItemStatus {
 
         help.put("GET apistatus/last", "Get last ID");
         help.put("GET apistatus/{key}", "GET by ID");
-        help.put("GET apistatus/raw/{key}", "Returns RAW in Base58 of status with the given key.");
+        help.put("GET apistatus/raw/{key}", "Returns RAW in Base64 of status with the given key.");
         help.put("GET apistatus/find?filter={name_string}&from{keyID}&&offset=0&limit=0desc={descending}", "Get by words in Name. Use patterns from 5 chars in words. Default {descending} - true");
         help.put("Get apistatus/image/{key}", "GET Status Image");
         help.put("Get apistatus/icon/{key}", "GET Status Icon");
@@ -101,7 +101,7 @@ public class APIItemStatus {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(Base58.encode(issueBytes))
+                .entity(Base64.getEncoder().encodeToString(issueBytes))
                 .build();
     }
 
@@ -158,7 +158,7 @@ public class APIItemStatus {
 
     @Path("image/{key}")
     @GET
-    @Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response statusImage(@PathParam("key") long key) throws IOException {
 
         int weight = 0;
@@ -182,7 +182,7 @@ public class APIItemStatus {
 
     @Path("icon/{key}")
     @GET
-    @Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response statusIcon(@PathParam("key") long key) throws IOException {
 
         if (key <= 0) {

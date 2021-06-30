@@ -238,6 +238,17 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         return ((OrderSuit) map).getHaveWanFirst(have, want);
     }
 
+    @Override
+    public IteratorCloseable<Long> iteratorByAssetKey(long assetKey, boolean descending) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        return ((OrderSuit) this.map).getIteratorByAssetKey(assetKey, descending);
+
+    }
+
 
     @Override
     public List<Order> getOrdersForAddress(

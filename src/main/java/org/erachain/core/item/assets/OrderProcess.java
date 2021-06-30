@@ -15,7 +15,6 @@ import org.mapdb.Fun;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 @Slf4j
@@ -24,7 +23,6 @@ import java.util.List;
  */
 public class OrderProcess {
 
-    static BigDecimal MIN_LEFT_SHARE = new BigDecimal("0.0002");
     /**
      * По идее тут ордер активный должен себе получить лучшие условия если округление пошло в сторону,
      * так как он в мне выгодных условиях по цене
@@ -52,12 +50,16 @@ public class OrderProcess {
             assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
         }
 
-        BigDecimal price = orderThis.getPrice();
-        Account creator = orderThis.getCreator();
-
         long id = orderThis.getId();
         // GET HEIGHT from ID
-        int height = (int) (id >> 32);
+        //int height = (int) (id >> 32);
+        // нужно так как при сдвиге цены Заказ может быть уже початый и тут на ОстатокЦены проверку делаем
+        BigDecimal price = orderThis.calcLeftPrice();
+        BigDecimal thisPriceReverse = orderThis.calcLeftPriceReverse();
+        BigDecimal thisPriceReverseShifted = thisPriceReverse.multiply(BlockChain.COMPARE_TRADE_DEVIATION);
+
+        Account creator = orderThis.getCreator();
+
 
         CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
         OrderMap ordersMap = dcSet.getOrderMap();
@@ -65,26 +67,10 @@ public class OrderProcess {
 
         boolean debug = false;
 
-        if (BlockChain.CHECK_BUGS > 1 &&
-                //creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-                //id.equals(Transaction.makeDBRef(12435, 1))
-                //id.equals(770667456757788l) // 174358 ---- 	255979-3	255992-1
-                //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
-                //// 	255979-3	255992-1
-                //|| height == 255992
-                Transaction.viewDBRef(id).equals("1831504-1")
-            //id == 3644468729217028L
-
-
-            //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
-            //|| height == 253841 // сработал NEW_FLOR 2-й
-            //|| height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
-            //|| (haveAssetKey == 12L && wantAssetKey == 95L)
-            //|| (wantAssetKey == 95L && haveAssetKey == 12L)
-            //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
-            //Arrays.equals(Base58.decode("2GnkzTNDJtMgDHmKKxkZSQP95S7DesENCR2HRQFQHcspFCmPStz6yn4XEnpdW4BmSYW5dkML6xYZm1xv7JXfbfNz"), transaction.getSignature()
-            //id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
-            //&& !db.isFork()
+        if (BlockChain.CHECK_BUGS > 3
+            //&& creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+            //|| height == 255992
+            //Transaction.viewDBRef(id).equals("40046-1")
         ) {
             debug = true;
         }
@@ -92,92 +78,26 @@ public class OrderProcess {
         ////// NEED FOR making secondary keys in TradeMap
         /// not need now ordersMap.add(this);
 
-        BigDecimal thisPriceReverse = orderThis.calcPriceReverse();
-
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
         List<Order> orders = ordersMap.getOrdersForTradeWithFork(wantAssetKey, haveAssetKey, thisPriceReverse);
-
-        /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
-        if (id > BlockChain.LEFT_PRICE_HEIGHT_SEQ && (debug || BlockChain.CHECK_BUGS > 5) && !orders.isEmpty()) {
-            BigDecimal priceTst = orders.get(0).calcLeftPrice();
-            Long timestamp = orders.get(0).getId();
-            Long idTst = 0L;
-            for (Order item : orders) {
-                if (item.getId().equals(idTst)) {
-                    // RISE ERROR
-                    List<Order> orders_test = ordersMap.getOrdersForTradeWithFork(wantAssetKey, haveAssetKey, thisPriceReverse);
-                    timestamp = null;
-                    ++timestamp;
-                }
-                idTst = item.getId();
-
-                if (item.getHaveAssetKey() != wantAssetKey
-                        || item.getWantAssetKey() != haveAssetKey) {
-                    // RISE ERROR
-                    timestamp = null;
-                    ++timestamp;
-                }
-                // потому что сранивается потом обратная цена то тут должно быть возрастание
-                // и если не так то ошибка
-                int comp = priceTst.compareTo(item.calcLeftPrice());
-                if (comp > 0) {
-                    // RISE ERROR
-                    timestamp = null;
-                    ++timestamp;
-                } else if (comp == 0) {
-                    // здесь так же должно быть возрастание
-                    // если не так то ошибка
-                    if (timestamp.compareTo(item.getId()) > 0) {
-                        // RISE ERROR
-                        timestamp = null;
-                        ++timestamp;
-                    }
-                }
-
-                priceTst = item.calcLeftPrice();
-                timestamp = item.getId();
-            }
-
-            List<Order> ordersAll = ordersMap.getOrdersForTradeWithFork(wantAssetKey, haveAssetKey, null);
-            priceTst = orders.get(0).calcLeftPrice();
-            timestamp = orders.get(0).getId();
-            for (Order item : ordersAll) {
-                int comp = priceTst.compareTo(item.calcLeftPrice()); // по остаткам цены());
-                if (comp > 0) {
-                    // RISE ERROR
-                    timestamp = null;
-                    ++timestamp;
-                } else if (comp == 0) {
-                    // здесь так же должно быть возростание
-                    // если не так то ошибка
-                    if (timestamp.compareTo(item.getId()) > 0) {
-                        // RISE ERROR
-                        timestamp = null;
-                        ++timestamp;
-                    }
-                }
-                priceTst = item.calcLeftPrice();
-                timestamp = item.getId();
-            }
-        }
 
         BigDecimal thisAmountHaveLeft = orderThis.getAmountHaveLeft();
         BigDecimal thisAmountHaveLeftStart = thisAmountHaveLeft;
         BigDecimal processedAmountFulfilledWant = BigDecimal.ZERO;
 
         int compare = 0;
-        int compareLeft = 0;
+        int compareThisLeft = 0;
 
         if (debug) {
             debug = true;
         }
 
-        boolean completedOrder = false;
+        boolean completedThisOrder = false;
         // используется для порядка отражения ордеров при поиске
         int index = 0;
 
-        while (!completedOrder && index < orders.size()) {
+        while (!completedThisOrder && index < orders.size()) {
             //GET ORDER
             Order order;
             if (dcSet.inMemory()) {
@@ -191,9 +111,9 @@ public class OrderProcess {
 
             index++;
 
-            if (debug ||
-                    Transaction.viewDBRef(id).equals("2685-1")
-                //id == 3644468729217028L
+            String orderREF = Transaction.viewDBRef(order.getId());
+            if (debug
+                //|| orderREF.equals("40046-1")
             ) {
                 debug = true;
             }
@@ -203,10 +123,10 @@ public class OrderProcess {
 
             // REVERSE
             ////////// по остаткам цену берем!
-            BigDecimal orderReversePrice = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPriceReverse() : order.calcPriceReverse();
+            BigDecimal orderReversePrice = order.calcLeftPriceReverse();
             // PRICE
             ////////// по остаткам цену берем!
-            BigDecimal orderPrice = id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice();
+            BigDecimal orderPrice = order.calcLeftPrice();
 
             Trade trade;
             BigDecimal tradeAmountForHave;
@@ -214,12 +134,12 @@ public class OrderProcess {
             BigDecimal tradeAmountAccurate;
             BigDecimal differenceTrade;
             //BigDecimal differenceTradeThis;
-            String orderREF = Transaction.viewDBRef(order.getId());
 
             /////////////// - разность точности цены из-за того что у одного ордера значение больше на порядки и этот порядок в точность уходит
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
             //////// old compare = thisPrice.compareTo(orderReversePrice);
-            compare = orderPrice.compareTo(thisPriceReverse);
+            //compare = orderPrice.compareTo(thisPriceReverse);
+            compare = orderPrice.compareTo(thisPriceReverseShifted);
             if (compare > 0) {
                 // Делаем просто проверку на обратную цену и все - без игр с округлением и проверки дополнительной
                 // и сравним так же по прямой цене со сниженной точностью у Заказа
@@ -231,98 +151,119 @@ public class OrderProcess {
                 }
             }
 
-            boolean willUnResolvedFor = false;
+            boolean willOrderUnResolved = false;
             orderAmountHaveLeft = order.getAmountHaveLeft();
-            // SCALE for HAVE in ORDER
-            // цену ему занижаем так как это держатель позиции
             if (order.getFulfilledHave().signum() == 0) {
                 orderAmountWantLeft = order.getAmountWant();
             } else {
-                orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveAssetScale, RoundingMode.HALF_DOWN);
+                orderAmountWantLeft = order.getAmountWantLeft();
             }
 
-            compareLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
-            if (compareLeft == 0) {
+            compareThisLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
+            if (compareThisLeft == 0) {
+                // оба ордера полностью исполнены
                 tradeAmountForHave = orderAmountHaveLeft;
-                tradeAmountForWant = orderAmountWantLeft;
+                tradeAmountForWant = thisAmountHaveLeft;
 
-                completedOrder = true;
+                completedThisOrder = true;
 
-            } else if (compareLeft < 0) {
-
+            } else if (compareThisLeft < 0) {
+                // берем из текущего (Order) заказа данные для сделки - он полностью будет исполнен
                 tradeAmountForHave = orderAmountHaveLeft;
 
                 // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
-                if (orderThis.willUnResolvedFor(orderAmountWantLeft, false)
-                        && thisAmountHaveLeft.subtract(orderAmountWantLeft).divide(orderAmountWantLeft, 6, RoundingMode.HALF_DOWN)
-                        .compareTo(MIN_LEFT_SHARE) <= 0) {
+                if (orderThis.willUnResolvedFor(orderAmountWantLeft, BlockChain.MAX_ORDER_DEVIATION_LOW)
+                        // и отклонение будет небольшое для текущего Заказа
+                        && !Order.isPricesNotClose(
+                        orderPrice,
+                        Order.calcPrice(tradeAmountForHave, thisAmountHaveLeft, haveAssetScale),
+                        BlockChain.MAX_ORDER_DEVIATION)
+                    //&& !order.isLeftDeviationOut(thisAmountHaveLeft.multiply(orderReversePrice), BlockChain.MAX_ORDER_DEVIATION)
+                ) {
                     tradeAmountForWant = thisAmountHaveLeft;
-                    completedOrder = true;
+                    completedThisOrder = true;
                 } else {
                     tradeAmountForWant = orderAmountWantLeft;
                 }
 
             } else {
-
+                // берем из нашего (OrderThis) заказа данные для сделки - он полностью будет исполнен
                 tradeAmountForWant = thisAmountHaveLeft;
-
-                if (debug) {
-                    debug = true;
-                }
 
                 if (compare == 0) {
                     // цена совпала (возможно с округлением) то без пересчета берем что раньше посчитали
                     tradeAmountForHave = orderThis.getAmountWantLeft();
+                    if (tradeAmountForHave.compareTo(orderAmountHaveLeft) >= 0) {
+                        // если вылазим после округления за предел то берем что есть
+                        tradeAmountForHave = orderAmountHaveLeft;
+
+                    } else {
+                        // тут возможны округления и остатки неисполнимые уже у Текущего Заказа
+                        // если текущий ордер станет не исполняемым, то попробуем его тут обработать особо
+                        willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, BlockChain.MAX_ORDER_DEVIATION_LOW);
+                        if (willOrderUnResolved
+                                // и остаток небольшой для всего Заказа
+                                && !Order.isPricesNotClose(
+                                orderPrice,
+                                Order.calcPrice(orderAmountHaveLeft, tradeAmountForWant, haveAssetScale),
+                                BlockChain.MAX_ORDER_DEVIATION)
+                            // && !order.isLeftDeviationOut(tradeAmountForHave, BlockChain.MAX_ORDER_DEVIATION)
+                        ) {
+                            tradeAmountForHave = orderAmountHaveLeft;
+                        }
+                    }
 
                 } else {
+                    // цена нашего Заказ - "по рынку", значит пересчитаем Хочу по цене текущего Заказа
+                    tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, BigDecimal.ROUND_HALF_UP);
 
-                    // RESOLVE amount with SCALE
-                    // тут округляем наоборот вверх - больше даем тому кто активный
-                    tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
                     if (tradeAmountForHave.compareTo(orderAmountHaveLeft) >= 0) {
                         // если вылазим после округления за предел то берем что есть
                         tradeAmountForHave = orderAmountHaveLeft;
 
                     } else {
 
-                        if (debug) {
-                            debug = true;
+                        // если текущий ордер станет не исполняемым, то попробуем его тут обработать особо
+                        willOrderUnResolved = order.willUnResolvedFor(tradeAmountForHave, BlockChain.MAX_ORDER_DEVIATION_LOW);
+                        if (willOrderUnResolved
+                                // и остаток небольшой для всего Заказа
+                                && !Order.isPricesNotClose(
+                                orderPrice,
+                                Order.calcPrice(orderAmountHaveLeft, tradeAmountForWant, haveAssetScale),
+                                BlockChain.MAX_ORDER_DEVIATION)
+                            //&& !order.isLeftDeviationOut(tradeAmountForHave, BlockChain.MAX_ORDER_DEVIATION)
+                        ) {
+                            tradeAmountForHave = orderAmountHaveLeft;
                         }
+                    }
 
-                        // если исполняемый ордер станет не исполняемым, то попробуем его тут обработать особо
-                        willUnResolvedFor = order.willUnResolvedFor(tradeAmountForHave, true);
-                        if (willUnResolvedFor) {
-                            BigDecimal priceUpdateTrade = Order.calcPrice(orderAmountHaveLeft,
-                                    // haveSacel for order.WANT
-                                    tradeAmountForWant, haveAssetScale);
-                            // если цена текущей сделки не сильно изменится
-                            // или если остаток у ордера стенки уже очень маленький по сравнению с текущей сделкой
-                            // то весь ордер в сделку сольем
-                            if (!Order.isPricesNotClose(orderPrice, priceUpdateTrade, false)
-                                    || orderAmountHaveLeft.subtract(tradeAmountForHave)
-                                    .divide(orderAmountHaveLeft,
-                                            BlockChain.TRADE_PRICE_DIFF_LIMIT.scale(),
-                                            RoundingMode.DOWN) // FOR compare!
-                                    ///RoundingMode.HALF_DOWN)
+                    // теперь обязательно пересчет обратно по цене ордера делаем - так как у нас может быть ПО РЫНКУ
+                    // и цена с Имею не та если слишком чильно округлилось (для штучных товаров)
+                    tradeAmountForWant = tradeAmountForHave.multiply(orderPrice).setScale(haveAssetScale, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal diff = thisAmountHaveLeft.subtract(tradeAmountForWant);
+                    if (diff.signum() > 0 && diff.divide(thisAmountHaveLeft, Order.MAX_PRICE_ACCURACY, BigDecimal.ROUND_HALF_UP)
+                            .compareTo(BlockChain.MAX_ORDER_DEVIATION_LOW) < 0
+                            || tradeAmountForWant.compareTo(thisAmountHaveLeft) >= 0) {
+                        // если вылазим после округления за предел то берем что есть
+                        tradeAmountForWant = thisAmountHaveLeft;
 
-                                    .compareTo(BlockChain.TRADE_PRICE_DIFF_LIMIT) < 0) {
-
-                                tradeAmountForHave = orderAmountHaveLeft;
-
-                            }
-
-                            // проверим еще раз может вылезло за рамки
-                            if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
-                                // если вылазим после округления за предел то берем что есть
-                                tradeAmountForHave = orderAmountHaveLeft;
-                            }
+                        //THIS is COMPLETED
+                        completedThisOrder = true;
+                    } else {
+                        // возможно что у нашего ордера уже ничего не остается почти и он станет неисполняемым
+                        if (orderThis.willUnResolvedFor(tradeAmountForWant, BlockChain.MAX_ORDER_DEVIATION_LOW)
+                                // и такая сделка сильно ухудшит цену текущего Заказа
+                                && !Order.isPricesNotClose(
+                                orderPrice,
+                                Order.calcPrice(tradeAmountForHave, thisAmountHaveLeft, haveAssetScale),
+                                BlockChain.MAX_ORDER_DEVIATION)
+                            //&& !order.isLeftDeviationOut(thisAmountHaveLeft.multiply(orderReversePrice), BlockChain.MAX_ORDER_DEVIATION)
+                        ) {
+                            tradeAmountForWant = thisAmountHaveLeft;
+                            completedThisOrder = true;
                         }
                     }
                 }
-
-                //THIS is COMPLETED
-                completedOrder = true;
-
             }
 
             if (tradeAmountForHave.compareTo(BigDecimal.ZERO) <= 0
@@ -333,161 +274,155 @@ public class OrderProcess {
                 error++;
             }
 
-            //CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
-            //AND WE CAN BUY ANYTHING
-            if (tradeAmountForHave.compareTo(BigDecimal.ZERO) > 0) {
-                //CREATE TRADE
+            //CREATE TRADE
 
-                // CUT PRECISION in bytes
-                tradeAmountForHave = tradeAmountForHave.stripTrailingZeros();
-                byte[] amountBytes = tradeAmountForHave.unscaledValue().toByteArray();
-                while (amountBytes.length > Order.FULFILLED_LENGTH) {
-                    tradeAmountForHave.setScale(tradeAmountForHave.scale() - 1, BigDecimal.ROUND_HALF_UP);
-                    amountBytes = tradeAmountForHave.unscaledValue().toByteArray();
-                }
-                tradeAmountForWant = tradeAmountForWant.stripTrailingZeros();
+            // CUT PRECISION in bytes
+            tradeAmountForHave = tradeAmountForHave.stripTrailingZeros();
+            byte[] amountBytes = tradeAmountForHave.unscaledValue().toByteArray();
+            while (amountBytes.length > Order.FULFILLED_LENGTH) {
+                tradeAmountForHave.setScale(tradeAmountForHave.scale() - 1, BigDecimal.ROUND_HALF_UP);
+                amountBytes = tradeAmountForHave.unscaledValue().toByteArray();
+            }
+            tradeAmountForWant = tradeAmountForWant.stripTrailingZeros();
+            amountBytes = tradeAmountForWant.unscaledValue().toByteArray();
+            while (amountBytes.length > Order.FULFILLED_LENGTH) {
+                tradeAmountForWant.setScale(tradeAmountForWant.scale() - 1, BigDecimal.ROUND_HALF_UP);
                 amountBytes = tradeAmountForWant.unscaledValue().toByteArray();
-                while (amountBytes.length > Order.FULFILLED_LENGTH) {
-                    tradeAmountForWant.setScale(tradeAmountForWant.scale() - 1, BigDecimal.ROUND_HALF_UP);
-                    amountBytes = tradeAmountForWant.unscaledValue().toByteArray();
-                }
+            }
 
-                if (debug) {
-                    debug = true;
-                }
+            if (debug) {
+                debug = true;
+            }
 
-                //////////////////////////// TRADE /////////////////
-                if (tradeAmountForHave.scale() > wantAssetScale
-                        || tradeAmountForWant.scale() > haveAssetScale) {
+            //////////////////////////// TRADE /////////////////
+            if (tradeAmountForHave.scale() > wantAssetScale
+                    || tradeAmountForWant.scale() > haveAssetScale) {
+                Long error = null;
+                error++;
+            }
+            if (tradeAmountForHave.signum() <= 0
+                    || tradeAmountForWant.signum() < 0) {
+                Long error = null;
+                error++;
+            }
+
+            trade = new Trade(id, order.getId(), haveAssetKey, wantAssetKey,
+                    tradeAmountForHave, tradeAmountForWant,
+                    haveAssetScale, wantAssetScale, index);
+
+            if (BlockChain.CHECK_BUGS > 1) {
+                boolean testDeviation = orderPrice.subtract(trade.calcPrice()).abs().divide(orderPrice, Order.MAX_PRICE_ACCURACY, BigDecimal.ROUND_HALF_UP)
+                        .compareTo(BlockChain.MAX_TRADE_DEVIATION_HI) > 0;
+                if (testDeviation) {
+                    logger.error("TRADE Deviation so big: " + orderPrice.subtract(trade.calcPrice()).abs()
+                            .divide(orderPrice, Order.MAX_PRICE_ACCURACY, BigDecimal.ROUND_HALF_UP).toPlainString());
                     Long error = null;
                     error++;
                 }
-                if (tradeAmountForHave.signum() <= 0
-                        || tradeAmountForWant.signum() < 0) {
-                    Long error = null;
-                    error++;
-                }
+            }
 
-                trade = new Trade(id, order.getId(), haveAssetKey, wantAssetKey,
-                        tradeAmountForHave, tradeAmountForWant,
-                        haveAssetScale, wantAssetScale, index);
+            //ADD TRADE TO DATABASE
+            tradesMap.put(trade);
 
-                //ADD TRADE TO DATABASE
-                tradesMap.put(trade);
+            /// так как у нас Индексы высчитываются по плавающей цене для остатков и она сейчас изменится
+            /// то сперва удалим Ордер - до изменения Остатков и цены по Остаткам
+            /// тогда можно ключи делать по цене на Остатки
+            //REMOVE FROM ORDERS
+            ordersMap.delete(order);
 
-                /// так как у нас Индексы высчитываются по плавающей цене для остатков и она сейчас изменится
-                /// то сперва удалим Ордер - до изменения Остатков и цены по Остаткам
-                /// тогда можно ключи делать по цене на Остатки
-                //REMOVE FROM ORDERS
-                ordersMap.delete(order);
-
-                //UPDATE FULFILLED HAVE
-                order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // amountHave));
-                // accounting on PLEDGE position
-                order.getCreator().changeBalance(dcSet, true,
-                        true, wantAssetKey, tradeAmountForHave, false, false,
-                        true
-                );
+            //UPDATE FULFILLED HAVE
+            order.fulfill(tradeAmountForHave); // amountHave));
+            // accounting on PLEDGE position
+            order.getCreator().changeBalance(dcSet, true,
+                    true, wantAssetKey, tradeAmountForHave, false, false,
+                    true
+            );
 
 
-                orderThis.setFulfilledHave(orderThis.getFulfilledHave().add(tradeAmountForWant)); //amountWant));
+            orderThis.fulfill(tradeAmountForWant); //amountWant));
 
-                if (order.isFulfilled()) {
+            if (order.isFulfilled()) {
+                //ADD TO COMPLETED ORDERS
+                completedMap.put(order);
+            } else {
+                //UPDATE ORDER
+                if (willOrderUnResolved) {
+                    // if left not enough for 1 buy by price this order
+                    order.dcSet = dcSet;
+                    order.processOnUnresolved(block, transaction, true);
+
                     //ADD TO COMPLETED ORDERS
                     completedMap.put(order);
                 } else {
-                    //UPDATE ORDER
-                    if (willUnResolvedFor) {
-                        // if left not enough for 1 buy by price this order
-                        order.dcSet = dcSet;
-                        order.processOnUnresolved(block, transaction, true);
-
-                        //ADD TO COMPLETED ORDERS
-                        completedMap.put(order);
-                    } else {
-                        // тут цена по остаткам поменяется
-                        ordersMap.put(order);
-                    }
+                    // тут цена по остаткам поменяется
+                    ordersMap.put(order);
                 }
+            }
 
-                //TRANSFER FUNDS
-                if (height > BlockChain.VERS_5_3) {
-                    AssetCls.processTrade(dcSet, block, order.getCreator(),
-                            false, assetWant, assetHave,
-                            false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
+            //TRANSFER FUNDS
+            AssetCls.processTrade(dcSet, block, order.getCreator(),
+                    false, assetWant, assetHave,
+                    false, tradeAmountForWant, transaction.getTimestamp(), order.getId());
 
-                } else {
-                    order.getCreator().changeBalance(dcSet, false, false, haveAssetKey,
-                            tradeAmountForWant, false, false, false);
-                    transaction.addCalculated(block, order.getCreator(), order.getWantAssetKey(), tradeAmountForWant,
-                            "Trade Order @" + Transaction.viewDBRef(order.getId()));
-                }
 
-                // Учтем что у стороны ордера обновилась форжинговая информация
-                if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
-                    block.addForgingInfoUpdate(order.getCreator());
-                }
+            // Учтем что у стороны ордера обновилась форжинговая информация
+            if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
+                block.addForgingInfoUpdate(order.getCreator());
+            }
 
-                // update new values
-                thisAmountHaveLeft = orderThis.getAmountHaveLeft();
-                processedAmountFulfilledWant = processedAmountFulfilledWant.add(tradeAmountForHave);
+            // update new values
+            thisAmountHaveLeft = orderThis.getAmountHaveLeft();
+            processedAmountFulfilledWant = processedAmountFulfilledWant.add(tradeAmountForHave);
+
+            if (debug) {
+                debug = true;
+            }
+
+            if (completedThisOrder)
+                break;
+
+            // возможно схлопнулся?
+            if (orderThis.isFulfilled()) {
+                completedThisOrder = true;
+                break;
+            }
+
+            // if can't trade by more good price than self - by orderOrice - then  auto cancel!
+            //////// если наш Заказ "ПО РЫНКУ"?
+            if (orderThis.isInitiatorUnResolved()) {
 
                 if (debug) {
-                    debug = true;
+                    debug = orderThis.isInitiatorUnResolved();
                 }
 
-                if (completedOrder)
-                    break;
+                // cancel order if it not fulfiled isDivisible
 
-                // возможно схлопнулся?
-                if (orderThis.isFulfilled()) {
-                    completedOrder = true;
-                    break;
-                }
-
-                // if can't trade by more good price than self - by orderOrice - then  auto cancel!
-                if (orderThis.isInitiatorUnResolved()) {
-
-                    if (debug) {
-                        debug = orderThis.isInitiatorUnResolved();
-                    }
-
-                    // cancel order if it not fulfiled isDivisible
-
-                    // or HAVE not enough to one WANT  = price
-                    ///CancelOrderTransaction.process_it(dcSet, this);
-                    //and stop resolve
-                    completedOrder = true;
-                    // REVERT not completed AMOUNT
-                    orderThis.processOnUnresolved(block, transaction, false);
-                    break;
-                }
-
+                // or HAVE not enough to one WANT  = price
+                ///CancelOrderTransaction.process_it(dcSet, this);
+                //and stop resolve
+                completedThisOrder = true;
+                // REVERT not completed AMOUNT
+                orderThis.processOnUnresolved(block, transaction, false);
+                break;
             }
+
         }
 
         if (debug) {
             debug = true;
         }
 
-        if (!completedOrder) {
-            ordersMap.put(orderThis);
-        } else {
+        if (completedThisOrder) {
             completedMap.put(orderThis);
+        } else {
+            ordersMap.put(orderThis);
         }
 
         //TRANSFER FUNDS
         if (processedAmountFulfilledWant.signum() > 0) {
-            if (height > BlockChain.VERS_5_3) {
-                AssetCls.processTrade(dcSet, block, creator,
-                        true, assetHave, assetWant,
-                        false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
-            } else {
-                creator.changeBalance(dcSet, false, false, wantAssetKey,
-                        processedAmountFulfilledWant, false, false, false);
-                transaction.addCalculated(block, creator, wantAssetKey, processedAmountFulfilledWant,
-                        "Resolve Order @" + Transaction.viewDBRef(id));
-            }
+            AssetCls.processTrade(dcSet, block, creator,
+                    true, assetHave, assetWant,
+                    false, processedAmountFulfilledWant, transaction.getTimestamp(), id);
         }
 
         // с ордера сколько было продано моего актива? на это число уменьшаем залог
@@ -500,20 +435,39 @@ public class OrderProcess {
 
     }
 
+    /**
+     * @param dcSet
+     * @param id
+     * @param block
+     * @param blockTime
+     * @return Заказ перед откатом - чтоббы знать сколько у нго было исполнения
+     */
     public static Order orphan(DCSet dcSet, Long id, Block block, long blockTime) {
 
         CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
         OrderMap ordersMap = dcSet.getOrderMap();
         TradeMap tradesMap = dcSet.getTradeMap();
 
-
         //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled
         // - на всякий случай удалим его в любом случае
         //// тут нужно получить остатки все из текущего состояния иначе индексы по измененной цене с остатков не удалятся
         /// поэтому смотрим что есть в таблице и если есть то его грузим с ценой по остаткам той что в базе
-        Order orderThis = completedMap.remove(id);
-        if (orderThis == null) {
+        // Этот ордер передадим на верх БЕЗ ИЗМЕНЕНИЯ ТУТ - для восстановления остатков
+        Order orderThis;
+        // сначала с малой базе быстрый поиск
+        if (ordersMap.contains(id)) {
             orderThis = ordersMap.remove(id);
+        } else {
+            orderThis = completedMap.remove(id);
+            if (orderThis.isCanceled()
+                    // возможно СТАТУС станет в будущем как Закрыт а не Отменен, тогда эта проверка сработает:
+                    || orderThis.getAmountHaveLeft().signum() > 0) {
+                // это значит что ордер был автоматически закрыт by Unresolved / outPrice
+                // назад вернем этот остаток
+                orderThis.getCreator().changeBalance(dcSet, true, false, orderThis.getHaveAssetKey(),
+                        orderThis.getAmountHaveLeft(), false, false,
+                        true, Account.BALANCE_POS_PLEDGE);
+            }
         }
 
         long haveAssetKey = orderThis.getHaveAssetKey();
@@ -534,56 +488,59 @@ public class OrderProcess {
 
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
 
-        BigDecimal thisAmountHaveLeft = orderThis.getAmountHaveLeft();
-        BigDecimal thisAmountHaveLeftEnd = thisAmountHaveLeft; //this.getAmountHaveLeft();
-
         AssetCls assetHave = dcSet.getItemAssetMap().get(haveAssetKey);
         AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
 
         //ORPHAN TRADES
-        Trade trade;
         try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(id)) {
             while (iterator.hasNext()) {
 
-                trade = tradesMap.get(iterator.next());
+                final Trade trade = tradesMap.get(iterator.next());
                 if (!trade.isTrade()) {
                     continue;
                 }
-                Order target = trade.getTargetOrder(dcSet);
+                Order target;
+                // сначала с малой базе быстрый поиск
+                if (ordersMap.contains(trade.getTarget())) {
+                    //// Пока не изменились Остатки и цена по Остатки не съехала, удалим из таблицы ордеров
+                    /// иначе вторичный ключ останется так как он не будет найден из-за измененной "цены по остаткам"
+                    target = ordersMap.remove(trade.getTarget());
+                } else {
+                    //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
+                    // - на всякий случай удалим его в любом случае
+                    target = completedMap.remove(trade.getTarget());
+                    if (target.isCanceled()
+                            // возможно СТАТУС станет в будущем как Закрыт а не Отменен, тогда эта проверка сработает:
+                            || target.getAmountHaveLeft().signum() > 0) {
+                        // это значит что ордер быо автоматически закрыт by Unresolved / outPrice
+                        // назад вернем
+                        target.getCreator().changeBalance(dcSet, true, false, wantAssetKey,
+                                target.getAmountHaveLeft(), false, false,
+                                true, Account.BALANCE_POS_PLEDGE);
+                    }
+                }
 
                 //REVERSE FUNDS
                 BigDecimal tradeAmountHave = trade.getAmountHave();
                 BigDecimal tradeAmountWant = trade.getAmountWant();
 
-                //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
-                // - на всякий случай удалим его в любом случае
-                completedMap.delete(target);
-
-                //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
-                /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
-                ordersMap.delete(target);
-
                 //REVERSE FULFILLED
-                target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
+                target.fulfill(tradeAmountHave.negate());
                 // accounting on PLEDGE position
                 target.getCreator().changeBalance(dcSet, false,
                         true, wantAssetKey, tradeAmountHave, false, false,
                         true
                 );
 
+                // REVERSE THIS ORDER
                 thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
-                if (height > BlockChain.VERS_5_3) {
-                    AssetCls.processTrade(dcSet, block, target.getCreator(),
-                            false, assetWant, assetHave,
-                            true, tradeAmountWant,
-                            blockTime,
-                            0L);
-                } else {
+                AssetCls.processTrade(dcSet, block, target.getCreator(),
+                        false, assetWant, assetHave,
+                        true, tradeAmountWant,
+                        blockTime,
+                        0L);
 
-                    target.getCreator().changeBalance(dcSet, true, false, haveAssetKey,
-                            tradeAmountWant, false, false, false);
-                }
                 // Учтем что у стороны ордера обновилась форжинговая информация
                 if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
                     block.addForgingInfoUpdate(target.getCreator());
@@ -602,28 +559,20 @@ public class OrderProcess {
                     }
                 }
 
-
             }
         } catch (IOException e) {
         }
 
-        // с ордера сколько было продано моего актива? на это число уменьшаем залог
-        thisAmountHaveLeftEnd = orderThis.getAmountHaveLeft().subtract(thisAmountHaveLeftEnd);
-        if (thisAmountHaveLeftEnd.signum() > 0) {
+        if (orderThis.getFulfilledHave().signum() > 0) {
             // change PLEDGE
             creator.changeBalance(dcSet, false, true, haveAssetKey,
-                    thisAmountHaveLeftEnd, false, false, true);
+                    orderThis.getFulfilledHave(), false, false, true);
         }
 
         //REVERT WANT
-        if (height > BlockChain.VERS_5_3) {
-            AssetCls.processTrade(dcSet, block, creator,
-                    true, assetHave, assetWant,
-                    true, thisAmountFulfilledWant, blockTime, 0L);
-        } else {
-            creator.changeBalance(dcSet, true, false, wantAssetKey,
-                    thisAmountFulfilledWant, false, false, false);
-        }
+        AssetCls.processTrade(dcSet, block, creator,
+                true, assetHave, assetWant,
+                true, thisAmountFulfilledWant, blockTime, 0L);
 
         return orderThis;
     }

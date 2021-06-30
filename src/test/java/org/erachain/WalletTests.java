@@ -39,7 +39,7 @@ public class WalletTests {
         secureDatabase = new SecureWalletDatabase(password);
 
         wallet = new Wallet(DCSet.getInstance(), false, false);
-        create = wallet.create(database, secureDatabase, Crypto.getInstance()
+        create = wallet.create(secureDatabase, Crypto.getInstance()
                 .digest(password.getBytes()), 10, false, false);
     }
 

@@ -6,6 +6,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
+import org.erachain.datachain.IndexIterator;
 import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
@@ -15,6 +16,8 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+
+import java.util.NavigableSet;
 
 /**
  * Хранит сделки на бирже
@@ -26,8 +29,7 @@ import org.mapdb.Fun.Tuple3;
 public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
     private BTreeMap pairKeyMap;
-    private BTreeMap wantKeyMap;
-    private BTreeMap haveKeyMap;
+    private NavigableSet assetKeySet;
     private BTreeMap targetsKeyMap;
 
     public TradeSuitMapDB(DBASet databaseSet, DB database) {
@@ -83,46 +85,18 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         });
 
         //
-        this.wantKeyMap = database.createTreeMap("trades_key_want")
-                .comparator(Fun.TUPLE3_COMPARATOR)
+        this.assetKeySet = database.createTreeSet("trades_key_asset")
+                .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
         //BIND
-        Bind.secondaryKey(map, this.wantKeyMap, new Fun.Function2<Tuple3<String, Long, Integer>, Tuple2<Long, Long>, Trade>() {
+        Bind.secondaryKeys(map, this.assetKeySet, new Fun.Function2<Long[], Tuple2<Long, Long>, Trade>() {
             @Override
-            public Tuple3<String, Long, Integer> run(Tuple2<Long, Long> key, Trade value) {
-                long want = value.getWantKey();
-
-                String wantKey;
-                wantKey = String.valueOf(want);
-
-                // обратная сортировка поэтому все вычитаем
-                return new Tuple3<String, Long, Integer>(wantKey, Long.MAX_VALUE - value.getInitiator(),
-                        Integer.MAX_VALUE - value.getSequence());
+            public Long[] run(Tuple2<Long, Long> key, Trade value) {
+                return new Long[]{value.getHaveKey(), value.getWantKey()};
             }
         });
 
-        //
-        this.haveKeyMap = database.createTreeMap("trades_key_have")
-                .comparator(Fun.TUPLE3_COMPARATOR)
-                .makeOrGet();
-
-        //BIND
-        Bind.secondaryKey(map, this.haveKeyMap, new Fun.Function2<Tuple3<String, Long, Integer>, Tuple2<Long, Long>, Trade>() {
-            @Override
-            public Tuple3<String, Long, Integer> run(Tuple2<Long, Long> key, Trade value) {
-                long have = value.getHaveKey(); //order.getHaveAssetKey();
-
-                String haveKey;
-                haveKey = String.valueOf(have);
-
-                // обратная сортировка поэтому все вычитаем
-                return new Tuple3<String, Long, Integer>(haveKey, Long.MAX_VALUE - value.getInitiator(),
-                        Integer.MAX_VALUE - value.getSequence());
-            }
-        });
-
-        // TODO: тут получается вообще лишний индекс - причем он 2 раза делается на одну запись - обе стороны
         //REVERSE KEY
         this.targetsKeyMap = database.createTreeMap("trades_key_reverse")
                 //.comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
@@ -133,18 +107,9 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         Bind.secondaryKey(map, this.targetsKeyMap, new Fun.Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Trade>() {
             @Override
             public Tuple2<Long, Long> run(Tuple2<Long, Long> key, Trade value) {
-
                 return new Tuple2<Long, Long>(key.b, key.a);
             }
         });
-        if (false) {
-            Bind.secondaryKey(map, this.targetsKeyMap, new Fun.Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Trade>() {
-                @Override
-                public Tuple2<Long, Long> run(Tuple2<Long, Long> key, Trade value) {
-                    return new Tuple2<Long, Long>(key.a, key.b);
-                }
-            });
-        }
 
     }
 
@@ -194,29 +159,21 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getHaveIterator(long have) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByAssetKey(long assetKey, boolean descending) {
 
-        if (this.haveKeyMap == null)
+        if (this.assetKeySet == null)
             return null;
 
-        String haveKey = String.valueOf(have);
-        return new IteratorCloseableImpl(((BTreeMap<Tuple3, Tuple2<Long, Long>>)
-                this.haveKeyMap).subMap(
-                    Fun.t3(haveKey, null, null),
-                    Fun.t3(haveKey, Fun.HI(), Fun.HI())).values().iterator());
-    }
+        if (descending)
+            return IteratorCloseableImpl.make(new IndexIterator(
+                    this.assetKeySet.descendingSet().subSet(
+                            Fun.t2(assetKey, Fun.HI),
+                            Fun.t2(assetKey, null)).iterator()));
 
-    @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getWantIterator(long want) {
-
-        if (this.wantKeyMap == null)
-            return null;
-
-        String wantKey = String.valueOf(want);
-
-        return new IteratorCloseableImpl(((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.wantKeyMap).subMap(
-                Fun.t3(wantKey, null, null),
-                Fun.t3(wantKey, Fun.HI(), Fun.HI())).values().iterator());
+        return IteratorCloseableImpl.make(new IndexIterator(
+                this.assetKeySet.subSet(
+                        Fun.t2(assetKey, null),
+                        Fun.t2(assetKey, Fun.HI)).iterator()));
     }
 
     @Override
@@ -294,8 +251,6 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
      */
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getPairOrderIDIterator(long startOrderID, long stopOrderID) {
-        if (this.pairKeyMap == null)
-            return null;
 
         return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) this.map).subMap(
                 // обратная сортировка поэтому все вычитаем и -1 для всех getSequence

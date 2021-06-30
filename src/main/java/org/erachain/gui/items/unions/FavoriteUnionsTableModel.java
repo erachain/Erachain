@@ -15,7 +15,7 @@ public class FavoriteUnionsTableModel extends FavoriteItemModelTable {
 
     public FavoriteUnionsTableModel() {
         super(DCSet.getInstance().getItemUnionMap(),
-                Controller.getInstance().getWallet().database.getUnionFavoritesSet(),
+                Controller.getInstance().getWallet().dwSet.getUnionFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Favorite"},
                 new Boolean[]{false, true, true, false},
                 ObserverMessage.RESET_UNION_FAVORITES_TYPE,

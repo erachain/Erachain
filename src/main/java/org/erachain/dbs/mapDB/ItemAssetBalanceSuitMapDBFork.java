@@ -15,8 +15,6 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
 
 // TODO SOFT HARD TRUE
 
@@ -111,13 +109,6 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
 
     }
 
-    // тут родительские ключи еще нужны поидее - но это не используется в форке никак
-    @Override
-    public Collection<byte[]> assetKeys(long assetKey) {
-        //FILTER ALL KEYS
-        return null;
-    }
-
     /**
      * Соберем Ключи с Родителем
      *
@@ -142,12 +133,6 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
     @Override
     // NOT used in FORK
     public IteratorCloseable<byte[]> accountIterator(Account account) {
-        return null;
-    }
-
-    @Override
-    // NOT used in FORK
-    public List<byte[]> accountKeys(Account account) {
         return null;
     }
 

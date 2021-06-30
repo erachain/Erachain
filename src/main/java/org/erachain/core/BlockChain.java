@@ -228,19 +228,19 @@ public class BlockChain {
      */
     public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? (DEMO_MODE ? 0 : 0) : 1707784; // see in sidePROTOCOL.json as 'allValidBefore'
     public static final int WIN_VAL_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2023904;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 2103440;
-    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 1932512; //260120;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 2152137;
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2135000; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
      * !!! ВНИМАНИЕ !!! нельзя изменять походу собранной цепочки - так как съедут цены и индекс не удалится у некоторых ордеров - цена о другая.
      * см issue https://lab.erachain.org/erachain/Erachain/-/issues/1322
      */
-    public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? 0 : 623904;
+    public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? 0 : 0;
     /**
      * {@link LEFT_PRICE_HEIGHT} as SeqNo
      */
-    
-    public static final long LEFT_PRICE_HEIGHT_SEQ = Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
+
+    //public static final long LEFT_PRICE_HEIGHT_SEQ = Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
 
     public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 44666;
 
@@ -334,29 +334,16 @@ public class BlockChain {
             };
 
     // DEX precision
-    ///public static final int TRADE_PRECISION = 4;
-    /**
-     * Если после исполнения торговой сделки остается остаток у ордера-инициатора и
-     * цена для остатка отклонится больше чем на эту величину то ему возвращаем остаток
-     * see org.erachain.core.item.assets.OrderTestsMy#testOrderProcessingNonDivisible() - 0.0000432
-     * Тут точность можно сделать меньше так он либо полностью исполнится либо встанет уже с новой ценой по остатку в стакане
-     */
-    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT = new BigDecimal("0.0005");
-    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT_NEG = INITIATOR_PRICE_DIFF_LIMIT.multiply(new BigDecimal(5));
     /**
      * Если после исполнения торговой сделки остается остаток у ордера-цели и
      * цена для остатка отклонится больше чем на эту величину то либо скидываем остаток в эту сделку либо ему возвращаем остаток
-     * Тут нужно точность выше чем у Инициатора - так как он может перекрыть цену других встречных ордеров в стакане
-     * И по хорошему его нужно пересчитать как Активный если цена полезла не в его сторону
+     * Инициатор - "ПО РЫНКУ" - у него точность хуже делаем
      */
-    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.0005");
-    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT_NEG = TARGET_PRICE_DIFF_LIMIT.multiply(new BigDecimal(5));
-    /**
-     * Если сыграло INITIATOR_PRICE_DIFF_LIMIT и цена сделки после скидывания в нее остатка ордера-цели не выйдет
-     * за это ограничение, то скидываем в сделку. Иначе отдаем обратно как OUTPRICE
-     */
-    ///final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
-    final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("0.002");
+    final public static BigDecimal MAX_TRADE_DEVIATION_HI = new BigDecimal("0.005");
+    final public static BigDecimal MAX_ORDER_DEVIATION = new BigDecimal("0.002");
+    final public static BigDecimal MAX_ORDER_DEVIATION_LOW = new BigDecimal("0.0005");
+    final public static BigDecimal COMPARE_TRADE_DEVIATION = new BigDecimal("1.000001");
+
 
     public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : !MAIN_MODE ? 0 : VERS_4_11;
 

@@ -116,6 +116,10 @@ public class OnDealClick {
             case Transaction.INVALID_NAME_LENGTH_MAX:
                 mess = "Invalid name MAX length";
                 break;
+            case Transaction.INVALID_TAGS_LENGTH_MAX:
+                mess = "Invalid tags MAX length";
+                break;
+
             case Transaction.INVALID_VALUE_LENGTH_MAX:
                 mess = "Invalid value length";
                 break;
@@ -201,6 +205,10 @@ public class OnDealClick {
             case Transaction.INVALID_ICON_LENGTH_MAX:
                 mess = "Invalid icon MAX length";
                 break;
+            case Transaction.INVALID_ICON_TYPE:
+                mess = "Invalid icon type";
+                break;
+
             case Transaction.INVALID_IMAGE_LENGTH_MIN:
                 mess = "Invalid image MIN length";
                 break;
