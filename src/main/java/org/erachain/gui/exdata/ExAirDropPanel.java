@@ -218,6 +218,7 @@ public class ExAirDropPanel extends IconPanel {
 
         jPanelMain = new JPanel();
         jComboBoxAccrualAsset = new JComboBox<>();
+        jComboBoxAccrualAction = new JComboBox<>();
         jLabelBalancePosition = new JLabel();
         jComboBoxFilterBalancePosition = new JComboBox<>();
         jLabel_FeesResult = new JLabel();

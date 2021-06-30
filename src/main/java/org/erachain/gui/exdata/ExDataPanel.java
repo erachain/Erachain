@@ -302,6 +302,7 @@ public class ExDataPanel extends JPanel {
 
         jTabbedPane_Type.addTab(Lang.T("Type"), docTypeAppendixPanel);
 
+        //////////////// ACCRUALS
         JScrollPane multiPayScrollBar = new JScrollPane();
         multiPayScrollBar.setViewportView(exAccrualsPanel);
         jTabbedPane_Type.addTab(Lang.T("Accruals"), multiPayScrollBar);
