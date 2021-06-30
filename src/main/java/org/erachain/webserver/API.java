@@ -52,7 +52,7 @@ import java.util.*;
 @Path("api")
 public class API {
 
-    private static final Logger LOGGER = LoggerFactory            .getLogger(API.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(API.class);
     @Context
     private UriInfo uriInfo;
     private HttpServletRequest request;
@@ -536,22 +536,22 @@ public class API {
     }
 
     @GET
-    @Path("/blocks")
+    @Path("blocks")
     public Response getBlocksFromHeightV1(@Context UriInfo info,
                                           @QueryParam("from") Integer fromHeight,
                                           @QueryParam("offset") int offset,
-                                          @QueryParam("limit") int limit) {
-        boolean onlyhead = checkBoolean(info, "onlyhead");
+                                          @DefaultValue("10") @QueryParam("limit") int limit) {
+        boolean onlyHead = checkBoolean(info, "onlyhead");
         boolean desc = checkBoolean(info, "desc");
 
-        int limitMax = onlyhead ? 200 : 50;
+        int limitMax = onlyHead ? 200 : 50;
         if (limit > limitMax)
             limit = limitMax;
         if (offset > limitMax)
             offset = limitMax;
 
         JSONArray array = new JSONArray();
-        if (onlyhead) {
+        if (onlyHead) {
             BlocksHeadsMap blockHeadsMap = dcSet.getBlocksHeadsMap();
             try {
                 try (IteratorCloseable<Integer> iterator = blockHeadsMap.getIterator(fromHeight, desc)) {

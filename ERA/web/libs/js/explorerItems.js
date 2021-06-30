@@ -1,9 +1,22 @@
-function itemHead(item, forPrint) {
+function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
 
-    var output = '';
+    var output = '<td>';
     var type = item.item_type;
 
     var source;
+
+    // FACE - for AUDIO
+    if (imageFaceURL) {
+        if (imageFaceType == 'video') {
+            output += '<video autoplay muted playsinline loop width="350"><source src="' + imageFaceURL + '"></video>';
+
+        } else {
+            output += '<img width="350" src="' + imageFaceURL + '" />';
+        }
+
+
+    }
+
     if (item.image) {
         source = 'data:image/gif;base64,' + item.image;
     } else if (item.imageURL) {
@@ -14,14 +27,17 @@ function itemHead(item, forPrint) {
 
     if (source) {
         if (item.imageTypeName == 'video') {
-            output += '<video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls >';
-            output += '<td><video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
+            output += '<video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls ></video>';
+            output += '<video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
 
         } else if (item.imageTypeName == 'audio') {
-            output += '<td><video controls="" autoplay="" name="media"><source src="' + source + '" type="audio/mp3"></video>';
+            //output += '<video controls="" autoplay="" name="media"><source src="' + source + '" type="audio/mp3">';
+            //output += '<source src="' + item.maker_person_image_url + '" type="' + item.maker_person_image_media_type + '"></video>';
+            output += '<audio controls autoplay loop><source src="' + source + '" type="audio/mp3"></audio>';
+
         } else {
             output += '<img id="image-holder" onclick="style.display=\'none\'">';
-            output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
+            output += '<a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
         }
 
         output += '</td><td style ="width: 70%; padding-left:20px"><br>';

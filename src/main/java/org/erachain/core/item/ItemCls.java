@@ -499,6 +499,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return imageType;
     }
 
+    public String getImageTypeName() {
+        return viewMediaType(imageType);
+    }
+
     public boolean hasImageURL() {
         return imageAsURL;
     }
@@ -1151,6 +1155,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         if (person != null) {
             itemJson.put("maker_person", person.b.getName());
             itemJson.put("maker_person_key", person.b.getKey());
+            itemJson.put("maker_person_image_url", person.b.getImageURL());
+            itemJson.put("maker_person_image_type", person.b.getImageTypeName());
+            itemJson.put("maker_person_image_media_type", person.b.getImageMediaType().toString());
+
         }
 
         itemJson.put("iconType", getIconType());

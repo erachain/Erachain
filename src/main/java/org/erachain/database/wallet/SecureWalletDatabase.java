@@ -69,7 +69,7 @@ public class SecureWalletDatabase {
         // ADD TO DATABASE
         getAccountSeedMap().add(privateKey);
 
-        int nonce = getAndIncrementNonce() + 1;
+        int nonce = getAndIncrementNonce();
 
         commit();
 
