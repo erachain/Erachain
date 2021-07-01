@@ -242,8 +242,8 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         Font headFont = new Font(ff.getFontName(), Font.BOLD, ff.getSize() + 1);
 
         GridBagLayout layout = new GridBagLayout();
-        layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
-        layout.rowHeights = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        //layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        //layout.rowHeights = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
         setLayout(layout);
 
         GridBagConstraints gridBagConstraints;
@@ -286,7 +286,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         //JPanel panel1 = new JPanel(new BorderLayout());
         //panel1.add(jLabel_Help, BorderLayout.CENTER);
         add(jLabel_Help, fieldGBC);
-        jLabel_Help.setPreferredSize(new Dimension(0, 200));
+        jLabel_Help.setPreferredSize(new Dimension(400, 200));
 
         jPanelMain.setLayout(layout);
         jPanelMain.setVisible(false);
