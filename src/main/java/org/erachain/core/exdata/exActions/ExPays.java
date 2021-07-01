@@ -591,12 +591,12 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
      * @param selfPay
      * @return
      */
-    public static Fun.Tuple2<ExPays, String> make(Long assetKey, int balancePos, boolean backward,
-                                                  int payMethod, String payMethodValue, String amountMin, String amountMax,
-                                                  Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
-                                                  String filterBalanceMoreThen, String filterBalanceLessThen,
-                                                  int filterTXType, String filterTimeStartStr, String filterTimeXEndStr,
-                                                  int filterByPerson, boolean selfPay) {
+    public static Fun.Tuple2<ExAction, String> make(Long assetKey, int balancePos, boolean backward,
+                                                    int payMethod, String payMethodValue, String amountMin, String amountMax,
+                                                    Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
+                                                    String filterBalanceMoreThen, String filterBalanceLessThen,
+                                                    int filterTXType, String filterTimeStartStr, String filterTimeXEndStr,
+                                                    int filterByPerson, boolean selfPay) {
 
         int steep = 0;
         BigDecimal amountMinBG;

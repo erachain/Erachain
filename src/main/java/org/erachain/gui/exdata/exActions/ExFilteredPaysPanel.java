@@ -5,6 +5,7 @@ import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.exdata.exActions.ExAction;
 import org.erachain.core.exdata.exActions.ExPays;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -36,9 +37,9 @@ import java.util.List;
 import java.util.TimeZone;
 
 
-public class ExFilteredPaysPanel extends IconPanel {
+public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
-    public static String NAME = "ExAccrualsPanel";
+    public static String NAME = "ExActionPanel";
     public static String TITLE = "Accruals";
 
     private ExDataPanel parent;
@@ -120,7 +121,7 @@ public class ExFilteredPaysPanel extends IconPanel {
 
                         jScrollPaneAccruals.setVisible(false);
 
-                        Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
+                        Fun.Tuple2<ExPays, String> exPaysRes = getresult();
                         if (exPaysRes.b != null) {
                             jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
                                     Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
@@ -159,7 +160,7 @@ public class ExFilteredPaysPanel extends IconPanel {
 
                         jScrollPaneAccruals.setVisible(false);
 
-                        Fun.Tuple2<ExPays, String> exPaysRes = getAccruals();
+                        Fun.Tuple2<ExPays, String> exPaysRes = getresult();
                         if (exPaysRes.b != null) {
                             jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
                                     Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
@@ -405,7 +406,7 @@ public class ExFilteredPaysPanel extends IconPanel {
         jPanelMain.add(jLabelAssetToPay, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jComboBoxAccrualAsset.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxAccrualAsset"));
+        jComboBoxAccrualAsset.setToolTipText(Lang.T("ExActionPanel.jComboBoxAccrualAsset"));
         jPanelMain.add(jComboBoxAccrualAsset, fieldGBC);
 
         jLabelAction.setText(Lang.T("Action"));
@@ -413,7 +414,7 @@ public class ExFilteredPaysPanel extends IconPanel {
         jPanelMain.add(jLabelAction, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jComboBoxAccrualAction.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxAccrualAction"));
+        jComboBoxAccrualAction.setToolTipText(Lang.T("ExActionPanel.jComboBoxAccrualAction"));
         jPanelMain.add(jComboBoxAccrualAction, fieldGBC);
 
         ////////// PAYMENT METHOD
@@ -434,13 +435,13 @@ public class ExFilteredPaysPanel extends IconPanel {
         }));
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxMethodPaymentType, fieldGBC);
-        jComboBoxMethodPaymentType.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxMethodPaymentType"));
+        jComboBoxMethodPaymentType.setToolTipText(Lang.T("ExActionPanel.jComboBoxMethodPaymentType"));
 
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelAmount, labelGBC);
         fieldGBC.gridy = gridy;
         jPanelMain.add(jTextFieldAmount, fieldGBC);
-        jTextFieldAmount.setToolTipText(Lang.T("ExAccrualsPanel.jTextFieldAmount"));
+        jTextFieldAmount.setToolTipText(Lang.T("ExActionPanel.jTextFieldAmount"));
 
 
         fieldGBC.gridy = ++gridy;
@@ -498,7 +499,7 @@ public class ExFilteredPaysPanel extends IconPanel {
         jPanelMain.add(jLabel2, labelGBC);
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxFilterAsset, fieldGBC);
-        jComboBoxFilterAsset.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxFilterAsset"));
+        jComboBoxFilterAsset.setToolTipText(Lang.T("ExActionPanel.jComboBoxFilterAsset"));
 
         jPanelFilterBalance.setLayout(jPanelLayout);
 
@@ -584,7 +585,7 @@ public class ExFilteredPaysPanel extends IconPanel {
 
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxTXTypeFilter, fieldGBC);
-        jComboBoxTXTypeFilter.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxTXTypeFilter"));
+        jComboBoxTXTypeFilter.setToolTipText(Lang.T("ExActionPanel.jComboBoxTXTypeFilter"));
 
         jPanelStartEndActions.setLayout(jPanelLayout);
 
@@ -641,7 +642,7 @@ public class ExFilteredPaysPanel extends IconPanel {
 
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxPersonFilter, fieldGBC);
-        jComboBoxPersonFilter.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxPersonFilter"));
+        jComboBoxPersonFilter.setToolTipText(Lang.T("ExActionPanel.jComboBoxPersonFilter"));
 
         separateBGC.gridy = ++gridy;
         jPanelMain.add(jSeparator5, separateBGC);
@@ -701,7 +702,7 @@ public class ExFilteredPaysPanel extends IconPanel {
 
     }
 
-    public Fun.Tuple2<ExPays, String> getAccruals() {
+    public Fun.Tuple2<ExAction, String> getResult() {
 
         if (!jPanelMain.isVisible())
             return new Fun.Tuple2<>(null, null);

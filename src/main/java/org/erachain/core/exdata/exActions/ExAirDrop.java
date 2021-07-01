@@ -324,9 +324,9 @@ public class ExAirDrop extends ExAction {
 
     }
 
-    public static Fun.Tuple2<ExAirDrop, String> make(Long assetKey, String amountStr,
-                                                     int balancePos, boolean backward,
-                                                     String[] addressesStr) {
+    public static Fun.Tuple2<ExAction, String> make(Long assetKey, String amountStr,
+                                                    int balancePos, boolean backward,
+                                                    String[] addressesStr) {
 
         int steep = 0;
         BigDecimal amount;

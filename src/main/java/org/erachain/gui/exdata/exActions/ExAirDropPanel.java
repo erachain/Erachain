@@ -3,6 +3,7 @@ package org.erachain.gui.exdata.exActions;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.exdata.exActions.ExAction;
 import org.erachain.core.exdata.exActions.ExAirDrop;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -32,9 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ExAirDropPanel extends IconPanel {
+public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
-    public static String NAME = "ExAccrualsPanel";
+    public static String NAME = "ExActionPanel";
     public static String TITLE = "Accruals";
 
     private ExDataPanel parent;
@@ -308,7 +309,7 @@ public class ExAirDropPanel extends IconPanel {
         jPanelMain.add(jLabelAssetToPay, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jComboBoxAccrualAsset.setToolTipText(Lang.T("ExAccrualsPanel.jComboBoxAccrualAsset"));
+        jComboBoxAccrualAsset.setToolTipText(Lang.T("ExActionPanel.jComboBoxAccrualAsset"));
         jPanelMain.add(jComboBoxAccrualAsset, fieldGBC);
 
 
@@ -316,7 +317,7 @@ public class ExAirDropPanel extends IconPanel {
         jPanelMain.add(jLabelAmount, labelGBC);
         fieldGBC.gridy = gridy;
         jPanelMain.add(jTextFieldAmount, fieldGBC);
-        jTextFieldAmount.setToolTipText(Lang.T("ExAccrualsPanel.jTextFieldAmount"));
+        jTextFieldAmount.setToolTipText(Lang.T("ExActionPanel.jTextFieldAmount"));
 
         /////////////////////// BUTTONS
 
@@ -368,7 +369,7 @@ public class ExAirDropPanel extends IconPanel {
 
     }
 
-    public Fun.Tuple2<ExAirDrop, String> getAccruals() {
+    public Fun.Tuple2<ExAction, String> getResult() {
 
         if (!jPanelMain.isVisible())
             return new Fun.Tuple2<>(null, null);

@@ -10,7 +10,7 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.exdata.authors.AuthorsPanel;
-import org.erachain.gui.exdata.exActions.ExAccrualsPanel;
+import org.erachain.gui.exdata.exActions.ExActionPanel;
 import org.erachain.gui.exdata.exActions.ExAirDropPanel;
 import org.erachain.gui.exdata.sources.SourcesPanel;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
@@ -79,7 +79,7 @@ public class ExDataPanel extends JPanel {
     public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
     public DocTypeAppendixPanel docTypeAppendixPanel;
-    public ExAccrualsPanel exAccrualsPanel;
+    public ExActionPanel exAccrualsPanel;
     public ExAirDropPanel exAirDropPanel;
 
     /**
@@ -289,7 +289,7 @@ public class ExDataPanel extends JPanel {
         jTextField_Title_Message = new JTextField();
         jButton_Input_Hashes_From_File_Other_Hashes = new MButton();
         docTypeAppendixPanel = new DocTypeAppendixPanel(this);
-        exAccrualsPanel = new ExAccrualsPanel(this);
+        exAccrualsPanel = new ExActionPanel(this);
         exAirDropPanel = new ExAirDropPanel(this);
 
         GridBagLayout layout = new GridBagLayout();
@@ -775,7 +775,7 @@ public class ExDataPanel extends JPanel {
             }
         }
 
-        Fun.Tuple2<ExPays, String> exAccrualsResult = exAccrualsPanel.getAccruals();
+        Fun.Tuple2<ExPays, String> exAccrualsResult = exAccrualsPanel.getAction();
         if (exAccrualsResult.b != null) {
             return new Fun.Tuple2(null, exAccrualsResult.b);
         }
