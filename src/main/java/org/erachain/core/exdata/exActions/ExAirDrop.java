@@ -1,4 +1,4 @@
-package org.erachain.core.exdata;
+package org.erachain.core.exdata.exActions;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -33,7 +33,7 @@ import java.util.List;
  * Simple pay - for all same amount
  */
 
-public class ExAirDrop {
+public class ExAirDrop extends ExAction {
 
     public static final byte BASE_LENGTH = 4 + 8 + 8 + 2;
 

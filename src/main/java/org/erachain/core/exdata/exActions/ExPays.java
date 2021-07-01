@@ -1,4 +1,4 @@
-package org.erachain.core.exdata;
+package org.erachain.core.exdata.exActions;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -39,7 +39,7 @@ import java.util.*;
  * mess: message title: Title file_Set: [file Name, ZIP? , file byte[]]
  */
 
-public class ExPays {
+public class ExPays extends ExAction {
 
     public static final byte BASE_LENGTH = 4 + 3;
 

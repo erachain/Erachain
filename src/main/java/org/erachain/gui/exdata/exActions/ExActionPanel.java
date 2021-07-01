@@ -1,15 +1,18 @@
-package org.erachain.gui.exdata;
+package org.erachain.gui.exdata.exActions;
 
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.exdata.ExAirDrop;
+import org.erachain.core.exdata.exActions.ExAirDrop;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.IconPanel;
+import org.erachain.gui.exdata.AccrualsModel;
+import org.erachain.gui.exdata.AirDropsModel;
+import org.erachain.gui.exdata.ExDataPanel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RenderComboBoxAssetActions;
@@ -30,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ExAirDropPanel extends IconPanel {
+public class ExActionPanel extends IconPanel {
 
     public static String NAME = "ExAccrualsPanel";
     public static String TITLE = "Accruals";
@@ -39,7 +42,7 @@ public class ExAirDropPanel extends IconPanel {
     public ComboBoxAssetsModel assetsModel;
     private Boolean lock = new Boolean(false);
 
-    public ExAirDropPanel(ExDataPanel parent) {
+    public ExActionPanel(ExDataPanel parent) {
         super(NAME, TITLE);
         this.parent = parent;
         initComponents();
@@ -206,7 +209,7 @@ public class ExAirDropPanel extends IconPanel {
             return;
 
         int selected = jComboBoxAccrualAction.getSelectedIndex();
-        jComboBoxAccrualAction.setModel(new javax.swing.DefaultComboBoxModel(
+        jComboBoxAccrualAction.setModel(new DefaultComboBoxModel(
                 asset.viewAssetTypeActionsList(creator.equals(asset.getMaker()), false).toArray()));
         if (selected >= 0)
             jComboBoxAccrualAction.setSelectedIndex(selected);
@@ -236,7 +239,7 @@ public class ExAirDropPanel extends IconPanel {
         jTextFieldAmount = new JTextField();
         jButtonCalcCompu = new JButton();
 
-        java.awt.GridBagLayout jPanelLayout = new java.awt.GridBagLayout();
+        GridBagLayout jPanelLayout = new GridBagLayout();
         jPanelLayout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0};
         jPanelLayout.rowHeights = new int[]{0};
 
@@ -386,9 +389,9 @@ public class ExAirDropPanel extends IconPanel {
     public JCheckBox jCheckBoxAccrualsUse;
     private JLabel jLabel_Help = new JLabel();
     public JComboBox<ItemCls> jComboBoxAccrualAsset;
-    private javax.swing.JComboBox<Integer> jComboBoxFilterBalancePosition;
-    private javax.swing.JComboBox<String> jComboBoxFilterSideBalance;
-    private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxAccrualAction;
+    private JComboBox<Integer> jComboBoxFilterBalancePosition;
+    private JComboBox<String> jComboBoxFilterSideBalance;
+    private JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxAccrualAction;
     private JLabel jLabelAmount;
     private JLabel jLabel_FeesResult;
     private JLabel jLabelBalancePosition;

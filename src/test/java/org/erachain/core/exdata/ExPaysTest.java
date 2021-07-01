@@ -1,5 +1,6 @@
 package org.erachain.core.exdata;
 
+import org.erachain.core.exdata.exActions.ExPays;
 import org.junit.Test;
 
 import java.math.BigDecimal;

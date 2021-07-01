@@ -1,9 +1,10 @@
-package org.erachain.gui.exdata;
+package org.erachain.gui.exdata.exActions;
 
 
-import org.erachain.core.exdata.ExPays;
+import org.erachain.core.exdata.exActions.ExPays;
 import org.erachain.core.item.ItemCls;
 import org.erachain.gui.IconPanel;
+import org.erachain.gui.exdata.ExDataPanel;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun;
 

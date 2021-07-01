@@ -10,7 +10,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.ExPays;
+import org.erachain.core.exdata.exActions.ExPays;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.exdata.exLink.ExLinkSource;
@@ -180,7 +180,7 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         if (extendedData.hasExPays()) {
-            ExPays pays = extendedData.getExPays();
+            ExPays pays = extendedData.getExAction();
             if (pays.hasAmount()) {
                 listTags.add(new Object[]{ItemCls.ASSET_TYPE, pays.getAssetKey(), pays.getAsset().getTags()});
             }
@@ -210,7 +210,7 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     public ExPays getExPays() {
-        return extendedData.getExPays();
+        return extendedData.getExAction();
     }
 
     @Override
@@ -901,7 +901,7 @@ public class RSignNote extends Transaction implements Itemable {
         if (getExLink() != null)
             long_fee += 100 * BlockChain.FEE_PER_BYTE;
 
-        ExPays exPays = extendedData.getExPays();
+        ExPays exPays = extendedData.getExAction();
         if (exPays != null) {
             long_fee += exPays.getTotalFeeBytes() * BlockChain.FEE_PER_BYTE;
         }

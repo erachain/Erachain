@@ -3,8 +3,6 @@ package org.erachain.core.exdata.exActions;
 import com.google.common.primitives.Ints;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
-import org.erachain.core.exdata.ExAirDrop;
-import org.erachain.core.exdata.ExPays;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -12,9 +10,7 @@ import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Simple pay - for all same amount
@@ -36,16 +32,13 @@ public abstract class ExAction {
         }
     }
 
-
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> getCheckedAccruals(Transaction statement) {
-    }
-
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> precalcCheckedAccruals(int height, Account creator) {
-    }
+    public abstract byte[] getDBdata();
 
     public abstract byte[] toBytes() throws Exception;
 
     public abstract int length();
+
+    public abstract int parseDBData(byte[] dbData, int position);
 
     public static ExAction parse(byte[] data, int pos) throws Exception {
 

@@ -2,14 +2,16 @@ package org.erachain.gui.exdata;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.exdata.ExAirDrop;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.ExPays;
+import org.erachain.core.exdata.exActions.ExAirDrop;
+import org.erachain.core.exdata.exActions.ExPays;
 import org.erachain.core.exdata.exLink.*;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.exdata.authors.AuthorsPanel;
+import org.erachain.gui.exdata.exActions.ExAccrualsPanel;
+import org.erachain.gui.exdata.exActions.ExAirDropPanel;
 import org.erachain.gui.exdata.sources.SourcesPanel;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
