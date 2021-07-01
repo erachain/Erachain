@@ -337,8 +337,8 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         jTextFieldDateEnd.setFont(UIManager.getFont("TextField.font"));
 
         GridBagLayout layout = new GridBagLayout();
-        layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
-        layout.rowHeights = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        //layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        //layout.rowHeights = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
         setLayout(layout);
 
         GridBagConstraints gridBagConstraints;
@@ -381,7 +381,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         //JPanel panel1 = new JPanel(new BorderLayout());
         //panel1.add(jLabel_Help, BorderLayout.CENTER);
         add(jLabel_Help, fieldGBC);
-        jLabel_Help.setPreferredSize(new Dimension(0, 200));
+        jLabel_Help.setPreferredSize(new Dimension(500, 200));
 
         jPanelMain.setLayout(layout);
         jPanelMain.setVisible(false);
@@ -693,7 +693,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         jPanelMain.add(jPanel3, fieldGBC);
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
