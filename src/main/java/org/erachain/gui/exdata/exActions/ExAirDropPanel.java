@@ -147,7 +147,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
                         ExAirDrop airDrop = (ExAirDrop) exPaysRes.a;
                         airDrop.setDC(DCSet.getInstance());
-                        airDrop.preProcessAndValidate(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
+                        airDrop.preProcessAndPreValidate(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
                         List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = airDrop.getResults();
 
                         String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + airDrop.getAddressesCount()

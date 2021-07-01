@@ -97,18 +97,31 @@ public abstract class ExAction<R> {
     public abstract String getInfoHTML();
 
     /**
-     * make calculations and validate it if need
+     * make calculations of lists and pre-validate it if need
      *
      * @param andValidate
      */
-    public abstract int preProcessAndValidate(int height, Account creator, boolean andValidate);
+    public abstract int preProcessAndPreValidate(int height, Account creator, boolean andValidate);
 
-    public int preProcessAndValidate(Transaction transaction, boolean andValidate) {
-        return preProcessAndValidate(transaction.getBlockHeight(), transaction.getCreator(), andValidate);
+    /**
+     * make calculations of lists and pre-validate it if need
+     *
+     * @param transaction
+     * @param andValidate
+     * @return
+     */
+    public int preProcessAndPreValidate(Transaction transaction, boolean andValidate) {
+        return preProcessAndPreValidate(transaction.getBlockHeight(), transaction.getCreator(), andValidate);
     }
 
     public abstract void updateItemsKeys(List listTags);
 
+    /**
+     * full validate
+     *
+     * @param rNote
+     * @return
+     */
     public abstract int isValid(RSignNote rNote);
 
     public abstract void process(Transaction rNote, Block block);

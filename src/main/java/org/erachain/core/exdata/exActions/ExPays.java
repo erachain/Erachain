@@ -840,7 +840,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     }
 
     @Override
-    public int preProcessAndValidate(int height, Account creator, boolean andValidate) {
+    public int preProcessAndPreValidate(int height, Account creator, boolean andValidate) {
         if (results == null) {
             resultsCount = makeFilterPayList(dcSet, height, asset, creator, andValidate);
             if (payMethod == PAYMENT_METHOD_TOTAL) {
@@ -896,6 +896,16 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         return true;
     }
 
+    /**
+     * Тут именно делает список проходя по Итератору балансы заданного актива. Однако после надо еще запустить calcAccrualsForMethodTotal
+     *
+     * @param dcSet
+     * @param height
+     * @param asset
+     * @param creator
+     * @param andValidate
+     * @return
+     */
     public int makeFilterPayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
 
         results = new ArrayList<>();
@@ -1274,7 +1284,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void process(Transaction rNote, Block block) {
 
         if (results == null) {
-            resultsCount = preProcessAndValidate(rNote, false);
+            resultsCount = preProcessAndPreValidate(rNote, false);
         }
 
         if (resultsCount == 0)
@@ -1296,7 +1306,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void orphan(Transaction rNote) {
 
         if (results == null) {
-            resultsCount = preProcessAndValidate(rNote, false);
+            resultsCount = preProcessAndPreValidate(rNote, false);
         }
 
         if (resultsCount == 0)

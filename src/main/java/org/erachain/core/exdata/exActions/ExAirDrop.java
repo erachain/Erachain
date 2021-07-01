@@ -158,11 +158,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
 
     }
 
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> precalcCheckedAccruals(int height, Account creator) {
-        checkValidList(dcSet, height, asset, creator);
-        return checkedAccruals;
-    }
-
     public byte[] toBytes() throws Exception {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -374,7 +369,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
     }
 
     @Override
-    public int preProcessAndValidate(int height, Account creator, boolean andValidate) {
+    public int preProcessAndPreValidate(int height, Account creator, boolean andValidate) {
         if (results == null) {
             resultsCount = makePayList(dcSet, height, asset, creator, andValidate);
         }
