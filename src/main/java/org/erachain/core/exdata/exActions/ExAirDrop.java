@@ -14,8 +14,6 @@ import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceMap;
-import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -34,7 +32,7 @@ import java.util.List;
  * Simple pay - for all same amount
  */
 
-public class ExAirDrop extends ExAction {
+public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>>> {
 
     public static final byte BASE_LENGTH = 4 + 8 + 8 + 2;
 
@@ -58,6 +56,7 @@ public class ExAirDrop extends ExAction {
     private int height;
     AssetCls asset;
     BigDecimal totalPay;
+    private int resultsCount;
 
     /**
      * recipient + accrual
@@ -123,38 +122,6 @@ public class ExAirDrop extends ExAction {
 
         checkedAccruals = new ArrayList<>();
 
-        int scale = asset.getScale();
-
-        byte[] accountFrom = creator.getShortAddressBytes();
-
-        ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
-        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
-
-        // определим - меняется ли позиция баланса если направление сменим
-        // это нужно чтобы отсекать смену знака у балансов для тек активов у кого меняется позиция от знака
-        // настроим данные платежа по знакам Актива ИКоличества, так как величина коэффициента способа всегда положительная
-        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
-        int balancePosDirect = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), false, asset.isSelfManaged());
-        int balancePosBackward = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), true, asset.isSelfManaged());
-        int filterBySigNum;
-        if (balancePosDirect != balancePosBackward) {
-            if (balancePosDirect == TransactionAmount.ACTION_SPEND) {
-                // используем только отрицательные балансы
-                filterBySigNum = -1;
-            } else {
-                // используем только положительные балансы
-                filterBySigNum = 1;
-            }
-        } else {
-            filterBySigNum = 0;
-        }
-
-        boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
-        // сменим знак балансов для отрицательных
-        if (reversedBalancesInPosition) {
-            filterBySigNum *= -1;
-        }
-
         BigDecimal accrual = amount;
 
         int count = 0;
@@ -171,7 +138,7 @@ public class ExAirDrop extends ExAction {
                     creatorIsPerson, assetKey, balancePos,
                     asset)) {
                 errorValue = recipient.getAddress();
-                return (count = -Transaction.RECEIVER_NOT_PERSONALIZED);
+                return -Transaction.RECEIVER_NOT_PERSONALIZED;
             }
 
             // не проверяем на 0 - так это может быть рассылка писем всем
@@ -189,17 +156,6 @@ public class ExAirDrop extends ExAction {
 
         return count;
 
-    }
-
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> makeCheckedList(Transaction transaction, boolean andValidate) {
-        makePayList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
-        return checkedAccruals;
-    }
-
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> precalcAccrualList(
-            int height, Account creator) {
-        checkValidList(dcSet, height, asset, creator);
-        return checkedAccruals;
     }
 
     public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> precalcCheckedAccruals(int height, Account creator) {
@@ -419,7 +375,10 @@ public class ExAirDrop extends ExAction {
 
     @Override
     public int preProcessAndValidate(int height, Account creator, boolean andValidate) {
-        return 0;
+        if (results == null) {
+            resultsCount = makePayList(dcSet, height, asset, creator, andValidate);
+        }
+        return resultsCount;
     }
 
     public Fun.Tuple2<Integer, String> checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {

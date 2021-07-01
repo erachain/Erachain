@@ -145,14 +145,14 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                             return;
                         }
 
-                        ExAirDrop pays = (ExAirDrop) exPaysRes.a;
-                        pays.setDC(DCSet.getInstance());
-                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.precalcAccrualList(
-                                Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        ExAirDrop airDrop = (ExAirDrop) exPaysRes.a;
+                        airDrop.setDC(DCSet.getInstance());
+                        airDrop.preProcessAndValidate(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
+                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = airDrop.getResults();
 
-                        String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getAddressesCount()
-                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getAddressesCount())
-                                + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
+                        String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + airDrop.getAddressesCount()
+                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getAddressesCount())
+                                + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay();
                         jLabel_FeesResult.setText(result);
 
                         AirDropsModel model = new AirDropsModel(accrual);
