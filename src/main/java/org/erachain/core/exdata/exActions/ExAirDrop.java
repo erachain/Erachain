@@ -410,6 +410,7 @@ public class ExAirDrop extends ExAction {
     @Override
     public String getInfoHTML() {
         String out = "<h3>" + Lang.T("Accruals") + "</h3>";
+        out += Lang.T("Asset") + ": <b>" + asset.getName() + "<br>";
         out += Lang.T("Count # кол-во") + ": <b>" + addresses.length
                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(getTotalFeeBytes())
                 + "</b>, " + Lang.T("Total") + ": <b>" + totalPay;

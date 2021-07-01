@@ -841,6 +841,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public String getInfoHTML() {
 
         String out = "<h3>" + Lang.T("Accruals") + "</h3>";
+        out += Lang.T("Asset") + ": <b>" + asset.getName() + "<br>";
         out += Lang.T("Count # кол-во") + ": <b>" + resultsCount
                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(totalFeeBytes)
                 + "</b>, " + Lang.T("Total") + ": <b>" + totalPay;
@@ -850,7 +851,13 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     @Override
     public int preProcessAndValidate(int height, Account creator, boolean andValidate) {
-        return 0;
+        if (results == null) {
+            resultsCount = makeFilterPayList(dcSet, height, asset, creator, andValidate);
+            if (payMethod == PAYMENT_METHOD_TOTAL) {
+                calcAccrualsForMethodTotal();
+            }
+        }
+        return resultsCount;
     }
 
     public boolean calcAccrualsForMethodTotal() {
@@ -1097,7 +1104,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     }
 
     public int makeFilterPayList(Transaction transaction, boolean andValidate) {
-        return makeFilterPayList(transaction.getDCSet(), transaction.getBlockHeight(), asset, transaction.getCreator(), andValidate);
+        return makeFilterPayList(dcSet, height, asset, transaction.getCreator(), andValidate);
     }
 
     public void preProcessAndValidate(int height, Account creator) {
