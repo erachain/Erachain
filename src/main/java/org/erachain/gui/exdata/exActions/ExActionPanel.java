@@ -18,11 +18,8 @@ public class ExActionPanel extends IconPanel {
     public static String NAME = "ExActionPanel";
     public static String TITLE = "Action";
 
-    private ExDataPanel parent;
-
     public ExActionPanel(ExDataPanel parent) {
         super(NAME, TITLE);
-        this.parent = parent;
 
         GridBagLayout layout = new GridBagLayout();
         setLayout(layout);
@@ -39,22 +36,23 @@ public class ExActionPanel extends IconPanel {
         fieldGBC.weightx = 0.1;
         fieldGBC.insets = new Insets(10, 0, 10, 20);
 
-        GridBagConstraints headBGC = new GridBagConstraints();
-        headBGC.gridwidth = 15;
-        headBGC.fill = GridBagConstraints.HORIZONTAL;
-        headBGC.weightx = 0.1;
+        GridBagConstraints panelBGC = new GridBagConstraints();
+        panelBGC.gridx = 0;
+        panelBGC.gridwidth = 15;
+        panelBGC.fill = GridBagConstraints.BOTH;
+        panelBGC.weightx = 0.1;
         //headBGC.anchor = GridBagConstraints.LINE_START;
-        headBGC.insets = new Insets(5, 0, 0, 0);
+        panelBGC.insets = new Insets(0, 0, 0, 0);
 
         int gridy = 0;
 
-        add(new JLabel(Lang.T("Select Accruals Type") + ":"), labelGBC);
+        add(new JLabel(Lang.T("Select Action Type") + ":"), labelGBC);
 
         selectBox = new JComboBox<>();
         selectBox.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
                 Lang.T("Without Action"),
-                Lang.T("Simple List Accruals (Air Drop)"),
-                Lang.T("Calculated Filtered Accruals")
+                Lang.T("Calculated Filtered Accruals"),
+                Lang.T("Simple List Accruals (Air Drop)")
         }));
 
         selectBox.addItemListener(new ItemListener() {
@@ -69,32 +67,31 @@ public class ExActionPanel extends IconPanel {
         actionPanels[ExAction.FILTERED_ACCRUALS_TYPE] = new ExFilteredPaysPanel(parent);
         actionPanels[ExAction.LIST_PAYOUTS_TYPE] = new ExAirDropPanel(parent);
 
-        updateAction();
-
         for (JPanel actionPanel : actionPanels) {
             actionPanel.setVisible(false);
-            panel.add(actionPanel);
+            actionsPanel.add(actionPanel);
         }
 
-        headBGC.gridx = ++gridy;
-        add(panel, headBGC);
-
+        panelBGC.gridx = ++gridy;
+        add(actionsPanel, panelBGC);
 
     }
 
     public void updateAction() {
-        int selected = selectBox.getSelectedIndex();
+        int selected = selectBox.getSelectedIndex() - 1;
         for (int i = 0; i < actionPanels.length; i++) {
             actionPanels[i].setVisible(selected == i);
         }
     }
 
     public Fun.Tuple2<ExAction, String> getAction() {
-        int selected = selectBox.getSelectedIndex();
+        int selected = selectBox.getSelectedIndex() - 1;
+        if (selected < 0)
+            return null;
         return ((ExActionPanelInt) actionPanels[selected]).getResult();
     }
 
     public javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> selectBox;
-    private JPanel panel = new JPanel();
-    public IconPanel[] actionPanels;
+    private JPanel actionsPanel = new JPanel();
+    public IconPanel[] actionPanels = new IconPanel[2];
 }

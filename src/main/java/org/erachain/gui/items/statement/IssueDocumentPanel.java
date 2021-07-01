@@ -88,7 +88,7 @@ public class IssueDocumentPanel extends IconPanel {
             jComboBox_Account_Work.setSelectedItem(creator);
         }
         if (actionAsset != null) {
-            ((ExFilteredPaysPanel) exData_Panel.exActionPanel.actionPanels[ExAction.FILTERED_ACCRUALS_TYPE]).jComboBoxAccrualAsset.setSelectedItem(actionAsset);
+            ((ExFilteredPaysPanel) exData_Panel.exActionPanel.actionPanels[ExAction.FILTERED_ACCRUALS_TYPE + 1]).jComboBoxAccrualAsset.setSelectedItem(actionAsset);
         }
         if (type > 0) {
             exData_Panel.docTypeAppendixPanel.typeDocymentCombox.setSelectedIndex(type);
@@ -349,7 +349,7 @@ public class IssueDocumentPanel extends IconPanel {
     public void selectAccruals(AssetCls actionAsset, AssetCls filterAsset) {
         selectTabbedPane(1);
         exData_Panel.exActionPanel.selectBox.setSelectedIndex(ExAction.FILTERED_ACCRUALS_TYPE);
-        ExFilteredPaysPanel panel = (ExFilteredPaysPanel) exData_Panel.exActionPanel.actionPanels[ExAction.FILTERED_ACCRUALS_TYPE];
+        ExFilteredPaysPanel panel = (ExFilteredPaysPanel) exData_Panel.exActionPanel.actionPanels[ExAction.FILTERED_ACCRUALS_TYPE + 1];
         panel.jCheckBoxAccrualsUse.setSelected(true);
         panel.jPanelMain.setVisible(true);
         if (actionAsset != null)
