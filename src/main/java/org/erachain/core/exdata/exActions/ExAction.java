@@ -1,6 +1,5 @@
 package org.erachain.core.exdata.exActions;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.transaction.RSignNote;
@@ -104,9 +103,8 @@ public abstract class ExAction<R> {
      */
     public abstract int preProcessAndValidate(int height, Account creator, boolean andValidate);
 
-    public int makeResults(Transaction transaction) {
-        setDC(transaction.getDCSet());
-        return preProcessAndValidate(Controller.getInstance().getMyHeight(), transaction.getCreator(), false);
+    public int preProcessAndValidate(Transaction transaction, boolean andValidate) {
+        return preProcessAndValidate(transaction.getBlockHeight(), transaction.getCreator(), andValidate);
     }
 
     public abstract void updateItemsKeys(List listTags);

@@ -214,16 +214,6 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         this.totalFeeBytes = totalFeeBytes;
     }
 
-    public List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> getOrCalcresults(Transaction statement) {
-        if (results == null) {
-            resultsCount = makeFilterPayList(statement, false);
-            if (payMethod == PAYMENT_METHOD_TOTAL) {
-                calcAccrualsForMethodTotal();
-            }
-        }
-        return results;
-    }
-
     public Long getAssetKey() {
         return assetKey;
     }
@@ -1103,66 +1093,6 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     }
 
-    public int makeFilterPayList(Transaction transaction, boolean andValidate) {
-        return makeFilterPayList(dcSet, height, asset, transaction.getCreator(), andValidate);
-    }
-
-    public void preProcessAndValidate(int height, Account creator) {
-
-        if (!hasAmount()) {
-            resultsCount = 0;
-            results = new ArrayList<>();
-            return;
-        }
-
-        resultsCount = makeFilterPayList(dcSet, height, asset, creator, false);
-        if (resultsCount == 0)
-            return;
-
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
-            // просчитаем значения для точного округления Общей Суммы
-            if (!calcAccrualsForMethodTotal())
-                // нет значений
-                return;
-        }
-
-        Account recipient;
-        //byte[] signature = rNote.getSignature();
-        boolean creatorIsPerson = creator.isPerson(dcSet, height);
-
-        // возьмем знаки (минус) для создания позиции баланса такой
-        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
-        long key = signs.a * assetKey;
-
-        // комиссию не проверяем так как она не правильно считается внутри?
-        long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
-
-        Fun.Tuple2<Integer, String> result;
-        Fun.Tuple4 item;
-        BigDecimal amount;
-        byte[] signature = new byte[0];
-        for (int index = 0; index < resultsCount; index++) {
-
-            item = results.get(index);
-            recipient = (Account) item.a;
-
-            if (creator.equals(recipient))
-                // пропустим себя
-                continue;
-
-            amount = (BigDecimal) item.c;
-
-            result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                    key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
-                    backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
-
-            if (result.a != Transaction.VALIDATE_OK) {
-                errorValue = result.b;
-                results.set(index, new Fun.Tuple4(item.a, item.b, item.c, result));
-            }
-        }
-    }
-
     public int isValid(RSignNote rNote) {
 
         if (hasAmount()) {
@@ -1217,7 +1147,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             return Transaction.INVALID_TRANSFER_TYPE;
         }
 
-        resultsCount = makeFilterPayList(rNote, true);
+        resultsCount = makeFilterPayList(dcSet, height, asset, rNote.getCreator(), true);
 
         if (resultsCount < 0) {
             // ERROR on make LIST
@@ -1344,7 +1274,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void process(Transaction rNote, Block block) {
 
         if (results == null) {
-            resultsCount = makeFilterPayList(rNote, false);
+            resultsCount = preProcessAndValidate(rNote, false);
         }
 
         if (resultsCount == 0)
@@ -1366,7 +1296,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void orphan(Transaction rNote) {
 
         if (results == null) {
-            resultsCount = makeFilterPayList(rNote, false);
+            resultsCount = preProcessAndValidate(rNote, false);
         }
 
         if (resultsCount == 0)
