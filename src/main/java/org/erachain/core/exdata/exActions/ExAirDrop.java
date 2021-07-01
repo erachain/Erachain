@@ -2,7 +2,6 @@ package org.erachain.core.exdata.exActions;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -272,8 +271,8 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
         int steep = 0;
         BigDecimal amount;
 
-        Controller cntr = Controller.getInstance();
-        BlockChain chain = cntr.getBlockChain();
+        //Controller cntr = Controller.getInstance();
+        //BlockChain chain = cntr.getBlockChain();
 
         try {
             amount = amountStr == null || amountStr.isEmpty() ? null : new BigDecimal(amountStr);
@@ -376,41 +375,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
         return resultsCount;
     }
 
-    public Fun.Tuple2<Integer, String> checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {
-
-        Account recipient;
-        //byte[] signature = rNote.getSignature();
-        boolean creatorIsPerson = creator.isPerson(dcSet, height);
-
-        // возьмем знаки (минус) для создания позиции баланса такой
-        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
-        long key = signs.a * assetKey;
-
-        // комиссию не проверяем так как она не правильно считается внутри?
-        long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
-
-        Fun.Tuple2<Integer, String> result;
-        byte[] signature = new byte[0];
-        int index = 0;
-        for (byte[] recipientShort : addresses) {
-
-            recipient = new Account(recipientShort);
-
-            result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                    key, asset, amount, recipient,
-                    backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
-
-            if (result.a != Transaction.VALIDATE_OK) {
-                errorValue = "Airdrop: address[" + index + "] -> " + recipient.getAddress();
-                return result;
-            }
-
-            ++index;
-        }
-
-        return new Fun.Tuple2<>(Transaction.VALIDATE_OK, null);
-    }
-
     public int isValid(RSignNote rNote) {
 
         if (this.assetKey == 0L) {
@@ -423,7 +387,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
             errorValue = "Airdrop: payMethodValue < 0";
             return Transaction.INVALID_AMOUNT;
         }
-
 
         height = rNote.getBlockHeight();
 
@@ -449,14 +412,21 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
             return result.a;
         }
 
-        ////////// TODO NEED CHECK ALL
-        boolean needCheckAllList = false;
-        if (needCheckAllList) {
+        int index = 0;
+        for (byte[] recipientShort : addresses) {
 
-            result = checkValidList(dcSet, height, asset, creator);
+            recipient = new Account(recipientShort);
+
+            result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+                    key, asset, amount, recipient,
+                    backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
+
             if (result.a != Transaction.VALIDATE_OK) {
+                errorValue = "Airdrop: address[" + index + "] -> " + recipient.getAddress();
                 return result.a;
             }
+
+            ++index;
         }
 
         return Transaction.VALIDATE_OK;
@@ -483,13 +453,11 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
             if (recipient == null)
                 break;
 
-            actionPayAmount = amount;
-
-            isAmountNegate = actionPayAmount.signum() < 0;
+            isAmountNegate = amount.signum() < 0;
             backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
 
             if (!asOrphan && block != null) {
-                rNote.addCalculated(block, recipient, absKey, actionPayAmount,
+                rNote.addCalculated(block, recipient, absKey, amount,
                         asset.viewAssetTypeAction(backwardAction, balancePos, asset.getMaker().equals(creator)));
             }
 
@@ -497,9 +465,9 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
                 // пропустим себя в любом случае - хотя КАлькулейтед оставим для виду
                 continue;
 
-            // сбросим направлени от фильтра
-            actionPayAmount = actionPayAmount.abs();
-            // зазадим направление от Действия нашего
+            // сбросим направление от фильтра
+            actionPayAmount = amount.abs();
+            // зададим направление от Действия нашего
             actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
 
             TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
