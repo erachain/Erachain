@@ -27,10 +27,7 @@ import org.mapdb.Fun;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashSet;
+import java.util.*;
 
 //import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -170,7 +167,7 @@ public class RSignNote extends Transaction implements Itemable {
             itemsKeys = new Object[][]{};
         }
 
-        ArrayList<Object> listTags = new ArrayList<>();
+        List<Object> listTags = new ArrayList<>();
 
         if (creatorPersonDuration != null) {
             // AS PERSON

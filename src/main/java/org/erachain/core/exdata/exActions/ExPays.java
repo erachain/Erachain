@@ -309,7 +309,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     }
 
     @Override
-    public void updateItemsKeys(ArrayList<Object> listTags) {
+    public void updateItemsKeys(List listTags) {
         if (hasAmount()) {
             listTags.add(new Object[]{ItemCls.ASSET_TYPE, getAssetKey(), getAsset().getTags()});
         }
@@ -846,6 +846,11 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
                 + "</b>, " + Lang.T("Total") + ": <b>" + totalPay;
 
         return out;
+    }
+
+    @Override
+    public int preProcessAndValidate(int height, Account creator, boolean andValidate) {
+        return 0;
     }
 
     public boolean calcAccrualsForMethodTotal() {

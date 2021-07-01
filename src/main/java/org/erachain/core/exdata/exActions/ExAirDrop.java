@@ -108,7 +108,7 @@ public class ExAirDrop extends ExAction {
     }
 
     @Override
-    public void updateItemsKeys(ArrayList<Object> listTags) {
+    public void updateItemsKeys(List listTags) {
         listTags.add(new Object[]{ItemCls.ASSET_TYPE, getAssetKey(), getAsset().getTags()});
     }
 
@@ -366,7 +366,9 @@ public class ExAirDrop extends ExAction {
 
         String value = (String) jsonObject.get("amount");
 
-        String[] addressesStr = (JSONArray<String>) jsonObject.get("addresses");
+        JSONArray addressesJson = (JSONArray) jsonObject.get("addresses");
+        String[] addressesStr = (String[]) addressesJson.toArray(new String[addressesJson.size()]);
+
         return make(assetKey, value, position, backward, addressesStr);
     }
 
@@ -411,6 +413,7 @@ public class ExAirDrop extends ExAction {
         out += Lang.T("Count # кол-во") + ": <b>" + addresses.length
                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(getTotalFeeBytes())
                 + "</b>, " + Lang.T("Total") + ": <b>" + totalPay;
+        return out;
     }
 
     @Override

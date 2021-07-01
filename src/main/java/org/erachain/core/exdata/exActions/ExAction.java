@@ -8,7 +8,7 @@ import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simple pay - for all same amount
@@ -108,7 +108,7 @@ public abstract class ExAction<R> {
         return preProcessAndValidate(transaction.getBlockHeight(), transaction.getCreator(), false);
     }
 
-    public abstract void updateItemsKeys(ArrayList<Object> listTags);
+    public abstract void updateItemsKeys(List listTags);
 
     public abstract int isValid(RSignNote rNote);
 
