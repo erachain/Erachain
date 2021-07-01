@@ -129,8 +129,8 @@ public class ExFilteredPaysPanel extends IconPanel {
 
                         ExPays pays = exPaysRes.a;
                         pays.setDC(DCSet.getInstance());
-                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.precalcFilteredAccruals(
-                                Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        pays.preProcessAndValidate(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.getFilteredAccruals();
                         pays.calcTotalFeeBytes();
                         jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
                                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
@@ -169,8 +169,8 @@ public class ExFilteredPaysPanel extends IconPanel {
 
                         ExPays pays = exPaysRes.a;
                         pays.setDC(DCSet.getInstance());
-                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.precalcFilteredAccruals(
-                                Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        pays.preProcessAndValidate(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.getFilteredAccruals();
                         pays.calcTotalFeeBytes();
                         String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
                                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())

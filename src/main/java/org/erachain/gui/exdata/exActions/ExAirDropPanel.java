@@ -1,6 +1,5 @@
 package org.erachain.gui.exdata.exActions;
 
-
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;

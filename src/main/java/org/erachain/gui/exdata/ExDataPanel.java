@@ -789,7 +789,7 @@ public class ExDataPanel extends JPanel {
 
         byte[] exData;
         try {
-            exData = ExData.make(exLink, exAccrualsResult.a, exAirDropResult.a, creator, jTextField_Title_Message.getText(),
+            exData = ExData.make(exLink, exAccrualsResult.a, creator, jTextField_Title_Message.getText(),
                     signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
                     templateKey, fill_Template_Panel.get_Params(),
                     fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),

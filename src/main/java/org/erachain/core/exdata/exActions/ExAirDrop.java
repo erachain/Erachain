@@ -8,6 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -66,6 +67,7 @@ public class ExAirDrop extends ExAction {
     public String errorValue;
 
     public ExAirDrop(int flags, long assetKey, BigDecimal amount, int balancePos, boolean backward, byte[][] addresses) {
+        super(LIST_PAYOUTS_TYPE);
         this.flags = flags;
         this.assetKey = assetKey;
         this.amount = amount;
@@ -103,6 +105,10 @@ public class ExAirDrop extends ExAction {
 
     public BigDecimal getTotalPay() {
         return totalPay;
+    }
+
+    public void updateItemsKeys(ArrayList<Object> listTags) {
+        listTags.add(new Object[]{ItemCls.ASSET_TYPE, getAssetKey(), getAsset().getTags()});
     }
 
     public void setDC(DCSet dcSet) {
@@ -238,6 +244,34 @@ public class ExAirDrop extends ExAction {
         return BASE_LENGTH + addresses.length * Account.ADDRESS_SHORT_LENGTH;
     }
 
+    public int getLengthDBData() {
+        return (totalPay == null ? 1 : 2 + totalPay.unscaledValue().toByteArray().length);
+    }
+
+    public byte[] getDBdata() {
+
+        byte[] buff;
+        byte[] dbData;
+
+        if (totalPay == null) {
+            dbData = new byte[1];
+            buff = null;
+        } else {
+            buff = this.totalPay.unscaledValue().toByteArray();
+            dbData = new byte[2 + buff.length];
+        }
+
+        int pos = 0;
+
+        dbData[pos++] = (byte) buff.length;
+
+        dbData[pos++] = (byte) this.totalPay.scale();
+        System.arraycopy(buff, 0, dbData, pos, buff.length);
+
+        return dbData;
+
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static ExAirDrop parse(byte[] data, int pos) throws Exception {
 
@@ -272,6 +306,22 @@ public class ExAirDrop extends ExAction {
         }
 
         return new ExAirDrop(flags, assetKey, payValue, balancePos, backward, addresses);
+    }
+
+    public int parseDBData(byte[] dbData, int position) {
+
+        int len = dbData[position++];
+        if (len == 0) {
+            totalPay = null;
+        } else {
+            int scale = dbData[position++];
+            totalPay = new BigDecimal(new BigInteger(Arrays.copyOfRange(dbData, position, position + len)), scale);
+        }
+
+        position += len;
+
+        return position;
+
     }
 
     public static Fun.Tuple2<ExAirDrop, String> make(Long assetKey, String amountStr,

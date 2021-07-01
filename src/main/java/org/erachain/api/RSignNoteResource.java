@@ -368,7 +368,7 @@ public class RSignNoteResource {
 
             byte[] exDataBytes;
             try {
-                exDataBytes = ExData.make(exLink, accruals, exAirdrop, privateKeyAccount, title,
+                exDataBytes = ExData.make(exLink, accruals, privateKeyAccount, title,
                         onlyRecipients, recipients, authors, sources, tags, isEncrypted,
                         templateKey, templateParams, templateUnique,
                         message, messageUnique,
