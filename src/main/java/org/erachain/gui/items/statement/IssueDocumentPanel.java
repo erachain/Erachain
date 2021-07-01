@@ -348,12 +348,14 @@ public class IssueDocumentPanel extends IconPanel {
 
     public void selectAccruals(AssetCls actionAsset, AssetCls filterAsset) {
         selectTabbedPane(1);
-        exData_Panel.exActionPanel.jCheckBoxAccrualsUse.setSelected(true);
-        exData_Panel.exActionPanel.jPanelMain.setVisible(true);
+        exData_Panel.exActionPanel.selectBox.setSelectedIndex(ExAction.FILTERED_ACCRUALS_TYPE);
+        ExFilteredPaysPanel panel = (ExFilteredPaysPanel) exData_Panel.exActionPanel.actionPanels[ExAction.FILTERED_ACCRUALS_TYPE];
+        panel.jCheckBoxAccrualsUse.setSelected(true);
+        panel.jPanelMain.setVisible(true);
         if (actionAsset != null)
-            exData_Panel.exActionPanel.jComboBoxAccrualAsset.setSelectedItem(actionAsset);
+            panel.jComboBoxAccrualAsset.setSelectedItem(actionAsset);
         if (filterAsset != null)
-            exData_Panel.exActionPanel.jComboBoxFilterAsset.setSelectedItem(filterAsset);
+            panel.jComboBoxFilterAsset.setSelectedItem(filterAsset);
     }
 
     public void setChecks() {

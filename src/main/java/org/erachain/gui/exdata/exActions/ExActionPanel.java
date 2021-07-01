@@ -19,7 +19,6 @@ public class ExActionPanel extends IconPanel {
     public static String TITLE = "Action";
 
     private ExDataPanel parent;
-    private Boolean lock = new Boolean(false);
 
     public ExActionPanel(ExDataPanel parent) {
         super(NAME, TITLE);
@@ -95,7 +94,7 @@ public class ExActionPanel extends IconPanel {
         return ((ExActionPanelInt) actionPanels[selected]).getResult();
     }
 
-    private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> selectBox;
+    public javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> selectBox;
     private JPanel panel = new JPanel();
     public IconPanel[] actionPanels;
 }
