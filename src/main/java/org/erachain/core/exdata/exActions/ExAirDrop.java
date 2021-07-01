@@ -369,9 +369,9 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
     }
 
     @Override
-    public int preProcessAndPreValidate(int height, Account creator, boolean andValidate) {
+    public int preProcess(int height, Account creator) {
         if (results == null) {
-            resultsCount = makePayList(dcSet, height, asset, creator, andValidate);
+            resultsCount = makePayList(dcSet, height, asset, creator, false);
         }
         return resultsCount;
     }

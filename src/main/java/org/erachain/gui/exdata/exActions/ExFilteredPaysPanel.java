@@ -121,16 +121,16 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         jScrollPaneAccruals.setVisible(false);
 
-                        Fun.Tuple2<ExAction, String> exPaysRes = getResult();
-                        if (exPaysRes.b != null) {
-                            jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
-                                    Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                        Fun.Tuple2<ExAction, String> exActionRes = getResult();
+                        if (exActionRes.b != null) {
+                            jLabel_FeesResult.setText(exActionRes.a == null ? Lang.T(exActionRes.b) :
+                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue)));
                             return;
                         }
 
-                        ExPays pays = (ExPays) exPaysRes.a;
+                        ExPays pays = (ExPays) exActionRes.a;
                         pays.setDC(DCSet.getInstance());
-                        pays.preProcessAndPreValidate(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
+                        pays.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
                         List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.getResults();
                         pays.calcTotalFeeBytes();
                         jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()
@@ -160,17 +160,17 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         jScrollPaneAccruals.setVisible(false);
 
-                        Fun.Tuple2<ExAction, String> exPaysRes = getResult();
-                        if (exPaysRes.b != null) {
-                            jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
-                                    Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
+                        Fun.Tuple2<ExAction, String> exActionRes = getResult();
+                        if (exActionRes.b != null) {
+                            jLabel_FeesResult.setText(exActionRes.a == null ? Lang.T(exActionRes.b) :
+                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue)));
                             jButtonViewResult.setEnabled(true);
                             return;
                         }
 
-                        ExPays pays = (ExPays) exPaysRes.a;
+                        ExPays pays = (ExPays) exActionRes.a;
                         pays.setDC(DCSet.getInstance());
-                        pays.preProcessAndPreValidate(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
+                        pays.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
                         List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.getResults();
                         pays.calcTotalFeeBytes();
                         String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()

@@ -840,9 +840,9 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     }
 
     @Override
-    public int preProcessAndPreValidate(int height, Account creator, boolean andValidate) {
+    public int preProcess(int height, Account creator) {
         if (results == null) {
-            resultsCount = makeFilterPayList(dcSet, height, asset, creator, andValidate);
+            resultsCount = makeFilterPayList(dcSet, height, asset, creator, false);
             if (payMethod == PAYMENT_METHOD_TOTAL) {
                 calcAccrualsForMethodTotal();
             }
@@ -1284,7 +1284,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void process(Transaction rNote, Block block) {
 
         if (results == null) {
-            resultsCount = preProcessAndPreValidate(rNote, false);
+            resultsCount = preProcess(rNote);
         }
 
         if (resultsCount == 0)
@@ -1306,7 +1306,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void orphan(Transaction rNote) {
 
         if (results == null) {
-            resultsCount = preProcessAndPreValidate(rNote, false);
+            resultsCount = preProcess(rNote);
         }
 
         if (resultsCount == 0)

@@ -98,20 +98,17 @@ public abstract class ExAction<R> {
 
     /**
      * make calculations of lists and pre-validate it if need
-     *
-     * @param andValidate
      */
-    public abstract int preProcessAndPreValidate(int height, Account creator, boolean andValidate);
+    public abstract int preProcess(int height, Account creator);
 
     /**
      * make calculations of lists and pre-validate it if need
      *
      * @param transaction
-     * @param andValidate
      * @return
      */
-    public int preProcessAndPreValidate(Transaction transaction, boolean andValidate) {
-        return preProcessAndPreValidate(transaction.getBlockHeight(), transaction.getCreator(), andValidate);
+    public int preProcess(Transaction transaction) {
+        return preProcess(transaction.getBlockHeight(), transaction.getCreator());
     }
 
     public abstract void updateItemsKeys(List listTags);

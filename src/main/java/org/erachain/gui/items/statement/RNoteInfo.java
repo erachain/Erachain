@@ -256,7 +256,7 @@ public class RNoteInfo extends RecDetailsFrame {
 
         ExAction exAction = exData.getExAction();
         if (exAction != null) {
-            exAction.preProcessAndPreValidate(statement, false);
+            exAction.preProcess(statement);
             resultStr += exAction.getInfoHTML();
         }
 
