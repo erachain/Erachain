@@ -121,19 +121,19 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         jScrollPaneAccruals.setVisible(false);
 
-                        Fun.Tuple2<ExPays, String> exPaysRes = getresult();
+                        Fun.Tuple2<ExAction, String> exPaysRes = getResult();
                         if (exPaysRes.b != null) {
                             jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
                                     Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
                             return;
                         }
 
-                        ExPays pays = exPaysRes.a;
+                        ExPays pays = (ExPays) exPaysRes.a;
                         pays.setDC(DCSet.getInstance());
                         pays.preProcessAndValidate(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.getFilteredAccruals();
+                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.getResults();
                         pays.calcTotalFeeBytes();
-                        jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
+                        jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()
                                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
                                 + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay());
                     } finally {
@@ -160,7 +160,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         jScrollPaneAccruals.setVisible(false);
 
-                        Fun.Tuple2<ExPays, String> exPaysRes = getresult();
+                        Fun.Tuple2<ExAction, String> exPaysRes = getResult();
                         if (exPaysRes.b != null) {
                             jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
                                     Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
@@ -168,17 +168,17 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
                             return;
                         }
 
-                        ExPays pays = exPaysRes.a;
+                        ExPays pays = (ExPays) exPaysRes.a;
                         pays.setDC(DCSet.getInstance());
                         pays.preProcessAndValidate(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.getFilteredAccruals();
+                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.getResults();
                         pays.calcTotalFeeBytes();
-                        String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getFilteredAccrualsCount()
+                        String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()
                                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
                                 + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
                         jLabel_FeesResult.setText(result);
 
-                        AccrualsModel model = new AccrualsModel(accrual);
+                        AccrualsModel model = new AccrualsModel(accruals);
                         jTablePreviewAccruals.setModel(model);
                         TableColumnModel columnModel = jTablePreviewAccruals.getColumnModel();
 

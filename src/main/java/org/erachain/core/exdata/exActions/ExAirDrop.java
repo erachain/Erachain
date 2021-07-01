@@ -107,6 +107,7 @@ public class ExAirDrop extends ExAction {
         return totalPay;
     }
 
+    @Override
     public void updateItemsKeys(ArrayList<Object> listTags) {
         listTags.add(new Object[]{ItemCls.ASSET_TYPE, getAssetKey(), getAsset().getTags()});
     }
@@ -190,10 +191,6 @@ public class ExAirDrop extends ExAction {
 
     }
 
-    public int makeFilterPayList(Transaction transaction, boolean andValidate) {
-        return makePayList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
-    }
-
     public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> makeCheckedList(Transaction transaction, boolean andValidate) {
         makePayList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
         return checkedAccruals;
@@ -202,13 +199,6 @@ public class ExAirDrop extends ExAction {
     public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> precalcAccrualList(
             int height, Account creator) {
         checkValidList(dcSet, height, asset, creator);
-        return checkedAccruals;
-    }
-
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> getCheckedAccruals(Transaction statement) {
-        if (checkedAccruals == null) {
-            checkedAccruals = makeCheckedList(statement, false);
-        }
         return checkedAccruals;
     }
 
@@ -369,6 +359,17 @@ public class ExAirDrop extends ExAction {
 
     }
 
+    public static Fun.Tuple2<ExAction, String> parseJSON_local(JSONObject jsonObject) throws Exception {
+        long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0L).toString());
+        int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
+        boolean backward = Boolean.valueOf((boolean) jsonObject.getOrDefault("backward", false));
+
+        String value = (String) jsonObject.get("amount");
+
+        String[] addressesStr = (JSONArray<String>) jsonObject.get("addresses");
+        return make(assetKey, value, position, backward, addressesStr);
+    }
+
     /**
      * Version 2 maker for BlockExplorer
      */
@@ -402,6 +403,19 @@ public class ExAirDrop extends ExAction {
         toJson.put("addresses", array);
 
         return toJson;
+    }
+
+    @Override
+    public String getInfoHTML() {
+        String out = "<h3>" + Lang.T("Accruals") + "</h3>";
+        out += Lang.T("Count # кол-во") + ": <b>" + addresses.length
+                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(getTotalFeeBytes())
+                + "</b>, " + Lang.T("Total") + ": <b>" + totalPay;
+    }
+
+    @Override
+    public int preProcessAndValidate(int height, Account creator, boolean andValidate) {
+        return 0;
     }
 
     public Fun.Tuple2<Integer, String> checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {

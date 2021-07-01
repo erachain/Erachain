@@ -6,6 +6,7 @@ import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.util.ArrayList;
 
@@ -69,12 +70,31 @@ public abstract class ExAction<R> {
 
     }
 
+    public static Fun.Tuple2<ExAction, String> parseJSON(JSONObject json) {
+
+        try {
+            int type = (Integer) json.get("type");
+            switch (type) {
+                case FILTERED_ACCRUALS_TYPE:
+                    return ExPays.parseJSON_local(json);
+                case LIST_PAYOUTS_TYPE:
+                    return ExAirDrop.parseJSON_local(json);
+            }
+            return new Fun.Tuple2<>(null, "Invalid ExAction type: " + type);
+        } catch (Exception e) {
+            return new Fun.Tuple2<>(null, e.getMessage());
+        }
+
+    }
+
     /**
      * Version 2 maker for BlockExplorer
      */
     public abstract JSONObject makeJSONforHTML(JSONObject langObj);
 
     public abstract JSONObject toJson();
+
+    public abstract String getInfoHTML();
 
     /**
      * make calculations and validate it if need
@@ -84,7 +104,8 @@ public abstract class ExAction<R> {
     public abstract int preProcessAndValidate(int height, Account creator, boolean andValidate);
 
     public int makeResults(Transaction transaction) {
-        return preProcessAndValidate(transaction.getDCSet(), transaction.getCreator(), false);
+        setDC(transaction.getDCSet());
+        return preProcessAndValidate(transaction.getBlockHeight(), transaction.getCreator(), false);
     }
 
     public abstract void updateItemsKeys(ArrayList<Object> listTags);

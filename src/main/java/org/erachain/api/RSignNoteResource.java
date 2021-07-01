@@ -5,8 +5,8 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
+import org.erachain.core.exdata.exActions.ExAction;
 import org.erachain.core.exdata.exActions.ExAirDrop;
-import org.erachain.core.exdata.exActions.ExPays;
 import org.erachain.core.exdata.exLink.*;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -232,43 +232,18 @@ public class RSignNoteResource {
         }
 
         /////////// Accruals
-        JSONObject accrualsJson = (JSONObject) jsonObject.get("accruals");
-        ExPays accruals;
-        if (accrualsJson == null) {
-            accruals = null;
+        JSONObject actionJson = (JSONObject) jsonObject.get("action");
+        ExAction action;
+        if (actionJson == null) {
+            action = null;
         } else {
-            long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
-            int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
-            boolean backward = Boolean.valueOf((boolean) jsonObject.getOrDefault("backward", false));
 
-            int payMethod = Integer.valueOf(jsonObject.getOrDefault("method", 1).toString());
-            String value = (String) jsonObject.get("methodValue");
-            String amountMin = (String) jsonObject.get("amountMin");
-            String amountMax = (String) jsonObject.get("amountMax");
-
-            long filterAssetKey = Long.valueOf(jsonObject.getOrDefault("filterAssetKey", 0l).toString());
-            int filterPos = Integer.valueOf(jsonObject.getOrDefault("filterBalPos", 1).toString());
-            int filterSide = Integer.valueOf(jsonObject.getOrDefault("filterBalSide", 1).toString());
-
-            int filterTXType = Integer.valueOf(jsonObject.getOrDefault("filterTXType", 1).toString());
-            String filterGreatEqual = (String) jsonObject.get("filterGreatEqual");
-            String filterLessEqual = (String) jsonObject.get("filterLessEqual");
-            String filterTimeStart = (String) jsonObject.get("activeAfter");
-            String filterTimeEnd = (String) jsonObject.get("activeBefore");
-
-            int filterPerson = Integer.valueOf(jsonObject.getOrDefault("filterPerson", 0).toString());
-            boolean selfUse = Boolean.valueOf((boolean) jsonObject.getOrDefault("selfUse", false));
-
-            Fun.Tuple2<ExPays, String> accrualsResult = ExPays.make(assetKey, position, backward, payMethod, value,
-                    amountMin, amountMax, filterAssetKey, filterPos, filterSide,
-                    filterGreatEqual, filterLessEqual,
-                    filterTXType, filterTimeStart, filterTimeEnd,
-                    filterPerson, selfUse);
+            Fun.Tuple2<ExAction, String> accrualsResult = ExAction.parseJSON(jsonObject);
 
             if (accrualsResult.a == null) {
-                accruals = null;
+                action = null;
             } else {
-                accruals = accrualsResult.a;
+                action = accrualsResult.a;
             }
 
         }
@@ -368,7 +343,7 @@ public class RSignNoteResource {
 
             byte[] exDataBytes;
             try {
-                exDataBytes = ExData.make(exLink, accruals, privateKeyAccount, title,
+                exDataBytes = ExData.make(exLink, action, privateKeyAccount, title,
                         onlyRecipients, recipients, authors, sources, tags, isEncrypted,
                         templateKey, templateParams, templateUnique,
                         message, messageUnique,

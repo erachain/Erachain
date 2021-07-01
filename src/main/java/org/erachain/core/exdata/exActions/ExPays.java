@@ -115,7 +115,8 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     /**
      * make FLAGS internal
-     *  @param flags
+     *
+     * @param flags
      * @param assetKey
      * @param balancePos
      * @param backward
@@ -307,6 +308,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         return (this.flags & ACTIVE_END_FLAG_MASK) != 0;
     }
 
+    @Override
     public void updateItemsKeys(ArrayList<Object> listTags) {
         if (hasAmount()) {
             listTags.add(new Object[]{ItemCls.ASSET_TYPE, getAssetKey(), getAsset().getTags()});
@@ -585,8 +587,8 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
      * @param filterBalanceMoreThen
      * @param filterBalanceLessThen
      * @param filterTXType
-     * @param filterTimeStartStr      'yyyy-MM-dd hh:mm:00' or Timestamp[sec] or SeqNo: 123-1
-     * @param filterTimeXEndStr       'yyyy-MM-dd hh:mm:00' or Timestamp[sec] or SeqNo: 123-1
+     * @param filterTimeStartStr    'yyyy-MM-dd hh:mm:00' or Timestamp[sec] or SeqNo: 123-1
+     * @param filterTimeXEndStr     'yyyy-MM-dd hh:mm:00' or Timestamp[sec] or SeqNo: 123-1
      * @param filterByPerson
      * @param selfPay
      * @return
@@ -708,6 +710,36 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     }
 
+    public static Fun.Tuple2<ExAction, String> parseJSON_local(JSONObject jsonObject) throws Exception {
+        long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0L).toString());
+        int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
+        boolean backward = Boolean.valueOf((boolean) jsonObject.getOrDefault("backward", false));
+
+        int payMethod = Integer.valueOf(jsonObject.getOrDefault("method", 1).toString());
+        String value = (String) jsonObject.get("methodValue");
+        String amountMin = (String) jsonObject.get("amountMin");
+        String amountMax = (String) jsonObject.get("amountMax");
+
+        long filterAssetKey = Long.valueOf(jsonObject.getOrDefault("filterAssetKey", 0l).toString());
+        int filterPos = Integer.valueOf(jsonObject.getOrDefault("filterBalPos", 1).toString());
+        int filterSide = Integer.valueOf(jsonObject.getOrDefault("filterBalSide", 1).toString());
+
+        int filterTXType = Integer.valueOf(jsonObject.getOrDefault("filterTXType", 1).toString());
+        String filterGreatEqual = (String) jsonObject.get("filterGreatEqual");
+        String filterLessEqual = (String) jsonObject.get("filterLessEqual");
+        String filterTimeStart = (String) jsonObject.get("activeAfter");
+        String filterTimeEnd = (String) jsonObject.get("activeBefore");
+
+        int filterPerson = Integer.valueOf(jsonObject.getOrDefault("filterPerson", 0).toString());
+        boolean selfUse = Boolean.valueOf((boolean) jsonObject.getOrDefault("selfUse", false));
+
+        return make(assetKey, position, backward, payMethod, value,
+                amountMin, amountMax, filterAssetKey, filterPos, filterSide,
+                filterGreatEqual, filterLessEqual,
+                filterTXType, filterTimeStart, filterTimeEnd,
+                filterPerson, selfUse);
+    }
+
     /**
      * Version 2 maker for BlockExplorer
      */
@@ -804,6 +836,16 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         }
 
         return toJson;
+    }
+
+    public String getInfoHTML() {
+
+        String out = "<h3>" + Lang.T("Accruals") + "</h3>";
+        out += Lang.T("Count # кол-во") + ": <b>" + resultsCount
+                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(totalFeeBytes)
+                + "</b>, " + Lang.T("Total") + ": <b>" + totalPay;
+
+        return out;
     }
 
     public boolean calcAccrualsForMethodTotal() {

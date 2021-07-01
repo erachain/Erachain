@@ -92,10 +92,10 @@ public class ExActionPanel extends IconPanel {
 
     public Fun.Tuple2<ExAction, String> getAction() {
         int selected = selectBox.getSelectedIndex();
-        return actionPanels[selected];
+        return ((ExActionPanelInt) actionPanels[selected]).getResult();
     }
 
     private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> selectBox;
     private JPanel panel = new JPanel();
-    private IconPanel[] actionPanels;
+    public IconPanel[] actionPanels;
 }

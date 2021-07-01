@@ -104,21 +104,16 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
                         jScrollPaneAccruals.setVisible(false);
 
-                        Fun.Tuple2<ExAirDrop, String> exPaysRes = getAccruals();
+                        Fun.Tuple2<ExAction, String> exPaysRes = getResult();
                         if (exPaysRes.b != null) {
                             jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
                                     Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
                             return;
                         }
 
-                        ExAirDrop pays = exPaysRes.a;
-                        pays.setDC(DCSet.getInstance());
-                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.precalcCheckedAccruals(
-                                Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        ExAirDrop airDrop = (ExAirDrop) exPaysRes.a;
 
-                        jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + pays.getAddressesCount()
-                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
-                                + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay());
+                        jLabel_FeesResult.setText(airDrop.getInfoHTML());
                     } finally {
                         jButtonCalcCompu.setEnabled(true);
                         jButtonViewResult.setEnabled(true);
@@ -142,7 +137,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
                         jScrollPaneAccruals.setVisible(false);
 
-                        Fun.Tuple2<ExAirDrop, String> exPaysRes = getAccruals();
+                        Fun.Tuple2<ExAction, String> exPaysRes = getResult();
                         if (exPaysRes.b != null) {
                             jLabel_FeesResult.setText(exPaysRes.a == null ? Lang.T(exPaysRes.b) :
                                     Lang.T(exPaysRes.b) + (exPaysRes.a.errorValue == null ? "" : Lang.T(exPaysRes.a.errorValue)));
@@ -150,7 +145,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                             return;
                         }
 
-                        ExAirDrop pays = exPaysRes.a;
+                        ExAirDrop pays = (ExAirDrop) exPaysRes.a;
                         pays.setDC(DCSet.getInstance());
                         List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = pays.precalcAccrualList(
                                 Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
