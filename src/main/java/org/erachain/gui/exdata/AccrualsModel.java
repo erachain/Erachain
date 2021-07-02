@@ -12,37 +12,48 @@ import java.util.Vector;
 
 public class AccrualsModel extends DefaultTableModel {
 
-    public AccrualsModel(List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals) {
-        super(new String[]{Lang.T("No."),
-                        Lang.T("Balance"),
-                        Lang.T("Account"),
-                        Lang.T("Accrual"),
-                        Lang.T("Error")
-                },
-                accruals.size());
-        setRows(accruals);
+    static Vector<Object> headVector = new Vector<Object>(8) {{
+        add(Lang.T("No."));
+        add(Lang.T("Balance"));
+        add(Lang.T("Account"));
+        add(Lang.T("Accrual"));
+        add(Lang.T("Error"));
+    }};
+
+    public AccrualsModel(List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
+        super(setRows(accruals, onlyErrors), headVector);
     }
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return true;
+        return false;
     }
 
-    public void setRows(List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals) {
+    static Vector<Object> setRows(List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
         int count = 0;
-        Vector vector = getDataVector();
+        Vector vector = new Vector();
+
+        Vector<Object> rowVector;
+
         for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : accruals) {
 
-            Vector<Object> rowVector = new Vector<Object>(4);
-            rowVector.addElement(count + 1);
+            if (onlyErrors && item.d == null)
+                continue;
+
+            rowVector = new Vector<Object>(8);
+            rowVector.addElement(++count);
             rowVector.addElement(item.b.toPlainString());
             rowVector.addElement(item.a.getPersonAsString());
             rowVector.addElement(item.c.toPlainString());
-            rowVector.addElement(item.d == null ? "" : Lang.T(OnDealClick.resultMess(item.d.a)));
+            if (item.d == null) {
+                rowVector.addElement("");
+            } else {
+                rowVector.addElement(Lang.T(OnDealClick.resultMess(item.d.a)) + (item.d.b == null ? "" : " - " + item.d.b));
+            }
 
-            vector.set(count++, rowVector);
+            vector.add(rowVector);
         }
-        fireTableDataChanged();
+        return vector;
     }
 }
 

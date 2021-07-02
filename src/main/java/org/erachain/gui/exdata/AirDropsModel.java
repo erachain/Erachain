@@ -12,35 +12,47 @@ import java.util.Vector;
 
 public class AirDropsModel extends DefaultTableModel {
 
-    public AirDropsModel(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals) {
-        super(new String[]{Lang.T("No."),
-                        Lang.T("Account"),
-                        Lang.T("Accrual"),
-                        Lang.T("Error")
-                },
-                accruals.size());
-        setRows(accruals);
+    static Vector<Object> headVector = new Vector<Object>(8) {{
+        add(Lang.T("No."));
+        add(Lang.T("Account"));
+        add(Lang.T("Accrual"));
+        add(Lang.T("Error"));
+    }};
+
+    public AirDropsModel(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
+        super(setRows(accruals, onlyErrors), headVector);
     }
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return true;
+        return false;
     }
 
-    public void setRows(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals) {
+    static Vector setRows(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
         int count = 0;
-        Vector vector = getDataVector();
+        Vector data = new Vector();
+
+        Vector<Object> rowVector;
+
         for (Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>> item : accruals) {
 
-            Vector<Object> rowVector = new Vector<Object>(4);
-            rowVector.addElement(count + 1);
+            if (onlyErrors && item.c == null)
+                continue;
+
+            rowVector = new Vector<Object>(8);
+            rowVector.addElement(++count);
             rowVector.addElement(item.a.getPersonAsString());
             rowVector.addElement(item.b.toPlainString());
-            rowVector.addElement(item.c == null ? "" : Lang.T(OnDealClick.resultMess(item.c.a)));
+            if (item.c == null) {
+                rowVector.addElement("");
+            } else {
+                rowVector.addElement(Lang.T(OnDealClick.resultMess(item.c.a)) + (item.c.b == null ? "" : " - " + item.c.b));
+            }
 
-            vector.set(count++, rowVector);
+            data.add(rowVector);
         }
-        fireTableDataChanged();
+
+        return data;
     }
 }
 

@@ -20,6 +20,7 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RenderComboBoxActionFilter;
 import org.erachain.gui.models.RenderComboBoxAssetActions;
 import org.erachain.gui.models.RenderComboBoxViewBalance;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun;
 
@@ -130,7 +131,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         ExPays pays = (ExPays) exActionRes.a;
                         pays.setDC(DCSet.getInstance());
-                        pays.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
+                        pays.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
                         List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.getResults();
                         pays.calcTotalFeeBytes();
                         jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()
@@ -170,15 +171,20 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         ExPays pays = (ExPays) exActionRes.a;
                         pays.setDC(DCSet.getInstance());
-                        pays.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.getResults();
+                        pays.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), true);
+                        List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> results = pays.getResults();
                         pays.calcTotalFeeBytes();
-                        String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()
+
+                        String result = "<html>";
+                        if (pays.resultCode != Transaction.VALIDATE_OK) {
+                            result += Lang.T("Error") + "! " + Lang.T(OnDealClick.resultMess(pays.resultCode));
+                        }
+                        result += Lang.T("Count # кол-во") + ": <b>" + pays.getResultsCount()
                                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
                                 + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
                         jLabel_FeesResult.setText(result);
 
-                        AccrualsModel model = new AccrualsModel(accruals);
+                        AccrualsModel model = new AccrualsModel(results, pays.resultCode != Transaction.VALIDATE_OK);
                         jTablePreviewAccruals.setModel(model);
                         TableColumnModel columnModel = jTablePreviewAccruals.getColumnModel();
 
@@ -671,7 +677,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         headBGC.gridy = ++gridy;
         jPanel3.add(jLabel_FeesResult, headBGC);
 
-        jTablePreviewAccruals = new MTable(new AccrualsModel(new ArrayList<>()));
+        jTablePreviewAccruals = new MTable(new AccrualsModel(new ArrayList<>(), false));
 
         jTablePreviewAccruals.setAutoCreateRowSorter(true);
         jScrollPaneAccruals.setViewportView(jTablePreviewAccruals);

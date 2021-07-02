@@ -35,7 +35,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
 
     public static final byte BASE_LENGTH = 4 + 8 + 8 + 2;
 
-    public static final int MAX_COUNT = Short.MAX_VALUE;
+    public static final int MAX_COUNT = 1 << 16;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExAirDrop.class);
 
@@ -51,16 +51,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
     private final byte[][] addresses;
 
     /////////////////
-    DCSet dcSet;
-    private int height;
-    AssetCls asset;
-    BigDecimal totalPay;
-    private int resultsCount;
-
-    /**
-     * recipient + accrual
-     */
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> checkedAccruals;
 
     public String errorValue;
 
@@ -117,43 +107,42 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
         }
     }
 
-    public int makePayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
+    public void makePayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
 
-        checkedAccruals = new ArrayList<>();
+        results = new ArrayList<>();
+        errorValue = null;
+        resultCode = Transaction.VALIDATE_OK;
 
         BigDecimal accrual = amount;
 
-        int count = 0;
-
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
+
+        if (andValidate && addresses.length > MAX_COUNT) {
+            errorValue = "" + MAX_COUNT;
+            resultCode = Transaction.INVALID_MAX_ITEMS_COUNT;
+            return;
+        }
 
         for (byte[] recipientShort : addresses) {
 
             Account recipient = new Account(recipientShort);
-            count++;
 
             // IF send from PERSON to ANONYMOUS
             if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
                     creatorIsPerson, assetKey, balancePos,
                     asset)) {
-                errorValue = recipient.getAddress();
-                return -Transaction.RECEIVER_NOT_PERSONALIZED;
-            }
-
-            // не проверяем на 0 - так это может быть рассылка писем всем
-            checkedAccruals.add(new Fun.Tuple3(recipient, accrual, null));
-
-            count++;
-            if (andValidate && count > MAX_COUNT) {
-                errorValue = "MAX count over: " + MAX_COUNT;
-                return (count = -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+                resultCode = Transaction.RECEIVER_NOT_PERSONALIZED;
+                errorValue = null;
+                results.add(new Fun.Tuple3(recipient, accrual, new Fun.Tuple2<>(resultCode, null)));
+            } else {
+                results.add(new Fun.Tuple3(recipient, accrual, null));
             }
 
         }
 
         totalPay = amount.multiply(new BigDecimal(addresses.length));
 
-        return count;
+        return;
 
     }
 
@@ -368,11 +357,9 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
     }
 
     @Override
-    public int preProcess(int height, Account creator) {
-        if (results == null) {
-            resultsCount = makePayList(dcSet, height, asset, creator, false);
-        }
-        return resultsCount;
+    public int preProcess(int height, Account creator, boolean andPreValid) {
+        makePayList(dcSet, height, asset, creator, andPreValid);
+        return resultCode;
     }
 
     public int isValid(RSignNote rNote) {

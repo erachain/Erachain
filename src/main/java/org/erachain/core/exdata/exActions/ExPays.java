@@ -42,7 +42,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
 
-    public static final int MAX_COUNT = Integer.MAX_VALUE >> 4;
+    public static final int MAX_COUNT = 1 << 17;
     private static final byte AMOUNT_FLAG_MASK = -128;
     private static final byte AMOUNT_MIN_FLAG_MASK = 64;
     private static final byte AMOUNT_MAX_FLAG_MASK = 32;
@@ -98,13 +98,9 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public boolean useSelfBalance; // 54
 
     /////////////////
-    DCSet dcSet;
-    private int height;
-    AssetCls asset;
     int payAction;
     AssetCls filterAsset;
     private int resultsCount;
-    private BigDecimal totalPay;
     private long totalFeeBytes;
     private long iteratorUses;
     private int maxIndex;
@@ -222,7 +218,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         return asset;
     }
 
-    public int getresultsCount() {
+    public int getResultsCount() {
         return resultsCount;
     }
 
@@ -840,14 +836,16 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     }
 
     @Override
-    public int preProcess(int height, Account creator) {
-        if (results == null) {
-            resultsCount = makeFilterPayList(dcSet, height, asset, creator, false);
-            if (payMethod == PAYMENT_METHOD_TOTAL) {
-                calcAccrualsForMethodTotal();
-            }
+    public int preProcess(int height, Account creator, boolean andPreValid) {
+        makeFilterPayList(dcSet, height, asset, creator, andPreValid);
+        if (resultCode != Transaction.VALIDATE_OK) {
+            return resultCode;
         }
-        return resultsCount;
+
+        if (payMethod == PAYMENT_METHOD_TOTAL) {
+            calcAccrualsForMethodTotal();
+        }
+        return resultCode;
     }
 
     public boolean calcAccrualsForMethodTotal() {
@@ -906,12 +904,15 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
      * @param andValidate
      * @return
      */
-    public int makeFilterPayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
+    public void makeFilterPayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
 
         results = new ArrayList<>();
 
         iteratorUses = 0L;
         resultsCount = 0;
+
+        errorValue = null;
+        resultCode = Transaction.VALIDATE_OK;
 
         int scale = asset.getScale();
 
@@ -947,7 +948,6 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             filterBySigNum *= -1;
         }
 
-
         Long filterTimeStartSeqNo = filterTimeStart == null ? null : Transaction.makeDBRef(
                 Controller.getInstance().blockChain.getHeightOnTimestampMS(filterTimeStart), 0);
         Long filterTimeEndSeqNo = filterTimeEnd == null ? null : Transaction.makeDBRef(
@@ -958,7 +958,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         BigDecimal accrual;
         BigDecimal totalBalances = BigDecimal.ZERO;
 
-        int count = 0;
+        resultsCount = 0;
 
         Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
         Long myPersonKey = null;
@@ -1038,14 +1038,6 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
                         continue;
                 }
 
-                // IF send from PERSON to ANONYMOUS
-                if (hasAmount && andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
-                        creatorIsPerson, assetKey, balancePos,
-                        asset)) {
-                    errorValue = recipient.getAddress();
-                    return (resultsCount = -Transaction.RECEIVER_NOT_PERSONALIZED);
-                }
-
                 if (!hasAmount) {
                     accrual = null;
                 } else {
@@ -1069,13 +1061,24 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
                     }
                 }
 
-                // не проверяем на 0 - так это может быть рассылка писем всем
-                results.add(new Fun.Tuple4(recipient, balance, accrual, null));
+                // IF send from PERSON to ANONYMOUS
+                if (hasAmount && andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
+                        creatorIsPerson, assetKey, balancePos,
+                        asset)) {
+                    resultCode = Transaction.RECEIVER_NOT_PERSONALIZED;
+                    errorValue = null;
+                    results.add(new Fun.Tuple4(recipient, balance, accrual, new Fun.Tuple2<>(resultCode, errorValue)));
+                } else {
 
-                count++;
-                if (andValidate && count > MAX_COUNT) {
-                    errorValue = "MAX count over: " + MAX_COUNT;
-                    return (resultsCount = -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+                    // не проверяем на 0 - так это может быть рассылка писем всем
+                    results.add(new Fun.Tuple4(recipient, balance, accrual, null));
+                }
+
+                resultsCount++;
+                if (andValidate && resultsCount > MAX_COUNT) {
+                    errorValue = "" + MAX_COUNT;
+                    resultCode = Transaction.INVALID_MAX_ITEMS_COUNT;
+                    return;
                 }
 
                 if (onlyPerson) {
@@ -1091,15 +1094,14 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
         switch (payMethod) {
             case PAYMENT_METHOD_ABSOLUTE:
-                totalPay = payMethodValue.multiply(new BigDecimal(count));
+                totalPay = payMethodValue.multiply(new BigDecimal(resultsCount));
                 break;
             default:
                 totalPay = totalBalances;
         }
 
-        resultsCount = count;
         calcTotalFeeBytes();
-        return count;
+        return;
 
     }
 
@@ -1157,7 +1159,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             return Transaction.INVALID_TRANSFER_TYPE;
         }
 
-        resultsCount = makeFilterPayList(dcSet, height, asset, rNote.getCreator(), true);
+        makeFilterPayList(dcSet, height, asset, rNote.getCreator(), true);
 
         if (resultsCount < 0) {
             // ERROR on make LIST

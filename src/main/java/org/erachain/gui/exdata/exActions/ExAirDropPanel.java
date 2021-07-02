@@ -7,6 +7,7 @@ import org.erachain.core.exdata.exActions.ExAction;
 import org.erachain.core.exdata.exActions.ExAirDrop;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.IconPanel;
@@ -17,6 +18,7 @@ import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RenderComboBoxAssetActions;
 import org.erachain.gui.models.RenderComboBoxViewBalance;
+import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun;
 
@@ -114,15 +116,11 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
                         ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
                         airDrop.setDC(DCSet.getInstance());
-                        airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = airDrop.getResults();
-                        if (exActionRes.b != null) {
-                            jLabel_FeesResult.setText(exActionRes.a == null ? Lang.T(exActionRes.b) :
-                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue)));
-                            return;
-                        }
-
-                        jLabel_FeesResult.setText(airDrop.getInfoHTML());
+                        airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
+                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = airDrop.getResults();
+                        jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()
+                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getTotalFeeBytes())
+                                + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay());
                     } finally {
                         jButtonCalcCompu.setEnabled(true);
                         jButtonViewResult.setEnabled(true);
@@ -156,15 +154,19 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
                         ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
                         airDrop.setDC(DCSet.getInstance());
-                        airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem());
-                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accrual = airDrop.getResults();
+                        airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), true);
+                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> results = airDrop.getResults();
 
-                        String result = "<html>" + Lang.T("Count # кол-во") + ": <b>" + airDrop.getAddressesCount()
+                        String result = "<html>";
+                        if (airDrop.resultCode != Transaction.VALIDATE_OK) {
+                            result += Lang.T("Error") + "! " + Lang.T(OnDealClick.resultMess(airDrop.resultCode));
+                        }
+                        result += Lang.T("Count # кол-во") + ": <b>" + airDrop.getAddressesCount()
                                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getAddressesCount())
                                 + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay();
                         jLabel_FeesResult.setText(result);
 
-                        AirDropsModel model = new AirDropsModel(accrual);
+                        AirDropsModel model = new AirDropsModel(results, airDrop.resultCode != Transaction.VALIDATE_OK);
                         jTablePreviewAccruals.setModel(model);
                         TableColumnModel columnModel = jTablePreviewAccruals.getColumnModel();
 
@@ -342,7 +344,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         headBGC.gridy = ++gridy;
         jPanel3.add(jLabel_FeesResult, headBGC);
 
-        jTablePreviewAccruals = new MTable(new AccrualsModel(new ArrayList<>()));
+        jTablePreviewAccruals = new MTable(new AccrualsModel(new ArrayList<>(), false));
 
         jTablePreviewAccruals.setAutoCreateRowSorter(true);
         jScrollPaneAccruals.setViewportView(jTablePreviewAccruals);

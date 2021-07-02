@@ -2,12 +2,14 @@ package org.erachain.core.exdata.exActions;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -20,11 +22,16 @@ public abstract class ExAction<R> {
     public static final int LIST_PAYOUTS_TYPE = 1;
 
     int type;
-    R results;
-    /////////////////
-    DCSet dcSet;
-    private int height;
 
+    /////////////////
+    protected DCSet dcSet;
+    protected int height;
+    protected AssetCls asset;
+
+    protected R results;
+    protected BigDecimal totalPay;
+
+    public int resultCode;
     public String errorValue;
 
     ExAction(int type) {
@@ -99,16 +106,18 @@ public abstract class ExAction<R> {
     /**
      * make calculations of lists and pre-validate it if need
      */
-    public abstract int preProcess(int height, Account creator);
+    public abstract int preProcess(int height, Account creator, boolean andPreValid);
 
     /**
-     * make calculations of lists and pre-validate it if need
+     * make calculations of lists for process / orphan. If before validated it take old results
      *
      * @param transaction
      * @return
      */
     public int preProcess(Transaction transaction) {
-        return preProcess(transaction.getBlockHeight(), transaction.getCreator());
+        if (results == null)
+            return (resultCode = preProcess(transaction.getBlockHeight(), transaction.getCreator(), false));
+        return resultCode;
     }
 
     public abstract void updateItemsKeys(List listTags);
