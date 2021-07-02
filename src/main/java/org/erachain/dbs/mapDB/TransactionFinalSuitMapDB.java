@@ -71,6 +71,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     public void openMap() {
 
+        HI = Long.MAX_VALUE;
+        LO = 0L;
+
         // OPEN MAP
         // TREE MAP for sortable search
         DB.BTreeMapMaker mapConstruct = database.createTreeMap("height_seq_transactions")
