@@ -47,6 +47,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
     public ComboBoxAssetsModel assetsModel;
     public ComboBoxAssetsModel assetsModel1;
     private Boolean lock = new Boolean(false);
+    private AssetCls asset;
 
     public ExFilteredPaysPanel(ExDataPanel parent) {
         super(NAME, TITLE);
@@ -124,7 +125,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
-                            jLabel_FeesResult.setText(exActionRes.a == null ? Lang.T(exActionRes.b) :
+                            jLabel_FeesResult.setText(Lang.T("Error") + "! " + exActionRes.a == null ? Lang.T(exActionRes.b) :
                                     Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue)));
                             return;
                         }
@@ -163,8 +164,8 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
-                            jLabel_FeesResult.setText(exActionRes.a == null ? Lang.T(exActionRes.b) :
-                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue)));
+                            jLabel_FeesResult.setText(Lang.T("Error") + "! " + (exActionRes.a == null ? Lang.T(exActionRes.b) :
+                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue))));
                             jButtonViewResult.setEnabled(true);
                             return;
                         }
@@ -226,7 +227,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
     }
 
     public void updateAction() {
-        AssetCls asset = (AssetCls) jComboBoxAccrualAsset.getSelectedItem();
+        asset = (AssetCls) jComboBoxAccrualAsset.getSelectedItem();
         if (asset == null)
             return;
 
@@ -717,8 +718,17 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         if (!jPanelMain.isVisible())
             return new Fun.Tuple2<>(null, null);
 
+        Account creator = (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem();
+        if (creator == null)
+            return new Fun.Tuple2<>(null, Lang.T("Empty Creator account"));
+
         Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> balancePosition
                 = (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>) jComboBoxAccrualAction.getSelectedItem();
+
+        if (asset.isUnTransferable(creator.equals(asset.getMaker()))
+                || balancePosition == null)
+            return new Fun.Tuple2<>(null, Lang.T("Empty actions for this asset"));
+
 
         Integer txTypeFilter = (Integer) jComboBoxTXTypeFilter.getSelectedItem();
 
@@ -736,8 +746,9 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         }
 
         boolean minMaxUse = jComboBoxMethodPaymentType.getSelectedIndex() == ExPays.PAYMENT_METHOD_COEFF;
+
         return ExPays.make(
-                ((AssetCls) jComboBoxAccrualAsset.getSelectedItem()).getKey(),
+                asset.getKey(),
                 balancePosition.a.a, balancePosition.a.b,
                 jComboBoxMethodPaymentType.getSelectedIndex(),
                 jTextFieldAmount.getText(),

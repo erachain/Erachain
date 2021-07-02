@@ -108,8 +108,8 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
-                            jLabel_FeesResult.setText(exActionRes.a == null ? Lang.T(exActionRes.b) :
-                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue)));
+                            jLabel_FeesResult.setText(Lang.T("Error") + "! " + (exActionRes.a == null ? Lang.T(exActionRes.b) :
+                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue))));
                             jButtonViewResult.setEnabled(true);
                             return;
                         }
@@ -146,8 +146,8 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
-                            jLabel_FeesResult.setText(exActionRes.a == null ? Lang.T(exActionRes.b) :
-                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue)));
+                            jLabel_FeesResult.setText(Lang.T("Error") + "! " + (exActionRes.a == null ? Lang.T(exActionRes.b) :
+                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue))));
                             jButtonViewResult.setEnabled(true);
                             return;
                         }
