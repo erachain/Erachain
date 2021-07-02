@@ -234,12 +234,12 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         if (creator == null)
             return;
 
+        //////// для восстановления Выделенного
+        int selected = jComboBoxAccrualAction.getSelectedIndex();
         jComboBoxAccrualAction.setModel(new DefaultComboBoxModel(
                 asset.viewAssetTypeActionsList(creator.equals(asset.getMaker()), false).toArray()));
-
-        int selected = jComboBoxAccrualAction.getSelectedIndex();
-        /////////// не успевает зачастую - идет обновление и ставится на 0 в пустом спике и ошибка вылетает
-        if (false && selected >= 0 && selected < jComboBoxAccrualAction.getModel().getSize())
+        /////////// у некоторых активов нет действий вообще!
+        if (selected >= 0 && selected < jComboBoxAccrualAction.getModel().getSize())
             jComboBoxAccrualAction.setSelectedIndex(selected);
 
     }
