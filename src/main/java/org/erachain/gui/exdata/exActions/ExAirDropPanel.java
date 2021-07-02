@@ -159,11 +159,13 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
                         String result = "<html>";
                         if (airDrop.resultCode != Transaction.VALIDATE_OK) {
-                            result += Lang.T("Error") + "! " + Lang.T(OnDealClick.resultMess(airDrop.resultCode));
+                            result += "<b>" + Lang.T("Error") + "!<b> " + Lang.T(OnDealClick.resultMess(airDrop.resultCode)) + "<br>";
+                            result += Lang.T("Found errors") + ":<b> " + airDrop.getAddressesCount() + "<br>";
+                        } else {
+                            result += Lang.T("Count # кол-во") + ": <b>" + airDrop.getAddressesCount()
+                                    + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getAddressesCount())
+                                    + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay();
                         }
-                        result += Lang.T("Count # кол-во") + ": <b>" + airDrop.getAddressesCount()
-                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getAddressesCount())
-                                + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay();
                         jLabel_FeesResult.setText(result);
 
                         AirDropsModel model = new AirDropsModel(results, airDrop.resultCode != Transaction.VALIDATE_OK);

@@ -177,11 +177,13 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         String result = "<html>";
                         if (pays.resultCode != Transaction.VALIDATE_OK) {
-                            result += Lang.T("Error") + "! " + Lang.T(OnDealClick.resultMess(pays.resultCode));
+                            result += "<b>" + Lang.T("Error") + "!<b> " + Lang.T(OnDealClick.resultMess(pays.resultCode)) + "<br>";
+                            result += Lang.T("Found errors") + ":<b> " + pays.getResultsCount() + "<br>";
+                        } else {
+                            result += Lang.T("Count # кол-во") + ": <b>" + pays.getResultsCount()
+                                    + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
+                                    + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
                         }
-                        result += Lang.T("Count # кол-во") + ": <b>" + pays.getResultsCount()
-                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(pays.getTotalFeeBytes())
-                                + "</b>, " + Lang.T("Total") + ": <b>" + pays.getTotalPay();
                         jLabel_FeesResult.setText(result);
 
                         AccrualsModel model = new AccrualsModel(results, pays.resultCode != Transaction.VALIDATE_OK);
