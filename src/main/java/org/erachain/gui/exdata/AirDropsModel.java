@@ -21,6 +21,7 @@ public class AirDropsModel extends DefaultTableModel {
 
     public AirDropsModel() {
         super(new Vector(), headVector);
+        lastError = null;
         addRow(new Object[]{0, "", ""});
     }
 
@@ -38,6 +39,8 @@ public class AirDropsModel extends DefaultTableModel {
     }
 
     static Vector setRows(String[] addresses) {
+        lastError = null;
+
         int count = 0;
         Vector<Vector> data = new Vector();
 
@@ -63,6 +66,8 @@ public class AirDropsModel extends DefaultTableModel {
     }
 
     static Vector setRows(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
+        lastError = null;
+
         int count = 0;
         Vector data = new Vector();
 

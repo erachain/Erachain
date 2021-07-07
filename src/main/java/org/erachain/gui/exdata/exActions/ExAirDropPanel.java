@@ -144,8 +144,14 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                                     addressesModel = new AirDropsModel(addresses);
                                     jTableAddresses.setModel(addressesModel);
 
+                                    TableColumnModel columnModel = jTableAddresses.getColumnModel();
+                                    TableColumn columnNo = columnModel.getColumn(0);
+                                    columnNo.setMinWidth(50);
+                                    columnNo.setMaxWidth(70);
+                                    columnNo.setPreferredWidth(50);
+
                                     if (AirDropsModel.lastError != null) {
-                                        jLabel_FeesResult.setText(Lang.T("Error") + "! " + AirDropsModel.lastError);
+                                        jLabel_FeesResult.setText(Lang.T("Error") + "! " + Lang.T(AirDropsModel.lastError));
                                         jButtonViewResult.setEnabled(true);
                                         return;
                                     }
@@ -185,7 +191,6 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         if (exActionRes.b != null) {
                             jLabel_FeesResult.setText(Lang.T("Error") + "! " + (exActionRes.a == null ? Lang.T(exActionRes.b) :
                                     Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue))));
-                            jButtonViewResult.setEnabled(true);
                             return;
                         }
 
@@ -225,7 +230,6 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         if (exActionRes.b != null) {
                             jLabel_FeesResult.setText(Lang.T("Error") + "! " + (exActionRes.a == null ? Lang.T(exActionRes.b) :
                                     Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue))));
-                            jButtonViewResult.setEnabled(true);
                             return;
                         }
 
@@ -247,21 +251,15 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
                         addressesModel = new AirDropsModel(results, airDrop.resultCode != Transaction.VALIDATE_OK);
                         jTableAddresses.setModel(addressesModel);
-                        TableColumnModel columnModel = jTableAddresses.getColumnModel();
 
+                        TableColumnModel columnModel = jTableAddresses.getColumnModel();
                         TableColumn columnNo = columnModel.getColumn(0);
                         columnNo.setMinWidth(50);
-                        columnNo.setMaxWidth(100);
-                        columnNo.setPreferredWidth(70);
-                        columnNo.setWidth(70);
-                        columnNo.sizeWidthToFit();
+                        columnNo.setMaxWidth(70);
+                        columnNo.setPreferredWidth(50);
 
-                        TableColumn columnBal = columnModel.getColumn(1);
-                        columnBal.setMinWidth(100);
-                        columnBal.setMaxWidth(200);
-                        columnBal.setPreferredWidth(150);
-                        columnBal.setWidth(150);
-                        columnBal.sizeWidthToFit();
+                        //columnNo.setWidth(70);
+                        //columnNo.sizeWidthToFit();
 
                     } finally {
                         jButtonLoad.setEnabled(true);
