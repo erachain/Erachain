@@ -11,18 +11,21 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.IconPanel;
-import org.erachain.gui.exdata.AccrualsEditModel;
 import org.erachain.gui.exdata.AirDropsModel;
 import org.erachain.gui.exdata.ExDataPanel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RenderComboBoxAssetActions;
 import org.erachain.gui.models.RenderComboBoxViewBalance;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -30,11 +33,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 
 public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExAirDropPanel.class);
 
     public static String NAME = "ExAirDropPanel";
     public static String TITLE = "AirDrops";
@@ -42,6 +52,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
     private ExDataPanel parent;
     public ComboBoxAssetsModel assetsModel;
     private Boolean lock = new Boolean(false);
+    AirDropsModel addressesModel;
 
     public ExAirDropPanel(ExDataPanel parent) {
         super(NAME, TITLE);
@@ -92,6 +103,76 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
             }
         });
 
+        jButtonLoad.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (lock)
+                    return;
+                synchronized (lock) {
+                    try {
+                        lock = new Boolean(true);
+                        jButtonLoad.setEnabled(false);
+                        jButtonCalcCompu.setEnabled(false);
+                        jButtonViewResult.setEnabled(false);
+
+                        FileChooser chooser = new FileChooser();
+                        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                        chooser.setMultiSelectionEnabled(false);
+                        FileNameExtensionFilter filter = new FileNameExtensionFilter("List", "txt", "csv");
+                        chooser.setFileFilter(filter);
+                        chooser.setDialogTitle(Lang.T("Open List") + "...");
+                        int returnVal = chooser.showOpenDialog(getParent());
+                        String[] addresses;
+                        if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+                            File file = new File(chooser.getSelectedFile().getPath());
+                            if (file.getName().toLowerCase().endsWith("csv")) {
+                            } else {
+                                try {
+                                    List<String> lines = new ArrayList<String>();
+                                    BufferedReader in = new BufferedReader(new FileReader(file));
+                                    String str;
+                                    while ((str = in.readLine()) != null) {
+                                        str = str.trim();
+                                        if (str.startsWith("//"))
+                                            continue;
+
+                                        lines.add(str);
+                                    }
+                                    in.close();
+                                    addresses = lines.toArray(new String[lines.size()]);
+                                    addressesModel = new AirDropsModel(new BigDecimal(jTextFieldAmount.getText() == null ?
+                                            "1" : jTextFieldAmount.getText()), addresses);
+
+
+                                } catch (Exception e) {
+                                    LOGGER.error(e.getMessage(), e);
+                                }
+
+                            }
+                        }
+
+                        Fun.Tuple2<ExAction, String> exActionRes = getResult();
+
+
+                        ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
+                        airDrop.setDC(DCSet.getInstance());
+                        airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
+                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = airDrop.getResults();
+                        jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()
+                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getTotalFeeBytes())
+                                + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay());
+                    } finally {
+                        jButtonLoad.setEnabled(true);
+                        jButtonCalcCompu.setEnabled(true);
+                        jButtonViewResult.setEnabled(true);
+
+                        lock = new Boolean(false);
+                    }
+                }
+            }
+        });
+
         jButtonCalcCompu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -100,6 +181,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                 synchronized (lock) {
                     try {
                         lock = new Boolean(true);
+                        jButtonLoad.setEnabled(false);
                         jButtonCalcCompu.setEnabled(false);
                         jButtonViewResult.setEnabled(false);
 
@@ -121,6 +203,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getTotalFeeBytes())
                                 + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay());
                     } finally {
+                        jButtonLoad.setEnabled(true);
                         jButtonCalcCompu.setEnabled(true);
                         jButtonViewResult.setEnabled(true);
 
@@ -138,6 +221,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                 synchronized (lock) {
                     try {
                         lock = new Boolean(true);
+                        jButtonLoad.setEnabled(false);
                         jButtonCalcCompu.setEnabled(false);
                         jButtonViewResult.setEnabled(false);
 
@@ -167,9 +251,9 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         }
                         jLabel_FeesResult.setText(result);
 
-                        AirDropsModel model = new AirDropsModel(results, airDrop.resultCode != Transaction.VALIDATE_OK);
-                        jTablePreviewAccruals.setModel(model);
-                        TableColumnModel columnModel = jTablePreviewAccruals.getColumnModel();
+                        addressesModel = new AirDropsModel(results, airDrop.resultCode != Transaction.VALIDATE_OK);
+                        jTableAddresses.setModel(addressesModel);
+                        TableColumnModel columnModel = jTableAddresses.getColumnModel();
 
                         TableColumn columnNo = columnModel.getColumn(0);
                         columnNo.setMinWidth(50);
@@ -193,6 +277,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         columnPay.sizeWidthToFit();
 
                     } finally {
+                        jButtonLoad.setEnabled(true);
                         jButtonCalcCompu.setEnabled(true);
                         jButtonViewResult.setEnabled(true);
 
@@ -238,12 +323,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         jButtonViewResult = new JButton();
         jCheckBoxAccrualsUse = new JCheckBox();
         JLabel jLabelAmount = new JLabel(Lang.T("Amount"));
-        jSeparator1 = new JSeparator();
-        jSeparator2 = new JSeparator();
-        jSeparator3 = new JSeparator();
-        jSeparator4 = new JSeparator();
-        jSeparator5 = new JSeparator();
-        jTextFieldAmount = new JTextField();
+        jTextFieldAmount = new JTextField("1");
         jButtonCalcCompu = new JButton();
 
         java.awt.GridBagLayout jPanelLayout = new java.awt.GridBagLayout();
@@ -337,25 +417,29 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
         jPanel3.setLayout(jPanelLayout);
 
-        jButtonCalcCompu.setText(Lang.T("Preview Fee"));
+        jButtonLoad.setText(Lang.T("Load"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.insets = new Insets(10, 10, 10, 10);
         gridBagConstraints.ipadx = 10;
         gridBagConstraints.ipady = 10;
+        jPanel3.add(jButtonLoad, gridBagConstraints);
+
+        jButtonCalcCompu.setText(Lang.T("Preview Fee"));
+        gridBagConstraints.gridx = 1;
         jPanel3.add(jButtonCalcCompu, gridBagConstraints);
 
         jButtonViewResult.setText(Lang.T("Preview Results"));
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         jPanel3.add(jButtonViewResult, gridBagConstraints);
 
         headBGC.gridy = ++gridy;
         jPanel3.add(jLabel_FeesResult, headBGC);
 
-        jTablePreviewAccruals = new MTable(new AccrualsEditModel());
+        jTableAddresses = new MTable(new AirDropsModel());
 
-        jTablePreviewAccruals.setAutoCreateRowSorter(true);
-        jScrollPaneAccruals.setViewportView(jTablePreviewAccruals);
+        jTableAddresses.setAutoCreateRowSorter(true);
+        jScrollPaneAccruals.setViewportView(jTableAddresses);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -391,13 +475,20 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> balancePosition
                 = (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>) jComboBoxAccrualAction.getSelectedItem();
 
+        Vector<Vector> vector = addressesModel.getDataVector();
+        String[] addresses = new String[vector.size()];
+        for (int i = 0; i < vector.size(); i++) {
+            addresses[i] = (String) vector.get(i).get(1);
+        }
+
         return ExAirDrop.make(
                 ((AssetCls) jComboBoxAccrualAsset.getSelectedItem()).getKey(),
                 jTextFieldAmount.getText(),
                 balancePosition.a.a, balancePosition.a.b,
-                null);
+                addresses);
     }
 
+    private JButton jButtonLoad = new JButton();
     private JButton jButtonCalcCompu;
     private JButton jButtonViewResult;
     public JCheckBox jCheckBoxAccrualsUse;
@@ -410,13 +501,8 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
     private JLabel jLabelBalancePosition;
     public JPanel jPanelMain;
     private JPanel jPanel3;
-    private JSeparator jSeparator1;
-    private JSeparator jSeparator2;
-    private JSeparator jSeparator3;
-    private JSeparator jSeparator4;
-    private JSeparator jSeparator5;
     private JTextField jTextFieldAmount;
 
-    private MTable jTablePreviewAccruals;
+    private MTable jTableAddresses;
     private JScrollPane jScrollPaneAccruals = new JScrollPane();
 }

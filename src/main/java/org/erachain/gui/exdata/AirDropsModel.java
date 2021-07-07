@@ -15,9 +15,17 @@ public class AirDropsModel extends DefaultTableModel {
     static Vector<Object> headVector = new Vector<Object>(8) {{
         add(Lang.T("No."));
         add(Lang.T("Account"));
-        add(Lang.T("Accrual"));
         add(Lang.T("Error"));
     }};
+
+    public AirDropsModel() {
+        super(new Vector(), headVector);
+        addRow(new Object[]{0, "", ""});
+    }
+
+    public AirDropsModel(BigDecimal amount, String[] addresses) {
+        super(setRows(amount, addresses), headVector);
+    }
 
     public AirDropsModel(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
         super(setRows(accruals, onlyErrors), headVector);
@@ -25,7 +33,31 @@ public class AirDropsModel extends DefaultTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return false;
+        return column == 1;
+    }
+
+    static Vector setRows(BigDecimal amount, String[] addresses) {
+        int count = 0;
+        Vector<Vector> data = new Vector();
+
+        Vector<Object> rowVector;
+        Fun.Tuple2<Account, String> result;
+        for (String item : addresses) {
+            result = Account.tryMakeAccount(item);
+            rowVector = new Vector<Object>(8);
+            rowVector.addElement(++count);
+            if (result.a == null) {
+                rowVector.addElement(item);
+                rowVector.addElement(result.b);
+            } else {
+                rowVector.addElement(result.a.getPersonAsString());
+                rowVector.addElement("");
+            }
+
+            data.add(rowVector);
+        }
+
+        return data;
     }
 
     static Vector setRows(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
@@ -54,5 +86,6 @@ public class AirDropsModel extends DefaultTableModel {
 
         return data;
     }
+
 }
 
