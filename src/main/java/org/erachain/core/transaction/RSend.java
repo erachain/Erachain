@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 
 /*
 
@@ -421,17 +422,13 @@ public class RSend extends TransactionAmount {
         // GET BASE
         JSONObject transaction = this.getJsonBase();
 
-        if (title.length() > 0) {
-            transaction.put("title", this.title);
-        }
-
         if (data != null && data.length > 0) {
 
             // ADD CREATOR/SERVICE/DATA
             if (this.isText() && !this.isEncrypted()) {
                 transaction.put("message", new String(this.data, StandardCharsets.UTF_8));
             } else {
-                transaction.put("message", Base58.encode(this.data));
+                transaction.put("data", Base64.getEncoder().encodeToString(this.data));
             }
             transaction.put("encrypted", this.isEncrypted());
             transaction.put("isText", this.isText());
