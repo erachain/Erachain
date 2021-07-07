@@ -12,6 +12,7 @@ import java.util.Vector;
 
 public class AirDropsModel extends DefaultTableModel {
 
+    public static String lastError;
     static Vector<Object> headVector = new Vector<Object>(8) {{
         add(Lang.T("No."));
         add(Lang.T("Account"));
@@ -49,6 +50,7 @@ public class AirDropsModel extends DefaultTableModel {
             if (result.a == null) {
                 rowVector.addElement(item);
                 rowVector.addElement(result.b);
+                lastError = result.b;
             } else {
                 rowVector.addElement(result.a.getPersonAsString());
                 rowVector.addElement("");

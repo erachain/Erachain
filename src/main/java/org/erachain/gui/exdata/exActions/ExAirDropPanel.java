@@ -142,25 +142,20 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                                     in.close();
                                     addresses = lines.toArray(new String[lines.size()]);
                                     addressesModel = new AirDropsModel(addresses);
+                                    jTableAddresses.setModel(addressesModel);
 
+                                    if (AirDropsModel.lastError != null) {
+                                        jLabel_FeesResult.setText(Lang.T("Error") + "! " + AirDropsModel.lastError);
+                                        jButtonViewResult.setEnabled(true);
+                                        return;
+                                    }
 
                                 } catch (Exception e) {
                                     LOGGER.error(e.getMessage(), e);
                                 }
-
                             }
                         }
 
-                        Fun.Tuple2<ExAction, String> exActionRes = getResult();
-
-
-                        ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
-                        airDrop.setDC(DCSet.getInstance());
-                        airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
-                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = airDrop.getResults();
-                        jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()
-                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getTotalFeeBytes())
-                                + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay());
                     } finally {
                         jButtonLoad.setEnabled(true);
                         jButtonCalcCompu.setEnabled(true);
