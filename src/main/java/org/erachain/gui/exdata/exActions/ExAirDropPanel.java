@@ -185,8 +185,6 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         jButtonCalcCompu.setEnabled(false);
                         jButtonViewResult.setEnabled(false);
 
-                        //jScrollPaneAccruals.setVisible(false);
-
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
                             jLabel_FeesResult.setText(Lang.T("Error") + "! " + (exActionRes.a == null ? Lang.T(exActionRes.b) :
@@ -224,8 +222,6 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         jButtonCalcCompu.setEnabled(false);
                         jButtonViewResult.setEnabled(false);
 
-                        //jScrollPaneAccruals.setVisible(false);
-
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
                             jLabel_FeesResult.setText(Lang.T("Error") + "! " + (exActionRes.a == null ? Lang.T(exActionRes.b) :
@@ -244,7 +240,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                             result += Lang.T("Found errors") + ":<b> " + airDrop.getAddressesCount() + "<br>";
                         } else {
                             result += Lang.T("Count # кол-во") + ": <b>" + airDrop.getAddressesCount()
-                                    + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getAddressesCount())
+                                    + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getTotalFeeBytes())
                                     + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay();
                         }
                         jLabel_FeesResult.setText(result);

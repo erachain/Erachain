@@ -81,7 +81,6 @@ public class AirDropsModel extends DefaultTableModel {
             rowVector = new Vector<Object>(8);
             rowVector.addElement(++count);
             rowVector.addElement(item.a.getPersonAsString());
-            rowVector.addElement(item.b.toPlainString());
             if (item.c == null) {
                 rowVector.addElement("");
             } else {
