@@ -422,10 +422,6 @@ public class RSend extends TransactionAmount {
         // GET BASE
         JSONObject transaction = this.getJsonBase();
 
-        if (title.length() > 0) {
-            transaction.put("title", this.title);
-        }
-
         if (data != null && data.length > 0) {
 
             // ADD CREATOR/SERVICE/DATA
