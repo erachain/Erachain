@@ -23,8 +23,8 @@ public class AirDropsModel extends DefaultTableModel {
         addRow(new Object[]{0, "", ""});
     }
 
-    public AirDropsModel(BigDecimal amount, String[] addresses) {
-        super(setRows(amount, addresses), headVector);
+    public AirDropsModel(String[] addresses) {
+        super(setRows(addresses), headVector);
     }
 
     public AirDropsModel(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
@@ -36,7 +36,7 @@ public class AirDropsModel extends DefaultTableModel {
         return column == 1;
     }
 
-    static Vector setRows(BigDecimal amount, String[] addresses) {
+    static Vector setRows(String[] addresses) {
         int count = 0;
         Vector<Vector> data = new Vector();
 

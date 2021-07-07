@@ -141,8 +141,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                                     }
                                     in.close();
                                     addresses = lines.toArray(new String[lines.size()]);
-                                    addressesModel = new AirDropsModel(new BigDecimal(jTextFieldAmount.getText() == null ?
-                                            "1" : jTextFieldAmount.getText()), addresses);
+                                    addressesModel = new AirDropsModel(addresses);
 
 
                                 } catch (Exception e) {
@@ -269,19 +268,11 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         columnBal.setWidth(150);
                         columnBal.sizeWidthToFit();
 
-                        TableColumn columnPay = columnModel.getColumn(3);
-                        columnPay.setMinWidth(100);
-                        columnPay.setMaxWidth(200);
-                        columnPay.setPreferredWidth(150);
-                        columnPay.setWidth(150);
-                        columnPay.sizeWidthToFit();
-
                     } finally {
                         jButtonLoad.setEnabled(true);
                         jButtonCalcCompu.setEnabled(true);
                         jButtonViewResult.setEnabled(true);
 
-                        //jScrollPaneAccruals.setVisible(true);
                         lock = new Boolean(false);
 
                     }
