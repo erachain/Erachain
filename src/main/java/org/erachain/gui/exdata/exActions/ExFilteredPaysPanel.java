@@ -356,7 +356,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
         GridBagConstraints labelGBC = new GridBagConstraints();
         labelGBC.anchor = GridBagConstraints.LINE_END;
-        labelGBC.insets = new Insets(0, 20, 10, 0);
+        labelGBC.insets = new Insets(0, 20, 10, 10);
 
         GridBagConstraints fieldGBC = new GridBagConstraints();
         fieldGBC.gridx = 6;

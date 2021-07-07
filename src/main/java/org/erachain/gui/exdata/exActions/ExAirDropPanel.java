@@ -11,7 +11,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.IconPanel;
-import org.erachain.gui.exdata.AccrualsModel;
+import org.erachain.gui.exdata.AccrualsEditModel;
 import org.erachain.gui.exdata.AirDropsModel;
 import org.erachain.gui.exdata.ExDataPanel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
@@ -31,14 +31,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
-    public static String NAME = "ExActionPanel";
-    public static String TITLE = "Accruals";
+    public static String NAME = "ExAirDropPanel";
+    public static String TITLE = "AirDrops";
 
     private ExDataPanel parent;
     public ComboBoxAssetsModel assetsModel;
@@ -104,7 +103,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         jButtonCalcCompu.setEnabled(false);
                         jButtonViewResult.setEnabled(false);
 
-                        jScrollPaneAccruals.setVisible(false);
+                        //jScrollPaneAccruals.setVisible(false);
 
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
@@ -142,7 +141,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         jButtonCalcCompu.setEnabled(false);
                         jButtonViewResult.setEnabled(false);
 
-                        jScrollPaneAccruals.setVisible(false);
+                        //jScrollPaneAccruals.setVisible(false);
 
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
@@ -197,7 +196,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         jButtonCalcCompu.setEnabled(true);
                         jButtonViewResult.setEnabled(true);
 
-                        jScrollPaneAccruals.setVisible(true);
+                        //jScrollPaneAccruals.setVisible(true);
                         lock = new Boolean(false);
 
                     }
@@ -219,7 +218,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         int selected = jComboBoxAccrualAction.getSelectedIndex();
         jComboBoxAccrualAction.setModel(new javax.swing.DefaultComboBoxModel(
                 asset.viewAssetTypeActionsList(creator.equals(asset.getMaker()), false).toArray()));
-        if (selected >= 0)
+        if (selected >= 0 && selected < jComboBoxAccrualAction.getModel().getSize())
             jComboBoxAccrualAction.setSelectedIndex(selected);
 
     }
@@ -238,7 +237,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         jPanel3 = new JPanel();
         jButtonViewResult = new JButton();
         jCheckBoxAccrualsUse = new JCheckBox();
-        jLabelAmount = new JLabel();
+        JLabel jLabelAmount = new JLabel(Lang.T("Amount"));
         jSeparator1 = new JSeparator();
         jSeparator2 = new JSeparator();
         jSeparator3 = new JSeparator();
@@ -263,7 +262,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
         GridBagConstraints labelGBC = new GridBagConstraints();
         labelGBC.anchor = GridBagConstraints.LINE_END;
-        labelGBC.insets = new Insets(0, 20, 10, 0);
+        labelGBC.insets = new Insets(0, 20, 10, 10);
 
         GridBagConstraints fieldGBC = new GridBagConstraints();
         fieldGBC.gridx = 6;
@@ -291,10 +290,10 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
         int gridy = 0;
 
-        jCheckBoxAccrualsUse.setText(Lang.T("Make Accruals"));
+        jCheckBoxAccrualsUse.setText(Lang.T("Make Air Drops"));
         add(jCheckBoxAccrualsUse, fieldGBC);
 
-        jLabel_Help.setText("<html>" + Lang.T("ExAccrualsPanel_Help") + "</html>");
+        jLabel_Help.setText("<html>" + Lang.T("ExAirDropPanel_Help") + "</html>");
         fieldGBC.gridy = ++gridy;
         //JPanel panel1 = new JPanel(new BorderLayout());
         //panel1.add(jLabel_Help, BorderLayout.CENTER);
@@ -317,15 +316,22 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         jPanelMain.add(jLabelAssetToPay, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jComboBoxAccrualAsset.setToolTipText(Lang.T("ExActionPanel.jComboBoxAccrualAsset"));
+        jComboBoxAccrualAsset.setToolTipText(Lang.T("ExAirDropPanel.jComboBoxAccrualAsset"));
         jPanelMain.add(jComboBoxAccrualAsset, fieldGBC);
 
+        JLabel jLabelAction = new JLabel(Lang.T("Action"));
+        labelGBC.gridy = ++gridy;
+        jPanelMain.add(jLabelAction, labelGBC);
+
+        fieldGBC.gridy = gridy;
+        jComboBoxAccrualAction.setToolTipText(Lang.T("ExAirDropPanel.jComboBoxAccrualAction"));
+        jPanelMain.add(jComboBoxAccrualAction, fieldGBC);
 
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelAmount, labelGBC);
         fieldGBC.gridy = gridy;
         jPanelMain.add(jTextFieldAmount, fieldGBC);
-        jTextFieldAmount.setToolTipText(Lang.T("ExActionPanel.jTextFieldAmount"));
+        jTextFieldAmount.setToolTipText(Lang.T("ExAirDropPanel.jTextFieldAmount"));
 
         /////////////////////// BUTTONS
 
@@ -346,7 +352,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         headBGC.gridy = ++gridy;
         jPanel3.add(jLabel_FeesResult, headBGC);
 
-        jTablePreviewAccruals = new MTable(new AccrualsModel(new ArrayList<>(), false));
+        jTablePreviewAccruals = new MTable(new AccrualsEditModel());
 
         jTablePreviewAccruals.setAutoCreateRowSorter(true);
         jScrollPaneAccruals.setViewportView(jTablePreviewAccruals);
@@ -400,7 +406,6 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
     private javax.swing.JComboBox<Integer> jComboBoxFilterBalancePosition;
     private javax.swing.JComboBox<String> jComboBoxFilterSideBalance;
     private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxAccrualAction;
-    private JLabel jLabelAmount;
     private JLabel jLabel_FeesResult;
     private JLabel jLabelBalancePosition;
     public JPanel jPanelMain;
