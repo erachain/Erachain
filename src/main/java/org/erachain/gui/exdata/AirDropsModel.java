@@ -6,7 +6,6 @@ import org.erachain.lang.Lang;
 import org.mapdb.Fun;
 
 import javax.swing.table.DefaultTableModel;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Vector;
 
@@ -29,7 +28,7 @@ public class AirDropsModel extends DefaultTableModel {
         super(setRows(addresses), headVector);
     }
 
-    public AirDropsModel(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
+    public AirDropsModel(List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
         super(setRows(accruals, onlyErrors), headVector);
     }
 
@@ -65,7 +64,7 @@ public class AirDropsModel extends DefaultTableModel {
         return data;
     }
 
-    static Vector setRows(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
+    static Vector setRows(List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
         lastError = null;
 
         int count = 0;
@@ -73,18 +72,17 @@ public class AirDropsModel extends DefaultTableModel {
 
         Vector<Object> rowVector;
 
-        for (Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>> item : accruals) {
+        for (Fun.Tuple2<Account, Fun.Tuple2<Integer, String>> item : accruals) {
 
-            if (onlyErrors && item.c == null)
+            if (onlyErrors && item.b == null)
                 continue;
 
             rowVector = new Vector<Object>(8);
             rowVector.addElement(++count);
-            rowVector.addElement(item.a.getPersonAsString());
-            if (item.c == null) {
+            if (item.b == null) {
                 rowVector.addElement("");
             } else {
-                rowVector.addElement(Lang.T(OnDealClick.resultMess(item.c.a)) + (item.c.b == null ? "" : " - " + item.c.b));
+                rowVector.addElement(Lang.T(OnDealClick.resultMess(item.b.a)) + (item.b.b == null ? "" : " - " + item.b.b));
             }
 
             data.add(rowVector);

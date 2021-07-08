@@ -31,7 +31,7 @@ import java.util.List;
  * Simple pay - for all same amount
  */
 
-public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>>> {
+public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>>> {
 
     public static final byte BASE_LENGTH = 4 + 8 + 8 + 2;
 
@@ -113,8 +113,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
         errorValue = null;
         resultCode = Transaction.VALIDATE_OK;
 
-        BigDecimal accrual = amount;
-
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
 
         if (andValidate && addresses.length > MAX_COUNT) {
@@ -133,9 +131,9 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple3<Account, BigDecimal, Fun
                     asset)) {
                 resultCode = Transaction.RECEIVER_NOT_PERSONALIZED;
                 errorValue = null;
-                results.add(new Fun.Tuple3(recipient, accrual, new Fun.Tuple2<>(resultCode, null)));
+                results.add(new Fun.Tuple2(recipient, new Fun.Tuple2<>(resultCode, null)));
             } else {
-                results.add(new Fun.Tuple3(recipient, accrual, null));
+                results.add(new Fun.Tuple2(recipient, null));
             }
 
         }

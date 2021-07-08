@@ -36,7 +36,6 @@ import java.awt.event.ItemListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -195,7 +194,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
                         airDrop.setDC(DCSet.getInstance());
                         airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
-                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = airDrop.getResults();
+                        List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> accruals = airDrop.getResults();
                         jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()
                                 + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getTotalFeeBytes())
                                 + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay());
@@ -232,7 +231,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
                         airDrop.setDC(DCSet.getInstance());
                         airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), true);
-                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> results = airDrop.getResults();
+                        List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> results = airDrop.getResults();
 
                         String result = "<html>";
                         if (airDrop.resultCode != Transaction.VALIDATE_OK) {
