@@ -21,7 +21,7 @@ public class AirDropsModel extends DefaultTableModel {
     public AirDropsModel() {
         super(new Vector(), headVector);
         lastError = null;
-        addRow(new Object[]{0, "", ""});
+        //addRow(new Object[]{0, "", ""});
     }
 
     public AirDropsModel(String[] addresses) {
@@ -34,7 +34,7 @@ public class AirDropsModel extends DefaultTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return column == 1;
+        return false && column == 1;
     }
 
     static Vector setRows(String[] addresses) {
