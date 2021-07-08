@@ -3,12 +3,13 @@ package org.erachain.gui.exdata;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.ExPays;
+import org.erachain.core.exdata.exActions.ExAction;
 import org.erachain.core.exdata.exLink.*;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.exdata.authors.AuthorsPanel;
+import org.erachain.gui.exdata.exActions.ExActionPanel;
 import org.erachain.gui.exdata.sources.SourcesPanel;
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
@@ -40,7 +41,7 @@ import java.util.Set;
  */
 public class ExDataPanel extends JPanel {
 
-    IssueDocumentPanel parentPanel;
+    public IssueDocumentPanel parentPanel;
 
     public MultipleRecipientsPanel multipleRecipientsPanel;
     public MFillTemplatePanel fill_Template_Panel;
@@ -76,7 +77,7 @@ public class ExDataPanel extends JPanel {
     public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
     public JCheckBox checkBoxMakeHashAndCheckUniqueAttachedFiles;
     public DocTypeAppendixPanel docTypeAppendixPanel;
-    public ExAccrualsPanel exAccrualsPanel;
+    public ExActionPanel exActionPanel;
 
     /**
      * Creates new form IssueDocumentPanel
@@ -285,7 +286,7 @@ public class ExDataPanel extends JPanel {
         jTextField_Title_Message = new JTextField();
         jButton_Input_Hashes_From_File_Other_Hashes = new MButton();
         docTypeAppendixPanel = new DocTypeAppendixPanel(this);
-        exAccrualsPanel = new ExAccrualsPanel(this);
+        exActionPanel = new ExActionPanel(this);
 
         GridBagLayout layout = new GridBagLayout();
         layout.columnWidths = new int[]{0, 0, 0};
@@ -299,9 +300,10 @@ public class ExDataPanel extends JPanel {
 
         jTabbedPane_Type.addTab(Lang.T("Type"), docTypeAppendixPanel);
 
-        JScrollPane multiPayScrollBar = new JScrollPane();
-        multiPayScrollBar.setViewportView(exAccrualsPanel);
-        jTabbedPane_Type.addTab(Lang.T("Accruals"), multiPayScrollBar);
+        //////////////// ACCRUALS
+        JScrollPane exActionScrollBar = new JScrollPane();
+        exActionScrollBar.setViewportView(exActionPanel);
+        jTabbedPane_Type.addTab(Lang.T("Accruals"), exActionScrollBar);
 
         jTabbedPane_Type.addTab(Lang.T("Recipients"), multipleRecipientsPanel);
         jTabbedPane_Type.addTab(Lang.T(authorsPanel.getName()), authorsPanel);
@@ -769,16 +771,17 @@ public class ExDataPanel extends JPanel {
             }
         }
 
-        Fun.Tuple2<ExPays, String> exAccrualsResult = exAccrualsPanel.getAccruals();
-        if (exAccrualsResult.b != null) {
-            return new Fun.Tuple2(null, exAccrualsResult.b);
+        Fun.Tuple2<ExAction, String> exActionResult = exActionPanel.getAction();
+        if (exActionResult.b != null) {
+            return new Fun.Tuple2(null, exActionResult.b);
         }
+
 
         Long templateKey = fill_Template_Panel.sel_Template == null ? null : fill_Template_Panel.sel_Template.getKey();
 
         byte[] exData;
         try {
-            exData = ExData.make(exLink, exAccrualsResult.a, creator, jTextField_Title_Message.getText(),
+            exData = ExData.make(exLink, exActionResult.a, creator, jTextField_Title_Message.getText(),
                     signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
                     templateKey, fill_Template_Panel.get_Params(),
                     fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),

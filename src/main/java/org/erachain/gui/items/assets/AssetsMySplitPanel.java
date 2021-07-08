@@ -94,7 +94,7 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
                 AssetCls asset = (AssetCls) itemTableSelected;
                 IssueDocumentPanel panel = new IssueDocumentPanel(asset.getMaker(), asset);
-                panel.selectAccruals(null, null);
+                panel.selectAccruals(asset, null);
                 MainPanel.getInstance().insertNewTab(Lang.T("Make Accruals"), panel);
             }
         });

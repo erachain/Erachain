@@ -1,0 +1,19 @@
+// coding UTF-8
+// set arguments for start Erachain here
+// This is example
+// make startARGS.txt in Erachain folder
+
+dbs=mapdb
+
+web=on
+weballowed=*
+
+nogui
+
+testnet=demo
+bugs=5
+
+datachainpath=dataDEMO
+
+nousewallet
+cache=off
