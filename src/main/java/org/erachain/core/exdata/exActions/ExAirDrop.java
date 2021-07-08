@@ -1,20 +1,18 @@
-package org.erachain.core.exdata;
+package org.erachain.core.exdata.exActions;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceMap;
-import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -33,11 +31,11 @@ import java.util.List;
  * Simple pay - for all same amount
  */
 
-public class ExAirDrop {
+public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>>> {
 
-    public static final byte BASE_LENGTH = 4 + 8 + 8 + 2;
+    public static final byte BASE_LENGTH = 4 + 8 + 1 + 2 + 4;
 
-    public static final int MAX_COUNT = Short.MAX_VALUE;
+    public static final int MAX_COUNT = 1 << 16;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExAirDrop.class);
 
@@ -53,19 +51,11 @@ public class ExAirDrop {
     private final byte[][] addresses;
 
     /////////////////
-    DCSet dcSet;
-    private int height;
-    AssetCls asset;
-    BigDecimal totalPay;
-
-    /**
-     * recipient + accrual
-     */
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> checkedAccruals;
 
     public String errorValue;
 
     public ExAirDrop(int flags, long assetKey, BigDecimal amount, int balancePos, boolean backward, byte[][] addresses) {
+        super(LIST_PAYOUTS_TYPE);
         this.flags = flags;
         this.assetKey = assetKey;
         this.amount = amount;
@@ -105,6 +95,11 @@ public class ExAirDrop {
         return totalPay;
     }
 
+    @Override
+    public void updateItemsKeys(List listTags) {
+        listTags.add(new Object[]{ItemCls.ASSET_TYPE, getAssetKey(), getAsset().getTags()});
+    }
+
     public void setDC(DCSet dcSet) {
         if (this.dcSet == null || !this.dcSet.equals(dcSet)) {
             this.dcSet = dcSet;
@@ -112,103 +107,41 @@ public class ExAirDrop {
         }
     }
 
-    public int makePayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
+    public void makePayList(DCSet dcSet, int height, AssetCls asset, Account creator, boolean andValidate) {
 
-        checkedAccruals = new ArrayList<>();
-
-        int scale = asset.getScale();
-
-        byte[] accountFrom = creator.getShortAddressBytes();
-
-        ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
-        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
-
-        // определим - меняется ли позиция баланса если направление сменим
-        // это нужно чтобы отсекать смену знака у балансов для тек активов у кого меняется позиция от знака
-        // настроим данные платежа по знакам Актива ИКоличества, так как величина коэффициента способа всегда положительная
-        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
-        int balancePosDirect = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), false, asset.isSelfManaged());
-        int balancePosBackward = Account.balancePosition(assetKey * signs.a, new BigDecimal(signs.b), true, asset.isSelfManaged());
-        int filterBySigNum;
-        if (balancePosDirect != balancePosBackward) {
-            if (balancePosDirect == TransactionAmount.ACTION_SPEND) {
-                // используем только отрицательные балансы
-                filterBySigNum = -1;
-            } else {
-                // используем только положительные балансы
-                filterBySigNum = 1;
-            }
-        } else {
-            filterBySigNum = 0;
-        }
-
-        boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
-        // сменим знак балансов для отрицательных
-        if (reversedBalancesInPosition) {
-            filterBySigNum *= -1;
-        }
-
-        BigDecimal accrual = amount;
-
-        int count = 0;
+        results = new ArrayList<>();
+        errorValue = null;
+        resultCode = Transaction.VALIDATE_OK;
 
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
+
+        if (andValidate && addresses.length > MAX_COUNT) {
+            errorValue = "" + MAX_COUNT;
+            resultCode = Transaction.INVALID_MAX_ITEMS_COUNT;
+            return;
+        }
 
         for (byte[] recipientShort : addresses) {
 
             Account recipient = new Account(recipientShort);
-            count++;
 
             // IF send from PERSON to ANONYMOUS
             if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
                     creatorIsPerson, assetKey, balancePos,
                     asset)) {
-                errorValue = recipient.getAddress();
-                return (count = -Transaction.RECEIVER_NOT_PERSONALIZED);
-            }
-
-            // не проверяем на 0 - так это может быть рассылка писем всем
-            checkedAccruals.add(new Fun.Tuple3(recipient, accrual, null));
-
-            count++;
-            if (andValidate && count > MAX_COUNT) {
-                errorValue = "MAX count over: " + MAX_COUNT;
-                return (count = -Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR);
+                resultCode = Transaction.RECEIVER_NOT_PERSONALIZED;
+                errorValue = null;
+                results.add(new Fun.Tuple2(recipient, new Fun.Tuple2<>(resultCode, null)));
+            } else {
+                results.add(new Fun.Tuple2(recipient, null));
             }
 
         }
 
         totalPay = amount.multiply(new BigDecimal(addresses.length));
 
-        return count;
+        return;
 
-    }
-
-    public int makeFilterPayList(Transaction transaction, boolean andValidate) {
-        return makePayList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
-    }
-
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> makeCheckedList(Transaction transaction, boolean andValidate) {
-        makePayList(transaction.getDCSet(), height, asset, transaction.getCreator(), andValidate);
-        return checkedAccruals;
-    }
-
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> precalcAccrualList(
-            int height, Account creator) {
-        checkValidList(dcSet, height, asset, creator);
-        return checkedAccruals;
-    }
-
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> getCheckedAccruals(Transaction statement) {
-        if (checkedAccruals == null) {
-            checkedAccruals = makeCheckedList(statement, false);
-        }
-        return checkedAccruals;
-    }
-
-    public List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> precalcCheckedAccruals(int height, Account creator) {
-        checkValidList(dcSet, height, asset, creator);
-        return checkedAccruals;
     }
 
     public byte[] toBytes() throws Exception {
@@ -219,6 +152,12 @@ public class ExAirDrop {
 
         byte[] buff;
         outStream.write(Longs.toByteArray(this.assetKey));
+
+        if (backward) {
+            outStream.write(-balancePos);
+        } else {
+            outStream.write(balancePos);
+        }
 
         outStream.write(this.amount.scale());
         buff = this.amount.unscaledValue().toByteArray();
@@ -235,7 +174,37 @@ public class ExAirDrop {
     }
 
     public int length() {
-        return BASE_LENGTH + addresses.length * Account.ADDRESS_SHORT_LENGTH;
+        return BASE_LENGTH
+                + this.amount.unscaledValue().toByteArray().length
+                + addresses.length * Account.ADDRESS_SHORT_LENGTH;
+    }
+
+    public int getLengthDBData() {
+        return (totalPay == null ? 1 : 2 + totalPay.unscaledValue().toByteArray().length);
+    }
+
+    public byte[] getDBdata() {
+
+        byte[] buff;
+        byte[] dbData;
+
+        if (totalPay == null) {
+            dbData = new byte[1];
+            buff = null;
+        } else {
+            buff = this.totalPay.unscaledValue().toByteArray();
+            dbData = new byte[2 + buff.length];
+        }
+
+        int pos = 0;
+
+        dbData[pos++] = (byte) buff.length;
+
+        dbData[pos++] = (byte) this.totalPay.scale();
+        System.arraycopy(buff, 0, dbData, pos, buff.length);
+
+        return dbData;
+
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -247,7 +216,7 @@ public class ExAirDrop {
         int flags = Ints.fromByteArray(Arrays.copyOfRange(data, pos, pos + Integer.BYTES));
         pos += Integer.BYTES;
 
-        Long assetKey = null;
+        Long assetKey;
         int balancePos = 0;
         boolean backward = false;
 
@@ -255,7 +224,10 @@ public class ExAirDrop {
         pos += Long.BYTES;
 
         balancePos = data[pos++];
-        backward = data[pos++] > 0;
+        if (balancePos < 0) {
+            backward = true;
+            balancePos = -balancePos;
+        }
 
         scale = data[pos++];
         len = data[pos++];
@@ -267,22 +239,40 @@ public class ExAirDrop {
 
         byte[][] addresses = new byte[len][];
         for (int i = 0; i < len; i++) {
-            System.arraycopy(data, pos, addresses[i], 0, Account.ADDRESS_SHORT_LENGTH);
+            byte[] buff = new byte[Account.ADDRESS_SHORT_LENGTH];
+            System.arraycopy(data, pos, buff, 0, Account.ADDRESS_SHORT_LENGTH);
+            addresses[i] = buff;
             pos += Account.ADDRESS_SHORT_LENGTH;
         }
 
         return new ExAirDrop(flags, assetKey, payValue, balancePos, backward, addresses);
     }
 
-    public static Fun.Tuple2<ExAirDrop, String> make(Long assetKey, String amountStr,
-                                                     int balancePos, boolean backward,
-                                                     String[] addressesStr) {
+    public int parseDBData(byte[] dbData, int position) {
+
+        int len = dbData[position++];
+        if (len == 0) {
+            totalPay = null;
+        } else {
+            int scale = dbData[position++];
+            totalPay = new BigDecimal(new BigInteger(Arrays.copyOfRange(dbData, position, position + len)), scale);
+        }
+
+        position += len;
+
+        return position;
+
+    }
+
+    public static Fun.Tuple2<ExAction, String> make(Long assetKey, String amountStr,
+                                                    int balancePos, boolean backward,
+                                                    String[] addressesStr) {
 
         int steep = 0;
         BigDecimal amount;
 
-        Controller cntr = Controller.getInstance();
-        BlockChain chain = cntr.getBlockChain();
+        //Controller cntr = Controller.getInstance();
+        //BlockChain chain = cntr.getBlockChain();
 
         try {
             amount = amountStr == null || amountStr.isEmpty() ? null : new BigDecimal(amountStr);
@@ -317,6 +307,19 @@ public class ExAirDrop {
         int flags = 0;
         return new Fun.Tuple2<>(new ExAirDrop(flags, assetKey, amount, balancePos, backward, addresses), null);
 
+    }
+
+    public static Fun.Tuple2<ExAction, String> parseJSON_local(JSONObject jsonObject) throws Exception {
+        long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0L).toString());
+        int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
+        boolean backward = Boolean.valueOf((boolean) jsonObject.getOrDefault("backward", false));
+
+        String value = (String) jsonObject.get("amount");
+
+        JSONArray addressesJson = (JSONArray) jsonObject.get("addresses");
+        String[] addressesStr = (String[]) addressesJson.toArray(new String[addressesJson.size()]);
+
+        return make(assetKey, value, position, backward, addressesStr);
     }
 
     /**
@@ -354,39 +357,20 @@ public class ExAirDrop {
         return toJson;
     }
 
-    public Fun.Tuple2<Integer, String> checkValidList(DCSet dcSet, int height, AssetCls asset, Account creator) {
+    @Override
+    public String getInfoHTML() {
+        String out = "<h3>" + Lang.T("Accruals") + "</h3>";
+        out += Lang.T("Asset") + ": <b>" + asset.getName() + "<br>";
+        out += Lang.T("Count # кол-во") + ": <b>" + addresses.length
+                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(getTotalFeeBytes())
+                + "</b>, " + Lang.T("Total") + ": <b>" + totalPay;
+        return out;
+    }
 
-        Account recipient;
-        //byte[] signature = rNote.getSignature();
-        boolean creatorIsPerson = creator.isPerson(dcSet, height);
-
-        // возьмем знаки (минус) для создания позиции баланса такой
-        Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
-        long key = signs.a * assetKey;
-
-        // комиссию не проверяем так как она не правильно считается внутри?
-        long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
-
-        Fun.Tuple2<Integer, String> result;
-        byte[] signature = new byte[0];
-        int index = 0;
-        for (byte[] recipientShort : addresses) {
-
-            recipient = new Account(recipientShort);
-
-            result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                    key, asset, amount, recipient,
-                    backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
-
-            if (result.a != Transaction.VALIDATE_OK) {
-                errorValue = "Airdrop: address[" + index + "] -> " + recipient.getAddress();
-                return result;
-            }
-
-            ++index;
-        }
-
-        return new Fun.Tuple2<>(Transaction.VALIDATE_OK, null);
+    @Override
+    public int preProcess(int height, Account creator, boolean andPreValid) {
+        makePayList(dcSet, height, asset, creator, andPreValid);
+        return resultCode;
     }
 
     public int isValid(RSignNote rNote) {
@@ -401,7 +385,6 @@ public class ExAirDrop {
             errorValue = "Airdrop: payMethodValue < 0";
             return Transaction.INVALID_AMOUNT;
         }
-
 
         height = rNote.getBlockHeight();
 
@@ -418,23 +401,39 @@ public class ExAirDrop {
         long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
 
         BigDecimal totalFeeBG = rNote.getFee();
+        Fun.Tuple2<Integer, String> result;
         // проверим как будто всю сумму одному переводим - с учетом комиссии полной
-        Fun.Tuple2<Integer, String> result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
-                backward, totalFeeBG, null, creatorIsPerson, actionFlags);
-        if (result.a != Transaction.VALIDATE_OK) {
-            errorValue = "Airdrop: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
-            return result.a;
-        }
-
-        ////////// TODO NEED CHECK ALL
-        boolean needCheckAllList = false;
-        if (needCheckAllList) {
-
-            result = checkValidList(dcSet, height, asset, creator);
+        if (backward) {
+            // 1. balancePos == Account.BALANCE_POS_DEBT &&
+            // тут надо делать проверку на общую сумму по списку долгов у получателей, подсчитав ее заранее - что накладно
+            // иначе она не пройдет - так как у одного адресата нет того долга
+            // 2. balancePos == Account.BALANCE_POS_HOLD
+            // тут вообще нельзя проверку общую делать
+        } else {
+            result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+                    key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
+                    backward, totalFeeBG, null, creatorIsPerson, actionFlags);
             if (result.a != Transaction.VALIDATE_OK) {
+                errorValue = "Airdrop: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
                 return result.a;
             }
+        }
+
+        int index = 0;
+        for (byte[] recipientShort : addresses) {
+
+            recipient = new Account(recipientShort);
+
+            result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+                    key, asset, amount, recipient,
+                    backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
+
+            if (result.a != Transaction.VALIDATE_OK) {
+                errorValue = "Airdrop: address[" + index + "] -> " + recipient.getAddress();
+                return result.a;
+            }
+
+            ++index;
         }
 
         return Transaction.VALIDATE_OK;
@@ -448,11 +447,16 @@ public class ExAirDrop {
         // возьмем знаки (минус) для создания позиции баланса такой
         Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
         Long actionPayKey = signs.a * assetKey;
-        boolean isAmountNegate;
-        BigDecimal actionPayAmount;
         boolean incomeReverse = balancePos == Account.BALANCE_POS_HOLD;
         boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
-        boolean backwardAction;
+
+        // сбросим направление от фильтра
+        BigDecimal actionPayAmount = amount.abs();
+        // зададим направление от Действия нашего
+        actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
+
+        boolean isAmountNegate = amount.signum() < 0;
+        boolean backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
 
         Account recipient;
         for (byte[] address : addresses) {
@@ -461,13 +465,8 @@ public class ExAirDrop {
             if (recipient == null)
                 break;
 
-            actionPayAmount = amount;
-
-            isAmountNegate = actionPayAmount.signum() < 0;
-            backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
-
             if (!asOrphan && block != null) {
-                rNote.addCalculated(block, recipient, absKey, actionPayAmount,
+                rNote.addCalculated(block, recipient, absKey, amount,
                         asset.viewAssetTypeAction(backwardAction, balancePos, asset.getMaker().equals(creator)));
             }
 
@@ -475,15 +474,15 @@ public class ExAirDrop {
                 // пропустим себя в любом случае - хотя КАлькулейтед оставим для виду
                 continue;
 
-            // сбросим направлени от фильтра
-            actionPayAmount = actionPayAmount.abs();
-            // зазадим направление от Действия нашего
-            actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
-
             TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
                     asset, actionPayKey, actionPayAmount, backwardAction,
                     incomeReverse);
 
+        }
+
+        if (!asOrphan && block != null) {
+            rNote.addCalculated(block, creator, absKey, totalPay.negate(),
+                    asset.viewAssetTypeAction(backwardAction, balancePos, asset.getMaker().equals(creator)));
         }
 
     }

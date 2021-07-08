@@ -6,41 +6,91 @@ import org.erachain.lang.Lang;
 import org.mapdb.Fun;
 
 import javax.swing.table.DefaultTableModel;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Vector;
 
 public class AirDropsModel extends DefaultTableModel {
 
-    public AirDropsModel(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals) {
-        super(new String[]{Lang.T("No."),
-                        Lang.T("Account"),
-                        Lang.T("Accrual"),
-                        Lang.T("Error")
-                },
-                accruals.size());
-        setRows(accruals);
+    public static String lastError;
+    static Vector<Object> headVector = new Vector<Object>(8) {{
+        add(Lang.T("No."));
+        add(Lang.T("Account"));
+        add(Lang.T("Error"));
+    }};
+
+    public AirDropsModel() {
+        super(new Vector(), headVector);
+        lastError = null;
+        //addRow(new Object[]{0, "", ""});
+    }
+
+    public AirDropsModel(String[] addresses) {
+        super(setRows(addresses), headVector);
+    }
+
+    public AirDropsModel(List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
+        super(setRows(accruals, onlyErrors), headVector);
     }
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return true;
+        return false && column == 1;
     }
 
-    public void setRows(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals) {
+    static Vector setRows(String[] addresses) {
+        lastError = null;
+
         int count = 0;
-        Vector vector = getDataVector();
-        for (Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>> item : accruals) {
+        Vector<Vector> data = new Vector();
 
-            Vector<Object> rowVector = new Vector<Object>(4);
-            rowVector.addElement(count + 1);
-            rowVector.addElement(item.a.getPersonAsString());
-            rowVector.addElement(item.b.toPlainString());
-            rowVector.addElement(item.c == null ? "" : Lang.T(OnDealClick.resultMess(item.c.a)));
+        Vector<Object> rowVector;
+        Fun.Tuple2<Account, String> result;
+        for (String item : addresses) {
+            result = Account.tryMakeAccount(item);
+            rowVector = new Vector<Object>(8);
+            rowVector.addElement(++count);
+            if (result.a == null) {
+                rowVector.addElement(item);
+                rowVector.addElement(result.b);
+                lastError = result.b;
+            } else {
+                rowVector.addElement(result.a);
+                rowVector.addElement("");
+            }
 
-            vector.set(count++, rowVector);
+            data.add(rowVector);
         }
-        fireTableDataChanged();
+
+        return data;
     }
+
+    static Vector setRows(List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
+        lastError = null;
+
+        int count = 0;
+        Vector data = new Vector();
+
+        Vector<Object> rowVector;
+
+        for (Fun.Tuple2<Account, Fun.Tuple2<Integer, String>> item : accruals) {
+
+            if (onlyErrors && item.b == null)
+                continue;
+
+            rowVector = new Vector<Object>(8);
+            rowVector.addElement(++count);
+            rowVector.addElement(item.a);
+            if (item.b == null) {
+                rowVector.addElement("");
+            } else {
+                rowVector.addElement(Lang.T(OnDealClick.resultMess(item.b.a)) + (item.b.b == null ? "" : " - " + item.b.b));
+            }
+
+            data.add(rowVector);
+        }
+
+        return data;
+    }
+
 }
 
