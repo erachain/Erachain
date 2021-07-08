@@ -130,10 +130,19 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                                 try {
                                     List<String> lines = new ArrayList<String>();
                                     BufferedReader in = new BufferedReader(new FileReader(file));
+                                    Account account;
                                     String str;
                                     while ((str = in.readLine()) != null) {
                                         str = str.trim();
                                         if (str.startsWith("//"))
+                                            continue;
+
+                                        // чтобы не было двойных выплат по счет и публичному ключу в списке - делаем Счет
+                                        account = Account.tryMakeAccount(str).a;
+                                        if (account == null)
+                                            continue;
+
+                                        if (lines.contains(account.getAddress()))
                                             continue;
 
                                         lines.add(str);
