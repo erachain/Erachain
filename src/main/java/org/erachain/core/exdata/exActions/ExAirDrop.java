@@ -403,10 +403,11 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         BigDecimal totalFeeBG = rNote.getFee();
         Fun.Tuple2<Integer, String> result;
         // проверим как будто всю сумму одному переводим - с учетом комиссии полной
-        if (balancePos == Account.BALANCE_POS_DEBT && backward) {
+        if (backward) {
+            // 1. balancePos == Account.BALANCE_POS_DEBT &&
             // тут надо делать проверку на общую сумму по списку долгов у получателей, подсчитав ее заранее - что накладно
             // иначе она не пройдет - так как у одного адресата нет того долга
-        } else if (balancePos == Account.BALANCE_POS_HOLD && backward) {
+            // 2. balancePos == Account.BALANCE_POS_HOLD
             // тут вообще нельзя проверку общую делать
         } else {
             result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
