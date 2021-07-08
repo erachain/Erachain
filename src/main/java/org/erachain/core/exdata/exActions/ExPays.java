@@ -1192,12 +1192,19 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             BigDecimal totalFeeBG = rNote.getFee();
             Fun.Tuple2<Integer, String> result;
             // проверим как будто всю сумму одному переводим - с учетом комиссии полной
-            result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                    key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
-                    backward, totalFeeBG, null, creatorIsPerson, actionFlags);
-            if (result.a != Transaction.VALIDATE_OK) {
-                errorValue = result.b + " - Accruals: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
-                return result.a;
+            if (balancePos == Account.BALANCE_POS_DEBT && backward) {
+                // тут надо делать проверку на общую сумму по списку долгов у получателей, подсчитав ее заранее - что накладно
+                // иначе она не пройдет - так как у одного адресата нет того долга
+            } else if (balancePos == Account.BALANCE_POS_HOLD && backward) {
+                // тут вообще нельзя проверку общую делать
+            } else {
+                result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+                        key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
+                        backward, totalFeeBG, null, creatorIsPerson, actionFlags);
+                if (result.a != Transaction.VALIDATE_OK) {
+                    errorValue = result.b + " - Accruals: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
+                    return result.a;
+                }
             }
 
             ////////// TODO NEED CHECK ALL

@@ -401,13 +401,21 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         long actionFlags = Transaction.NOT_VALIDATE_FLAG_FEE;
 
         BigDecimal totalFeeBG = rNote.getFee();
+        Fun.Tuple2<Integer, String> result;
         // проверим как будто всю сумму одному переводим - с учетом комиссии полной
-        Fun.Tuple2<Integer, String> result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
-                backward, totalFeeBG, null, creatorIsPerson, actionFlags);
-        if (result.a != Transaction.VALIDATE_OK) {
-            errorValue = "Airdrop: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
-            return result.a;
+        if (balancePos == Account.BALANCE_POS_DEBT && backward) {
+            // тут надо делать проверку на общую сумму по списку долгов у получателей, подсчитав ее заранее - что накладно
+            // иначе она не пройдет - так как у одного адресата нет того долга
+        } else if (balancePos == Account.BALANCE_POS_HOLD && backward) {
+            // тут вообще нельзя проверку общую делать
+        } else {
+            result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
+                    key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
+                    backward, totalFeeBG, null, creatorIsPerson, actionFlags);
+            if (result.a != Transaction.VALIDATE_OK) {
+                errorValue = "Airdrop: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
+                return result.a;
+            }
         }
 
         int index = 0;
@@ -438,11 +446,16 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         // возьмем знаки (минус) для создания позиции баланса такой
         Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
         Long actionPayKey = signs.a * assetKey;
-        boolean isAmountNegate;
-        BigDecimal actionPayAmount;
         boolean incomeReverse = balancePos == Account.BALANCE_POS_HOLD;
         boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
-        boolean backwardAction;
+
+        // сбросим направление от фильтра
+        BigDecimal actionPayAmount = amount.abs();
+        // зададим направление от Действия нашего
+        actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
+
+        boolean isAmountNegate = amount.signum() < 0;
+        boolean backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
 
         Account recipient;
         for (byte[] address : addresses) {
@@ -450,9 +463,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
             recipient = new Account(address);
             if (recipient == null)
                 break;
-
-            isAmountNegate = amount.signum() < 0;
-            backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
 
             if (!asOrphan && block != null) {
                 rNote.addCalculated(block, recipient, absKey, amount,
@@ -463,15 +473,15 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
                 // пропустим себя в любом случае - хотя КАлькулейтед оставим для виду
                 continue;
 
-            // сбросим направление от фильтра
-            actionPayAmount = amount.abs();
-            // зададим направление от Действия нашего
-            actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
-
             TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
                     asset, actionPayKey, actionPayAmount, backwardAction,
                     incomeReverse);
 
+        }
+
+        if (!asOrphan && block != null) {
+            rNote.addCalculated(block, creator, absKey, totalPay.negate(),
+                    asset.viewAssetTypeAction(backwardAction, balancePos, asset.getMaker().equals(creator)));
         }
 
     }
