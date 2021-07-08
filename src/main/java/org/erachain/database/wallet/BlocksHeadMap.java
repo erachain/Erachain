@@ -135,6 +135,9 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
 
     @Override
     public void openMap() {
+        HI = Integer.MAX_VALUE;
+        LO = 0;
+
         //OPEN MAP
         map = database.createTreeMap("blocks")
                 ///.keySerializer(BTreeKeySerializer.) /// ТУТ тоже переделать на стандартный серилиазотор

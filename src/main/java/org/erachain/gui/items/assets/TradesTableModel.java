@@ -101,9 +101,9 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
 
                 String result = "";
                 if (typeSell)
-                    result = NumberAsString.formatAsString(trade.getAmountHave());
-                else
                     result = NumberAsString.formatAsString(trade.getAmountWant());
+                else
+                    result = NumberAsString.formatAsString(trade.getAmountHave());
 
                 if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
@@ -134,9 +134,9 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 ///return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
 
                 if (typeSell)
-                    result = NumberAsString.formatAsString(trade.getAmountWant());
-                else
                     result = NumberAsString.formatAsString(trade.getAmountHave());
+                else
+                    result = NumberAsString.formatAsString(trade.getAmountWant());
 
                 if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
