@@ -189,7 +189,7 @@ public class DBRocksDBTableTest {
 
         logger.error(" Filter Apprropriate completed ");
 
-        Iterator<byte[]> iterator = tab.accountKeys(account1).iterator();
+        Iterator<byte[]> iterator = tab.accountIterator(account1);
 
         assetKeyTMP = 0;
         iteratorSize = 0;
@@ -234,7 +234,7 @@ public class DBRocksDBTableTest {
         int iteratorSize = 0;
 
         int iteratorSize1 = 0;
-        Iterator<byte[]> assetKeys = tab.assetKeys(assetKey1).iterator();
+        Iterator<byte[]> assetKeys = tab.getIteratorByAsset(assetKey1);
         while (assetKeys.hasNext()) {
             iteratorSize1++;
             byte[] key = assetKeys.next();
@@ -250,7 +250,7 @@ public class DBRocksDBTableTest {
         tab.set(Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey2)), balance1);
 
         iteratorSize = 0;
-        assetKeys = tab.assetKeys(assetKey1).iterator();
+        assetKeys = tab.getIteratorByAsset(assetKey1);
         while (assetKeys.hasNext()) {
             iteratorSize++;
             assetKeys.next();
@@ -258,7 +258,7 @@ public class DBRocksDBTableTest {
         assertEquals(1, iteratorSize);
 
         iteratorSize = 0;
-        assetKeys = tab.assetKeys(assetKey2).iterator();
+        assetKeys = tab.getIteratorByAsset(assetKey2);
         while (assetKeys.hasNext()) {
             iteratorSize++;
             assetKeys.next();
@@ -279,7 +279,7 @@ public class DBRocksDBTableTest {
         assertEquals(tab.size(), size + 4);
 
         //////////////////
-        assetKeys = tab.assetKeys(assetKey1).iterator();
+        assetKeys = tab.getIteratorByAsset(assetKey1);
 
         int found1 = 0;
         int found2 = 0;
@@ -310,7 +310,7 @@ public class DBRocksDBTableTest {
 
 
         //////////////////
-        assetKeys = tab.assetKeys(assetKey2).iterator();
+        assetKeys = tab.getIteratorByAsset(assetKey2);
         iteratorSize = 0;
         found1 = 0;
         found2 = 0;
@@ -339,7 +339,7 @@ public class DBRocksDBTableTest {
         ///////////// тот же КЛЮЧ но новый баланс
         tab.set(keyAccount3Asset1, balance3);
 
-        assetKeys = tab.assetKeys(assetKey1).iterator();
+        assetKeys = tab.getIteratorByAsset(assetKey1);
         iteratorSize = 0;
         found1 = 0;
         found2 = 0;

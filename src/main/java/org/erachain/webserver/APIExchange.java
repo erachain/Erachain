@@ -158,7 +158,7 @@ public class APIExchange {
 
     @GET
     @Path("allordersbyaddress/{address}/{from}")
-    // TODO нужно сделать тесты на проверку потерянных ордеров - есть трнзакция создания а его нету ни в одной таблице
+    // TODO нужно сделать тесты на проверку потерянных ордеров - есть транзакция создания а его нету ни в одной таблице
     public Response getAllOrdersByAddress(@Context UriInfo info,
                                           @PathParam("address") String address,
                                           @PathParam("from") String fromOrder,
