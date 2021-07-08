@@ -8,6 +8,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -18,7 +19,10 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -169,10 +173,11 @@ public class ItemAssetBalanceMapImplTest {
                         balanceTmp;
 
                 Account testAccount = account2;
-                Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(testAccount);
+                IteratorCloseable<byte[]> assetIter = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountIterator(testAccount);
 
                 int iteratorSize = 0;
-                for (byte[] key : assetKeysSet) {
+                while (assetIter.hasNext()) {
+                    byte[] key = assetIter.next();
                     iteratorSize++;
                     long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
                     byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(key);
@@ -241,10 +246,11 @@ public class ItemAssetBalanceMapImplTest {
                 Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                         balanceTmp;
 
-                Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1);
+                IteratorCloseable<byte[]> assetIter = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey1);
                 balance = null;
                 int iteratorSize = 0;
-                for (byte[] key : assetKeysSet) {
+                while (assetIter.hasNext()) {
+                    byte[] key = assetIter.next();
                     iteratorSize++;
                     long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
                     assertEquals(assetKey, assetKey1);
@@ -318,7 +324,7 @@ public class ItemAssetBalanceMapImplTest {
                 int iteratorSize = 0;
 
                 int iteratorSize1 = 0;
-                Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1).iterator();
+                Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey1);
                 while (assetKeys.hasNext()) {
                     iteratorSize1++;
                     byte[] key = assetKeys.next();
@@ -334,7 +340,7 @@ public class ItemAssetBalanceMapImplTest {
                 map.set(Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey2)), balance1);
 
                 iteratorSize = 0;
-                assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1).iterator();
+                assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey1);
                 while (assetKeys.hasNext()) {
                     iteratorSize++;
                     assetKeys.next();
@@ -342,7 +348,7 @@ public class ItemAssetBalanceMapImplTest {
                 assertEquals(1, iteratorSize);
 
                 iteratorSize = 0;
-                assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey2).iterator();
+                assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey2);
                 while (assetKeys.hasNext()) {
                     iteratorSize++;
                     assetKeys.next();
@@ -364,7 +370,7 @@ public class ItemAssetBalanceMapImplTest {
                 assertEquals(map.size(), size + 4);
 
                 //////////////////
-                assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1).iterator();
+                assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey1);
 
                 int found1 = 0;
                 int found2 = 0;
@@ -395,7 +401,7 @@ public class ItemAssetBalanceMapImplTest {
 
 
                 //////////////////
-                assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey2).iterator();
+                assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey2);
                 iteratorSize = 0;
                 found1 = 0;
                 found2 = 0;
@@ -424,7 +430,7 @@ public class ItemAssetBalanceMapImplTest {
                 ///////////// тот же КЛЮЧ но новый баланс
                 map.set(keyAccount3Asset1, balance3);
 
-                assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1).iterator();
+                assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey1);
                 iteratorSize = 0;
                 found1 = 0;
                 found2 = 0;
@@ -479,7 +485,7 @@ public class ItemAssetBalanceMapImplTest {
                 map.set(Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey2)), balance1);
 
                 iteratorSize = 0;
-                accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(account1).iterator();
+                accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountIterator(account1);
                 while (accountKeys.hasNext()) {
                     iteratorSize++;
                     accountKeys.next();
@@ -494,7 +500,7 @@ public class ItemAssetBalanceMapImplTest {
                 assertEquals(map.size(), size + 4);
 
                 //////////////////
-                accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(account1).iterator();
+                accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountIterator(account1);
 
                 int found1 = 0;
                 int found2 = 0;
@@ -521,7 +527,7 @@ public class ItemAssetBalanceMapImplTest {
 
 
                 //////////////////
-                accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(account2).iterator();
+                accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountIterator(account2);
                 iteratorSize = 0;
                 found1 = 0;
                 found2 = 0;
@@ -548,7 +554,7 @@ public class ItemAssetBalanceMapImplTest {
                 ///////////// тот же КЛЮЧ
                 map.set(Bytes.concat(account3.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance3);
 
-                accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(account3).iterator();
+                accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountIterator(account3);
                 iteratorSize = 0;
                 found1 = 0;
                 found2 = 0;
