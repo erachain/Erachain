@@ -11,9 +11,8 @@ public interface FilteredByStringArray<U> {
      * @param fromSeqNo
      * @param offset
      * @param limit
-     * @param descending
      * @return
      */
-    List<U> getByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending);
+    List<U> getByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit);
 
 }

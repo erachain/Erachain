@@ -2234,7 +2234,7 @@ public class API {
 
         ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
         // DOES ASSETID EXIST
-        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, true);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit);
 
         JSONArray array = new JSONArray();
 

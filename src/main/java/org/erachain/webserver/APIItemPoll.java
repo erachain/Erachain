@@ -141,7 +141,7 @@ public class APIItemPoll {
         }
 
         ItemPollMap map = DCSet.getInstance().getItemPollMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, descending);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit);
 
         JSONArray array = new JSONArray();
 

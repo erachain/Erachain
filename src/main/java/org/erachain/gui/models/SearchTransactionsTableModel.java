@@ -129,7 +129,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
             Fun.Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filter, false, 10000, fromID, start, true);
         } else {
             list.addAll(((FilteredByStringArray) dcSet.getTransactionFinalMap())
-                    .getByFilterAsArray(filter, fromID, start, step, descending));
+                    .getByFilterAsArray(filter, fromID, start, step));
         }
 
         for (Transaction item : list) {

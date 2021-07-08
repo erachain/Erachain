@@ -394,7 +394,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Long> keys = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, isCreator, fromID, false)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, isCreator, fromID, descending)) {
             int counter = 0;
             //Transaction item;
             Long key;
@@ -684,7 +684,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return result;
     }
 
-    public List<Transaction> getByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
+    public List<Transaction> getByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }

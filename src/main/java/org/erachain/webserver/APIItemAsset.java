@@ -175,7 +175,7 @@ public class APIItemAsset {
         }
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, descending);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit);
 
         JSONArray array = new JSONArray();
 
