@@ -91,7 +91,7 @@ public class SearchStatementsTableModel extends SearchTableModelCls<Transaction>
         DCSet dcSet = DCSet.getInstance();
 
         list = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
-                .getByFilterAsArray(filter, fromID, start, step);
+                .getByFilterAsArray(filter, fromID, start, step, descending);
 
         fireTableDataChanged();
 

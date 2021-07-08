@@ -138,7 +138,7 @@ public class APIItemTemplate {
         }
 
         ItemTemplateMap map = DCSet.getInstance().getItemTemplateMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, descending);
 
         JSONArray array = new JSONArray();
 

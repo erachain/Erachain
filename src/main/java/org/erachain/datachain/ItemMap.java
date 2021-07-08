@@ -13,7 +13,6 @@ import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
-import org.erachain.dbs.MergeAND_SortedIterators;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 import org.slf4j.Logger;
@@ -364,67 +363,57 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                         null);
             }
 
-            if (false) {
-                // надо сначала отсортровать все итераторы - и это медленно
-                IteratorCloseable<Long> iterator = MergeAND_SortedIterators.make(result.getB(), Fun.COMPARATOR, false);
-                if (offset > 0)
-                    Iterators.advance(iterator, offset);
+            Long key;
+            HashSet<Long> andHashSet = null;
+            for (IteratorCloseable<Long> iterator : result.getB()) {
 
-                return new Pair<>(null, iterator);
-            } else {
-                Long key;
-                HashSet<Long> andHashSet = null;
-                for (IteratorCloseable<Long> iterator : result.getB()) {
-
-                    if (andHashSet == null) {
-                        // first time - add ALL
-                        andHashSet = new HashSet<>();
-                        while (iterator.hasNext()) {
-                            andHashSet.add(iterator.next());
-                        }
-                        continue;
-                    }
-
-                    // текущий список
-                    HashSet<Long> tempHashSet = new HashSet<>();
+                if (andHashSet == null) {
+                    // first time - add ALL
+                    andHashSet = new HashSet<>();
                     while (iterator.hasNext()) {
-                        tempHashSet.add(iterator.next());
+                        andHashSet.add(iterator.next());
                     }
-
-                    // теперь проверим все значения в списке по И
-                    Iterator<Long> iteratorAND = andHashSet.iterator();
-                    List<Long> toRemove = new ArrayList<>();
-                    while (iteratorAND.hasNext()) {
-                        key = iteratorAND.next();
-                        if (!tempHashSet.contains(key)) {
-                            toRemove.add(key);
-                        }
-                    }
-                    for (Long removedKey : toRemove) {
-                        andHashSet.remove(removedKey);
-                    }
+                    continue;
                 }
 
-                NavigableSet<Long> treeSet = new TreeSet<>();
-                for (Long keyResult : andHashSet) {
-                    treeSet.add(keyResult);
+                // текущий список
+                HashSet<Long> tempHashSet = new HashSet<>();
+                while (iterator.hasNext()) {
+                    tempHashSet.add(iterator.next());
                 }
 
-                if (descending)
-                    treeSet = treeSet.descendingSet();
-
-                if (fromID != null) {
-                    treeSet = (NavigableSet<Long>) treeSet.subSet(fromID, descending ? 0L : Long.MAX_VALUE);
+                // теперь проверим все значения в списке по И
+                Iterator<Long> iteratorAND = andHashSet.iterator();
+                List<Long> toRemove = new ArrayList<>();
+                while (iteratorAND.hasNext()) {
+                    key = iteratorAND.next();
+                    if (!tempHashSet.contains(key)) {
+                        toRemove.add(key);
+                    }
                 }
-
-                IteratorCloseable<Long> iterator = IteratorCloseableImpl.make(treeSet.iterator());
-
-                if (offset > 0)
-                    Iterators.advance(iterator, offset);
-
-                return new Pair<>(null, IteratorCloseableImpl.make(iterator));
-
+                for (Long removedKey : toRemove) {
+                    andHashSet.remove(removedKey);
+                }
             }
+
+            NavigableSet<Long> treeSet = new TreeSet<>();
+            for (Long keyResult : andHashSet) {
+                treeSet.add(keyResult);
+            }
+
+            if (descending)
+                treeSet = treeSet.descendingSet();
+
+            if (fromID != null) {
+                treeSet = (NavigableSet<Long>) treeSet.subSet(fromID, descending ? 0L : Long.MAX_VALUE);
+            }
+
+            IteratorCloseable<Long> iteratorOut = IteratorCloseableImpl.make(treeSet.iterator());
+
+            if (offset > 0)
+                Iterators.advance(iteratorOut, offset);
+
+            return new Pair<>(null, iteratorOut);
 
         } finally {
             try {
@@ -443,7 +432,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<ItemCls> getByFilterAsArray(String filter, Long fromID, int offset, int limit) {
+    public List<ItemCls> getByFilterAsArray(String filter, Long fromID, int offset, int limit, boolean descending) {
 
         if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();

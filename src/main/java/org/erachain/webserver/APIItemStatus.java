@@ -138,7 +138,7 @@ public class APIItemStatus {
         }
 
         ItemStatusMap map = DCSet.getInstance().getItemStatusMap();
-        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit);
+        List<ItemCls> list = map.getByFilterAsArray(filter, fromID, offset, limit, descending);
 
         JSONArray array = new JSONArray();
 
