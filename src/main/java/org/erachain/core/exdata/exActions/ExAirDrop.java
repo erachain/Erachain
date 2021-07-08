@@ -33,7 +33,7 @@ import java.util.List;
 
 public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>>> {
 
-    public static final byte BASE_LENGTH = 4 + 8 + 8 + 2;
+    public static final byte BASE_LENGTH = 4 + 8 + 1 + 2 + 4;
 
     public static final int MAX_COUNT = 1 << 16;
 
@@ -153,6 +153,12 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         byte[] buff;
         outStream.write(Longs.toByteArray(this.assetKey));
 
+        if (backward) {
+            outStream.write(-balancePos);
+        } else {
+            outStream.write(balancePos);
+        }
+
         outStream.write(this.amount.scale());
         buff = this.amount.unscaledValue().toByteArray();
         outStream.write(buff.length);
@@ -168,7 +174,9 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     }
 
     public int length() {
-        return BASE_LENGTH + addresses.length * Account.ADDRESS_SHORT_LENGTH;
+        return BASE_LENGTH
+                + this.amount.unscaledValue().toByteArray().length
+                + addresses.length * Account.ADDRESS_SHORT_LENGTH;
     }
 
     public int getLengthDBData() {
@@ -208,7 +216,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         int flags = Ints.fromByteArray(Arrays.copyOfRange(data, pos, pos + Integer.BYTES));
         pos += Integer.BYTES;
 
-        Long assetKey = null;
+        Long assetKey;
         int balancePos = 0;
         boolean backward = false;
 
@@ -216,7 +224,10 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         pos += Long.BYTES;
 
         balancePos = data[pos++];
-        backward = data[pos++] > 0;
+        if (balancePos < 0) {
+            backward = true;
+            balancePos = -balancePos;
+        }
 
         scale = data[pos++];
         len = data[pos++];
@@ -228,7 +239,9 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         byte[][] addresses = new byte[len][];
         for (int i = 0; i < len; i++) {
-            System.arraycopy(data, pos, addresses[i], 0, Account.ADDRESS_SHORT_LENGTH);
+            byte[] buff = new byte[Account.ADDRESS_SHORT_LENGTH];
+            System.arraycopy(data, pos, buff, 0, Account.ADDRESS_SHORT_LENGTH);
+            addresses[i] = buff;
             pos += Account.ADDRESS_SHORT_LENGTH;
         }
 

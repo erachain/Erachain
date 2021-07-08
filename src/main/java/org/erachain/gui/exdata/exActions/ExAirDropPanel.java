@@ -244,7 +244,10 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         }
                         jLabel_FeesResult.setText(result);
 
-                        addressesModel = new AirDropsModel(results, airDrop.resultCode != Transaction.VALIDATE_OK);
+                        addressesModel = new AirDropsModel(results, false
+                                /// иначе список ломается - если внутри сделаем хранение данных то можно отражения курочить так
+                                // airDrop.resultCode != Transaction.VALIDATE_OK
+                        );
                         jTableAddresses.setModel(addressesModel);
 
                         TableColumnModel columnModel = jTableAddresses.getColumnModel();
@@ -448,7 +451,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
     public Fun.Tuple2<ExAction, String> getResult() {
 
-        if (!jPanelMain.isVisible())
+        if (!jPanelMain.isVisible() || addressesModel == null || addressesModel.getDataVector().size() == 0)
             return new Fun.Tuple2<>(null, null);
 
         Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String> balancePosition
@@ -457,7 +460,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         Vector<Vector> vector = addressesModel.getDataVector();
         String[] addresses = new String[vector.size()];
         for (int i = 0; i < vector.size(); i++) {
-            addresses[i] = (String) vector.get(i).get(1);
+            addresses[i] = ((Account) vector.get(i).get(1)).getAddress();
         }
 
         return ExAirDrop.make(

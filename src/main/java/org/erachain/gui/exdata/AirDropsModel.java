@@ -54,7 +54,7 @@ public class AirDropsModel extends DefaultTableModel {
                 rowVector.addElement(result.b);
                 lastError = result.b;
             } else {
-                rowVector.addElement(result.a.getPersonAsString());
+                rowVector.addElement(result.a);
                 rowVector.addElement("");
             }
 
@@ -79,6 +79,7 @@ public class AirDropsModel extends DefaultTableModel {
 
             rowVector = new Vector<Object>(8);
             rowVector.addElement(++count);
+            rowVector.addElement(item.a);
             if (item.b == null) {
                 rowVector.addElement("");
             } else {

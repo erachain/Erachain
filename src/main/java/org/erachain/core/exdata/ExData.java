@@ -235,8 +235,9 @@ public class ExData {
         }
 
         this.exAction = exAction;
-        if (this.exAction != null) {
+        if (exAction != null) {
             this.flags[1] |= ACTION_FLAG_MASK;
+            this.flags[2] = (byte) exAction.getType();
         }
 
         this.title = title;
