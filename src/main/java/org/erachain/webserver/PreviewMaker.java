@@ -5,6 +5,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -96,6 +97,10 @@ public class PreviewMaker {
         outLog.getParentFile().mkdirs();
 
         if (!outLog.exists()) {
+            MediaType imageType = item.getImageMediaType();
+            if (imageType.getSubtype() == "jpeg") {
+                pathIn += ".jpg";
+            }
             File fileIn = new File(pathIn);
             try (FileOutputStream fos = new FileOutputStream(fileIn)) {
                 fos.write(image);

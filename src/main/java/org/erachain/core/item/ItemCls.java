@@ -449,8 +449,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public static MediaType getMediaType(int mediaType, byte[] media) {
         if (mediaType == ItemCls.MEDIA_TYPE_IMG) {
             if (media.length > 20) {
-                byte[] header = new byte[10];
-                System.arraycopy(media, 0, header, 0, 10);
+                byte[] header = new byte[20];
+                System.arraycopy(media, 0, header, 0, 20);
                 String typeName = new String(header).trim();
                 if (typeName.contains("PNG")) {
                     typeName = "png";
