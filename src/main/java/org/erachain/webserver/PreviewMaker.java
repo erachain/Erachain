@@ -99,6 +99,7 @@ public class PreviewMaker {
         if (!outLog.exists()) {
             MediaType imageType = item.getImageMediaType();
             if (imageType.getSubtype() == "jpeg") {
+                // иначе некоторые картинки дают сбой при конвертации в ffmpeg
                 pathIn += ".jpg";
             }
             File fileIn = new File(pathIn);
