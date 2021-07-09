@@ -4,11 +4,13 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.exdata.exActions.ExAction;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.*;
 import org.erachain.gui.exdata.ExDataPanel;
+import org.erachain.gui.exdata.exActions.ExFilteredPaysPanel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
@@ -79,14 +81,14 @@ public class IssueDocumentPanel extends IconPanel {
         jComboBox_Account_Work.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 exData_Panel.updateRecipients();
-                exData_Panel.exAccrualsPanel.updateAction();
+                exData_Panel.exActionPanel.updateAction();
             }
         });
         if (creator != null) {
             jComboBox_Account_Work.setSelectedItem(creator);
         }
         if (actionAsset != null) {
-            exData_Panel.exAccrualsPanel.jComboBoxAccrualAsset.setSelectedItem(actionAsset);
+            ((ExFilteredPaysPanel) exData_Panel.exActionPanel.actionPanels[ExAction.FILTERED_ACCRUALS_TYPE + 1]).jComboBoxAccrualAsset.setSelectedItem(actionAsset);
         }
         if (type > 0) {
             exData_Panel.docTypeAppendixPanel.typeDocymentCombox.setSelectedIndex(type);
@@ -346,12 +348,14 @@ public class IssueDocumentPanel extends IconPanel {
 
     public void selectAccruals(AssetCls actionAsset, AssetCls filterAsset) {
         selectTabbedPane(1);
-        exData_Panel.exAccrualsPanel.jCheckBoxAccrualsUse.setSelected(true);
-        exData_Panel.exAccrualsPanel.jPanelMain.setVisible(true);
+        exData_Panel.exActionPanel.selectBox.setSelectedIndex(ExAction.FILTERED_ACCRUALS_TYPE);
+        ExFilteredPaysPanel panel = (ExFilteredPaysPanel) exData_Panel.exActionPanel.actionPanels[ExAction.FILTERED_ACCRUALS_TYPE + 1];
+        panel.jCheckBoxAccrualsUse.setSelected(true);
+        panel.jPanelMain.setVisible(true);
         if (actionAsset != null)
-            exData_Panel.exAccrualsPanel.jComboBoxAccrualAsset.setSelectedItem(actionAsset);
+            panel.jComboBoxAccrualAsset.setSelectedItem(actionAsset);
         if (filterAsset != null)
-            exData_Panel.exAccrualsPanel.jComboBoxFilterAsset.setSelectedItem(filterAsset);
+            panel.jComboBoxFilterAsset.setSelectedItem(filterAsset);
     }
 
     public void setChecks() {

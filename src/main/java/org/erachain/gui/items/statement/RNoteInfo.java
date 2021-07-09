@@ -1,10 +1,9 @@
 package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.ExPays;
+import org.erachain.core.exdata.exActions.ExAction;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.exdata.exLink.ExLinkSource;
 import org.erachain.core.item.persons.PersonCls;
@@ -255,13 +254,10 @@ public class RNoteInfo extends RecDetailsFrame {
         exData = statement.getExData();
         exData.setDC(DCSet.getInstance());
 
-        ExPays exPays = exData.getExPays();
-        if (exPays != null) {
-            exPays.getFilteredAccruals(statement);
-            resultStr += "<h3>" + Lang.T("Accruals") + "</h3>";
-            resultStr += Lang.T("Count # кол-во") + ": <b>" + exPays.getFilteredAccrualsCount()
-                    + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(exPays.getTotalFeeBytes())
-                    + "</b>, " + Lang.T("Total") + ": <b>" + exPays.getTotalPay();
+        ExAction exAction = exData.getExAction();
+        if (exAction != null) {
+            exAction.preProcess(statement);
+            resultStr += exAction.getInfoHTML();
         }
 
         if (exData.isCanSignOnlyRecipients()) {
