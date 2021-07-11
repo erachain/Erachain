@@ -9,6 +9,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
+import org.erachain.datachain.IndexIterator;
 import org.erachain.datachain.OrderSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NavigableSet;
 
 ;
 
@@ -33,7 +35,7 @@ import java.util.Map;
  * занчение: Блок<br>
  * <p>
  * Есть вторичный индекс, для отчетов (blockexplorer) - generatorMap
- * TODO - убрать длинный индек и вставить INT
+ * TODO - убрать длинный индекс и вставить INT
  *
  * @return
  */
@@ -47,6 +49,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     // TODO: cut index to WANT only
     private BTreeMap wantHaveKeyMap;
     private BTreeMap addressHaveWantKeyMap;
+    private NavigableSet assetKeySet;
 
     public OrdersSuitMapDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger);
@@ -54,6 +57,10 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
 
     @Override
     public void openMap() {
+
+        HI = Long.MAX_VALUE;
+        LO = 0L;
+
         // OPEN MAP
         map = database.createTreeMap("orders")
                 .valueSerializer(new OrderSerializer())
@@ -79,7 +86,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
 
                                 // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
                                 // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
-                                key > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice(),
+                                order.calcLeftPrice(),
                                 //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
                                 // но нужно помнить что сначала полностью удаляем ордер а потом добавляем его вместо простого Обновить
                                 // тоже самое и при сливе из ФОРКнутой базы при просчете валидности и догонянии цепочки - надо учесть
@@ -129,6 +136,23 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                                 value.getId());
                     }
                 });
+
+        // WANT/HAVE KEY
+        this.assetKeySet = database.createTreeSet("orders_key_asset")
+                .comparator(Fun.COMPARATOR)
+                .makeOrGet();
+
+        //BIND HAVE/WANT KEY
+        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.assetKeySet,
+                new Fun.Function2<Long[], Long,
+                        Order>() {
+                    @Override
+                    public Long[] run(
+                            Long key, Order value) {
+                        return new Long[]{value.getWantAssetKey(), value.getHaveAssetKey()};
+                    }
+                });
+
     }
 
     //@Override
@@ -147,6 +171,25 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
             return null;
 
         return get(first.getValue());
+
+    }
+
+    @Override
+    public IteratorCloseable<Long> getIteratorByAssetKey(long assetKey, boolean descending) {
+
+        if (this.assetKeySet == null)
+            return null;
+
+        if (descending)
+            return IteratorCloseableImpl.make(new IndexIterator(
+                    this.assetKeySet.descendingSet().subSet(
+                            Fun.t2(assetKey, Long.MAX_VALUE),
+                            Fun.t2(assetKey, 0L)).iterator()));
+
+        return IteratorCloseableImpl.make(new IndexIterator(
+                this.assetKeySet.subSet(
+                        Fun.t2(assetKey, 0L),
+                        Fun.t2(assetKey, Long.MAX_VALUE)).iterator()));
 
     }
 
@@ -216,11 +259,11 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
             }
 
             Order order = get(key);
-            if (BlockChain.CHECK_BUGS > 1 && order == null) {
+            if (BlockChain.CHECK_BUGS > -1 && order == null) {
                 logger.error("ORDER [" + Transaction.viewDBRef(key) + "] = NULL");
             }
             result.put(key, order);
-            // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
+            // здесь хотя бы одну заявку с неподходящей вроде бы ценой нужно взять
             // причем берем по Остаткам Цену теперь
             if (stopPrice != null && order.calcLeftPrice().compareTo(stopPrice) > 0) {
                 break;

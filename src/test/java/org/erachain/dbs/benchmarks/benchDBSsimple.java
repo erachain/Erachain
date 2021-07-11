@@ -97,7 +97,7 @@ public class benchDBSsimple {
             int iteratorSize = 0;
 
             int iteratorSize1 = 0;
-            Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1).iterator();
+            Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey1);
             while (assetKeys.hasNext()) {
                 iteratorSize1++;
                 byte[] key = assetKeys.next();
@@ -113,7 +113,7 @@ public class benchDBSsimple {
             map.set(Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey2)), balance1);
 
             iteratorSize = 0;
-            assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1).iterator();
+            assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey1);
             while (assetKeys.hasNext()) {
                 iteratorSize++;
                 assetKeys.next();
@@ -121,7 +121,7 @@ public class benchDBSsimple {
             assertEquals(1, iteratorSize);
 
             iteratorSize = 0;
-            assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey2).iterator();
+            assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey2);
             while (assetKeys.hasNext()) {
                 iteratorSize++;
                 assetKeys.next();
@@ -136,7 +136,7 @@ public class benchDBSsimple {
             assertEquals(map.size(), size + 4);
 
             //////////////////
-            assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1).iterator();
+            assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey1);
 
             int found1 = 0;
             int found2 = 0;
@@ -165,7 +165,7 @@ public class benchDBSsimple {
 
 
             //////////////////
-            assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey2).iterator();
+            assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey2);
             iteratorSize = 0;
             found1 = 0;
             found2 = 0;
@@ -194,7 +194,7 @@ public class benchDBSsimple {
             ///////////// тот же КЛЮЧ
             map.set(Bytes.concat(account3.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance3);
 
-            assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1).iterator();
+            assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).getIteratorByAsset(assetKey1);
             iteratorSize = 0;
             found1 = 0;
             found2 = 0;
@@ -239,7 +239,7 @@ public class benchDBSsimple {
             map.set(Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey2)), balance1);
 
             iteratorSize = 0;
-            accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(account1).iterator();
+            accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountIterator(account1);
             while (accountKeys.hasNext()) {
                 iteratorSize++;
                 accountKeys.next();
@@ -254,7 +254,7 @@ public class benchDBSsimple {
             assertEquals(map.size(), size + 4);
 
             //////////////////
-            accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(account1).iterator();
+            accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountIterator(account1);
 
             int found1 = 0;
             int found2 = 0;
@@ -281,7 +281,7 @@ public class benchDBSsimple {
 
 
             //////////////////
-            accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(account2).iterator();
+            accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountIterator(account2);
             iteratorSize = 0;
             found1 = 0;
             found2 = 0;
@@ -308,7 +308,7 @@ public class benchDBSsimple {
             ///////////// тот же КЛЮЧ
             map.set(Bytes.concat(account3.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance3);
 
-            accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(account3).iterator();
+            accountKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountIterator(account3);
             iteratorSize = 0;
             found1 = 0;
             found2 = 0;

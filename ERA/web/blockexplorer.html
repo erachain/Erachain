@@ -679,7 +679,7 @@ button.white-bgc[disabled]:focus,
             output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.Label_asset_key +
                 '<td><b>' + data.Balance.Label_asset_name + '<td><b>' + data.Balance.Label_Balance_1 +
                 '<td><b>' + data.Balance.Label_Balance_2 + '<td><b>' + data.Balance.Label_Balance_3 + '<td><b>'
-                 + data.Balance.Label_Balance_4 + '</tr>';
+                 + data.Balance.Label_Balance_4 + '<td><b>' + data.Balance.Label_Balance_5 + '</tr>';
             for (key in data.Balance.balances) {
                 output += '<tr><td><a href ="?asset=' + data.Balance.balances[key].asset_key +
                     get_lang() + '">' + data.Balance.balances[key].asset_key + '</a>';
@@ -694,10 +694,12 @@ button.white-bgc[disabled]:focus,
                     '&position=3' + get_lang() + '">' + data.Balance.balances[key].balance_3 + '</a>';
                 output += '<td><a href ="?person=' + data.person_key + '&asset=' + data.Balance.balances[key].asset_key +
                     '&position=4' + get_lang() + '">' + data.Balance.balances[key].balance_4 + '</a>';
+                output += '<td><a href ="?person=' + data.person_key + '&asset=' + data.Balance.balances[key].asset_key +
+                    '&position=4' + get_lang() + '">' + data.Balance.balances[key].balance_5 + '</a>';
                 } else {
                 output += '<td>' + data.Balance.balances[key].balance_1 + '<td>' +
                     data.Balance.balances[key].balance_2 + '<td>' + data.Balance.balances[key].balance_3
-                    + '<td>' + data.Balance.balances[key].balance_4;
+                    + '<td>' + data.Balance.balances[key].balance_4 + '<td>' + data.Balance.balances[key].balance_5;
                 }
 
             }
@@ -1369,6 +1371,7 @@ button.white-bgc[disabled]:focus,
                 output += data.Label_Transactions_count + ': <b>' + data.countTx.txsCount + '</b><br>';
             }
 
+            output += data.Label_Size + ': <b>' + data.size + '</b><br>';
             output += data.Label_Total_Fee + ': <b>' + data.totalFee + '</b><br>';
             output += '<br>';
 

@@ -40,7 +40,10 @@ import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DLSet;
-import org.erachain.datachain.*;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemMap;
+import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
@@ -97,8 +100,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.3.01 dev";
-    public static String buildTime = "2021-03-22 12:00:00 UTC";
+    public static String version = "5.4 dev";
+    public static String buildTime = "2021-05-05 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -110,10 +113,7 @@ public class Controller extends Observable {
     public final static long MIN_MEMORY_TAIL = 64 * (1 << 20); // Машина Явы вылетает если меньше 50 МБ
 
     public static final Integer MUTE_PEER_COUNT = 6;
-    // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
-    // code!
-    // for reset DB if DB PROTOCOL is CHANGED
-    public static final String releaseVersion = "3.02.02";
+
     // TODO ENUM would be better here
     public static final int STATUS_NO_CONNECTIONS = 0;
     public static final int STATUS_SYNCHRONIZING = 1;
@@ -121,6 +121,7 @@ public class Controller extends Observable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class.getSimpleName());
 
     public static int HARD_WORK = 0;
+    public static String CACHE_DC = "hard";
     public boolean useGui = true;
     public boolean useNet = true;
 
@@ -129,7 +130,7 @@ public class Controller extends Observable {
     public static long buildTimestamp;
     private static Controller instance;
     public PairsController pairsController;
-    public Wallet wallet;
+    private Wallet wallet;
     public TelegramStore telegramStore;
     private int status;
     private boolean dcSetWithObserver = false;
@@ -767,7 +768,7 @@ public class Controller extends Observable {
         // CREATE WALLET
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open Wallet"));
-        this.wallet = new Wallet(this.dcSetWithObserver, this.dynamicGUI);
+        this.wallet = new Wallet(dcSet, this.dcSetWithObserver, this.dynamicGUI);
 
         boolean walletKeysRecovered = false;
         if (this.seedCommand != null && this.seedCommand.length > 1 && !Wallet.walletKeysExists()) {
@@ -821,8 +822,9 @@ public class Controller extends Observable {
                 this.wallet.initiateItemsFavorites();
             }
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Wallet OK" + " " + Settings.getInstance().getDataWalletPath()));
-            LOGGER.info("Wallet OK" + " " + Settings.getInstance().getDataWalletPath());
+            String mess = "Wallet OK" + " " + Settings.getInstance().getDataWalletPath();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, mess));
+            LOGGER.info(mess);
 
             // create telegtam
 
@@ -896,7 +898,10 @@ public class Controller extends Observable {
         Settings.getInstance().setWalletKeysPath(selectedDir);
 
         // open wallet
-        Controller.getInstance().wallet = new Wallet(dcSetWithObserver, dynamicGUI);
+        if (Controller.getInstance().wallet == null) {
+            Controller.getInstance().wallet = new Wallet(dcSet, dcSetWithObserver, dynamicGUI);
+        }
+
         // not wallet return 0;
         if (!Controller.getInstance().wallet.walletKeysExists()) {
             Settings.getInstance().setWalletKeysPath(pathOld);
@@ -1014,37 +1019,6 @@ public class Controller extends Observable {
             }
         }
 
-    }
-
-    /**
-     * я так понял - это отслеживание версии базы данных - и если она новая то все удаляем и заново закачиваем
-     *
-     * @throws IOException
-     * @throws Exception
-     */
-    public void startFromScratchOnDemand() throws IOException, Exception {
-        String dataVersion = this.dcSet.getLocalDataMap().get(LocalDataMap.LOCAL_DATA_VERSION_KEY);
-
-        if (dataVersion == null || !dataVersion.equals(releaseVersion)) {
-            File dataDir = new File(Settings.getInstance().getDataChainPath());
-            File dataBak = getDataBakDir(dataDir);
-            this.dcSet.close();
-
-            if (dataDir.exists()) {
-                // delete data folder
-                java.nio.file.Files.walkFileTree(dataDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-
-            }
-
-            if (dataBak.exists()) {
-                // delete data folder
-                java.nio.file.Files.walkFileTree(dataBak.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-            }
-            DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
-
-            this.dcSet.getLocalDataMap().put(LocalDataMap.LOCAL_DATA_VERSION_KEY, Controller.releaseVersion);
-
-        }
     }
 
     private File getDataBakDir(File dataDir) {
@@ -1757,7 +1731,9 @@ public class Controller extends Observable {
             // BROADCAST MESSAGE
             this.network.broadcast(telegram, false);
             // save DB
-            Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
+            if (wallet != null && wallet.dwSet != null) {
+                wallet.dwSet.getTelegramsMap().add(transaction.viewSignature(), transaction);
+            }
         }
 
         return notAdded;
@@ -2409,8 +2385,14 @@ public class Controller extends Observable {
         return this.wallet.importAccountSeed(accountSeed);
     }
 
-    public String importPrivateKey(byte[] accountSeed) {
-        return this.wallet.importPrivateKey(accountSeed);
+    public Tuple3<String, Integer, String> importPrivateKey(byte[] privateKey) {
+        if (privateKey.length > 34) {
+            // 64 bytes - from mobile
+            return this.wallet.importPrivateKey(privateKey);
+        } else {
+            // as account pair SEED - 32 bytes
+            return new Tuple3<>(this.wallet.importAccountSeed(privateKey), null, null);
+        }
     }
 
     public byte[] exportAccountSeed(String address) {
@@ -2617,14 +2599,18 @@ public class Controller extends Observable {
     }
 
     public void addTelegramToWallet(Transaction transaction, String signatureKey) {
+        if (wallet == null || wallet.dwSet == null) {
+            return;
+        }
+
         HashSet<Account> recipients = transaction.getRecipientAccounts();
         PublicKeyAccount creator = transaction.getCreator();
         String creator58 = creator.getAddress();
         String creatorPubKey58 = creator.getBase58();
         for (Account recipient : recipients) {
             if (wallet.accountExists(recipient)) {
-                wallet.database.getTelegramsMap().add(signatureKey, transaction);
-                if (!wallet.database.getFavoriteAccountsMap().contains(creator58)) {
+                wallet.dwSet.getTelegramsMap().add(signatureKey, transaction);
+                if (!wallet.dwSet.getFavoriteAccountsMap().contains(creator58)) {
                     String title = transaction.getTitle();
                     String description = "";
                     if (transaction instanceof RSend) {
@@ -2924,22 +2910,52 @@ public class Controller extends Observable {
         return dcSet.getTradeMap().getTradesFromTradeID(tradeID, limit);
     }
 
-    public List<Trade> getTradeByOrderID(long orderID, int limit) {
-        return dcSet.getTradeMap().getTradesByOrderID(orderID, 0, limit);
+    /**
+     * @param fromOrderID
+     * @param toOrderID   0 - ALL to end
+     * @param limit
+     * @param useCancel
+     * @return
+     */
+    public List<Trade> getTradeFromToOrderID(long fromOrderID, long toOrderID, int limit, boolean useCancel) {
+        return dcSet.getTradeMap().getTradesFromToOrderID(fromOrderID, toOrderID, limit, useCancel);
     }
 
-    public List<Trade> getTradeByOrderID(long have, long want, long orderID, int limit) {
-        return dcSet.getTradeMap().getTradesByOrderID(have, want, orderID, 0, limit);
+    /**
+     * @param have
+     * @param want
+     * @param fromOrderID
+     * @param toOrderID   0 - ALL to and
+     * @param limit
+     * @param useCancel
+     * @return
+     */
+    public List<Trade> getTradeFromToOrderID(long have, long want, long fromOrderID, long toOrderID, int limit, boolean useCancel) {
+        return dcSet.getTradeMap().getTradesFromToOrderID(have, want, fromOrderID, toOrderID, limit, useCancel);
     }
 
-    public List<Trade> getTradeByHeight(int height, int limit) {
+    /**
+     * @param fromHeight
+     * @param toHeight   0 - ALL to and
+     * @param limit
+     * @return
+     */
+    public List<Trade> getTradeFromToHeight(int fromHeight, int toHeight, int limit) {
         // так как там обратный отсчет
-        return dcSet.getTradeMap().getTradesByHeight(height, 0, limit);
+        return dcSet.getTradeMap().getTradesFromToHeight(fromHeight, toHeight, limit);
     }
 
-    public List<Trade> getTradeByHeight(long have, long want, int height, int limit) {
+    /**
+     * @param have
+     * @param want
+     * @param fromHeight
+     * @param toHeight   0 - ALL to and
+     * @param limit
+     * @return
+     */
+    public List<Trade> getTradeFromToHeight(long have, long want, int fromHeight, int toHeight, int limit) {
         // так как там обратный отсчет
-        return dcSet.getTradeMap().getTradesByHeight(have, want, height, 0, limit);
+        return dcSet.getTradeMap().getTradesFromToHeight(have, want, fromHeight, toHeight, limit);
     }
 
     // IMPRINTS
@@ -3061,26 +3077,68 @@ public class Controller extends Observable {
      * this.transactionCreator.createTransactionFromRaw(rawData); } }
      */
 
-    public Pair<Transaction, Integer> lightCreateTransactionFromRaw(byte[] rawData) {
+    public Fun.Tuple3<Transaction, Integer, String> parseAndCheck(String rawDataStr, boolean base64, boolean andCheck) {
+        byte[] transactionBytes;
+
+        int step = 1;
+        try {
+            if (base64) {
+                transactionBytes = Base64.getDecoder().decode(rawDataStr);
+            } else {
+                step++;
+                transactionBytes = Base58.decode(rawDataStr);
+            }
+        } catch (Exception e) {
+            return new Fun.Tuple3<>(null, -1, "Base" + (step == 2 ? "58" : "64") + " decode: " + e.getMessage());
+        }
+
+        if (andCheck)
+            return Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes, true);
+
+        try {
+            Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
+            return new Tuple3<Transaction, Integer, String>(transaction, null, null);
+        } catch (Exception e) {
+            return new Tuple3<Transaction, Integer, String>(null, Transaction.INVALID_RAW_DATA, e.getMessage());
+        }
+
+    }
+
+    public Tuple3<Transaction, Integer, String> lightCreateTransactionFromRaw(byte[] rawData, boolean notRelease) {
 
         // CREATE TRANSACTION FROM RAW
         Transaction transaction;
         try {
             transaction = TransactionFactory.getInstance().parse(rawData, Transaction.FOR_NETWORK);
         } catch (Exception e) {
-            return new Pair<Transaction, Integer>(null, Transaction.INVALID_RAW_DATA);
+            return new Tuple3<Transaction, Integer, String>(null, Transaction.INVALID_RAW_DATA, e.getMessage());
         }
 
         // CHECK IF RECORD VALID
         if (!transaction.isSignatureValid(DCSet.getInstance()))
-            return new Pair<Transaction, Integer>(transaction, Transaction.INVALID_SIGNATURE);
+            return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
 
         // CHECK FOR UPDATES
-        int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0l);
-        if (valid != Transaction.VALIDATE_OK)
-            return new Pair<Transaction, Integer>(transaction, valid);
+        int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0L, notRelease);
+        if (valid == Transaction.VALIDATE_OK)
+            return new Tuple3<Transaction, Integer, String>(transaction, valid, null);
 
-        return new Pair<Transaction, Integer>(transaction, valid);
+        return new Tuple3<Transaction, Integer, String>(transaction, valid, transaction.errorValue);
+
+    }
+
+    public Tuple3<Transaction, Integer, String> checkTransaction(Transaction transaction) {
+
+        // CHECK IF RECORD VALID
+        if (!transaction.isSignatureValid(DCSet.getInstance()))
+            return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
+
+        // CHECK FOR UPDATES
+        int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0l, false);
+        if (valid != Transaction.VALIDATE_OK)
+            return new Tuple3<Transaction, Integer, String>(transaction, valid, transaction.errorValue);
+
+        return new Tuple3<Transaction, Integer, String>(transaction, valid, null);
 
     }
 
@@ -3450,6 +3508,13 @@ public class Controller extends Observable {
         }
     }
 
+    public Transaction changeOrder(PrivateKeyAccount creator, int feePow, Order order, BigDecimal wantAmount) {
+        Transaction orderCreate = this.dcSet.getTransactionFinalMap().get(order.getId());
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createChangeOrderTransaction(creator, feePow, orderCreate.getSignature(), wantAmount);
+        }
+    }
+
     public Pair<Transaction, Integer> deployAT(PrivateKeyAccount creator, String name, String description, String type,
                                                String tags, byte[] creationBytes, BigDecimal quantity, int feePow) {
 
@@ -3732,8 +3797,8 @@ public class Controller extends Observable {
             return null;
         }
 
-        if (wallet != null) {
-            Tuple3<String, String, String> favorite = wallet.database.getFavoriteAccountsMap().get(address);
+        if (wallet != null && wallet.dwSet != null) {
+            Tuple3<String, String, String> favorite = wallet.dwSet.getFavoriteAccountsMap().get(address);
             if (favorite != null && favorite.a != null) {
                 return Base58.decode(favorite.a);
             }
@@ -3893,6 +3958,7 @@ public class Controller extends Observable {
         databaseSystem = DCSet.DBS_MAP_DB;
 
         for (String arg : args) {
+
             if (arg.equals("-cli")) {
                 cli = true;
                 useGui = false;
@@ -3952,6 +4018,11 @@ public class Controller extends Observable {
                     }
                 } catch (Exception e) {
                 }
+                continue;
+            }
+
+            if (arg.startsWith("-cache=") && arg.length() > 7) {
+                CACHE_DC = arg.substring(7).toLowerCase();
                 continue;
             }
 
@@ -4187,9 +4258,9 @@ public class Controller extends Observable {
                         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, null,
                                 Lang.T("STARTUP ERROR") + ": "
                                         + errorMsg, 600, 400, Lang.T(" "));
-                        dd.jButton0.setVisible(false);
-                        dd.jButton1.setVisible(false);
-                        dd.jButton2.setText(Lang.T("Cancel"));
+                        dd.jButtonRAW.setVisible(false);
+                        dd.jButtonFREE.setVisible(false);
+                        dd.jButtonGO.setText(Lang.T("Cancel"));
                         dd.setLocationRelativeTo(null);
                         dd.setVisible(true);
                     }

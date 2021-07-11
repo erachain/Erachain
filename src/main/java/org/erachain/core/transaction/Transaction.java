@@ -86,6 +86,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
 
     // VALIDATION CODE
+    public static final int JSON_ERROR = -1;
     public static final int VALIDATE_OK = 1;
     public static final int FUTURE_ABILITY = 2;
     public static final int INVALID_WALLET_ADDRESS = 3;
@@ -153,6 +154,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static final int INVALID_CLAIM_DEBT_CREATOR = 61;
 
+    public static final int ORDER_ALREADY_COMPLETED = 65;
+
+    public static final int INVALID_AWARD = 81;
+    public static final int INVALID_MAX_AWARD_COUNT = 82;
+
+    public static final int INVALID_MAX_ITEMS_COUNT = 85;
+
     public static final int NOT_ENOUGH_ERA_OWN = 101;
     public static final int NOT_ENOUGH_ERA_USE = 102;
     public static final int NOT_ENOUGH_ERA_OWN_10 = 103;
@@ -179,6 +187,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int INVALID_VALUE_LENGTH_MAX = 160;
     public static final int INVALID_TITLE_LENGTH_MIN = 161;
     public static final int INVALID_TITLE_LENGTH_MAX = 162;
+    public static final int INVALID_TAGS_LENGTH_MAX = 163;
+    public static final int INVALID_ICON_TYPE = 164;
 
     public static final int NOT_DEBTABLE_ASSET = 171;
     public static final int NOT_HOLDABLE_ASSET = 172;
@@ -316,6 +326,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     // exchange of assets
     public static final int CREATE_ORDER_TRANSACTION = 50;
     public static final int CANCEL_ORDER_TRANSACTION = 51;
+    public static final int CHANGE_ORDER_TRANSACTION = 52;
     // voting
     public static final int CREATE_POLL_TRANSACTION = 61;
     public static final int VOTE_ON_POLL_TRANSACTION = 62;
@@ -446,7 +457,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected PersonCls creatorPerson;
 
     /**
-     * Для создания поисковых Меток - Тип сущности + номер ее. например @P12 - персона 12
+     * Для создания поисковых Меток - Тип сущности + номер ее (например @P12 - персона 12) + Метки (Tags) от самой Сущности
      */
     protected Object[][] itemsKeys;
 
@@ -669,6 +680,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     /**
+     * Нужно для наполнения данными для isValid & process
+     *
      * @param dcSet
      * @param forDeal
      * @param blockHeight
@@ -693,7 +706,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     /**
-     * Нарастить мясо на скелет из базы состояния - нужно например для созданим вторичных ключей и Номер Сущности
+     * Нарастить мясо на скелет из базы состояния - нужно для записи в FinalMap b созданим вторичных ключей и Номер Сущности
      */
     public void updateFromStateDB() {
     }
@@ -748,6 +761,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 // exchange of assets
                 CREATE_ORDER_TRANSACTION,
                 CANCEL_ORDER_TRANSACTION,
+                CHANGE_ORDER_TRANSACTION,
 
                 // voting
                 VOTE_ON_ITEM_POLL_TRANSACTION
@@ -815,6 +829,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 return CreateOrderTransaction.TYPE_NAME;
             case CANCEL_ORDER_TRANSACTION:
                 return CancelOrderTransaction.TYPE_NAME;
+            case CHANGE_ORDER_TRANSACTION:
+                return ChangeOrderTransaction.TYPE_NAME;
 
             // voting
             case VOTE_ON_ITEM_POLL_TRANSACTION:
@@ -844,12 +860,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return this.timestamp;
     }
 
-    public static Long getTimestampByDBRef(Long dbRef) {
-        Tuple2<Integer, Integer> key = parseDBRef(dbRef);
-        BlockChain blockChain = Controller.getInstance().getBlockChain();
-        return blockChain.getTimestamp(key.a) + key.b;
-    }
-
     // for test signature only!!!
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
@@ -871,6 +881,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public Object[][] getItemsKeys() {
+        if (itemsKeys == null)
+            makeItemsKeys();
+
         return itemsKeys;
     }
 
@@ -1492,11 +1505,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         BigDecimal compuRate;
         if (useDEX) {
-            Trade lastTrade = DCSet.getInstance().getTradeMap().getLastTrade(AssetCls.FEE_KEY, asset.getKey());
+            Trade lastTrade = DCSet.getInstance().getTradeMap().getLastTrade(AssetCls.FEE_KEY, asset.getKey(), false);
             if (lastTrade == null) {
                 compuRate = BigDecimal.ZERO;
             } else {
-                compuRate = lastTrade.getHaveKey().equals(AssetCls.FEE_KEY) ? lastTrade.calcPriceRevers() : lastTrade.calcPrice();
+                compuRate = lastTrade.getHaveKey() == AssetCls.FEE_KEY ? lastTrade.calcPriceRevers() : lastTrade.calcPrice();
             }
 
         } else {
@@ -1596,7 +1609,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     @SuppressWarnings("unchecked")
     protected JSONObject getJsonBase() {
 
-        DCSet localDCSet = DCSet.getInstance();
+        if (dcSet == null) {
+            setDC(DCSet.getInstance(), true);
+        }
 
         JSONObject transaction = new JSONObject();
 
@@ -1604,7 +1619,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
         transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
 
-        transaction.put("confirmations", this.getConfirmations(localDCSet));
+        transaction.put("confirmations", this.getConfirmations(dcSet));
         transaction.put("type", getType());
         transaction.put("record_type", this.viewTypeName());
         transaction.put("type_name", this.viewTypeName());
@@ -1613,6 +1628,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         if (exLink != null) {
             transaction.put("exLink", getExLink().toJson());
         }
+
+        // getSignature - make in GENEIS
+        transaction.put("signature", this.getSignature() == null ? "null" : Base58.encode(this.signature));
 
         int height;
         if (this.creator == null) {
@@ -1627,7 +1645,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             transaction.put("deadLine", getDeadline());
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
             transaction.put("creator", this.creator.getAddress());
-            transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
             transaction.put("fee", this.fee.toPlainString());
             transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
         }
@@ -1643,9 +1660,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         transaction.put("size", this.viewSize(Transaction.FOR_NETWORK));
 
-        if (dcSet == null) {
-            setDC(localDCSet, true);
-        }
         transaction.put("tags", Arrays.asList(this.getTags()));
 
         return transaction;
@@ -1718,7 +1732,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         boolean isSigned = this.signature != null;
         transaction.put("signature", isSigned ? Base58.encode(this.signature) : "null");
 
-        transaction.put("raw", Base58.encode(this.toBytes(FOR_NETWORK, isSigned)));
+        transaction.put("raw", Base64.getEncoder().encodeToString(this.toBytes(FOR_NETWORK, isSigned)));
 
         return transaction;
     }
@@ -2089,6 +2103,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return out;
     }
 
+    @Deprecated
     public void updateMapByError(int error, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));
@@ -2097,6 +2112,39 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
     }
 
+    @Deprecated
+    public void updateMapByError(int error, HashMap out, String lang) {
+        out.put("error", error);
+        if (lang == null) {
+            out.put("message", OnDealClick.resultMess(error));
+        } else {
+            out.put("lang", lang);
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            out.put("message", langObj == null ? OnDealClick.resultMess(error) : Lang.T(OnDealClick.resultMess(error), langObj));
+        }
+        if (errorValue != null) {
+            out.put("value", errorValue);
+        }
+    }
+
+    public void updateMapByError2(HashMap out, int error, String lang) {
+        JSONObject json = new JSONObject();
+        json.put("code", error);
+        json.put("message", OnDealClick.resultMess(error));
+        if (lang != null) {
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            if (langObj != null) {
+                json.put("lang", lang);
+                json.put("local", Lang.T(OnDealClick.resultMess(error), langObj));
+            }
+        }
+        if (errorValue != null) {
+            json.put("value", errorValue);
+        }
+        out.put("error", json);
+    }
+
+    @Deprecated
     public void updateMapByError(int error, String errorMess, HashMap out) {
         out.put("error", error);
         out.put("message", errorMess);
@@ -2105,16 +2153,58 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
     }
 
+    public void updateMapByError2(int error, String errorMess, HashMap out) {
+        JSONObject json = new JSONObject();
+        json.put("code", error);
+        json.put("message", errorMess);
+        if (errorValue != null) {
+            json.put("value", errorValue);
+        }
+        out.put("error", json);
+    }
+
+    @Deprecated
+    public void updateMapByError(int error, String errorMess, HashMap out, String lang) {
+        out.put("error", error);
+        if (lang == null) {
+            out.put("message", errorMess);
+        } else {
+            out.put("lang", lang);
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            out.put("message", langObj == null ? errorMess : Lang.T(errorMess, langObj));
+        }
+        if (errorValue != null) {
+            out.put("value", errorValue);
+        }
+    }
+
+    @Deprecated
     public static void updateMapByErrorSimple(int error, String errorMess, HashMap out) {
         out.put("error", error);
         out.put("message", errorMess);
     }
 
+    public static void updateMapByErrorSimple2(HashMap out, int error, String errorMess, String lang) {
+        JSONObject json = new JSONObject();
+        json.put("code", error);
+        json.put("message", errorMess);
+        if (lang != null) {
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            if (langObj != null) {
+                json.put("lang", lang);
+                json.put("local", Lang.T(errorMess, langObj));
+            }
+        }
+        out.put("error", json);
+    }
+
+    @Deprecated
     public static void updateMapByErrorSimple(int error, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));
     }
 
+    @Deprecated
     public static void updateMapByErrorValue(int error, String errorValue, HashMap out) {
         out.put("error", error);
         out.put("message", OnDealClick.resultMess(error));
@@ -2153,7 +2243,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                     giftBG, false, false, false);
             // учтем что получили бонусы
             if (royaltyAssetKey == BlockChain.FEE_KEY) {
-                invitedAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Account.BALANCE_SIDE_DEBIT);
+                invitedAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
             }
 
             if (txCalculated != null && !asOrphan) {
@@ -2186,7 +2276,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
             // учтем что получили бонусы
             if (royaltyAssetKey == BlockChain.FEE_KEY) {
-                issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Account.BALANCE_SIDE_DEBIT);
+                issuerAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
             }
 
             if (txCalculated != null && !asOrphan) {
@@ -2210,7 +2300,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
             // учтем что получили бонусы
             if (royaltyAssetKey == BlockChain.FEE_KEY) {
-                issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Account.BALANCE_SIDE_DEBIT);
+                issuerAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
             }
 
             if (txCalculated != null && !asOrphan) {
@@ -2369,7 +2459,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         account.changeBalance(this.dcSet, asOrphan, false, FEE_KEY, royaltyBG, false, false, false);
         // учтем что получили бонусы
-        account.changeCOMPUBonusBalances(dcSet, asOrphan, royaltyBG, Account.BALANCE_SIDE_DEBIT);
+        account.changeCOMPUStatsBalances(dcSet, asOrphan, royaltyBG, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
 
         if (block != null && !asOrphan) {
             block.addCalculated(account, FEE_KEY, royaltyBG,
@@ -2449,7 +2539,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 // NOT update INCOME balance
                 this.creator.changeBalance(this.dcSet, true, false, FEE_KEY, this.fee, false, false, true);
                 // учтем траты
-                this.creator.changeCOMPUBonusBalances(this.dcSet, true, this.fee, Account.BALANCE_SIDE_CREDIT);
+                this.creator.changeCOMPUStatsBalances(this.dcSet, false, this.fee, Account.FEE_BALANCE_SIDE_SPEND);
             }
 
             // Multi Level Referal
@@ -2488,7 +2578,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 // NOT update INCOME balance
                 this.creator.changeBalance(this.dcSet, false, false, FEE_KEY, this.fee, false, false, true);
                 // учтем траты
-                this.creator.changeCOMPUBonusBalances(this.dcSet, false, this.fee, Account.BALANCE_SIDE_CREDIT);
+                this.creator.changeCOMPUStatsBalances(this.dcSet, true, this.fee, Account.FEE_BALANCE_SIDE_SPEND);
 
             }
 

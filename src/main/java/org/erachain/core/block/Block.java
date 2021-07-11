@@ -128,7 +128,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
                 + TRANSACTIONS_COUNT_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH
                 + HEIGHT_LENGTH + GENERATING_BALANCE_LENGTH + WIN_VALUE_LENGTH + TOTAL_WIN_VALUE_LENGTH + WIN_VALUE_LENGTH
-                + FEE_LENGTH + FEE_LENGTH;
+                + FEE_LENGTH + FEE_LENGTH + Integer.BYTES;
 
         public final int version;
         public final byte[] reference;
@@ -145,11 +145,12 @@ public class Block implements Closeable, ExplorerJsonLine {
         public final long totalWinValue;
         public final long totalFee;
         public final long emittedFee;
+        public final int size;
 
         public BlockHead(int version, byte[] reference, PublicKeyAccount creator, int transactionCount,
                          byte[] transactionsHash, byte[] signature,
                          int heightBlock, int forgingValue, long winValue, long target,
-                         long totalWinValue, long totalFee, long emittedFee) {
+                         long totalWinValue, long totalFee, long emittedFee, int size) {
             this.version = version;
             this.creator = creator;
             this.signature = signature;
@@ -164,6 +165,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             this.totalWinValue = totalWinValue;
             this.totalFee = totalFee;
             this.emittedFee = emittedFee;
+            this.size = size;
         }
 
         public BlockHead(Block block, int heightBlock, int forgingValue, long winValue, long target,
@@ -174,6 +176,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             this.transactionsCount = block.transactionCount;
             this.transactionsHash = block.transactionsHash;
             this.signature = block.signature;
+            this.size = block.getDataLength(false);
 
             this.heightBlock = heightBlock;
             this.forgingValue = forgingValue;
@@ -191,6 +194,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             this.transactionsCount = block.transactionCount;
             this.transactionsHash = block.transactionsHash;
             this.signature = block.signature;
+            this.size = block.getDataLength(false);
 
             this.heightBlock = block.heightBlock;
             this.forgingValue = block.forgingValue;
@@ -216,6 +220,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             this.totalWinValue = block.totalWinValue;
             this.totalFee = block.totalFee;
             this.emittedFee = block.emittedFee;
+            this.size = block.getDataLength(false);
         }
 
         public long getTimestamp() {
@@ -234,7 +239,6 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             //WRITE VERSION
             byte[] versionBytes = Ints.toByteArray(this.version);
-            versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
             System.arraycopy(versionBytes, 0, data, pos, VERSION_LENGTH);
             pos += VERSION_LENGTH;
 
@@ -250,7 +254,6 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             //WRITE TRANSACTION COUNT
             byte[] transactionCountBytes = Ints.toByteArray(this.transactionsCount);
-            transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
             System.arraycopy(transactionCountBytes, 0, data, pos, TRANSACTIONS_COUNT_LENGTH);
             pos += TRANSACTIONS_COUNT_LENGTH;
 
@@ -264,44 +267,43 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             //WRITE HEIGHT
             byte[] heightBytes = Ints.toByteArray(this.heightBlock);
-            heightBytes = Bytes.ensureCapacity(heightBytes, HEIGHT_LENGTH, 0);
             System.arraycopy(heightBytes, 0, data, pos, HEIGHT_LENGTH);
             pos += HEIGHT_LENGTH;
 
             //WRITE GENERATING BALANCE
             byte[] generatingBalanceBytes = Ints.toByteArray(this.forgingValue);
-            generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
             System.arraycopy(generatingBalanceBytes, 0, data, pos, GENERATING_BALANCE_LENGTH);
             pos += GENERATING_BALANCE_LENGTH;
 
             //WRITE WIN VALUE
             byte[] winValueBytes = Longs.toByteArray(this.winValue);
-            winValueBytes = Bytes.ensureCapacity(winValueBytes, WIN_VALUE_LENGTH, 0);
             System.arraycopy(winValueBytes, 0, data, pos, WIN_VALUE_LENGTH);
             pos += WIN_VALUE_LENGTH;
 
             //WRITE TARGET
             byte[] targetBytes = Longs.toByteArray(this.target);
-            targetBytes = Bytes.ensureCapacity(targetBytes, WIN_VALUE_LENGTH, 0);
             System.arraycopy(targetBytes, 0, data, pos, WIN_VALUE_LENGTH);
             pos += WIN_VALUE_LENGTH;
 
             //WRITE TOTAL WIN VALUE
             byte[] totalWinValueBytes = Longs.toByteArray(this.totalWinValue);
-            totalWinValueBytes = Bytes.ensureCapacity(totalWinValueBytes, TOTAL_WIN_VALUE_LENGTH, 0);
             System.arraycopy(totalWinValueBytes, 0, data, pos, TOTAL_WIN_VALUE_LENGTH);
             pos += TOTAL_WIN_VALUE_LENGTH;
 
             //WRITE TOTAL FEE
             byte[] totalFeeBytes = Longs.toByteArray(this.totalFee);
-            totalFeeBytes = Bytes.ensureCapacity(totalFeeBytes, FEE_LENGTH, 0);
             System.arraycopy(totalFeeBytes, 0, data, pos, FEE_LENGTH);
             pos += FEE_LENGTH;
 
             //WRITE EMITTED FEE
             byte[] emittedFeeBytes = Longs.toByteArray(this.emittedFee);
-            emittedFeeBytes = Bytes.ensureCapacity(emittedFeeBytes, FEE_LENGTH, 0);
             System.arraycopy(emittedFeeBytes, 0, data, pos, FEE_LENGTH);
+            pos += FEE_LENGTH;
+
+            //WRITE BLOCK SIZE
+            byte[] blockSizeBytes = Ints.toByteArray(this.size);
+            System.arraycopy(blockSizeBytes, 0, data, pos, Integer.BYTES);
+            pos += Integer.BYTES;
 
             return data;
         }
@@ -382,8 +384,13 @@ public class Block implements Closeable, ExplorerJsonLine {
             long emittedFee = Longs.fromByteArray(emittedFeeBytes);
             position += FEE_LENGTH;
 
+            //READ BLOCK SIZE
+            byte[] blockSizeBytes = Arrays.copyOfRange(data, position, position + Integer.BYTES);
+            int size = Ints.fromByteArray(blockSizeBytes);
+            position += Integer.BYTES;
+
             return new BlockHead(version, reference, creator, transactionCount, transactionsHash, signature,
-                    height, forgingValue, winValue, target, tolalWinValue, totalFee, emittedFee);
+                    height, forgingValue, winValue, target, tolalWinValue, totalFee, emittedFee, size);
 
         }
 
@@ -404,6 +411,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             head.put("reference", Base58.encode(this.reference));
             head.put("timestamp", this.getTimestamp());
             head.put("forgingValue", this.forgingValue);
+            head.put("size", this.size);
             head.put("winValue", this.winValue);
             head.put("winValueTargeted", calcWinValueTargeted());
             head.put("target", this.target);
@@ -427,6 +435,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             blockJSON.put("generator", creator.getAddress());
             blockJSON.put("transactionsCount", transactionsCount);
             blockJSON.put("timestamp", getTimestamp());
+            blockJSON.put("size", this.size);
 
             ///loadHeadMind(DCSet.getInstance());
             blockJSON.put("totalFee", viewFeeAsBigDecimal());
@@ -441,32 +450,6 @@ public class Block implements Closeable, ExplorerJsonLine {
             return blockJSON;
         }
 
-    }
-
-    public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
-        JSONObject blockJSON = new JSONObject();
-        if (blockHead == null) {
-            // LOAD HEAD
-            loadHeadMind((DCSet) DCSet.getInstance());
-        }
-
-        blockJSON.put("height", heightBlock);
-        blockJSON.put("signature", Base58.encode(signature));
-        blockJSON.put("generator", creator.getAddress());
-        blockJSON.put("transactionsCount", getTransactionCount());
-        blockJSON.put("timestamp", getTimestamp());
-
-        ///loadHeadMind(DCSet.getInstance());
-        blockJSON.put("totalFee", viewTotalFeeAsBigDecimal());
-        Tuple3<Integer, Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
-        if (forgingPoint != null) {
-            blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
-        }
-        blockJSON.put("generatingBalance", blockHead.forgingValue);
-        blockJSON.put("target", blockHead.target);
-        blockJSON.put("winValue", blockHead.winValue);
-        blockJSON.put("winValueTargeted", blockHead.calcWinValueTargeted());
-        return blockJSON;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1179,6 +1162,9 @@ public class Block implements Closeable, ExplorerJsonLine {
     public JSONObject toJson() {
         JSONObject block = new JSONObject();
 
+        if (blockHead == null)
+            loadHeadMind(DCSet.getInstance());
+
         DCSet dcSet = DCSet.getInstance();
         block.put("version", this.version);
         block.put("reference", Base58.encode(this.reference));
@@ -1217,6 +1203,33 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         //RETURN
         return block;
+    }
+
+    public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
+        JSONObject blockJSON = new JSONObject();
+        if (blockHead == null) {
+            // LOAD HEAD
+            loadHeadMind((DCSet) DCSet.getInstance());
+        }
+
+        blockJSON.put("height", heightBlock);
+        blockJSON.put("signature", Base58.encode(signature));
+        blockJSON.put("generator", creator.getAddress());
+        blockJSON.put("transactionsCount", getTransactionCount());
+        blockJSON.put("timestamp", getTimestamp());
+        blockJSON.put("size", blockHead.size);
+
+        ///loadHeadMind(DCSet.getInstance());
+        blockJSON.put("totalFee", viewTotalFeeAsBigDecimal());
+        Tuple3<Integer, Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
+        if (forgingPoint != null) {
+            blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
+        }
+        blockJSON.put("generatingBalance", blockHead.forgingValue);
+        blockJSON.put("target", blockHead.target);
+        blockJSON.put("winValue", blockHead.winValue);
+        blockJSON.put("winValueTargeted", blockHead.calcWinValueTargeted());
+        return blockJSON;
     }
 
     public byte[] toBytes(boolean withSign, boolean forDB) {
@@ -1546,7 +1559,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 
         this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
-        if (this.winValue < 1 && this.heightBlock > BlockChain.ALL_VALID_BEFORE) {
+        // если по ALL_VALID_BEFORE пройдет дальше то там корректировка значения стоит!
+        if (this.winValue < 1 && this.heightBlock > BlockChain.WIN_VAL_ALL_VALID && this.heightBlock > BlockChain.ALL_VALID_BEFORE) {
             this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
             this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
 
@@ -1568,7 +1582,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (this.winValue < 1) {
             // значит проскочило по BlockChain.ALL_VALID_BEFORE
             // присвоим его как предыдущее значение
-            this.winValue = parentBlockHead.winValue;
+            this.winValue = parentBlockHead.winValue
+                    // на всякий случай поднимем немного иначе может не пройти если цель увеличится малость
+                    + (parentBlockHead.winValue >> 4);
         }
 
         // вычислив всю силу цепочки
@@ -2151,7 +2167,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     forgerEarn, false, false, true);
 
             // учтем что нафоржили
-            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, forgerEarn, Account.BALANCE_SIDE_FORGED);
+            this.creator.changeCOMPUStatsBalances(dcSet, asOrphan, forgerEarn, Account.FEE_BALANCE_SIDE_FORGED);
 
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && this.txCalculated != null) {
@@ -2403,12 +2419,12 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 holder.changeBalance(dcSet, asOrphan, false, BlockChain.FEE_KEY, balanceHold, false, false, false);
                 // учтем что получили бонусы
-                holder.changeCOMPUBonusBalances(dcSet, asOrphan, balanceHold, Account.BALANCE_SIDE_DEBIT);
+                holder.changeCOMPUStatsBalances(dcSet, asOrphan, balanceHold, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
 
                 // у эмитента снимем
                 BlockChain.FEE_ASSET_EMITTER.changeBalance(dcSet, !asOrphan, false, BlockChain.FEE_KEY, balanceHold,
                         false, false, false);
-                BlockChain.FEE_ASSET_EMITTER.changeCOMPUBonusBalances(dcSet, !asOrphan, balanceHold, Account.BALANCE_SIDE_DEBIT);
+                BlockChain.FEE_ASSET_EMITTER.changeCOMPUStatsBalances(dcSet, !asOrphan, balanceHold, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
 
                 if (this.txCalculated != null) {
                     txCalculated.add(new RCalculated(holder, BlockChain.FEE_KEY, balanceHold,

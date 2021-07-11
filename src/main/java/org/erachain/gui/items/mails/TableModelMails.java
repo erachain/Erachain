@@ -35,7 +35,7 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
     public TableModelMails(boolean incoming) {
 
-        super(Controller.getInstance().wallet.database.getTransactionMap(),
+        super(Controller.getInstance().getWallet().dwSet.getTransactionMap(),
                 new String[]{"№", "Date", "Title", "Amount", "Asset", "Sender", "Receiver"},
                 new Boolean[]{false, true, true, true, true, true, false}, true, 1000);
         this.incoming = incoming;
@@ -116,7 +116,7 @@ public class TableModelMails extends WalletTableModel<Transaction> {
 
         list = new ArrayList<Transaction>();
 
-        Wallet wallet = Controller.getInstance().wallet;
+        Wallet wallet = Controller.getInstance().getWallet();
         Iterator<Fun.Tuple2<Long, Integer>> iterator = ((WTransactionMap) map).getTypeIterator(
                 (byte) Transaction.SEND_ASSET_TRANSACTION, true);
         if (iterator == null) {

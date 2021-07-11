@@ -18,9 +18,9 @@ function assets(data) {
     }
 
     output += '<table BORDER=0 cellpadding=10 cellspacing=0 ' +
-        'class="tiny table table-striped" style="font-size:1.2em; border: 1px solid #ddd;"><tr>';
-    output += '<td><b>' + data.Label_table_asset_key + ': <b>' + data.Label_table_asset_name +
-        '<td><b>' + data.Label_table_asset_type + '<td><b>' + data.Label_table_asset_maker;
+        'class="tiny table-striped" style="max-width:1380px; font-size:1.2em; border: 1px solid #ddd;"><tr>';
+    output += '<td width="50%"><b>' + data.Label_table_asset_name + ' / ' + data.Label_table_asset_key +
+        '<td><b>' + data.Label_table_asset_type + ' / <b>' + data.Label_table_asset_maker;
     output += '<td><b>' + data.Label_table_asset_quantity + '<td><b>' + data.Label_table_asset_released
          + '<td><b>' + data.Label_table_asset_lastPrice
          + '<td><b>' + data.Label_table_asset_changePrice
@@ -30,15 +30,22 @@ function assets(data) {
     for (var i in data.pageItems) {
         var item = data.pageItems[i];
         output += '<tr>';
-        output += '<td> <a href=?asset=' + item.key + get_lang() + '>';
-        output += '<b>' + item.key + '</b>: ';
-        output += makeMediaIcon(item, '', 'width:2em')
+        output += '<td>';
+        //output += makeMediaIcon(item, '', 'width:2em')
+        output += '<div class="row"><div class="col-lg-2"><a href=?asset=' + item.key + get_lang() + '>' + makeMediaIcon(item, '', 'width:3em') + '</a></div><div class="col-lg-10">';
+        output += '<div class="row"><a href=?asset=' + item.key + get_lang() + '>' + cutBlank(escapeHtml(item.nameOrig), 70) + '</a></div>';
+        output += '<div class="row" style="font-size:0.8em">' + item.key;
 
-        output += cutBlank(escapeHtml(item.name), 50);
-        output += '</a>';
-        output += '<td>' + item.assetTypeNameFull;
+        if (item.tags) {
+            for (var i in item.tags) {
+                output += ' <a href=?q=' + item.tags[i] + '&lang=ru&search=assets>' + item.tags[i] + '</a> ';
+            }
+        }
 
-        output += '<td><a href=?address=' + item.maker + get_lang() + '>';
+        output += '</div></div></div>';
+        output += '<td style="font-size:0.8em">' + item.assetTypeNameFull;
+
+        output += '<br><a href=?address=' + item.maker + get_lang() + '>';
         if (item.hasOwnProperty('person'))
             output += '[' + item.person_key + ']' + cutBlank(escapeHtml(item.person), 25);
         else
@@ -84,7 +91,11 @@ function asset(data, forPrint) {
 
     var item = data.item;
     ////// HEAD
-    output += itemHead(item, forPrint);
+    if (item.imageTypeName == 'audio') {
+        output += itemHead(item, forPrint, item.maker_person_image_url, item.maker_person_image_type);
+    } else {
+        output += itemHead(item, forPrint);
+    }
 
     //////// BODY
     output += '<p style="font-size:1.3em; margin-top:0.5em; margin-bottom:0px">';
@@ -104,13 +115,37 @@ function asset(data, forPrint) {
     if (!forPrint)
         output += ', &nbsp&nbsp<a href=?top=all&asset=' + item.key + get_lang() + ' class="button ll-blue-bgc"><b>' + item.Label_Holders + '</b></a>';
 
-    output += '<br>' + item.Label_AssetType + ': <a href=?q=%3A' + item.type_abbrev + get_lang() + '&search=assets ><b>' + item.assetTypeNameFull + '</b></a><br>';
+    output += '<br>' + item.Label_AssetType + ': ';
+    if (forPrint) {
+        output += '<b>' + item.assetTypeNameFull + '</b><br>';
+    } else {
+        output += '<a href=?q=%3A' + item.type_abbrev + get_lang() + '&search=assets ><b>' + item.assetTypeNameFull + '</b></a><br>';
+    }
+
     if (item.properties) {
         output += '</p><p style="margin-bottom:0px">';
         output += '<b>' + item.Label_Properties + '</b>: ' + item.properties + '</p>';
     }
 
     output += '<p style="margin-bottom:0px"><b>' + item.Label_AssetType_Desc + '</b>: ' + item.assetTypeDesc + '</p>';
+
+    if (item.DEXAwards) {
+        output += '<p style="margin-bottom:0px"><b>' + item.Label_DEX_Awards + '</b>:<br>';
+        for (key in item.DEXAwards) {
+            output += '&nbsp;&nbsp;&nbsp;&nbsp;';
+            if (forPrint) {
+                output += item.DEXAwards[key].address;
+            } else {
+                output += '<a href ="?address=' + item.DEXAwards[key].address + get_lang() + '">' + item.DEXAwards[key].address + '</a>';
+            }
+            output += ' <b>x' + item.DEXAwards[key].value1 * 0.001 + '%</b>';
+            if (item.DEXAwards[key].memo) {
+                output += ' - ' + item.DEXAwards[key].memo;
+            }
+            output += '<br>';
+        }
+        output += '</p>';
+    }
 
     output += itemFoot(item, forPrint);
 
@@ -147,9 +182,9 @@ function asset(data, forPrint) {
 
 
         output += '<td><a href="?asset=' + pair.base_id + '&asset=' + pair.quote_id  + get_lang() + '"><b>'
-                + addCommas(pair.last_price.toPrecision(8)) + '</a><br>';
+                + addCommas(pair.last_price.toPrecision(6)) + '</a><br>';
         output += '<a href="?asset=' + pair.quote_id + '&asset=' + pair.base_id  + get_lang() + '"><b>'
-                + addCommas((1.0 / pair.last_price).toPrecision(8));
+                + addCommas((1.0 / pair.last_price).toPrecision(6));
 
         output += '<td>';
         if (pair.price_change_percent_24h > 0) {
@@ -162,15 +197,15 @@ function asset(data, forPrint) {
         output += '<br>' + pair.count_24h;
 
         output += '<td>';
-        output += addCommas(pair.highest_bid.toPrecision(8)) + ' / ' + addCommas(pair.lowest_ask.toPrecision(8));
-        output += '<br>' + addCommas((1.0 / pair.lowest_ask).toPrecision(8)) + ' / ' + addCommas((1.0 / pair.highest_bid).toPrecision(8));
+        output += addCommas(pair.highest_bid.toPrecision(6)) + ' / ' + addCommas(pair.lowest_ask.toPrecision(6));
+        output += '<br>' + addCommas((1.0 / pair.lowest_ask).toPrecision(6)) + ' / ' + addCommas((1.0 / pair.highest_bid).toPrecision(6));
 
         output += '<td nowrap>';
-        output += addCommas(pair.quote_volume.toPrecision(8)) + '<br>' + addCommas(pair.base_volume.toPrecision(8));
+        output += addCommas(pair.quote_volume.toPrecision(6)) + '<br>' + addCommas(pair.base_volume.toPrecision(6));
 
         output += '<td>';
-        output += addCommas(pair.lowest_price_24h.toPrecision(8)) + ' / ' + addCommas(pair.highest_price_24h.toPrecision(8));
-        output += '<br>' + addCommas((1.0 / pair.highest_price_24h).toPrecision(8)) + ' / ' + addCommas((1.0 / pair.lowest_price_24h).toPrecision(8));
+        output += addCommas(pair.lowest_price_24h.toPrecision(6)) + ' / ' + addCommas(pair.highest_price_24h.toPrecision(6));
+        output += '<br>' + addCommas((1.0 / pair.highest_price_24h).toPrecision(6)) + ' / ' + addCommas((1.0 / pair.lowest_price_24h).toPrecision(6));
 
     }
     output += '<tr><td><b>' + data.Label_Total + ':';

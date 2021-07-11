@@ -30,7 +30,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
     private static final int BASE_LENGTH = GenesisRecord.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
-    private Account creator;
+    private Account sender;
     private Account recipient;
     private BigDecimal amount;
     private long key;
@@ -49,9 +49,9 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     }
 
     // RENT
-    public GenesisTransferAssetTransaction(Account recipient, long key, BigDecimal amount, Account creator) {
+    public GenesisTransferAssetTransaction(Account recipient, long key, BigDecimal amount, Account sender) {
         this(recipient, key, amount);
-        this.creator = creator;
+        this.sender = sender;
         this.generateSignature();
     }
 
@@ -96,6 +96,10 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
     }
 
+    public Account getSender() {
+        return this.sender;
+    }
+
     public Account getRecipient() {
         return this.recipient;
     }
@@ -127,9 +131,9 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
-        if (this.amount != null) {
+        if (this.amount != null && this.amount.signum() != 0) {
             long assetKey = this.getAbsKey();
-            AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(assetKey);
+            AssetCls asset = this.dcSet.getItemAssetMap().get(assetKey);
             if (asset == null || assetKey > BlockChain.AMOUNT_SCALE_FROM) {
                 int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
                 if (different_scale != 0) {
@@ -191,8 +195,8 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         JSONObject transaction = super.toJson();
 
         //ADD CREATOR/RECIPIENT/AMOUNT/ASSET
-        if (this.creator != null)
-            transaction.put("creator", this.creator.getAddress());
+        if (this.sender != null)
+            transaction.put("sender", this.sender.getAddress());
 
         transaction.put("recipient", this.recipient.getAddress());
         transaction.put("asset", this.key);
@@ -223,7 +227,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         if (key < 0) {
             //WRITE OWNER
-            data = Bytes.concat(data, this.creator.getAddressBytes());
+            data = Bytes.concat(data, this.sender.getAddressBytes());
         }
 
         return data;
@@ -291,11 +295,11 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         if (key < 0) {
             // THIS is CREDIT
             //this.maker.setBalance(key, this.owner.getBalance(db, key).subtract(this.amount), db);
-            this.creator.changeBalance(this.dcSet, true, false, key, this.amount,
+            this.sender.changeBalance(this.dcSet, true, false, key, this.amount,
                     false, false, false);
             this.dcSet.getCredit_AddressesMap().add(
                     new Tuple3<String, Long, String>(
-                            this.creator.getAddress(), -key,
+                            this.sender.getAddress(), -key,
                             this.recipient.getAddress()),
                     //new Tuple3<String, Long, String>(this.owner.getAddress(), -key, this.recipient.getAddress()),
                     this.amount);
@@ -363,8 +367,8 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     @Override
     public HashSet<Account> getInvolvedAccounts() {
         HashSet<Account> accounts = new HashSet<Account>(3, 1);
-        if (this.creator != null)
-            accounts.add(this.creator);
+        if (this.sender != null)
+            accounts.add(this.sender);
 
         accounts.addAll(this.getRecipientAccounts());
         return accounts;
@@ -380,7 +384,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     @Override
     public boolean isInvolved(Account account) {
 
-        if (account.equals(creator)
+        if (account.equals(sender)
                 || account.equals(recipient)) {
             return true;
         }

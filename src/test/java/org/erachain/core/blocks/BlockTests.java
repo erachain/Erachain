@@ -95,7 +95,7 @@ public class BlockTests {
         //GENERATE NEW HEAD
         Block.BlockHead head = new Block.BlockHead(1, new byte[Block.REFERENCE_LENGTH], generator, 100,
                 new byte[Block.TRANSACTIONS_HASH_LENGTH], new byte[Block.SIGNATURE_LENGTH], 23, 10000,
-                45000, 33000, 567554563654L, 3456,12);
+                45000, 33000, 567554563654L, 3456, 12, 200);
         byte[] raw = head.toBytes();
 
 

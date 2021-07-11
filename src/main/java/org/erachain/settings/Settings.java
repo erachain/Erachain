@@ -29,7 +29,7 @@ import java.util.List;
 public class Settings {
 
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L; // MAIN Net
-    public static final long DEFAULT_DEMO_NET_STAMP = 1609491286000L; // DEMO Net
+    public static final long DEFAULT_DEMO_NET_STAMP = 1623043800000L; // DEMO Net
 
     public static String APP_NAME = "";
     public static String APP_FULL_NAME = "";
@@ -156,7 +156,6 @@ public class Settings {
     public static boolean simpleTestNet;
     private InetAddress localAddress;
     private String[] defaultPeers = {};
-
 
     private String userPath = "";
 
@@ -839,7 +838,7 @@ public class Settings {
             return Long.valueOf(this.settingsJSON.get("compuRateAsset").toString());
         }
 
-        return 95L;
+        return AssetCls.USD_KEY;
     }
 
     public boolean getCompuRateUseDEX() {

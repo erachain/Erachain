@@ -16,7 +16,7 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable implement
     public static final int COLUMN_FAVORITE = 3;
     public FavoriteImprintsTableModel() {
         super(DCSet.getInstance().getItemImprintMap(),
-                Controller.getInstance().wallet.database.getImprintFavoritesSet(),
+                Controller.getInstance().getWallet().dwSet.getImprintFavoritesSet(),
                 new String[]{"Key", "Name", "Publisher", "Favorite"},
                 new Boolean[]{false, true, true, false},
                 ObserverMessage.RESET_IMPRINT_FAVORITES_TYPE,

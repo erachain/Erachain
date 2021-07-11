@@ -1,6 +1,7 @@
 package org.erachain.database.wallet;
 // 30/03 ++
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -12,18 +13,34 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.DCSet;
+import org.erachain.dbs.DBTab;
 import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.json.simple.JSONObject;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Files;
 
+@Slf4j
 public class DWSet extends DBASet {
 
+    /**
+     * New version will auto-rebase DCSet from empty db file
+     */
+    final static int CURRENT_VERSION = 532; // vers 5.3.03
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DWSet.class);
+
     private static final String LAST_BLOCK = "lastBlock";
+
+    public final DCSet dcSet;
 
     private Var<Long> licenseKeyVar;
     private Long licenseKey;
@@ -55,8 +72,10 @@ public class DWSet extends DBASet {
 
     private TelegramsMap telegramsMap;
 
-    public DWSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
-        super(dbFile, database, withObserver,  dynamicGUI);
+    public DWSet(DCSet dcSet, File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
+        super(dbFile, database, withObserver, dynamicGUI);
+
+        this.dcSet = dcSet;
 
         // LICENCE SIGNED
         licenseKeyVar = database.getAtomicVar("licenseKey");
@@ -84,15 +103,22 @@ public class DWSet extends DBASet {
         this.statusFavoritesSet = new FavoriteItemMapStatus(this, this.database);
         this.unionFavoritesSet = new FavoriteItemMapUnion(this, this.database);
         this.statementFavoritesSet = new FavoriteDocument(this, this.database);
-        this.telegramsMap = new TelegramsMap(this,this.database);
+        this.telegramsMap = new TelegramsMap(this, this.database);
 
     }
 
-    public synchronized static DWSet reCreateDB(boolean withObserver, boolean dynamicGUI) {
+    /**
+     * Создание файла для основной базы данных
+     *
+     * @param dbFile
+     * @return
+     */
+    public static DB makeFileDB(File dbFile) {
 
-        //OPEN WALLET
-        File dbFile = new File(Settings.getInstance().getDataWalletPath(), "wallet.dat");
-        dbFile.getParentFile().mkdirs();
+        boolean isNew = !dbFile.exists();
+        if (isNew) {
+            dbFile.getParentFile().mkdirs();
+        }
 
         //DELETE TRANSACTIONS
         //File transactionFile = new File(Settings.getInstance().getWalletDir(), "wallet.dat.t");
@@ -102,7 +128,7 @@ public class DWSet extends DBASet {
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
                 //.cacheSize(2048)
 
-                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                //// иначе кеширует блок и если в нем удалить транзакции или еще что то выдаст тут же такой блок с пустыми полями
                 ///// добавил dcSet.clearCache(); --
                 ///.cacheDisable()
 
@@ -133,7 +159,46 @@ public class DWSet extends DBASet {
 
                 .make();
 
-        return new DWSet(dbFile, database, withObserver, dynamicGUI);
+        if (isNew)
+            DBASet.setVersion(database, CURRENT_VERSION);
+
+        return database;
+
+    }
+
+    public synchronized static DWSet reCreateDB(DCSet dcSet, boolean withObserver, boolean dynamicGUI) {
+
+        //OPEN DB
+        File dbFile = new File(Settings.getInstance().getDataWalletPath(), "wallet.dat");
+
+        DB database = null;
+        try {
+            database = makeFileDB(dbFile);
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+            try {
+                Files.walkFileTree(dbFile.getParentFile().toPath(),
+                        new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (Throwable e1) {
+                logger.error(e1.getMessage(), e1);
+            }
+            database = makeFileDB(dbFile);
+        }
+
+        if (DBASet.getVersion(database) < CURRENT_VERSION) {
+            database.close();
+            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DWSet in " + dbFile.getParentFile().toPath());
+            try {
+                Files.walkFileTree(dbFile.getParentFile().toPath(),
+                        new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (Throwable e) {
+                logger.error(e.getMessage(), e);
+            }
+            database = makeFileDB(dbFile);
+
+        }
+
+        return new DWSet(dcSet, dbFile, database, withObserver, dynamicGUI);
 
     }
 
@@ -412,8 +477,18 @@ public class DWSet extends DBASet {
         hardFlush();
     }
 
+    public void clear(boolean andAccountsMap) {
+        for (DBTab table : tables) {
+            if (!andAccountsMap && table instanceof AccountMap)
+                continue;
+
+            table.clear();
+        }
+    }
+
+
     /**
-     * закрываем без коммита! - чтобы при запуске продолжитть?
+     * закрываем без коммита! - чтобы при запуске продолжить?
      */
     @Override
     public void close() {
@@ -421,7 +496,7 @@ public class DWSet extends DBASet {
         if (this.database == null || this.database.isClosed())
             return;
 
-        Controller.getInstance().wallet.synchronizeBodyUsed = false;
+        Controller.getInstance().getWallet().synchronizeBodyUsed = false;
 
         int step = 0;
         while (uses > 0 && ++step < 100) {

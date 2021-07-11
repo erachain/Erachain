@@ -64,7 +64,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
         }
 
         Trade trade = null;
-        int type = 0;
+        boolean typeSell = false;
         Order initatorOrder = null;
         Order targetOrder = null;
 
@@ -77,7 +77,10 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 targetOrder = Order.getOrder(db, trade.getTarget());
 
                 if (initatorOrder != null)
-                    type = initatorOrder.getHaveAssetKey() == this.have.getKey() ? -1 : 1;
+                    typeSell = initatorOrder.getHaveAssetKey() == this.have.getKey();
+                else {
+                    boolean debug = true;
+                }
 
             }
         }
@@ -97,10 +100,10 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 //    return "<html><i>" + NumberAsString.formatAsString(sumAsset1) + "</i></html>";
 
                 String result = "";
-                if (type > 0)
-                    result = NumberAsString.formatAsString(trade.getAmountHave());
-                else
+                if (typeSell)
                     result = NumberAsString.formatAsString(trade.getAmountWant());
+                else
+                    result = NumberAsString.formatAsString(trade.getAmountHave());
 
                 if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
@@ -113,27 +116,27 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
 
                 if (row == this.list.size())
                     return "";
-                    ///return null;
+                ///return null;
 
-                if (type > 0)
-                    return "<html><span style='color:green'>▲</span>"
-                        + NumberAsString.formatAsString(trade.calcPrice())
-                        + "</html>";
-                else
+                if (typeSell)
                     return "<html><span style='color:red'>▼</span>"
-                        + NumberAsString.formatAsString(trade.calcPriceRevers())
+                            + NumberAsString.formatAsString(trade.calcPriceRevers())
+                            + "</html>";
+
+                return "<html><span style='color:green'>▲</span>"
+                        + NumberAsString.formatAsString(trade.calcPrice())
                         + "</html>";
 
             case COLUMN_ASSET_2:
 
                 if (row == this.list.size())
                     return "";
-                    ///return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
+                ///return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
 
-                if (type > 0)
-                    result = NumberAsString.formatAsString(trade.getAmountWant());
-                else
+                if (typeSell)
                     result = NumberAsString.formatAsString(trade.getAmountHave());
+                else
+                    result = NumberAsString.formatAsString(trade.getAmountWant());
 
                 if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
@@ -149,7 +152,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
     @Override
     public void getInterval() {
 
-        this.list = ((TradeMap) map).getTrades(haveKey, wantKey, startKey, step);
+        this.list = ((TradeMap) map).getTradesByPair(haveKey, wantKey, startKey, step, false, false);
 
     }
 
@@ -182,8 +185,8 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 // Поэтому просто ищем тутт по ID
                 Fun.Tuple2<Long, Long> key = (Fun.Tuple2<Long, Long>) object;
                 for (Trade trade : list) {
-                    if (trade.getInitiator().equals(key.a)
-                            && trade.getTarget().equals(key.b)) {
+                    if (trade.getInitiator() == key.a
+                            && trade.getTarget() == key.b) {
                         this.needUpdate = true;
                         return;
                     }

@@ -21,21 +21,31 @@ public class Trade {
     private static final int AMOUNT_LENGTH = Order.FULFILLED_LENGTH;
     private static final int SEQUENCE_LENGTH = 4;
     private static final int SCALE_LENGTH = 1;
-    private static final int BASE_LENGTH = 2 * ORDER_LENGTH + 2 * ASSET_KEY_LENGTH
+    private static final int BASE_LENGTH = 1 + 2 * ORDER_LENGTH + 2 * ASSET_KEY_LENGTH
             + 4 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + SEQUENCE_LENGTH;
 
-    private Long initiator;
-    private Long target;
-    private Long haveKey;
-    private Long wantKey;
-    private BigDecimal amountHave;
-    private BigDecimal amountWant;
-    private int haveAssetScale;
-    private int wantAssetScale;
-    private int sequence;
+    private final byte type;
+    private final long initiator;
+    private final long target;
+    private final long haveKey;
+    private final long wantKey;
+    private final BigDecimal amountHave;
+    private final BigDecimal amountWant;
+    private final int haveAssetScale;
+    private final int wantAssetScale;
+
+    /**
+     * Used only for inintiator Order - for make sorted secondary INDEX
+     */
+    private final int sequence;
+
+    public static final byte TYPE_TRADE = 0;
+    public static final byte TYPE_CANCEL = 1;
+    public static final byte TYPE_CHANGE = 2;
 
     // make trading if two orders is seeked
-    public Trade(Long initiator, Long target, Long haveKey, Long wantKey, BigDecimal amountHave, BigDecimal amountWant, int haveAssetScale, int wantAssetScale, int sequence) {
+    public Trade(long initiator, long target, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, int haveAssetScale, int wantAssetScale, int sequence) {
+        this.type = TYPE_TRADE;
         this.initiator = initiator;
         this.target = target;
         this.haveKey = haveKey;
@@ -48,19 +58,64 @@ public class Trade {
         this.sequence = sequence;
     }
 
+    public Trade(byte type, long initiator, long target, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, int haveAssetScale, int wantAssetScale, int sequence) {
+        this.type = type;
+        this.initiator = initiator;
+        this.target = target;
+        this.haveKey = haveKey;
+        this.wantKey = wantKey;
+        this.amountHave = amountHave;
+        this.amountWant = amountWant;
+        this.haveAssetScale = haveAssetScale;
+        this.wantAssetScale = wantAssetScale;
+
+        this.sequence = sequence;
+    }
+
+    public String viewType() {
+        switch (type) {
+            case TYPE_TRADE:
+                return "trade";
+            case TYPE_CANCEL:
+                return "cancel";
+            case TYPE_CHANGE:
+                return "change";
+        }
+        return "unknown";
+    }
+
+    public boolean isTrade() {
+        return type == TYPE_TRADE;
+    }
+
+    public boolean isCancel() {
+        return type == TYPE_CANCEL;
+    }
+
+    public boolean isChange() {
+        return type == TYPE_CHANGE;
+    }
+
     public String viewID() {
         return Transaction.viewDBRef(initiator) + "/" + Transaction.viewDBRef(target);
     }
 
-    public Long getInitiator() {
+    public long getInitiator() {
         return this.initiator;
     }
 
-    public Order getInitiatorOrder(DCSet db) {
-        return Order.getOrder(db, this.initiator);
+    public Order getInitiatorOrder(DCSet dcSet) {
+        if (type == TYPE_TRADE)
+            return Order.getOrder(dcSet, this.initiator);
+
+        return null;
     }
 
-    public Long getTarget() {
+    public Transaction getInitiatorTX(DCSet dcSet) {
+        return dcSet.getTransactionFinalMap().get(this.initiator);
+    }
+
+    public long getTarget() {
         return this.target;
     }
 
@@ -73,10 +128,11 @@ public class Trade {
         return Order.getOrder(db, this.target);
     }
 
-    public Long getHaveKey() {
+    public long getHaveKey() {
         return this.haveKey;
     }
-    public Long getWantKey() {
+
+    public long getWantKey() {
         return this.wantKey;
     }
 
@@ -99,7 +155,7 @@ public class Trade {
         return this.sequence;
     }
 
-    public Long getTimestamp() {
+    public long getTimestamp() {
         Tuple2<Integer, Integer> key = Transaction.parseDBRef(this.initiator);
         return Controller.getInstance().getBlockChain().getTimestamp(key.a);
     }
@@ -119,6 +175,8 @@ public class Trade {
     public JSONObject toJson(long keyForBuySell, boolean withCreators) {
 
         JSONObject trade = new JSONObject();
+        trade.put("type", type);
+        trade.put("typeName", viewType());
         trade.put("id", viewID());
         trade.put("initiator", Transaction.viewDBRef(initiator));
         trade.put("target", Transaction.viewDBRef(target));
@@ -159,11 +217,16 @@ public class Trade {
         }
 
         if (withCreators) {
-            Order order = getInitiatorOrder(DCSet.getInstance());
-            trade.put("initiatorCreator", order.getCreator().getAddress());
+            if (isTrade()) {
+                Order order = getInitiatorOrder(DCSet.getInstance());
+                trade.put("initiatorCreator", order.getCreator().getAddress());
+            } else {
+                Transaction cancelTX = DCSet.getInstance().getTransactionFinalMap().get(initiator);
+                trade.put("initiatorCreator", cancelTX.getCreator().getAddress());
+            }
 
-            order = getTargetOrder(DCSet.getInstance());
-            trade.put("targetCreator", order.getCreator().getAddress());
+            Order orderTarget = getTargetOrder(DCSet.getInstance());
+            trade.put("targetCreator", orderTarget.getCreator().getAddress());
 
         }
 
@@ -173,34 +236,34 @@ public class Trade {
 
 
     //PARSE/CONVERT
-    public static Trade parse(byte[] data) throws Exception
-	{
-		//CHECK IF CORRECT LENGTH
-		if(data.length != BASE_LENGTH)
-		{
-			throw new Exception("Data does not match trade length");
-		}
+    public static Trade parse(byte[] data) throws Exception {
+        //CHECK IF CORRECT LENGTH
+        if (data.length != BASE_LENGTH) {
+            throw new Exception("Data does not match trade length");
+        }
 
-		int position = 0;
+        int position = 0;
 
-		//READ INITIATOR
-		byte[] initiatorBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-		Long initiator = Longs.fromByteArray(initiatorBytes);
-		position += ORDER_LENGTH;
+        byte type = data[position++];
 
-		//READ TARGET
-		byte[] targetBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-		Long target = Longs.fromByteArray(targetBytes);
-		position += ORDER_LENGTH;
+        //READ INITIATOR
+        byte[] initiatorBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
+        long initiator = Longs.fromByteArray(initiatorBytes);
+        position += ORDER_LENGTH;
+
+        //READ TARGET
+        byte[] targetBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
+        long target = Longs.fromByteArray(targetBytes);
+        position += ORDER_LENGTH;
 
         //READ HAVE
         byte[] haveBytes = Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH);
-        Long haveKey = Longs.fromByteArray(haveBytes);
+        long haveKey = Longs.fromByteArray(haveBytes);
         position += ASSET_KEY_LENGTH;
 
         //READ WANT
         byte[] wantBytes = Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH);
-        Long wantKey = Longs.fromByteArray(wantBytes);
+        long wantKey = Longs.fromByteArray(wantBytes);
         position += ASSET_KEY_LENGTH;
 
         //READ HAVE SCALE
@@ -230,12 +293,12 @@ public class Trade {
         byte[] sequenceBytes = Arrays.copyOfRange(data, position, position + SEQUENCE_LENGTH);
         int sequence = Ints.fromByteArray(sequenceBytes);
 
-        return new Trade(initiator, target, haveKey, wantKey, amountHave, amountWant, haveAssetScale, wantAssetScale, sequence);
+        return new Trade(type, initiator, target, haveKey, wantKey, amountHave, amountWant, haveAssetScale, wantAssetScale, sequence);
 	}
 
 	public byte[] toBytes()
 	{
-        byte[] data = new byte[0];
+        byte[] data = new byte[]{type};
 
 		//WRITE INITIATOR
         byte[] initiatorBytes = Longs.toByteArray(this.initiator);
@@ -289,97 +352,22 @@ public class Trade {
 		return BASE_LENGTH;
 	}
 
-    //PROCESS/ORPHAN
-
-    public void process_old(DCSet db) {
-        Order initiator = this.getInitiatorOrder(db);
-        Order target = this.getTargetOrder(db);
-
-        //ADD TRADE TO DATABASE
-        db.getTradeMap().put(this);
-        if (!db.getTradeMap().contains(new Tuple2<Long, Long>(this.initiator, this.target))) {
-            int error = 0;
-        }
-
-        //UPDATE FULFILLED HAVE
-        initiator.setFulfilledHave(initiator.getFulfilledHave().add(this.amountWant));
-        target.setFulfilledHave(target.getFulfilledHave().add(this.amountHave));
-
-        //CHECK IF FULFILLED
-        if (initiator.isFulfilled()) {
-            //REMOVE FROM ORDERS
-            db.getOrderMap().delete(initiator);
-
-            //ADD TO COMPLETED ORDERS
-            //initiator.setFulfilledWant(initiator.getAmountWant());
-            db.getCompletedOrderMap().put(initiator);
-        } else {
-            //UPDATE ORDER
-            db.getOrderMap().put(initiator);
-        }
-
-        if (target.isFulfilled()) {
-            //REMOVE FROM ORDERS
-            db.getOrderMap().delete(target);
-
-            //ADD TO COMPLETED ORDERS
-            //target.setFulfilledWant(target.getAmountWant());
-            db.getCompletedOrderMap().put(target);
-        } else {
-            //UPDATE ORDER
-            //target.setFulfilledWant(target.getFulfilledWant().add(amountWant));
-            db.getOrderMap().put(target);
-        }
-
-        //TRANSFER FUNDS
-        //initiator.getCreator().setBalance(initiator.getWantAssetKey(), initiator.getCreator().getBalance(db, initiator.getWantAssetKey()).add(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, false, false, initiator.getWantAssetKey(), this.amountHave, false, false, false);
-        //target.getCreator().setBalance(target.getWantAssetKey(), target.getCreator().getBalance(db, target.getWantAssetKey()).add(this.amountWant), db);
-        target.getCreator().changeBalance(db, false, false, target.getWantAssetKey(), this.amountWant, false, false, false);
-    }
-
-    public void orphan_old(DCSet db) {
-        Order initiator = this.getInitiatorOrder(db);
-        Order target = this.getTargetOrder(db);
-
-        //REVERSE FUNDS
-        //initiator.getCreator().setBalance(initiator.getWantAssetKey(), initiator.getCreator().getBalance(db, initiator.getWantAssetKey()).subtract(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, true, false, initiator.getWantAssetKey(), this.amountHave, false, false, false);
-        //target.getCreator().setBalance(target.getWantAssetKey(), target.getCreator().getBalance(db, target.getWantAssetKey()).subtract(this.amountWant), db);
-        target.getCreator().changeBalance(db, true, false, target.getWantAssetKey(), this.amountWant, false, false, false);
-
-        //CHECK IF ORDER IS FULFILLED
-        if (initiator.isFulfilled()) {
-            //REMOVE FROM COMPLETED ORDERS
-            db.getCompletedOrderMap().delete(initiator);
-        }
-        if (target.isFulfilled()) {
-            //DELETE TO COMPLETED ORDERS
-            db.getCompletedOrderMap().delete(target);
-        }
-
-        //REVERSE FULFILLED
-        initiator.setFulfilledHave(initiator.getFulfilledHave().subtract(this.amountWant));
-        target.setFulfilledHave(target.getFulfilledHave().subtract(this.amountHave));
-
-        //UPDATE ORDERS
-        db.getOrderMap().put(initiator);
-        db.getOrderMap().put(target);
-
-        //REMOVE FROM DATABASE
-        db.getTradeMap().delete(this);
-    }
-
     @Override
     public boolean equals(Object object) {
         if (object instanceof Trade) {
             Trade trade = (Trade) object;
 
-            return (trade.getInitiator().equals(this.getInitiator()) && trade.getTarget().equals(this.getTarget()));
+            return (trade.getInitiator() == initiator && trade.getTarget() == target);
         }
 
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return (int) (initiator + target);
+    }
+
 
     @Override
     public String toString() {

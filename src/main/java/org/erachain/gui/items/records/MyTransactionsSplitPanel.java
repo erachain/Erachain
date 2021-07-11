@@ -63,7 +63,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
     public SetIntervalPanel setIntervalPanel;
 
     private JMenuItem item_Save;
-    Wallet wallet = Controller.getInstance().wallet;
+    Wallet wallet = Controller.getInstance().getWallet();
 
     private MyTransactionsSplitPanel() {
         super(NAME, TITLE);
@@ -161,7 +161,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         });
 
         // set interval panel
-        setIntervalPanel = new SetIntervalPanel(Controller.getInstance().wallet.database.getTransactionMap());
+        setIntervalPanel = new SetIntervalPanel(wallet.dwSet.getTransactionMap());
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -247,7 +247,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                     return;
 
                 // code delete
-                Controller.getInstance().getWallet().database.getTransactionMap()
+                Controller.getInstance().getWallet().dwSet.getTransactionMap()
                         .delete(selectedTransaction);
 
             }
@@ -470,7 +470,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
             transaction.setHeightSeq(dbRef);
         }
 
-        Controller.getInstance().wallet.processTransaction(transaction);
+        Controller.getInstance().getWallet().processTransaction(transaction);
         JOptionPane.showMessageDialog(new JFrame(),
                 Lang.T("Transaction confirmed") + "!",
                 Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);

@@ -3,8 +3,10 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 
@@ -31,7 +33,7 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
 
         this.order = order;
         this.isSell = isSell;
-        this.list = DCSet.getInstance().getTradeMap().getTradesByOrderID(order.getId());
+        this.list = DCSet.getInstance().getTradeMap().getTradesByOrderID(order.getId(), true, descending);
 
     }
 
@@ -48,12 +50,12 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
 
 
         int type = 0;
-        DCSet db = DCSet.getInstance();
+        DCSet dcSet = DCSet.getInstance();
 
-        Order initiatorOrder = Order.getOrder(db, trade.getInitiator());
-        Order targetOrder = Order.getOrder(db, trade.getTarget());
+        Transaction initiatorOrderTX = trade.getInitiatorTX(dcSet);
+        Order targetOrder = Order.getOrder(dcSet, trade.getTarget());
 
-        boolean isMine = Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())
+        boolean isMine = Controller.getInstance().isAddressIsMine(initiatorOrderTX.getCreator().getAddress())
                 || Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress());
 
         switch (column) {
@@ -66,9 +68,16 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
                 String result;
 
                 if (isSell)
-                    result = NumberAsString.formatAsString(trade.getAmountHave());
+                    if (trade.isTrade()) {
+                        result = NumberAsString.formatAsString(trade.getAmountHave());
+                    } else if (trade.isChange()) {
+                        result = Lang.T("Change");
+                    } else {
+                        // CANCEL
+                        result = Lang.T("Cancel");
+                    }
                 else
-                    result = initiatorOrder.getCreator().getPersonAsString();
+                    result = initiatorOrderTX.getCreator().getPersonAsString();
 
                 if (isMine) {
                     result = "<html><b>" + result + "</b></html>";
@@ -92,9 +101,15 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
             case COLUMN_WHO_AMOUNT:
 
                 if (isSell)
-                    result = initiatorOrder.getCreator().getPersonAsString();
-                else
+                    result = initiatorOrderTX.getCreator().getPersonAsString();
+                else if (trade.isTrade()) {
                     result = NumberAsString.formatAsString(trade.getAmountHave());
+                } else if (trade.isChange()) {
+                    result = Lang.T("Change");
+                } else {
+                    // CANCEL
+                    result = Lang.T("Cancel");
+                }
 
                 if (isMine) {
                     result = "<html><b>" + result + "</b></html>";

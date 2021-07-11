@@ -11,6 +11,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
@@ -41,7 +42,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     public static final byte TYPE_ID = (byte) Transaction.CREATE_ORDER_TRANSACTION;
     public static final String TYPE_NAME = "Create Order";
 
-    private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
+    public static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
     private static final int HAVE_LENGTH = 8;
     private static final int WANT_LENGTH = 8;
     // private static final int PRICE_LENGTH = 12;
@@ -76,7 +77,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                                   byte[] signature) {
         this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
         this.signature = signature;
-        //this.order = new Order(new BigInteger(signature), creator, haveKey, wantKey, amountHave, amountWant, timestamp);
 
     }
 
@@ -97,6 +97,13 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 signature);
     }
 
+    public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave,
+                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amountHave, amountWant, feePow, timestamp,
+                reference);
+    }
+
+
     // GETTERS/SETTERS
 
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
@@ -113,9 +120,11 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     // public static String getName() { return "Create Order"; }
 
+    @Override
     public String getTitle() {
-        ///return viewTypeName();
-        return ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, haveKey) + " " + ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, wantKey);
+        return //TYPE_NAME + " " +
+                ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, haveKey)
+                        + " " + ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, wantKey);
     }
 
     @Override
@@ -139,12 +148,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         } else {
             return long_fee;
         }
-    }
-
-    public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave,
-                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amountHave, amountWant, feePow, timestamp,
-                reference);
     }
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
@@ -652,10 +655,18 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         // изменяемые объекты нужно заново создавать
         //.copy() // тут надо что-то сделать новым - а то значения в памяти по ссылке меняются
         Order order = makeOrder(); //.copy();
-        order.process(block, this);
 
-        if (true // так как проверка в Форке - потом быстрый слив и эта таблица вообще не будет просчитана
-                || !dcSet.isFork()) {
+        // MOVE HAVE from OWN to PLEDGE
+        creator.changeBalance(dcSet, true, false, haveKey, amountHave,
+                false, false,
+                // accounting on PLEDGE position
+                true, Account.BALANCE_POS_PLEDGE);
+
+        OrderProcess.process(order, block, this);
+
+        if (Controller.getInstance().dlSet != null
+                // так как проверка в Форке - потом быстрый слив и эта таблица вообще не будет просчитана
+                && !dcSet.isFork()) {
             // статистику по парам
             PairMapImpl pairMap = Controller.getInstance().dlSet.getPairMap();
             if (!pairMap.contains(new Fun.Tuple2(haveKey, wantKey))) {
@@ -676,12 +687,20 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         super.orphan(block, forDeal);
 
         // ORPHAN ORDER
-        // изменяемые объекты нужно заново создавать
-        //this.order.copy().orphan();
 
-        // изменяемые объекты нужно заново создавать
-        Order order = makeOrder();
-        order.orphan(block);
+        // тут получаем Заказ не измененный - который был до отката
+        Order order = OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
+
+        // RESTORE HAVE
+        // GET HAVE LEFT - if it CANCELED by Outprice or not completed
+        //   - если обработка остановлена по достижению порога Инкремента
+        creator.changeBalance(dcSet, false, false, haveKey,
+                // так как внутри может сработать Unresolved by Outprice - и именно остаток недобитый тут тоже учтётся
+                // этот осток от Неисполнения внутри OrderProcess.orphan делается
+                order.getAmountHave(),
+                false, false,
+                // accounting on PLEDGE position
+                true, Account.BALANCE_POS_PLEDGE);
 
     }
 

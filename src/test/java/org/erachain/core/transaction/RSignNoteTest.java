@@ -7,7 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.ExPays;
+import org.erachain.core.exdata.exActions.ExPays;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.IDB;

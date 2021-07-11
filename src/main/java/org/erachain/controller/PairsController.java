@@ -59,7 +59,7 @@ public class PairsController {
         File file = new File(Settings.getInstance().getUserPath() + "market.json");
 
         //CREATE FILE IF IT DOESNT EXIST
-        if (BlockChain.MAIN_MODE && file.exists()) {
+        if (!BlockChain.CLONE_MODE && file.exists()) {
             String jsonString = "";
             try {
                 //READ PEERS FILE
@@ -144,15 +144,15 @@ public class PairsController {
      */
     public static TradePair reCalc(AssetCls asset1, AssetCls asset2, TradePair currentPair) {
         TradeMapImpl tradesMap = DCSet.getInstance().getTradeMap();
-        Long key1 = asset1.getKey();
-        Long key2 = asset2.getKey();
+        long key1 = asset1.getKey();
+        long key2 = asset2.getKey();
 
         int heightStart = Controller.getInstance().getMyHeight();
         int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
 
         int count24 = 0;
-        BigDecimal minPrice = new BigDecimal(Long.MAX_VALUE);
-        BigDecimal maxPrice = new BigDecimal(Long.MIN_VALUE);
+        BigDecimal minPrice = null;
+        BigDecimal maxPrice = null;
         BigDecimal lastPrice = null;
         BigDecimal baseVolume = BigDecimal.ZERO;
         BigDecimal quoteVolume = BigDecimal.ZERO;
@@ -170,9 +170,13 @@ public class PairsController {
                         LOGGER.warn("trade for pair [" + key1 + "/" + key2 + "] not found");
                         continue;
                     }
+
+                    if (!trade.isTrade())
+                        continue;
+
                     if (currentPair != null && lastTrade == null) {
                         // изменений не было
-                        if (trade.getTimestamp().equals(currentPair.getLastTime())) {
+                        if (trade.getTimestamp() == currentPair.getLastTime()) {
                             currentPair.setUpdateTime(Block.getTimestamp(heightStart));
                             return currentPair;
                         }
@@ -181,7 +185,7 @@ public class PairsController {
 
                     count24++;
 
-                    reversed = trade.getHaveKey().equals(key2);
+                    reversed = trade.getHaveKey() == key2;
 
                     // у сделки обратные Have Want
                     price = reversed ? trade.calcPrice() : trade.calcPriceRevers();
@@ -190,9 +194,9 @@ public class PairsController {
                         lastTime = trade.getTimestamp();
                     }
 
-                    if (minPrice.compareTo(price) > 0)
+                    if (minPrice == null || minPrice.compareTo(price) > 0)
                         minPrice = price;
-                    if (maxPrice.compareTo(price) < 0)
+                    if (maxPrice == null || maxPrice.compareTo(price) < 0)
                         maxPrice = price;
 
                     baseVolume = baseVolume.add(reversed ? trade.getAmountHave() : trade.getAmountWant());
@@ -203,9 +207,9 @@ public class PairsController {
                 // тут подсчет отклонения за сутки
             } else {
                 // за последние сутки не было сделок, значит смотрим просто последнюю цену
-                trade = tradesMap.getLastTrade(key1, key2);
+                trade = tradesMap.getLastTrade(key1, key2, false);
                 if (trade != null) {
-                    reversed = trade.getHaveKey().equals(key2);
+                    reversed = trade.getHaveKey() == key2;
                     price = lastPrice = maxPrice = minPrice = reversed ? trade.calcPrice() : trade.calcPriceRevers();
                 } else {
                     price = lastPrice = maxPrice = minPrice = BigDecimal.ZERO;
@@ -223,8 +227,8 @@ public class PairsController {
         Order askLastOrder = ordersMap.getHaveWanFirst(key1, key2);
         BigDecimal lower_askPrice = askLastOrder == null ? BigDecimal.ZERO : askLastOrder.calcLeftPrice();
 
-        int countOrdersBid = ordersMap.getCountHave(key2, 100);
-        int countOrdersAsk = ordersMap.getCountHave(key1, 100);
+        int countOrdersBid = ordersMap.getCount(key2, key1, 200);
+        int countOrdersAsk = ordersMap.getCount(key1, key2, 200);
 
         return new TradePair(asset1, asset2, lastPrice, lastTime,
                 highest_bidPrice, lower_askPrice, baseVolume, quoteVolume, price,
@@ -267,6 +271,9 @@ public class PairsController {
             while (iterator.hasNext()) {
                 Trade trade = tradesMap.get(iterator.next());
                 if (trade == null)
+                    continue;
+
+                if (!trade.isTrade())
                     continue;
 
                 if (lastTrade == null)

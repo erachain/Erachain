@@ -14,7 +14,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.blockexplorer.WrongSearchException;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Base64;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.payment.Payment;
@@ -81,7 +80,10 @@ public class WebResource {
             "bar_right.gif", "locked.png", "unlocked.png", "exchange.png"
     };
     String[] videoArray = {
-            "video01.mp4"
+            //"video01.mp4"
+    };
+    String[] audioArray = {
+            //"audi01.mp3"
     };
 
     public static String selectTitleOpt(Document htmlDoc) {
@@ -614,7 +616,7 @@ public class WebResource {
         try {
             InputStream valueAs = is.getValueAs(InputStream.class);
             byte[] byteArray = IOUtils.toByteArray(valueAs);
-            String encode = Base64.encode(byteArray);
+            String encode = Base64.getEncoder().encodeToString(byteArray);
             MediaType mediaType = is.getMediaType();
             String result = "data:" + mediaType.getType() + "/"
                     + mediaType.getSubtype() + ";base64, ";
@@ -1069,20 +1071,30 @@ public class WebResource {
     @Path("index/img/{filename}")
     @GET
     public Response image(@PathParam("filename") String filename) {
-        ArrayList<String> imgs = new ArrayList<String>();
 
-        imgs.addAll(Arrays.asList(imgsArray));
+        File file;
+        if (true) {
+            file = new File("web/img/" + filename);
+            if (!file.exists())
+                return error404(request, null);
+        } else {
+            // OLD
+            ArrayList<String> imgs = new ArrayList<String>();
 
-        int imgnum = imgs.indexOf(filename);
+            imgs.addAll(Arrays.asList(imgsArray));
 
-        if (imgnum == -1) {
-            return error404(request, null);
+            int imgnum = imgs.indexOf(filename);
+
+            if (imgnum == -1) {
+                return error404(request, null);
+            }
+
+            file = new File("web/img/" + imgs.get(imgnum));
         }
 
-        File file = new File("web/img/" + imgs.get(imgnum));
         String type = "";
 
-        switch (getFileExtention(imgs.get(imgnum))) {
+        switch (getFileExtention(filename)) {
             case "png":
                 type = "image/png";
                 break;
@@ -1103,11 +1115,16 @@ public class WebResource {
         }
     }
 
+    @Path("ic/{filename}")
+    @GET
+    public Response imageIC(@PathParam("filename") String filename) {
+        return image("ic/" + filename);
+    }
+
     @Path("index/video/{filename}")
     @GET
     public Response video(@PathParam("filename") String filename) {
         ArrayList<String> videos = new ArrayList<String>();
-
         videos.addAll(Arrays.asList(videoArray));
 
         int index = videos.indexOf(filename);
@@ -3372,6 +3389,35 @@ public class WebResource {
         }
     }
 
+    public String miniIndex() {
+        try {
+            return readFile("web/main.mini.html", StandardCharsets.UTF_8);
+
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            return "ERROR";
+        }
+    }
+
+    @Path("/index/{html}")
+    @GET
+    public Response getHtml(@PathParam("html") String html) {
+        return error404(request, null);
+    }
+
+    @GET
+    @Path("robots.txt")
+    public Response robotsTxt() {
+        File file = new File("web/blockexplorer/robots.txt");
+        try {
+            BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
+            String type = URLConnection.guessContentTypeFromStream(is);
+            return Response.ok(file, type).build();
+        } catch (Exception e) {
+            return Response.status(200).entity("index.html").build();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Path("namestorage:{name}")
     @GET
@@ -3412,23 +3458,7 @@ public class WebResource {
 
     }
 
-    public String miniIndex() {
-        try {
-            return readFile("web/main.mini.html", StandardCharsets.UTF_8);
-
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            return "ERROR";
-        }
-    }
-
-    @Path("/index/{html}")
-    @GET
-    public Response getHtml(@PathParam("html") String html) {
-        return error404(request, null);
-    }
-
-    @Path("{name}/{key}")
+    @Path("ns/{name}/{key}")
     @GET
     public Response getKeyAsWebsite(@PathParam("name") String nameName,
                                     @PathParam("key") String key) {
@@ -3456,15 +3486,16 @@ public class WebResource {
         }
     }
 
-    @Path("{name}")
+    @Path("ns/{name}")
     @GET
     public Response getNames(@PathParam("name") String nameName) {
-        Account name = new Account(nameName);
 
         try {
 
+            Tuple2<Account, String> result = Account.tryMakeAccount(nameName);
+
             // CHECK IF NAME EXISTS
-            if (name == null) {
+            if (result.a == null) {
                 return error404(request, null);
             }
 
@@ -3517,7 +3548,7 @@ public class WebResource {
 
                 String type = evaluate.replaceAll(pictureRegex, "$1");
                 String subtype = evaluate.replaceAll(pictureRegex, "$2");
-                byte[] dataOfImage = Base64.decode(evaluate.replaceAll(
+                byte[] dataOfImage = Base64.getDecoder().decode(evaluate.replaceAll(
                         pictureRegex, "$3"));
                 Response build = Response
                         .ok(dataOfImage,

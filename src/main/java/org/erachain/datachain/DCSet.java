@@ -24,8 +24,6 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.File;
@@ -44,9 +42,8 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 530; // vers 5.3.1
+    final static int CURRENT_VERSION = 532; // vers 5.3.03
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
      * Делаем дамн КУЧИ в VisualVM и там в параметрах смотрим откуда этот объект был создан
@@ -112,7 +109,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
      */
-    private static final boolean needClearCache = false;
+    private static boolean needClearCache = false;
 
     private static boolean isStoped = false;
     private volatile static DCSet instance;
@@ -162,7 +159,7 @@ public class DCSet extends DBASet implements Closeable {
     private ItemAssetMap itemAssetMap;
     private IssueAssetMap issueAssetMap;
     private OrderMapImpl orderMap;
-    private CompletedOrderMap completedOrderMap;
+    private CompletedOrderMapImpl completedOrderMap;
     private TradeMapImpl tradeMap;
     private ItemStatusMap itemStatusMap;
     private IssueStatusMap issueStatusMap;
@@ -203,7 +200,7 @@ public class DCSet extends DBASet implements Closeable {
     public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory, int defaultDBS) {
         super(dbFile, database, withObserver, dynamicGUI);
 
-        LOGGER.info("UP SIZE BEFORE COMMIT [KB]: " + MAX_ENGINE_BEFORE_COMMIT_KB
+        logger.info("UP SIZE BEFORE COMMIT [KB]: " + MAX_ENGINE_BEFORE_COMMIT_KB
                 + ", ACTIONS BEFORE COMMIT: " + ACTIONS_BEFORE_COMMIT
                 + ", DELETIONS BEFORE COMPACT: " + DELETIONS_BEFORE_COMPACT);
 
@@ -317,7 +314,7 @@ public class DCSet extends DBASet implements Closeable {
             this.atTransactionMap = new ATTransactionMap(this, database);
 
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             this.close();
             throw e;
         }
@@ -325,7 +322,7 @@ public class DCSet extends DBASet implements Closeable {
         if (false // теперь отклучаем счетчики для усклрения работы - отсвили только в Подписи
                 &&this.blockMap.size() != this.blocksHeadsMap.size()
                 || this.blockSignsMap.size() != this.blocksHeadsMap.size()) {
-            LOGGER.info("reset DATACHAIN on height error (blockMap, blockSignsMap, blocksHeadsMap: "
+            logger.info("reset DATACHAIN on height error (blockMap, blockSignsMap, blocksHeadsMap: "
                     + this.blockMap.size() + " != "
                     + this.blockSignsMap.size() + " != " + this.blocksHeadsMap.size());
 
@@ -346,10 +343,12 @@ public class DCSet extends DBASet implements Closeable {
     protected DCSet(DCSet parent, DB idDatabase) {
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
-            // System.out.println("########################### Free Memory:"
-            // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                     + (Controller.MIN_MEMORY_TAIL)) {
+
+                //logger.debug("########################### Max=Total Memory [MB]:" + (Runtime.getRuntime().totalMemory() >> 20));
+                //logger.debug("########################### Free Memory [MB]:" + (Runtime.getRuntime().freeMemory() >> 20));
+
                 // у родителя чистим - у себя нет, так как только создали
                 parent.clearCache();
                 System.gc();
@@ -563,62 +562,45 @@ public class DCSet extends DBASet implements Closeable {
          * WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
          */
 
-        if (true) {
+        if (Controller.CACHE_DC.equals("off")) {
+            databaseStruc.cacheDisable();
+            needClearCache = false;
+        } else {
             // USE CACHE
             if (BLOCKS_MAP != DBS_MAP_DB) {
-                // если блоки не сохраняются в общей базе данных
+                // если блоки не сохраняются в общей базе данных, а трнзакции мелкие по размеру
                 databaseStruc
                         .cacheSize(1024 << (5 + Controller.HARD_WORK));
             } else {
-                if (needClearCache) {
-                    //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                    ///// добавил dcSet.clearCache(); --
-                    databaseStruc
-                            .cacheSize(32 + 32 << Controller.HARD_WORK)
-                    ;
-
-                } else if (BlockChain.TEST_DB > 0) {
-                    databaseStruc
-
-                            // при норм размере и досточной памяти скорость не хуже чем у остальных
-                            //.cacheLRUEnable() // скорость зависит от памяти и настроек -
-                            //.cacheSize(2048 + 64 << Controller.HARD_WORK)
-
-                            // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                            // у другого типа КЭША происходит утечка памяти
-                            .cacheHardRefEnable() // самый быстрый
-
-                    ///.cacheSoftRefEnable()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
-
-                    // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
-                    ///.cacheWeakRefEnable() // new WeakReference()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
-                    ;
-
-                } else {
-                    databaseStruc
-
-                            // при норм размере и досточной памяти скорость не хуже чем у остальных
-                            //.cacheLRUEnable() // скорость зависит от памяти и настроек -
-                            //.cacheSize(2048 + 64 << Controller.HARD_WORK)
-
-                            // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                            // у другого типа КЭША происходит утечка памяти
-                            ///.cacheHardRefEnable()
-
-                            ///.cacheSoftRefEnable()
-                            ///.cacheSize(32 << Controller.HARD_WORK)
-
-                            // analog new WeakReference() - в случае нехватки ппамяти кеш сам чистится
-                            .cacheWeakRefEnable() // new WeakReference()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
-                    ;
-
-                }
+                // если блоки в этой MapDB то уменьшим - так как размер блока может быть большой
+                databaseStruc.cacheSize(32 + 32 << Controller.HARD_WORK);
             }
-        } else {
-            databaseStruc.cacheDisable();
+
+            // !!! кэш по умолчанию на количество записей - таблица в памяти
+            // !!! - может быстро съесть память ((
+            // !!! если записи (блоки или единичные транзакции) большого объема!!!
+
+            if (Controller.CACHE_DC.equals("lru")) {
+                // при норм размере и достаточной памяти скорость не хуже чем у остальных
+                // скорость зависит от памяти и настроек -
+                databaseStruc.cacheLRUEnable();
+                needClearCache = true;
+            } else if (Controller.CACHE_DC.equals("weak")) {
+                // analog new cacheSoftRefE - в случае нехватки памяти кеш сам чистится
+                databaseStruc.cacheWeakRefEnable();
+                needClearCache = false;
+            } else if (Controller.CACHE_DC.equals("soft")) {
+                // analog new WeakReference() - в случае нехватки памяти кеш сам чистится
+                databaseStruc.cacheSoftRefEnable();
+                needClearCache = false;
+            } else {
+                // это чистит сама память если осталось 25% от кучи - так что она безопасная
+                // самый быстрый
+                // но чистится каждые 10 тыс обращений - org.mapdb.Caches.HardRef
+                // - опасный так как может поесть память быстро!
+                databaseStruc.cacheHardRefEnable();
+                needClearCache = true;
+            }
         }
 
         DB database = databaseStruc.make();
@@ -695,7 +677,7 @@ public class DCSet extends DBASet implements Closeable {
 
         if (DBASet.getVersion(database) < CURRENT_VERSION) {
             database.close();
-            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake datachain Set " + dbFile.getParentFile().toPath());
+            logger.warn("New Version: " + CURRENT_VERSION + ". Try remake DCSet in " + dbFile.getParentFile().toPath());
             try {
                 Files.walkFileTree(dbFile.getParentFile().toPath(),
                         new SimpleFileVisitorForRecursiveFolderDeletion());
@@ -721,9 +703,9 @@ public class DCSet extends DBASet implements Closeable {
         if (Controller.getInstance().compactDConStart) {
             instance.getTransactionTab().clear();
             instance.database.commit();
-            LOGGER.debug("try COMPACT");
+            logger.debug("try COMPACT");
             database.compact();
-            LOGGER.debug("COMPACTED");
+            logger.debug("COMPACTED");
         }
 
     }
@@ -1359,7 +1341,7 @@ public class DCSet extends DBASet implements Closeable {
      * Ключ: ссылка на запись создания заказа<br>
      * Значение: заказ<br>
      */
-    public CompletedOrderMap getCompletedOrderMap() {
+    public CompletedOrderMapImpl getCompletedOrderMap() {
         return this.completedOrderMap;
     }
 
@@ -1655,7 +1637,7 @@ public class DCSet extends DBASet implements Closeable {
             return fork;
 
         } catch (java.lang.OutOfMemoryError e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
 
             this.outUses();
 
@@ -1710,13 +1692,13 @@ public class DCSet extends DBASet implements Closeable {
             // теперь нужно все общие переменные переопределить
         } catch (Exception e) {
 
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
 
             // база битая - выходим!! Хотя rollback должен сработать
             Controller.getInstance().stopAll(9613);
             return;
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
 
             // база битая - выходим!! Хотя rollback должен сработать
             Controller.getInstance().stopAll(9615);
@@ -1735,19 +1717,19 @@ public class DCSet extends DBASet implements Closeable {
                 // если основная база то с откатом
                 if (parent == null) {
                     if (this.getBlockMap().isProcessing()) {
-                        LOGGER.debug("TRY ROLLBACK");
+                        logger.debug("TRY ROLLBACK");
                         for (DBTab tab : tables) {
                             try {
                                 tab.rollback();
                             } catch (IOError e) {
-                                LOGGER.error(e.getMessage(), e);
+                                logger.error(e.getMessage(), e);
                             }
                         }
 
                         try {
                             this.database.rollback();
                         } catch (IOError e) {
-                            LOGGER.error(e.getMessage(), e);
+                            logger.error(e.getMessage(), e);
                         }
 
                         // not need on close!
@@ -1757,14 +1739,14 @@ public class DCSet extends DBASet implements Closeable {
                             try {
                                 tab.commit();
                             } catch (IOError e) {
-                                LOGGER.error(tab.toString() + ": " + e.getMessage(), e);
+                                logger.error(tab.toString() + ": " + e.getMessage(), e);
                             }
                         }
 
                         try {
                             this.database.commit();
                         } catch (IOError e) {
-                            LOGGER.error(e.getMessage(), e);
+                            logger.error(e.getMessage(), e);
                         }
                     }
                 }
@@ -1773,7 +1755,7 @@ public class DCSet extends DBASet implements Closeable {
                     try {
                         tab.close();
                     } catch (IOError e) {
-                        LOGGER.error(e.getMessage(), e);
+                        logger.error(e.getMessage(), e);
                     }
                 }
                 // улучшает работу финализера
@@ -1781,7 +1763,7 @@ public class DCSet extends DBASet implements Closeable {
                 try {
                     this.database.close();
                 } catch (IOError e) {
-                    LOGGER.error(e.getMessage(), e);
+                    logger.error(e.getMessage(), e);
                 }
                 // улучшает работу финализера
                 this.database = null;
@@ -1798,7 +1780,7 @@ public class DCSet extends DBASet implements Closeable {
     protected void finalize() throws Throwable {
         close();
         if (BlockChain.CHECK_BUGS > 5) {
-            LOGGER.debug("DCSet is FINALIZED: " + this.toString());
+            logger.debug("DCSet is FINALIZED: " + this.toString());
         }
         super.finalize();
     }
@@ -1868,10 +1850,10 @@ public class DCSet extends DBASet implements Closeable {
 
             long start = System.currentTimeMillis();
 
-            LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions
+            logger.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions
                     + (this.actions > ACTIONS_BEFORE_COMMIT ? "by Actions: " + this.actions :
                     (diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB ? "by diff Size Engine: " + diffSizeEngine : "by time"))
-                );
+            );
 
             for (DBTab tab : tables) {
                 tab.commit();
@@ -1883,15 +1865,15 @@ public class DCSet extends DBASet implements Closeable {
                 // очень долго делает - лучше ключем при старте
                 poinCompact = System.currentTimeMillis();
 
-                LOGGER.debug("try COMPACT");
+                logger.debug("try COMPACT");
                 // очень долго делает - лучше ключем при старте
                 try {
                     this.database.compact();
                     transactionTab.setTotalDeleted(0);
-                    LOGGER.debug("COMPACTED");
+                    logger.debug("COMPACTED");
                 } catch (Exception e) {
                     transactionTab.setTotalDeleted(transactionTab.getTotalDeleted() >> 1);
-                    LOGGER.error(e.getMessage(), e);
+                    logger.error(e.getMessage(), e);
                 }
             }
 
@@ -1911,7 +1893,7 @@ public class DCSet extends DBASet implements Closeable {
                         Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
                     }
                 } catch (Throwable e) {
-                    ///LOGGER.error(e.getMessage(), e);
+                    ///logger.error(e.getMessage(), e);
                 }
 
             }
@@ -1919,14 +1901,14 @@ public class DCSet extends DBASet implements Closeable {
             clearGC = !clearGC;
             if (clearGC) {
                 if (true || needClearCache || clearGC) {
-                    LOGGER.debug("CLEAR ENGINE CACHE...");
+                    logger.debug("CLEAR ENGINE CACHE...");
                     clearCache();
                 }
-                LOGGER.debug("CLEAR GC");
+                logger.debug("CLEAR GC");
                 System.gc();
             }
 
-            LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " + getEngineSize() + "   %%%%%%  commit time: "
+            logger.debug("%%%%%%%%%%%%%%%%%% TOTAL: " + getEngineSize() + "   %%%%%%  commit time: "
                     + (System.currentTimeMillis() - start) + " ms");
 
             poinFlush = System.currentTimeMillis();

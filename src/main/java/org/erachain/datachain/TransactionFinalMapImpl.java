@@ -394,7 +394,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         List<Long> keys = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, isCreator, fromID, false)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type, isCreator, fromID, descending)) {
             int counter = 0;
             //Transaction item;
             Long key;
@@ -635,7 +635,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     continue;
 
                 // теперь проверим все слова в Заголовке
-                transaction.setDC(dcSet);
+                transaction.setDC(dcSet, true);
                 String[] titleArray = transaction.getTags();
 
                 if (titleArray == null || titleArray.length < words.length)

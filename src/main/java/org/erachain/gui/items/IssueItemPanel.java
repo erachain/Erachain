@@ -37,13 +37,15 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JLabel titleJLabel = new JLabel();
     protected JLabel accountJLabel = new JLabel(Lang.T("Account") + ":");
     protected JLabel nameJLabel = new JLabel(Lang.T("Name") + ":");
+    protected JLabel tagsJLabel = new JLabel(Lang.T("Tags") + ":");
     protected JLabel descriptionJLabel = new JLabel(Lang.T("Description") + ":");
     protected JLabel feeJLabel = new JLabel(Lang.T("Fee Power") + ":");
     protected JComboBox<String> textFeePow = new JComboBox<>();
     protected JComboBox<Account> fromJComboBox = new JComboBox<>(new AccountsComboBoxModel());
     protected JButton issueJButton = new JButton(Lang.T("Issue"));
     protected JScrollPane jScrollPane1 = new JScrollPane();
-    protected JTextField textName = new JTextField("");
+    protected JTextField nameField = new JTextField("");
+    protected JTextField tagsField = new JTextField("");
     protected JTextArea textAreaDescription = new JTextArea("");
     protected AddImageLabel addIconLabel;
     protected AddImageLabel addImageLabel;
@@ -73,13 +75,15 @@ public abstract class IssueItemPanel extends IconPanel {
 
         addIconLabel = new AddImageLabel(Lang.T("Add Logo"),
                 WIDTH_LOGO, HEIGHT_LOGO,
-                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL, false, useExtURL);
+                0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL, false, useExtURL,
+                Toolkit.getDefaultToolkit().getImage("images/icons/add-media-logo.png"));
         addIconLabel.setBorder(null);
         addIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
 
         addImageLabel = new AddImageLabel(
                 Lang.T("Add image"), cropWidth, cropHeight,
-                0, ItemCls.MAX_IMAGE_LENGTH, cropWidth >> 1, cropHeight >> 1, originalSize, useExtURL);
+                0, ItemCls.MAX_IMAGE_LENGTH, cropWidth >> 1, cropHeight >> 1, originalSize, useExtURL,
+                Toolkit.getDefaultToolkit().getImage("images/icons/add-media.png"));
         addImageLabel.setBorder(null);
         addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
 
@@ -193,6 +197,13 @@ public abstract class IssueItemPanel extends IconPanel {
 
     protected abstract boolean checkValues();
 
+    protected void makeAppData() {
+        itemAppData = ItemCls.makeAppData(0L,
+                !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
+                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(), tagsField.getText());
+
+    }
+
     protected abstract void makeTransaction();
 
     protected abstract String makeTransactionView();
@@ -261,9 +272,7 @@ public abstract class IssueItemPanel extends IconPanel {
             }
 
             // соберем данные общего класса
-            itemAppData = ItemCls.makeAppData(0L,
-                    !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(), null, null);
+            makeAppData();
 
             makeTransaction();
 
@@ -341,7 +350,14 @@ public abstract class IssueItemPanel extends IconPanel {
         jPanelMain.add(nameJLabel, labelGBC);
 
         fieldGBC.gridy = y++;
-        jPanelMain.add(textName, fieldGBC);
+        jPanelMain.add(nameField, fieldGBC);
+
+        labelGBC.gridy = y;
+        jPanelMain.add(tagsJLabel, labelGBC);
+
+        fieldGBC.gridy = y++;
+        jPanelMain.add(tagsField, fieldGBC);
+        tagsField.setToolTipText(Lang.T("Use ',' to separate the Tags"));
 
         fieldGBC.gridy = y++;
         jPanelMain.add(jPanelAdd, fieldGBC);

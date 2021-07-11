@@ -17,11 +17,11 @@ public class FavoriteStatementsTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_TEMPLATE = 4;
     public static final int COLUMN_FAVORITE = 5;
 
-    Wallet wallet = Controller.getInstance().wallet;
+    Wallet wallet = Controller.getInstance().getWallet();
 
     public FavoriteStatementsTableModel() {
         super(DCSet.getInstance().getTransactionFinalMap(),
-                Controller.getInstance().wallet.database.getDocumentFavoritesSet(),
+                Controller.getInstance().getWallet().dwSet.getDocumentFavoritesSet(),
                 new String[]{"№", "Timestamp", "Creator", "Title", "Template", "Favorite"},
                 new Boolean[]{false, true, true, true, false, false},
                 ObserverMessage.RESET_STATEMENT_FAVORITES_TYPE,

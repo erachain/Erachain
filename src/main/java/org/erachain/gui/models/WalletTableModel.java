@@ -27,7 +27,7 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
             ///map.addObserver(this);
         } else {
             // ожидаем открытия кошелька
-            Controller.getInstance().wallet.addWaitingObserver(this);
+            Controller.getInstance().getWallet().addWaitingObserver(this);
         }
         dcSet.getBlockMap().addObserver(this); // for update CONFIRMS
 
@@ -38,7 +38,7 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
             super.deleteObservers();
             map.deleteObserver(this);
         }
-        Controller.getInstance().wallet.removeWaitingObserver(this);
+        Controller.getInstance().getWallet().removeWaitingObserver(this);
         dcSet.getBlockMap().deleteObserver(this); // for update CONFIRMS
     }
 }

@@ -29,7 +29,7 @@ function exchange(data){
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.orders + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
-            + '&asset=' + item.want.key + get_lang() + '"><b>' + (item.last > 100? item.last.toPrecision(10) : item.last > 1? item.last.toPrecision(8) : item.last.toPrecision(6)) + '</b></a>';
+            + '&asset=' + item.want.key + get_lang() + '"><b>' + (item.last > 100? item.last.toPrecision(6) : item.last > 1? item.last.toPrecision(6) : item.last.toPrecision(6)) + '</b></a>';
         output += '<td><a href="?asset=' + item.have.key
             + '&asset=' + item.want.key + get_lang() + '"><b>' + item.volume24 + '</b></a>';
 
@@ -79,7 +79,7 @@ function exchange(data){
             else {
                 output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>';
             }
-            output += '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice.toPrecision(10)) + '</span>';
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice.toPrecision(6)) + '</span>';
 
         } else {
             output += '<td align=right>' + addCommas(trade.amountHave);
@@ -89,7 +89,7 @@ function exchange(data){
             else {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>';
             }
-            output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice.toPrecision(10)) + '</span>';
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice.toPrecision(6)) + '</span>';
 
         }
 
@@ -131,11 +131,9 @@ function order(data){
 
     var status;
     if (data.completed) {
-        if (data.canceled) {
-            status = data.Label_Canceled;
-        } else {
-            status = data.Label_Completed;
-        }
+        status = data.Label_Completed;
+    } else if (data.canceled) {
+        status = data.Label_Canceled;
     } else {
         status = data.Label_Active;
     }
@@ -147,13 +145,18 @@ function order(data){
     output += data.Label_Order + ': <a href="?tx=' + data.txSeqNo + get_lang() + '"><b>' + data.txSeqNo + '</b></a><br>';
     output += data.Label_table_have + '</b>: <a href=?asset=' + data.assetHaveKey + get_lang() + '><b>' + data.assetHaveName + '</b></a><br>';
     output += data.Label_Volume + ': <b>' + addCommas(data.order.amountHave) + '</b><br>';
-    output += data.Label_Price + ': <b>' + addCommas(data.order.price) + '</b><br>';
+    output += data.Label_Price + ': <b>' + addCommas(data.order.price) + ' / ' + addCommas(data.order.priceReverse) + '</b><br>';
     output += data.Label_Total_Cost + ': <b>' + addCommas(data.order.amountWant) + '</b><br>';
     output += data.Label_table_want + ': <a href=?asset=' + data.assetWantKey + get_lang() + '><b>' + data.assetWantName + '</b></a><br>';
     output += data.Label_Creator + ': <a href="?address=' + data.creator + '">' + data.creator_person + '</a><br>';
     //output += data.Label_Fulfilled + ': <b>' + addCommas(data.order.fulfilledHave) + '</b><br>';
-    output += data.Label_LeftHave + ': <b>' + addCommas(data.order.leftHave) + '</b><br>';
-    output += data.Label_LeftPrice + ': <b>' + addCommas(data.order.leftPrice) + '</b><br>';
+    if (data.order.leftHave != 0 && data.order.leftWant != 0) {
+        output += data.Label_LeftHave + ': ' + addCommas(data.order.leftHave) + ' / ' + addCommas(data.order.leftWant) + '<br>';
+        output += data.Label_LeftPrice + ': ' + (100.0 * (1 - data.order.leftPrice / data.order.price)).toPrecision(4) + '%<br>';
+    }
+
+    output += data.Label_Pair + ': <a href="?asset=' + data.assetHaveKey
+        + '&asset=' + data.assetWantKey + get_lang() + '"><b>' + data.assetHaveName + ' / ' + data.assetWantName + '</b></a>';
 
     output += '</p>';
 
@@ -174,18 +177,22 @@ function order(data){
         var trade = data.lastTrades[key];
         output += '<tr>';
 
-        output += '<td align=center><a href=?trade=' + trade.initiatorTx + '/' + trade.targetTx + get_lang()
-        output += '>' + convertTimestamp( trade.timestamp, false);
+        if (trade.type == 'cancel' || trade.type == 'change') {
+            output += '<td align=center><a href=?tx=' + trade.initiatorTx + get_lang()
+        } else {
+            output += '<td align=center><a href=?trade=' + trade.initiatorTx + '/' + trade.targetTx + get_lang()
+        }
+        output += '>' + convertTimestamp(trade.timestamp, false);
 
         output += '<td><a href=?asset=' + trade.assetHaveKey + '&asset=' + trade.assetWantKey + '>' + getShortNameBlanked(trade.assetHaveName) + '/' + getShortNameBlanked(trade.assetWantName) + '</a>';
 
         output += '<td><a href=?address=' + trade.initiatorCreator_addr + '>' + cutBlank(trade.initiatorCreator, 20) + '</a>';
 
-        // отобрадает что это создатель актива действует
+        // отображает что это создатель актива действует
         if (trade.initiatorCreator_addr == data.assetWantMaker) {
-            if (trade.type != 'sell') {
+            if (trade.type == 'buy') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
-            } else {
+            } else if (trade.type == 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson"></span>';
             }
         }
@@ -200,7 +207,7 @@ function order(data){
             }
             output += '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice) + '</span>';
 
-        } else {
+        } else if (trade.type == 'buy') {
             output += '<td align=right>' + addCommas(trade.amountHave);
 
             output += '<td align=left>';
@@ -210,13 +217,25 @@ function order(data){
             }
             output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
 
+        } else if (trade.type == 'change') {
+            output += '<td align=right><span class="glyphicon glyphicon-edit" style="color:blue; font-size:1.0em"></span>';
+
+            output += '<td align=right>';
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
+        } else if (trade.type == 'cancel') {
+            output += '<td align=right>' + addCommas(trade.amountHave);
+
+            output += '<td align=left>';
+            output += '<span class="glyphicon glyphicon-remove" style="color:crimson; font-size:1.0em"></span>';
+            output += '<span style="color:crimson">' + data.Label_Cancel + '</span>';
+
         }
 
-        // отобрадает что это создатель актива действует
+        // отображает что это создатель актива действует
         if (trade.targetCreator_addr == data.assetWantMaker) {
             if (trade.type == 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
-            } else {
+            } else if (trade.type == 'buy') {
                 output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson"></span>';
             }
         }

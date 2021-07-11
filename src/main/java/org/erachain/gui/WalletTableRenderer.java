@@ -53,7 +53,7 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
         }
 
         Object isUnViewed = table.getValueAt(row, TimerTableModelCls.COLUMN_UN_VIEWED);
-        if (isUnViewed != null && (boolean) isUnViewed) {
+        if (isUnViewed instanceof Boolean && (boolean) isUnViewed) {
             Font font = adaptee.getFont();
             font = new Font(font.getName(), Font.BOLD, font.getSize());
             cell.setFont(font);
@@ -64,7 +64,7 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
         Object isOutcome = table.getValueAt(row, TimerTableModelCls.COLUMN_IS_OUTCOME);
         Color color;
 
-        if (isOutcome != null && !(boolean) isOutcome ^ markIncome) {
+        if (isOutcome instanceof Boolean && !(boolean) isOutcome ^ markIncome) {
             if (isSelected) {
                 color = FORE_COLOR_SELECTED;
             } else {

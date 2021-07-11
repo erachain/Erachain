@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 import org.bouncycastle.util.Strings;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Base64;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.utils.StrJSonFine;
@@ -12,6 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +32,7 @@ public class TelegramAnswerMessage extends Message {
             @SuppressWarnings("unchecked")
             Set<Integer> telegKeySet = jsonTelegrams.keySet();
             for (int i = 0; i<telegKeySet.size(); i++){
-                byte[] transactionByte = Base64.decode((String) jsonTelegrams.get(i+""));
+                byte[] transactionByte = Base64.getDecoder().decode((String) jsonTelegrams.get(i + ""));
                 Transaction trans = null;
                 try {
                     trans = RSend.Parse(transactionByte, Transaction.FOR_NETWORK);
@@ -40,7 +40,7 @@ public class TelegramAnswerMessage extends Message {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                telegransList.add((Transaction)trans);
+                telegransList.add(trans);
             };
         } 
          
@@ -62,27 +62,28 @@ public class TelegramAnswerMessage extends Message {
         for(String key:telegramKeys){
             // senders
             Transaction tran = Controller.getInstance().telegramStore.database.getTelegramsMap().get(key);
-            if(senderAccount.contains(tran.viewCreator()) &&  !telegransList.contains(tran)){
+            if (senderAccount.contains(tran.viewCreator()) && !telegransList.contains(tran)) {
                 telegransList.add(tran);
                 continue;
             }
-            // recievers
-            HashSet<Account> recipients = tran.getRecipientAccounts();
-            for(Account recipient:recipients){
-            
-              if (Controller.getInstance().wallet.accountExists(recipient) && !telegransList.contains(tran))
-                  telegransList.add(tran);
+            // receivers
+            if (Controller.getInstance().doesWalletExists()) {
+                HashSet<Account> recipients = tran.getRecipientAccounts();
+                for (Account recipient : recipients) {
+                    if (Controller.getInstance().getWallet().accountExists(recipient) && !telegransList.contains(tran))
+                        telegransList.add(tran);
+                }
             }
-      }
+        }
         // add JSON
         JSONObject jsonList = new JSONObject();
         for(int i = 0;i<telegransList.size(); i++){
             Transaction tran = telegransList.get(i);
             // convert Base64
-            String base64 = Base64.encode(tran.toBytes(Transaction.FOR_NETWORK, true));
+            String base64 = Base64.getEncoder().encodeToString(tran.toBytes(Transaction.FOR_NETWORK, true));
             jsonList.put(i, base64);
           }
-        // add lict in resut
+
         json.put("list", jsonList);
         
     }

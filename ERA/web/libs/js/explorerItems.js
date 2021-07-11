@@ -1,9 +1,22 @@
-function itemHead(item, forPrint) {
+function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
 
-    var output = '';
+    var output = '<td>';
     var type = item.item_type;
 
     var source;
+
+    // FACE - for AUDIO
+    if (imageFaceURL) {
+        if (imageFaceType == 'video') {
+            output += '<video autoplay muted playsinline loop width="350"><source src="' + imageFaceURL + '"></video>';
+
+        } else {
+            output += '<img width="350" src="' + imageFaceURL + '" />';
+        }
+
+
+    }
+
     if (item.image) {
         source = 'data:image/gif;base64,' + item.image;
     } else if (item.imageURL) {
@@ -14,12 +27,17 @@ function itemHead(item, forPrint) {
 
     if (source) {
         if (item.imageTypeName == 'video') {
-            output += '<video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls >';
-            output += '<td><video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
+            output += '<video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls ></video>';
+            output += '<video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
+
+        } else if (item.imageTypeName == 'audio') {
+            //output += '<video controls="" autoplay="" name="media"><source src="' + source + '" type="audio/mp3">';
+            //output += '<source src="' + item.maker_person_image_url + '" type="' + item.maker_person_image_media_type + '"></video>';
+            output += '<audio controls autoplay loop><source src="' + source + '" type="audio/mp3"></audio>';
 
         } else {
             output += '<img id="image-holder" onclick="style.display=\'none\'">';
-            output += '<td><a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
+            output += '<a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
         }
 
         output += '</td><td style ="width: 70%; padding-left:20px"><br>';
@@ -40,6 +58,10 @@ function itemHead(item, forPrint) {
         output += '</a>';
 
     output += '</h3>';
+    if (item.hasOwnProperty('tags')) {
+        output += '<br>' + item.tags;
+    }
+
     if (item.hasOwnProperty('exLink')) {
         output += '<h3>'
             + '<img src="img/parentTx.png" style="height:1.5em"> ' + item.exLink_Name + ' '
@@ -90,8 +112,13 @@ function itemHead(item, forPrint) {
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_TXCreator + ':<b> ' + creator + '</b><br>';
         } else {
             output += ': <a href=?tx=' + item.tx_seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + item.tx_seqNo + '</b></a></h4>';
-            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Pubkey + ':<b> ' + item.tx_creator_pubkey + '</b><br>';
-            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ':<b> ' + item.reference + '</b><br>';
+
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Pubkey + ': '
+             + '<a href ="?address=' + item.tx_creator_pubkey + get_lang() + '"><b> ' + item.tx_creator_pubkey + '</b></a><br>';
+
+            output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ': '
+             + '<a href ="?tx=' + item.tx_signature + get_lang() + '"><b>' + item.tx_signature + '</b></a><br>';
+
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_TXCreator + ':<b> ' + creator + '</b><br>';
 
             output += '<a href=?q=' + item.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.Label_Actions + '</b></a>';
@@ -112,7 +139,8 @@ function itemFoot(item, forPrint) {
     var output = '';
     if (item.description) {
         output += '<h3>' + item.Label_Description;
-        output += ' &nbsp&nbsp<a href=../api'+ type + '/text/' + item.key + ' class="tiny button ll-blue-bgc" style="font-size:0.7em"><b>' + item.Label_SourceText + '</b></a>';
+        if (!forPrint)
+            output += ' &nbsp&nbsp<a href=../api'+ type + '/text/' + item.key + ' class="tiny button ll-blue-bgc" style="font-size:0.7em"><b>' + item.Label_SourceText + '</b></a>';
         output += '</h3><br>' + fformat(item.description);
     }
 

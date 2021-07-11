@@ -4,6 +4,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.junit.Test;
@@ -76,6 +77,46 @@ public class AccountTest {
         assertEquals(((BigDecimal) balance3.a).intValue(), 0);
         assertEquals(((BigDecimal) balance3.b).intValue(), BlockChain.ERA_COMPU_ALL_UP ?
                 account.addDEVAmount(Transaction.RIGHTS_KEY).intValue() : 0);
+
+    }
+
+    @Test
+    public void tryMakeAccount() {
+        byte[] shortBytes = new byte[20];
+        account = new Account(shortBytes);
+        assertEquals(account.getAddress().length() > Account.ADDRESS_LENGTH, true);
+
+        byte[] ppk;
+        PrivateKeyAccount accountPPK;
+        Fun.Tuple2<Account, String> result;
+
+        if (false) {
+            // норм все пашет
+            for (byte i = 0; i < 255; i++) {
+                shortBytes[10] = i;
+                for (int k = 0; k < 1000; k++) {
+                    ppk = Wallet.generateAccountSeed(shortBytes, k);
+                    accountPPK = new PrivateKeyAccount(ppk);
+                    result = Account.tryMakeAccount(accountPPK.getAddress());
+                    assertEquals(accountPPK.getAddress(), result.a.getAddress());
+
+                }
+            }
+        }
+
+        if (true) {
+            String address = "74n5QJWHUCbqNR5v6ifjtB9YmmkXvdbc";
+            result = Account.tryMakeAccount(address);
+            assertEquals(null, result.a);
+            //assertEquals(address, result.a.getAddress());
+        }
+
+        if (true) {
+            String address = "5Tm7uhFLkCbQ1maNvWkDXCkPsbTreoY6wA4xbPCcy1z";
+            result = Account.tryMakeAccount(address);
+            assertEquals("788TNN4ujpCys3zeE261q767BHaj2UsDu6", result.a.getAddress());
+        }
+
 
     }
 }

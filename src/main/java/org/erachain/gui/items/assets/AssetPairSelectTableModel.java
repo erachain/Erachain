@@ -50,7 +50,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<Fun.Tuple2<Ass
 
         ItemAssetMap assetMap = DCSet.getInstance().getItemAssetMap();
         assetPair = assetMap.get(key);
-        FavoriteItemMapAsset favoriteMap = Controller.getInstance().wallet.database.getAssetFavoritesSet();
+        FavoriteItemMapAsset favoriteMap = Controller.getInstance().getWallet().dwSet.getAssetFavoritesSet();
         list = new ArrayList<>();
 
         PairMapImpl pairsMap = Controller.getInstance().dlSet.getPairMap();

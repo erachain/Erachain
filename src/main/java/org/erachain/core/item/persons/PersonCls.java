@@ -12,6 +12,7 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ByteArrayUtils;
 import org.erachain.utils.DateTimeFormat;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -19,10 +20,7 @@ import org.mapdb.Fun.Tuple2;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
+import java.util.*;
 
 
 //birthLatitude -90..90; birthLongitude -180..180
@@ -462,7 +460,7 @@ public abstract class PersonCls extends ItemCls {
 
         for (String address : addresses.keySet()) {
             Account account = new Account(address);
-            Tuple2<BigDecimal, BigDecimal> balance = account.getBalanceForAction(assetKey, position);
+            Tuple2<BigDecimal, BigDecimal> balance = account.getBalanceForPosition(assetKey, position);
             if (balance != null)
                 balanceTotal = balanceTotal.add(balance.b);
         }
@@ -548,4 +546,37 @@ public abstract class PersonCls extends ItemCls {
         return itemJson;
     }
 
+    public static JSONArray toJsonAddresses(Long key) {
+
+        TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(new Long(key));
+        TransactionFinalMap transactionsMap = DCSet.getInstance().getTransactionFinalMap();
+
+        JSONArray jsonItems = new JSONArray();
+        for (String address : addresses.keySet()) {
+
+            Stack<Fun.Tuple3<Integer, Integer, Integer>> stack = addresses.get(address);
+            if (stack == null || stack.isEmpty()) {
+                continue;
+            }
+
+            Fun.Tuple3<Integer, Integer, Integer> item = stack.peek();
+            Transaction transactionIssue = transactionsMap.get(item.b, item.c);
+
+            Map accountJSON = new LinkedHashMap();
+            accountJSON.put("address", address);
+            accountJSON.put("to_date", item.a * 86400000L);
+            accountJSON.put("verifier", transactionIssue.getCreator().getAddress());
+            if (transactionIssue.getCreator().getPerson() != null) {
+                accountJSON.put("verifier_key", transactionIssue.getCreator().getPerson().b.getKey());
+                accountJSON.put("verifier_name", transactionIssue.getCreator().getPerson().b.viewName());
+            } else {
+                accountJSON.put("verifier_key", "");
+                accountJSON.put("verifier_name", "");
+            }
+
+            jsonItems.add(accountJSON);
+
+        }
+        return jsonItems;
+    }
 }

@@ -76,8 +76,8 @@ public class MailsHTMLTableModel extends JTable implements Observer {
     private DefaultTableModel messagesModel;
 
     DCSet dcSet = DCSet.getInstance();
-    Wallet wallet = Controller.getInstance().wallet;
-    DWSet dwSet = wallet.database;
+    Wallet wallet = Controller.getInstance().getWallet();
+    DWSet dwSet = wallet.dwSet;
     WTransactionMap tableMap = dwSet.getTransactionMap();
     private Account myAccountFilter;
     private Account sideAccountFilter;

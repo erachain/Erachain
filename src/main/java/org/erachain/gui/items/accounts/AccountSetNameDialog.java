@@ -29,7 +29,7 @@ import java.util.List;
 public class AccountSetNameDialog extends javax.swing.JDialog {
 
     public JSONObject answer;
-    FavoriteAccountsMap db = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
+    FavoriteAccountsMap db = Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap();
     /**
      * Creates new form Account_Show
      */

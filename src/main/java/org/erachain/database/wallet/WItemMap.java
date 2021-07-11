@@ -44,8 +44,6 @@ public class WItemMap extends DCUMapImpl<Long, ItemCls> {
         // ИМЯ и ТИП заданы, создаем карту и ИНдексы
         openMap();
 
-        ///makeAutoKey(database, (Bind.MapWithModificationListener)map, name + "_wak");
-
         this.createIndexes();
 
         if (databaseSet.isWithObserver()) {
@@ -59,6 +57,10 @@ public class WItemMap extends DCUMapImpl<Long, ItemCls> {
 
     @Override
     public void openMap() {
+
+        HI = Long.MAX_VALUE;
+        LO = 0L;
+
         //OPEN MAP
         if (this.name == null)
             return;
@@ -68,13 +70,13 @@ public class WItemMap extends DCUMapImpl<Long, ItemCls> {
                 .valueSerializer(new ItemSerializer(this.type))
                 .counterEnable()
                 .makeOrGet();
-        //map = ((BTreeMap) map).descendingMap();
     }
 
     @Override
     protected void getMemoryMap() {
     }
 
+    @Override
     public ItemCls get(Long key) {
         ItemCls item = super.get(key);
         item.setKey(key);

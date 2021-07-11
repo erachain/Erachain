@@ -402,22 +402,23 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         newBlockDC = dcSet.fork(database, "getUnconfirmedTransactions");
                     }
 
-                    transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
-
-                    if (false // вообще-то все внутренние транзакции уже провверены на подпись!
-                            && !transaction.isSignatureValid(newBlockDC)) {
-                        needRemoveInvalids.add(transaction.getSignature());
-                        continue;
-                    }
-
-                    if (false && // тут нельзя пока удалять - может она будет включена
-                            // и пусть удаляется только если невалидная будет
-                            timestamp > transaction.getDeadline()) {
-                        needRemoveInvalids.add(transaction.getSignature());
-                        continue;
-                    }
-
                     try {
+
+                        // здесь уже может быть ошибка если Ордер не найден например для Отмена ордера
+                        transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
+
+                        if (false // вообще-то все внутренние транзакции уже провверены на подпись!
+                                && !transaction.isSignatureValid(newBlockDC)) {
+                            needRemoveInvalids.add(transaction.getSignature());
+                            continue;
+                        }
+
+                        if (false && // тут нельзя пока удалять - может она будет включена
+                                // и пусть удаляется только если невалидная будет
+                                timestamp > transaction.getDeadline()) {
+                            needRemoveInvalids.add(transaction.getSignature());
+                            continue;
+                        }
 
                         if (transaction.isValid(Transaction.FOR_NETWORK, 0L) != Transaction.VALIDATE_OK) {
                             needRemoveInvalids.add(transaction.getSignature());
@@ -957,30 +958,28 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                             //PREVENT CONCURRENT MODIFY EXCEPTION
                             List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
-                            synchronized (knownAccounts) {
 
-                                local_status = 5;
-                                this.setMonitorStatus("local_status " + viewStatus());
+                            local_status = 5;
+                            this.setMonitorStatus("local_status " + viewStatus());
 
-                                for (PrivateKeyAccount account : knownAccounts) {
+                            for (PrivateKeyAccount account : knownAccounts) {
 
-                                    forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
-                                    if (winValue < 1)
-                                        continue;
+                                forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+                                winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
+                                if (winValue < 1)
+                                    continue;
 
-                                    targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
-                                    if (targetedWinValue < 1)
-                                        continue;
+                                targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
+                                if (targetedWinValue < 1)
+                                    continue;
 
-                                    if (winValue > winned_winValue) {
-                                        //this.winners.put(account, winned_value);
-                                        acc_winner = account;
-                                        winned_winValue = winValue;
-                                        winned_forgingValue = forgingValue;
-                                        //max_winned_value_account = winned_value_account;
+                                if (winValue > winned_winValue) {
+                                    //this.winners.put(account, winned_value);
+                                    acc_winner = account;
+                                    winned_winValue = winValue;
+                                    winned_forgingValue = forgingValue;
+                                    //max_winned_value_account = winned_value_account;
 
-                                    }
                                 }
                             }
 

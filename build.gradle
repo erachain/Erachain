@@ -33,7 +33,7 @@ ext {
 }
 
 //String versionEra = "4.11.08-${git.head().abbreviatedId}"
-String versionEra = "5.3.01 dev"
+String versionEra = "5.4 dev"
 archivesBaseName = 'Erachain'
 group 'org.erachain'
 //version versionEra
@@ -52,6 +52,8 @@ compileJava {
 }
 
 dependencies {
+    implementation 'org.jetbrains:annotations:19.0.0'
+    implementation 'org.jetbrains:annotations:19.0.0'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
 // https://mvnrepository.com/artifact/org.rocksdb/rocksdbjni
     compile group: 'org.rocksdb', name: 'rocksdbjni', version: '6.4.6'
@@ -160,6 +162,7 @@ task CopyResourse {
         include 'market.json'
         include 'peers*'
         include 'start*'
+        include 'makePreview*'
     }
 
     copy {

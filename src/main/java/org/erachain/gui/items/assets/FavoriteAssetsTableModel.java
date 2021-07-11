@@ -18,7 +18,7 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
 
     public FavoriteAssetsTableModel() {
         super(DCSet.getInstance().getItemAssetMap(),
-                Controller.getInstance().wallet.database.getAssetFavoritesSet(),
+                Controller.getInstance().getWallet().dwSet.getAssetFavoritesSet(),
                 new String[]{"Key", "Name", "Maker", "Type", "Quantity", "Favorite", "I Maker"},
                 new Boolean[]{false, true, true, false, false, false, false},
                 ObserverMessage.RESET_ASSET_FAVORITES_TYPE,

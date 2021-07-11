@@ -6,7 +6,6 @@ import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.Jsonable;
-import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.blockexplorer.WebTransactionsHTML;
@@ -58,7 +57,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public static final int MEDIA_TYPE_IMG = 0;
     public static final int MEDIA_TYPE_VIDEO = 1;
-    public static final int MEDIA_TYPE_SOUND = 2;
+    public static final int MEDIA_TYPE_AUDIO = 2;
     public static final int MEDIA_TYPE_FRAME = 10; // POST
 
     protected static final int TYPE_LENGTH = 2;
@@ -92,7 +91,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      */
     protected static final int DB_DATA_MASK = 1 << 30;
 
-    //protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
+    // appDATA [10]
+    protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
+    protected static final long ITEM_FLAGS_HAS_TAGS = 1L << (Long.SIZE - 1);
+
     protected static final byte APP_DATA_ITEM_START_MASK = (byte) 64;
     protected static final byte APP_DATA_ITEM_STOP_MASK = (byte) 32;
     // ITEM_FLAGS[0]
@@ -125,6 +127,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     protected Long startDate;
     protected Long stopDate;
+
+    protected String tags;
 
     public Transaction referenceTx = null;
 
@@ -285,13 +289,19 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             stopDate = Longs.fromByteArray(Arrays.copyOfRange(appData, pos, pos + Long.BYTES));
             pos += Long.BYTES;
         }
+        if ((flags & ITEM_FLAGS_HAS_TAGS) != 0) {
+            int len = Byte.toUnsignedInt(appData[pos++]);
+            tags = new String(Arrays.copyOfRange(appData, pos, pos + len), StandardCharsets.UTF_8);
+            pos += len;
+        }
 
         return pos;
     }
 
-    public static byte[] makeAppData(long flags, boolean iconAsURL, int iconType, boolean imageAsURL, int imageType, Long startDate, Long stopDate) {
+    public static byte[] makeAppData(long flags, boolean iconAsURL, int iconType, boolean imageAsURL, int imageType, Long startDate, Long stopDate, String tags) {
         if (flags != 0 || iconAsURL || imageAsURL || iconType != 0 || imageType != 0
-                || startDate != null || stopDate != null) {
+                || startDate != null || stopDate != null
+                || tags != null && !tags.isEmpty()) {
             byte[] appData = new byte[12];
 
             // 2 байта пропустим, потом флаги
@@ -314,6 +324,16 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
                 appData[0] |= APP_DATA_ITEM_STOP_MASK;
                 appData = Bytes.concat(appData, Longs.toByteArray(stopDate));
             }
+
+            if (tags != null && !tags.isEmpty()) {
+                flags |= ITEM_FLAGS_HAS_TAGS;
+                byte[] tagsBytes = tags.getBytes(StandardCharsets.UTF_8);
+                appData = Bytes.concat(appData, new byte[]{(byte) tagsBytes.length});
+                appData = Bytes.concat(appData, tagsBytes);
+            }
+
+            // Теперь Флаги собранные - (2 байта пропустим)
+            System.arraycopy(Longs.toByteArray(flags), 0, appData, 2, Long.BYTES);
 
             return appData;
 
@@ -391,11 +411,30 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             return Transaction.INVALID_IMAGE_LENGTH_MAX;
         }
 
+        if (tags != null && tags.getBytes(StandardCharsets.UTF_8).length > 255) {
+            return Transaction.INVALID_TAGS_LENGTH_MAX;
+        }
+
         //CHECK DESCRIPTION LENGTH
         int descriptionLength = description == null ? 0 : description.getBytes(StandardCharsets.UTF_8).length;
         if (descriptionLength > Transaction.MAX_DATA_BYTES_LENGTH) {
             errorValue = "" + descriptionLength + " > " + Transaction.MAX_DATA_BYTES_LENGTH;
             return Transaction.INVALID_DESCRIPTION_LENGTH_MAX;
+        }
+
+        if (iconAsURL && (icon == null || icon.length > 512)) {
+            errorValue = "icon";
+            return Transaction.INVALID_URL_LENGTH;
+        }
+
+        if (imageAsURL && (image == null || image.length > 512)) {
+            errorValue = "image";
+            return Transaction.INVALID_URL_LENGTH;
+        }
+
+        if (iconType == MEDIA_TYPE_AUDIO) {
+            errorValue = "!=audio";
+            return Transaction.INVALID_ICON_TYPE;
         }
 
         return Transaction.VALIDATE_OK;
@@ -489,7 +528,18 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      * @return
      */
     public String[] getTags() {
+        if (tags != null && !tags.isEmpty()) {
+            String[] array = tags.toLowerCase().split(",");
+            for (int i = 0; i < array.length; i++) {
+                array[i] = array[i].trim();
+            }
+            return array;
+        }
         return null;
+    }
+
+    public String getTagsStr() {
+        return tags;
     }
 
     public long getFlags() {
@@ -510,8 +560,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
                 return "img";
             case MEDIA_TYPE_VIDEO:
                 return "video";
-            case MEDIA_TYPE_SOUND:
-                return "sound";
+            case MEDIA_TYPE_AUDIO:
+                return "audio";
             case MEDIA_TYPE_FRAME:
                 return "frame";
             default:
@@ -521,20 +571,26 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public static MediaType getMediaType(int mediaType, byte[] media) {
         if (mediaType == ItemCls.MEDIA_TYPE_IMG) {
-            byte[] header = new byte[10];
-            System.arraycopy(media, 0, header, 0, 10);
-            String typeName = new String(header).trim();
-            if (typeName.contains("PNG")) {
-                typeName = "png";
-            } else if (typeName.contains("GIF")) {
-                typeName = "gif";
+            if (media.length > 20) {
+                byte[] header = new byte[20];
+                System.arraycopy(media, 0, header, 0, 20);
+                String typeName = new String(header).trim();
+                if (typeName.contains("PNG")) {
+                    typeName = "png";
+                } else if (typeName.contains("GIF")) {
+                    typeName = "gif";
+                } else {
+                    typeName = "jpeg";
+                }
+                return new MediaType("image", typeName);
             } else {
-                typeName = "jpeg";
+                return new MediaType("image", "jpeg");
             }
-            return new MediaType("image", typeName);
 
         } else if (mediaType == ItemCls.MEDIA_TYPE_VIDEO) {
             return new MediaType("video", "mp4");
+        } else if (mediaType == ItemCls.MEDIA_TYPE_AUDIO) {
+            return new MediaType("audio", "mp3");
         }
         return null;
     }
@@ -568,6 +624,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public int getImageType() {
         return imageType;
+    }
+
+    public String getImageTypeName() {
+        return viewMediaType(imageType);
     }
 
     public boolean hasImageURL() {
@@ -987,6 +1047,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         itemJSON.put("key", this.getKey());
         itemJSON.put("name", this.name);
+        if (tags != null && !tags.isEmpty())
+            itemJSON.put("tags", this.tags);
 
         itemJSON.put("iconType", getIconType());
         itemJSON.put("iconTypeName", viewMediaType(iconType));
@@ -1032,7 +1094,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         //itemJSON.put("itemTypeSub", this.getItemSubType());
         itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
         itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
-        itemJSON.put("description", this.description);
+        itemJSON.put("description", viewDescription());
         itemJSON.put("maker", this.maker.getAddress());
         itemJSON.put("creator", this.maker.getAddress()); // @Deprecated
         itemJSON.put("maker_public_key", this.maker.getBase58());
@@ -1119,7 +1181,16 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         JSONObject itemJSON = new JSONObject();
         itemJSON.put("key", this.getKey());
+        itemJSON.put("nameOrig", getName());
         itemJSON.put("name", this.viewName());
+        String[] tagsArray = getTags();
+        if (tagsArray != null && tagsArray.length > 0) {
+            JSONArray tagsJson = new JSONArray();
+            for (String tag : tagsArray) {
+                tagsJson.add(tag);
+            }
+            itemJSON.put("tags", tagsJson);
+        }
         itemJSON.put("item_type", this.getItemTypeName());
 
         if (description != null && !description.isEmpty()) {
@@ -1211,6 +1282,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         if (person != null) {
             itemJson.put("maker_person", person.b.getName());
             itemJson.put("maker_person_key", person.b.getKey());
+            itemJson.put("maker_person_image_url", person.b.getImageURL());
+            itemJson.put("maker_person_image_type", person.b.getImageTypeName());
+            itemJson.put("maker_person_image_media_type", person.b.getImageMediaType().toString());
+
         }
 
         itemJson.put("iconType", getIconType());
@@ -1278,15 +1353,14 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     /**
-     * @param creator
      * @param dcSet
      * @return key если еще не добавлен, -key если добавлен и 0 - если это не НОВА
      */
-    public long isNovaAsset(Account creator, DCSet dcSet) {
+    public long isNovaItem(DCSet dcSet) {
         Object item = getNovaItems().get(this.name);
-        if (item != null && creator.equals(getNovaItemCreator(item))) {
+        if (item != null && maker.equals(getNovaItemCreator(item))) {
             ItemMap dbMap = this.getDBMap(dcSet);
-            Long key = (Long) getNovaItemKey(item);
+            Long key = getNovaItemKey(item);
             if (dbMap.contains(key)) {
                 return -key;
             } else {
@@ -1303,7 +1377,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         ItemMap dbMap = this.getDBMap(db);
 
         long newKey;
-        long novaKey = this.isNovaAsset(this.maker, db);
+        long novaKey = this.isNovaItem(db);
         if (novaKey > 0) {
 
             // INSERT WITH NOVA KEY

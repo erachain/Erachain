@@ -393,7 +393,9 @@ public class Synchronizer extends Thread {
 
             // освободим всю память
             dcSet.clearCache();
-            ctrl.wallet.database.clearCache();
+            if (ctrl.doesWalletExists()) {
+                ctrl.getWallet().dwSet.clearCache();
+            }
 
             ConcurrentHashMap<Long, Transaction> orphanedTransactions
                     = checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
@@ -800,7 +802,7 @@ public class Synchronizer extends Thread {
                 Block lastCommonBlock = dcSet.getBlockSignsMap().getBlock(lastCommonBlockSignature);
 
                 // SYNCHRONIZE BLOCKS
-                LOGGER.info("synchronize with OPRHAN from common block [" + lastCommonBlock.getHeight()
+                LOGGER.info("synchronize with ORPHAN from common block [" + lastCommonBlock.getHeight()
                         + "] for blocks: " + blocks.size());
                 synchronizeNewBlocks(dcSet, lastCommonBlock, checkPointHeight, blocks, peer);
 
@@ -1262,8 +1264,8 @@ public class Synchronizer extends Thread {
             if (!dcSet.isFork()) {
                 // только запись в нашу цепочку
 
-                if (ctrl.doesWalletExists() && !ctrl.noDataWallet && ctrl.wallet.walletUpdater != null) {
-                    ctrl.wallet.walletUpdater.offerMessage(new Pair(doOrphan, block));
+                if (ctrl.doesWalletExists() && !ctrl.noDataWallet && ctrl.getWallet().walletUpdater != null) {
+                    ctrl.getWallet().walletUpdater.offerMessage(new Pair(doOrphan, block));
                 }
 
                 processTiming = System.nanoTime() - processTiming;

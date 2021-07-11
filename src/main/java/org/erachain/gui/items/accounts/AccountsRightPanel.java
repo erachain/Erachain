@@ -66,13 +66,13 @@ public class AccountsRightPanel extends JPanel {
     protected int row;
 
     WTransactionMap wTxMap;
-    Wallet wallet = Controller.getInstance().wallet;
+    Wallet wallet = Controller.getInstance().getWallet();
 
     /**
      * Creates new form НовыйJPanel
      */
     public AccountsRightPanel() {
-        wTxMap = Controller.getInstance().wallet.database.getTransactionMap();
+        wTxMap = wallet.dwSet.getTransactionMap();
         initComponents();
     }
 

@@ -101,21 +101,21 @@ public class DepositExchange extends IconPanel {
 
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
         //String url_string = "https://api.face2face.cash/apipay/index.json";
-        String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
-        String urlGetHistory = "https://api.face2face.cash/apipay/history.json/ERA/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
-        String urlGetDetailsTest = "https://api.face2face.cash/apipay/get_uri_in.json/2/3/12/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
+        //String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
+        //String urlGetHistory = "https://api.face2face.cash/apipay/history.json/FOIL/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5";
+        //String urlGetDetailsTest = "https://api.face2face.cash/apipay/get_uri_in.json/2/3/12/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/1000";
 
         JSONObject jsonObject;
 
         String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
 
-        AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
+        AssetCls assetBuy = (AssetCls) cbxAssets.getSelectedItem();
         AssetCls assetInput = (AssetCls) cbxAssetsInput.getSelectedItem();
 
         String assetOutput;
         String assetOutputName;
 
-        switch ((int) asset.getKey()) {
+        switch ((int) assetBuy.getKey()) {
             case 1:
                 assetOutput = "ERA/";
                 assetOutputName = "ERA";
@@ -124,28 +124,17 @@ public class DepositExchange extends IconPanel {
                 assetOutput = "COMPU/";
                 assetOutputName = "COMPU";
                 break;
-            case 92:
-                assetOutput = "@RUB/";
-                assetOutputName = "RUB";
-                break;
-            case 95:
-                assetOutput = "@USD/";
-                assetOutputName = "USD";
-                break;
-            case 1114:
-                urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
-                assetOutput = "@ZEN/";
-                assetOutputName = "ZEN";
-                break;
             case (int) DepositExchange.TEST_ASSET:
                 /// http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/ETH/@ETH/7KmL1nheVHYVmdaEB4rsRjiENUD3sTr7EE/1
                 urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
                 assetOutput = "@ETH/";
                 assetOutputName = "ETH";
+                assetInput = assetBuy;
                 break;
             default:
-                assetOutput = "@BTC/";
-                assetOutputName = "BTC";
+                assetOutput = "f" + assetBuy.getName() + "/";
+                assetOutputName = assetBuy.getName();
+                assetInput = assetBuy;
         }
 
         String urlPars = assetOutput + jTextField_Address.getText();
@@ -155,31 +144,27 @@ public class DepositExchange extends IconPanel {
 
         switch ((int) assetInput.getKey()) {
             case 1:
-                urlPars = "ERA/" + urlPars + "/500";
-                assetIncomeName = assetIncomeABBR = "ERA";
+                urlPars = assetInput.getName() + "/" + urlPars + "/500";
+                assetIncomeName = assetIncomeABBR = assetInput.getName();
                 break;
             case 2:
-                urlPars = "COMPU/" + urlPars + "/1";
-                assetIncomeName = assetIncomeABBR = "COMPU";
+                urlPars = assetInput.getName() + "/" + urlPars + "/1";
+                assetIncomeName = assetIncomeABBR = assetInput.getName();
                 break;
-            case 95:
-                urlPars = "RUB/" + urlPars + "/2500";
-                assetIncomeName = assetIncomeABBR = "RUB";
+            case 12:
+                urlPars = assetInput.getName() + "/" + urlPars + "/0.001";
+                assetIncomeName = "bitcoins";
+                assetIncomeABBR = assetInput.getName();
                 break;
-            case 1114:
-                urlPars = "ZEN/" + urlPars + "/100";
-                assetIncomeName = "horizens";
-                assetIncomeABBR = "ZEN";
-                break;
-            case 1048583:
+            case (int) DepositExchange.TEST_ASSET:
                 urlPars = "ETH/" + urlPars + "/1";
                 assetIncomeName = "etheriums";
                 assetIncomeABBR = "ETH";
                 break;
             default:
-                urlPars = "BTC/" + urlPars + "/0.01";
-                assetIncomeName = "bitcoins";
-                assetIncomeABBR = "BTC";
+                // rate not need
+                urlPars = assetInput.getName() + "/" + urlPars + "/10";
+                assetIncomeName = assetIncomeABBR = assetInput.getName();
         }
 
         urlGetDetails += urlPars;
@@ -229,7 +214,7 @@ public class DepositExchange extends IconPanel {
                 payToAddressCheck.setText("<html><b>" + jsonObject.get("wrong") + "</b></html>");
                 payToAddressField.setText(jsonObject.get("addr_in").toString());
 
-                if (jsonObject.containsKey("addr_out_full") && asset.getKey() == DepositExchange.TEST_ASSET) {
+                if (jsonObject.containsKey("addr_out_full") && assetBuy.getKey() == DepositExchange.TEST_ASSET) {
                     String payMess = jsonObject.get("addr_out_full").toString();
                     jLabel_AreaDetails.setVisible(true);
                     jButton_copyDetails.setVisible(true);
@@ -248,7 +233,7 @@ public class DepositExchange extends IconPanel {
 
                 //LOGGER.debug(StrJSonFine.convert(jsonObject));
 
-                switch ((int) asset.getKey()) {
+                switch ((int) assetBuy.getKey()) {
                     case 1:
                     case 2:
                         help += Lang.T("Transfer <b>%1</b> to this address for buy")
@@ -261,7 +246,7 @@ public class DepositExchange extends IconPanel {
                                 .replace("%1", assetIncomeName);
                 }
 
-                if (asset.getKey() == DepositExchange.TEST_ASSET) {
+                if (assetBuy.getKey() == DepositExchange.TEST_ASSET) {
                     String payMess = jsonObject.get("addr_out_full").toString();
                     jLabel_AreaDetails.setVisible(true);
                     jButton_copyDetails.setVisible(true);
@@ -275,7 +260,7 @@ public class DepositExchange extends IconPanel {
                 }
 
                 help += "<p>" + Lang.T("Minimal payment in equivalent")
-                        + " <b>" + 0.00025 + " " + assetIncomeABBR + "</b>";
+                        + " <b>" + 2.5 + " USD</b>";
 
                 payToAddressField.setText(jsonObject.get("addr_in").toString());
                 payToAddressCheck.setText(help);
@@ -421,10 +406,11 @@ public class DepositExchange extends IconPanel {
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_AssetInput, labelGBC);
 
-        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(new long[]{AssetCls.BTC_KEY,
-                DepositExchange.TEST_ASSET
-                // 14L // ETG
-        }));
+        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(
+                new long[]{AssetCls.BTC_KEY,
+                        18L, 20L, 22L,
+                        DepositExchange.TEST_ASSET
+                }));
         fieldGBC.gridy = gridy;
         this.jPanelMain.add(cbxAssetsInput, fieldGBC);
 
@@ -619,28 +605,13 @@ public class DepositExchange extends IconPanel {
 
         switch ((int) asset.getKey()) {
             case 1:
-                //jLabel_Details.setText(Lang.T("Address for buy") + ":");
-                refreshReceiverDetails(Lang.T("Payment details for buy") + " ERA",
-                        detailsHead);
-                jLabel_Asset.setText(Lang.T("What to buy"));
-                jLabel_AssetInput.setVisible(true);
-                cbxAssetsInput.setVisible(true);
-                break;
             case 2:
                 //jLabel_Details.setText(Lang.T("Address for buy") + ":");
-                refreshReceiverDetails(Lang.T("Payment details for buy") + " COMPU",
+                refreshReceiverDetails(Lang.T("Payment details for buy") + " " + asset.getName(),
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to buy"));
                 jLabel_AssetInput.setVisible(true);
                 cbxAssetsInput.setVisible(true);
-                break;
-            case 1114:
-                //jLabel_Details.setText(Lang.T("Address to deposit") + " ZEN" + ":");
-                refreshReceiverDetails(Lang.T("Payment details to deposit") + " ZEN",
-                        detailsHead);
-                jLabel_Asset.setText(Lang.T("What to deposit"));
-                jLabel_AssetInput.setVisible(false);
-                cbxAssetsInput.setVisible(false);
                 break;
             case (int) DepositExchange.TEST_ASSET:
                 //jLabel_Details.setText(Lang.T("Address to deposit") + " ETH" + ":");
@@ -652,7 +623,7 @@ public class DepositExchange extends IconPanel {
                 break;
             default:
                 //jLabel_Details.setText(Lang.T("Address to deposit") + ":");
-                refreshReceiverDetails(Lang.T("Payment details to deposit") + " BTC",
+                refreshReceiverDetails(Lang.T("Payment details to deposit") + " " + asset.getName(),
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to deposit"));
                 jLabel_AssetInput.setVisible(false);
@@ -681,28 +652,34 @@ public class DepositExchange extends IconPanel {
 
             switch ((int) asset.getKey()) {
                 case 1:
-                    urlGetDetails += "ERA/";
+                    urlGetDetails += "FOIL/";
                     break;
                 case 12:
-                    urlGetDetails += "@BTC/";
+                    urlGetDetails += "fBTC/";
                     break;
                 case 14:
-                    urlGetDetails += "@ETH-/";
+                    urlGetDetails += "fETH-/";
                     break;
-                case 92:
-                    urlGetDetails += "@RUB/";
+                case 18:
+                    urlGetDetails += "fDOGE/";
                     break;
-                case 95:
-                    urlGetDetails += "@USD/";
+                case 20:
+                    urlGetDetails += "fLTC/";
                     break;
-                case 1114:
-                    urlGetDetails += "@ZEN/";
+                case 22:
+                    urlGetDetails += "fDASH/";
+                    break;
+                case 1643:
+                    urlGetDetails += "fRUB/";
+                    break;
+                case 1840:
+                    urlGetDetails += "fUSD/";
                     break;
                 case (int) DepositExchange.TEST_ASSET:
-                    urlGetDetails += "@ETH/";
+                    urlGetDetails += "fETH--/";
                     break;
                 default:
-                    urlGetDetails += "COMPU/";
+                    urlGetDetails += "MVLT/";
             }
 
         }
@@ -876,10 +853,10 @@ public class DepositExchange extends IconPanel {
 
                                 resultText +=
                                         //+ " &#9654; "
-                                         " &#10144; "
-                                        + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
-                                        + " - " + pay_out.get("created_on")
-                                        + " <a href='" + txURLout + pay_out.get("txid").toString() + "'>(TX)</a>"
+                                        " &#10144; "
+                                                + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
+                                                + " - " + pay_out.get("created_on")
+                                                + " <a href='" + txURLout + pay_out.get("txid").toString() + "'>(TX)</a>"
                                 ;
                             } else if (json.containsKey("stasus")) {
                                 /** есди выплаты не было и платеж со статусом ожидания и т.д.

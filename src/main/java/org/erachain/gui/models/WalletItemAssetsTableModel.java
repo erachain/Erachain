@@ -17,7 +17,7 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
     DCSet dcSet = DCSet.getInstance();
 
     public WalletItemAssetsTableModel() {
-        super(Controller.getInstance().wallet.database.getAssetMap(),
+        super(Controller.getInstance().getWallet().dwSet.getAssetMap(),
                 new String[]{"Key", "Name", "Maker", "Type", "Quantity", "Favorite"},
                 new Boolean[]{false, true, true, false, false, false}, true, COLUMN_FAVORITE);
 

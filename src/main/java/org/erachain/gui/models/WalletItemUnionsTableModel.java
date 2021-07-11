@@ -13,7 +13,7 @@ public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
     public static final int COLUMN_FAVORITE = 3;
 
     public WalletItemUnionsTableModel() {
-        super(Controller.getInstance().wallet.database.getUnionMap(),
+        super(Controller.getInstance().getWallet().dwSet.getUnionMap(),
                 new String[]{"Key", "Name", "Creator", "Favorite"},
                 new Boolean[]{false, true, true, false}, true, COLUMN_FAVORITE);
 

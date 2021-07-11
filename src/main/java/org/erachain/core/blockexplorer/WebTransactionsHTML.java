@@ -134,6 +134,9 @@ public class WebTransactionsHTML {
             case Transaction.CANCEL_ORDER_TRANSACTION:
                 outTX.put("body", cancel_Order_HTML(transaction));
                 break;
+            case Transaction.CHANGE_ORDER_TRANSACTION:
+                outTX.put("body", update_Order_HTML(transaction));
+                break;
             case Transaction.VOTE_ON_ITEM_POLL_TRANSACTION:
                 outTX.put("body", vote_On_Item_Poll_HTML(transaction));
                 break;
@@ -183,7 +186,8 @@ public class WebTransactionsHTML {
 
         JSONObject tras_json = transaction.toJson();
 
-        String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ": </b>" + tras_json.get("type");
+        String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ":</b>";
+        out += " [" + tras_json.get("type") + "]" + tras_json.get("type_name");
         out += " (" + Lang.T("Block", langObj) + ": </b><a href=?block=" + tras_json.get("height") + get_Lang() + ">" + tras_json.get("height") + "</a>";
         out += ", " + Lang.T("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("seqNo") + get_Lang() + ">" + tras_json.get("seqNo") + "</a> ) </font><br>";
 
@@ -193,18 +197,20 @@ public class WebTransactionsHTML {
 
         if (!(transaction instanceof RCalculated)) {
             out += "<br><b>" + Lang.T("Size", langObj) + ": </b>" + tras_json.get("size");
-            out += "<br><b>" + Lang.T("Public Key", langObj) + ": </b><a href=?address="
-                    + tras_json.get("publickey") + get_Lang() + ">" + tras_json.get("publickey") + "</a>";
-            out += "<br><b>" + Lang.T("Signature", langObj) + ": </b>" + tras_json.get("signature");
-            out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + tras_json.get("fee");
+            out += "<br><b>" + Lang.T("Signature", langObj) + ": </b>" + tras_json.get("signature") + "<br>";
+            if (transaction.getCreator() == null) {
+                // GENESIS
+                out += "<b>" + Lang.T("Creator", langObj) + ":</b> GENESIS";
+            } else {
+                out += "<b>" + Lang.T("Creator", langObj)
+                        + ":</b> <a href=?address=" + transaction.getCreator().getAddress() + get_Lang() + ">"
+                        + transaction.getCreator().getPersonAsString() + "</a>";
+                out += "<br><b>" + Lang.T("Public Key", langObj) + ": </b><a href=?address="
+                        + tras_json.get("publickey") + get_Lang() + ">" + tras_json.get("publickey") + "</a>";
+                out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + tras_json.get("fee");
+            }
             if (transaction.isWiped()) {
                 out += "<BR><b>" + Lang.T("WIPED", langObj) + ": </b>" + "true";
-            }
-            out += "<br> ";
-            if (transaction.getCreator() != null) {
-                out += "<b>" + Lang.T("Creator", langObj)
-                        + ": </b><a href=?address=" + tras_json.get("creator") + get_Lang() + ">"
-                        + transaction.getCreator().getPersonAsString() + "</a>";
             }
         }
 
@@ -252,17 +258,16 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         GenesisTransferAssetTransaction assetTransfer = (GenesisTransferAssetTransaction) transaction;
-        if (assetTransfer.getCreator() != null) {
-            out += Lang.T("Creator", langObj) + ": <a href=?address="
-                    + assetTransfer.getCreator().getAddress() + get_Lang() + "><b>" + assetTransfer.getCreator().getPersonAsString()
+
+        if (assetTransfer.getSender() != null) {
+            out += "<br>" + Lang.T("Sender", langObj) + ": <a href=?address="
+                    + assetTransfer.getSender().getAddress() + get_Lang() + "><b>" + assetTransfer.getSender().getPersonAsString()
                     + "</b></a>";
-        } else {
-            out += "<b>" + Lang.T("Creator", langObj) + ": GENESIS";
         }
 
         out += "<br>" + Lang.T("Recipient", langObj) + ": <a href=?address="
                 + assetTransfer.getRecipient().getAddress() + get_Lang() + "><b>" + assetTransfer.getRecipient().getPersonAsString()
-                + "</b></a><br>";
+                + "</b></a>";
 
         out += "<br>" + Lang.T(assetTransfer.viewActionType(), langObj)
                 + ": <b>" + assetTransfer.getAmount().toPlainString() + " x "
@@ -380,20 +385,18 @@ public class WebTransactionsHTML {
         CreateOrderTransaction orderCreation = (CreateOrderTransaction) transaction;
 
         Long refDB = orderCreation.getDBRef();
+        //
         Order order = null;
         String status;
         if (dcSet.getOrderMap().contains(refDB)) {
             order = dcSet.getOrderMap().get(refDB);
-            status = "Active";
         } else if (dcSet.getCompletedOrderMap().contains(refDB)) {
             order = dcSet.getCompletedOrderMap().get(refDB);
-            if (order.isCompleted()) {
-                status = "Completed";
-            } else {
-                status = "Canceled";
-            }
-        } else {
+        }
+        if (order == null) {
             status = "Unknown";
+        } else {
+            status = order.viewStatus();
         }
 
         out += "<h4><a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
@@ -413,6 +416,57 @@ public class WebTransactionsHTML {
         out += Lang.T("Price", langObj) + ": <b>"
                 + orderCreation.makeOrder().calcPrice().toPlainString()
                 + " / " + orderCreation.makeOrder().calcPriceReverse().toPlainString() + "</b><br>";
+
+        return out;
+    }
+
+    private String update_Order_HTML(Transaction transaction) {
+        // TODO Auto-generated method stub
+
+        String out = "";
+
+        ChangeOrderTransaction orderUpdate = (ChangeOrderTransaction) transaction;
+
+        Long orderID = orderUpdate.getOrderId();
+        //
+        Order orderOrig = null;
+        String statusOrig;
+        if (dcSet.getOrderMap().contains(orderID)) {
+            orderOrig = dcSet.getOrderMap().get(orderID);
+        } else if (dcSet.getCompletedOrderMap().contains(orderID)) {
+            orderOrig = dcSet.getCompletedOrderMap().get(orderID);
+        }
+        if (orderOrig == null) {
+            statusOrig = "Unknown";
+        } else {
+            statusOrig = orderOrig.viewStatus();
+        }
+
+        out += "<h4><a href='?order=" + Transaction.viewDBRef(orderID) + get_Lang() + "'>" + Lang.T(statusOrig, langObj) + "</a>";
+
+        Long refDB = orderUpdate.getDBRef();
+        //
+        Order order = null;
+        String status;
+        if (dcSet.getOrderMap().contains(refDB)) {
+            order = dcSet.getOrderMap().get(refDB);
+        } else if (dcSet.getCompletedOrderMap().contains(refDB)) {
+            order = dcSet.getCompletedOrderMap().get(refDB);
+        }
+        if (order == null) {
+            status = "Unknown";
+        } else {
+            status = order.viewStatus();
+        }
+
+        out += " - <a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
+
+        out += Lang.T("Order Signature", langObj) + ": <a href='?tx=" + Base58.encode(orderUpdate.getOrderRef()) + "'><b>"
+                + Base58.encode(orderUpdate.getOrderRef()) + "</b></a><br>";
+
+        out += Lang.T("Update Price", langObj) + ": <b>"
+                + orderUpdate.makeUpdatedOrder().calcPrice().toPlainString()
+                + " / " + orderUpdate.makeUpdatedOrder().calcPriceReverse().toPlainString() + "</b><br>";
 
         return out;
     }

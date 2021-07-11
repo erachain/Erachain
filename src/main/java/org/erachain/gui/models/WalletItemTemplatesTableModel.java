@@ -13,7 +13,7 @@ public class WalletItemTemplatesTableModel extends WalletTableModel<TemplateCls>
     public static final int COLUMN_FAVORITE = 4;
 
     public WalletItemTemplatesTableModel() {
-        super(Controller.getInstance().wallet.database.getTemplateMap(),
+        super(Controller.getInstance().getWallet().dwSet.getTemplateMap(),
                 new String[]{"Key", "Name", "Maker", "Confirmed", "Favorite"},
                 new Boolean[]{true, true, true, true, true}, true, COLUMN_FAVORITE);
     }

@@ -9,9 +9,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Base64;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.ExPays;
+import org.erachain.core.exdata.exActions.ExAction;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
 import org.erachain.core.exdata.exLink.ExLinkSource;
@@ -28,9 +27,7 @@ import org.mapdb.Fun;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 
 //import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -170,7 +167,7 @@ public class RSignNote extends Transaction implements Itemable {
             itemsKeys = new Object[][]{};
         }
 
-        ArrayList<Object> listTags = new ArrayList<>();
+        List<Object> listTags = new ArrayList<>();
 
         if (creatorPersonDuration != null) {
             // AS PERSON
@@ -179,11 +176,8 @@ public class RSignNote extends Transaction implements Itemable {
             listTags.add(new Object[]{ItemCls.AUTHOR_TYPE, creatorPersonDuration.a, creatorPerson.getTags()});
         }
 
-        if (extendedData.hasExPays()) {
-            ExPays pays = extendedData.getExPays();
-            if (pays.hasAmount()) {
-                listTags.add(new Object[]{ItemCls.ASSET_TYPE, pays.getAssetKey(), pays.getAsset().getTags()});
-            }
+        if (extendedData.hasExAction()) {
+            extendedData.getExAction().updateItemsKeys(listTags);
         }
 
         if (typeBytes[1] > 1 && extendedData != null && extendedData.getTemplateKey() != 0L) {
@@ -209,8 +203,8 @@ public class RSignNote extends Transaction implements Itemable {
         return extendedData.getExLink();
     }
 
-    public ExPays getExPays() {
-        return extendedData.getExPays();
+    public ExAction getExAction() {
+        return extendedData.getExAction();
     }
 
     @Override
@@ -482,7 +476,7 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         if (data != null && data.length > 0) {
-            transaction.put("data64", Base64.encode(this.data));
+            transaction.put("data64", Base64.getEncoder().encodeToString(this.data));
         }
 
         return transaction;
@@ -798,7 +792,8 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         int result;
-        if (height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
+        if (false // комиссия у так уже = 0 - нельзя модифицировать флаг внутри
+                && height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
                 && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
             // не учитываем комиссию если размер блока маленький
             result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_FEE);
@@ -900,9 +895,9 @@ public class RSignNote extends Transaction implements Itemable {
         if (getExLink() != null)
             long_fee += 100 * BlockChain.FEE_PER_BYTE;
 
-        ExPays exPays = extendedData.getExPays();
-        if (exPays != null) {
-            long_fee += exPays.getTotalFeeBytes() * BlockChain.FEE_PER_BYTE;
+        ExAction exAction = extendedData.getExAction();
+        if (exAction != null) {
+            long_fee += exAction.getTotalFeeBytes() * BlockChain.FEE_PER_BYTE;
         }
 
         if (extendedData.hasAuthors()) {
@@ -965,7 +960,10 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     public boolean isFavorite() {
-        return Controller.getInstance().wallet.database.getDocumentFavoritesSet().contains(this.dbRef);
+        if (Controller.getInstance().doesWalletExists()) {
+            return Controller.getInstance().getWallet().dwSet.getDocumentFavoritesSet().contains(this.dbRef);
+        }
+        return false;
     }
 
     public Fun.Tuple3<Integer, String, RSignNote> decrypt(Account recipient) {

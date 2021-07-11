@@ -14,7 +14,7 @@ public class WalletItemImprintsTableModel extends WalletTableModel<ImprintCls> {
     public static final int COLUMN_FAVORITE = 4;
 
     public WalletItemImprintsTableModel() {
-        super(Controller.getInstance().wallet.database.getImprintMap(),
+        super(Controller.getInstance().getWallet().dwSet.getImprintMap(),
                 new String[]{"Key", "Name", "Maker", "Confirmed", "Favorite"},
                 new Boolean[]{false, true, true, false}, true, COLUMN_FAVORITE);
     }

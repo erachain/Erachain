@@ -1,16 +1,14 @@
 package org.erachain.network.message;
 
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.primitives.Bytes;
 import org.bouncycastle.util.Strings;
+import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import com.google.common.primitives.Bytes;
-
-import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
+import java.util.List;
+import java.util.Set;
 
 public class TelegramGetMessage extends Message {
 
@@ -21,10 +19,12 @@ public class TelegramGetMessage extends Message {
     public TelegramGetMessage() {
         super(TELEGRAM_GET_TYPE);
         address = new JSONObject();
-        List<Account> acounts = Controller.getInstance().wallet.getAccounts();
-        for (int i = 0;i<acounts.size();i++){
-            this.address.put(i,acounts.get(i).getAddress()); 
-       }
+        if (Controller.getInstance().doesWalletExists()) {
+            List<Account> acounts = Controller.getInstance().getWallet().getAccounts();
+            for (int i = 0; i < acounts.size(); i++) {
+                this.address.put(i, acounts.get(i).getAddress());
+            }
+        }
     }
       
        

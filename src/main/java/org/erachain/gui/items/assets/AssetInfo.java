@@ -1,6 +1,7 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -115,6 +116,10 @@ public class AssetInfo extends JTextPane {
             if (record != null)
                 text += "<td><div  style='float:left'><div><b>" + Lang.T("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
             text += "<div><b>" + Lang.T("Name") + ": </b>" + asset.viewName() + "</div>";
+            if (asset.getTagsStr() != null) {
+                text += "<div><b>" + Lang.T("Tags") + ": </b>" + asset.getTagsStr() + "</div>";
+            }
+
             text += "<div   style='word-wrap: break-word; '>";
 
             text += "<div>" + Lang.T("Maker") + ": <a href = '!!Maker'><b>" + hl_Maker.get_Text() + "</b></a></div>";
@@ -125,6 +130,14 @@ public class AssetInfo extends JTextPane {
             text += " " + Lang.T("Accuracy") + ": <b>" + asset.getScale() + "</b>,";
             text += " " + Lang.T("Quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
             text += " " + Lang.T("Released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
+
+            if (asset.getDEXAwards() != null) {
+                text += "<br>" + Lang.T("DEX Awards" + ":");
+                for (ExLinkAddress award : asset.getDEXAwards()) {
+                    text += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
+                            + (award.getMemo() == null || award.getMemo().isEmpty() ? "" : " - " + award.getMemo());
+                }
+            }
 
             text += "<div>" + Lang.T("Description") + ":<br>";
             if (asset.getKey() > 0 && asset.getKey() < 1000) {

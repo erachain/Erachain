@@ -26,7 +26,7 @@ public class WalletOrdersTableModel extends WalletTableModel<Order> implements O
     public static final int COLUMN_STATUS = 9;
 
     public WalletOrdersTableModel() {
-        super(Controller.getInstance().wallet.database.getOrderMap(),
+        super(Controller.getInstance().getWallet().dwSet.getOrderMap(),
                 new String[]{"№", "Timestamp", "Amount", "Have", "Price", "Want", "Total", "Left", "Creator", "Status"},
                 new Boolean[]{false, true, true, true, true, true, true, true, true, true}, true, 10000);
 

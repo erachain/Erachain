@@ -26,7 +26,7 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel implements Obser
     public AccountsComboBoxModel(long personKey) {
         this.personKey = personKey;
         addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey);
-        observable = Controller.getInstance().wallet.database.getAccountMap();
+        observable = Controller.getInstance().getWallet().dwSet.getAccountMap();
 
         synchronized (addresses) {
             sortAndAdd();
@@ -84,7 +84,7 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel implements Obser
             observable.addObserver(this);
         } else {
             // ожидаем открытия кошелька
-            Controller.getInstance().wallet.addWaitingObserver(this);
+            Controller.getInstance().getWallet().addWaitingObserver(this);
         }
     }
 

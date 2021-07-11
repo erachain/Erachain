@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class AccountNameAdd extends javax.swing.JDialog {
 
-    FavoriteAccountsMap favoriteAccountsMap = Controller.getInstance().wallet.database.getFavoriteAccountsMap();
+    FavoriteAccountsMap favoriteAccountsMap = Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap();
     private AccountNameAdd th;
     // Variables declaration - do not modify
     private javax.swing.ButtonGroup buttonGroupSelectType;
