@@ -189,7 +189,7 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
 
 
     protected void reset() {
-        textName.setText("");
+        nameField.setText("");
         textAreaDescription.setText("");
         addImageLabel.reset();
     }
@@ -252,7 +252,7 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
-        PersonsUnion union = new PersonsUnion(itemAppData, creator, textName.getText(),
+        PersonsUnion union = new PersonsUnion(itemAppData, creator, nameField.getText(),
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(), textAreaDescription.getText(), (byte) 0);
 
         transaction = (IssuePersonRecord) Controller.getInstance().issuePerson(creator, exLink, feePow,

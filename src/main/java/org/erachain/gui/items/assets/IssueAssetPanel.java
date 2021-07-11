@@ -185,7 +185,7 @@ public class IssueAssetPanel extends IssueItemPanel {
     @Override
     protected void makeAppData() {
         itemAppData = AssetCls.makeAppData(!addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
+                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(), null, null,
                 tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients());
 
     }

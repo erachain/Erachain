@@ -200,7 +200,9 @@ public abstract class IssueItemPanel extends IconPanel {
     protected void makeAppData() {
         itemAppData = ItemCls.makeAppData(0L,
                 !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(), tagsField.getText());
+                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
+                null, null,
+                tagsField.getText());
 
     }
 

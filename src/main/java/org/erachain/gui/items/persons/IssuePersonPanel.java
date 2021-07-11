@@ -390,9 +390,11 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
             // соберем данные общего класса
             itemAppData = ItemCls.makeAppData(0L,
                     !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(), tagsField.getText(), null, null);
+                    !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
+                    null, null,
+                    tagsField.getText());
 
-            Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, itemAppData, creator,
+            Pair<Transaction, Integer> result = Controller.getInstance().issuePersonHuman(forIssue, itemAppData, creator,
                     exLink, nameField.getText(), feePow, birthday, deathday, gender,
                     "", //textPersonNumber.getText(),
                     birthLatitude,

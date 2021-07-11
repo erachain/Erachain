@@ -19,7 +19,7 @@ public class ItemClsTest {
 
     @Test
     public void parseAppData() {
-        byte[] appData = AssetCls.makeAppData(1L, true, 7, true, 7, null, null, "tags");
+        byte[] appData = ItemCls.makeAppData(1L, true, 7, true, 7, null, null, "tags");
         ItemCls item = new AssetUnique(appData, null, "String name", null, null, "String description", 3);
 
         assertEquals(item.getFlags(), 0L);
@@ -44,7 +44,7 @@ public class ItemClsTest {
         byte[] appdata = ItemCls.makeAppData(0L, false, 0, false, 0, null, null, null);
         assertEquals(appdata, null);
 
-        appdata = AssetCls.makeAppData(1L, true, 7, false, 7, null, null, "tags");
+        appdata = ItemCls.makeAppData(1L, true, 7, false, 7, null, null, "tags");
         assertEquals("10000000", Integer.toBinaryString(Byte.toUnsignedInt(appdata[0])));
         assertEquals("10000111", Integer.toBinaryString(Byte.toUnsignedInt(appdata[10])));
         assertEquals("111", Integer.toBinaryString(Byte.toUnsignedInt(appdata[11])));

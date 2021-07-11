@@ -92,16 +92,12 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     protected static final int DB_DATA_MASK = 1 << 30;
 
     // appDATA [10]
-    protected static final byte APP_DATA_ITEM_FLAGS_MASK = (byte) -128;
-    protected static final long ITEM_FLAGS_HAS_TAGS = 1L << (Long.SIZE - 1);
-
     protected static final byte APP_DATA_ITEM_START_MASK = (byte) 64;
     protected static final byte APP_DATA_ITEM_STOP_MASK = (byte) 32;
+
     // ITEM_FLAGS[0]
     protected static final byte ITEM_HAS_URL_MASK = (byte) -128;
-    //protected static final byte ITEM_HAS_IMAGE_URL_MASK = (byte) -128;
-    //protected static final long ITEM_ICON_TYPE_MASK = (4L + 2L + 1L) << 59; // маска Типа на 3 бита - 8 значений разных
-    //protected static final long ITEM_IMAGE_TYPE_MASK = (4L + 2L + 1L) << 56; // маска Типа на 3 бита - 8 значений разных
+    protected static final long ITEM_FLAGS_HAS_TAGS = 1L << (Long.SIZE - 1);
 
     /**
      * 0-1 - байты переключателей для включения обработчиков супер-класса и суб-классов
