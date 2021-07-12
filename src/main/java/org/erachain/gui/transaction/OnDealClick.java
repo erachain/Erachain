@@ -244,7 +244,7 @@ public class OnDealClick {
                 mess = "Option not exists";
                 break;
             case Transaction.INVALID_OUTSIDE_VALIDATY_PERIOD:
-                mess = "Action outside the validity period";
+                mess = "TX.INVALID_OUTSIDE_VALIDATY_PERIOD";
                 break;
 
             //case Transaction.ALREADY_VOTED_FOR_THAT_OPTION:

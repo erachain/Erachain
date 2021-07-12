@@ -1671,6 +1671,7 @@
   "Type/Domain": "Тип/Домен",
   "True": "Да",
   "true": "да",
+  "TX.INVALID_OUTSIDE_VALIDATY_PERIOD": "Действие вне срока действия",
   "Twin hashes": "Дублированный Хэш",
   "UI Settings": "Настройки Интерфейса",
   "Unconfirmed": "Неподтвержденный",

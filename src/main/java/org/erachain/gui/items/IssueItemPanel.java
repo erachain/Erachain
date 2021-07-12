@@ -26,7 +26,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
@@ -252,10 +251,11 @@ public abstract class IssueItemPanel extends IconPanel {
                 + im;
 
         if (item.hasStartDate() || item.hasStopDate()) {
-            out += "<br>" + Lang.T("Validity period") + ":"
+            out += Lang.T("Validity period") + ":"
                     + (item.hasStartDate() ? item.viewStartDate() : "-")
                     + " / "
-                    + (item.hasStopDate() ? item.viewStopDate() : "-");
+                    + (item.hasStopDate() ? item.viewStopDate() : "-")
+                    + "<br>";
         }
 
         return out;
@@ -386,15 +386,12 @@ public abstract class IssueItemPanel extends IconPanel {
 
         if (useStartStop) {
             // SET ONE TIME ZONE for Birthday
-            TimeZone tz = TimeZone.getDefault();
-            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-            Calendar calendar = Calendar.getInstance(tz);
+            Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
             startField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
             startField.setCalendar(calendar);
             stopField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
             stopField.setCalendar(calendar);
-            TimeZone.setDefault(tz);
 
             labelGBC.gridy = y;
             jPanelMain.add(new JLabel(Lang.T("Validity period") + ":"), labelGBC);
