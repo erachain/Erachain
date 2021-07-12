@@ -1,5 +1,6 @@
 package org.erachain.gui.items;
 
+import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -22,6 +23,10 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
@@ -49,6 +54,11 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JTextArea textAreaDescription = new JTextArea("");
     protected AddImageLabel addIconLabel;
     protected AddImageLabel addImageLabel;
+
+    protected JCheckBox startCheckBox = new JCheckBox(Lang.T("Start"));
+    protected JDateChooser startField;
+    protected JCheckBox stopCheckBox = new JCheckBox(Lang.T("Stop"));
+    protected JDateChooser stopField;
     protected JScrollPane jScrollPane2;
     protected JPanel jPanelMain = new javax.swing.JPanel();
     protected JPanel jPanelAdd = new javax.swing.JPanel();
@@ -116,6 +126,19 @@ public abstract class IssueItemPanel extends IconPanel {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 viewLinkParent();
+            }
+        });
+
+        startCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startField.setEnabled(startCheckBox.isSelected());
+            }
+        });
+        stopCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stopField.setEnabled(stopCheckBox.isSelected());
             }
         });
 
@@ -201,7 +224,8 @@ public abstract class IssueItemPanel extends IconPanel {
         itemAppData = ItemCls.makeAppData(0L,
                 !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
                 !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
-                null, null,
+                !startCheckBox.isSelected() ? null : startField.getCalendar().getTimeInMillis(),
+                !stopCheckBox.isSelected() ? null : stopField.getCalendar().getTimeInMillis(),
                 tagsField.getText());
 
     }
@@ -222,11 +246,19 @@ public abstract class IssueItemPanel extends IconPanel {
         if (!im.isEmpty())
             im += "<br>";
 
-        return Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
+        String out = Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
                 + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
                 + "[" + item.getKey() + "]" + Lang.T(nameLabel) + ":&nbsp;" + item.viewName() + "<br>"
                 + im;
 
+        if (item.hasStartDate() || item.hasStopDate()) {
+            out += "<br>" + Lang.T("Validity period") + ":"
+                    + (item.hasStartDate() ? item.viewStartDate() : "-")
+                    + " / "
+                    + (item.hasStopDate() ? item.viewStopDate() : "-");
+        }
+
+        return out;
     }
 
     protected PrivateKeyAccount creator;
@@ -314,45 +346,66 @@ public abstract class IssueItemPanel extends IconPanel {
         fieldGBC.gridy = y++;
         jPanelMain.add(fromJComboBox, fieldGBC);
 
-        if (true) {
-            labelGBC.gridy = y;
-            jPanelMain.add(exLinkTextLabel, labelGBC);
+        labelGBC.gridy = y;
+        jPanelMain.add(exLinkTextLabel, labelGBC);
 
-            exLinkText.setToolTipText(Lang.T("IssueItemPanel.exLinkText"));
+        exLinkText.setToolTipText(Lang.T("IssueItemPanel.exLinkText"));
 
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 8;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.gridwidth = 5;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 0.1;
-            gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
-            jPanelMain.add(exLinkText, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = fieldGBC.gridx;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanelMain.add(exLinkText, gridBagConstraints);
 
-            exLinkDescriptionLabel.setText(Lang.T("Parent") + ":");
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 13;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-            gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-            jPanelMain.add(exLinkDescriptionLabel, gridBagConstraints);
+        exLinkDescriptionLabel.setText(Lang.T("Parent") + ":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 13;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(exLinkDescriptionLabel, gridBagConstraints);
 
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 15;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 12;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 0.9;
-            gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-            jPanelMain.add(exLinkDescription, gridBagConstraints);
-        }
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 15;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridwidth = 12;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.9;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        jPanelMain.add(exLinkDescription, gridBagConstraints);
 
         labelGBC.gridy = y;
         jPanelMain.add(nameJLabel, labelGBC);
 
         fieldGBC.gridy = y++;
         jPanelMain.add(nameField, fieldGBC);
+
+        // SET ONE TIME ZONE for Birthday
+        TimeZone tz = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        Calendar calendar = Calendar.getInstance(tz);
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        startField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+        startField.setCalendar(calendar);
+        stopField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+        stopField.setCalendar(calendar);
+        TimeZone.setDefault(tz);
+
+        labelGBC.gridy = y;
+        jPanelMain.add(new JLabel(Lang.T("Validity period") + ":"), labelGBC);
+        JPanel startStop = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        startStop.add(startCheckBox);
+        startField.setEnabled(false);
+        startStop.add(startField);
+        startStop.add(stopCheckBox);
+        stopField.setEnabled(false);
+        startStop.add(stopField);
+        fieldGBC.gridy = y++;
+        jPanelMain.add(startStop, fieldGBC);
 
         labelGBC.gridy = y;
         jPanelMain.add(tagsJLabel, labelGBC);

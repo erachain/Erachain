@@ -20,6 +20,8 @@ import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.Iconable;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -315,6 +317,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             if (startDate != null) {
                 appData[0] |= APP_DATA_ITEM_START_MASK;
                 appData = Bytes.concat(appData, Longs.toByteArray(startDate));
+                if (stopDate != null && stopDate < startDate) {
+                    stopDate = null;
+                }
             }
             if (stopDate != null) {
                 appData[0] |= APP_DATA_ITEM_STOP_MASK;
@@ -629,6 +634,31 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public boolean hasImageURL() {
         return imageAsURL;
     }
+
+    public boolean hasStartDate() {
+        return startDate != null;
+    }
+
+    public boolean hasStopDate() {
+        return stopDate != null;
+    }
+
+    public long getStartDate() {
+        return startDate;
+    }
+
+    public long getStopDate() {
+        return stopDate;
+    }
+
+    public String viewStartDate() {
+        return DateTimeFormat.timestamptoString(this.startDate, Settings.getInstance().getBirthTimeFormat(), "UTC");
+    }
+
+    public String viewStopDate() {
+        return DateTimeFormat.timestamptoString(this.stopDate, Settings.getInstance().getBirthTimeFormat(), "UTC");
+    }
+
 
     public String getImageURL() {
         if (imageAsURL) {
