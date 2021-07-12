@@ -328,7 +328,7 @@ public abstract class IssueItemPanel extends IconPanel {
     //
     // выводит верхние поля панели
     // возвращает номер сроки с которой можно продолжать вывод инфы на панель
-    protected int initTopArea() {
+    protected int initTopArea(boolean useStartStop) {
         int y = 0;
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -384,28 +384,30 @@ public abstract class IssueItemPanel extends IconPanel {
         fieldGBC.gridy = y++;
         jPanelMain.add(nameField, fieldGBC);
 
-        // SET ONE TIME ZONE for Birthday
-        TimeZone tz = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        Calendar calendar = Calendar.getInstance(tz);
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        startField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
-        startField.setCalendar(calendar);
-        stopField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
-        stopField.setCalendar(calendar);
-        TimeZone.setDefault(tz);
+        if (useStartStop) {
+            // SET ONE TIME ZONE for Birthday
+            TimeZone tz = TimeZone.getDefault();
+            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+            Calendar calendar = Calendar.getInstance(tz);
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            startField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+            startField.setCalendar(calendar);
+            stopField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+            stopField.setCalendar(calendar);
+            TimeZone.setDefault(tz);
 
-        labelGBC.gridy = y;
-        jPanelMain.add(new JLabel(Lang.T("Validity period") + ":"), labelGBC);
-        JPanel startStop = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        startStop.add(startCheckBox);
-        startField.setEnabled(false);
-        startStop.add(startField);
-        startStop.add(stopCheckBox);
-        stopField.setEnabled(false);
-        startStop.add(stopField);
-        fieldGBC.gridy = y++;
-        jPanelMain.add(startStop, fieldGBC);
+            labelGBC.gridy = y;
+            jPanelMain.add(new JLabel(Lang.T("Validity period") + ":"), labelGBC);
+            JPanel startStop = new JPanel(new FlowLayout(FlowLayout.LEADING));
+            startStop.add(startCheckBox);
+            startField.setEnabled(false);
+            startStop.add(startField);
+            startStop.add(stopCheckBox);
+            stopField.setEnabled(false);
+            startStop.add(stopField);
+            fieldGBC.gridy = y++;
+            jPanelMain.add(startStop, fieldGBC);
+        }
 
         labelGBC.gridy = y;
         jPanelMain.add(tagsJLabel, labelGBC);

@@ -111,6 +111,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
     protected int initComponents(boolean andBottom) {
         super.initComponents();
 
+
         registrarAddress = new RecipientAddress(this);
 
         exLinkTextLabel.setVisible(!andBottom);
@@ -125,7 +126,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         addIconLabel.setEditable(andBottom);
 
         // вывод верхней панели
-        int gridy = super.initTopArea();
+        int gridy = super.initTopArea(false);
 
         issueJButton.setText(Lang.T("Create and copy to clipboard"));
         //issueJButton.addActionListener(e -> onIssueClick());

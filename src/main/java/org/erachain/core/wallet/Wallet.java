@@ -16,6 +16,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.*;
+import org.erachain.database.DBASet;
 import org.erachain.database.wallet.AccountMap;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
@@ -575,7 +576,16 @@ public class Wallet extends Observable implements Observer {
 			this.dwSet.clearCache();
 
 			// RESET MAPS
-			dwSet.clear(false);
+			try {
+				dwSet.clear(false);
+			} catch (NullPointerException e) {
+				// видимо цепочку другую взяли и в ней таких сущностей нет и падает на создании меток
+				DBASet.setVersion(this.dwSet.database, 1);
+				this.dwSet.hardFlush();
+				this.dwSet.close();
+				dwSet = DWSet.reCreateDB(dcSet, dwSet.isWithObserver(), dwSet.isDynamicGUI());
+
+			}
 
 			LOGGER.info("   >>>>  Maps was Resetted");
 

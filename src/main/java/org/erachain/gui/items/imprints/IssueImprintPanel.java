@@ -29,7 +29,7 @@ public class IssueImprintPanel extends IssueItemPanel {
         initComponents();
 
         // вывод верхней панели
-        int y = initTopArea();
+        int y = initTopArea(true);
 
         int gridy = y;
 

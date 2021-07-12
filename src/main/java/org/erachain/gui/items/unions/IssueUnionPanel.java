@@ -103,7 +103,7 @@ public class IssueUnionPanel extends IssueItemPanel {
 
         super.initComponents();
 
-        int gridyParent = initTopArea();
+        int gridyParent = initTopArea(true);
         int gridy = 1;
 
         int gridwidth = fieldGBC.gridwidth;

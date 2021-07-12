@@ -69,7 +69,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         super.initComponents();
 
         // вывод верхней панели
-        int gridy = super.initTopArea();
+        int gridy = super.initTopArea(true);
 
         labelGBC.gridy = gridy;
         jPanelAdd.add(typeJLabel, labelGBC);

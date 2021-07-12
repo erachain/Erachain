@@ -29,7 +29,7 @@ public class IssuePollPanel extends IssueItemPanel {
         optionsTableModel = new CreateOptionsTableModel(new Object[]{Lang.T("Name")}, 0);
 
         // вывод верхней панели
-        int gridy = initTopArea();
+        int gridy = initTopArea(true);
 
         JLabel optionsLabel = new JLabel(Lang.T("Options") + ":");
         labelGBC.gridy = gridy;

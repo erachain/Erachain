@@ -90,7 +90,7 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
         addIconLabel.setEditable(andBottom);
 
         // вывод верхней панели
-        int gridy = super.initTopArea();
+        int gridy = super.initTopArea(false);
 
         issueJButton.setText(Lang.T("Create and copy to clipboard"));
         //issueJButton.addActionListener(e -> onIssueClick());
