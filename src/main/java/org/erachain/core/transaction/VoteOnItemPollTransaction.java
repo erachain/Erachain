@@ -281,6 +281,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         }
 
         if (!poll.isActive(timestamp)) {
+            errorValue = poll.errorValue;
             return INVALID_OUTSIDE_VALIDATY_PERIOD;
         }
 

@@ -600,7 +600,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         boolean wrong;
 
         if (!asset.isActive(timestamp)) {
-            return new Fun.Tuple2<>(INVALID_OUTSIDE_VALIDATY_PERIOD, null);
+            return new Fun.Tuple2<>(INVALID_OUTSIDE_VALIDATY_PERIOD, asset.errorValue);
         }
 
         if (asset.isUnique() && !amount.abs().stripTrailingZeros().equals(BigDecimal.ONE)) {

@@ -660,8 +660,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public boolean isActive(long timestamp) {
-        return (startDate == null || timestamp >= startDate)
-                && (stopDate == null || timestamp < stopDate);
+        if (startDate != null && timestamp < startDate) {
+            errorValue = "< " + viewStartDate();
+            return false;
+        }
+        if (stopDate != null && timestamp >= stopDate) {
+            errorValue = ">= " + viewStopDate();
+            return false;
+        }
+        return true;
     }
 
     public String getImageURL() {

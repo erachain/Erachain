@@ -449,8 +449,12 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (this.haveAsset == null || this.wantAsset == null)
             return ITEM_ASSET_NOT_EXIST;
 
-        if (!haveAsset.isActive(timestamp) || !wantAsset.isActive(timestamp)) {
-            errorValue = wantAsset.isActive(timestamp) ? "Have asset" : "Want asset";
+        if (!haveAsset.isActive(timestamp)) {
+            errorValue = haveAsset.errorValue + " " + "Have asset";
+            return INVALID_OUTSIDE_VALIDATY_PERIOD;
+        }
+        if (!wantAsset.isActive(timestamp)) {
+            errorValue = wantAsset.errorValue + " " + "Want asset";
             return INVALID_OUTSIDE_VALIDATY_PERIOD;
         }
 
