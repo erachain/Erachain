@@ -659,6 +659,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return DateTimeFormat.timestamptoString(this.stopDate, Settings.getInstance().getBirthTimeFormat(), "UTC");
     }
 
+    public boolean isActive(long timestamp) {
+        return (startDate == null || timestamp >= startDate)
+                && (stopDate == null || timestamp < stopDate);
+    }
 
     public String getImageURL() {
         if (imageAsURL) {
@@ -1163,6 +1167,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         String imageURL = getImageURL();
         if (imageURL != null)
             itemJSON.put("imageURL", imageURL);
+
+        if (startDate != null)
+            itemJSON.put("startDate", startDate);
+        if (stopDate != null)
+            itemJSON.put("stopDate", stopDate);
 
         return itemJSON;
     }

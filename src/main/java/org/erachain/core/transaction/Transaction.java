@@ -224,6 +224,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int ITEM_DUPLICATE = 214;
     public static final int INVALID_TIMESTAMP_START = 215;
     public static final int INVALID_TIMESTAMP_END = 216;
+    public static final int INVALID_OUTSIDE_VALIDATY_PERIOD = 217;
 
     public static final int INVALID_ASSET_TYPE = 222;
 
