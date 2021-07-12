@@ -1201,7 +1201,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             } else {
                 result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                         key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
-                        backward, totalFeeBG, null, creatorIsPerson, actionFlags);
+                        backward, totalFeeBG, null, creatorIsPerson, actionFlags, rNote.getTimestamp());
                 if (result.a != Transaction.VALIDATE_OK) {
                     errorValue = result.b + " - Accruals: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
                     return result.a;
@@ -1226,7 +1226,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
                     result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                             key, asset, signs.b > 0 ? amount : amount.negate(), recipient,
-                            backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
+                            backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags, rNote.getTimestamp());
 
                     if (result.a != Transaction.VALIDATE_OK) {
                         errorValue = result.b + " - Accruals: " + amount.toPlainString() + " -> " + recipient.getAddress();

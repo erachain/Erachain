@@ -281,7 +281,7 @@ public class TransactionCreator {
 	}
 */
 
-    public Pair<Transaction, Integer> createIssuePersonTransaction(
+    public Pair<Transaction, Integer> createIssuePersonHumanTransaction(
             boolean forIssue,
             byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String fullName, int feePow, long birthday, long deathday,
             byte gender, String race, float birthLatitude, float birthLongitude,
@@ -357,7 +357,7 @@ public class TransactionCreator {
         }
     }
 
-    public Pair<Transaction, Integer> createIssuePersonTransaction(
+    public Pair<Transaction, Integer> createIssuePersonHumanTransaction(
             PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
         //CHECK FOR UPDATES
         this.checkUpdate();
@@ -385,6 +385,21 @@ public class TransactionCreator {
 
     }
 
+    public Transaction createIssuePersonTransaction(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
+        //CHECK FOR UPDATES
+        this.checkUpdate();
+
+        //TIME
+        long time = NTP.getTime();
+
+        //CREATE ISSUE TRANSACTION
+        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, person, (byte) feePow, time, 0L);
+        issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
+        issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
+
+        return issuePersonRecord;
+    }
+
     public Transaction createIssuePollTransaction(PrivateKeyAccount creator, ExLink linkTo, int feePow, PollCls poll) {
         //CHECK FOR UPDATES
         this.checkUpdate();
@@ -393,11 +408,11 @@ public class TransactionCreator {
         long time = NTP.getTime();
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssuePollRecord issueStatusRecord = new IssuePollRecord(creator, linkTo, poll, (byte) feePow, time, 0L);
-        issueStatusRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueStatusRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
+        IssuePollRecord issuePollRecord = new IssuePollRecord(creator, linkTo, poll, (byte) feePow, time, 0L);
+        issuePollRecord.sign(creator, Transaction.FOR_NETWORK);
+        issuePollRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
-        return issueStatusRecord;
+        return issuePollRecord;
     }
 
     public Transaction createIssuePollTransaction(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, String description,

@@ -100,7 +100,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.4 dev";
+    public static String version = "5.4 dev 01";
     public static String buildTime = "2021-05-05 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -3252,19 +3252,19 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Transaction, Integer> issuePerson(boolean forIssue, byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String fullName,
-                                                  int feePow, long birthday, long deathday, byte gender, String race, float birthLatitude,
-                                                  float birthLongitude, String skinColor, String eyeColor, String hairСolor, int height, byte[] icon,
-                                                  byte[] image, String description, PublicKeyAccount owner, byte[] ownerSignature) {
+    public Pair<Transaction, Integer> issuePersonHuman(boolean forIssue, byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String fullName,
+                                                       int feePow, long birthday, long deathday, byte gender, String race, float birthLatitude,
+                                                       float birthLongitude, String skinColor, String eyeColor, String hairСolor, int height, byte[] icon,
+                                                       byte[] image, String description, PublicKeyAccount owner, byte[] ownerSignature) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.createIssuePersonTransaction(forIssue, itemAppData, creator, linkTo, fullName, feePow, birthday,
+            return this.transactionCreator.createIssuePersonHumanTransaction(forIssue, itemAppData, creator, linkTo, fullName, feePow, birthday,
                     deathday, gender, race, birthLatitude, birthLongitude, skinColor, eyeColor, hairСolor, height, icon,
                     image, description, owner, ownerSignature);
         }
     }
 
-    public Object issuePerson(HttpServletRequest request, String x) {
+    public Object issuePersonHuman(HttpServletRequest request, String x) {
 
         JSONObject out = new JSONObject();
 
@@ -3387,11 +3387,18 @@ public class Controller extends Observable {
                 skinColor, eyeColor, hairСolor, height, icon, image, description,
                 ownerSignature);
 
-        return issuePerson(creatorPrivate, linkTo, feePow, person);
+        return issuePersonHuman(creatorPrivate, linkTo, feePow, person);
 
     }
 
-    public Pair<Transaction, Integer> issuePerson(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
+    public Pair<Transaction, Integer> issuePersonHuman(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssuePersonHumanTransaction(creator, linkTo, feePow, person);
+        }
+    }
+
+    public Transaction issuePerson(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createIssuePersonTransaction(creator, linkTo, feePow, person);
