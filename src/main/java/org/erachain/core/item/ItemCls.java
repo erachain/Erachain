@@ -965,7 +965,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         data = Bytes.concat(data, this.image);
 
         /// APP DATA
-        if (hasAppData) {
+        if (useAll && hasAppData) {
             // WRITE APP DATA LENGTH
             data = Bytes.concat(data, Ints.toByteArray(this.appData.length));
             data = Bytes.concat(data, this.appData);
