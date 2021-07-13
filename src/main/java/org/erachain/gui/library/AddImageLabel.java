@@ -299,35 +299,6 @@ public class AddImageLabel extends JPanel {
 
                             mediaBytes = imageStream.toByteArray();
 
-                            int templWidth = bufferedImage.getWidth();
-                            int templHeight = bufferedImage.getHeight();
-                            int counter = 0;
-
-                            if (false && minSize > 0 && mediaBytes.length < minSize) {
-                                while (mediaBytes.length < minSize && counter++ < 100) {
-                                    imageStream.reset();
-                                    templWidth *= 1.2;
-                                    templHeight *= 1.2;
-                                    Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
-                                    writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
-                                }
-
-                            } else if (false && maxSize > 0 && mediaBytes.length > maxSize) {
-                                while (mediaBytes.length > maxSize && counter++ < 100) {
-                                    imageStream.reset();
-                                    templWidth /= 1.2;
-                                    templHeight /= 1.2;
-                                    Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
-                                    writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
-                                }
-
-                            } else if (false && typeOfImage == TypeOfImage.JPEG) {
-                                // преобразуем GIF с прозрачным фоном в непрозрачный если надо
-                                // это может понадобиться если Оригинальный размер картинки взяли и не было преобразования в snapshot в ImageCropDisplayPanelNavigator2D.getSnapshot
-                                Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
-                                writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
-                            }
-
                             labelSize.setText(Lang.T("Size") + ": " + (mediaBytes.length >> 10) + " kB");
 
                         } catch (Exception e) {
@@ -336,19 +307,6 @@ public class AddImageLabel extends JPanel {
 
                     }
 
-                    private void writeImage(ByteArrayOutputStream imageStream, int templWidth, int templHeight, Image scaledImage, TypeOfImage typeOfImage) throws IOException {
-                        BufferedImage image;
-                        if (typeOfImage == TypeOfImage.GIF) {
-                            image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_ARGB);
-                            image.getGraphics().drawImage(scaledImage, 0, 0, null);
-                            ImageIO.write(image, "gif", imageStream);
-                        } else {
-                            image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_RGB);
-                            image.getGraphics().drawImage(scaledImage, 0, 0, Color.WHITE, null);
-                            ImageIO.write(image, "jpeg", imageStream);
-                        }
-                        mediaBytes = imageStream.toByteArray();
-                    }
                 };
             }
         }

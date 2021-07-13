@@ -96,6 +96,7 @@ public abstract class IssueItemPanel extends IconPanel {
                 Toolkit.getDefaultToolkit().getImage("images/icons/add-media.png"));
         addImageLabel.setBorder(null);
         addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        addImageLabel.setPreferredSize(new Dimension(cropWidth, cropHeight));
 
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
