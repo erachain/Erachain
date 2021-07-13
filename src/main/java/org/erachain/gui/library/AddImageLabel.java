@@ -41,6 +41,8 @@ public class AddImageLabel extends JPanel {
     private JLabel label;
     private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
+    private JScrollPane jScrollImage = new JScrollPane();
+
     public JTextField externalURL = new JTextField();
     public JComboBox externalURLType = new JComboBox(new String[]{Lang.T("Image"), Lang.T("Video"), Lang.T("Audio")});
 
@@ -52,28 +54,39 @@ public class AddImageLabel extends JPanel {
 
         this.emptyImage = emptyImage;
 
-        setLayout(new BorderLayout());
-        JPanel panelTop = new JPanel();
-        panelTop.setLayout(new BorderLayout());
-        panelTop.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        add(panelTop, BorderLayout.NORTH);
+        JPanel panelScroll = new JPanel();
+        panelScroll.add(mainLabel);
+
+        //mainLabel.setMinimumSize(new Dimension(initialWidth - 50, initialHeight - 50));
+        //mainLabel.setPreferredSize(new Dimension(initialWidth + 50, initialHeight + 50));
+        //mainLabel.setMaximumSize(new Dimension(initialWidth << 1, initialHeight << 1));
+        //jScrollImage.setMinimumSize(new Dimension(initialWidth - 50, initialHeight - 50));
+        //jScrollImage.setPreferredSize(new Dimension(initialWidth + 250, initialHeight + 250));
+        //jScrollImage.setMaximumSize(new Dimension(initialWidth << 1, initialHeight << 1));
+        jScrollImage.setViewportView(panelScroll);
+
+        //setLayout(new BorderLayout());
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        //panelTop.setCursor(new Cursor(Cursor.HAND_CURSOR));
         this.text = text;
         label = new JLabel(text, SwingConstants.CENTER);
-        panelTop.add(label, BorderLayout.NORTH);
-        panelTop.add(mainLabel, BorderLayout.CENTER);
-        panelTop.add(labelSize, BorderLayout.SOUTH);
+        add(label);
+        add(jScrollImage);
+        add(labelSize);
 
         JButton externalURLCheck = new JButton(Lang.T("Check URL"));
         if (useExtURL) {
-            JPanel panelCenter = new JPanel();
-            panelCenter.setLayout(new BorderLayout());
-            add(panelCenter, BorderLayout.CENTER);
+            JPanel panelURLLine1 = new JPanel();
+            panelURLLine1.setLayout(new BoxLayout(panelURLLine1, BoxLayout.X_AXIS));
 
-            panelCenter.add(new JLabel(Lang.T("Use URL") + ":"), BorderLayout.NORTH);
-            panelCenter.add(externalURLType, BorderLayout.EAST);
+            panelURLLine1.add(new JLabel(Lang.T("Use URL") + ":"));
+            panelURLLine1.add(externalURLType);
+            add(panelURLLine1);
+
             externalURL.setToolTipText(Lang.T("AddImageLabel.externalURL.tip"));
-            panelCenter.add(externalURL, BorderLayout.CENTER);
-            panelCenter.add(externalURLCheck, BorderLayout.SOUTH);
+            add(externalURL);
+            add(externalURLCheck);
+
         }
 
         this.baseWidth = baseWidth;
@@ -86,7 +99,17 @@ public class AddImageLabel extends JPanel {
         mainLabel.setVerticalAlignment(SwingConstants.TOP);
         mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        panelTop.addMouseListener(new MouseAdapter() {
+        jScrollImage.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (editable) {
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        addImage(minSize, maxSize, originalSize);
+                    }
+                }
+            }
+        });
+        jScrollImage.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (editable) {
@@ -256,7 +279,6 @@ public class AddImageLabel extends JPanel {
                             if (chooser.getSelectedFile().getPath().toLowerCase().endsWith(".gif")
                                     || chooser.getSelectedFile().getPath().toLowerCase().endsWith(".png")) {
                                 mainLabel.setIcon(new ImageIcon(url));
-                                ///mainLabel.setPreferredSize(new Dimension(100, 100));
                             } else {
                                 mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
                             }
@@ -271,10 +293,10 @@ public class AddImageLabel extends JPanel {
 
                         int bufferedWidth = bufferedImage.getWidth();
                         int preferredWidth = mainLabel.getPreferredSize().width;
-                        preferredWidth = 250;
+                        //preferredWidth = 250;
 
                         ImageIcon imageIcon;
-                        // под размеры поля подгоним чтобы поле не обрезало каритнку
+                        // под размеры поля подгоним чтобы поле не обрезало картинку
                         if (bufferedWidth > preferredWidth) {
                             float scaleView = (float) preferredWidth / bufferedWidth;
                             Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
