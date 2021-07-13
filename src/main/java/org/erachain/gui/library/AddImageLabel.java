@@ -57,34 +57,28 @@ public class AddImageLabel extends JPanel {
         JPanel panelScroll = new JPanel();
         panelScroll.add(mainLabel);
 
-        //mainLabel.setMinimumSize(new Dimension(initialWidth - 50, initialHeight - 50));
-        //mainLabel.setPreferredSize(new Dimension(initialWidth + 50, initialHeight + 50));
-        //mainLabel.setMaximumSize(new Dimension(initialWidth << 1, initialHeight << 1));
-        //jScrollImage.setMinimumSize(new Dimension(initialWidth - 50, initialHeight - 50));
-        //jScrollImage.setPreferredSize(new Dimension(initialWidth + 250, initialHeight + 250));
-        //jScrollImage.setMaximumSize(new Dimension(initialWidth << 1, initialHeight << 1));
+        jScrollImage.setMinimumSize(new Dimension(initialWidth, initialHeight));
         jScrollImage.setViewportView(panelScroll);
 
         //setLayout(new BorderLayout());
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        //panelTop.setCursor(new Cursor(Cursor.HAND_CURSOR));
         this.text = text;
-        label = new JLabel(text, SwingConstants.CENTER);
+        label = new JLabel(text); //, SwingConstants.CENTER);
         add(label);
         add(jScrollImage);
         add(labelSize);
 
         JButton externalURLCheck = new JButton(Lang.T("Check URL"));
         if (useExtURL) {
+            add(new JLabel(Lang.T("Use URL") + ":", SwingConstants.LEFT));
+
             JPanel panelURLLine1 = new JPanel();
             panelURLLine1.setLayout(new BoxLayout(panelURLLine1, BoxLayout.X_AXIS));
-
-            panelURLLine1.add(new JLabel(Lang.T("Use URL") + ":"));
+            externalURL.setToolTipText(Lang.T("AddImageLabel.externalURL.tip"));
+            panelURLLine1.add(externalURL);
             panelURLLine1.add(externalURLType);
             add(panelURLLine1);
 
-            externalURL.setToolTipText(Lang.T("AddImageLabel.externalURL.tip"));
-            add(externalURL);
             add(externalURLCheck);
 
         }
@@ -96,10 +90,12 @@ public class AddImageLabel extends JPanel {
         mainLabel.setIcon(createEmptyImage(Color.WHITE, this.initialWidth, this.initialHeight));
 
         setBorder(BorderFactory.createEtchedBorder());
-        mainLabel.setVerticalAlignment(SwingConstants.TOP);
-        mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        mainLabel.setBorder(BorderFactory.createEtchedBorder());
+        //mainLabel.setVerticalAlignment(SwingConstants.TOP);
+        //mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        jScrollImage.addMouseListener(new MouseAdapter() {
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        label.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (editable) {
@@ -109,6 +105,7 @@ public class AddImageLabel extends JPanel {
                 }
             }
         });
+        jScrollImage.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jScrollImage.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
