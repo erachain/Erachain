@@ -7,7 +7,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
-import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -48,7 +47,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
     private JLabel labelPublicKey = new JLabel();
     protected MButton pasteButton;
 
-    protected PersonHuman person;
+    protected PersonCls person;
 
     public InsertPersonPanel() {
         super(NAME, TITLE, "Person issue has been sent!");
@@ -243,7 +242,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         person = null;
         reset();
         try {
-            person = (PersonHuman) PersonFactory.getInstance().parse(Transaction.FOR_NETWORK, dataPerson, false);
+            person = (PersonCls) PersonFactory.getInstance().parse(Transaction.FOR_NETWORK, dataPerson, false);
         } catch (Exception ee) {
             JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.T("Error"),
                     JOptionPane.ERROR_MESSAGE);

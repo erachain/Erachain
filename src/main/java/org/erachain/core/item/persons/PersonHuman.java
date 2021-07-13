@@ -12,7 +12,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.utils.ByteArrayUtils;
 import org.json.simple.JSONObject;
 
@@ -23,9 +22,6 @@ import java.util.Arrays;
 public class PersonHuman extends PersonCls {
 
     private static final int TYPE_ID = HUMAN;
-
-    // for personal data maker - his signature
-    protected byte[] makerSignature;
 
     public PersonHuman(byte[] appData, PublicKeyAccount maker, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
@@ -261,14 +257,6 @@ public class PersonHuman extends PersonCls {
         return 5;
     }
 
-    public byte[] getMakerSignature() {
-        return makerSignature;
-    }
-
-    public boolean isMustBeSigned() {
-        return typeBytes[1] == (byte) 1;
-    }
-
     public byte[] toBytes(int forDeal, boolean includeReference, boolean onlyBody) {
         byte[] data = super.toBytes(forDeal, includeReference, onlyBody);
         if (this.typeBytes[1] == 1) {
@@ -315,34 +303,6 @@ public class PersonHuman extends PersonCls {
         this.makerSignature = Crypto.getInstance().sign(maker, data);
         this.typeBytes[1] = (byte) 1;
 
-    }
-
-    public boolean isSignatureValid(DCSet dcSet) {
-
-        if (this.makerSignature == null || this.makerSignature.length != Crypto.SIGNATURE_LENGTH
-                || Arrays.equals(this.makerSignature, new byte[Crypto.SIGNATURE_LENGTH]))
-            return false;
-
-        if (dcSet.getBlocksHeadsMap().size() < BlockChain.SKIP_VALID_SIGN_BEFORE) {
-            // for skip NOT VALID SIGNs
-            for (byte[] valid_item : BlockChain.VALID_SIGN) {
-                if (Arrays.equals(this.reference, valid_item)) {
-                    if (dcSet.getTransactionFinalMapSigns().contains(this.reference))
-                        return false;
-                    else
-                        return true;
-                }
-            }
-        }
-
-        boolean includeReference = false;
-        boolean forMakerSign = true;
-        // not use SIGNATURE here
-        byte[] data = super.toBytes(Transaction.FOR_NETWORK, includeReference, forMakerSign);
-        if (data == null)
-            return false;
-
-        return Crypto.getInstance().verify(this.maker.getPublicKey(), this.makerSignature, data);
     }
 
 }

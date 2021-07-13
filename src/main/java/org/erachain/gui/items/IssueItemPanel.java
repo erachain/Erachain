@@ -26,6 +26,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
+import java.util.Date;
 
 import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
@@ -385,12 +386,10 @@ public abstract class IssueItemPanel extends IconPanel {
         jPanelMain.add(nameField, fieldGBC);
 
         if (useStartStop) {
-            // SET ONE TIME ZONE for Birthday
             Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            startField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+            startField = new JDateChooser(new Date(System.currentTimeMillis()), "yyyy-MM-dd HH:mm z");
             startField.setCalendar(calendar);
-            stopField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+            stopField = new JDateChooser(new Date(System.currentTimeMillis()), "yyyy-MM-dd HH:mm z");
             stopField.setCalendar(calendar);
 
             labelGBC.gridy = y;
