@@ -187,11 +187,10 @@ public abstract class IssueItemPanel extends IconPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.gridheight = 18;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weighty = 0.2;
-        gridBagConstraints.weightx = 0.9;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.weighty = 0.7;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanelMain.add(jPanelLeft, gridBagConstraints);
 
         add(jPanelMain);

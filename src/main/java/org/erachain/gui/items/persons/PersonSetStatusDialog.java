@@ -102,8 +102,6 @@ public class PersonSetStatusDialog extends JDialog {
         jComboBox_YourAddress.setModel(new AccountsComboBoxModel());
         jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         JPanel info = new PersonInfo002(person, false);
-        //info.show_001(person);
-        info.setFocusable(false);
         jLabel_PersonInfo.setViewportView(info);
         jFormattedTextField_fromDate.setDateFormatString("yyyy-MM-dd");
         jFormattedTextField_toDate.setDateFormatString("yyyy-MM-dd");
