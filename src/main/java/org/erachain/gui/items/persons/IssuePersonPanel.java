@@ -144,9 +144,6 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
         txtBirthday.setFont(UIManager.getFont("TextField.font"));
         txtDeathDay.setFont(UIManager.getFont("TextField.font"));
 
-        int gridwidth = fieldGBC.gridwidth;
-        fieldGBC.gridwidth = 2;
-
         // gender
         labelGBC.gridy = gridy;
         jPanelAdd.add(jLabelGender, labelGBC);
@@ -176,9 +173,9 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
         //BirthLatitude
         labelGBC.gridy = gridy;
-        //jPanelAdd.add(jLabelBirthLatitudeLongtitude, labelGBC);
+        jPanelAdd.add(jLabelBirthLatitudeLongtitude, labelGBC);
         fieldGBC.gridy = gridy++;
-        //jPanelAdd.add(txtBirthLatitude, fieldGBC);
+        jPanelAdd.add(txtBirthLatitude, fieldGBC);
 
         //HairСolor
         labelGBC.gridy = gridy;
@@ -249,15 +246,6 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                 }
             }
         });
-
-       /* // set acoount TO
-        this.registrarAddress.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                refreshReceiverDetails();
-            }
-        });*/
-
-        fieldGBC.gridwidth = gridwidth;
 
         if (andBottom) {
             // вывод подвала
