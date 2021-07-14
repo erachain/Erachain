@@ -41,6 +41,8 @@ public class AddImageLabel extends JPanel {
     private JLabel label;
     private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
+    private JScrollPane jScrollImage = new JScrollPane();
+
     public JTextField externalURL = new JTextField();
     public JComboBox externalURLType = new JComboBox(new String[]{Lang.T("Image"), Lang.T("Video"), Lang.T("Audio")});
 
@@ -52,28 +54,33 @@ public class AddImageLabel extends JPanel {
 
         this.emptyImage = emptyImage;
 
-        setLayout(new BorderLayout());
-        JPanel panelTop = new JPanel();
-        panelTop.setLayout(new BorderLayout());
-        panelTop.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        add(panelTop, BorderLayout.NORTH);
+        JPanel panelScroll = new JPanel();
+        panelScroll.add(mainLabel);
+
+        jScrollImage.setMinimumSize(new Dimension(initialWidth, initialHeight));
+        jScrollImage.setViewportView(panelScroll);
+
+        //setLayout(new BorderLayout());
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.text = text;
-        label = new JLabel(text, SwingConstants.CENTER);
-        panelTop.add(label, BorderLayout.NORTH);
-        panelTop.add(mainLabel, BorderLayout.CENTER);
-        panelTop.add(labelSize, BorderLayout.SOUTH);
+        label = new JLabel(text); //, SwingConstants.CENTER);
+        add(label);
+        add(jScrollImage);
+        add(labelSize);
 
         JButton externalURLCheck = new JButton(Lang.T("Check URL"));
         if (useExtURL) {
-            JPanel panelCenter = new JPanel();
-            panelCenter.setLayout(new BorderLayout());
-            add(panelCenter, BorderLayout.CENTER);
+            add(new JLabel(Lang.T("Use URL") + ":", SwingConstants.LEFT));
 
-            panelCenter.add(new JLabel(Lang.T("Use URL") + ":"), BorderLayout.NORTH);
-            panelCenter.add(externalURLType, BorderLayout.EAST);
+            JPanel panelURLLine1 = new JPanel();
+            panelURLLine1.setLayout(new BoxLayout(panelURLLine1, BoxLayout.X_AXIS));
             externalURL.setToolTipText(Lang.T("AddImageLabel.externalURL.tip"));
-            panelCenter.add(externalURL, BorderLayout.CENTER);
-            panelCenter.add(externalURLCheck, BorderLayout.SOUTH);
+            panelURLLine1.add(externalURL);
+            panelURLLine1.add(externalURLType);
+            add(panelURLLine1);
+
+            add(externalURLCheck);
+
         }
 
         this.baseWidth = baseWidth;
@@ -83,10 +90,23 @@ public class AddImageLabel extends JPanel {
         mainLabel.setIcon(createEmptyImage(Color.WHITE, this.initialWidth, this.initialHeight));
 
         setBorder(BorderFactory.createEtchedBorder());
-        mainLabel.setVerticalAlignment(SwingConstants.TOP);
-        mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        mainLabel.setBorder(BorderFactory.createEtchedBorder());
+        //mainLabel.setVerticalAlignment(SwingConstants.TOP);
+        //mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        panelTop.addMouseListener(new MouseAdapter() {
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (editable) {
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        addImage(minSize, maxSize, originalSize);
+                    }
+                }
+            }
+        });
+        jScrollImage.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        jScrollImage.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (editable) {
@@ -256,7 +276,6 @@ public class AddImageLabel extends JPanel {
                             if (chooser.getSelectedFile().getPath().toLowerCase().endsWith(".gif")
                                     || chooser.getSelectedFile().getPath().toLowerCase().endsWith(".png")) {
                                 mainLabel.setIcon(new ImageIcon(url));
-                                ///mainLabel.setPreferredSize(new Dimension(100, 100));
                             } else {
                                 mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
                             }
@@ -271,10 +290,10 @@ public class AddImageLabel extends JPanel {
 
                         int bufferedWidth = bufferedImage.getWidth();
                         int preferredWidth = mainLabel.getPreferredSize().width;
-                        preferredWidth = 250;
+                        //preferredWidth = 250;
 
                         ImageIcon imageIcon;
-                        // под размеры поля подгоним чтобы поле не обрезало каритнку
+                        // под размеры поля подгоним чтобы поле не обрезало картинку
                         if (bufferedWidth > preferredWidth) {
                             float scaleView = (float) preferredWidth / bufferedWidth;
                             Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
@@ -299,35 +318,6 @@ public class AddImageLabel extends JPanel {
 
                             mediaBytes = imageStream.toByteArray();
 
-                            int templWidth = bufferedImage.getWidth();
-                            int templHeight = bufferedImage.getHeight();
-                            int counter = 0;
-
-                            if (false && minSize > 0 && mediaBytes.length < minSize) {
-                                while (mediaBytes.length < minSize && counter++ < 100) {
-                                    imageStream.reset();
-                                    templWidth *= 1.2;
-                                    templHeight *= 1.2;
-                                    Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
-                                    writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
-                                }
-
-                            } else if (false && maxSize > 0 && mediaBytes.length > maxSize) {
-                                while (mediaBytes.length > maxSize && counter++ < 100) {
-                                    imageStream.reset();
-                                    templWidth /= 1.2;
-                                    templHeight /= 1.2;
-                                    Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
-                                    writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
-                                }
-
-                            } else if (false && typeOfImage == TypeOfImage.JPEG) {
-                                // преобразуем GIF с прозрачным фоном в непрозрачный если надо
-                                // это может понадобиться если Оригинальный размер картинки взяли и не было преобразования в snapshot в ImageCropDisplayPanelNavigator2D.getSnapshot
-                                Image scaledImage = bufferedImage.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
-                                writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
-                            }
-
                             labelSize.setText(Lang.T("Size") + ": " + (mediaBytes.length >> 10) + " kB");
 
                         } catch (Exception e) {
@@ -336,19 +326,6 @@ public class AddImageLabel extends JPanel {
 
                     }
 
-                    private void writeImage(ByteArrayOutputStream imageStream, int templWidth, int templHeight, Image scaledImage, TypeOfImage typeOfImage) throws IOException {
-                        BufferedImage image;
-                        if (typeOfImage == TypeOfImage.GIF) {
-                            image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_ARGB);
-                            image.getGraphics().drawImage(scaledImage, 0, 0, null);
-                            ImageIO.write(image, "gif", imageStream);
-                        } else {
-                            image = new BufferedImage(templWidth, templHeight, BufferedImage.TYPE_INT_RGB);
-                            image.getGraphics().drawImage(scaledImage, 0, 0, Color.WHITE, null);
-                            ImageIO.write(image, "jpeg", imageStream);
-                        }
-                        mediaBytes = imageStream.toByteArray();
-                    }
                 };
             }
         }

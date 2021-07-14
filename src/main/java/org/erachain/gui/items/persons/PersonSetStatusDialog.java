@@ -12,7 +12,6 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.ResultDialog;
@@ -72,7 +71,6 @@ public class PersonSetStatusDialog extends JDialog {
     private javax.swing.JTextField jFeeTxt;
     private JDateChooser jFormattedTextField_fromDate;
     private JDateChooser jFormattedTextField_toDate;
-    private javax.swing.JScrollPane jLabel_RecordInfo;
     public PersonSetStatusDialog(PersonCls person) {
         super();
         //ICON
@@ -103,9 +101,7 @@ public class PersonSetStatusDialog extends JDialog {
         jComboBox_Status.setModel(new ComboBoxStatusesModel());
         jComboBox_YourAddress.setModel(new AccountsComboBoxModel());
         jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        PersonInfo info = new PersonInfo();
-        info.show_001(person);
-        info.setFocusable(false);
+        JPanel info = new PersonInfo002(person, false);
         jLabel_PersonInfo.setViewportView(info);
         jFormattedTextField_fromDate.setDateFormatString("yyyy-MM-dd");
         jFormattedTextField_toDate.setDateFormatString("yyyy-MM-dd");
@@ -117,50 +113,16 @@ public class PersonSetStatusDialog extends JDialog {
         jFeeTxt.setVisible(Gui.SHOW_FEE_POWER);
         jParentRecTxt.setText("0");
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        this.setPreferredSize(MainFrame.getInstance().getPreferredSize());
+
         setModal(true);
-        //PACK
+
+        setPreferredSize(new Dimension(1200, 600));
+        this.setResizable(true);
+        // PACK
         this.pack();
-        //   this.setResizable(true);
-        this.setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null); // set after PACK!!
         this.setVisible(true);
 
-
-    }
-
-    private Transaction refreshRecordDetails() {
-
-		/*
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
-		{
-			infoPanel.show_mess(Lang.T("Status must be OK to show public key details."));
-	        jLabel_RecordInfo.setViewportView(infoPanel);
-			return null;
-		}
-		*/
-
-        Transaction record = null;
-        if (jParentRecTxt.getText().length() == 0) {
-            infoPanel.show_mess(Lang.T(""));
-            jLabel_RecordInfo.setViewportView(infoPanel);
-            return record;
-        }
-
-        record = DCSet.getInstance().getTransactionFinalMap().getRecord(jParentRecTxt.getText());
-        if (record == null) {
-            infoPanel.show_mess(Lang.T("Error") + " - use 1233-321.");
-            jLabel_RecordInfo.setViewportView(infoPanel);
-            return record;
-        }
-
-        ////ENABLE
-        //jButton_Confirm.setEnabled(true);
-
-        infoPanel.show_001(record);
-        //infoPanel.setFocusable(false);
-        jLabel_RecordInfo.setViewportView(infoPanel);
-
-        return record;
     }
 
     public void onGoClick(
@@ -176,13 +138,13 @@ public class PersonSetStatusDialog extends JDialog {
         int feePow = 0;
         int parse = 0;
 
-        long value_1 = 0l;
-        long value_2 = 0l;
+        long value_1 = 0L;
+        long value_2 = 0L;
         byte[] data_1 = jAData1Txt.getText().length() == 0 ? null :
                 jAData1Txt.getText().getBytes(StandardCharsets.UTF_8);
         byte[] data_2 = jAData2Txt.getText().length() == 0 ? null :
                 jAData2Txt.getText().getBytes(StandardCharsets.UTF_8);
-        long refParent = 0l;
+        long refParent = 0L;
 
         byte[] description = jTextArea_Description.getText().length() == 0 ? null :
                 jTextArea_Description.getText().getBytes(StandardCharsets.UTF_8);
@@ -316,19 +278,14 @@ public class PersonSetStatusDialog extends JDialog {
         jLabel_Fee = new javax.swing.JLabel();
         jFeeTxt = new javax.swing.JTextField();
 
-
         jLabel_Title = new javax.swing.JLabel();
         jLabel__Description = new javax.swing.JLabel();
         jLabel_PersonInfo = new javax.swing.JScrollPane();
         jLabel1 = new javax.swing.JLabel();
 
-        //      setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         java.awt.GridBagLayout layout1 = new java.awt.GridBagLayout();
-        //      layout.columnWidths = new int[] {0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0};
-        //     layout.rowHeights = new int[] {0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0};
         getContentPane().setLayout(layout1);
 
-        //       jComboBox_YourAddress.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
@@ -354,7 +311,6 @@ public class PersonSetStatusDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(15, 16, 0, 0);
         getContentPane().add(jLabel_Status, gridBagConstraints);
 
-        //     jComboBox_Status.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
@@ -372,7 +328,6 @@ public class PersonSetStatusDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(22, 16, 0, 0);
         getContentPane().add(jLabel_Data_From, gridBagConstraints);
 
-        //       jFormattedTextField_fromDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
         jFormattedTextField_fromDate.setMinimumSize(new java.awt.Dimension(80, 20));
         jFormattedTextField_fromDate.setName(""); // NOI18N
         jFormattedTextField_fromDate.setFont(UIManager.getFont("TextField.font"));
@@ -395,14 +350,8 @@ public class PersonSetStatusDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(22, 0, 0, 0);
         getContentPane().add(jLabel_Data_To, gridBagConstraints);
 
-        //    jFormattedTextField_toDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
         jFormattedTextField_toDate.setMinimumSize(new java.awt.Dimension(80, 20));
         jFormattedTextField_toDate.setName(""); // NOI18N
-        //      jFormattedTextField_toDate.addActionListener(new java.awt.event.ActionListener() {
-        //          public void actionPerformed(java.awt.event.ActionEvent evt) {
-        //              jFormattedTextField_toDateActionPerformed(evt);
-        //          }
-        //      });
         jFormattedTextField_toDate.setFont(UIManager.getFont("TextField.font"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;

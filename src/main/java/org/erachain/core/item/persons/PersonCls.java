@@ -58,6 +58,7 @@ public abstract class PersonCls extends ItemCls {
     // already exist in super - protected String name; // First Name|Middle Name|Last Name
     protected long birthday; // timestamp
     protected long deathday; // timestamp
+    protected int type; // person / avatar / union
     protected byte gender; //
     protected String race;
     protected float birthLatitude;

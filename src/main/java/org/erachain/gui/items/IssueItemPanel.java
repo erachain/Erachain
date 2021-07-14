@@ -26,6 +26,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
+import java.util.Date;
 
 import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
@@ -58,10 +59,9 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JDateChooser startField;
     protected JCheckBox stopCheckBox = new JCheckBox(Lang.T("Stop"));
     protected JDateChooser stopField;
-    protected JScrollPane jScrollPane2;
     protected JPanel jPanelMain = new javax.swing.JPanel();
     protected JPanel jPanelAdd = new javax.swing.JPanel();
-    protected JPanel jPanelLeft = new javax.swing.JPanel();
+    protected JPanel jPanelLeft = new JPanel();
     protected GridBagConstraints gridBagConstraints;
     protected GridBagConstraints labelGBC;
     protected GridBagConstraints fieldGBC;
@@ -80,21 +80,22 @@ public abstract class IssueItemPanel extends IconPanel {
         this.issueMess = issueMess;
         this.confirmMess = "Confirmation Transaction";
 
-        jScrollPane2 = new JScrollPane();
-
         addIconLabel = new AddImageLabel(Lang.T("Add Logo"),
                 WIDTH_LOGO, HEIGHT_LOGO,
                 0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL, false, useExtURL,
                 Toolkit.getDefaultToolkit().getImage("images/icons/add-media-logo.png"));
-        addIconLabel.setBorder(null);
-        addIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        //addIconLabel.setBorder(null);
+        //addIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        //addIconLabel.setMaximumSize(new Dimension(400, 500));
+
 
         addImageLabel = new AddImageLabel(
                 Lang.T("Add image"), cropWidth, cropHeight,
                 0, ItemCls.MAX_IMAGE_LENGTH, cropWidth >> 1, cropHeight >> 1, originalSize, useExtURL,
                 Toolkit.getDefaultToolkit().getImage("images/icons/add-media.png"));
-        addImageLabel.setBorder(null);
-        addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        //addImageLabel.setBorder(null);
+        //addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        //addImageLabel.setMaximumSize(new Dimension(400, 500));
 
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -160,7 +161,9 @@ public abstract class IssueItemPanel extends IconPanel {
         jPanelMain.setLayout(new java.awt.GridBagLayout());
         jPanelAdd.setLayout(new java.awt.GridBagLayout());
 
-        jPanelLeft.setLayout(new java.awt.GridBagLayout());
+        jPanelLeft.setLayout(new BoxLayout(jPanelLeft, BoxLayout.Y_AXIS));
+        //jPanelLeft.setMinimumSize(new Dimension(200, 400));
+        //jPanelLeft.setMaximumSize(new Dimension(600, 500));
 
         labelGBC = new java.awt.GridBagConstraints();
         labelGBC.gridwidth = 3;
@@ -175,35 +178,19 @@ public abstract class IssueItemPanel extends IconPanel {
         fieldGBC.insets = new java.awt.Insets(0, 5, 5, 8);
 
         if (useIcon) {
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-            gridBagConstraints.weightx = 0.1;
-            gridBagConstraints.insets = new java.awt.Insets(8, 8, 10, 10);
-            jPanelLeft.add(addIconLabel, gridBagConstraints);
+            jPanelLeft.add(addIconLabel);
         }
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NORTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
-        jPanelLeft.add(addImageLabel, gridBagConstraints);
+        jPanelLeft.add(addImageLabel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.gridheight = 38;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.gridheight = 18;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weighty = 0.9;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.weighty = 0.7;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanelMain.add(jPanelLeft, gridBagConstraints);
 
         add(jPanelMain);
@@ -385,12 +372,10 @@ public abstract class IssueItemPanel extends IconPanel {
         jPanelMain.add(nameField, fieldGBC);
 
         if (useStartStop) {
-            // SET ONE TIME ZONE for Birthday
             Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            startField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+            startField = new JDateChooser(new Date(System.currentTimeMillis()), "yyyy-MM-dd HH:mm z");
             startField.setCalendar(calendar);
-            stopField = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+            stopField = new JDateChooser(new Date(System.currentTimeMillis()), "yyyy-MM-dd HH:mm z");
             stopField.setCalendar(calendar);
 
             labelGBC.gridy = y;
