@@ -290,8 +290,8 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         getContentPane().setLayout(layout);
 
         jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        PersonInfo info = new PersonInfo();
-        info.show_001(person);
+        JPanel info = new PersonInfo002(person, false);
+        //info.show_001(person);
         info.setFocusable(false);
         jLabel_PersonInfo.setViewportView(info);
 
