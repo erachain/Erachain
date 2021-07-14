@@ -58,6 +58,13 @@ public class PersonHuman extends PersonCls {
     }
 
     //GETTERS/SETTERS
+    public byte[] getMakerSignature() {
+        return makerSignature;
+    }
+
+    public boolean isMustBeSigned() {
+        return typeBytes[1] == (byte) 1;
+    }
 
     //PARSE
     // TODO - когда нулевая длдлинна и ошибка - но в ГУИ ошибка нне высветилась и создалась плоая запись и она развалила сеть
@@ -261,14 +268,6 @@ public class PersonHuman extends PersonCls {
         return 5;
     }
 
-    public byte[] getMakerSignature() {
-        return makerSignature;
-    }
-
-    public boolean isMustBeSigned() {
-        return typeBytes[1] == (byte) 1;
-    }
-
     public byte[] toBytes(int forDeal, boolean includeReference, boolean onlyBody) {
         byte[] data = super.toBytes(forDeal, includeReference, onlyBody);
         if (this.typeBytes[1] == 1) {
@@ -344,5 +343,4 @@ public class PersonHuman extends PersonCls {
 
         return Crypto.getInstance().verify(this.maker.getPublicKey(), this.makerSignature, data);
     }
-
 }

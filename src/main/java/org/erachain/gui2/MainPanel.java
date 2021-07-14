@@ -322,12 +322,15 @@ public class MainPanel extends javax.swing.JPanel {
             if (str.equals(Lang.T("Issue Person")) || str.equals("IssuePersonPanel")) {
                 insertTab(new IssuePersonPanel());
                 return;
-
             }
+
             if (str.equals(Lang.T("Insert Person")) || str.equals("InsertPersonPanel")) {
                 insertTab(new InsertPersonPanel());
                 return;
-
+            }
+            if (str.equals(Lang.T("Issue Union")) || str.equals("IssuePersonsUnionPanel")) {
+                insertTab(new IssuePersonsUnionPanel());
+                return;
             }
 
             if (str.equals(Lang.T("My Accounts")) || str.equals("MyAccountsSplitPanel")) {

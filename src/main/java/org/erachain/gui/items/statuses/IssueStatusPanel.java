@@ -25,7 +25,7 @@ public class IssueStatusPanel extends IssueItemPanel {
         initComponents();
 
         // вывод верхней панели
-        int gridy = initTopArea();
+        int gridy = initTopArea(true);
 
         JLabel singleLabel = new JLabel(Lang.T("Single") + ":");
         labelGBC.gridy = gridy;

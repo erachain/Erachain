@@ -34,8 +34,8 @@ public abstract class PersonCls extends ItemCls {
     private static int MIN_IMAGE_LENGTH = BlockChain.MAIN_MODE ? 10240 : 10240 >> 1;
 
     public static final int HUMAN = 1;
-    public static final int DOG = 2;
-    public static final int CAT = 3;
+    public static final int UNION = 2;
+    //public static final int CAT = 3;
     public static final int GENDER_LENGTH = 1;
     public static final int HEIGHT_LENGTH = 1;
     protected static final int BIRTHDAY_LENGTH = ItemCls.TIMESTAMP_LENGTH;
@@ -58,6 +58,7 @@ public abstract class PersonCls extends ItemCls {
     // already exist in super - protected String name; // First Name|Middle Name|Last Name
     protected long birthday; // timestamp
     protected long deathday; // timestamp
+    protected int type; // person / avatar / union
     protected byte gender; //
     protected String race;
     protected float birthLatitude;
@@ -66,6 +67,25 @@ public abstract class PersonCls extends ItemCls {
     protected String eyeColor; // First Name|Middle Name|Last Name
     protected String hairСolor; // First Name|Middle Name|Last Name
     protected byte height;
+
+    public PersonCls(byte[] data, boolean includeReference, int forDeal) throws Exception {
+        super(data, includeReference, forDeal);
+    }
+
+    public PersonCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image,
+                     String description) {
+        super(typeBytes, appData, maker, name, icon, image, description);
+    }
+
+    public PersonCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, long birthday, long deathday,
+                     byte personType, byte flags, byte[] icon, byte[] image, String description) {
+        super(typeBytes, appData, maker, name, icon, image, description);
+        this.birthday = birthday;
+        this.deathday = deathday;
+        this.gender = personType;
+        this.height = flags;
+
+    }
 
     public PersonCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, long birthday, long deathday,
                      byte gender, String race, float birthLatitude, float birthLongitude,
@@ -338,6 +358,14 @@ public abstract class PersonCls extends ItemCls {
         return super.isValid();
     }
 
+    public boolean isHuman() {
+        return typeBytes[0] == HUMAN;
+    }
+
+    public boolean isUnion() {
+        return typeBytes[0] == UNION;
+    }
+
     // to BYTES
     public byte[] toBytes(int forDeal, boolean includeReference, boolean forMakerSign) {
 
@@ -415,7 +443,7 @@ public abstract class PersonCls extends ItemCls {
     @Override
     public String toString(DCSet db) {
         long key = this.getKey(db);
-        return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : ("." + this.typeBytes[0])) + "]"
+        return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : "U") + "]"
                 + this.name // + "♥"
                 ///+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC")
                 ;
@@ -444,7 +472,7 @@ public abstract class PersonCls extends ItemCls {
     @Override
     public String getShort(DCSet db) {
         long key = this.getKey(db);
-        return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : ("." + this.typeBytes[0])) + "]"
+        return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : "U") + "]"
                 + this.name.substring(0, Math.min(this.name.length(), 20)) //"♥"
                 //+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC")
                 ;

@@ -18,7 +18,7 @@ public class IssueTemplatePanel extends IssueItemPanel {
 
         initComponents();
 
-        initBottom(initTopArea());
+        initBottom(initTopArea(true));
 
         setVisible(true);
     }

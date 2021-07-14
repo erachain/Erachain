@@ -885,6 +885,7 @@
   "Type/Domain": "Type/Domain",
   "True": "Yes",
   "true": "yes",
+  "TX.INVALID_OUTSIDE_VALIDATY_PERIOD": "Action outside the validity period",
   "Twin hashes": "Twin hash",
   "UI Settings": "User interface settings",
   "Unconfirmed": "Not confirmed",

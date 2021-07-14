@@ -280,6 +280,11 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
             return POLL_OPTION_NOT_EXISTS;
         }
 
+        if (!poll.isActive(timestamp)) {
+            errorValue = poll.errorValue;
+            return INVALID_OUTSIDE_VALIDATY_PERIOD;
+        }
+
         return super.isValid(forDeal, flags);
 
     }

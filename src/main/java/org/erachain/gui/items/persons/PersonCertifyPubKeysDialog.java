@@ -83,11 +83,10 @@ public class PersonCertifyPubKeysDialog extends JDialog {
 
         setPreferredSize(new Dimension(1200, 600));
         this.setResizable(true);
-        this.setLocationRelativeTo(null);
         // PACK
         this.pack();
+        this.setLocationRelativeTo(null); // set after PACK!!
         this.setVisible(true);
-        // MainFrame.this.add(comp, constraints).setFocusable(false);
     }
 
     private void refreshReceiverDetails(JTextField pubKeyTxt, JLabel pubKeyDetails) {
@@ -273,25 +272,14 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         jLabel_Title = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        // setMinimumSize(new java.awt.Dimension(800, 600));
         setModal(true);
-        // setPreferredSize(new java.awt.Dimension(800, 600));
-        addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
-            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
-                formAncestorMoved(evt);
-            }
-
-            public void ancestorResized(java.awt.event.HierarchyEvent evt) {
-            }
-        });
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-        layout.columnWidths = new int[]{0, 9, 0, 9, 0, 9, 0};
-        layout.rowHeights = new int[]{0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
+        //layout.columnWidths = new int[]{0, 9, 0, 9, 0, 9, 0};
+        //layout.rowHeights = new int[]{0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
         getContentPane().setLayout(layout);
 
         jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        PersonInfo info = new PersonInfo();
-        info.show_001(person);
+        JPanel info = new PersonInfo002(person, false);
         info.setFocusable(false);
         jLabel_PersonInfo.setViewportView(info);
 
@@ -414,24 +402,9 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = insets;
-        //getContentPane().add(jLabel_addDays, gridBagConstraints);
 
-        /*
-         * try { jFormattedTextField_ToDo.setFormatterFactory(new
-         * javax.swing.text.DefaultFormatterFactory(new
-         * javax.swing.text.MaskFormatter("##.##.####"))); } catch
-         * (java.text.ParseException ex) { ex.printStackTrace(); }
-         */
-        // jTextField_addDays.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         jTextField_addDays.setToolTipText("");
-        // jTextField_addDays.setMinimumSize(new java.awt.Dimension(100, 20));
         jTextField_addDays.setText("0"); // NOI18N
-        // jTextField_addDays.setPreferredSize(new java.awt.Dimension(100, 20));
-        jTextField_addDays.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFormattedTextField_ToDoActionPerformed(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = gridy;
@@ -439,7 +412,6 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = insets;
-        //getContentPane().add(jTextField_addDays, gridBagConstraints);
 
         jLabel_addDays_Check.setText("<html>'.' =2 " + Lang.T("year") + ",<br> '+' ="
                 + Lang.T("MAX days") + ",<br> '-' =" + Lang.T("Unconfirmed")
@@ -463,21 +435,9 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         gridBagConstraints.insets = insets;
         getContentPane().add(jLabel_Fee, gridBagConstraints);
 
-        // jFormattedTextField_Fee.setFormatterFactory(new
-        // javax.swing.text.DefaultFormatterFactory(new
-        // javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#"))));
         jFormattedTextField_Fee.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        // jFormattedTextField_Fee.setMinimumSize(new java.awt.Dimension(100,
-        // 20));
         jFormattedTextField_Fee.setText("0");
         jFormattedTextField_Fee.setVisible(Gui.SHOW_FEE_POWER);
-        // jFormattedTextField_Fee.setPreferredSize(new java.awt.Dimension(100,
-        // 20));
-        jFormattedTextField_Fee.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFormattedTextField_FeeActionPerformed(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = gridy;
@@ -517,40 +477,5 @@ public class PersonCertifyPubKeysDialog extends JDialog {
         getContentPane().add(jButton_Confirm, gridBagConstraints);
 
     }// <
-
-    private void jFormattedTextField_ToDoActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-    // private javax.swing.JEditorPane jLabel_PersonInfo;
-
-    private void jTextField_Address2ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void jButton_CanselActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-
-    }
-
-    private void jButton_ConfirmActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void jTextField_Address1ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void jFormattedTextField_FeeActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void formAncestorMoved(java.awt.event.HierarchyEvent evt) {
-        // TODO add your handling code here:
-    }
-
-    private void jTextField_Address3ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-    }
-    // End of variables declaration
 
 }

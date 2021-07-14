@@ -1,5 +1,6 @@
 package org.erachain.gui.items;
 
+import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -22,6 +23,10 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Calendar;
+import java.util.Date;
 
 import static org.erachain.gui.items.utils.GUIConstants.*;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
@@ -49,10 +54,14 @@ public abstract class IssueItemPanel extends IconPanel {
     protected JTextArea textAreaDescription = new JTextArea("");
     protected AddImageLabel addIconLabel;
     protected AddImageLabel addImageLabel;
-    protected JScrollPane jScrollPane2;
+
+    protected JCheckBox startCheckBox = new JCheckBox(Lang.T("Start"));
+    protected JDateChooser startField;
+    protected JCheckBox stopCheckBox = new JCheckBox(Lang.T("Stop"));
+    protected JDateChooser stopField;
     protected JPanel jPanelMain = new javax.swing.JPanel();
     protected JPanel jPanelAdd = new javax.swing.JPanel();
-    protected JPanel jPanelLeft = new javax.swing.JPanel();
+    protected JPanel jPanelLeft = new JPanel();
     protected GridBagConstraints gridBagConstraints;
     protected GridBagConstraints labelGBC;
     protected GridBagConstraints fieldGBC;
@@ -71,21 +80,22 @@ public abstract class IssueItemPanel extends IconPanel {
         this.issueMess = issueMess;
         this.confirmMess = "Confirmation Transaction";
 
-        jScrollPane2 = new JScrollPane();
-
         addIconLabel = new AddImageLabel(Lang.T("Add Logo"),
                 WIDTH_LOGO, HEIGHT_LOGO,
                 0, ItemCls.MAX_ICON_LENGTH, WIDTH_LOGO_INITIAL, HEIGHT_LOGO_INITIAL, false, useExtURL,
                 Toolkit.getDefaultToolkit().getImage("images/icons/add-media-logo.png"));
-        addIconLabel.setBorder(null);
-        addIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        //addIconLabel.setBorder(null);
+        //addIconLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        //addIconLabel.setMaximumSize(new Dimension(400, 500));
+
 
         addImageLabel = new AddImageLabel(
                 Lang.T("Add image"), cropWidth, cropHeight,
                 0, ItemCls.MAX_IMAGE_LENGTH, cropWidth >> 1, cropHeight >> 1, originalSize, useExtURL,
                 Toolkit.getDefaultToolkit().getImage("images/icons/add-media.png"));
-        addImageLabel.setBorder(null);
-        addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        //addImageLabel.setBorder(null);
+        //addImageLabel.setImageHorizontalAlignment(SwingConstants.LEFT);
+        //addImageLabel.setMaximumSize(new Dimension(400, 500));
 
         titleJLabel.setFont(FONT_TITLE);
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -119,6 +129,19 @@ public abstract class IssueItemPanel extends IconPanel {
             }
         });
 
+        startCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startField.setEnabled(startCheckBox.isSelected());
+            }
+        });
+        stopCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stopField.setEnabled(stopCheckBox.isSelected());
+            }
+        });
+
     }
 
     private void viewLinkParent() {
@@ -138,7 +161,9 @@ public abstract class IssueItemPanel extends IconPanel {
         jPanelMain.setLayout(new java.awt.GridBagLayout());
         jPanelAdd.setLayout(new java.awt.GridBagLayout());
 
-        jPanelLeft.setLayout(new java.awt.GridBagLayout());
+        jPanelLeft.setLayout(new BoxLayout(jPanelLeft, BoxLayout.Y_AXIS));
+        //jPanelLeft.setMinimumSize(new Dimension(200, 400));
+        //jPanelLeft.setMaximumSize(new Dimension(600, 500));
 
         labelGBC = new java.awt.GridBagConstraints();
         labelGBC.gridwidth = 3;
@@ -153,35 +178,19 @@ public abstract class IssueItemPanel extends IconPanel {
         fieldGBC.insets = new java.awt.Insets(0, 5, 5, 8);
 
         if (useIcon) {
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-            gridBagConstraints.weightx = 0.1;
-            gridBagConstraints.insets = new java.awt.Insets(8, 8, 10, 10);
-            jPanelLeft.add(addIconLabel, gridBagConstraints);
+            jPanelLeft.add(addIconLabel);
         }
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NORTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 0.4;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
-        jPanelLeft.add(addImageLabel, gridBagConstraints);
+        jPanelLeft.add(addImageLabel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.gridheight = 38;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.gridheight = 18;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weighty = 0.9;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.weighty = 0.7;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanelMain.add(jPanelLeft, gridBagConstraints);
 
         add(jPanelMain);
@@ -200,7 +209,10 @@ public abstract class IssueItemPanel extends IconPanel {
     protected void makeAppData() {
         itemAppData = ItemCls.makeAppData(0L,
                 !addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(), tagsField.getText());
+                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
+                !startCheckBox.isSelected() ? null : startField.getCalendar().getTimeInMillis(),
+                !stopCheckBox.isSelected() ? null : stopField.getCalendar().getTimeInMillis(),
+                tagsField.getText());
 
     }
 
@@ -220,11 +232,20 @@ public abstract class IssueItemPanel extends IconPanel {
         if (!im.isEmpty())
             im += "<br>";
 
-        return Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
+        String out = Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
                 + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
                 + "[" + item.getKey() + "]" + Lang.T(nameLabel) + ":&nbsp;" + item.viewName() + "<br>"
                 + im;
 
+        if (item.hasStartDate() || item.hasStopDate()) {
+            out += Lang.T("Validity period") + ":"
+                    + (item.hasStartDate() ? item.viewStartDate() : "-")
+                    + " / "
+                    + (item.hasStopDate() ? item.viewStopDate() : "-")
+                    + "<br>";
+        }
+
+        return out;
     }
 
     protected PrivateKeyAccount creator;
@@ -294,7 +315,7 @@ public abstract class IssueItemPanel extends IconPanel {
     //
     // выводит верхние поля панели
     // возвращает номер сроки с которой можно продолжать вывод инфы на панель
-    protected int initTopArea() {
+    protected int initTopArea(boolean useStartStop) {
         int y = 0;
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -312,45 +333,63 @@ public abstract class IssueItemPanel extends IconPanel {
         fieldGBC.gridy = y++;
         jPanelMain.add(fromJComboBox, fieldGBC);
 
-        if (true) {
-            labelGBC.gridy = y;
-            jPanelMain.add(exLinkTextLabel, labelGBC);
+        labelGBC.gridy = y;
+        jPanelMain.add(exLinkTextLabel, labelGBC);
 
-            exLinkText.setToolTipText(Lang.T("IssueItemPanel.exLinkText"));
+        exLinkText.setToolTipText(Lang.T("IssueItemPanel.exLinkText"));
 
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 8;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.gridwidth = 5;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 0.1;
-            gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
-            jPanelMain.add(exLinkText, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = fieldGBC.gridx;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanelMain.add(exLinkText, gridBagConstraints);
 
-            exLinkDescriptionLabel.setText(Lang.T("Parent") + ":");
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 13;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-            gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-            jPanelMain.add(exLinkDescriptionLabel, gridBagConstraints);
+        exLinkDescriptionLabel.setText(Lang.T("Parent") + ":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 13;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        jPanelMain.add(exLinkDescriptionLabel, gridBagConstraints);
 
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 15;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 12;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 0.9;
-            gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
-            jPanelMain.add(exLinkDescription, gridBagConstraints);
-        }
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 15;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridwidth = 12;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.9;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 8);
+        jPanelMain.add(exLinkDescription, gridBagConstraints);
 
         labelGBC.gridy = y;
         jPanelMain.add(nameJLabel, labelGBC);
 
         fieldGBC.gridy = y++;
         jPanelMain.add(nameField, fieldGBC);
+
+        if (useStartStop) {
+            Calendar calendar = Calendar.getInstance();
+            startField = new JDateChooser(new Date(System.currentTimeMillis()), "yyyy-MM-dd HH:mm z");
+            startField.setCalendar(calendar);
+            stopField = new JDateChooser(new Date(System.currentTimeMillis()), "yyyy-MM-dd HH:mm z");
+            stopField.setCalendar(calendar);
+
+            labelGBC.gridy = y;
+            jPanelMain.add(new JLabel(Lang.T("Validity period") + ":"), labelGBC);
+            JPanel startStop = new JPanel(new FlowLayout(FlowLayout.LEADING));
+            startStop.add(startCheckBox);
+            startField.setEnabled(false);
+            startStop.add(startField);
+            startStop.add(stopCheckBox);
+            stopField.setEnabled(false);
+            startStop.add(stopField);
+            fieldGBC.gridy = y++;
+            jPanelMain.add(startStop, fieldGBC);
+        }
 
         labelGBC.gridy = y;
         jPanelMain.add(tagsJLabel, labelGBC);

@@ -110,6 +110,13 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Pubkey + ':<b> ' + item.tx_creator_pubkey + '</b><br>';
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_Signature + ':<b> ' + item.tx_signature + '</b><br>';
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_TXCreator + ':<b> ' + creator + '</b><br>';
+            if (item.startDate || item.stopDate) {
+                output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_ValidityPeriod + ':<b> '
+                 + (item.startDate? convertTimestamp(item.startDate, true) : "-")
+                 + " / "
+                 + (item.stopDate? convertTimestamp(item.stopDate, true) : "-")
+                 + '</b><br>';
+            }
         } else {
             output += ': <a href=?tx=' + item.tx_seqNo + get_lang() + ' class="button ll-blue-bgc"><b>' + item.tx_seqNo + '</b></a></h4>';
 
@@ -120,6 +127,13 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
              + '<a href ="?tx=' + item.tx_signature + get_lang() + '"><b>' + item.tx_signature + '</b></a><br>';
 
             output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_TXCreator + ':<b> ' + creator + '</b><br>';
+            if (item.startDate || item.stopDate) {
+                output += '&nbsp&nbsp&nbsp&nbsp' + item.Label_ValidityPeriod + ':<b> '
+                 + (item.startDate? convertTimestamp(item.startDate, true) : "-")
+                 + " / "
+                 + (item.stopDate? convertTimestamp(item.stopDate, true) : "-")
+                 + '</b><br>';
+            }
 
             output += '<a href=?q=' + item.charKey + get_lang() + '&search=transactions class="button ll-blue-bgc"><b>' + item.Label_Actions + '</b></a>';
         }

@@ -1,7 +1,6 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
@@ -244,8 +243,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 new ChangeOrderFrame(order, false);
             }
         });
-        if (BlockChain.TEST_MODE)
-            sellOrdersMenu.add(sellChange);
+        sellOrdersMenu.add(sellChange);
 
         JMenuItem cancel = new JMenuItem(Lang.T("Cancel"));
         cancel.addActionListener(new ActionListener() {
@@ -427,8 +425,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 new ChangeOrderFrame(order, true);
             }
         });
-        if (BlockChain.TEST_MODE)
-            buyOrdersMenu.add(buyChange);
+        buyOrdersMenu.add(buyChange);
 
         JMenuItem buyCancel = new JMenuItem(Lang.T("Cancel"));
         buyCancel.addActionListener(new ActionListener() {

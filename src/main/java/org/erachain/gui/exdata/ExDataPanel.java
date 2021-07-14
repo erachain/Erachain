@@ -772,16 +772,15 @@ public class ExDataPanel extends JPanel {
         }
 
         Fun.Tuple2<ExAction, String> exActionResult = exActionPanel.getAction();
-        if (exActionResult.b != null) {
+        if (exActionResult != null && exActionResult.b != null) {
             return new Fun.Tuple2(null, exActionResult.b);
         }
-
 
         Long templateKey = fill_Template_Panel.sel_Template == null ? null : fill_Template_Panel.sel_Template.getKey();
 
         byte[] exData;
         try {
-            exData = ExData.make(exLink, exActionResult.a, creator, jTextField_Title_Message.getText(),
+            exData = ExData.make(exLink, exActionResult == null ? null : exActionResult.a, creator, jTextField_Title_Message.getText(),
                     signCanOnlyRecipients, recipients, authors, sources, tags, isEncrypted,
                     templateKey, fill_Template_Panel.get_Params(),
                     fill_Template_Panel.checkBoxMakeHashAndCheckUniqueTemplate.isSelected(),

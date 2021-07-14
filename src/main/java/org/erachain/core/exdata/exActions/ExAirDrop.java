@@ -412,7 +412,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         } else {
             result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                     key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
-                    backward, totalFeeBG, null, creatorIsPerson, actionFlags);
+                    backward, totalFeeBG, null, creatorIsPerson, actionFlags, rNote.getTimestamp());
             if (result.a != Transaction.VALIDATE_OK) {
                 errorValue = "Airdrop: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
                 return result.a;
@@ -426,7 +426,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
             result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
                     key, asset, amount, recipient,
-                    backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags);
+                    backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags, rNote.getTimestamp());
 
             if (result.a != Transaction.VALIDATE_OK) {
                 errorValue = "Airdrop: address[" + index + "] -> " + recipient.getAddress();

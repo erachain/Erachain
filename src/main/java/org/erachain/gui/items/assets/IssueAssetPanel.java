@@ -69,7 +69,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         super.initComponents();
 
         // вывод верхней панели
-        int gridy = super.initTopArea();
+        int gridy = super.initTopArea(true);
 
         labelGBC.gridy = gridy;
         jPanelAdd.add(typeJLabel, labelGBC);
@@ -111,12 +111,10 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = fieldGBC.gridy;
         gridBagConstraints.gridwidth = 9;
-        //gridBagConstraints.gridheight = 4;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         jPanelAdd.add(multipleRoyaltyPanel, gridBagConstraints);
-
 
         // вывод подвала
         super.initBottom(gridy);
@@ -186,6 +184,8 @@ public class IssueAssetPanel extends IssueItemPanel {
     protected void makeAppData() {
         itemAppData = AssetCls.makeAppData(!addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
                 !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
+                !startCheckBox.isSelected() ? null : startField.getCalendar().getTimeInMillis(),
+                !stopCheckBox.isSelected() ? null : stopField.getCalendar().getTimeInMillis(),
                 tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients());
 
     }

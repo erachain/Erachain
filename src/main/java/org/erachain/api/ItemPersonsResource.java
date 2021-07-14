@@ -146,7 +146,7 @@ public class ItemPersonsResource {
     public String issue(String x) {
 
         Controller cntr = Controller.getInstance();
-        Object result = cntr.issuePerson(request, x);
+        Object result = cntr.issuePersonHuman(request, x);
         if (result instanceof JSONObject) {
             return ((JSONObject) result).toJSONString();
         }
@@ -199,7 +199,7 @@ public class ItemPersonsResource {
                     e.getMessage());
         }
 
-        Pair<Transaction, Integer> transactionResult = cntr.issuePerson(resultRaw.a, linkTo, feePow, item);
+        Pair<Transaction, Integer> transactionResult = cntr.issuePersonHuman(resultRaw.a, linkTo, feePow, item);
         if (transactionResult.getB() != Transaction.VALIDATE_OK) {
             throw ApiErrorFactory.getInstance().createError(
                     transactionResult.getB());

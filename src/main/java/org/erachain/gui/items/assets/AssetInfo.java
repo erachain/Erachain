@@ -123,6 +123,15 @@ public class AssetInfo extends JTextPane {
             text += "<div   style='word-wrap: break-word; '>";
 
             text += "<div>" + Lang.T("Maker") + ": <a href = '!!Maker'><b>" + hl_Maker.get_Text() + "</b></a></div>";
+
+            if (asset.hasStartDate() || asset.hasStopDate()) {
+                text += "<div>" + Lang.T("Validity period") + ": "
+                        + (asset.hasStartDate() ? asset.viewStartDate() : "-")
+                        + " / "
+                        + (asset.hasStopDate() ? asset.viewStopDate() : "-")
+                        + "</div>";
+            }
+
             text += "<div>" + Lang.T("Class") + ": <b>" + Lang.T(asset.getItemSubType()) + "</b>,";
             text += " " + Lang.T("Type") + ": <a href='!!Type'><b>" +
                     asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:"
