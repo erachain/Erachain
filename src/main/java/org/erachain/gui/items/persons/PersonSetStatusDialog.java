@@ -115,10 +115,14 @@ public class PersonSetStatusDialog extends JDialog {
         jFeeTxt.setVisible(Gui.SHOW_FEE_POWER);
         jParentRecTxt.setText("0");
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        this.setPreferredSize(MainFrame.getInstance().getPreferredSize());
+
         setModal(true);
-        //PACK
+
+        setPreferredSize(new Dimension(1200, 600));
+        this.setResizable(true);
+        // PACK
         this.pack();
+        this.setLocationRelativeTo(null); // set after PACK!!
         this.setVisible(true);
 
     }
