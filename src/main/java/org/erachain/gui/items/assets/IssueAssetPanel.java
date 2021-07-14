@@ -111,12 +111,10 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = fieldGBC.gridy;
         gridBagConstraints.gridwidth = 9;
-        //gridBagConstraints.gridheight = 4;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         jPanelAdd.add(multipleRoyaltyPanel, gridBagConstraints);
-
 
         // вывод подвала
         super.initBottom(gridy);
