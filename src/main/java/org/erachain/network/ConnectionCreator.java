@@ -255,36 +255,36 @@ public class ConnectionCreator extends MonitoredThread {
                             connectToPeersOfThisPeer(peer, 4, true);
                         }
                     }
-                }
 
-                //CHECK IF WE STILL NEED NEW CONNECTIONS
-                // USE unknown peers from known peers
-                if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true, false)) {
-                    //OLD SCHOOL ITERATE activeConnections
-                    //avoids Exception when adding new elements
-                    List<Peer> peers = network.getActivePeers(false);
-                    for (Peer peer : peers) {
+                    //CHECK IF WE STILL NEED NEW CONNECTIONS
+                    // USE unknown peers from known peers
+                    if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true, false)) {
+                        //OLD SCHOOL ITERATE activeConnections
+                        //avoids Exception when adding new elements
+                        List<Peer> peers = network.getActivePeers(false);
+                        for (Peer peer : peers) {
 
-                        if (!this.network.run)
-                            break;
+                            if (!this.network.run)
+                                break;
 
-                        // если произошел полныцй разрыв сети - то прекратим поиск тут
-                        if (network.noActivePeers(false))
-                            break;
+                            // если произошел полныцй разрыв сети - то прекратим поиск тут
+                            if (network.noActivePeers(false))
+                                break;
 
-                        if (peer.isBanned())
-                            continue;
+                            if (peer.isBanned())
+                                continue;
 
-                        if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true, false)) {
-                            break;
+                            if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true, false)) {
+                                break;
+                            }
+
+                            long timesatmp = NTP.getTime();
+                            if (timesatmp - getPeersTimestamp > GET_PEERS_PERIOD) {
+                                connectToPeersOfThisPeer(peer, -1, false);
+                                getPeersTimestamp = timesatmp;
+                            }
+
                         }
-
-                        long timesatmp = NTP.getTime();
-                        if (timesatmp - getPeersTimestamp > GET_PEERS_PERIOD) {
-                            connectToPeersOfThisPeer(peer, -1, false);
-                            getPeersTimestamp = timesatmp;
-                        }
-
                     }
 
                 } else {
