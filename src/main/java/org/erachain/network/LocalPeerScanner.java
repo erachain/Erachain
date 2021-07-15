@@ -1,7 +1,6 @@
 package org.erachain.network;
 
 import org.apache.commons.net.util.SubnetUtils;
-import org.erachain.core.BlockChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +9,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocalPeerScanner extends Thread {
+public class LocalPeerScanner {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalPeerScanner.class);
 
@@ -70,12 +69,4 @@ public class LocalPeerScanner extends Thread {
         return result;
     }
 
-    @Override
-    public void run() {
-        try {
-            scanLocalNetForPeers(BlockChain.NETWORK_PORT);
-        } catch (Exception e) {
-            logger.debug(e.getMessage());
-        }
-    }
 }

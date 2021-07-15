@@ -546,7 +546,7 @@ public class SettingsBasicPanel extends JPanel {
         gbc_lbllimitConnections.gridy = ++panelRow;//12;
         add(lbllimitConnections, gbc_lbllimitConnections);
 
-        chckbxLocalPeersScannerEnabled = new JCheckBox(Lang.T("Local peer discovery"));
+        chckbxLocalPeersScannerEnabled = new JCheckBox(Lang.T("Use Local peers only"));
         chckbxLocalPeersScannerEnabled.setHorizontalAlignment(SwingConstants.LEFT);
         chckbxLocalPeersScannerEnabled.setSelected(Settings.getInstance().isLocalPeersScannerEnabled());
         GridBagConstraints gbc_chckbxLocalPeersScannerEnabled = new GridBagConstraints();

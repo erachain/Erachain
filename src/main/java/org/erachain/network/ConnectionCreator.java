@@ -12,6 +12,7 @@ import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -187,103 +188,115 @@ public class ConnectionCreator extends MonitoredThread {
             }
 
             //CHECK IF WE NEED NEW CONNECTIONS
-            if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true, false)) {
+            if (Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true, false)) {
 
-                //GET LIST OF KNOWN PEERS
-                knownPeers = network.getAllPeers();
+                if (network.localPeerScanner == null) {
 
-                //ITERATE knownPeers
-                for (Peer peer : knownPeers) {
+                    //GET LIST OF KNOWN PEERS
+                    knownPeers = network.getAllPeers();
 
-                    //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
-                    if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true, false)) {
-                        // stop use KNOWN peers
-                        break;
-                    }
+                    //ITERATE knownPeers
+                    for (Peer peer : knownPeers) {
 
-                    if (Network.isMyself(peer.getAddress())) {
-                        continue;
-                    }
-
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-
-                    if (!this.network.run)
-                        break;
-
-                    //CHECK IF SOCKET IS NOT LOCALHOST
-                    //if(true)
-                    if (peer.getAddress().isAnyLocalAddress()
-                            || peer.getAddress().isLoopbackAddress()) {
-                        continue;
-                    }
-                    if (peer.getAddress().isSiteLocalAddress()) {
-                        //continue;
-                        LOGGER.debug("Local peer: {}",peer.getAddress());
-                    }
-
-                    //CHECK IF PEER ALREADY used
-                    // new PEER from NETWORK poll or original from DB
-                    peer = network.getKnownPeer(peer, Network.ANY_TYPE);
-
-                    if (!network.isGoodForConnect(peer))
-                        continue;
-
-                    LOGGER.info("try connect to: " + peer);
-
-                    //CONNECT
-                    this.setMonitorStatusBefore("peer.connect " + peer);
-                    if(!peer.connect(null, network, "connected +++ "))
-                        continue;
-
-                    this.setMonitorStatusAfter();
-
-                    if (peer.isUsed()) {
-
-                        if (false) {
-                            // не надо - так внутри же все запускается!
-                            peer.setNeedPing();
+                        //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
+                        if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true, false)) {
+                            // stop use KNOWN peers
+                            break;
                         }
 
-                        // TRY CONNECT to WHITE peers of this PEER
-                        connectToPeersOfThisPeer(peer, 4, true);
+                        if (Network.isMyself(peer.getAddress())) {
+                            continue;
+                        }
+
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+
+                        if (!this.network.run)
+                            break;
+
+                        //CHECK IF SOCKET IS NOT LOCALHOST
+                        //if(true)
+                        if (peer.getAddress().isAnyLocalAddress()
+                                || peer.getAddress().isLoopbackAddress()) {
+                            continue;
+                        }
+                        if (peer.getAddress().isSiteLocalAddress()) {
+                            //continue;
+                            LOGGER.debug("Local peer: {}", peer.getAddress());
+                        }
+
+                        //CHECK IF PEER ALREADY used
+                        // new PEER from NETWORK poll or original from DB
+                        peer = network.getKnownPeer(peer, Network.ANY_TYPE);
+
+                        if (!network.isGoodForConnect(peer))
+                            continue;
+
+                        LOGGER.info("try connect to: " + peer);
+
+                        //CONNECT
+                        this.setMonitorStatusBefore("peer.connect " + peer);
+                        if (!peer.connect(null, network, "connected +++ "))
+                            continue;
+
+                        this.setMonitorStatusAfter();
+
+                        if (peer.isUsed()) {
+
+                            if (false) {
+                                // не надо - так внутри же все запускается!
+                                peer.setNeedPing();
+                            }
+
+                            // TRY CONNECT to WHITE peers of this PEER
+                            connectToPeersOfThisPeer(peer, 4, true);
+                        }
                     }
+                }
+
+                //CHECK IF WE STILL NEED NEW CONNECTIONS
+                // USE unknown peers from known peers
+                if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true, false)) {
+                    //OLD SCHOOL ITERATE activeConnections
+                    //avoids Exception when adding new elements
+                    List<Peer> peers = network.getActivePeers(false);
+                    for (Peer peer : peers) {
+
+                        if (!this.network.run)
+                            break;
+
+                        // если произошел полныцй разрыв сети - то прекратим поиск тут
+                        if (network.noActivePeers(false))
+                            break;
+
+                        if (peer.isBanned())
+                            continue;
+
+                        if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true, false)) {
+                            break;
+                        }
+
+                        long timesatmp = NTP.getTime();
+                        if (timesatmp - getPeersTimestamp > GET_PEERS_PERIOD) {
+                            connectToPeersOfThisPeer(peer, -1, false);
+                            getPeersTimestamp = timesatmp;
+                        }
+
+                    }
+
+                } else {
+                    // only LOCALS
+                    try {
+                        network.localPeerScanner.scanLocalNetForPeers(BlockChain.NETWORK_PORT);
+                    } catch (IOException e) {
+                    }
+                    continue;
                 }
             }
 
-            //CHECK IF WE STILL NEED NEW CONNECTIONS
-            // USE unknown peers from known peers
-            if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true, false)) {
-                //OLD SCHOOL ITERATE activeConnections
-                //avoids Exception when adding new elements
-                List<Peer> peers = network.getActivePeers(false);
-                for (Peer peer : peers) {
-
-                    if (!this.network.run)
-                        break;
-
-                    // если произошел полныцй разрыв сети - то прекратим поиск тут
-                    if (network.noActivePeers(false))
-                        break;
-
-                    if (peer.isBanned())
-                        continue;
-
-                    if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true, false)) {
-                        break;
-                    }
-
-                    long timesatmp = NTP.getTime();
-                    if (timesatmp - getPeersTimestamp > GET_PEERS_PERIOD) {
-                        connectToPeersOfThisPeer(peer, -1, false);
-                        getPeersTimestamp = timesatmp;
-                    }
-
-                }
-            }
 
             //SLEEP
             int counter = network.getActivePeersCounter(true, false);

@@ -47,7 +47,7 @@ public class Network extends Observable {
     private MessagesProcessor messagesProcessor;
     PeerManager peerManager;
     public TelegramManager telegramer;
-    private LocalPeerScanner localPeerScanner;
+    public LocalPeerScanner localPeerScanner;
     CopyOnWriteArrayList<Peer> knownPeers;
 
     //private SortedSet<String> handledTelegramMessages;
@@ -142,8 +142,6 @@ public class Network extends Observable {
 
         if (Settings.getInstance().isLocalPeersScannerEnabled()) {
             localPeerScanner = new LocalPeerScanner(this);
-            if (controller.useNet)
-                localPeerScanner.start();
         }
 
     }
@@ -801,9 +799,6 @@ public class Network extends Observable {
     public void stop() {
 
         this.run = false;
-        if (localPeerScanner != null) {
-            localPeerScanner.interrupt();
-        }
 
         // STOP MESSAGES PROCESSOR
         messagesProcessor.halt();
