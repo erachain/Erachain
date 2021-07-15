@@ -78,6 +78,10 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
         }
     }
 
+    public Peer getItem(int row) {
+        return peers.get(row);
+    }
+
     @Override
     public int getColumnCount() {
         return columnNames.length;
@@ -117,7 +121,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
             case COLUMN_ADDRESS:
                 JSONObject info = peer.getNodeInfo();
                 if (info != null) {
-                    String port = (String) info.get("port");
+                    Long port = (Long) info.get("port");
                     if (port != null) {
                         String url = info.getOrDefault("scheme", "https").toString()
                                 + "://" + peer.getAddress().getHostAddress() + ":" + port + "/index/blockexplorer.html";
