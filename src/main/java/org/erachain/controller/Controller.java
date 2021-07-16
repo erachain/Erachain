@@ -4023,6 +4023,7 @@ public class Controller extends Observable {
 
             if (arg.startsWith("-cache=") && arg.length() > 7) {
                 CACHE_DC = arg.substring(7).toLowerCase();
+                LOGGER.info("-cache set to [" + CACHE_DC + "]");
                 continue;
             }
 
