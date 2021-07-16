@@ -1950,14 +1950,16 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         int height = getBlockHeightByParentOrLast(dcSet);
         if (height < BlockChain.SKIP_VALID_SIGN_BEFORE) {
-            // for skip NOT VALID SIGNs
-            for (byte[] valid_item : BlockChain.VALID_SIGN) {
-                if (Arrays.equals(signature, valid_item)) {
-                    if (dcSet.getTransactionFinalMapSigns().contains(signature))
-                        return false;
-                    else
-                        return true;
-                }
+            return true;
+        }
+
+        // for skip NOT VALID SIGNs
+        for (byte[] valid_item : BlockChain.VALID_SIGN) {
+            if (Arrays.equals(signature, valid_item)) {
+                if (dcSet.getTransactionFinalMapSigns().contains(signature))
+                    return false;
+                else
+                    return true;
             }
         }
 
