@@ -21,7 +21,8 @@ public class AccrualsModel extends DefaultTableModel {
     }};
 
     public AccrualsModel(List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
-        super(setRows(accruals, onlyErrors), headVector);
+        // на некоторых компилятора вызывает ошибку без явного указания (Vector)
+        super((Vector) setRows(accruals, onlyErrors), (Vector) headVector);
     }
 
     @Override
