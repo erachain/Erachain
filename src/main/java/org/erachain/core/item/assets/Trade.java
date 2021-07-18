@@ -42,6 +42,7 @@ public class Trade {
     public static final byte TYPE_TRADE = 0;
     public static final byte TYPE_CANCEL = 1;
     public static final byte TYPE_CHANGE = 2;
+    public static final byte TYPE_CANCEL_BY_ORDER = 3;
 
     // make trading if two orders is seeked
     public Trade(long initiator, long target, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, int haveAssetScale, int wantAssetScale, int sequence) {
@@ -80,12 +81,22 @@ public class Trade {
                 return "cancel";
             case TYPE_CHANGE:
                 return "change";
+            case TYPE_CANCEL_BY_ORDER:
+                return "autocancel";
         }
         return "unknown";
     }
 
+    public int getType() {
+        return type;
+    }
+
     public boolean isTrade() {
         return type == TYPE_TRADE;
+    }
+
+    public boolean isCancelByTrade() {
+        return type == TYPE_CANCEL_BY_ORDER;
     }
 
     public boolean isCancel() {
