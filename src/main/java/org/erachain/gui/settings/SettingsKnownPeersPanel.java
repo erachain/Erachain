@@ -1,9 +1,11 @@
 package org.erachain.gui.settings;
 // 16 03
 
+import org.erachain.controller.Controller;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.KnownPeersTableModel;
 import org.erachain.lang.Lang;
+import org.erachain.network.Peer;
 import org.erachain.utils.IPAddressFormatValidator;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -96,8 +98,21 @@ public class SettingsKnownPeersPanel extends JPanel {
                 knownPeersTableModel.deleteAddress(row);
             }
         });
-
         menu.add(deleteaddressmenu);
+
+        JMenuItem connectItem = new JMenuItem(Lang.T("Connect"));
+        connectItem.addActionListener(arg0 -> {
+            // чтобы развязат задержку и не тормозить GUI
+            new Thread(() -> {
+                int row = knownPeersTable.getSelectedRow();
+                Peer peer = knownPeersTableModel.getItem(row);
+                ;
+                Controller.getInstance().network.addPeer(peer, 0); // reset BAN if exists
+                peer.connect(null, Controller.getInstance().network,
+                        "connected as recircled by USER!!! ");
+            }).start();
+        });
+        menu.add(connectItem);
 
         knownPeersTable.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {

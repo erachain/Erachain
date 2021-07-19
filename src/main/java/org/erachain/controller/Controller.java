@@ -100,7 +100,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.4 dev 01";
+    public static String version = "5.4";
     public static String buildTime = "2021-05-05 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -4023,6 +4023,7 @@ public class Controller extends Observable {
 
             if (arg.startsWith("-cache=") && arg.length() > 7) {
                 CACHE_DC = arg.substring(7).toLowerCase();
+                LOGGER.info("-cache set to [" + CACHE_DC + "]");
                 continue;
             }
 

@@ -3,6 +3,7 @@ package org.erachain.core.item;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.Jsonable;
@@ -936,9 +937,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         if (useAll) {
             //WRITE ICON SIZE - 2 bytes = 64kB max
-            int iconLength = this.icon.length;
-            byte[] iconLengthBytes = Ints.toByteArray(iconLength);
-            data = Bytes.concat(data, new byte[]{iconLengthBytes[2], iconLengthBytes[3]});
+            byte[] iconLengthBytes = Shorts.toByteArray((short) this.icon.length);
+            data = Bytes.concat(data, iconLengthBytes);
 
             //WRITE ICON
             data = Bytes.concat(data, this.icon);
@@ -965,7 +965,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         data = Bytes.concat(data, this.image);
 
         /// APP DATA
-        if (hasAppData) {
+        if (useAll && hasAppData) {
             // WRITE APP DATA LENGTH
             data = Bytes.concat(data, Ints.toByteArray(this.appData.length));
             data = Bytes.concat(data, this.appData);

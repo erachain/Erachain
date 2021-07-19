@@ -68,13 +68,19 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
                 String result;
 
                 if (isSell)
-                    if (trade.isTrade()) {
-                        result = NumberAsString.formatAsString(trade.getAmountHave());
-                    } else if (trade.isChange()) {
-                        result = Lang.T("Change");
-                    } else {
-                        // CANCEL
-                        result = Lang.T("Cancel");
+                    switch (trade.getType()) {
+                        case Trade.TYPE_CANCEL:
+                            // CANCEL
+                            result = Lang.T("Cancel");
+                            break;
+                        case Trade.TYPE_CHANGE:
+                            result = Lang.T("Change");
+                            break;
+                        case Trade.TYPE_CANCEL_BY_ORDER:
+                            result = Lang.T("Cancel by Order");
+                            break;
+                        default:
+                            result = NumberAsString.formatAsString(trade.getAmountHave());
                     }
                 else
                     result = initiatorOrderTX.getCreator().getPersonAsString();
@@ -89,26 +95,34 @@ public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements 
 
                 if (isSell)
                     return "<html><span style='color:green'>▲</span>"
-                            + (isMine? "<b>" + NumberAsString.formatAsString(trade.calcPrice()) + "</b>"
-                                : NumberAsString.formatAsString(trade.calcPrice()))
+                            + (isMine ? "<b>" + NumberAsString.formatAsString(trade.calcPrice()) + "</b>"
+                            : NumberAsString.formatAsString(trade.calcPrice()))
                             + "</html>";
                 else
                     return "<html><span style='color:red'>▼</span>"
-                            + (isMine? "<b>" + NumberAsString.formatAsString(trade.calcPriceRevers()) + "</b>"
-                                : NumberAsString.formatAsString(trade.calcPriceRevers()))
+                            + (isMine ? "<b>" + NumberAsString.formatAsString(trade.calcPriceRevers()) + "</b>"
+                            : NumberAsString.formatAsString(trade.calcPriceRevers()))
                             + "</html>";
 
             case COLUMN_WHO_AMOUNT:
 
                 if (isSell)
                     result = initiatorOrderTX.getCreator().getPersonAsString();
-                else if (trade.isTrade()) {
-                    result = NumberAsString.formatAsString(trade.getAmountHave());
-                } else if (trade.isChange()) {
-                    result = Lang.T("Change");
-                } else {
-                    // CANCEL
-                    result = Lang.T("Cancel");
+                else {
+                    switch (trade.getType()) {
+                        case Trade.TYPE_CANCEL:
+                            // CANCEL
+                            result = Lang.T("Cancel");
+                            break;
+                        case Trade.TYPE_CHANGE:
+                            result = Lang.T("Change");
+                            break;
+                        case Trade.TYPE_CANCEL_BY_ORDER:
+                            result = Lang.T("Cancel by Order");
+                            break;
+                        default:
+                            result = NumberAsString.formatAsString(trade.getAmountHave());
+                    }
                 }
 
                 if (isMine) {

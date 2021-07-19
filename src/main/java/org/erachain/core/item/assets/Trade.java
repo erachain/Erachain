@@ -42,6 +42,7 @@ public class Trade {
     public static final byte TYPE_TRADE = 0;
     public static final byte TYPE_CANCEL = 1;
     public static final byte TYPE_CHANGE = 2;
+    public static final byte TYPE_CANCEL_BY_ORDER = 3;
 
     // make trading if two orders is seeked
     public Trade(long initiator, long target, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, int haveAssetScale, int wantAssetScale, int sequence) {
@@ -80,8 +81,14 @@ public class Trade {
                 return "cancel";
             case TYPE_CHANGE:
                 return "change";
+            case TYPE_CANCEL_BY_ORDER:
+                return "order-cancel";
         }
         return "unknown";
+    }
+
+    public int getType() {
+        return type;
     }
 
     public boolean isTrade() {
@@ -96,6 +103,10 @@ public class Trade {
         return type == TYPE_CHANGE;
     }
 
+    public boolean isCancelByTrade() {
+        return type == TYPE_CANCEL_BY_ORDER;
+    }
+
     public String viewID() {
         return Transaction.viewDBRef(initiator) + "/" + Transaction.viewDBRef(target);
     }
@@ -105,7 +116,7 @@ public class Trade {
     }
 
     public Order getInitiatorOrder(DCSet dcSet) {
-        if (type == TYPE_TRADE)
+        if (type == TYPE_TRADE || type == TYPE_CANCEL_BY_ORDER)
             return Order.getOrder(dcSet, this.initiator);
 
         return null;
@@ -217,12 +228,17 @@ public class Trade {
         }
 
         if (withCreators) {
-            if (isTrade()) {
-                Order order = getInitiatorOrder(DCSet.getInstance());
-                trade.put("initiatorCreator", order.getCreator().getAddress());
-            } else {
-                Transaction cancelTX = DCSet.getInstance().getTransactionFinalMap().get(initiator);
-                trade.put("initiatorCreator", cancelTX.getCreator().getAddress());
+            switch (type) {
+                case TYPE_TRADE:
+                case TYPE_CANCEL_BY_ORDER:
+                    Order order = getInitiatorOrder(DCSet.getInstance());
+                    trade.put("initiatorCreator", order.getCreator().getAddress());
+                    break;
+                case TYPE_CANCEL:
+                case TYPE_CHANGE:
+                    Transaction cancelTX = DCSet.getInstance().getTransactionFinalMap().get(initiator);
+                    trade.put("initiatorCreator", cancelTX.getCreator().getAddress());
+                    break;
             }
 
             Order orderTarget = getTargetOrder(DCSet.getInstance());
