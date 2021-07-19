@@ -67,6 +67,9 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         //////////////// NOT PROTOCOL INDEXES
 
         //PAIR KEY
+        // ТУТ создается MAP - у которой должны быть уникальные ключи - иначе значение затрется
+        // - для ускорения работы не берется полный ключ Сделки а только Инициатор + getSequence
+        // - поэтому getSequence должен быть всегда новый
         this.pairKeyMap = database.createTreeMap("trades_key_pair")
                 .comparator(Fun.TUPLE3_COMPARATOR)
                 .makeOrGet();

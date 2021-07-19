@@ -455,7 +455,10 @@ public class OrderProcess {
                             target.getId(), // номер кого отменяем
                             target.getHaveAssetKey(), target.getWantAssetKey(),
                             target.getAmountHave(), target.getAmountWant(), // for price
-                            target.getHaveAssetScale(), target.getWantAssetScale(), index);
+                            target.getHaveAssetScale(), target.getWantAssetScale(),
+                            // уже 1-й сработал = тут + 1 все другие чтобы вторичный индекс pairKeyMap на затерся
+                            // см. dbs.mapDB.TradeSuitMapDB.pairKeyMap
+                            index + 1);
 
                     // нужно запомнить чтобы при откате восстановить назад
                     dcSet.getTradeMap().put(trade);
