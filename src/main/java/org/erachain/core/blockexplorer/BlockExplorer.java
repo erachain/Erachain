@@ -920,8 +920,9 @@ public class BlockExplorer {
 
             /// если пару нужно перевернуть так как есть общепринятые пары
             // !!! тут обратная пара в Сделке
-            if (pairHaveKey > startKey && pairWantKey > startKey) {
-                unchecked = true;
+            if (pairHaveKey > startKey && pairWantKey > startKey
+                    && !pairAssetWant.isUnique() && !pairAssetHave.isUnique()
+            ) {
                 tradeJSON.put("unchecked", true);
             } else if (pairHaveKey == 1L && pairWantKey == 2L
                     || cnt.pairsController.spotPairsList.containsKey(pairAssetWant.getName() + "_" + pairAssetHave.getName())
@@ -932,6 +933,8 @@ public class BlockExplorer {
                 tempKey = pairHaveKey;
                 pairHaveKey = pairWantKey;
                 pairWantKey = tempKey;
+            } else {
+                tradeJSON.put("unchecked", true);
             }
 
             pairAssetHave = dcSet.getItemAssetMap().get(pairHaveKey);
