@@ -32,7 +32,7 @@ public class GenesisIssuePersonRecord extends GenesisIssueItemRecord {
 
         //CHECK IF WE MATCH BLOCK LENGTH
         if (data.length < BASE_LENGTH) {
-            throw new Exception("Data does not match block length " + data.length);
+            throw new Exception("Data does not match RAW length " + data.length + " < " + BASE_LENGTH);
         }
 
         // READ TYPE
