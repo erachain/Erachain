@@ -888,13 +888,17 @@ public class BlockExplorer {
 
         Order orderInitiator = null;
         Transaction actionTX = null;
-        if (trade.isTrade()) {
-            orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
-        } else if (trade.isChange()) {
-            actionTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
-            actionTX.setDC(dcSet, true);
-        } else {
-            actionTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+        switch (trade.getType()) {
+            case Trade.TYPE_TRADE:
+            case Trade.TYPE_CANCEL_BY_ORDER:
+                orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
+                break;
+            case Trade.TYPE_CHANGE:
+                actionTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
+                actionTX.setDC(dcSet, true);
+                break;
+            default:
+                actionTX = dcSet.getTransactionFinalMap().get(trade.getInitiator());
         }
 
         long pairHaveKey;
@@ -977,7 +981,7 @@ public class BlockExplorer {
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
-        if (actionTX != null) {
+        if (!trade.isTrade()) {
             tradeJSON.put("type", trade.viewType());
             if (trade.isCancel()) {
                 tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());

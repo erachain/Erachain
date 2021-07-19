@@ -200,7 +200,7 @@ function order(data){
         if (trade.type == 'sell') {
             output += '<td align=right>' + addCommas(trade.amountHave);
 
-            output += '<td align=left>';
+            output += '<td align=right>';
             if (trade.unchecked == true) {}
             else {
                 output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>';
@@ -210,7 +210,7 @@ function order(data){
         } else if (trade.type == 'buy') {
             output += '<td align=right>' + addCommas(trade.amountHave);
 
-            output += '<td align=left>';
+            output += '<td align=right>';
             if (trade.unchecked == true) {}
             else {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>';
@@ -222,12 +222,21 @@ function order(data){
 
             output += '<td align=right>';
             output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
+
         } else if (trade.type == 'cancel') {
             output += '<td align=right>' + addCommas(trade.amountHave);
 
             output += '<td align=left>';
             output += '<span class="glyphicon glyphicon-remove" style="color:crimson; font-size:1.0em"></span>';
             output += '<span style="color:crimson">' + data.Label_Cancel + '</span>';
+
+        } else if (trade.type == 'order-cancel') {
+            output += '<td align=left>';
+            output += '<span class="glyphicon glyphicon-remove" style="color:crimson; font-size:1.0em"></span>';
+            output += '<span style="color:crimson">' + data.Label_Cancel + '</span>';
+
+            output += '<td align=right>' + addCommas(trade.targetAmount);
+
 
         }
 
