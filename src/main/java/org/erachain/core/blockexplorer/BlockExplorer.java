@@ -919,18 +919,19 @@ public class BlockExplorer {
             long startKey = pairAssetHave.getStartKey();
 
             /// если пару нужно перевернуть так как есть общепринятые пары
-            if (pairHaveKey == 1L && pairWantKey == 2L
+            // !!! тут обратная пара в Сделке
+            if (pairHaveKey > startKey && pairWantKey > startKey) {
+                unchecked = true;
+                tradeJSON.put("unchecked", true);
+            } else if (pairHaveKey == 1L && pairWantKey == 2L
                     || cnt.pairsController.spotPairsList.containsKey(pairAssetWant.getName() + "_" + pairAssetHave.getName())
+                    || pairHaveKey < startKey && pairWantKey > startKey
                     || pairAssetWant.isUnique() && !pairAssetHave.isUnique()
-                    || pairWantKey < startKey && pairHaveKey > startKey
             ) {
                 // swap pair
                 tempKey = pairHaveKey;
                 pairHaveKey = pairWantKey;
                 pairWantKey = tempKey;
-            } else if (pairHaveKey > startKey && pairWantKey > startKey) {
-                unchecked = true;
-                tradeJSON.put("unchecked", true);
             }
 
             pairAssetHave = dcSet.getItemAssetMap().get(pairHaveKey);
