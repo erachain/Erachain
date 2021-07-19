@@ -31,13 +31,15 @@ public class AccountSeedMap {
         //RESET ACCOUNTS LIST
         this.privateKeyAccounts = new ArrayList<PrivateKeyAccount>();
 
-        synchronized (this.privateKeyAccounts) {
-            for (byte[] accountSeed : accountSeedsSet) {
-                //CREATE ACCOUNT FROM ADDRESS
-                PrivateKeyAccount privateKeyAccount = new PrivateKeyAccount(accountSeed);
+        synchronized (accountSeedsSet) {
+            synchronized (privateKeyAccounts) {
+                for (byte[] accountSeed : accountSeedsSet) {
+                    //CREATE ACCOUNT FROM ADDRESS
+                    PrivateKeyAccount privateKeyAccount = new PrivateKeyAccount(accountSeed);
 
-                //ADD TO LIST
-                this.privateKeyAccounts.add(privateKeyAccount);
+                    //ADD TO LIST
+                    this.privateKeyAccounts.add(privateKeyAccount);
+                }
             }
         }
     }

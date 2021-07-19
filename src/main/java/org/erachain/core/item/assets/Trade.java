@@ -82,7 +82,7 @@ public class Trade {
             case TYPE_CHANGE:
                 return "change";
             case TYPE_CANCEL_BY_ORDER:
-                return "autocancel";
+                return "auto-cancel";
         }
         return "unknown";
     }

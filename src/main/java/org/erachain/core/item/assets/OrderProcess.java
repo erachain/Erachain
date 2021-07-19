@@ -419,9 +419,12 @@ public class OrderProcess {
             // это только если наш Ордер исполнен надо делать
             if (assetHave.isUnique() || assetWant.isUnique()) {
                 // cancel all other orders
+                // GET anew all orders - without break by price
+                index = 0;
                 if (assetWant.isUnique()) {
                     orders = dcSet.getOrderMap().getOrdersForTradeWithFork(haveAssetKey, wantAssetKey, null);
-                    index = 0;
+                } else {
+                    orders = dcSet.getOrderMap().getOrdersForTradeWithFork(wantAssetKey, haveAssetKey, null);
                 }
 
                 // инициатор всегда наш Ордер - для быстрого поиска при откате
@@ -452,7 +455,7 @@ public class OrderProcess {
                             target.getId(), // номер кого отменяем
                             target.getHaveAssetKey(), target.getWantAssetKey(),
                             target.getAmountHave(), target.getAmountWant(), // for price
-                            target.getHaveAssetScale(), target.getWantAssetScale(), 0);
+                            target.getHaveAssetScale(), target.getWantAssetScale(), index);
 
                     // нужно запомнить чтобы при откате восстановить назад
                     dcSet.getTradeMap().put(trade);
@@ -465,6 +468,7 @@ public class OrderProcess {
                             true, Account.BALANCE_POS_PLEDGE);
                     transaction.addCalculated(block, target.getCreator(), target.getHaveAssetKey(), left,
                             "Cancel By Order @" + Transaction.viewDBRef(cancelInitiatorID));
+
                 }
             }
 
@@ -553,8 +557,67 @@ public class OrderProcess {
 
                 final Trade trade = tradesMap.get(iterator.next());
                 switch (trade.getType()) {
-                    case Trade.TYPE_CANCEL:
+                    case Trade.TYPE_TRADE: {
+                        // сначала с малой базе быстрый поиск
+                        if (ordersMap.contains(trade.getTarget())) {
+                            //// Пока не изменились Остатки и цена по Остатки не съехала, удалим из таблицы ордеров
+                            /// иначе вторичный ключ останется так как он не будет найден из-за измененной "цены по остаткам"
+                            target = ordersMap.remove(trade.getTarget());
+                        } else {
+                            //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
+                            // - на всякий случай удалим его в любом случае
+                            target = completedMap.remove(trade.getTarget());
+                            if (target.isCanceled()
+                                    // возможно СТАТУС станет в будущем как Закрыт а не Отменен, тогда эта проверка сработает:
+                                    || target.getAmountHaveLeft().signum() > 0) {
+                                // это значит что ордер быо автоматически закрыт by Unresolved / outPrice
+                                // назад вернем
+                                target.getCreator().changeBalance(dcSet, true, false, wantAssetKey,
+                                        target.getAmountHaveLeft(), false, false,
+                                        true, Account.BALANCE_POS_PLEDGE);
+                            }
+                        }
+
+                        //REVERSE FUNDS
+                        BigDecimal tradeAmountHave = trade.getAmountHave();
+                        BigDecimal tradeAmountWant = trade.getAmountWant();
+
+                        //REVERSE FULFILLED
+                        target.fulfill(tradeAmountHave.negate());
+                        // accounting on PLEDGE position
+                        target.getCreator().changeBalance(dcSet, false,
+                                true, wantAssetKey, tradeAmountHave, false, false,
+                                true
+                        );
+
+                        // REVERSE THIS ORDER
+                        thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
+
+                        AssetCls.processTrade(dcSet, block, target.getCreator(),
+                                false, assetWant, assetHave,
+                                true, tradeAmountWant,
+                                blockTime,
+                                0L);
+
+                        // Учтем что у стороны ордера обновилась форжинговая информация
+                        if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
+                            block.addForgingInfoUpdate(target.getCreator());
+                        }
+
+                        //UPDATE ORDERS
+                        ordersMap.put(target);
+
+                        //REMOVE TRADE FROM DATABASE
+                        tradesMap.delete(trade);
+
+                        if (BlockChain.CHECK_BUGS > 3) {
+                            if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
+                                Long err = null;
+                                err++;
+                            }
+                        }
                         continue;
+                    }
                     case Trade.TYPE_CANCEL_BY_ORDER: {
                         // сделку ищем по ордеру и своему дбРЕФ
                         // чтобы восстановить старую цену
@@ -571,65 +634,6 @@ public class OrderProcess {
                                 true, Account.BALANCE_POS_PLEDGE);
 
                         continue;
-                    }
-                }
-
-                // сначала с малой базе быстрый поиск
-                if (ordersMap.contains(trade.getTarget())) {
-                    //// Пока не изменились Остатки и цена по Остатки не съехала, удалим из таблицы ордеров
-                    /// иначе вторичный ключ останется так как он не будет найден из-за измененной "цены по остаткам"
-                    target = ordersMap.remove(trade.getTarget());
-                } else {
-                    //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
-                    // - на всякий случай удалим его в любом случае
-                    target = completedMap.remove(trade.getTarget());
-                    if (target.isCanceled()
-                            // возможно СТАТУС станет в будущем как Закрыт а не Отменен, тогда эта проверка сработает:
-                            || target.getAmountHaveLeft().signum() > 0) {
-                        // это значит что ордер быо автоматически закрыт by Unresolved / outPrice
-                        // назад вернем
-                        target.getCreator().changeBalance(dcSet, true, false, wantAssetKey,
-                                target.getAmountHaveLeft(), false, false,
-                                true, Account.BALANCE_POS_PLEDGE);
-                    }
-                }
-
-                //REVERSE FUNDS
-                BigDecimal tradeAmountHave = trade.getAmountHave();
-                BigDecimal tradeAmountWant = trade.getAmountWant();
-
-                //REVERSE FULFILLED
-                target.fulfill(tradeAmountHave.negate());
-                // accounting on PLEDGE position
-                target.getCreator().changeBalance(dcSet, false,
-                        true, wantAssetKey, tradeAmountHave, false, false,
-                        true
-                );
-
-                // REVERSE THIS ORDER
-                thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
-
-                AssetCls.processTrade(dcSet, block, target.getCreator(),
-                        false, assetWant, assetHave,
-                        true, tradeAmountWant,
-                        blockTime,
-                        0L);
-
-                // Учтем что у стороны ордера обновилась форжинговая информация
-                if (haveAssetKey == Transaction.RIGHTS_KEY && block != null) {
-                    block.addForgingInfoUpdate(target.getCreator());
-                }
-
-                //UPDATE ORDERS
-                ordersMap.put(target);
-
-                //REMOVE TRADE FROM DATABASE
-                tradesMap.delete(trade);
-
-                if (BlockChain.CHECK_BUGS > 3) {
-                    if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
-                        Long err = null;
-                        err++;
                     }
                 }
 
