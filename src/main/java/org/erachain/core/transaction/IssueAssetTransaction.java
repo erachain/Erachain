@@ -212,7 +212,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
             test_len = BASE_LENGTH;
         }
         if (data.length < test_len) {
-            throw new Exception("Data does not match block length " + data.length);
+            throw new Exception("Data does not match RAW length " + data.length + " < " + test_len);
         }
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);

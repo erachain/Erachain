@@ -497,7 +497,7 @@ public class RSetStatusToItem extends Transaction {
         }
 
         if (data.length < test_len) {
-            throw new Exception("Data does not match block length " + data.length);
+            throw new Exception("Data does not match RAW length " + data.length + " < " + test_len);
         }
 
         // READ TYPE
