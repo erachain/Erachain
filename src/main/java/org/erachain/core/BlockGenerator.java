@@ -958,6 +958,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                             //PREVENT CONCURRENT MODIFY EXCEPTION
                             List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
+                            if (knownAccounts == null) {
+                                LOGGER.debug("knownAccounts is NULL");
+                                continue;
+                            }
 
                             local_status = 5;
                             this.setMonitorStatus("local_status " + viewStatus());

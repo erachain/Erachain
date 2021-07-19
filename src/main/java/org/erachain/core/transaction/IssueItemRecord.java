@@ -119,6 +119,10 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
             // эта транзакция взята как скелет из набора блока
             // найдем сохраненную транзакцию - в ней есь Номер Сути
             IssueItemRecord issueItemRecord = (IssueItemRecord) dcSet.getTransactionFinalMap().get(this.dbRef);
+            if (issueItemRecord == null) {
+                // это может быть при откате - транзакция уже удалена и пытается в кошельке ей мясо нарастить
+                return;
+            }
             key = issueItemRecord.getKey();
             item.setKey(key);
         } else if (item.getKey() == 0) {

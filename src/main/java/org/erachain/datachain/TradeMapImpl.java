@@ -101,7 +101,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Trade trade;
             while (iterator.hasNext()) {
                 trade = this.get(iterator.next());
-                if (!useCancel && trade.isCancel())
+                if (!useCancel && !trade.isTrade())
                     continue;
 
                 trades.add(trade);
@@ -137,7 +137,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Trade trade;
             while (iterator.hasNext()) {
                 trade = this.get(iterator.next());
-                if (!useCancel && trade.isCancel())
+                if (!useCancel && !trade.isTrade())
                     continue;
 
                 trades.add(trade);
@@ -152,7 +152,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Trade trade;
             while (iterator.hasNext()) {
                 trade = this.get(iterator.next());
-                if (!useCancel && trade.isCancel())
+                if (!useCancel && !trade.isTrade())
                     continue;
 
                 trades.add(trade);
@@ -195,7 +195,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Trade trade;
             while (iteratorLimit.hasNext()) {
                 trade = this.get(iteratorLimit.next());
-                if (!useCancel && trade.isCancel())
+                if (!useCancel && !trade.isTrade())
                     continue;
                 if (!useChange && trade.isChange())
                     continue;
@@ -229,7 +229,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                 if (useCancel)
                     return trade;
 
-                if (!trade.isCancel()) {
+                if (trade.isTrade()) {
                     return trade;
                 }
             }
@@ -322,7 +322,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Trade trade;
             while (iterator.hasNext()) {
                 trade = this.get(iterator.next());
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 trades.add(trade);
@@ -349,7 +349,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Trade trade;
             while (iterator.hasNext()) {
                 trade = this.get(iterator.next());
-                if (!useCancel && trade.isCancel())
+                if (!useCancel && !trade.isTrade())
                     continue;
 
                 trades.add(trade);
@@ -377,7 +377,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Trade trade;
             while (iterator.hasNext()) {
                 trade = this.get(iterator.next());
-                if (!useCancel && trade.isCancel())
+                if (!useCancel && !trade.isTrade())
                     continue;
 
                 trades.add(trade);
@@ -407,7 +407,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Trade trade;
             while (iterator.hasNext()) {
                 trade = this.get(iterator.next());
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 trades.add(trade);
@@ -437,7 +437,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             Trade trade;
             while (iterator.hasNext()) {
                 trade = this.get(iterator.next());
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 trades.add(trade);
@@ -474,7 +474,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
             while (iterator.hasNext()) {
                 Trade trade = this.get(iterator.next());
-                if (trade.isCancel())
+                if (!trade.isTrade())
                     continue;
 
                 if (trade.getHaveKey() == want) {

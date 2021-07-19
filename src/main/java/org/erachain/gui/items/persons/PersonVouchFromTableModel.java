@@ -123,7 +123,23 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RCertifyPubKey
                 }
             }
         } else if (message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE) {
-            Transaction transaction = (Transaction) message.getValue();
+            Transaction transaction = null;
+            if (message.getValue() instanceof Transaction) {
+                transaction = (Transaction) message.getValue();
+            } else {
+                Long dbRef = (Long) message.getValue();
+                boolean found = false;
+                for (Transaction tx : this.list) {
+                    if (tx.getDBRef() == dbRef) {
+                        transaction = (Transaction) message.getValue();
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                    return;
+            }
+
             if (transaction.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION) {
                 RCertifyPubKeys rSertify = (RCertifyPubKeys) transaction;
                 Tuple2<Integer, PersonCls> personRes = rSertify.getCreator().getPerson();

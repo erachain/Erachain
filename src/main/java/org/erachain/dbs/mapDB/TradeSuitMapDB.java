@@ -67,6 +67,9 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         //////////////// NOT PROTOCOL INDEXES
 
         //PAIR KEY
+        // ТУТ создается MAP - у которой должны быть уникальные ключи - иначе значение затрется
+        // - для ускорения работы не берется полный ключ Сделки а только Инициатор + getSequence
+        // - поэтому getSequence должен быть всегда новый
         this.pairKeyMap = database.createTreeMap("trades_key_pair")
                 .comparator(Fun.TUPLE3_COMPARATOR)
                 .makeOrGet();
@@ -200,9 +203,6 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(int startHeight, int stopHeight) {
 
-        if (this.pairKeyMap == null)
-            return null;
-
         // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
         return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) this.map).subMap(
                 Fun.t2(startHeight > 0 ? Transaction.makeDBRef(startHeight, 0) : null, null),
@@ -234,8 +234,6 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
 
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getIteratorFromID(long[] startTradeID) {
-        if (this.pairKeyMap == null)
-            return null;
 
         return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) this.map).subMap(
                 // обратная сортировка поэтому все вычитаем и -1 для всех getSequence
