@@ -916,15 +916,19 @@ public class BlockExplorer {
             pairAssetHave = dcSet.getItemAssetMap().get(pairHaveKey);
             pairAssetWant = dcSet.getItemAssetMap().get(pairWantKey);
 
+            long startKey = pairAssetHave.getStartKey();
+
             /// если пару нужно перевернуть так как есть общепринятые пары
-            if (pairHaveKey == 1L && pairWantKey == 2l
+            if (pairHaveKey == 1L && pairWantKey == 2L
                     || cnt.pairsController.spotPairsList.containsKey(pairAssetWant.getName() + "_" + pairAssetHave.getName())
+                    || pairAssetWant.isUnique() && !pairAssetHave.isUnique()
+                    || pairWantKey < startKey && pairHaveKey > startKey
             ) {
                 // swap pair
                 tempKey = pairHaveKey;
                 pairHaveKey = pairWantKey;
                 pairWantKey = tempKey;
-            } else if (pairHaveKey > 1000 && pairWantKey > 1000) {
+            } else if (pairHaveKey > startKey && pairWantKey > startKey) {
                 unchecked = true;
                 tradeJSON.put("unchecked", true);
             }
