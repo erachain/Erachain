@@ -101,8 +101,14 @@ public class ChangeOrderTransaction extends Transaction {
 
         super.setDC(dcSet, false);
 
-        orderID = dcSet.getTransactionFinalMapSigns().get(orderRef);
+        // на выходе может быть NULL - он в long не преобразуется - поэтому сначала исследуем
+        Long res = dcSet.getTransactionFinalMapSigns().get(orderRef);
 
+        if (res == null) {
+            return;
+        }
+
+        orderID = res;
         order = dcSet.getOrderMap().get(orderID);
         // подтянем в любом случае даже из Completed, а ниже проверку вставим на Активен?
         if (order == null) {
@@ -117,6 +123,10 @@ public class ChangeOrderTransaction extends Transaction {
     }
 
     public String getTitle() {
+        if (order == null) {
+            // если подпись ошибочная и ордера нет вообще
+            return "";
+        }
         return //TYPE_NAME + " " +
                 ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, order.getHaveAssetKey())
                         + " " + ItemCls.getItemTypeAndKey(ItemCls.ASSET_TYPE, order.getWantAssetKey());
@@ -400,8 +410,11 @@ public class ChangeOrderTransaction extends Transaction {
 
     @Override
     public void makeItemsKeys() {
-        if (isWiped()) {
+        if (isWiped()
+                || order == null // это может быть с инвалидной ссылкой на ордер
+        ) {
             itemsKeys = new Object[][]{};
+            return;
         }
 
         if (creatorPersonDuration == null) {
