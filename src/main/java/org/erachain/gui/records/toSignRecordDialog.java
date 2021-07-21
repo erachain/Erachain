@@ -173,7 +173,7 @@ public class toSignRecordDialog extends JDialog {
 
         //	JOptionPane.OK_OPTION
         if (confirmDialog.isConfirm > 0) {
-            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
+            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, null);
         }
         //ENABLE
         jButton_Confirm.setEnabled(true);

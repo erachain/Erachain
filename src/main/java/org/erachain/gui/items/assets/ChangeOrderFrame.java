@@ -243,7 +243,7 @@ public class ChangeOrderFrame extends JDialog {
         }
 
         Transaction changeOrder = Controller.getInstance().changeOrder(creator, feePow, order, wantAmount);
-        if (ResultDialog.make(this, changeOrder, false)) {
+        if (ResultDialog.make(this, changeOrder, false, null)) {
             dispose();
         }
 
