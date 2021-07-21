@@ -1,7 +1,6 @@
 package org.erachain.gui;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.items.assets.DepositExchange;
@@ -27,7 +26,7 @@ public class ResultDialog {
             JOptionPane.showMessageDialog(new JFrame(), message,
                     Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
             return true;
-        } else if (BlockChain.MAIN_MODE && result == Transaction.NOT_ENOUGH_FEE
+        } else if (result == Transaction.NOT_ENOUGH_FEE
                 // и биржа включена
                 && Settings.EXCHANGE_IN_OUT) {
 
