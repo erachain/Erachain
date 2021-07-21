@@ -230,7 +230,7 @@ public class BlockChain {
     public static final int WIN_VAL_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2023904;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 2152137;
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2135000; //260120;
-    public static final int AUTO_CANCEL_ORDERS_FROM = TEST_DB > 0 || !MAIN_MODE ? 0 : 2135000; //260120;
+    public static final int AUTO_CANCEL_ORDERS_FROM = TEST_DB > 0 || MAIN_MODE ? 2219177 : 0;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
      * !!! ВНИМАНИЕ !!! нельзя изменять походу собранной цепочки - так как съедут цены и индекс не удалится у некоторых ордеров - цена о другая.
