@@ -417,7 +417,7 @@ public class OrderProcess {
 
             // обработка уникальных только тут - тут все удалится для обоих сторон
             // это только если наш Ордер исполнен надо делать
-            if (height > BlockChain.AUTO_CANCEL_ORDERS_FROM && assetHave.isUnique() || assetWant.isUnique()) {
+            if (height > BlockChain.AUTO_CANCEL_ORDERS_FROM && (assetHave.isUnique() || assetWant.isUnique())) {
                 // cancel all other orders
                 // GET anew all orders - without break by price
                 index = 0;
