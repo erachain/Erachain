@@ -15,14 +15,14 @@ import java.math.BigDecimal;
 
 public class ResultDialog {
 
-    public static boolean make(Component parent, Transaction transaction, boolean tryFree) {
+    public static boolean make(Component parent, Transaction transaction, boolean tryFree, String txName) {
 
         int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK, tryFree, false);
 
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
             String message = Lang.T("Transaction \"%1\" has been sent").replace("%1",
-                    Lang.T(transaction.viewFullTypeName())) + "!";
+                    Lang.T(txName == null ? transaction.viewFullTypeName() : txName)) + "!";
             JOptionPane.showMessageDialog(new JFrame(), message,
                     Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
             return true;

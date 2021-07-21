@@ -252,7 +252,7 @@ public class MainFrame extends JFrame implements Observer {
                             confirmDialog.setVisible(true);
 
                             if (confirmDialog.isConfirm > 0) {
-                                ResultDialog.make(null, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
+                                ResultDialog.make(null, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, null);
                             }
 
                         }
