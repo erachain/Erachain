@@ -1,13 +1,11 @@
 package org.erachain.core.transCalculated;
 
-import java.util.Arrays;
-
-import org.erachain.core.transaction.Transaction;
-import org.json.simple.JSONObject;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.json.simple.JSONObject;
+
+import java.util.Arrays;
 
 /*
 
@@ -60,7 +58,7 @@ public class CalculatedCounter extends Calculated {
 
         int test_len = BASE_LENGTH;
         if (data.length < test_len) {
-            throw new Exception("Data does not match block length " + data.length);
+            throw new Exception("Data does not match RAW length " + data.length + " < " + test_len);
         }
 
         // READ TYPE
