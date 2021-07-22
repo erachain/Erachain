@@ -1,7 +1,11 @@
 package org.erachain.gui.items.statement;
 
 
-public class StatementsMySplitPanel extends StatementsSplitPanel {
+import org.erachain.core.transaction.RSignNote;
+import org.erachain.core.transaction.Transaction;
+import org.mapdb.Fun;
+
+public class StatementsMySplitPanel extends StatementsSplitPanel<Fun.Tuple2<Fun.Tuple2<Long, Integer>, Transaction>> {
 
     public static String NAME = "StatementsMySplitPanel";
     public static String TITLE = "My Documents";
@@ -11,4 +15,10 @@ public class StatementsMySplitPanel extends StatementsSplitPanel {
     public StatementsMySplitPanel() {
         super(NAME, TITLE, new MyStatementsTableModel(), MyStatementsTableModel.COLUMN_SEQNO, false);
     }
+
+    @Override
+    RSignNote getTransaction(Fun.Tuple2<Fun.Tuple2<Long, Integer>, Transaction> item) {
+        return (RSignNote) item.b;
+    }
+
 }

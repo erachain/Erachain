@@ -41,13 +41,15 @@ import java.util.ArrayList;
 import java.util.Base64;
 
 
-public abstract class StatementsSplitPanel extends SplitPanel {
+public abstract class StatementsSplitPanel<T> extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
 
     Wallet wallet = Controller.getInstance().getWallet();
+    private T currentItem;
     private RSignNote rNote;
     JMenuItem getPasswordMenuItems = new JMenuItem(Lang.T("Retrieve Password"));
+    JMenuItem favoriteMenuItems = new JMenuItem(Lang.T("Remove Favorite"));
 
     private WalletTableModel tableModel;
     private RowSorter<WalletTableModel> tableSorter;
@@ -95,16 +97,13 @@ public abstract class StatementsSplitPanel extends SplitPanel {
         JPopupMenu menu = new JPopupMenu();
 
         // favorite menu
-        if (isFavorite) {
-            JMenuItem favoriteMenuItems = new JMenuItem(Lang.T("Remove Favorite"));
-            favoriteMenuItems.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (rNote == null) return;
-                    favoriteSet(rNote);
-                }
-            });
-            menu.add(favoriteMenuItems);
-        }
+        favoriteMenuItems.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (rNote == null) return;
+                favoriteSet(rNote);
+            }
+        });
+        menu.add(favoriteMenuItems);
 
         menu.addSeparator();
 
@@ -376,6 +375,8 @@ public abstract class StatementsSplitPanel extends SplitPanel {
 
     }
 
+    abstract RSignNote getTransaction(T rNote);
+
     // filter search
     class search_tab_filter implements DocumentListener {
 
@@ -419,8 +420,11 @@ public abstract class StatementsSplitPanel extends SplitPanel {
                 return;
             }
 
-            rNote = (RSignNote) tableModel.getItem(jTableJScrollPanelLeftPanel.
+            currentItem = (T) tableModel.getItem(jTableJScrollPanelLeftPanel.
                     convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+
+            rNote = getTransaction(currentItem);
+            favoriteMenuItems.setText(Lang.T(wallet.isDocumentFavorite(rNote) ? "Remove Favorite" : "Add Favorite"));
 
             getPasswordMenuItems.setEnabled(rNote.isEncrypted());
 

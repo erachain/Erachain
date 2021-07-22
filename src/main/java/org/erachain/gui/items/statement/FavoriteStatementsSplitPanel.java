@@ -1,7 +1,9 @@
 package org.erachain.gui.items.statement;
 
 
-public class FavoriteStatementsSplitPanel extends StatementsSplitPanel {
+import org.erachain.core.transaction.RSignNote;
+
+public class FavoriteStatementsSplitPanel extends StatementsSplitPanel<RSignNote> {
 
     public static String NAME = "FavoriteStatementsSplitPanel";
     public static String TITLE = "Favorite Documents";
@@ -10,6 +12,11 @@ public class FavoriteStatementsSplitPanel extends StatementsSplitPanel {
 
     public FavoriteStatementsSplitPanel() {
         super(NAME, TITLE, new FavoriteStatementsTableModel(), FavoriteStatementsTableModel.COLUMN_SEQNO, true);
+    }
+
+    @Override
+    RSignNote getTransaction(RSignNote rNote) {
+        return rNote;
     }
 
 }
