@@ -471,6 +471,10 @@ public class ExData {
         return tags == null ? new byte[0] : tags;
     }
 
+    public boolean hasTags() {
+        return tags != null && tags.length > 0;
+    }
+
     public byte[][] getSecrets() {
         return secrets == null ? new byte[0][] : secrets;
     }

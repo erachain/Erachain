@@ -33,6 +33,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -52,6 +53,7 @@ import java.util.zip.DataFormatException;
 public class RNoteInfo extends RecDetailsFrame {
 
     RSignNote statement;
+    ExData exData;
     RSignNote statementEncrypted;
     private MAttachedFilesPanel file_Panel;
     private SignLibraryPanel voush_Library_Panel;
@@ -169,6 +171,53 @@ public class RNoteInfo extends RecDetailsFrame {
                 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
 
                 String fileName = arg0.getDescription();
+                if (fileName.startsWith("#T#")) {
+                    // TEMPLATE
+                    exData.getValuedText();
+
+                    fileName = "doc" + statement.viewHeightSeq();
+                    FileChooser chooser = new FileChooser();
+                    chooser.setDialogTitle(Lang.T("Save File") + ": " + fileName);
+                    //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                    chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+                    chooser.setMultiSelectionEnabled(false);
+                    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    //chooser.setAcceptAllFileFilterUsed(false);
+
+                    if (chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
+
+                        String pp = chooser.getSelectedFile().getPath() + File.separatorChar + fileName;
+
+                        File ff = new File(pp);
+                        // if file
+                        if (ff.exists() && ff.isFile()) {
+                            int aaa = JOptionPane.showConfirmDialog(chooser,
+                                    Lang.T("File") + " " + fileName
+                                            + " " + Lang.T("Exists") + "! "
+                                            + Lang.T("Overwrite") + "?", Lang.T("Message"),
+                                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                            if (aaa != 0) {
+                                return;
+                            }
+                            ff.delete();
+
+                        }
+
+                        String valuedText = exData.getValuedText();
+                        if (valuedText != null) {
+                            valuedText = Library.to_HTML(valuedText);
+                        }
+
+                        try (FileOutputStream fos = new FileOutputStream(pp)) {
+                            byte[] buffer = valuedText.getBytes(StandardCharsets.UTF_8);
+                            fos.write(buffer, 0, buffer.length);
+                        } catch (IOException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+
+                        return;
+                    }
+                }
 
                 FileChooser chooser = new FileChooser();
                 chooser.setDialogTitle(Lang.T("Save File") + ": " + fileName);
@@ -241,7 +290,6 @@ public class RNoteInfo extends RecDetailsFrame {
     private void viewInfo() {
 
         String resultStr = "";
-        ExData exData;
 
         exData = statement.getExData();
         exData.setDC(DCSet.getInstance());
@@ -298,7 +346,7 @@ public class RNoteInfo extends RecDetailsFrame {
         long templateKey = exData.getTemplateKey();
         if (templateKey > 0) {
             TemplateCls template = exData.getTemplate();
-            resultStr += "<a href=" + template.getKey() + "><h2>" + template.toString(DCSet.getInstance()) + "</h2></a>";
+            resultStr += "<a href=#T#" + template.getKey() + "><h2>" + template.toString(DCSet.getInstance()) + "</h2></a>";
 
             String valuedText = exData.getValuedText();
             if (valuedText != null) {
@@ -383,7 +431,7 @@ public class RNoteInfo extends RecDetailsFrame {
             resultStr += "<br>";
         }
 
-        if (exData.getTags() != null) {
+        if (exData.hasTags()) {
             resultStr += "<h4>" + Lang.T("Tags") + "</h4>";
             resultStr += statement.getExTags();
 
