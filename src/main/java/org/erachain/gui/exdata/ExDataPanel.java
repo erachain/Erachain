@@ -16,6 +16,7 @@ import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.*;
 import org.erachain.lang.Lang;
 import org.erachain.utils.FileHash;
+import org.erachain.utils.TableMenuPopupUtil;
 import org.erachain.utils.ZipBytes;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
@@ -25,6 +26,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +50,7 @@ public class ExDataPanel extends JPanel {
     public JTextField jTextField_Title_Message;
     public MTable jTable_Params_Message_Public;
     protected TemplateCls sel_Template;
-    private TableModelIssueHashes hashes_Table_Model;
+    private TableModelIssueHashes tableHashesModel;
     private AttacheFilesModel attached_Files_Model;
     private MButton jButton_Add_Attached_Files;
     private MButton jButton_Add_From_File_Other_Hashes;
@@ -71,7 +73,7 @@ public class ExDataPanel extends JPanel {
     public JTabbedPane jTabbedPane_Type;
     private JTabbedPane jTabbedPane_Other;
     private MTable jTable_Attached_Files;
-    private MTable jTable_Other_Hashes;
+    private MTable tableHashes;
     private JTextPane jTextPane_Message;
     public JCheckBox checkBoxMakeHashAndCheckUniqueText;
     public JCheckBox checkBoxMakeHashAndCheckUniqueHashes;
@@ -96,11 +98,11 @@ public class ExDataPanel extends JPanel {
             // delete row
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (hashes_Table_Model.getRowCount() > 0) {
-                    int selRow = jTable_Other_Hashes.getSelectedRow();
-                    if (selRow != -1 && hashes_Table_Model.getRowCount() >= selRow) {
-                        ((DefaultTableModel) hashes_Table_Model).removeRow(selRow);
-                        hashes_Table_Model.fireTableDataChanged();
+                if (tableHashesModel.getRowCount() > 0) {
+                    int selRow = tableHashes.getSelectedRow();
+                    if (selRow != -1 && tableHashesModel.getRowCount() >= selRow) {
+                        ((DefaultTableModel) tableHashesModel).removeRow(selRow);
+                        tableHashesModel.fireTableDataChanged();
                     }
                 }
             }
@@ -126,8 +128,8 @@ public class ExDataPanel extends JPanel {
                         Lang.T("Add"), JOptionPane.INFORMATION_MESSAGE);
                 if (str == null || str == "" || str.isEmpty())
                     return;
-                hashes_Table_Model.addRow(new Object[]{str, "Add"});
-                hashes_Table_Model.fireTableDataChanged();
+                tableHashesModel.addRow(new Object[]{str, "Add"});
+                tableHashesModel.fireTableDataChanged();
             }
         });
         this.jButton_Input_Hashes_From_File_Other_Hashes.setText(Lang.T("Import Hashs"));
@@ -138,6 +140,29 @@ public class ExDataPanel extends JPanel {
                 Hashs_from_Files(true);
             }
         });
+
+        JPopupMenu hashesMenu = new JPopupMenu();
+        JMenuItem copyHash = new JMenuItem(Lang.T("Copy Hash"));
+        copyHash.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = tableHashes.getSelectedRow();
+                if (row < 0) return;
+                row = tableHashes.convertRowIndexToModel(row);
+                String hash = (String) tableHashesModel.getValueAt(row, 0);
+                StringSelection stringSelection = new StringSelection(hash);
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.T("Hash '%1' has been copy to buffer")
+                                .replace("%1", hash)
+                                + ".",
+                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        hashesMenu.add(copyHash);
+
+        TableMenuPopupUtil.installContextMenu(tableHashes, hashesMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
         this.jButton_Add_Attached_Files.setText(Lang.T("Add"));
         jButton_Add_Attached_Files.addActionListener(new ActionListener() {
@@ -445,9 +470,9 @@ public class ExDataPanel extends JPanel {
         jScrollPane_Hashes_Files_Tale.setOpaque(false);
         jScrollPane_Hashes_Files_Tale.setPreferredSize(new Dimension(0, 0));
 
-        hashes_Table_Model = new TableModelIssueHashes(0);
-        jTable_Other_Hashes = new MTable(hashes_Table_Model);
-        jScrollPane_Hashes_Files_Tale.setViewportView(jTable_Other_Hashes);
+        tableHashesModel = new TableModelIssueHashes(0);
+        tableHashes = new MTable(tableHashesModel);
+        jScrollPane_Hashes_Files_Tale.setViewportView(tableHashes);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -585,10 +610,10 @@ public class ExDataPanel extends JPanel {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             // если есть пустые строки удаляем их
             int i;
-            for (i = 0; i <= hashes_Table_Model.getRowCount() - 1; i++) {
-                if (hashes_Table_Model.getValueAt(i, 0).toString().equals("")) {
+            for (i = 0; i <= tableHashesModel.getRowCount() - 1; i++) {
+                if (tableHashesModel.getValueAt(i, 0).toString().equals("")) {
 
-                    hashes_Table_Model.removeRow(i);
+                    tableHashesModel.removeRow(i);
 
                 }
             }
@@ -602,7 +627,7 @@ public class ExDataPanel extends JPanel {
                     hashesStr = new String(Files.readAllBytes(Paths.get(file_name)));
                 } catch (IOException e) {
                     e.printStackTrace();
-                    hashes_Table_Model.addRow(
+                    tableHashesModel.addRow(
                             new Object[]{"", Lang.T("error reading") + " - " + file_name});
                 }
 
@@ -610,7 +635,7 @@ public class ExDataPanel extends JPanel {
                     String[] hashes = hashesStr.split("\\s*(\\s|,|!|;|:|\n|\\.)\\s*");
                     for (String hashB58 : hashes) {
                         if (hashB58 != null && !hashB58.equals(new String("")))
-                            hashes_Table_Model.addRow(new Object[]{hashB58,
+                            tableHashesModel.addRow(new Object[]{hashB58,
                                     Lang.T("imported from") + " " + file_name});
                     }
 
@@ -623,19 +648,19 @@ public class ExDataPanel extends JPanel {
 
                 for (File patch : patchs) {
 
-                  /// HASHING
+                    /// HASHING
                     FileHash gf = new FileHash(patch);
                     String hashes = gf.getHash();
-                    hashes_Table_Model
+                    tableHashesModel
                             .addRow(new Object[]{hashes, Lang.T("from file ") + patch.getPath()});
                     gf = null;
                 }
 
             }
             // hashes_Table_Model.addRow(new Object[] { "",""});
-            hashes_Table_Model.fireTableDataChanged();
-            jTable_Other_Hashes.setRowSelectionInterval(hashes_Table_Model.getRowCount() - 1,
-                    hashes_Table_Model.getRowCount() - 1);
+            tableHashesModel.fireTableDataChanged();
+            tableHashes.setRowSelectionInterval(tableHashesModel.getRowCount() - 1,
+                    tableHashesModel.getRowCount() - 1);
 
         }
 
@@ -737,9 +762,9 @@ public class ExDataPanel extends JPanel {
 
         // hashes StandardCharsets.UTF_8
         HashMap<String, String> hashes_Map = new HashMap<String, String>();
-        int hR = hashes_Table_Model.getRowCount();
+        int hR = tableHashesModel.getRowCount();
         for (int i = 0; i < hR; i++) {
-            hashes_Map.put((String) hashes_Table_Model.getValueAt(i, 0), (String) hashes_Table_Model.getValueAt(i, 1));
+            hashes_Map.put((String) tableHashesModel.getValueAt(i, 0), (String) tableHashesModel.getValueAt(i, 1));
         }
         // files
         Set<Tuple3<String, Boolean, byte[]>> files_1 = new HashSet<Tuple3<String, Boolean, byte[]>>();
