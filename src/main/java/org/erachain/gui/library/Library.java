@@ -364,21 +364,11 @@ public class Library {
     }
 
     public static boolean will_HTML(String str) {
-        if (str.startsWith("#"))
-            if (str.startsWith("["))
-                // FORUM CKeditor
-                // TODO CK_editor INSERT
-                return Processor.process(str);
-
-        if (str.startsWith("{"))
-            // it is DOCX
-            // TODO DOCX insert
-            return str;
-
-        if (str.startsWith("<"))
+        if (str.startsWith("#") || str.startsWith("[") || str.startsWith("<"))
             // it is HTML
-            return str;
+            return true;
 
+        return false;
     }
 
     public static String isNum_And_Length(String str, int length) {

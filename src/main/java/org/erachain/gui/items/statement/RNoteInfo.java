@@ -173,9 +173,11 @@ public class RNoteInfo extends RecDetailsFrame {
                 String fileName = arg0.getDescription();
                 if (fileName.startsWith("#T#")) {
                     // TEMPLATE
-                    exData.getValuedText();
-
                     fileName = "doc" + statement.viewHeightSeq();
+                    String valuedText = exData.getValuedText();
+                    valuedText = Library.to_HTML(valuedText);
+                    fileName += Library.will_HTML(valuedText) ? ".html" : ".html";
+
                     FileChooser chooser = new FileChooser();
                     chooser.setDialogTitle(Lang.T("Save File") + ": " + fileName);
                     //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -201,11 +203,6 @@ public class RNoteInfo extends RecDetailsFrame {
                             }
                             ff.delete();
 
-                        }
-
-                        String valuedText = exData.getValuedText();
-                        if (valuedText != null) {
-                            valuedText = Library.to_HTML(valuedText);
                         }
 
                         try (FileOutputStream fos = new FileOutputStream(pp)) {
