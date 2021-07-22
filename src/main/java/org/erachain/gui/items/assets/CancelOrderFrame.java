@@ -230,7 +230,7 @@ public class CancelOrderFrame extends JDialog {
         }
 
         Transaction cancelOrder = Controller.getInstance().cancelOrder1(creator, order, feePow);
-        if (ResultDialog.make(this, cancelOrder, false)) {
+        if (ResultDialog.make(this, cancelOrder, false, null)) {
             dispose();
         }
 

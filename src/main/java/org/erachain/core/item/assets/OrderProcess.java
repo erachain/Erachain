@@ -52,7 +52,7 @@ public class OrderProcess {
 
         long id = orderThis.getId();
         // GET HEIGHT from ID
-        //int height = (int) (id >> 32);
+        int height = (int) (id >> 32);
         // нужно так как при сдвиге цены Заказ может быть уже початый и тут на ОстатокЦены проверку делаем
         BigDecimal price = orderThis.calcLeftPrice();
         BigDecimal thisPriceReverse = orderThis.calcLeftPriceReverse();
@@ -417,7 +417,7 @@ public class OrderProcess {
 
             // обработка уникальных только тут - тут все удалится для обоих сторон
             // это только если наш Ордер исполнен надо делать
-            if (assetHave.isUnique() || assetWant.isUnique()) {
+            if (height > BlockChain.AUTO_CANCEL_ORDERS_FROM && (assetHave.isUnique() || assetWant.isUnique())) {
                 // cancel all other orders
                 // GET anew all orders - without break by price
                 index = 0;

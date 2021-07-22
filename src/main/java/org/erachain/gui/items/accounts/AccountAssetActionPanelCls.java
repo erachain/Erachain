@@ -45,7 +45,6 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class AccountAssetActionPanelCls extends IconPanel implements RecipientAddress.RecipientAddressInterface {
 
-
     public Account creator;
 
     public Account recipient;
@@ -57,6 +56,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     public BigDecimal amount;
 
     public boolean backward;
+    int action;
 
     public ExLink exLink;
 
@@ -73,8 +73,6 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     public byte[] encrypted;
     public Integer result;
 
-    public int balancePosition;
-
     public boolean useSave;
 
     public boolean showAssetForm = false;
@@ -86,7 +84,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     private AccountsComboBoxModel accountsModel;
 
     public AccountAssetActionPanelCls(String panelName, String title, boolean backward, AssetCls assetIn,
-                                      int balancePosition,
+                                      int action,
                                       Account accountFrom, Account accountTo, String message) {
 
         super(panelName, title);
@@ -96,11 +94,12 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             this.asset = assetIn;
 
         this.backward = backward;
+        this.action = action;
 
         // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
         // поэтому тут только приватную переменную юзаем дальше
         if (title == null) {
-            this.title = asset.viewAssetTypeActionTitle(backward, balancePosition,
+            this.title = asset.viewAssetTypeActionTitle(backward, action,
                     accountFrom != null && accountFrom.equals(asset.getMaker()));
         }
 
@@ -114,10 +113,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         recipient = accountTo;
         // возможно есть счет по умолчанию
         if (recipient == null && asset != null) {
-            recipient = asset.defaultRecipient(balancePosition, backward);
+            recipient = asset.defaultRecipient(action, backward);
         }
-
-        this.balancePosition = balancePosition;
 
         initComponents(message);
 
@@ -130,7 +127,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             this.jTextField_Amount.setText(this.asset.defaultAmountAssetType().toPlainString());
 
         // account ComboBox
-        this.accountsModel = new AccountsComboBoxModel(balancePosition);
+        this.accountsModel = new AccountsComboBoxModel(action);
         jComboBoxCreator.setModel(accountsModel);
 
         if (creator != null) {
@@ -189,7 +186,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             jComboBox_Asset.setSelectedItem(asset);
         }
 
-        this.jComboBox_Fee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
+        this.jComboBox_Fee.setModel(new DefaultComboBoxModel<>(new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"}));
         jComboBox_Fee.setVisible(Gui.SHOW_FEE_POWER);
 
         //ON FAVORITES CHANGE
@@ -298,15 +295,15 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             recipientIsOwner = recipient.equals(asset.getMaker());
         }
 
-        if (asset.viewAssetTypeAction(backward, balancePosition, senderIsOwner) == null) {
+        if (asset.viewAssetTypeAction(backward, action, senderIsOwner) == null) {
             // Это возможно если был выбран актив уже внутри формы, а у него тип для которого текущего действия нету
             jButton_ok.setEnabled(false);
             jButton_ok.setText(Lang.T("Wrong Action"));
             return;
         }
 
-        String title = Lang.T(asset.viewAssetTypeActionTitle(backward, balancePosition, senderIsOwner));
-        String addAssetType = asset.viewAssetTypeAdditionAction(backward, balancePosition, senderIsOwner);
+        String title = Lang.T(asset.viewAssetTypeActionTitle(backward, action, senderIsOwner));
+        String addAssetType = asset.viewAssetTypeAdditionAction(backward, action, senderIsOwner);
         if (addAssetType == null) {
             jLabel_Title.setText(title + " - " + asset.viewName());
         } else {
@@ -316,12 +313,12 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         setName(title + " [" + asset.getKey() + "]");
 
-        jButton_ok.setText(Lang.T(asset.viewAssetTypeActionOK(backward, balancePosition, senderIsOwner)));
+        jButton_ok.setText(Lang.T(asset.viewAssetTypeActionOK(backward, action, senderIsOwner)));
 
-        this.jLabelCreator.setText(Lang.T(asset.viewAssetTypeCreator(backward, balancePosition, senderIsOwner)) + ":");
+        this.jLabelCreator.setText(Lang.T(asset.viewAssetTypeCreator(backward, action, senderIsOwner)) + ":");
 
         this.jLabelRecipient.setText(Lang.T(
-                asset.viewAssetTypeTarget(backward, balancePosition, recipientIsOwner) + " " + "Account") + ":");
+                asset.viewAssetTypeTarget(backward, action, recipientIsOwner) + " " + "Account") + ":");
         this.jLabelRecipientDetail.setText(Lang.T("Account Details") + ":");
 
         // set scale
@@ -350,10 +347,10 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                     balance = recipient.getBalance(asset.getKey());
             if (balance != null) {
                 details += (details.isEmpty() ? "" : "<br>") + Lang.T("Balances") + ": "
-                        + (balancePosition == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
-                        + " / " + (balancePosition == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
-                        + " / " + (balancePosition == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
-                        + " / " + (balancePosition == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
+                        + (action == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
+                        + " / " + (action == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
+                        + " / " + (action == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
+                        + " / " + (action == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
             }
             if (recipient.isPerson()) {
                 details += " - " + recipient.getPerson().b.getName();
@@ -375,10 +372,10 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balance = creator.getBalance(asset.getKey());
         if (balance != null) {
-            details += (balancePosition == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
-                    + " / " + (balancePosition == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
-                    + " / " + (balancePosition == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
-                    + " / " + (balancePosition == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
+            details += (action == TransactionAmount.ACTION_SEND ? ("<b>" + balance.a.b.toPlainString() + "</b>") : balance.a.b.toPlainString())
+                    + " / " + (action == TransactionAmount.ACTION_DEBT ? ("<b>" + balance.b.b.toPlainString() + "</b>") : balance.b.b.toPlainString())
+                    + " / " + (action == TransactionAmount.ACTION_HOLD ? ("<b>" + balance.c.b.toPlainString() + "</b>") : balance.c.b.toPlainString())
+                    + " / " + (action == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
         }
         this.jLabel_Balances.setText("<html>" + details);
 
@@ -610,7 +607,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(null, true, transaction,
-                Lang.T(asset.viewAssetTypeActionOK(backward, balancePosition,
+                Lang.T(asset.viewAssetTypeActionOK(backward, action,
                         creator != null && creator.equals(asset.getMaker()))),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.T("Confirmation Transaction"), useSave);
@@ -623,7 +620,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // JOptionPane.OK_OPTION
         if (confirmDialog.isConfirm > 0) {
-            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE);
+            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, jLabel_Title.getText());
         }
 
         // ENABLE
