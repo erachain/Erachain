@@ -14,6 +14,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MAttachedFilesPanel;
+import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
@@ -51,8 +53,8 @@ public class RNoteInfo extends RecDetailsFrame {
 
     RSignNote statement;
     RSignNote statementEncrypted;
-    //private MAttachedFilesPanel file_Panel;
-    //private SignLibraryPanel voush_Library_Panel;
+    private MAttachedFilesPanel file_Panel;
+    private SignLibraryPanel voush_Library_Panel;
     private javax.swing.JLabel jLabel_Title;
     private JTextPane jTextArea_Body;
 
@@ -161,14 +163,14 @@ public class RNoteInfo extends RecDetailsFrame {
 
         }
 
-        //++fieldGBC.gridy;
-        //add(file_Panel, fieldGBC);
+        ++fieldGBC.gridy;
+        add(file_Panel, fieldGBC);
 
         //jSplitPane1.setLeftComponent(jPanel1);
 
-        //voush_Library_Panel = new SignLibraryPanel(transaction);
-        //++fieldGBC.gridy;
-        //add(voush_Library_Panel, fieldGBC);
+        voush_Library_Panel = new SignLibraryPanel(transaction);
+        ++fieldGBC.gridy;
+        add(voush_Library_Panel, fieldGBC);
         //
 
         //++fieldGBC.gridy;
@@ -361,7 +363,7 @@ public class RNoteInfo extends RecDetailsFrame {
                     boolean zip = new Boolean(file.getValue().b);
                     String name_File = file.getKey();
                     byte[] file_byte = file.getValue().c;
-                    //file_Panel.addRow(name_File, zip, file_byte);
+                    file_Panel.addRow(name_File, zip, file_byte);
                 }
                 //file_Panel.fireTableDataChanged();
             }

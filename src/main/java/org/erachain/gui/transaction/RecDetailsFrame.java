@@ -36,7 +36,7 @@ public class RecDetailsFrame extends JPanel //JFrame
     public GridBagConstraints labelGBC;
     public GridBagConstraints fieldGBC;
     public JTextField signature;
-    Transaction transaction;
+    protected Transaction transaction;
     protected JTree linksTree;
 
     public RecDetailsFrame(Transaction transaction, boolean andSetup) {

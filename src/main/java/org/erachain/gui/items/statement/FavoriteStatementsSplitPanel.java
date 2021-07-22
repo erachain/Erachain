@@ -383,8 +383,10 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
                     convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
             JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+            RNoteInfo rNoteInfo = new RNoteInfo(transaction); // here load all values and calc FEE
+
             info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
-            jScrollPaneJPanelRightPanel.setViewportView(info_panel);
+            jScrollPaneJPanelRightPanel.setViewportView(rNoteInfo);
             //	jSplitPanel.setRightComponent(info_panel);
         }
     }
