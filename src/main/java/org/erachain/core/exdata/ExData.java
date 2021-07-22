@@ -1541,6 +1541,35 @@ public class ExData {
 
     }
 
+    public Fun.Tuple3<Integer, String, byte[]> getPassword(PublicKeyAccount account, Account recipient) {
+
+        byte[] password;
+        int pos = -1;
+        if (account.equals((recipient))) {
+            pos = recipients.length; // последний в Секретах
+        } else {
+            for (int i = 0; i < recipients.length; i++) {
+                if (recipients[i].equals(recipient)) {
+                    pos = i;
+                    break;
+                }
+            }
+        }
+
+        if (pos < 0) {
+            return new Fun.Tuple3<>(pos, "Address not found", null);
+        }
+
+        try {
+            password = Controller.getInstance().decrypt(account, recipient, secrets[pos]);
+            return new Tuple3<>(pos, null, password);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return new Tuple3<>(pos, e.getMessage(), null);
+        }
+
+    }
+
     public JSONObject toJson() {
 
         JSONObject toJson = new JSONObject();

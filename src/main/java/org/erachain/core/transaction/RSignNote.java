@@ -986,4 +986,8 @@ public class RSignNote extends Transaction implements Itemable {
         return new Fun.Tuple3<>(decryptedExData.a, decryptedExData.b, decryptedNote);
 
     }
+
+    public Fun.Tuple3<Integer, String, byte[]> getPassword(Account recipient) {
+        return extendedData.getPassword(creator, recipient);
+    }
 }
