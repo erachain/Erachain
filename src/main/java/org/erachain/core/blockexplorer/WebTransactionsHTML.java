@@ -847,13 +847,13 @@ public class WebTransactionsHTML {
 
     }
 
-    public static void getSigns(HashMap output, Transaction transaction, JSONObject langObj) {
+    public static String getSigns(Transaction transaction, JSONObject langObj) {
 
         DCSet dcSet = DCSet.getInstance();
 
         PublicKeyAccount creator = transaction.getCreator();
         if (creator == null) {
-            return;
+            return "";
         }
 
         Fun.Tuple2<Integer, PersonCls> creatorPersonItem = creator.getPerson();
@@ -899,8 +899,20 @@ public class WebTransactionsHTML {
             }
         }
 
-        ///out += "</table>";
-        output.put("signs", out);
+        return out;
+
+    }
+
+    public static void getSigns(HashMap output, Transaction transaction, JSONObject langObj) {
+
+        DCSet dcSet = DCSet.getInstance();
+
+        PublicKeyAccount creator = transaction.getCreator();
+        if (creator == null) {
+            return;
+        }
+
+        output.put("signs", getSigns(transaction, langObj));
 
     }
 

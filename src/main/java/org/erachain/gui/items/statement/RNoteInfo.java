@@ -2,6 +2,7 @@ package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.blockexplorer.WebTransactionsHTML;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exActions.ExAction;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
@@ -18,6 +19,7 @@ import org.erachain.gui.library.MAttachedFilesPanel;
 import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.ZipBytes;
 import org.json.simple.JSONObject;
@@ -176,7 +178,19 @@ public class RNoteInfo extends RecDetailsFrame {
                     fileName = "doc" + statement.viewHeightSeq();
                     String valuedText = exData.getValuedText();
                     valuedText = Library.to_HTML(valuedText);
-                    fileName += Library.will_HTML(valuedText) ? ".html" : ".html";
+                    //fileName += Library.will_HTML(valuedText) ? ".html" : ".txt";
+                    fileName += ".html";
+
+                    String message = exData.getMessage();
+                    if (message != null && !message.isEmpty()) {
+                        valuedText += "<br>";
+                        valuedText += Library.to_HTML(message);
+                    }
+
+                    valuedText += "<br><h2>" + Lang.T("Signs") + "</h2>";
+                    valuedText += WebTransactionsHTML.getSigns(transaction, Lang.getInstance().getLangJson(
+                            Settings.getInstance().getLang()));
+
 
                     FileChooser chooser = new FileChooser();
                     chooser.setDialogTitle(Lang.T("Save File") + ": " + fileName);
@@ -362,8 +376,8 @@ public class RNoteInfo extends RecDetailsFrame {
         }
 
         String message = exData.getMessage();
-        if (message != null) {
-            resultStr += Library.to_HTML(message) + "<br><br>";
+        if (message != null && !message.isEmpty()) {
+            resultStr += "<br>" + Library.to_HTML(message) + "<hr><br>";
         }
 
         if (exData.hasHashes()) {
