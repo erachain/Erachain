@@ -77,12 +77,6 @@ public class RNoteInfo extends RecDetailsFrame {
 
     private void initComponents() {
 
-
-        jTextArea_Body = new JTextPane();
-        jTextArea_Body.setContentType("text/html");
-        jTextArea_Body.setEditable(false);
-        MenuPopupUtil.installContextMenu(jTextArea_Body);
-
         ++labelGBC.gridy;
         jLabel_Title = new JLabel(Lang.T("Title") + ":");
         add(jLabel_Title, labelGBC);
@@ -90,25 +84,10 @@ public class RNoteInfo extends RecDetailsFrame {
         fieldGBC.gridy = labelGBC.gridy;
         add(new JLabel(statement.getTitle()), fieldGBC);
 
-        JScrollPane jScrollPane_Message_TextPane = new JScrollPane();
-        jScrollPane_Message_TextPane.setViewportView(jTextArea_Body);
-        jScrollPane_Message_TextPane.setPreferredSize(new Dimension(0, 500));
-
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = ++labelGBC.gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        gridBagConstraints.gridwidth = 3;
-        add(jScrollPane_Message_TextPane, gridBagConstraints);
-
-
         if (statement.isEncrypted()) {
             JCheckBox encrypted = new JCheckBox(Lang.T("Encrypted"));
             encrypted.setSelected(true);
-            ++fieldGBC.gridy;
+            fieldGBC.gridy = ++labelGBC.gridy;
             add(encrypted, fieldGBC);
 
             encrypted.addActionListener(new ActionListener() {
@@ -160,21 +139,27 @@ public class RNoteInfo extends RecDetailsFrame {
                     }
                 }
             });
-
         }
 
-        ++fieldGBC.gridy;
-        add(file_Panel, fieldGBC);
+        /////////////
+        JScrollPane jScrollPane_Message_TextPane = new JScrollPane();
+        jTextArea_Body = new JTextPane();
+        jTextArea_Body.setContentType("text/html");
+        jTextArea_Body.setEditable(false);
+        MenuPopupUtil.installContextMenu(jTextArea_Body);
+        jScrollPane_Message_TextPane.setViewportView(jTextArea_Body);
+        jScrollPane_Message_TextPane.setPreferredSize(new Dimension(0, 500));
 
-        //jSplitPane1.setLeftComponent(jPanel1);
-
-        voush_Library_Panel = new SignLibraryPanel(transaction);
-        ++fieldGBC.gridy;
-        add(voush_Library_Panel, fieldGBC);
-        //
-
-        //++fieldGBC.gridy;
-        //add(jSplitPane1, fieldGBC);
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = ++labelGBC.gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.gridwidth = 3;
+        add(jScrollPane_Message_TextPane, gridBagConstraints);
+        ///////////////////
 
         jTextArea_Body.addHyperlinkListener(new HyperlinkListener() {
 
@@ -231,21 +216,26 @@ public class RNoteInfo extends RecDetailsFrame {
                         }
 
                     } catch (IOException ex) {
-
                         System.out.println(ex.getMessage());
                     }
 
                 }
 
-
             }
         });
 
-    }// </editor-fold>
+        if (false) {
+            // старая версия - теперь все в HTML поле скопом со ссылками
+            ++fieldGBC.gridy;
+            file_Panel = new MAttachedFilesPanel();
+            add(file_Panel, fieldGBC);
 
-    //public void delay_on_Close() {
-    //    voush_Library_Panel.delay_on_close();
-    //}
+            voush_Library_Panel = new SignLibraryPanel(transaction);
+            ++fieldGBC.gridy;
+            add(voush_Library_Panel, fieldGBC);
+        }
+
+    }
 
     @SuppressWarnings("unchecked")
     private void viewInfo() {
@@ -308,7 +298,8 @@ public class RNoteInfo extends RecDetailsFrame {
         long templateKey = exData.getTemplateKey();
         if (templateKey > 0) {
             TemplateCls template = exData.getTemplate();
-            resultStr += "<h2>" + template.toString(DCSet.getInstance()) + "</h2>";
+            resultStr += "<a href=" + template.getKey() + "><h2>" + template.toString(DCSet.getInstance()) + "</h2></a>";
+
             String valuedText = exData.getValuedText();
             if (valuedText != null) {
                 resultStr += Library.to_HTML(valuedText);
