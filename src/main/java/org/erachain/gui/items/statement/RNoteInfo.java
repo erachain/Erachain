@@ -86,6 +86,8 @@ public class RNoteInfo extends RecDetailsFrame {
         add(new JLabel(statement.getTitle()), fieldGBC);
 
         if (statement.isEncrypted()) {
+            statementEncrypted = statement;
+
             JPanel cryptPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
 
             JCheckBox encrypted = new JCheckBox(Lang.T("Encrypted"));
@@ -107,8 +109,6 @@ public class RNoteInfo extends RecDetailsFrame {
                                 return;
                             }
                         }
-
-                        statementEncrypted = statement;
 
                         Account account = cntr.getInvolvedAccount(statement);
                         Fun.Tuple3<Integer, String, RSignNote> result = statement.decrypt(account);
@@ -147,32 +147,34 @@ public class RNoteInfo extends RecDetailsFrame {
                 @Override
                 public void actionPerformed(ActionEvent arg0) {
                     // TODO Auto-generated method stub
-                    String password = GetPasswordPane.showDialog(decryptByPassword, "Decrypt by Password");
-                    if (password == null) {
-                        return;
-                    } else if (password.length() < 10) {
-                        JOptionPane.showMessageDialog(null,
-                                Lang.T("Password so short"),
-                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                    if (encrypted.isSelected()) {
+                        String password = GetPasswordPane.showDialog(decryptByPassword, "Decrypt by Password");
+                        if (password == null) {
+                            return;
+                        } else if (password.length() < 10) {
+                            JOptionPane.showMessageDialog(null,
+                                    Lang.T("Password so short"),
+                                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+
+                            return;
+
+                        }
+                        Fun.Tuple2<String, RSignNote> result = statement.decryptByPassword(password);
+                        if (result.b == null) {
+                            JOptionPane.showMessageDialog(null,
+                                    Lang.T(result.a),
+                                    Lang.T("Not decrypted"), JOptionPane.ERROR_MESSAGE);
+
+                            return;
+
+                        }
+
                         encrypted.setSelected(!encrypted.isSelected());
 
-                        return;
-
+                        statement = result.b;
+                        statement.parseDataFull();
+                        viewInfo();
                     }
-                    Fun.Tuple2<String, RSignNote> result = statement.decryptByPassword(password);
-                    if (result.a != null) {
-                        JOptionPane.showMessageDialog(null,
-                                Lang.T(result.a),
-                                Lang.T("Not decrypted"), JOptionPane.ERROR_MESSAGE);
-                        encrypted.setSelected(!encrypted.isSelected());
-
-                        return;
-
-                    }
-
-                    statement = result.b;
-                    statement.parseDataFull();
-                    viewInfo();
                 }
             });
 
