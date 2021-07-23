@@ -5,7 +5,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
@@ -43,7 +42,7 @@ import java.util.List;
  */
 public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
-    Controller cnt = Controller.getInstance();
+    protected Controller cnt = Controller.getInstance();
     public JPanel info_Panel;
     public JButton buttonGetLasts = new JButton(Lang.T("Get Last"));
     public SignLibraryPanel voush_Library_Panel;
@@ -401,30 +400,6 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
         }
     }
 
-    public void favorite_set(Transaction transaction) {
+    protected abstract void favorite_set(Transaction transaction);
 
-        if (forDocuments) {
-            // CHECK IF FAVORITES
-            if (cnt.isDocumentFavorite(transaction)) {
-                int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
-
-                if (dd == 0) cnt.removeDocumentFavorite(transaction);
-            } else {
-                cnt.addDocumentFavorite(transaction);
-            }
-
-        } else {
-            // CHECK IF FAVORITES
-            if (cnt.isTransactionFavorite(transaction)) {
-                int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
-
-                if (dd == 0) cnt.removeTransactionFavorite(transaction);
-            } else {
-                cnt.addTransactionFavorite(transaction);
-            }
-
-        }
-        jTableJScrollPanelLeftPanel.repaint();
-
-    }
 }
