@@ -89,7 +89,7 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
                     // transactionsModel.get(row);
 
                     // SHOW DETAIL SCREEN OF TRANSACTION
-                    // TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+                    // TransactionDetailsFactory.createTransactionDetail(transaction);
                 }
             }
         });
@@ -134,8 +134,8 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
 
                             // GET TRANSACTION
                             Transaction transaction = transactionsModel.getItem(row);
-                            // SHOW DETAIL SCREEN OF TRANSACTION
-                            // TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+                                // SHOW DETAIL SCREEN OF TRANSACTION
+                                // TransactionDetailsFactory.createTransactionDetail(transaction);
 
                             JPanel panel = new JPanel();
                             panel.setLayout(new GridBagLayout());
@@ -150,8 +150,8 @@ public class UnconfirmedTransactionsPanel extends IconPanel {
                             tableGBC.weighty = 1;
                             tableGBC.gridx = 0;
                             tableGBC.gridy = 0;
-                            panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(transaction),
-                                    tableGBC);
+                                panel.add(TransactionDetailsFactory.createTransactionDetail(transaction),
+                                        tableGBC);
                             JLabel jLabel9 = new JLabel();
                             jLabel9.setText("");
                             GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();

@@ -208,7 +208,7 @@ public class SysTray implements Observer {
                             Transaction transaction = transactionsModel.getItem(row).b;
 
                             //SHOW DETAIL SCREEN OF TRANSACTION
-                            TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+                            TransactionDetailsFactory.createTransactionDetail(transaction);
                         }
                     }
                 });

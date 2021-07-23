@@ -363,7 +363,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
             Transaction transaction = (Transaction) favotitesTable.getItem(
                     jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
-            JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+            JPanel info_panel = TransactionDetailsFactory.createTransactionDetail(transaction);
             info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);
             //	jSplitPanel.setRightComponent(info_panel);

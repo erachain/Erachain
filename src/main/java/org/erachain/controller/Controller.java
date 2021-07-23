@@ -2666,6 +2666,14 @@ public class Controller extends Observable {
         return this.wallet.isDocumentFavorite(transaction);
     }
 
+    public void addDocumentFavorite(Transaction transaction) {
+        this.wallet.addDocumentFavorite(transaction);
+    }
+
+    public void removeDocumentFavorite(Transaction transaction) {
+        this.wallet.removeDocumentFavorite(transaction);
+    }
+
     public Collection<ItemCls> getAllItems(int type) {
         return getItemMap(type).values();
     }

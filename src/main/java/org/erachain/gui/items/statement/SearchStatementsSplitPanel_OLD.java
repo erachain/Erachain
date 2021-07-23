@@ -478,7 +478,7 @@ public class SearchStatementsSplitPanel_OLD extends SplitPanel {
 
             Transaction transaction = search_Table_Model.getItem(jTableJScrollPanelLeftPanel
                     .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+            JPanel info_panel = TransactionDetailsFactory.createTransactionDetail(transaction);
 
             int infoPanelWidth = jScrollPaneJPanelRightPanel.getSize().width;
             int infoPanelHeight = jScrollPaneJPanelRightPanel.getSize().height;

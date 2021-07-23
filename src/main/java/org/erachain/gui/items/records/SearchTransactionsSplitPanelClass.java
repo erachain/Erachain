@@ -9,6 +9,7 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
+import org.erachain.gui.items.statement.SearchStatementsTableModel;
 import org.erachain.gui.library.ASMakeHashMenuItem;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
@@ -42,18 +43,20 @@ import java.util.List;
  */
 public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
+    Controller cnt = Controller.getInstance();
     public JPanel info_Panel;
     public JButton buttonGetLasts = new JButton(Lang.T("Get Last"));
     public SignLibraryPanel voush_Library_Panel;
     public SearchTableModelCls transactionsTableModel;
     public Transaction selectedTransaction;
-    //JScrollPane jScrollPane4;
     private JTextField searchString;
+    private boolean forDocuments;
 
     public SearchTransactionsSplitPanelClass(String name, String title, SearchTableModelCls tableModel) {
         super(name, title);
 
         transactionsTableModel = tableModel;
+        forDocuments = tableModel instanceof SearchStatementsTableModel;
 
         this.searchToolBar_LeftPanel.setVisible(true);
 
@@ -129,7 +132,6 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
         columnModel.getColumn(transactionsTableModel.COLUMN_FAVORITE).setMaxWidth((100));
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
-
 
         this.jTableJScrollPanelLeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -291,7 +293,7 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
                     if (selectedTransaction == null) return;
 
                     //SHOW DETAIL SCREEN OF TRANSACTION
-                    TransactionDetailsFactory.getInstance().createTransactionDetail(selectedTransaction);
+                    TransactionDetailsFactory.createTransactionDetail(selectedTransaction);
                 }
             }
         });
@@ -364,7 +366,7 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
                 tableGBC.weighty = 1;
                 tableGBC.gridx = 0;
                 tableGBC.gridy = 0;
-                info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(selectedTransaction), tableGBC);
+                info_Panel.add(TransactionDetailsFactory.createTransactionDetail(selectedTransaction), tableGBC);
 
                 Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(selectedTransaction.getBlockHeight(), selectedTransaction.getSeqNo()));
                 GridBagConstraints gridBagConstraints = null;
@@ -401,14 +403,26 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
     public void favorite_set(Transaction transaction) {
 
-        // CHECK IF FAVORITES
-        if (Controller.getInstance().isTransactionFavorite(transaction)) {
-            int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
+        if (forDocuments) {
+            // CHECK IF FAVORITES
+            if (cnt.isDocumentFavorite(transaction)) {
+                int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
 
-            if (dd == 0) Controller.getInstance().removeTransactionFavorite(transaction);
+                if (dd == 0) cnt.removeDocumentFavorite(transaction);
+            } else {
+                cnt.addDocumentFavorite(transaction);
+            }
+
         } else {
+            // CHECK IF FAVORITES
+            if (cnt.isTransactionFavorite(transaction)) {
+                int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
 
-            Controller.getInstance().addTransactionFavorite(transaction);
+                if (dd == 0) cnt.removeTransactionFavorite(transaction);
+            } else {
+                cnt.addTransactionFavorite(transaction);
+            }
+
         }
         jTableJScrollPanelLeftPanel.repaint();
 
