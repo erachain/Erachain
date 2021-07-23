@@ -341,6 +341,9 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
             jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
     }
 
+    protected void updateMenu() {
+    }
+
     // listener select row
     class search_listener implements ListSelectionListener {
         @Override
@@ -350,6 +353,8 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
                 selectedTransaction = transactionsTableModel
                         .getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
 
+
+                updateMenu();
 
                 info_Panel = new JPanel();
                 info_Panel.setLayout(new GridBagLayout());
