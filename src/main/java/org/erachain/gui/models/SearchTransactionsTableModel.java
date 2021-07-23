@@ -32,7 +32,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls {
     @Override
     public Object getValueAt(int row, int column) {
         try {
-            if (this.list == null || this.list.size() - 1 < row) {
+            if (list == null || list.size() - 1 < row) {
                 return null;
             }
 
@@ -40,7 +40,6 @@ public class SearchTransactionsTableModel extends SearchTableModelCls {
             if (transaction == null) {
                 return null;
             }
-
 
             switch (column) {
 
@@ -77,16 +76,14 @@ public class SearchTransactionsTableModel extends SearchTableModelCls {
 
                     return cnt.isTransactionFavorite(transaction);
 
-
             }
-
-
-            return null;
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return null;
         }
+
+        return null;
+
     }
 
 }

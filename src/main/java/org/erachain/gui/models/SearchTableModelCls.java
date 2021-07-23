@@ -20,7 +20,6 @@ import javax.validation.constraints.Null;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 
 @SuppressWarnings("serial")
 public abstract class SearchTableModelCls extends AbstractTableModel {
@@ -198,8 +197,6 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
         return (this.list == null) ? 0 : this.list.size();
     }
 
-    public abstract Object getValueAt(int row, int column);
-
     public Class<? extends Object> getColumnClass(int c) {
         Object o = getValueAt(0, c);
         return o == null ? Null.class : o.getClass();
@@ -221,9 +218,6 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
             return 0;
 
         return map.size();
-    }
-
-    public synchronized void syncUpdate(Observable o, Object arg) {
     }
 
     /**
