@@ -1,9 +1,6 @@
 package org.erachain.gui.items.statement;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.wallet.Wallet;
-import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SearchTableModelCls;
 import org.erachain.lang.Lang;
@@ -11,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-public class SearchStatementsTableModel extends SearchTableModelCls<Transaction> {
+public class SearchStatementsTableModel extends SearchTableModelCls {
 
     public static final int COLUMN_SEQNO = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -21,15 +18,12 @@ public class SearchStatementsTableModel extends SearchTableModelCls<Transaction>
     public static final int COLUMN_FAVORITE = 5;
     private static final long serialVersionUID = 1L;
 
-    DCSet dcSet = DCSet.getInstance();
-    Wallet wallet = Controller.getInstance().getWallet();
-
     public SearchStatementsTableModel() {
 
         super(DCSet.getInstance().getTransactionFinalMap(),
                 new String[]{"№", "Timestamp", "Type", "Creator", "Statement", "Favorite"},
                 new Boolean[]{false, true, true, true, true, false},
-                true);
+                COLUMN_FAVORITE, true);
 
         logger = LoggerFactory.getLogger(this.getClass());
 
@@ -57,44 +51,10 @@ public class SearchStatementsTableModel extends SearchTableModelCls<Transaction>
             case COLUMN_TITLE:
                 return transaction.getTitle();
             case COLUMN_FAVORITE:
-                return wallet.isDocumentFavorite(transaction);
+                return cnt.isDocumentFavorite(transaction);
         }
 
         return null;
-    }
-
-
-    public void findByKey(String text) {
-
-        clear();
-
-        // TODO Auto-generated method stub
-        if (text.equals("") || text == null)
-            return;
-        if (!text.matches("[0-9]*"))
-            return;
-        if (new Long(text) < 1)
-            return;
-
-        Long key = new Long(text);
-        if (key > 0) {
-            list.add(DCSet.getInstance().getTransactionFinalMap().get(key));
-        }
-
-        fireTableDataChanged();
-    }
-
-    public void setFilterByName(String filter, Long fromID) {
-
-        clear();
-
-        DCSet dcSet = DCSet.getInstance();
-
-        list = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
-                .getByFilterAsArray(filter, fromID, start, step, descending);
-
-        fireTableDataChanged();
-
     }
 
     public void clear() {

@@ -100,6 +100,7 @@ public class SplitPanel extends IconPanel {
         //      jSplitPanel.M_setDividerSize(20);
         leftPanel = new JPanel();
         toolBarLeftPanel = new JPanel();
+        //toolBarLeftPanel
         button1ToolBarLeftPanel = new JButton();
         button2ToolBarLeftPanel = new JToggleButton();
         searchToolBar_LeftPanel = new JMenuBar();

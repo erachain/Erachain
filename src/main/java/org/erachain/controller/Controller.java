@@ -2662,6 +2662,10 @@ public class Controller extends Observable {
         return this.wallet.isTransactionFavorite(transaction);
     }
 
+    public boolean isDocumentFavorite(Transaction transaction) {
+        return this.wallet.isDocumentFavorite(transaction);
+    }
+
     public Collection<ItemCls> getAllItems(int type) {
         return getItemMap(type).values();
     }
