@@ -152,7 +152,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 			favoriteColumn.setPreferredWidth(50);//.setWidth(30);
 		*/
         // UPDATE FILTER ON TEXT CHANGE
-        this.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new My_Search());
+        this.searchTextField2.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
         this.jTableJScrollPanelLeftPanel.setModel(incoming_Mails_Model);
         this.jTableJScrollPanelLeftPanel = jTableJScrollPanelLeftPanel;
@@ -216,7 +216,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
         public void onChange() {
             // GET VALUE
-            String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
+            String search = searchTextField2.getText();
             // SET FILTER
             incoming_Mails_Model.fireTableDataChanged();
 

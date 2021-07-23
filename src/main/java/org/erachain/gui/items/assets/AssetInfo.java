@@ -191,7 +191,7 @@ public class AssetInfo extends JTextPane {
                     } else if (arg0.getDescription().equals("!!Type")) {
                         String find = asset.viewAssetTypeAbbrev();
                         SearchAssetsSplitPanel panel = new SearchAssetsSplitPanel(false);
-                        panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(":" + find);
+                        panel.searchTextField2.setText(":" + find);
                         panel.startSearchName();
                         MainPanel.getInstance().insertNewTab(Lang.T("Search") + " :" + find, panel);
                     }

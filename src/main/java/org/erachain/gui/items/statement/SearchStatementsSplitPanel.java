@@ -9,6 +9,7 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.persons.ItemsPersonsTableModel;
+import org.erachain.gui.library.ASMakeHashMenuItem;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.toSignRecordDialog;
@@ -45,35 +46,32 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     private int selected_Item;
     private JTextField key_Item;
     Wallet wallet = Controller.getInstance().getWallet();
+    private JTextField searchString;
 
     public SearchStatementsSplitPanel() {
         super(NAME, TITLE);
 
         this.searchToolBar_LeftPanel.setVisible(true);
-        this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
 
-        // not show buttons
-        jToolBarRightPanel.setVisible(false);
-        toolBarLeftPanel.setVisible(false);
-        this.toolBarLeftPanel.add(new JLabel("  " + Lang.T("Find Key") + ":"));
-        key_Item = new JTextField();
-        key_Item.setToolTipText("");
-        key_Item.setAlignmentX(1.0F);
-        key_Item.setMinimumSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
-        key_Item.setMinimumSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
-        key_Item.setPreferredSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
+        this.searthLabel2.setText(Lang.T("Height or seqNo") + ": ");
+        this.toolBarLeftPanel.add(new JLabel(Lang.T("Search") + ": "));
 
-        MenuPopupUtil.installContextMenu(key_Item);
+        searchString = new JTextField();
+        searchString.setToolTipText("");
 
-        this.toolBarLeftPanel.add(key_Item);
+        searchString.setMinimumSize(new java.awt.Dimension(350, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchString.setName(""); // NOI18N
+        searchString.setPreferredSize(new java.awt.Dimension(350, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchString.setMaximumSize(new java.awt.Dimension(2000, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
 
+        MenuPopupUtil.installContextMenu(searchString);
 
-        key_Item.addActionListener(new ActionListener() {
-
+        this.toolBarLeftPanel.add(searchString);
+        searchString.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                // TODO Auto-generated method stub
-                searchTextFieldSearchToolBarLeftPanelDocument.setText("");
+                search_Table_Model.clear();
+                searchTextField2.setText("");
                 search_Table_Model.findByKey(key_Item.getText());
                 if (search_Table_Model.getRowCount() < 1)
                     return;
@@ -84,8 +82,39 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
         });
 
+
+        this.searchFavoriteJCheckBoxLeftPanel.setVisible(true);
+
+        // not show buttons
+        jToolBarRightPanel.setVisible(false);
+
+        toolBarLeftPanel.setVisible(false);
+
+        // make hash item from popup menu
+        ASMakeHashMenuItem makeHashButton = new ASMakeHashMenuItem(searchString);
+        this.toolBarLeftPanel.add(makeHashButton);
+
+        MenuPopupUtil.installContextMenu(searchString);
+        MenuPopupUtil.installContextMenu(this.searchTextField2);
+
+
+        this.searchTextField2.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                //searchString.setText("");
+                search_Table_Model.clear();
+                //search_Table_Model.setBlockNumber(searchTextFieldSearchToolBarLeftPanelDocument.getText());
+                if (search_Table_Model.getRowCount() == 1)
+                    jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
+
+            }
+
+        });
+
         // not show My filter
-        searchMyJCheckBoxLeftPanel.setVisible(false);
+        searchMyJCheckBoxLeftPanel.setVisible(true);
 
         // CREATE TABLE
         search_Table_Model = new SearchStatementsTableModel();
@@ -121,14 +150,14 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         // search_Table.setRowSorter(searchSorter);
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
+        searchTextField2.addActionListener(new ActionListener() {
 
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 // GET VALUE
-                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
+                String search = searchTextField2.getText();
                 jScrollPanelLeftPanel.setViewportView(null);
                 jScrollPaneJPanelRightPanel.setViewportView(null);
 

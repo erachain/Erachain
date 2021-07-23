@@ -263,7 +263,7 @@ public class RecDetailsFrame extends JPanel //JFrame
                             String seqNo = ((Transaction) obj).viewHeightSeq();
                             SearchTransactionsSplitPanel panel = new SearchTransactionsSplitPanel();
                             panel.transactionsTableModel.clear();
-                            panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
+                            panel.searchTextField2.setText(seqNo);
                             panel.transactionsTableModel.setBlockNumber(seqNo);
                             String title = Lang.T("Link # Связь");
                             SplitPanel oldPanel = (SplitPanel) MainPanel.getInstance().getTabComponent(title);
@@ -277,7 +277,7 @@ public class RecDetailsFrame extends JPanel //JFrame
                             String seqNo = Transaction.viewDBRef(dbRef);
                             SearchTransactionsSplitPanel panel = new SearchTransactionsSplitPanel();
                             panel.transactionsTableModel.clear();
-                            panel.searchTextFieldSearchToolBarLeftPanelDocument.setText(seqNo);
+                            panel.searchTextField2.setText(seqNo);
                             panel.transactionsTableModel.setBlockNumber(seqNo);
                             String title = Lang.T("Link # Связь");
                             SplitPanel oldPanel = (SplitPanel) MainPanel.getInstance().getTabComponent(title);

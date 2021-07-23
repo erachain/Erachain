@@ -55,10 +55,10 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         super(NAME, TITLE);
 
         this.searchToolBar_LeftPanel.setVisible(true);
-        //jScrollPane4 = new JScrollPane();
 
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Height or seqNo") + ": ");
+        this.searthLabel2.setText(Lang.T("Height or seqNo") + ": ");
         this.toolBarLeftPanel.add(new JLabel(Lang.T("Search") + ": "));
+
         searchString = new JTextField();
         searchString.setToolTipText("");
 
@@ -103,17 +103,17 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         this.toolBarLeftPanel.add(makeHashButton);
 
         MenuPopupUtil.installContextMenu(searchString);
-        MenuPopupUtil.installContextMenu(this.searchTextFieldSearchToolBarLeftPanelDocument);
+        MenuPopupUtil.installContextMenu(this.searchTextField2);
 
 
-        this.searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
+        this.searchTextField2.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 //searchString.setText("");
                 transactionsTableModel.clear();
-                transactionsTableModel.setBlockNumber(searchTextFieldSearchToolBarLeftPanelDocument.getText());
+                transactionsTableModel.setBlockNumber(searchTextField2.getText());
                 if (transactionsTableModel.getRowCount() == 1)
                     jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
 
@@ -361,7 +361,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     }
 
     public void listener() {
-        transactionsTableModel.setBlockNumber(searchTextFieldSearchToolBarLeftPanelDocument.getText());
+        transactionsTableModel.setBlockNumber(searchTextField2.getText());
         if (transactionsTableModel.getRowCount() == 1)
             jTableJScrollPanelLeftPanel.addRowSelectionInterval(0, 0);
     }

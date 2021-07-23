@@ -68,7 +68,7 @@ public abstract class StatementsSplitPanel<T> extends SplitPanel {
         this.tableModel = tableModel;
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new search_tab_filter());
+        searchTextField2.getDocument().addDocumentListener(new search_tab_filter());
         // SET VIDEO
         jTableJScrollPanelLeftPanel = new MTable(this.tableModel);
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
@@ -394,7 +394,7 @@ public abstract class StatementsSplitPanel<T> extends SplitPanel {
         public void onChange() {
 
             // GET VALUE
-            String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
+            String search = searchTextField2.getText();
 
             // SET FILTER
             //tableModelPersons.getSortableList().setFilter(search);

@@ -50,9 +50,9 @@ public class SplitPanel extends IconPanel {
     public JToolBar jToolBarRightPanel;
     public JPanel leftPanel;
     public JPanel rightPanel1;
-    public JTextField searchTextFieldSearchToolBarLeftPanelDocument;
+    public JTextField searchTextField2;
     public JMenuBar searchToolBar_LeftPanel;
-    public JLabel searthLabelSearchToolBarLeftPanel;
+    public JLabel searthLabel2;
     public JPanel toolBarLeftPanel;
     public JCheckBox searchMyJCheckBoxLeftPanel;
     public JCheckBox searchFavoriteJCheckBoxLeftPanel;
@@ -104,8 +104,8 @@ public class SplitPanel extends IconPanel {
         button2ToolBarLeftPanel = new JToggleButton();
         searchToolBar_LeftPanel = new JMenuBar();
         searchToolBar_LeftPanel.setBorderPainted(false);
-        searthLabelSearchToolBarLeftPanel = new JLabel();
-        searchTextFieldSearchToolBarLeftPanelDocument = new JTextField();
+        searthLabel2 = new JLabel();
+        searchTextField2 = new JTextField();
         jScrollPanelLeftPanel = new JScrollPane();
 
         rightPanel1 = new JPanel();
@@ -124,16 +124,16 @@ public class SplitPanel extends IconPanel {
         searchToolBar_LeftPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
 
-        searthLabelSearchToolBarLeftPanel.setText(" " + Lang.T("Search") + ":");
-        searthLabelSearchToolBarLeftPanel.setToolTipText("");
-        searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel, gridBagConstraints);
+        searthLabel2.setText(" " + Lang.T("Search") + ":");
+        searthLabel2.setToolTipText("");
+        searchToolBar_LeftPanel.add(searthLabel2, gridBagConstraints);
 
-        searchTextFieldSearchToolBarLeftPanelDocument.setToolTipText("");
-        searchTextFieldSearchToolBarLeftPanelDocument.setAlignmentX(2.0F);
-        searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
-        searchTextFieldSearchToolBarLeftPanelDocument.setMaximumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
-        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
-        searchToolBar_LeftPanel.add(searchTextFieldSearchToolBarLeftPanelDocument);
+        searchTextField2.setToolTipText("");
+        searchTextField2.setAlignmentX(2.0F);
+        searchTextField2.setMinimumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchTextField2.setMaximumSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchTextField2.setPreferredSize(new Dimension(200, UIManager.getFont("Label.font").getSize() + UIManager.getFont("Label.font").getSize() / 2));
+        searchToolBar_LeftPanel.add(searchTextField2);
 
         button1ToolBarLeftPanel.setText("jButton1");
         button1ToolBarLeftPanel.setFocusable(false);

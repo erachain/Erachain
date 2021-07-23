@@ -38,14 +38,14 @@ public class OtherSearchBlocks extends SplitPanel {
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
         this.searchMyJCheckBoxLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(true);
-        this.searthLabelSearchToolBarLeftPanel.setText(Lang.T("Block") + " (1-20)");
-        this.searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(500, 20));
+        this.searthLabel2.setText(Lang.T("Block") + " (1-20)");
+        this.searchTextField2.setMinimumSize(new Dimension(500, 20));
         this.button2ToolBarLeftPanel.setVisible(false);
         this.button1ToolBarLeftPanel.setVisible(false);
         tamleModel = new OtherSeasrchBlocksTableModel();
         Table_Hash = new JTable(tamleModel);
 
-        searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
+        searchTextField2.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -76,7 +76,7 @@ public class OtherSearchBlocks extends SplitPanel {
 
                 rp.searchToolBar_LeftPanel.setVisible(false);
                 rp.toolBarLeftPanel.setVisible(false);
-                rp.searchTextFieldSearchToolBarLeftPanelDocument.setText(item_Table_Selected.getHeight() + "");
+                rp.searchTextField2.setText(item_Table_Selected.getHeight() + "");
                 rp.listener();
                 jScrollPaneJPanelRightPanel.setViewportView(rp);
                 //			itemTableSelected = null;
@@ -90,7 +90,7 @@ public class OtherSearchBlocks extends SplitPanel {
     }
 
     private void find() {
-        String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
+        String search = searchTextField2.getText();
 
 
         try {
@@ -194,7 +194,7 @@ public class OtherSearchBlocks extends SplitPanel {
             String hashe = Base58.encode(Crypto.getInstance().digest(fileInArray));
             // tableModel.addRow(new Object[] { hashes,
             // Lang.T("from file ") + file_name });
-            this.searchTextFieldSearchToolBarLeftPanelDocument.setText(hashe);
+            this.searchTextField2.setText(hashe);
             find();
 
         }

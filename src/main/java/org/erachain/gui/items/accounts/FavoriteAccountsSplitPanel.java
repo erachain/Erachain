@@ -68,7 +68,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         if (Controller.getInstance().doesWalletDatabaseExists())
             accountsMap = Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap();
 
-        searthLabelSearchToolBarLeftPanel.setVisible(true);
+        searthLabel2.setVisible(true);
         // this.searchTextFieldSearchToolBarLeftPanelDocument.setVisible(true);
         // this.searchToolBar_LeftPanel.setVisible(true);
         // not show buttons

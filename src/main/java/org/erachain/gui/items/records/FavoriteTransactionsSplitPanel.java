@@ -61,7 +61,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
         favotitesTable = new FavoriteTransactionTableModel();
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new search_tab_filter());
+        searchTextField2.getDocument().addDocumentListener(new search_tab_filter());
         // SET VIDEO
         jTableJScrollPanelLeftPanel = new MTable(this.favotitesTable);
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
@@ -338,7 +338,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
         public void onChange() {
 
             // GET VALUE
-            String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
+            String search = searchTextField2.getText();
 
             // SET FILTER
             //tableModelPersons.getSortableList().setFilter(search);
