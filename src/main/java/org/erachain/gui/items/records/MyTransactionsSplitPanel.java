@@ -231,7 +231,6 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                 // code Rebroadcast
 
                 if (selectedTransaction == null) return;
-                // DLSet db = DLSet.getInstance();
                 Controller.getInstance().broadcastTransaction(selectedTransaction);
 
             }

@@ -7,6 +7,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.ASMakeHashMenuItem;
 import org.erachain.gui.library.Library;
@@ -45,6 +46,7 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
     public JButton buttonGetLasts = new JButton(Lang.T("Get Last"));
     public SignLibraryPanel voush_Library_Panel;
     public SearchTableModelCls transactionsTableModel;
+    public Transaction selectedTransaction;
     //JScrollPane jScrollPane4;
     private JTextField searchString;
 
@@ -125,6 +127,8 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
         this.jTableJScrollPanelLeftPanel = new MTable(this.transactionsTableModel);
         TableColumnModel columnModel = jTableJScrollPanelLeftPanel.getColumnModel();
         columnModel.getColumn(transactionsTableModel.COLUMN_FAVORITE).setMaxWidth((100));
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Object.class, new WalletTableRenderer());
+        jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
 
 
         this.jTableJScrollPanelLeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -136,11 +140,8 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsTableModel.getItem(row);
-                DCSet db = DCSet.getInstance();
-                new toSignRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
+                if (selectedTransaction == null) return;
+                new toSignRecordDialog(selectedTransaction.getBlockHeight(), selectedTransaction.getSeqNo());
 
             }
         });
@@ -149,12 +150,10 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
         JMenuItem linkMenu = new JMenuItem(Lang.T("Append Document"));
         linkMenu.addActionListener(e -> {
-            int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-            row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-            Transaction transaction = (Transaction) transactionsTableModel.getItem(row);
+            if (selectedTransaction == null) return;
             MainPanel.getInstance().insertNewTab(
-                    Lang.T("For # для") + " " + transaction.viewHeightSeq(),
-                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, transaction.viewHeightSeq(), null));
+                    Lang.T("For # для") + " " + selectedTransaction.viewHeightSeq(),
+                    new IssueDocumentPanel(null, ExData.LINK_APPENDIX_TYPE, selectedTransaction.viewHeightSeq(), null));
 
         });
         mainMenu.add(linkMenu);
@@ -164,14 +163,12 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
         JMenuItem copyNumber = new JMenuItem(Lang.T("Copy Number"));
         copyNumber.addActionListener(e -> {
-            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            if (transaction == null) return;
-            StringSelection stringSelection = new StringSelection(transaction.viewHeightSeq());
+            if (selectedTransaction == null) return;
+            StringSelection stringSelection = new StringSelection(selectedTransaction.viewHeightSeq());
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Number of the '%1' has been copy to buffer")
-                            .replace("%1", transaction.viewHeightSeq())
+                            .replace("%1", selectedTransaction.viewHeightSeq())
                             + ".",
                     Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
@@ -180,12 +177,12 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
         JMenuItem copySign = new JMenuItem(Lang.T("Copy Signature"));
         copySign.addActionListener(e -> {
-            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            StringSelection stringSelection = new StringSelection(transaction.viewSignature());
+            if (selectedTransaction == null) return;
+            StringSelection stringSelection = new StringSelection(selectedTransaction.viewSignature());
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Signature '%1' has been copy to buffer")
-                            .replace("%1", transaction.viewSignature())
+                            .replace("%1", selectedTransaction.viewSignature())
                             + ".",
                     Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
@@ -194,14 +191,12 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
         JMenuItem copyJson = new JMenuItem(Lang.T("Copy JSON"));
         copyJson.addActionListener(e -> {
-            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            if (transaction == null) return;
-            StringSelection stringSelection = new StringSelection(transaction.toJson().toJSONString());
+            if (selectedTransaction == null) return;
+            StringSelection stringSelection = new StringSelection(selectedTransaction.toJson().toJSONString());
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("JSON of the '%1' has been copy to buffer")
-                            .replace("%1", transaction.viewHeightSeq())
+                            .replace("%1", selectedTransaction.viewHeightSeq())
                             + ".",
                     Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
@@ -210,14 +205,12 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
         JMenuItem copyRAW = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base58"));
         copyRAW.addActionListener(e -> {
-            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            if (transaction == null) return;
-            StringSelection stringSelection = new StringSelection(Base58.encode(transaction.toBytes(Transaction.FOR_NETWORK, true)));
+            if (selectedTransaction == null) return;
+            StringSelection stringSelection = new StringSelection(Base58.encode(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)));
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Bytecode of the '%1' has been copy to buffer")
-                            .replace("%1", transaction.viewHeightSeq())
+                            .replace("%1", selectedTransaction.viewHeightSeq())
                             + ".",
                     Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
@@ -226,14 +219,12 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
         JMenuItem copyRAW64 = new JMenuItem(Lang.T("Copy RAW (bytecode) as Base64"));
         copyRAW64.addActionListener(e -> {
-            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-            Transaction transaction = (Transaction) transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            if (transaction == null) return;
-            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(transaction.toBytes(Transaction.FOR_NETWORK, true)));
+            if (selectedTransaction == null) return;
+            StringSelection stringSelection = new StringSelection(Base64.getEncoder().encodeToString(selectedTransaction.toBytes(Transaction.FOR_NETWORK, true)));
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Bytecode of the '%1' has been copy to buffer")
-                            .replace("%1", transaction.viewHeightSeq())
+                            .replace("%1", selectedTransaction.viewHeightSeq())
                             + ".",
                     Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
@@ -242,32 +233,26 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
         JMenuItem saveJson = new JMenuItem(Lang.T("Save as JSON"));
         saveJson.addActionListener(e -> {
-            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-            Transaction transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            if (transaction == null) return;
-            Library.saveJSONtoFileSystem(this, transaction, "tx" + transaction.viewHeightSeq());
+            if (selectedTransaction == null) return;
+            Library.saveJSONtoFileSystem(this, selectedTransaction, "tx" + selectedTransaction.viewHeightSeq());
 
         });
         menuSaveCopy.add(saveJson);
 
         JMenuItem saveRAW = new JMenuItem(Lang.T("Save RAW (bytecode) as Base58"));
         saveRAW.addActionListener(e -> {
-            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-            Transaction transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            if (transaction == null) return;
-            Library.saveAsBase58FileSystem(this, transaction.toBytes(Transaction.FOR_NETWORK, true),
-                    "tx" + transaction.viewHeightSeq());
+            if (selectedTransaction == null) return;
+            Library.saveAsBase58FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + selectedTransaction.viewHeightSeq());
 
         });
         menuSaveCopy.add(saveRAW);
 
         JMenuItem saveRAW64 = new JMenuItem(Lang.T("Save RAW (bytecode) as Base64"));
         saveRAW64.addActionListener(e -> {
-            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-            Transaction transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            if (transaction == null) return;
-            Library.saveAsBase64FileSystem(this, transaction.toBytes(Transaction.FOR_NETWORK, true),
-                    "tx" + transaction.viewHeightSeq());
+            if (selectedTransaction == null) return;
+            Library.saveAsBase64FileSystem(this, selectedTransaction.toBytes(Transaction.FOR_NETWORK, true),
+                    "tx" + selectedTransaction.viewHeightSeq());
 
         });
         menuSaveCopy.add(saveRAW64);
@@ -281,14 +266,12 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                Transaction trans = transactionsTableModel.getItem(row);
+                if (selectedTransaction == null) return;
 
                 try {
                     URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
                             + "/index/blockexplorer.html"
-                            + "?tx=" + trans.viewHeightSeq()));
+                            + "?tx=" + selectedTransaction.viewHeightSeq()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }
@@ -305,14 +288,10 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     //GET ROW
-                    int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-                    row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-
-                    //GET TRANSACTION
-                    Transaction transaction = transactionsTableModel.getItem(row);
+                    if (selectedTransaction == null) return;
 
                     //SHOW DETAIL SCREEN OF TRANSACTION
-                    TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+                    TransactionDetailsFactory.getInstance().createTransactionDetail(selectedTransaction);
                 }
             }
         });
@@ -343,9 +322,8 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
 
                     if (jTableJScrollPanelLeftPanel
                             .getSelectedColumn() == transactionsTableModel.COLUMN_FAVORITE) {
-                        row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-                        Transaction transaction = transactionsTableModel.getItem(row);
-                        favorite_set(transaction);
+                        if (selectedTransaction == null) return;
+                        favorite_set(selectedTransaction);
                     }
                 }
             }
@@ -369,15 +347,11 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
     class search_listener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
-            // устанавливаем формат даты
-            Transaction transaction = null;
-            if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
-                try {
-                    transaction = transactionsTableModel.getItem(jTableJScrollPanelLeftPanel
-                            .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-                } catch (Exception e) {
 
-                }
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() >= 0 && jTableJScrollPanelLeftPanel.getSelectedRow() < transactionsTableModel.getRowCount()) {
+                selectedTransaction = transactionsTableModel
+                        .getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+
 
                 info_Panel = new JPanel();
                 info_Panel.setLayout(new GridBagLayout());
@@ -390,9 +364,9 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
                 tableGBC.weighty = 1;
                 tableGBC.gridx = 0;
                 tableGBC.gridy = 0;
-                info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(transaction), tableGBC);
+                info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(selectedTransaction), tableGBC);
 
-                Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(transaction.getBlockHeight(), transaction.getSeqNo()));
+                Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap().get(Transaction.makeDBRef(selectedTransaction.getBlockHeight(), selectedTransaction.getSeqNo()));
                 GridBagConstraints gridBagConstraints = null;
                 if (keys != null) {
 
@@ -414,7 +388,7 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
                     gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new SignLibraryPanel(transaction);
+                    voush_Library_Panel = new SignLibraryPanel(selectedTransaction);
                     info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }
