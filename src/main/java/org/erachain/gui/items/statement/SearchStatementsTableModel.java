@@ -18,7 +18,7 @@ public class SearchStatementsTableModel extends SearchTableModelCls {
 
     public SearchStatementsTableModel() {
 
-        super(DCSet.getInstance().getTransactionFinalMap(),
+        super(DCSet.getInstance().getTransactionFinalMap(), Transaction.SIGN_NOTE_TRANSACTION,
                 new String[]{"№", "Timestamp", "Type", "Creator", "Statement", "Favorite"},
                 new Boolean[]{false, true, true, true, true, false},
                 COLUMN_FAVORITE, true);

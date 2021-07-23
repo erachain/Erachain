@@ -21,7 +21,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls {
     public static final int COLUMN_FAVORITE = 7;
 
     public SearchTransactionsTableModel() {
-        super(DCSet.getInstance().getTransactionFinalMap(),
+        super(DCSet.getInstance().getTransactionFinalMap(), 0,
                 new String[]{"№", "Timestamp", "Type", "Creator", "Title", "Key", "Amount", "Favorite"},
                 new Boolean[]{false, true, true, true, true, true, true, true},
                 COLUMN_FAVORITE, true);

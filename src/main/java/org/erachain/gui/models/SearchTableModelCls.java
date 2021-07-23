@@ -46,12 +46,15 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
     protected DBTabImpl map;
     protected Logger logger;
 
+    int onlyType;
+
     public int COLUMN_FAVORITE;
 
-    public SearchTableModelCls(DBTabImpl map, String[] columnNames, Boolean[] columnAutoHeight,
+    public SearchTableModelCls(DBTabImpl map, int onlyType, String[] columnNames, Boolean[] columnAutoHeight,
                                int columnFavorite, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
+        this.onlyType = onlyType;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
         this.descending = descending;
@@ -67,22 +70,22 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
             blockNo = Integer.parseInt(string);
         } catch (NumberFormatException e) {
             Transaction transaction = ((TransactionFinalMap) map).getRecord(string);
-            if (transaction != null) {
-                transaction.setDC(DCSet.getInstance(), true);
+            if (transaction != null && (onlyType == 0 || onlyType == transaction.getType())) {
+                transaction.setDC(DCSet.getInstance(), false);
                 list.add(transaction);
             }
             this.fireTableDataChanged();
             return;
         }
 
-        list = (List<Transaction>) ((TransactionFinalMap) map).getTransactionsByBlock(blockNo);
+        List<Transaction> result = (List<Transaction>) ((TransactionFinalMap) map).getTransactionsByBlock(blockNo);
 
-        for (Transaction item : list) {
-            if (item instanceof RCalculated) {
-                list.remove(item);
+        for (Transaction transaction : result) {
+            if (onlyType > 0 && onlyType != transaction.getType()) {
                 continue;
             }
-            item.setDC(dcSet, false);
+            transaction.setDC(dcSet, false);
+            list.add(transaction);
         }
 
         this.fireTableDataChanged();
@@ -95,10 +98,13 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
 
         if (filter == null || (filter = filter.trim()).isEmpty()) {
             try (IteratorCloseable<Long> iterator = ((TransactionFinalMap) map).getIndexIterator(0, true)) {
-                int limit = 100;
+                int limit = 200;
                 int countForge = 0;
                 while (iterator.hasNext() && limit > 0) {
                     Transaction transaction = ((TransactionFinalMap) map).get(iterator.next());
+                    if (onlyType > 0 && onlyType != transaction.getType())
+                        continue;
+
                     if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
                         RCalculated tx = (RCalculated) transaction;
                         String mess = tx.getMessage();
@@ -108,10 +114,10 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
                             else
                                 countForge = 0;
                         }
-
                     }
 
                     --limit;
+                    transaction.setDC(dcSet, false);
                     list.add(transaction);
                 }
             } catch (IOException e) {
@@ -124,17 +130,21 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
 
         if (account != null) {
             // ИЩЕМ по СЧЕТУ
-            list.addAll(((TransactionFinalMap) map).getTransactionsByAddressLimit(account.getShortAddressBytes(), null, null, fromID, 0, 1000, true, descending));
+            List<Transaction> result = ((TransactionFinalMap) map).getTransactionsByAddressLimit(account.getShortAddressBytes(), null, null, fromID, 0, 1000, true, descending);
+            for (Transaction transaction : result) {
+                if (onlyType == 0 || onlyType == transaction.getType()) {
+                    transaction.setDC(dcSet, false);
+                    list.add(transaction);
+                }
+            }
 
         }
-
-        // ИЩЕМ по Заголовку
-        DCSet dcSet = DCSet.getInstance();
 
         if (!Base58.isExtraSymbols(filter)) {
             byte[] signature = Base58.decode(filter);
             Transaction transaction = dcSet.getTransactionFinalMap().get(signature);
-            if (transaction != null) {
+            if (transaction != null && (onlyType == 0 || onlyType == transaction.getType())) {
+                transaction.setDC(dcSet, false);
                 list.add(transaction);
             }
         }
@@ -143,19 +153,16 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
         String fromWord = null;
         if (false) {
             // TODO сделать поиск по Transaction.searchTransactions
-            Fun.Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filter, false, 10000, fromID, start, true);
+            Fun.Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filter, false, 1000, fromID, start, true);
         } else {
-            list.addAll(((FilteredByStringArray) dcSet.getTransactionFinalMap())
-                    .getByFilterAsArray(filter, fromID, start, step, descending));
-        }
-
-        for (Transaction item : list) {
-            if (false && // все берем
-                    item instanceof RCalculated) {
-                list.remove(item);
-                continue;
+            List<Transaction> result = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
+                    .getByFilterAsArray(filter, fromID, start, step, descending);
+            for (Transaction transaction : result) {
+                if (onlyType == 0 || onlyType == transaction.getType()) {
+                    transaction.setDC(dcSet, false);
+                    list.add(transaction);
+                }
             }
-            item.setDC(dcSet, false);
         }
 
         this.fireTableDataChanged();

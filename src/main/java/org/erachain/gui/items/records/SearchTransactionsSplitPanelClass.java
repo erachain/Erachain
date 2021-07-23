@@ -8,7 +8,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
-import org.erachain.gui.items.statement.SearchStatementsTableModel;
 import org.erachain.gui.library.ASMakeHashMenuItem;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
@@ -49,13 +48,11 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
     public SearchTableModelCls transactionsTableModel;
     public Transaction selectedTransaction;
     private JTextField searchString;
-    private boolean forDocuments;
 
     public SearchTransactionsSplitPanelClass(String name, String title, SearchTableModelCls tableModel) {
         super(name, title);
 
         transactionsTableModel = tableModel;
-        forDocuments = tableModel instanceof SearchStatementsTableModel;
 
         this.searchToolBar_LeftPanel.setVisible(true);
 
