@@ -65,10 +65,10 @@ public class RecDetailsFrame extends JPanel //JFrame
         //LABEL GBC
         labelGBC = new GridBagConstraints();
         labelGBC.insets = new Insets(10, 5, 5, 5);
-        labelGBC.fill = GridBagConstraints.HORIZONTAL;
+        //labelGBC.fill = GridBagConstraints.;
         labelGBC.anchor = GridBagConstraints.FIRST_LINE_START;//..NORTHWEST;
-        labelGBC.weightx = 0;
-        labelGBC.gridx = 0;
+        labelGBC.weightx = 0.1;
+        labelGBC.weighty = 0;
 
         //DETAIL GBC
         fieldGBC = new GridBagConstraints();
@@ -77,8 +77,8 @@ public class RecDetailsFrame extends JPanel //JFrame
         fieldGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
         fieldGBC.gridwidth = 3;
         fieldGBC.gridx = 1;
-        fieldGBC.weightx = 0.1;
-        fieldGBC.weighty = 0.1;
+        fieldGBC.weightx = 0.9;
+        fieldGBC.weighty = 0;
 
 
         int componentLevel = 0;
