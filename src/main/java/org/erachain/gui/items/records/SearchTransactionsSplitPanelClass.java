@@ -48,6 +48,9 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
     public SearchTableModelCls transactionsTableModel;
     public Transaction selectedTransaction;
     private JTextField searchString;
+    // MENU
+    protected JPopupMenu mainMenu = new JPopupMenu();
+
 
     public SearchTransactionsSplitPanelClass(String name, String title, SearchTableModelCls tableModel) {
         super(name, title);
@@ -130,9 +133,6 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
         jTableJScrollPanelLeftPanel.setDefaultRenderer(Boolean.class, new WalletTableRenderer());
 
         this.jTableJScrollPanelLeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        // MENU
-        JPopupMenu mainMenu = new JPopupMenu();
 
         JMenuItem vouch_menu = new JMenuItem(Lang.T("Sign / Vouch"));
         vouch_menu.addActionListener(new ActionListener() {

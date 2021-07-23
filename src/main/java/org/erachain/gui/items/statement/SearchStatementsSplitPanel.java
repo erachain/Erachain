@@ -14,6 +14,9 @@ public class SearchStatementsSplitPanel extends SearchTransactionsSplitPanelClas
 
     public SearchStatementsSplitPanel() {
         super(NAME, TITLE, new SearchStatementsTableModel());
+
+        mainMenu
+
     }
 
     @Override
