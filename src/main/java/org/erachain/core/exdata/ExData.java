@@ -1526,17 +1526,33 @@ public class ExData {
 
         try {
             password = Controller.getInstance().decrypt(account, recipient, secrets[pos]);
+            Fun.Tuple2<String, ExData> result = decryptByPassword(password);
+            if (result.b == null) {
+                return new Fun.Tuple3<>(pos, result.a, null);
+            }
+            return new Fun.Tuple3<>(null, null, result.b);
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return new Fun.Tuple3<>(pos, e.getMessage(), null);
+        }
+
+    }
+
+    public Fun.Tuple2<String, ExData> decryptByPassword(byte[] password) {
+
+        try {
             byte[] decryptedData = AEScrypto.aesDecrypt(encryptedData, password);
             Fun.Tuple2<JSONObject, HashMap> jsonAndFiles = parseJsonAndFiles(decryptedData, true);
 
             // это уже не зашифрованный - сбросим
             byte[] decryptedFlags = setEncryptedFlag(flags, false);
-            return new Tuple3<>(pos, null, new ExData(decryptedFlags, exLink, exAction, title, recipientsFlags, recipients,
+            return new Fun.Tuple2<>(null, new ExData(decryptedFlags, exLink, exAction, title, recipientsFlags, recipients,
                     authorsFlags, authors, sourcesFlags, sources, tags, jsonAndFiles.a,
                     jsonAndFiles.b));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            return new Fun.Tuple3<>(pos, e.getMessage(), null);
+            return new Fun.Tuple2<>(e.getMessage(), null);
         }
 
     }

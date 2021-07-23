@@ -987,6 +987,36 @@ public class RSignNote extends Transaction implements Itemable {
 
     }
 
+    public Fun.Tuple2<String, RSignNote> decryptByPassword(byte[] password) {
+
+        Fun.Tuple2<String, ExData> decryptedExData = extendedData.decryptByPassword(password);
+        if (decryptedExData.b == null) {
+            return new Fun.Tuple2<>(decryptedExData.a, null);
+        }
+
+        byte[] exData;
+        try {
+            exData = decryptedExData.b.toByte();
+        } catch (Exception e) {
+            return new Fun.Tuple2<>(e.getMessage(), null);
+        }
+
+        RSignNote decryptedNote = new RSignNote(typeBytes, creator, feePow, key, exData,
+                dataForDB, signers, signatures, timestamp, reference, signature,
+                seqNo, fee.longValue());
+        return new Fun.Tuple2<>(null, decryptedNote);
+
+    }
+
+    public Fun.Tuple2<String, RSignNote> decryptByPassword(String password) {
+        try {
+            byte[] pass = Base58.decode(password);
+            return decryptByPassword(pass);
+        } catch (Exception e) {
+            return new Fun.Tuple2<>(e.getMessage(), null);
+        }
+    }
+
     public Fun.Tuple3<Integer, String, byte[]> getPassword(Account recipient) {
         return extendedData.getPassword(creator, recipient);
     }

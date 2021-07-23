@@ -16,7 +16,6 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.models.WalletTableModel;
 import org.erachain.gui.records.toSignRecordDialog;
-import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -425,15 +424,11 @@ public abstract class StatementsSplitPanel<T> extends SplitPanel {
 
             rNote = getTransaction(currentItem);
             favoriteMenuItems.setText(Lang.T(wallet.isDocumentFavorite(rNote) ? "Remove Favorite" : "Add Favorite"));
-
             getPasswordMenuItems.setEnabled(rNote.isEncrypted());
 
-            JPanel info_panel = TransactionDetailsFactory.getInstance().createTransactionDetail(rNote);
             RNoteInfo rNoteInfo = new RNoteInfo(rNote); // here load all values and calc FEE
 
-            info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
             jScrollPaneJPanelRightPanel.setViewportView(rNoteInfo);
-            //	jSplitPanel.setRightComponent(info_panel);
         }
     }
 

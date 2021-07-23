@@ -13,10 +13,7 @@ import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.FileChooser;
-import org.erachain.gui.library.Library;
-import org.erachain.gui.library.MAttachedFilesPanel;
-import org.erachain.gui.library.SignLibraryPanel;
+import org.erachain.gui.library.*;
 import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -89,10 +86,11 @@ public class RNoteInfo extends RecDetailsFrame {
         add(new JLabel(statement.getTitle()), fieldGBC);
 
         if (statement.isEncrypted()) {
+            JPanel cryptPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+
             JCheckBox encrypted = new JCheckBox(Lang.T("Encrypted"));
             encrypted.setSelected(true);
-            fieldGBC.gridy = ++labelGBC.gridy;
-            add(encrypted, fieldGBC);
+            cryptPanel.add(encrypted);
 
             encrypted.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -114,7 +112,7 @@ public class RNoteInfo extends RecDetailsFrame {
 
                         Account account = cntr.getInvolvedAccount(statement);
                         Fun.Tuple3<Integer, String, RSignNote> result = statement.decrypt(account);
-                        if (result.a < 0) {
+                        if (result.a != null && result.a < 0) {
                             JOptionPane.showMessageDialog(null,
                                     Lang.T(result.b == null ? "Not exists Account access" : result.b),
                                     Lang.T("Not decrypted"), JOptionPane.ERROR_MESSAGE);
@@ -143,6 +141,34 @@ public class RNoteInfo extends RecDetailsFrame {
                     }
                 }
             });
+
+            JButton decryptByPassword = new JButton(Lang.T("Decrypt by Password"));
+            decryptByPassword.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    // TODO Auto-generated method stub
+                    String password = GetPasswordPane.showDialog(decryptByPassword, "Decrypt by Password");
+                    Fun.Tuple2<String, RSignNote> result = statement.decryptByPassword(password);
+                    if (result.a != null) {
+                        JOptionPane.showMessageDialog(null,
+                                Lang.T(result.a),
+                                Lang.T("Not decrypted"), JOptionPane.ERROR_MESSAGE);
+                        encrypted.setSelected(!encrypted.isSelected());
+
+                        return;
+
+                    }
+
+                    statement = result.b;
+                    statement.parseDataFull();
+                    viewInfo();
+                }
+            });
+
+            cryptPanel.add(decryptByPassword);
+
+            fieldGBC.gridy = ++labelGBC.gridy;
+            add(cryptPanel, fieldGBC);
         }
 
         /////////////
