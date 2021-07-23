@@ -148,6 +148,17 @@ public class RNoteInfo extends RecDetailsFrame {
                 public void actionPerformed(ActionEvent arg0) {
                     // TODO Auto-generated method stub
                     String password = GetPasswordPane.showDialog(decryptByPassword, "Decrypt by Password");
+                    if (password == null) {
+                        return;
+                    } else if (password.length() < 10) {
+                        JOptionPane.showMessageDialog(null,
+                                Lang.T("Password so short"),
+                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                        encrypted.setSelected(!encrypted.isSelected());
+
+                        return;
+
+                    }
                     Fun.Tuple2<String, RSignNote> result = statement.decryptByPassword(password);
                     if (result.a != null) {
                         JOptionPane.showMessageDialog(null,

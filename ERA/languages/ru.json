@@ -1182,6 +1182,7 @@
   "Password cannot be empty!": "Пароль не может быть пустым!",
   "Password do not match!": "Пароли не совпадают!",
   "Password length too short! Continue?": "Длина пароля слишком короткая! Продолжить?",
+  "Password so short": "Пароль слишком короткий",
   "Password:": "Пароль:",
   "Passwords do not match": "Пароли не совпадают",
   "Paste": "Вставить",
