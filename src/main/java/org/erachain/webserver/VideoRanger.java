@@ -43,7 +43,13 @@ public class VideoRanger {
         return Objects.hash(url);
     }
 
+    // Jetty does not need to be configured to use keep alive.
+    // If the client offers a request that can be kept alive (HTTP/2, HTTP/1.1 or HTTP/1.0 with a keep-alive header),
+    // then jetty will respond automatically to keep the connection alive
+    // - unless there is an error or a filter/servlet/handler explicitly sets Connection:close on the response.
+
     static int RANGE_LEN = 1 << 17;
+
     public static Response getRange(HttpServletRequest request, byte[] data) {
         String headerSince = request.getHeader("If-Modified-Since");
         // сервер шлет запрос мол поменялись данные? мы отвечаем - НЕТ
@@ -98,22 +104,23 @@ public class VideoRanger {
             rangeEnd = maxEND;
 
         int status = rangeEnd == maxEND ? 200 : 206;
-        rangeStr = "bytes " + rangeStart + "-" + rangeEnd + "/" + data.length;
+        rangeStr = "bytes " + rangeStart + "-" + rangeEnd + "/" + maxEND;
         LOGGER.debug(status + ": " + rangeStr);
 
         byte[] rangeBytes = new byte[rangeEnd - rangeStart + 1];
-        System.arraycopy(data, rangeStart, rangeBytes, 0, rangeBytes.length);
+        System.arraycopy(data, rangeStart, rangeBytes, 0, rangeBytes.length - 1);
 
         Response.ResponseBuilder responce = Response.status(status)
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Timing-Allow-Origin", "*")
                 .header("Last-Modified", cnt.blockChain.getGenesisTimestamp())
+                //.header("Last-Modified", System.currentTimeMillis())
                 .header("Content-Type", "video/mp4");
 
         if (status == 200) {
         } else {
             responce.header("Accept-Range", "bytes")
-                    .header("Content-Length", data.length)
+                    .header("Content-Length", rangeBytes.length)
                     .header("Content-Range", rangeStr);
         }
 
