@@ -77,11 +77,12 @@ public class VideoRanger {
 
         return Response.status(rangeEnd == data.length ? 200 : 206)
                 .header("Access-Control-Allow-Origin", "*")
-                .header("Content-length", data.length)
+                .header("Timing-Allow-Origin", "*")
                 .header("Last-Modified", cnt.blockChain.getGenesisTimestamp())
                 .header("Content-Type", "video/mp4")
                 .header("Accept-Range", "bytes")
-                .header("Timing-Allow-Origin", "*")
+                .header("Content-Length", rangeBytes.length)
+                .header("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + data.length)
                 .entity(new ByteArrayInputStream(rangeBytes))
                 .build();
     }
