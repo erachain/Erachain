@@ -174,7 +174,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
             jButtonCancel.setText(Lang.T("OK"));
         } else {
 
-            JPanel pp = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+            JPanel pp = TransactionDetailsFactory.createTransactionDetail(transaction);
             jScrollPane1.setViewportView(pp);
 
             jButtonRAW.addActionListener(new ActionListener() {

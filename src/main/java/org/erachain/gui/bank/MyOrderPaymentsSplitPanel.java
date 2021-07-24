@@ -79,7 +79,7 @@ public class MyOrderPaymentsSplitPanel extends SplitPanel {
         //		if (my_PersonsModel.getRowCount() > 0) my_PersonsModel.fireTableDataChanged();
 
         // UPDATE FILTER ON TEXT CHANGE
-        this.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new My_Search());
+        this.searchTextField2.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
         this.jTableJScrollPanelLeftPanel.setModel(payment_Orders_model);
         this.jTableJScrollPanelLeftPanel = payment_Orders_table;
@@ -162,7 +162,7 @@ public class MyOrderPaymentsSplitPanel extends SplitPanel {
 
         public void onChange() {
             // GET VALUE
-            String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
+            String search = searchTextField2.getText();
             // SET FILTER
             payment_Orders_model.fireTableDataChanged();
 

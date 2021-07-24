@@ -66,7 +66,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
         // UPDATE FILTER ON TEXT CHANGE
 
-        searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
+        searchTextField2.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -80,7 +80,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
     }
 
     public void startSearchName() {
-        String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
+        String search = searchTextField2.getText();
         if (search.equals("")) {
             jScrollPaneJPanelRightPanel.setViewportView(null);
             search_Table_Model.clear();
@@ -114,7 +114,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
     }
 
     public void startSearchKey() {
-        searchTextFieldSearchToolBarLeftPanelDocument.setText("");
+        searchTextField2.setText("");
         Label_search_Info_Panel.setText(Lang.T("Waiting..."));
         jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
         new Thread() {

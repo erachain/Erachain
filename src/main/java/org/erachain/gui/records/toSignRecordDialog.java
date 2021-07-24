@@ -110,7 +110,7 @@ public class toSignRecordDialog extends JDialog {
         //ENABLE
         jButton_Confirm.setEnabled(true);
 
-        JPanel infoPanel = TransactionDetailsFactory.getInstance().createTransactionDetail(record);
+        JPanel infoPanel = TransactionDetailsFactory.createTransactionDetail(record);
         jLabel_Name_Records.setText(Lang.T(record.viewFullTypeName()));
         //	infoPanel.show_001(record);
         //infoPanel.setFocusable(false);

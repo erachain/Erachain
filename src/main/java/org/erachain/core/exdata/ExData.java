@@ -471,6 +471,10 @@ public class ExData {
         return tags == null ? new byte[0] : tags;
     }
 
+    public boolean hasTags() {
+        return tags != null && tags.length > 0;
+    }
+
     public byte[][] getSecrets() {
         return secrets == null ? new byte[0][] : secrets;
     }
@@ -1522,17 +1526,62 @@ public class ExData {
 
         try {
             password = Controller.getInstance().decrypt(account, recipient, secrets[pos]);
+            Fun.Tuple2<String, ExData> result = decryptByPassword(password);
+            if (result.b == null) {
+                return new Fun.Tuple3<>(pos, result.a, null);
+            }
+            return new Fun.Tuple3<>(null, null, result.b);
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return new Fun.Tuple3<>(pos, e.getMessage(), null);
+        }
+
+    }
+
+    public Fun.Tuple2<String, ExData> decryptByPassword(byte[] password) {
+
+        try {
             byte[] decryptedData = AEScrypto.aesDecrypt(encryptedData, password);
             Fun.Tuple2<JSONObject, HashMap> jsonAndFiles = parseJsonAndFiles(decryptedData, true);
 
             // это уже не зашифрованный - сбросим
             byte[] decryptedFlags = setEncryptedFlag(flags, false);
-            return new Tuple3<>(pos, null, new ExData(decryptedFlags, exLink, exAction, title, recipientsFlags, recipients,
+            return new Fun.Tuple2<>(null, new ExData(decryptedFlags, exLink, exAction, title, recipientsFlags, recipients,
                     authorsFlags, authors, sourcesFlags, sources, tags, jsonAndFiles.a,
                     jsonAndFiles.b));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            return new Fun.Tuple3<>(pos, e.getMessage(), null);
+            return new Fun.Tuple2<>(e.getMessage(), null);
+        }
+
+    }
+
+    public Fun.Tuple3<Integer, String, byte[]> getPassword(PublicKeyAccount account, Account recipient) {
+
+        byte[] password;
+        int pos = -1;
+        if (account.equals((recipient))) {
+            pos = recipients.length; // последний в Секретах
+        } else {
+            for (int i = 0; i < recipients.length; i++) {
+                if (recipients[i].equals(recipient)) {
+                    pos = i;
+                    break;
+                }
+            }
+        }
+
+        if (pos < 0) {
+            return new Fun.Tuple3<>(pos, "Address not found", null);
+        }
+
+        try {
+            password = Controller.getInstance().decrypt(account, recipient, secrets[pos]);
+            return new Tuple3<>(pos, null, password);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return new Tuple3<>(pos, e.getMessage(), null);
         }
 
     }
