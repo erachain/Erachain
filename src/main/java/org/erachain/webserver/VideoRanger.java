@@ -38,7 +38,7 @@ public class VideoRanger {
         return Objects.hash(url);
     }
 
-    public Response get(HttpServletRequest request) {
+    public static Response getRange(HttpServletRequest request, byte[] data) {
         int rangeStart = -1;
         int rangeEnd = -1;
         String rangeStr = request.getHeader("Range");
@@ -46,7 +46,7 @@ public class VideoRanger {
             rangeStr = request.getHeader("range");
 
         if (rangeStr != null) {
-            // Range: bytes=0-1000
+            // Range: bytes=0-1000  // bytes=301867-
             if (rangeStr.startsWith("bytes=")) {
                 String[] tmp = rangeStr.substring(6).split("-");
                 try {
@@ -85,6 +85,10 @@ public class VideoRanger {
                 .header("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + data.length)
                 .entity(new ByteArrayInputStream(rangeBytes))
                 .build();
+    }
+
+    public Response getRange(HttpServletRequest request) {
+        return getRange(request, data);
     }
 
 }

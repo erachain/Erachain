@@ -279,7 +279,7 @@ public class APIItemPerson {
                     Transaction.ITEM_PERSON_NOT_EXIST);
         }
 
-        return APIItems.getImage(map, key, false);
+        return APIItems.getImage(request, map, key, false);
 
     }
 
