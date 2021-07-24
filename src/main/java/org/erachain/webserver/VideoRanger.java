@@ -38,6 +38,12 @@ public class VideoRanger {
         return url.equals(that.url);
     }
 
+    /**
+     * Первый запрос - выдаем что это тип Видео и размер
+     * - дальше ждем запросы на кусочки и keep alive в запросе чтобы Jetty не рвал соединение.
+     *
+     * @return
+     */
     @Override
     public int hashCode() {
         return Objects.hash(url);
@@ -48,25 +54,21 @@ public class VideoRanger {
     // then jetty will respond automatically to keep the connection alive
     // - unless there is an error or a filter/servlet/handler explicitly sets Connection:close on the response.
 
-    static int RANGE_LEN = 1 << 17;
+    static int RANGE_LEN = 100000;
 
     public static Response getRange(HttpServletRequest request, byte[] data) {
+
+        long lastUpdated = cnt.blockChain.getGenesisTimestamp();
         String headerSince = request.getHeader("If-Modified-Since");
         // сервер шлет запрос мол поменялись данные? мы отвечаем - НЕТ
-        if (false && headerSince != null && !headerSince.isEmpty())
-            return Response.status(304)
+        if (false && headerSince != null && !headerSince.isEmpty()) {
+            LOGGER.debug(headerSince + " OK!!!");
+            return Response.status(304) // not modified
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Timing-Allow-Origin", "*")
-                    .header("Last-Modified", cnt.blockChain.getGenesisTimestamp())
+                    .header("Last-Modified", lastUpdated)
                     .build();
-        if (false)
-            return Response.status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Timing-Allow-Origin", "*")
-                    .header("Last-Modified", cnt.blockChain.getGenesisTimestamp())
-                    .header("Content-Type", "video/mp4")
-                    .entity(new ByteArrayInputStream(data))
-                    .build();
+        }
 
 
         int maxEND = data.length - 1;
@@ -80,22 +82,27 @@ public class VideoRanger {
             LOGGER.debug(key + ": " + request.getHeader(key));
         }
 
-
         if (rangeStr == null || rangeStr.isEmpty() || !rangeStr.startsWith("bytes=")) {
-            rangeStart = 0;
-            rangeEnd = RANGE_LEN;
+            // это первый запрос - ответим что тут Видео + его размер
+            return Response.status(206) // range
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Timing-Allow-Origin", "*")
+                    .header("Last-Modified", lastUpdated)
+                    .header("Content-Length", data.length)
+                    .header("Content-Type", "video/mp4")
+                    .header("Accept-Range", "bytes")
+                    .build();
         } else {
             // Range: bytes=0-1000  // bytes=301867-
             String[] tmp = rangeStr.substring(6).split("-");
             rangeStart = Integer.parseInt(tmp[0]);
             if (tmp.length == 1) {
-                rangeEnd = rangeStart + RANGE_LEN; //maxEND;
-                //rangeEnd = maxEND - 1;
+                rangeEnd = rangeStart + RANGE_LEN - 1;
             } else {
                 try {
                     rangeEnd = Integer.parseInt(tmp[1]);
                 } catch (Exception e) {
-                    rangeEnd = maxEND;
+                    rangeEnd = rangeStart + RANGE_LEN - 1;
                 }
             }
         }
@@ -103,28 +110,27 @@ public class VideoRanger {
         if (rangeEnd > maxEND)
             rangeEnd = maxEND;
 
+        byte[] rangeBytes = new byte[rangeEnd - rangeStart + 1];
+        System.arraycopy(data, rangeStart, rangeBytes, 0, rangeBytes.length);
+
         int status = rangeEnd == maxEND ? 200 : 206;
-        rangeStr = "bytes " + rangeStart + "-" + rangeEnd + "/" + maxEND;
+        rangeStr = "bytes " + rangeStart + "-" + rangeEnd + "/" + data.length;
         LOGGER.debug(status + ": " + rangeStr);
 
-        byte[] rangeBytes = new byte[rangeEnd - rangeStart + 1];
-        System.arraycopy(data, rangeStart, rangeBytes, 0, rangeBytes.length - 1);
-
-        Response.ResponseBuilder responce = Response.status(status)
+        Response.ResponseBuilder response = Response.status(status)
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Timing-Allow-Origin", "*")
-                .header("Last-Modified", cnt.blockChain.getGenesisTimestamp())
-                //.header("Last-Modified", System.currentTimeMillis())
+                .header("Last-Modified", lastUpdated)
                 .header("Content-Type", "video/mp4");
 
         if (status == 200) {
         } else {
-            responce.header("Accept-Range", "bytes")
-                    .header("Content-Length", rangeBytes.length)
+            response.header("Accept-Range", "bytes")
+                    //.header("Content-Length", rangeBytes.length)
                     .header("Content-Range", rangeStr);
         }
 
-        return responce
+        return response
                 .entity(new ByteArrayInputStream(rangeBytes))
                 .build();
     }
