@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
+import java.util.Enumeration;
 import java.util.Objects;
 
 /**
@@ -42,21 +43,37 @@ public class VideoRanger {
         return Objects.hash(url);
     }
 
-    static int RANGE_LEN = 1 << 14;
+    static int RANGE_LEN = 1 << 17;
     public static Response getRange(HttpServletRequest request, byte[] data) {
         String headerSince = request.getHeader("If-Modified-Since");
+        // сервер шлет запрос мол поменялись данные? мы отвечаем - НЕТ
         if (false && headerSince != null && !headerSince.isEmpty())
             return Response.status(304)
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Timing-Allow-Origin", "*")
                     .header("Last-Modified", cnt.blockChain.getGenesisTimestamp())
                     .build();
+        if (false)
+            return Response.status(200)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Timing-Allow-Origin", "*")
+                    .header("Last-Modified", cnt.blockChain.getGenesisTimestamp())
+                    .header("Content-Type", "video/mp4")
+                    .entity(new ByteArrayInputStream(data))
+                    .build();
 
 
+        int maxEND = data.length - 1;
         int rangeStart;
         int rangeEnd;
         String rangeStr = request.getHeader("Range");
-        LOGGER.debug("Range: " + rangeStr == null ? "null" : rangeStr);
+        LOGGER.debug("Range: [" + (rangeStr == null ? "null" : rangeStr) + "]");
+        Enumeration<String> headersKeys = request.getHeaderNames();
+        while (headersKeys.hasMoreElements()) {
+            String key = headersKeys.nextElement();
+            LOGGER.debug(key + ": " + request.getHeader(key));
+        }
+
 
         if (rangeStr == null || rangeStr.isEmpty() || !rangeStr.startsWith("bytes=")) {
             rangeStart = 0;
@@ -66,32 +83,41 @@ public class VideoRanger {
             String[] tmp = rangeStr.substring(6).split("-");
             rangeStart = Integer.parseInt(tmp[0]);
             if (tmp.length == 1) {
-                rangeEnd = data.length;
+                rangeEnd = rangeStart + RANGE_LEN; //maxEND;
+                //rangeEnd = maxEND - 1;
             } else {
                 try {
                     rangeEnd = Integer.parseInt(tmp[1]);
                 } catch (Exception e) {
-                    rangeEnd = data.length;
+                    rangeEnd = maxEND;
                 }
             }
         }
 
-        if (rangeEnd > data.length)
-            rangeEnd = data.length;
+        if (rangeEnd > maxEND)
+            rangeEnd = maxEND;
 
-        LOGGER.debug("bytes " + rangeStart + "-" + rangeEnd + "/" + data.length);
+        int status = rangeEnd == maxEND ? 200 : 206;
+        rangeStr = "bytes " + rangeStart + "-" + rangeEnd + "/" + data.length;
+        LOGGER.debug(status + ": " + rangeStr);
 
-        byte[] rangeBytes = new byte[rangeEnd - rangeStart];
+        byte[] rangeBytes = new byte[rangeEnd - rangeStart + 1];
         System.arraycopy(data, rangeStart, rangeBytes, 0, rangeBytes.length);
 
-        return Response.status(rangeEnd == data.length ? 200 : 206)
+        Response.ResponseBuilder responce = Response.status(status)
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Timing-Allow-Origin", "*")
                 .header("Last-Modified", cnt.blockChain.getGenesisTimestamp())
-                .header("Content-Type", "video/mp4")
-                .header("Accept-Range", "bytes")
-                .header("Content-Length", data.length)
-                .header("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + data.length)
+                .header("Content-Type", "video/mp4");
+
+        if (status == 200) {
+        } else {
+            responce.header("Accept-Range", "bytes")
+                    .header("Content-Length", data.length)
+                    .header("Content-Range", rangeStr);
+        }
+
+        return responce
                 .entity(new ByteArrayInputStream(rangeBytes))
                 .build();
     }
