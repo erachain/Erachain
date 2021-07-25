@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
-import java.util.Enumeration;
 import java.util.Objects;
 
 /**
@@ -54,18 +53,17 @@ public class VideoRanger {
     // then jetty will respond automatically to keep the connection alive
     // - unless there is an error or a filter/servlet/handler explicitly sets Connection:close on the response.
 
-    static int RANGE_LEN = 100000;
+    static int RANGE_LEN = 25000;
 
     public static Response getRange(HttpServletRequest request, byte[] data) {
 
         long lastUpdated = cnt.blockChain.getGenesisTimestamp();
         String headerSince = request.getHeader("If-Modified-Since");
         // сервер шлет запрос мол поменялись данные? мы отвечаем - НЕТ
-        if (false && headerSince != null && !headerSince.isEmpty()) {
+        if (headerSince != null && !headerSince.isEmpty()) {
             LOGGER.debug(headerSince + " OK!!!");
             return Response.status(304) // not modified
                     .header("Access-Control-Allow-Origin", "*")
-                    .header("Timing-Allow-Origin", "*")
                     .header("Last-Modified", lastUpdated)
                     .build();
         }
@@ -75,20 +73,12 @@ public class VideoRanger {
         int rangeStart;
         int rangeEnd;
         String rangeStr = request.getHeader("Range");
-        LOGGER.debug("Range: [" + (rangeStr == null ? "null" : rangeStr) + "]");
-        Enumeration<String> headersKeys = request.getHeaderNames();
-        while (headersKeys.hasMoreElements()) {
-            String key = headersKeys.nextElement();
-            LOGGER.debug(key + ": " + request.getHeader(key));
-        }
 
         if (rangeStr == null || rangeStr.isEmpty() || !rangeStr.startsWith("bytes=")) {
             // это первый запрос - ответим что тут Видео + его размер
-            return Response.status(206) // range
+            return Response.status(206) // set range
                     .header("Access-Control-Allow-Origin", "*")
-                    .header("Timing-Allow-Origin", "*")
                     .header("Last-Modified", lastUpdated)
-                    .header("Content-Length", data.length)
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
                     .build();
@@ -98,37 +88,40 @@ public class VideoRanger {
             rangeStart = Integer.parseInt(tmp[0]);
             if (tmp.length == 1) {
                 rangeEnd = rangeStart + RANGE_LEN - 1;
+                if (rangeEnd > maxEND)
+                    rangeEnd = maxEND;
             } else {
                 try {
                     rangeEnd = Integer.parseInt(tmp[1]);
                 } catch (Exception e) {
                     rangeEnd = rangeStart + RANGE_LEN - 1;
+                    if (rangeEnd > maxEND)
+                        rangeEnd = maxEND;
                 }
             }
         }
 
-        if (rangeEnd > maxEND)
-            rangeEnd = maxEND;
+        if (rangeStart > maxEND || rangeEnd > maxEND) {
+            return Response.status(416) // out of range
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Last-Modified", lastUpdated)
+                    .header("Content-Type", "video/mp4")
+                    .header("Accept-Range", "bytes")
+                    .build();
+        }
 
         byte[] rangeBytes = new byte[rangeEnd - rangeStart + 1];
         System.arraycopy(data, rangeStart, rangeBytes, 0, rangeBytes.length);
 
-        int status = rangeEnd == maxEND ? 200 : 206;
         rangeStr = "bytes " + rangeStart + "-" + rangeEnd + "/" + data.length;
-        LOGGER.debug(status + ": " + rangeStr);
 
-        Response.ResponseBuilder response = Response.status(status)
+        Response.ResponseBuilder response = Response.status(206)
                 .header("Access-Control-Allow-Origin", "*")
-                .header("Timing-Allow-Origin", "*")
                 .header("Last-Modified", lastUpdated)
-                .header("Content-Type", "video/mp4");
-
-        if (status == 200) {
-        } else {
-            response.header("Accept-Range", "bytes")
-                    //.header("Content-Length", rangeBytes.length)
-                    .header("Content-Range", rangeStr);
-        }
+                .header("Content-Length", rangeBytes.length)
+                .header("Accept-Range", "bytes")
+                .header("Content-Type", "video/mp4")
+                .header("Content-Range", rangeStr);
 
         return response
                 .entity(new ByteArrayInputStream(rangeBytes))
