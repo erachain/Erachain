@@ -60,7 +60,7 @@ public class APIItems {
                                     preViewMaker.errorMess);
                         }
                     }
-                    mediaType = new MediaType("video", "mp4");
+                    mediaType = WebResource.TYPE_VIDEO;
                 } else {
                     mediaType = item.getImageMediaType();
                 }
@@ -69,7 +69,7 @@ public class APIItems {
 
         Controller cnt = Controller.getInstance();
 
-        if (mediaType.equals(new MediaType("video", "mp4"))) {
+        if (mediaType.equals(WebResource.TYPE_VIDEO)) {
             return VideoRanger.getRange(request, image);
         }
 
