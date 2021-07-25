@@ -76,11 +76,14 @@ public class VideoRanger {
 
         if (rangeStr == null || rangeStr.isEmpty() || !rangeStr.startsWith("bytes=")) {
             // это первый запрос - ответим что тут Видео + его размер
-            return Response.status(206) // set range
+            return Response.status(200) // set as first response
                     .header("Access-Control-Allow-Origin", "*")
+                    .header("Connection", "keep-alive")
                     .header("Last-Modified", lastUpdated)
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
+                    .header("Content-Length", data.length)
+                    .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
                     .build();
         } else {
             // Range: bytes=0-1000  // bytes=301867-
@@ -104,9 +107,12 @@ public class VideoRanger {
         if (rangeStart > maxEND || rangeEnd > maxEND) {
             return Response.status(416) // out of range
                     .header("Access-Control-Allow-Origin", "*")
+                    .header("Connection", "keep-alive")
                     .header("Last-Modified", lastUpdated)
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
+                    .header("Content-Length", data.length)
+                    .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
                     .build();
         }
 
@@ -115,15 +121,14 @@ public class VideoRanger {
 
         rangeStr = "bytes " + rangeStart + "-" + rangeEnd + "/" + data.length;
 
-        Response.ResponseBuilder response = Response.status(206)
+        return Response.status(206)
                 .header("Access-Control-Allow-Origin", "*")
-                .header("Last-Modified", lastUpdated)
-                .header("Content-Length", rangeBytes.length)
-                .header("Accept-Range", "bytes")
+                .header("Connection", "keep-alive")
                 .header("Content-Type", "video/mp4")
-                .header("Content-Range", rangeStr);
-
-        return response
+                .header("Last-Modified", lastUpdated)
+                .header("Accept-Range", "bytes")
+                .header("Content-Length", rangeBytes.length)
+                .header("Content-Range", rangeStr)
                 .entity(new ByteArrayInputStream(rangeBytes))
                 .build();
     }
