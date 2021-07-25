@@ -60,11 +60,14 @@ public class VideoRanger {
         long lastUpdated = cnt.blockChain.getGenesisTimestamp();
         String headerSince = request.getHeader("If-Modified-Since");
         // сервер шлет запрос мол поменялись данные? мы отвечаем - НЕТ
-        if (headerSince != null && !headerSince.isEmpty()) {
-            LOGGER.debug(headerSince + " OK!!!");
+        if (false && headerSince != null && !headerSince.isEmpty()) {
+            //LOGGER.debug(headerSince + " OK!!!");
             return Response.status(304) // not modified
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Last-Modified", lastUpdated)
+                    .header("Connection", "keep-alive")
+                    .header("Content-Type", "video/mp4")
+                    .header("Accept-Range", "bytes")
                     .build();
         }
 
@@ -76,14 +79,14 @@ public class VideoRanger {
 
         if (rangeStr == null || rangeStr.isEmpty() || !rangeStr.startsWith("bytes=")) {
             // это первый запрос - ответим что тут Видео + его размер
-            return Response.status(200) // set as first response
+            return Response.status(206) // set as first response
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Connection", "keep-alive")
                     .header("Last-Modified", lastUpdated)
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
-                    .header("Content-Length", data.length)
-                    .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
+                    //.header("Content-Length", data.length)
+                    //.header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
                     .build();
         } else {
             // Range: bytes=0-1000  // bytes=301867-
