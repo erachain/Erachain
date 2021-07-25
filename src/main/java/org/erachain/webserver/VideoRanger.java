@@ -99,6 +99,11 @@ public class VideoRanger {
             } else {
                 try {
                     rangeEnd = Integer.parseInt(tmp[1]);
+                    if (rangeEnd <= rangeStart) {
+                        rangeEnd = rangeStart + RANGE_LEN - 1;
+                        if (rangeEnd > maxEND)
+                            rangeEnd = maxEND;
+                    }
                 } catch (Exception e) {
                     rangeEnd = rangeStart + RANGE_LEN - 1;
                     if (rangeEnd > maxEND)
@@ -107,7 +112,7 @@ public class VideoRanger {
             }
         }
 
-        if (rangeStart > maxEND || rangeEnd > maxEND) {
+        if (rangeStart < 0 || rangeStart > maxEND || rangeEnd > maxEND) {
             return Response.status(416) // out of range
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Connection", "keep-alive")
