@@ -79,14 +79,15 @@ public class VideoRanger {
 
         if (rangeStr == null || rangeStr.isEmpty() || !rangeStr.startsWith("bytes=")) {
             // это первый запрос - ответим что тут Видео + его размер
-            return Response.status(206) // set as first response
+            return Response.status(200) // set as first response
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Connection", "keep-alive")
                     .header("Last-Modified", lastUpdated)
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
-                    //.header("Content-Length", data.length)
+                    .header("Content-Length", 0)
                     //.header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
+                    .header("Content-Range", "bytes 0-0/" + data.length)
                     .build();
         } else {
             // Range: bytes=0-1000  // bytes=301867-
