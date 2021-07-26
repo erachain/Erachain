@@ -64,7 +64,6 @@ public class VideoRanger {
             //LOGGER.debug(headerSince + " OK!!!");
             return Response.status(304) // not modified
                     .header("Access-Control-Allow-Origin", "*")
-                    .header("Last-Modified", lastUpdated)
                     .header("Connection", "keep-alive")
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
@@ -77,17 +76,19 @@ public class VideoRanger {
         int rangeEnd;
         String rangeStr = request.getHeader("Range");
 
-        if (rangeStr == null || rangeStr.isEmpty() || !rangeStr.startsWith("bytes=")) {
+        if (rangeStr == null || rangeStr.isEmpty()) {
             // это первый запрос - ответим что тут Видео + его размер
             return Response.status(200) // set as first response
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Connection", "keep-alive")
-                    .header("Last-Modified", lastUpdated)
+                    //.header("Last-Modified", lastUpdated)
+                    .header("Cache-Control", "public, max-age=31536000")
+                    .header("Content-Transfer-Encoding", "binary")
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
-                    .header("Content-Length", 0)
-                    //.header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
-                    .header("Content-Range", "bytes 0-0/" + data.length)
+                    .header("Content-Length", data.length)
+                    .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
+                    .entity(new ByteArrayInputStream(data))
                     .build();
         } else {
             // Range: bytes=0-1000  // bytes=301867-
@@ -117,10 +118,10 @@ public class VideoRanger {
             return Response.status(416) // out of range
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Connection", "keep-alive")
-                    .header("Last-Modified", lastUpdated)
+                    .header("Content-Transfer-Encoding", "binary")
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
-                    .header("Content-Length", data.length)
+                    .header("Content-Length", 0)
                     .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
                     .build();
         }
@@ -134,7 +135,8 @@ public class VideoRanger {
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Connection", "keep-alive")
                 .header("Content-Type", "video/mp4")
-                .header("Last-Modified", lastUpdated)
+                .header("Cache-Control", "public, max-age=31536000")
+                .header("Content-Transfer-Encoding", "binary")
                 .header("Accept-Range", "bytes")
                 .header("Content-Length", rangeBytes.length)
                 .header("Content-Range", rangeStr)
