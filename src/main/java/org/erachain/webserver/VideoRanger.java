@@ -53,7 +53,7 @@ public class VideoRanger {
     // then jetty will respond automatically to keep the connection alive
     // - unless there is an error or a filter/servlet/handler explicitly sets Connection:close on the response.
 
-    static int RANGE_LEN = 50000;
+    static int RANGE_LEN = 100000;
 
     public static Response getRange(HttpServletRequest request, byte[] data) {
 
@@ -82,7 +82,6 @@ public class VideoRanger {
             return Response.status(200) // set as first response
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Connection", "keep-alive")
-                    //.header("Last-Modified", lastUpdated)
                     .header("Cache-Control", "public, max-age=31536000")
                     .header("Content-Transfer-Encoding", "binary")
                     .header("Content-Type", "video/mp4")
