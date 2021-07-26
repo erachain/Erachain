@@ -82,15 +82,16 @@ public class VideoRanger {
             return Response.status(200) // set as first response
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Connection", "keep-alive")
-                    .header("Cache-Control", "public, max-age=31536000")
+                    //.header("Cache-Control", "public, max-age=31536000")
                     .header("Content-Transfer-Encoding", "binary")
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
-                    ////.header("Content-Length", data.length)
-                    ////.header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
-                    // тут походе передача идет пакетами внутри коннета и не выходит на уровень GET HTTP
+                    //.header("Content-Length", data.length)
+                    //.header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
+                    // тут походе передача идет пакетами внутри коннекта и не выходит на уровень GET HTTP
                     // а можно и не слать данные тут - не напрягать сеть?!?!
-                    // - да проверена - это лишь лишняя задержка для сети! .entity(new ByteArrayInputStream(data))
+                    // - да проверена - это лишь лишняя задержка для сети!
+                    //.entity(new ByteArrayInputStream(data))
                     .build();
         } else {
             // Range: bytes=0-1000  // bytes=301867-
@@ -135,7 +136,7 @@ public class VideoRanger {
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Connection", "keep-alive")
                 .header("Content-Type", "video/mp4")
-                .header("Cache-Control", "public, max-age=31536000")
+                //.header("Cache-Control", "public, max-age=31536000")
                 .header("Content-Transfer-Encoding", "binary")
                 .header("Accept-Range", "bytes")
                 .header("Content-Length", rangeBytes.length)
