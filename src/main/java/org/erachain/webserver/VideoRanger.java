@@ -122,14 +122,12 @@ public class VideoRanger {
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
                     .header("Content-Length", 0)
-                    .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
+                    .header("Content-Range", "bytes 0-0/" + data.length)
                     .build();
         }
 
         byte[] rangeBytes = new byte[rangeEnd - rangeStart + 1];
         System.arraycopy(data, rangeStart, rangeBytes, 0, rangeBytes.length);
-
-        rangeStr = "bytes " + rangeStart + "-" + rangeEnd + "/" + data.length;
 
         return Response.status(206)
                 .header("Access-Control-Allow-Origin", "*")
@@ -139,7 +137,7 @@ public class VideoRanger {
                 .header("Content-Transfer-Encoding", "binary")
                 .header("Accept-Range", "bytes")
                 .header("Content-Length", rangeBytes.length)
-                .header("Content-Range", rangeStr)
+                .header("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + data.length)
                 .entity(new ByteArrayInputStream(rangeBytes))
                 .build();
     }
