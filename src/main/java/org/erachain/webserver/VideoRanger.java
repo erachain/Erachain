@@ -53,9 +53,15 @@ public class VideoRanger {
     // then jetty will respond automatically to keep the connection alive
     // - unless there is an error or a filter/servlet/handler explicitly sets Connection:close on the response.
 
-    static int RANGE_LEN = 1 << 15;
+    /**
+     * Размер буфера для выдачи ответа - сейчас сети очень быстрые - задержка на запрос 42мс,
+     * а ответ в 1МБ с загрузкой - задержка всего 200-300мс. То есть нет смысла бить на маленькие пакеты - тогда время на запросы съедается почем зря
+     * Оптимально 250 к и выше. 250к - это 68мс задержка загрузки - т о есть полностью запрос обрабатывается за 120мс
+     * Но зато если бить мельче то одновременная загрузка большого числа видео будет меньше грузить сервер
+     */
+    static int RANGE_LEN = 1 << 18;
 
-    public static Response getRange(HttpServletRequest request, byte[] data) {
+    public static Response getRange(HttpServletRequest request, byte[] data, boolean asPreview) {
 
         long lastUpdated = cnt.blockChain.getGenesisTimestamp();
         String headerSince = request.getHeader("If-Modified-Since");
@@ -72,6 +78,7 @@ public class VideoRanger {
 
 
         int maxEND = data.length - 1;
+        int rangeLen = asPreview ? RANGE_LEN >> 3 : RANGE_LEN;
         int rangeStart;
         int rangeEnd;
         String rangeStr = request.getHeader("Range");
@@ -98,19 +105,19 @@ public class VideoRanger {
             String[] tmp = rangeStr.substring(6).split("-");
             rangeStart = Integer.parseInt(tmp[0]);
             if (tmp.length == 1) {
-                rangeEnd = rangeStart + RANGE_LEN - 1;
+                rangeEnd = rangeStart + rangeLen - 1;
                 if (rangeEnd > maxEND)
                     rangeEnd = maxEND;
             } else {
                 try {
                     rangeEnd = Integer.parseInt(tmp[1]);
                     if (rangeEnd <= rangeStart) {
-                        rangeEnd = rangeStart + RANGE_LEN - 1;
+                        rangeEnd = rangeStart + rangeLen - 1;
                         if (rangeEnd > maxEND)
                             rangeEnd = maxEND;
                     }
                 } catch (Exception e) {
-                    rangeEnd = rangeStart + RANGE_LEN - 1;
+                    rangeEnd = rangeStart + rangeLen - 1;
                     if (rangeEnd > maxEND)
                         rangeEnd = maxEND;
                 }
@@ -145,8 +152,8 @@ public class VideoRanger {
                 .build();
     }
 
-    public Response getRange(HttpServletRequest request) {
-        return getRange(request, data);
+    public Response getRange(HttpServletRequest request, boolean asPreview) {
+        return getRange(request, data, asPreview);
     }
 
 }

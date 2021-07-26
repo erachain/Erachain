@@ -69,7 +69,7 @@ public class APIItems {
         Controller cnt = Controller.getInstance();
 
         if (mediaType.equals(WebResource.TYPE_VIDEO)) {
-            return VideoRanger.getRange(request, image);
+            return VideoRanger.getRange(request, image, preView);
         }
 
         return Response.status(200)
