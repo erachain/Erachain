@@ -24,6 +24,7 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.Pair;
+import org.erachain.webserver.WebResource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -586,13 +587,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
                 }
                 return new MediaType("image", typeName);
             } else {
-                return new MediaType("image", "jpeg");
+                return WebResource.TYPE_JPEG;
             }
 
         } else if (mediaType == ItemCls.MEDIA_TYPE_VIDEO) {
-            return new MediaType("video", "mp4");
+            return WebResource.TYPE_VIDEO;
         } else if (mediaType == ItemCls.MEDIA_TYPE_AUDIO) {
-            return new MediaType("audio", "mp3");
+            return WebResource.TYPE_AUDIO;
         }
         return null;
     }

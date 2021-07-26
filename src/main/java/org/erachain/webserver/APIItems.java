@@ -10,6 +10,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.ItemMap;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
@@ -20,7 +21,7 @@ import java.io.File;
 
 public class APIItems {
 
-    public static Response getImage(ItemMap map, long key, boolean preView) {
+    public static Response getImage(HttpServletRequest request, ItemMap map, long key, boolean preView) {
 
         ItemCls item = map.get(key);
 
@@ -40,7 +41,6 @@ public class APIItems {
             if (image == null || image.length == 0) {
                 return Response.status(200)
                         .header("Access-Control-Allow-Origin", "*")
-                        .entity("")
                         .build();
             }
             if (PreviewMaker.notNeedPreview(item, image)) {
@@ -59,7 +59,7 @@ public class APIItems {
                                     preViewMaker.errorMess);
                         }
                     }
-                    mediaType = new MediaType("video", "mp4");
+                    mediaType = WebResource.TYPE_VIDEO;
                 } else {
                     mediaType = item.getImageMediaType();
                 }
@@ -68,13 +68,17 @@ public class APIItems {
 
         Controller cnt = Controller.getInstance();
 
+        if (mediaType.equals(WebResource.TYPE_VIDEO)) {
+            return VideoRanger.getRange(request, image, preView);
+        }
+
         return Response.status(200)
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Content-length", image.length)
                 .header("Last-Modified", cnt.blockChain.getTimestamp(1000))
                 .header("Timing-Allow-Origin", "*")
-                .entity(new ByteArrayInputStream(image))
                 .type(mediaType)
+                .entity(new ByteArrayInputStream(image))
                 .build();
 
     }
@@ -87,7 +91,6 @@ public class APIItems {
         if (icon == null || icon.length == 0) {
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity("")
                     .build();
         }
 
