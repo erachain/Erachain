@@ -78,7 +78,7 @@ public class VideoRanger {
 
 
         int maxEND = data.length - 1;
-        int rangeLen = asPreview ? RANGE_LEN >> 3 : RANGE_LEN;
+        int rangeLen = asPreview ? RANGE_LEN >> 2 : RANGE_LEN;
         int rangeStart;
         int rangeEnd;
         String rangeStr = request.getHeader("Range");
