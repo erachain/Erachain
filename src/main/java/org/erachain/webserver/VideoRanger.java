@@ -86,8 +86,8 @@ public class VideoRanger {
                     .header("Content-Transfer-Encoding", "binary")
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
-                    .header("Content-Length", data.length)
-                    .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
+                    ////.header("Content-Length", data.length)
+                    ////.header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
                     // тут походе передача идет пакетами внутри коннета и не выходит на уровень GET HTTP
                     // а можно и не слать данные тут - не напрягать сеть?!?!
                     // - да проверена - это лишь лишняя задержка для сети! .entity(new ByteArrayInputStream(data))
