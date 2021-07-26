@@ -90,7 +90,7 @@ public class VideoRanger {
                     .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
                     // тут походе передача идет пакетами внутри коннета и не выходит на уровень GET HTTP
                     // а можно и не слать данные тут - не напрягать сеть?!?!
-                    .entity(new ByteArrayInputStream(data))
+                    // - да проверена - это лишь лишняя задержка для сети! .entity(new ByteArrayInputStream(data))
                     .build();
         } else {
             // Range: bytes=0-1000  // bytes=301867-
