@@ -53,7 +53,7 @@ public class VideoRanger {
     // then jetty will respond automatically to keep the connection alive
     // - unless there is an error or a filter/servlet/handler explicitly sets Connection:close on the response.
 
-    static int RANGE_LEN = 25000;
+    static int RANGE_LEN = 50000;
 
     public static Response getRange(HttpServletRequest request, byte[] data) {
 
@@ -76,6 +76,7 @@ public class VideoRanger {
         int rangeEnd;
         String rangeStr = request.getHeader("Range");
 
+        // Sec-Fetch-Dest: document
         if (rangeStr == null || rangeStr.isEmpty()) {
             // это первый запрос - ответим что тут Видео + его размер
             return Response.status(200) // set as first response
@@ -88,6 +89,8 @@ public class VideoRanger {
                     .header("Accept-Range", "bytes")
                     .header("Content-Length", data.length)
                     .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
+                    // тут походе передача идет пакетами внутри коннета и не выходит на уровень GET HTTP
+                    // а можно и не слать данные тут - не напрягать сеть?!?!
                     .entity(new ByteArrayInputStream(data))
                     .build();
         } else {

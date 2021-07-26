@@ -41,7 +41,7 @@ public class APIItems {
             if (image == null || image.length == 0) {
                 return Response.status(200)
                         .header("Access-Control-Allow-Origin", "*")
-                        .entity("")
+                        //.entity("")
                         .build();
             }
             if (PreviewMaker.notNeedPreview(item, image)) {
