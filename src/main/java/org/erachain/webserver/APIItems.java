@@ -41,7 +41,6 @@ public class APIItems {
             if (image == null || image.length == 0) {
                 return Response.status(200)
                         .header("Access-Control-Allow-Origin", "*")
-                        //.entity("")
                         .build();
             }
             if (PreviewMaker.notNeedPreview(item, image)) {
@@ -78,8 +77,8 @@ public class APIItems {
                 .header("Content-length", image.length)
                 .header("Last-Modified", cnt.blockChain.getTimestamp(1000))
                 .header("Timing-Allow-Origin", "*")
-                .entity(new ByteArrayInputStream(image))
                 .type(mediaType)
+                .entity(new ByteArrayInputStream(image))
                 .build();
 
     }
@@ -92,7 +91,6 @@ public class APIItems {
         if (icon == null || icon.length == 0) {
             return Response.status(200)
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity("")
                     .build();
         }
 
