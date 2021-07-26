@@ -76,7 +76,6 @@ public class VideoRanger {
                     .build();
         }
 
-
         int maxEND = data.length - 1;
         int rangeLen = asPreview ? RANGE_LEN >> 2 : RANGE_LEN;
         int rangeStart;
