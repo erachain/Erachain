@@ -307,9 +307,9 @@ public class MyOrderTab extends SplitPanel {
     
     @Override
     public void onClose() {
-        ordersModel.deleteObservers();
-        setIntervalPanel.deleteObservers();
-        
+        // не надо так как потом не встанет Обсервер по новой и ордера перестанут обновляться ordersModel.deleteObservers();
+        // setIntervalPanel.deleteObservers();
+
     }
 
     protected void tableMouse2Click(Order order) {
