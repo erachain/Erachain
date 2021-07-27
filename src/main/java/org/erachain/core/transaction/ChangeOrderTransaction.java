@@ -97,6 +97,10 @@ public class ChangeOrderTransaction extends Transaction {
 
     // GETTERS/SETTERS
 
+    public boolean isHaveUpdated() {
+        return (typeBytes[3] & (byte) 1) != 0;
+    }
+
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
 
         super.setDC(dcSet, false);
@@ -193,7 +197,10 @@ public class ChangeOrderTransaction extends Transaction {
     // PARSE CONVERT
 
     public Order makeUpdatedOrder() {
-        return new Order(order, dbRef, this.amountWant);
+        if (isHaveUpdated())
+            return new Order(order, dbRef, this.amountWant, order.getAmountWant());
+
+        return new Order(order, dbRef, order.getAmountHave(), this.amountWant);
     }
 
     @SuppressWarnings("unchecked")
@@ -384,8 +391,20 @@ public class ChangeOrderTransaction extends Transaction {
         if (amountWant.signum() <= 0) {
             return NEGATIVE_AMOUNT;
         }
-        if (amountWant.compareTo(order.getAmountWant()) == 0) {
-            return INVALID_AMOUNT;
+
+        if (isHaveUpdated()) {
+            if (amountWant.compareTo(order.getAmountHave()) == 0) {
+                errorValue = "New amount is same";
+                return INVALID_AMOUNT;
+            } else if (amountWant.compareTo(order.getFulfilledHave()) <= 0) {
+                errorValue = "newAmount <= fulfilledHave";
+                return INVALID_AMOUNT;
+            }
+        } else {
+            if (amountWant.compareTo(order.getAmountWant()) == 0) {
+                errorValue = "New amount is same";
+                return INVALID_AMOUNT;
+            }
         }
 
         // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
@@ -452,12 +471,28 @@ public class ChangeOrderTransaction extends Transaction {
         dcSet.getCompletedOrderMap().put(order);
 
         // запомним для отчета что цена изменилась
-        Trade trade = new Trade(Trade.TYPE_CHANGE,
-                dbRef, // номер инициатора по нашему номеру
-                orderID, // номер оригинала?
-                order.getHaveAssetKey(), order.getWantAssetKey(),
-                order.getAmountHave(), amountWant,
-                order.getHaveAssetScale(), order.getWantAssetScale(), 0);
+        Trade trade;
+        if (isHaveUpdated()) {
+            trade = new Trade(Trade.TYPE_CHANGE,
+                    dbRef, // номер инициатора по нашему номеру
+                    orderID, // номер оригинала?
+                    order.getHaveAssetKey(), order.getWantAssetKey(),
+                    amountWant, order.getAmountWant(),
+                    order.getHaveAssetScale(), order.getWantAssetScale(), 0);
+
+            // change PLEDGE
+            BigDecimal diffAmount = order.getAmountHave().subtract(amountWant);
+            creator.changeBalance(dcSet, diffAmount.signum() > 0, true, order.getHaveAssetKey(),
+                    diffAmount.abs(), false, false, true);
+
+        } else {
+            trade = new Trade(Trade.TYPE_CHANGE,
+                    dbRef, // номер инициатора по нашему номеру
+                    orderID, // номер оригинала?
+                    order.getHaveAssetKey(), order.getWantAssetKey(),
+                    order.getAmountHave(), amountWant,
+                    order.getHaveAssetScale(), order.getWantAssetScale(), 0);
+        }
 
         // нужно запомнить чтобы при откате обновить назад цену
         dcSet.getTradeMap().put(trade);
@@ -465,7 +500,8 @@ public class ChangeOrderTransaction extends Transaction {
         // изменяемые объекты нужно заново создавать
         Order updatedOrder = makeUpdatedOrder();
 
-        if (order.getAmountWant().compareTo(amountWant) > 0) {
+        if (isHaveUpdated() && order.getAmountHave().compareTo(amountWant) < 0
+                || !isHaveUpdated() && order.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - проверим может он сработает
             updatedOrder.setDC(dcSet);
             OrderProcess.process(updatedOrder, block, this);
@@ -488,7 +524,15 @@ public class ChangeOrderTransaction extends Transaction {
         // удалим из исполненных
         Order orderOrig = dcSet.getCompletedOrderMap().remove(orderID);
 
-        if (orderOrig.getAmountWant().compareTo(amountWant) > 0) {
+        if (isHaveUpdated()) {
+            // change PLEDGE
+            BigDecimal diffAmount = orderOrig.getAmountHave().subtract(amountWant);
+            creator.changeBalance(dcSet, diffAmount.signum() < 0, true, orderOrig.getHaveAssetKey(),
+                    diffAmount.abs(), false, false, true);
+        }
+
+        if (isHaveUpdated() && orderOrig.getAmountHave().compareTo(amountWant) < 0
+                || !isHaveUpdated() && orderOrig.getAmountWant().compareTo(amountWant) > 0) {
             /// цена уменьшилась - откатим, ведь может он сработал
             OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
         } else {
