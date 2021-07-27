@@ -198,7 +198,6 @@ public class APIItemAsset {
     //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
     public Response assetImage(@Context UriInfo info, @PathParam("key") long key) throws IOException {
 
-
         boolean preview = API.checkBoolean(info, "preview");
 
         int weight = 0;
@@ -216,7 +215,7 @@ public class APIItemAsset {
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
-        return APIItems.getImage(map, key, preview);
+        return APIItems.getImage(request, map, key, preview);
 
     }
 

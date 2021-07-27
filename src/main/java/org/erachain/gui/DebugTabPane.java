@@ -62,7 +62,7 @@ public class DebugTabPane extends JTabbedPane {
                     Transaction transaction = transactionsTableModel.getItem(row);
 
                     //SHOW DETAIL SCREEN OF TRANSACTION
-                    TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+                    TransactionDetailsFactory.createTransactionDetail(transaction);
                 }
             }
         });

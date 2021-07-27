@@ -127,7 +127,7 @@ public class AssetPairSelect extends JDialog {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
 
-                pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.setText("");
+                pair_Panel.searchTextField2.setText("");
 
                 pair_Panel.Label_search_Info_Panel.setText(Lang.T("Waiting..."));
 
@@ -152,13 +152,13 @@ public class AssetPairSelect extends JDialog {
         });
 
 
-        pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
+        pair_Panel.searchTextField2.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 // GET VALUE
-                String search = pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.getText();
+                String search = pair_Panel.searchTextField2.getText();
                 if (search.equals("")) {
                     pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(null);
                     assetPairSelectTableModel.clear();
@@ -286,7 +286,7 @@ public class AssetPairSelect extends JDialog {
         pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
-        pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
+        pair_Panel.searchTextField2.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
                 onChange();
             }
@@ -302,7 +302,7 @@ public class AssetPairSelect extends JDialog {
             public void onChange() {
 
                 // GET VALUE
-                String search = pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.getText();
+                String search = pair_Panel.searchTextField2.getText();
 
                 // SET FILTER
                 assetPairSelectTableModel.fireTableDataChanged();

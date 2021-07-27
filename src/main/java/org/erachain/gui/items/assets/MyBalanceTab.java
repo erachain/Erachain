@@ -122,7 +122,7 @@ public class MyBalanceTab extends SplitPanel {
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
+        searchTextField2.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
                 onChange();
             }
@@ -138,7 +138,7 @@ public class MyBalanceTab extends SplitPanel {
             public void onChange() {
 
                 // GET VALUE
-                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
+                String search = searchTextField2.getText();
 
                 // SET FILTER
                 balancesModel.fireTableDataChanged();

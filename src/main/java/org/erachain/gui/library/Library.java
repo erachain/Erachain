@@ -359,9 +359,16 @@ public class Library {
      */
 
     public static String to_HTML(String str) {
-
         return viewDescriptionHTML(str);
 
+    }
+
+    public static boolean will_HTML(String str) {
+        if (str.startsWith("#") || str.startsWith("[") || str.startsWith("<"))
+            // it is HTML
+            return true;
+
+        return false;
     }
 
     public static String isNum_And_Length(String str, int length) {

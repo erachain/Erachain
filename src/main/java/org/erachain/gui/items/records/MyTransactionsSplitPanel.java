@@ -231,7 +231,6 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                 // code Rebroadcast
 
                 if (selectedTransaction == null) return;
-                // DLSet db = DLSet.getInstance();
                 Controller.getInstance().broadcastTransaction(selectedTransaction);
 
             }
@@ -516,7 +515,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                 tableGBC.weighty = 1;
                 tableGBC.gridx = 0;
                 tableGBC.gridy = 0;
-                records_Info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(selectedTransaction), tableGBC);
+                records_Info_Panel.add(TransactionDetailsFactory.createTransactionDetail(selectedTransaction), tableGBC);
 
                 Tuple2<BigDecimal, List<Long>> keys = DCSet.getInstance().getVouchRecordMap()
                         .get(Transaction.makeDBRef(selectedTransaction.getBlockHeight(), selectedTransaction.getSeqNo()));

@@ -56,10 +56,6 @@ public class CreateOrderDetailsFrame extends RecDetailsFrame {
         MenuPopupUtil.installContextMenu(price);
         this.add(price, fieldGBC);
 
-        //PACK
-        //		this.pack();
-        //        this.setResizable(false);
-        //       this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 }
