@@ -97,13 +97,16 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
 
         // SET ONE TIME ZONE for Birthday
         TimeZone tz = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        txtStartDay = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
-        Calendar calendar = Calendar.getInstance(tz);
-        calendar.set(1990, Calendar.NOVEMBER, 11, 12, 13, 1);
-        txtStartDay.setCalendar(calendar);
-        txtStopDay = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
-        TimeZone.setDefault(tz);
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+            txtStartDay = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+            Calendar calendar = Calendar.getInstance(tz);
+            calendar.set(1990, Calendar.NOVEMBER, 11, 12, 13, 1);
+            txtStartDay.setCalendar(calendar);
+            txtStopDay = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+        } finally {
+            TimeZone.setDefault(tz);
+        }
 
         txtStartDay.setFont(UIManager.getFont("TextField.font"));
         txtStopDay.setFont(UIManager.getFont("TextField.font"));
@@ -200,53 +203,59 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
 
     protected boolean checkValues() {
 
-        int parse = 0;
+        TimeZone tz = TimeZone.getDefault();
         try {
-            // READ GENDER
-            parse++;
-            unionType = (byte) (comboBoxType.getSelectedIndex());
-            parse++;
-            // SET TIMEZONE to UTC-0
-            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-            startDay = txtStartDay.getCalendar().getTimeInMillis();
-            parse++;
-            // END DATE
-            try {
-                endDay = txtStopDay.getCalendar().getTimeInMillis();
-            } catch (Exception ed1) {
-                endDay = startDay - 1;
-            }
-            if (aliveCheckBox.isSelected()) {
-                endDay = startDay - 1;
-            }
 
-        } catch (Exception e) {
-            String mess = "Invalid pars... " + parse;
-            switch (parse) {
-                case 1:
-                    mess = "Invalid type";
-                    break;
-                case 2:
-                    mess = "Invalid birthday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
-                    break;
-                case 3:
-                    mess = "Invalid deathday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
-                    break;
-                case 4:
-                    mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
-                    break;
-                case 5:
-                    mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
-                    break;
-                case 6:
-                    mess = "Invalid growth 10..255";
-                    break;
+            int parse = 0;
+            try {
+                // READ GENDER
+                parse++;
+                unionType = (byte) (comboBoxType.getSelectedIndex());
+                parse++;
+                // SET TIMEZONE to UTC-0
+                TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+                startDay = txtStartDay.getCalendar().getTimeInMillis();
+                parse++;
+                // END DATE
+                try {
+                    endDay = txtStopDay.getCalendar().getTimeInMillis();
+                } catch (Exception ed1) {
+                    endDay = startDay - 1;
+                }
+                if (aliveCheckBox.isSelected()) {
+                    endDay = startDay - 1;
+                }
+
+            } catch (Exception e) {
+                String mess = "Invalid pars... " + parse;
+                switch (parse) {
+                    case 1:
+                        mess = "Invalid type";
+                        break;
+                    case 2:
+                        mess = "Invalid birthday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
+                        break;
+                    case 3:
+                        mess = "Invalid deathday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
+                        break;
+                    case 4:
+                        mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
+                        break;
+                    case 5:
+                        mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
+                        break;
+                    case 6:
+                        mess = "Invalid growth 10..255";
+                        break;
+                }
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T(mess),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                return false;
             }
-            JOptionPane.showMessageDialog(new JFrame(), Lang.T(mess),
-                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-            return false;
+            return true;
+        } finally {
+            TimeZone.setDefault(tz);
         }
-        return true;
     }
 
 
