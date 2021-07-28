@@ -154,7 +154,7 @@ public class ChangeOrderTransactionTest {
             //CHECK TIMESTAMP
             assertEquals(tx.getTimestamp(), parsedTX.getTimestamp());
 
-            assertEquals(tx.getAmountWant(), parsedTX.getAmountWant());
+            assertEquals(tx.getNewAmount(), parsedTX.getNewAmount());
 
             assertEquals(Arrays.equals(tx.getOrderRef(), parsedTX.getOrderRef()), true);
 
