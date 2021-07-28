@@ -39,7 +39,9 @@ public class ChangeOrderTransaction extends Transaction {
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
     private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
-    ///  typeBytes[3] used as TransactionAmount.SCALE_MASK
+    /**
+     * typeBytes[3] used as TransactionAmount.SCALE_MASK = 31
+     */
     private static final byte HAVE_AMOUNT_MASK = (byte) 1 << 5;
 
     byte[] orderRef;
