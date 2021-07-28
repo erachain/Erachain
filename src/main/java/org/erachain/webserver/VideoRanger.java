@@ -85,7 +85,7 @@ public class VideoRanger {
         // Sec-Fetch-Dest: document
         if (rangeStr == null || rangeStr.isEmpty()) {
             // это первый запрос - ответим что тут Видео + его размер
-            return Response.status(206) // set as first response
+            return Response.status(200) // set as first response
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Connection", "keep-alive")
                     //.header("Cache-Control", "public, max-age=31536000")
