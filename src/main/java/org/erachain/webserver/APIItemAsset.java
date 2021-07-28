@@ -193,17 +193,10 @@ public class APIItemAsset {
 
     }
 
-    @Path("image/{key}")
-    @GET
-    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
-    public Response assetImage(@Context UriInfo info, @PathParam("key") long key) throws IOException {
+    private Response getImage(long key, boolean preview) {
 
-        boolean preview = API.checkBoolean(info, "preview");
-
-        int weight = 0;
         if (key <= 0) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     "Error key");
         }
 
@@ -211,19 +204,40 @@ public class APIItemAsset {
         // DOES EXIST
         if (!map.contains(key)) {
             throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
         return APIItems.getImage(request, map, key, preview);
+    }
 
+    @Path("image/{key}")
+    @GET
+    //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
+    public Response assetImage(@Context UriInfo info, @PathParam("key") long key) {
+
+        boolean preview = API.checkBoolean(info, "preview");
+        return getImage(key, preview);
+
+    }
+
+    @Path("imagepre/{key}")
+    @GET
+    public Response assetImagePre(@Context UriInfo info, @PathParam("key") long key) {
+        return getImage(key, true);
     }
 
     @Path("image/{key}.mp4")
     @GET
+    public Response assetImageMP4(@Context UriInfo info, @PathParam("key") long key) {
+        boolean preview = API.checkBoolean(info, "preview");
+        return getImage(key, preview);
+    }
+
+    @Path("imagepre/{key}.mp4")
+    @GET
     //@Produces({"video/mp4", "image/gif, image/png, image/jpeg"})
-    public Response assetImageMP4(@Context UriInfo info, @PathParam("key") long key) throws IOException {
-        return assetImage(info, key);
+    public Response assetImagePreMP4(@Context UriInfo info, @PathParam("key") long key) {
+        return getImage(key, true);
     }
 
     @Path("icon/{key}")
