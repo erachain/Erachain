@@ -92,11 +92,13 @@ public class VideoRanger {
                     .header("Content-Transfer-Encoding", "binary")
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
-                    // тут походе передача идет пакетами внутри коннекта и не выходит на уровень GET HTTP
-                    // а можно и не слать данные тут - не напрягать сеть?!?!
-                    // - да проверена - это лишь лишняя задержка для сети!
+                    // ****
+                    // для плеера на андроиде надо именно так - все данные в буфер пихать
+                    // на время обработки это не особо влияет так как копирования данных из DATA в буфер тут нет
+                    // и остальные браузеры и плееры этот запрос игнорируют все равно и время не тратят на него
                     .header("Content-Length", data.length)
                     .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
+                    // ****
                     .entity(new ByteArrayInputStream(data))
                     .build();
         } else {
