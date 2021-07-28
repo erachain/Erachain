@@ -339,10 +339,13 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         Font headFont = new Font(ff.getFontName(), Font.BOLD, ff.getSize() + 1);
 
         TimeZone tz = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        jTextFieldDateStart = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
-        jTextFieldDateEnd = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
-        TimeZone.setDefault(tz);
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+            jTextFieldDateStart = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+            jTextFieldDateEnd = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
+        } finally {
+            TimeZone.setDefault(tz);
+        }
 
         jTextFieldDateStart.setFont(UIManager.getFont("TextField.font"));
         jTextFieldDateEnd.setFont(UIManager.getFont("TextField.font"));
