@@ -59,7 +59,7 @@ public class VideoRanger {
      * Оптимально 250 к и выше. 250к - это 68мс задержка загрузки - т о есть полностью запрос обрабатывается за 120мс
      * Но зато если бить мельче то одновременная загрузка большого числа видео будет меньше грузить сервер
      */
-    static int RANGE_LEN = 1 << 18;
+    static int RANGE_LEN = 1 << 19;
 
     public static Response getRange(HttpServletRequest request, byte[] data, boolean asPreview) {
 
