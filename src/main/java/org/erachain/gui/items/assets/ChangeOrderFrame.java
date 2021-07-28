@@ -218,9 +218,9 @@ public class ChangeOrderFrame extends JDialog {
             return;
         }
 
-        BigDecimal wantAmount;
+        BigDecimal newAmount;
         try {
-            wantAmount = new BigDecimal(txtPrice.getText());
+            newAmount = new BigDecimal(txtPrice.getText());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, Lang.T("Invalid price") + "!", Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
             this.changeOrderButton.setEnabled(true);
@@ -237,12 +237,12 @@ public class ChangeOrderFrame extends JDialog {
         }
 
         if (reversePrice) {
-            wantAmount = order.getAmountHave().divide(wantAmount, assetWant.getScale(), RoundingMode.HALF_DOWN);
+            newAmount = order.getAmountWant().multiply(newAmount).setScale(assetHave.getScale(), RoundingMode.HALF_DOWN);
         } else {
-            wantAmount = order.getAmountHave().multiply(wantAmount).setScale(assetWant.getScale(), RoundingMode.HALF_DOWN);
+            newAmount = order.getAmountHave().multiply(newAmount).setScale(assetWant.getScale(), RoundingMode.HALF_DOWN);
         }
 
-        Transaction changeOrder = Controller.getInstance().changeOrder(creator, feePow, order, wantAmount);
+        Transaction changeOrder = Controller.getInstance().changeOrder(creator, feePow, order, newAmount, reversePrice);
         if (ResultDialog.make(this, changeOrder, false, null)) {
             dispose();
         }

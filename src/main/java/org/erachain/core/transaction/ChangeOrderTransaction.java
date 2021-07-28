@@ -39,7 +39,8 @@ public class ChangeOrderTransaction extends Transaction {
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
     private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
-    private static final byte HAVE_AMOUNT_MASK = (byte) 1;
+    ///  typeBytes[3] used as TransactionAmount.SCALE_MASK
+    private static final byte HAVE_AMOUNT_MASK = (byte) 1 << 5;
 
     byte[] orderRef;
     private final BigDecimal newAmount;
@@ -92,8 +93,8 @@ public class ChangeOrderTransaction extends Transaction {
     }
 
     public ChangeOrderTransaction(PublicKeyAccount creator, byte[] orderRef,
-                                  BigDecimal newAmount, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderRef, newAmount, feePow, timestamp,
+                                  BigDecimal newAmount, boolean useHave, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, useHave ? HAVE_AMOUNT_MASK : 0}, creator, orderRef, newAmount, feePow, timestamp,
                 reference);
     }
 

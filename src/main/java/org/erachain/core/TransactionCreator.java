@@ -584,7 +584,7 @@ public class TransactionCreator {
         return cancelOrderTransaction;
     }
 
-    public Transaction createChangeOrderTransaction(PrivateKeyAccount creator, int feePow, byte[] orderID, BigDecimal wantAmount) {
+    public Transaction createChangeOrderTransaction(PrivateKeyAccount creator, int feePow, byte[] orderID, BigDecimal wantAmount, boolean useHave) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 
@@ -592,7 +592,7 @@ public class TransactionCreator {
         long time = NTP.getTime();
 
         //CREATE PRDER TRANSACTION
-        ChangeOrderTransaction changeOrderTransaction = new ChangeOrderTransaction(creator, orderID, wantAmount, (byte) feePow, time, 0L);
+        ChangeOrderTransaction changeOrderTransaction = new ChangeOrderTransaction(creator, orderID, wantAmount, useHave, (byte) feePow, time, 0L);
         changeOrderTransaction.sign(creator, Transaction.FOR_NETWORK);
         changeOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
