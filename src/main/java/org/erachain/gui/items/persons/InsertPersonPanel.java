@@ -255,17 +255,21 @@ public class InsertPersonPanel extends IssuePersonPanel {
         addIconLabel.set(person.getIcon());
 
         // SET ONE TIME ZONE for Birthday
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        txtBirthday.setDate(new Date(person.getBirthday()));
-        if (!person.isAlive(0L)) {
-            txtDeathDay.setDate(new Date(person.getDeathday()));
-            txtDeathDay.setVisible(true);
-            jLabelDead.setVisible(true);
-        } else {
-            txtDeathDay.setVisible(false);
-            jLabelDead.setVisible(false);
+        TimeZone tz = TimeZone.getDefault();
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+            txtBirthday.setDate(new Date(person.getBirthday()));
+            if (!person.isAlive(0L)) {
+                txtDeathDay.setDate(new Date(person.getDeathday()));
+                txtDeathDay.setVisible(true);
+                jLabelDead.setVisible(true);
+            } else {
+                txtDeathDay.setVisible(false);
+                jLabelDead.setVisible(false);
+            }
+        } finally {
+            TimeZone.setDefault(tz);
         }
-        TimeZone.setDefault(TimeZone.getDefault());
 
         textAreaDescription.setText(person.getDescription() == null ? "" : person.getDescription());
 

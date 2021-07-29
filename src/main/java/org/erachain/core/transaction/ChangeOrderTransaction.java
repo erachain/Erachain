@@ -39,8 +39,13 @@ public class ChangeOrderTransaction extends Transaction {
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
     private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
+    /**
+     * typeBytes[3] used as TransactionAmount.SCALE_MASK = 31
+     */
+    private static final byte HAVE_AMOUNT_MASK = (byte) 1 << 5;
+
     byte[] orderRef;
-    private BigDecimal amountWant;
+    private final BigDecimal newAmount;
 
     long orderID;
     //private CreateOrderTransaction createOrderTx;
@@ -49,33 +54,33 @@ public class ChangeOrderTransaction extends Transaction {
     /**
      * @param typeBytes
      * @param creator
-     * @param orderRef   signature of Creating or last Changing Order transaction
-     * @param amountWant
+     * @param orderRef  signature of Creating or last Changing Order transaction
+     * @param newAmount
      * @param feePow
      * @param timestamp
      * @param reference
      */
     public ChangeOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
-                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
+                                  BigDecimal newAmount, byte feePow, long timestamp, Long reference) {
         super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
         this.orderRef = orderRef;
-        this.amountWant = amountWant;
+        this.newAmount = newAmount;
 
     }
 
     public ChangeOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
-                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference,
+                                  BigDecimal newAmount, byte feePow, long timestamp, Long reference,
                                   byte[] signature) {
-        this(typeBytes, creator, orderRef, amountWant, feePow, timestamp, reference);
+        this(typeBytes, creator, orderRef, newAmount, feePow, timestamp, reference);
         this.signature = signature;
 
     }
 
     public ChangeOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
-                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference,
+                                  BigDecimal newAmount, byte feePow, long timestamp, Long reference,
                                   byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, orderRef, amountWant, feePow, timestamp, reference);
+        this(typeBytes, creator, orderRef, newAmount, feePow, timestamp, reference);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
@@ -84,18 +89,22 @@ public class ChangeOrderTransaction extends Transaction {
     }
 
     public ChangeOrderTransaction(PublicKeyAccount creator, byte[] orderRef,
-                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderRef, amountWant, feePow, timestamp, reference,
+                                  BigDecimal newAmount, byte feePow, long timestamp, Long reference, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderRef, newAmount, feePow, timestamp, reference,
                 signature);
     }
 
     public ChangeOrderTransaction(PublicKeyAccount creator, byte[] orderRef,
-                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderRef, amountWant, feePow, timestamp,
+                                  BigDecimal newAmount, boolean useHave, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, useHave ? HAVE_AMOUNT_MASK : 0}, creator, orderRef, newAmount, feePow, timestamp,
                 reference);
     }
 
     // GETTERS/SETTERS
+
+    public boolean isHaveUpdated() {
+        return (typeBytes[3] & HAVE_AMOUNT_MASK) != 0;
+    }
 
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
 
@@ -134,7 +143,7 @@ public class ChangeOrderTransaction extends Transaction {
 
     @Override
     public String viewAmount() {
-        return this.amountWant.toPlainString();
+        return this.newAmount.toPlainString();
     }
 
     @Override
@@ -154,7 +163,7 @@ public class ChangeOrderTransaction extends Transaction {
 
     @Override
     public BigDecimal getAmount() {
-        return this.amountWant;
+        return this.newAmount;
     }
 
     @Override
@@ -171,8 +180,8 @@ public class ChangeOrderTransaction extends Transaction {
         return this.orderRef;
     }
 
-    public BigDecimal getAmountWant() {
-        return this.amountWant;
+    public BigDecimal getNewAmount() {
+        return this.newAmount;
     }
 
     public BigDecimal getPriceCalc() {
@@ -193,7 +202,10 @@ public class ChangeOrderTransaction extends Transaction {
     // PARSE CONVERT
 
     public Order makeUpdatedOrder() {
-        return new Order(order, dbRef, this.amountWant);
+        if (isHaveUpdated())
+            return new Order(order, dbRef, this.newAmount, order.getAmountWant());
+
+        return new Order(order, dbRef, order.getAmountHave(), this.newAmount);
     }
 
     @SuppressWarnings("unchecked")
@@ -203,7 +215,8 @@ public class ChangeOrderTransaction extends Transaction {
         JSONObject json = this.getJsonBase();
 
         json.put("order", Base58.encode(orderRef));
-        json.put("amountWant", this.amountWant.toPlainString());
+        json.put("amount", this.newAmount.toPlainString());
+        json.put("useHave", isHaveUpdated());
 
 
         return json;
@@ -315,16 +328,16 @@ public class ChangeOrderTransaction extends Transaction {
 
         BigDecimal amountBase;
         // WRITE ACCURACY of AMOUNT WANT
-        int different_scale = this.amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+        int different_scale = this.newAmount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
         if (different_scale != 0) {
             // RESCALE AMOUNT
-            amountBase = this.amountWant.scaleByPowerOfTen(different_scale);
+            amountBase = this.newAmount.scaleByPowerOfTen(different_scale);
             if (different_scale < 0)
                 different_scale += TransactionAmount.SCALE_MASK + 1;
 
             data[3] = (byte) (data[3] | different_scale);
         } else {
-            amountBase = this.amountWant;
+            amountBase = this.newAmount;
         }
         // WRITE AMOUNT WANT
         byte[] amountWantBytes = amountBase.unscaledValue().toByteArray();
@@ -381,26 +394,38 @@ public class ChangeOrderTransaction extends Transaction {
         }
 
         // CHECK IF AMOUNT POSITIVE
-        if (amountWant.signum() <= 0) {
+        if (newAmount.signum() <= 0) {
             return NEGATIVE_AMOUNT;
         }
-        if (amountWant.compareTo(order.getAmountWant()) == 0) {
-            return INVALID_AMOUNT;
+
+        if (isHaveUpdated()) {
+            if (newAmount.compareTo(order.getAmountHave()) == 0) {
+                errorValue = "New amount is same";
+                return INVALID_AMOUNT;
+            } else if (newAmount.compareTo(order.getFulfilledHave()) <= 0) {
+                errorValue = "newAmount <= fulfilledHave";
+                return INVALID_AMOUNT;
+            }
+        } else {
+            if (newAmount.compareTo(order.getAmountWant()) == 0) {
+                errorValue = "New amount is same";
+                return INVALID_AMOUNT;
+            }
         }
 
         // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
         // and SCALE
         byte[] amountBytes;
-        amountBytes = amountWant.unscaledValue().toByteArray();
+        amountBytes = newAmount.unscaledValue().toByteArray();
         if (amountBytes.length > AMOUNT_LENGTH) {
             return AMOUNT_LENGHT_SO_LONG;
         }
-        int scale = this.amountWant.scale();
+        int scale = this.newAmount.scale();
         if (scale < TransactionAmount.minSCALE
                 || scale > TransactionAmount.maxSCALE) {
             return AMOUNT_SCALE_WRONG;
         }
-        scale = this.amountWant.stripTrailingZeros().scale();
+        scale = this.newAmount.stripTrailingZeros().scale();
         if (scale > order.getWantAssetScale()) {
             return AMOUNT_SCALE_WRONG;
         }
@@ -452,12 +477,28 @@ public class ChangeOrderTransaction extends Transaction {
         dcSet.getCompletedOrderMap().put(order);
 
         // запомним для отчета что цена изменилась
-        Trade trade = new Trade(Trade.TYPE_CHANGE,
-                dbRef, // номер инициатора по нашему номеру
-                orderID, // номер оригинала?
-                order.getHaveAssetKey(), order.getWantAssetKey(),
-                order.getAmountHave(), amountWant,
-                order.getHaveAssetScale(), order.getWantAssetScale(), 0);
+        Trade trade;
+        if (isHaveUpdated()) {
+            trade = new Trade(Trade.TYPE_CHANGE,
+                    dbRef, // номер инициатора по нашему номеру
+                    orderID, // номер оригинала?
+                    order.getHaveAssetKey(), order.getWantAssetKey(),
+                    newAmount, order.getAmountWant(),
+                    order.getHaveAssetScale(), order.getWantAssetScale(), 0);
+
+            // change PLEDGE
+            BigDecimal diffAmount = order.getAmountHave().subtract(newAmount);
+            creator.changeBalance(dcSet, diffAmount.signum() > 0, true, order.getHaveAssetKey(),
+                    diffAmount.abs(), false, false, true);
+
+        } else {
+            trade = new Trade(Trade.TYPE_CHANGE,
+                    dbRef, // номер инициатора по нашему номеру
+                    orderID, // номер оригинала?
+                    order.getHaveAssetKey(), order.getWantAssetKey(),
+                    order.getAmountHave(), newAmount,
+                    order.getHaveAssetScale(), order.getWantAssetScale(), 0);
+        }
 
         // нужно запомнить чтобы при откате обновить назад цену
         dcSet.getTradeMap().put(trade);
@@ -465,7 +506,8 @@ public class ChangeOrderTransaction extends Transaction {
         // изменяемые объекты нужно заново создавать
         Order updatedOrder = makeUpdatedOrder();
 
-        if (order.getAmountWant().compareTo(amountWant) > 0) {
+        if (isHaveUpdated() && order.getAmountHave().compareTo(newAmount) < 0
+                || !isHaveUpdated() && order.getAmountWant().compareTo(newAmount) > 0) {
             /// цена уменьшилась - проверим может он сработает
             updatedOrder.setDC(dcSet);
             OrderProcess.process(updatedOrder, block, this);
@@ -488,7 +530,15 @@ public class ChangeOrderTransaction extends Transaction {
         // удалим из исполненных
         Order orderOrig = dcSet.getCompletedOrderMap().remove(orderID);
 
-        if (orderOrig.getAmountWant().compareTo(amountWant) > 0) {
+        if (isHaveUpdated()) {
+            // change PLEDGE
+            BigDecimal diffAmount = orderOrig.getAmountHave().subtract(newAmount);
+            creator.changeBalance(dcSet, diffAmount.signum() < 0, true, orderOrig.getHaveAssetKey(),
+                    diffAmount.abs(), false, false, true);
+        }
+
+        if (isHaveUpdated() && orderOrig.getAmountHave().compareTo(newAmount) < 0
+                || !isHaveUpdated() && orderOrig.getAmountWant().compareTo(newAmount) > 0) {
             /// цена уменьшилась - откатим, ведь может он сработал
             OrderProcess.orphan(dcSet, dbRef, block, block == null ? timestamp : block.getTimestamp());
         } else {

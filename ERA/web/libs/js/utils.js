@@ -1,5 +1,5 @@
 // select view format 
-function fformat(text){
+function preFormat(text){
 
 if (text == null || text.length == 0) return "";
 text = text.toString();
@@ -28,6 +28,19 @@ return marked(text);
 //  return plain text
 return htmlFilter(wordwrap(text, 0, '\n', true));
 
+}
+
+function fformat(text_in) {
+    var preText = preFormat(text_in)
+    preText = preText.replace(/@@(\d+-\d+)/g, '<a href=?tx=$1>@@$1</a>')
+    preText = preText.replace(/@@A(\d+)/g, '<a href=?asset=$1>@@A$1</a>')
+    preText = preText.replace(/@@I(\d+)/g, '<a href=?imprint=$1>@@I$1</a>')
+    preText = preText.replace(/@@P(\d+)/g, '<a href=?person=$1>@@P$1</a>')
+    preText = preText.replace(/@@S(\d+)/g, '<a href=?status=$1>@@S$1</a>')
+    preText = preText.replace(/@@T(\d+)/g, '<a href=?template=$1>@@T$1</a>')
+    preText = preText.replace(/@@V(\d+)/g, '<a href=?poll=$1>@@V$1</a>')
+
+    return preText
 }
 
 function convertTimestamp(timestamp, withYear) {

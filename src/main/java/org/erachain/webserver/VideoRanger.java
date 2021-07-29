@@ -59,7 +59,7 @@ public class VideoRanger {
      * Оптимально 250 к и выше. 250к - это 68мс задержка загрузки - т о есть полностью запрос обрабатывается за 120мс
      * Но зато если бить мельче то одновременная загрузка большого числа видео будет меньше грузить сервер
      */
-    static int RANGE_LEN = 1 << 18;
+    static int RANGE_LEN = 1 << 19;
 
     public static Response getRange(HttpServletRequest request, byte[] data, boolean asPreview) {
 
@@ -92,12 +92,14 @@ public class VideoRanger {
                     .header("Content-Transfer-Encoding", "binary")
                     .header("Content-Type", "video/mp4")
                     .header("Accept-Range", "bytes")
-                    //.header("Content-Length", data.length)
-                    //.header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
-                    // тут походе передача идет пакетами внутри коннекта и не выходит на уровень GET HTTP
-                    // а можно и не слать данные тут - не напрягать сеть?!?!
-                    // - да проверена - это лишь лишняя задержка для сети!
-                    //.entity(new ByteArrayInputStream(data))
+                    // ****
+                    // для плеера на андроиде надо именно так - все данные в буфер пихать
+                    // на время обработки это не особо влияет так как копирования данных из DATA в буфер тут нет
+                    // и остальные браузеры и плееры этот запрос игнорируют все равно и время не тратят на него
+                    .header("Content-Length", data.length)
+                    .header("Content-Range", "bytes 0-" + maxEND + "/" + data.length)
+                    // ****
+                    .entity(new ByteArrayInputStream(data))
                     .build();
         } else {
             // Range: bytes=0-1000  // bytes=301867-

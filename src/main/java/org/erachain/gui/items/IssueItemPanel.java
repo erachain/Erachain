@@ -373,6 +373,9 @@ public abstract class IssueItemPanel extends IconPanel {
 
         if (useStartStop) {
             Calendar calendar = Calendar.getInstance();
+            //TimeZone tz = TimeZone.getDefault();
+            //TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
             startField = new JDateChooser(new Date(System.currentTimeMillis()), "yyyy-MM-dd HH:mm z");
             startField.setCalendar(calendar);
             stopField = new JDateChooser(new Date(System.currentTimeMillis()), "yyyy-MM-dd HH:mm z");

@@ -102,14 +102,14 @@ public class Order implements Comparable<Order> {
 
     }
 
-    public Order(Order order, long id, BigDecimal newWantAmount) {
+    public Order(Order order, long id, BigDecimal newHaveAmount, BigDecimal newWantAmount) {
 
         this.id = id;
         this.creator = order.creator;
         this.haveAssetKey = order.haveAssetKey;
         this.wantAssetKey = order.wantAssetKey;
 
-        this.amountHave = order.amountHave;
+        this.amountHave = newHaveAmount;
         this.amountWant = newWantAmount;
 
         this.haveAssetScale = order.haveAssetScale;

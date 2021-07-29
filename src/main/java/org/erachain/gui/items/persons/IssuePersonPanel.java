@@ -133,13 +133,13 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
         // SET ONE TIME ZONE for Birthday
         TimeZone tz = TimeZone.getDefault();
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        //TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         txtBirthday = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
         Calendar calendar = Calendar.getInstance(tz);
         calendar.set(1990, Calendar.NOVEMBER, 11, 12, 13, 1);
         txtBirthday.setCalendar(calendar);
         txtDeathDay = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
-        TimeZone.setDefault(tz);
+        //TimeZone.setDefault(tz);
 
         txtBirthday.setFont(UIManager.getFont("TextField.font"));
         txtDeathDay.setFont(UIManager.getFont("TextField.font"));
@@ -273,60 +273,66 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
     protected boolean checkValues() {
 
-        int parse = 0;
+        TimeZone tz = TimeZone.getDefault();
         try {
-            // READ GENDER
-            parse++;
-            gender = (byte) (comboBoxGender.getSelectedIndex());
-            parse++;
-            // SET TIMEZONE to UTC-0
-            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-            birthday = txtBirthday.getCalendar().getTimeInMillis();
-            parse++;
-            // END DATE
-            try {
-                deathday = txtDeathDay.getCalendar().getTimeInMillis();
-            } catch (Exception ed1) {
-                deathday = birthday - 1;
-            }
-            if (aliveCheckBox.isSelected()) {
-                deathday = birthday - 1;
-            }
-            parse++;
-            String[] latitudeLongitude = txtBirthLatitude.getText().split(",");
-            birthLatitude = Float.parseFloat(latitudeLongitude[0]);
-            parse++;
-            birthLongitude = Float.parseFloat(latitudeLongitude[1]);
-            parse++;
-            height = Integer.parseInt(txtHeight.getText());
 
-        } catch (Exception e) {
-            String mess = "Invalid pars... " + parse;
-            switch (parse) {
-                case 1:
-                    mess = "Invalid gender";
-                    break;
-                case 2:
-                    mess = "Invalid birthday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
-                    break;
-                case 3:
-                    mess = "Invalid deathday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
-                    break;
-                case 4:
-                    mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
-                    break;
-                case 5:
-                    mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
-                    break;
-                case 6:
-                    mess = "Invalid growth 10..255";
-                    break;
+            int parse = 0;
+            try {
+                // READ GENDER
+                parse++;
+                gender = (byte) (comboBoxGender.getSelectedIndex());
+                parse++;
+                // SET TIMEZONE to UTC-0
+                TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+                birthday = txtBirthday.getCalendar().getTimeInMillis();
+                parse++;
+                // END DATE
+                try {
+                    deathday = txtDeathDay.getCalendar().getTimeInMillis();
+                } catch (Exception ed1) {
+                    deathday = birthday - 1;
+                }
+                if (aliveCheckBox.isSelected()) {
+                    deathday = birthday - 1;
+                }
+                parse++;
+                String[] latitudeLongitude = txtBirthLatitude.getText().split(",");
+                birthLatitude = Float.parseFloat(latitudeLongitude[0]);
+                parse++;
+                birthLongitude = Float.parseFloat(latitudeLongitude[1]);
+                parse++;
+                height = Integer.parseInt(txtHeight.getText());
+
+            } catch (Exception e) {
+                String mess = "Invalid pars... " + parse;
+                switch (parse) {
+                    case 1:
+                        mess = "Invalid gender";
+                        break;
+                    case 2:
+                        mess = "Invalid birthday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
+                        break;
+                    case 3:
+                        mess = "Invalid deathday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
+                        break;
+                    case 4:
+                        mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
+                        break;
+                    case 5:
+                        mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
+                        break;
+                    case 6:
+                        mess = "Invalid growth 10..255";
+                        break;
+                }
+                JOptionPane.showMessageDialog(new JFrame(), Lang.T(mess),
+                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                return false;
             }
-            JOptionPane.showMessageDialog(new JFrame(), Lang.T(mess),
-                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-            return false;
+            return true;
+        } finally {
+            TimeZone.setDefault(tz);
         }
-        return true;
     }
 
 
