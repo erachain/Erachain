@@ -75,6 +75,7 @@ public class WebTransactionsHTML {
         outTX.put("head", out);
         outTX.put("timestampLabel", Lang.T("Date", langObj));
         outTX.put("timestamp", transaction.getTimestamp());
+        outTX.put("signature", transaction.viewSignature());
 
         if (transaction.isWiped())
             return outTX;
