@@ -22,6 +22,7 @@ public abstract class ExAction<R> {
     public static final int LIST_PAYOUTS_TYPE = 1;
 
     int type;
+    protected long assetKey;
 
     /////////////////
     protected DCSet dcSet;
@@ -42,9 +43,23 @@ public abstract class ExAction<R> {
         return type;
     }
 
+    public long getAssetKey() {
+        return assetKey;
+    }
+
+    public AssetCls getAsset() {
+        return asset;
+    }
+
     public R getResults() {
         return results;
     }
+
+    public BigDecimal getTotalPay() {
+        return totalPay;
+    }
+
+    public abstract String viewResults();
 
     public abstract long getTotalFeeBytes();
 

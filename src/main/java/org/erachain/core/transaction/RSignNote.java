@@ -207,6 +207,10 @@ public class RSignNote extends Transaction implements Itemable {
         return extendedData.getExAction();
     }
 
+    public boolean hasExAction() {
+        return extendedData.hasExAction();
+    }
+
     @Override
     public String getExTags() {
         if (extendedData != null) {

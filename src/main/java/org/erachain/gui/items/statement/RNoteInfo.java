@@ -19,6 +19,7 @@ import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MenuPopupUtil;
+import org.erachain.utils.SaveStrToFile;
 import org.erachain.utils.ZipBytes;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -87,6 +88,21 @@ public class RNoteInfo extends RecDetailsFrame {
         fieldGBC.gridy = labelGBC.gridy;
         add(new JLabel(statement.getTitle()), fieldGBC);
 
+        if (statement.hasExAction()) {
+            JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+            JButton downloadBtn = new JButton(Lang.T("Download Action Results"));
+            downloadBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    downloadActionResults(statement);
+                }
+            });
+            panel.add(downloadBtn);
+
+            fieldGBC.gridy = ++labelGBC.gridy;
+            add(panel, fieldGBC);
+        }
+
         if (statement.isEncrypted()) {
             statementEncrypted = statement;
 
@@ -151,7 +167,6 @@ public class RNoteInfo extends RecDetailsFrame {
                     retrievePassword(statement);
                 }
             });
-
             cryptPanel.add(getPassword);
 
             JButton decryptByPassword = new JButton(Lang.T("Decrypt by Password"));
@@ -557,5 +572,57 @@ public class RNoteInfo extends RecDetailsFrame {
                     Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
 
         }
+    }
+
+    public static void downloadActionResults(RSignNote rNote) {
+        if (!rNote.hasExAction()) {
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setDialogTitle(Lang.T("Save Action Results"));
+        chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+        chooser.setMultiSelectionEnabled(false);
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+
+            String fileName = "Action_results_" + rNote.viewHeightSeq() + ".txt";
+            String path = chooser.getSelectedFile().getPath() + File.separatorChar + fileName;
+            File file = new File(path);
+            // if file
+            if (file.exists() && file.isFile()) {
+                if (0 != JOptionPane.showConfirmDialog(chooser,
+                        Lang.T("File") + " " + fileName
+                                + " " + Lang.T("Exists") + "! "
+                                + Lang.T("Overwrite") + "?", Lang.T("Message"),
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE)) {
+                    return;
+                }
+                file.delete();
+
+            }
+
+            ExAction exAction = rNote.getExAction();
+            try {
+
+                String results = Lang.T("Transaction") + ": " + rNote.viewHeightSeq() + ", "
+                        + Lang.T("Total") + ": " + exAction.getTotalPay().toPlainString()
+                        + " " + exAction.getAsset().toString() + "\n\n";
+
+                results += exAction.viewResults();
+
+                SaveStrToFile.save(file, results);
+                JOptionPane.showMessageDialog(new JFrame(),
+                        Lang.T("Results of the actions were downloaded to a %1")
+                                .replace("%1", file.getPath())
+                                + ".",
+                        Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (IOException e) {
+            }
+
+        }
+
     }
 }

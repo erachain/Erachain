@@ -1042,7 +1042,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public long getAssetKey() {
-        return 0l;
+        return 0L;
     }
 
     public AssetCls getAsset() {
