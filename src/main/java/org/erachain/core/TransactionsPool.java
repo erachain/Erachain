@@ -252,6 +252,8 @@ public class TransactionsPool extends MonitoredThread {
         long poinCleared = 0;
         int clearedUTXs = 0;
 
+        long minorClear = 0;
+
         runned = true;
         //Message message;
         while (runned) {
@@ -283,22 +285,33 @@ public class TransactionsPool extends MonitoredThread {
                             if (sizeUTX > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                                 int height = dcSet.getBlocksHeadsMap().size();
                                 long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
-                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, false);
+                                long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
+                                keepTime = timestamp - (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
+                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(keepTime, false);
                             }
                         } else {
                             // если идет синхронизация, то удаляем все что есть не на текущее время
                             // и так как даже если мы вот-вот засинхримся мы все равно блок не сможем сразу собрать
                             // из-за мягкой синхронизации с сетью - а значит и нам не нужно заботиться об удаленных трнзакциях
                             // у нас - они будут включены другими нодами которые полностью в синхре
-                            // мы выстыпаем лишь как ретрнслятор - при этом у нас запас по времени хранения все равно должен быть
+                            // мы выступаем лишь как ретранслятор - при этом у нас запас по времени хранения все равно должен быть
                             // чтобы помнить какие транзакции мы уже словили и ретранслировали
                             if (sizeUTX > BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3) {
                                 int height = dcSet.getBlocksHeadsMap().size();
                                 long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
-                                //long timestamp = NTP.getTime();
-                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, true);
+                                long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
+                                keepTime = timestamp - (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
+                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(keepTime, true);
                             }
                         }
+                    } else if (isStatusOK &&
+                            System.currentTimeMillis() - minorClear > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(0)) {
+                        // each block
+                        minorClear = System.currentTimeMillis();
+                        int height = dcSet.getBlocksHeadsMap().size();
+                        long keepTime = Controller.getInstance().getBlockChain().getTimestamp(height)
+                                - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(0);
+                        clearedUTXs += utxMap.clearByDeadTimeAndLimit(keepTime, true);
                     }
 
                     boolean needReset = clearedUTXs > DCSet.DELETIONS_BEFORE_COMPACT >> (isStatusOK ? 0 : 3)

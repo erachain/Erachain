@@ -873,7 +873,7 @@ public class BlockChain {
         if (CLONE_MODE)
             return BLOCKS_PERIOD;
 
-        if (VERS_30SEC > 0 && height <= VERS_30SEC) {
+        if (height > 0 && VERS_30SEC > 0 && height <= VERS_30SEC) {
             return 288; // old MainNet
         }
 

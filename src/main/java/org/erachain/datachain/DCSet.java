@@ -612,11 +612,12 @@ public class DCSet extends DBASet implements Closeable {
     }
 
     /**
-     * Для проверкт одного блока в памяти - при добавлении в цепочку или в буфер ожидания
+     * Для проверки одного блока в памяти - при добавлении в цепочку или в буфер ожидания
      *
      * @return
      */
     public static boolean needResetUTXPoolMap = false;
+
     public static DB makeDBinMemory() {
 
         // лучше для памяти ставить наилучшее сжатие чтобы память не кушать лишний раз

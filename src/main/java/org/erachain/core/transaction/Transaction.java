@@ -869,7 +869,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public long getDeadline() {
-        return this.timestamp + BlockChain.UNCONFIRMED_DEADTIME_MS(this.timestamp);
+        return this.timestamp + 5 * BlockChain.UNCONFIRMED_DEADTIME_MS(this.timestamp);
     }
 
     /// tyutuy jhg jhg jg j
