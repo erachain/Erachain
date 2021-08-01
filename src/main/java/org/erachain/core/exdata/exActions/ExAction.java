@@ -59,7 +59,7 @@ public abstract class ExAction<R> {
         return totalPay;
     }
 
-    public abstract String viewResults();
+    public abstract String viewResults(Transaction transactionParent);
 
     public abstract long getTotalFeeBytes();
 

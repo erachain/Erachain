@@ -30,6 +30,7 @@ import java.util.List;
 
 /**
  * Simple pay - for all same amount
+ * Result: recipient + Validate_Result {code, mess}
  */
 
 public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>>> {
@@ -84,7 +85,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     }
 
     @Override
-    public String viewResults() {
+    public String viewResults(Transaction transactionParent) {
         Crypto crypto = Crypto.getInstance();
         String amountStr = " " + amount.toPlainString();
         String results = "";

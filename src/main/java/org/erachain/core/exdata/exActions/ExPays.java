@@ -282,8 +282,23 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     }
 
     @Override
-    public String viewResults() {
-        return "results";
+    public String viewResults(Transaction transactionParent) {
+
+        if (results == null) {
+            preProcess(transactionParent);
+        }
+
+        if (payMethod == PAYMENT_METHOD_TOTAL) {
+            calcAccrualsForMethodTotal();
+        }
+
+        String out = "";
+        int i = 0;
+        for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
+            out += ++i + " " + item.a.getAddress() + item.c + "\n";
+        }
+
+        return out;
     }
 
     @Override

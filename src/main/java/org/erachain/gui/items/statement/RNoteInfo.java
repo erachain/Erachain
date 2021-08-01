@@ -606,11 +606,12 @@ public class RNoteInfo extends RecDetailsFrame {
             ExAction exAction = rNote.getExAction();
             try {
 
-                String results = Lang.T("Transaction") + ": " + rNote.viewHeightSeq() + ", "
-                        + Lang.T("Total") + ": " + exAction.getTotalPay().toPlainString()
-                        + " " + exAction.getAsset().toString() + "\n\n";
+                String results = exAction.viewResults(rNote);
 
-                results += exAction.viewResults();
+                results = Lang.T("Transaction") + ": " + rNote.viewHeightSeq() + ", "
+                        + Lang.T("Total") + ": " + exAction.getTotalPay().toPlainString()
+                        + " " + exAction.getAsset().toString() + "\n\n"
+                        + results;
 
                 SaveStrToFile.save(file, results);
                 JOptionPane.showMessageDialog(new JFrame(),
