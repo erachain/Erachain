@@ -295,7 +295,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         String out = "";
         int i = 0;
         for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
-            out += ++i + " " + item.a.getAddress() + item.c + "\n";
+            out += ++i + " " + item.a.getAddress() + " " + item.c.toPlainString() + "\n";
         }
 
         return out;
