@@ -2737,6 +2737,9 @@ public class BlockExplorer {
 
         output.put("creator_name", rNote.getCreator().getPersonAsString());
 
+        output.put("heightSeqNo", rNote.viewHeightSeq());
+        output.put("signature", rNote.viewSignature());
+
         rNote.getExData().makeJSONforHTML(output, block, seqNo, langObj);
 
         WebTransactionsHTML.getApps(output, rNote, langObj);
@@ -2772,7 +2775,6 @@ public class BlockExplorer {
             } else {
                 new WebTransactionsHTML().get_HTML(this, transaction);
                 output.put("Label_Transaction", Lang.T("Transaction", langObj));
-                output.put("heightSeqNo", transaction.viewHeightSeq());
             }
         }
 

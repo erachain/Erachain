@@ -43,7 +43,7 @@ function tx(data) {
         output += tx.links + '<br>';
     }
 
-    output += '<br><a href ="/api/tx/raw/' + data.heightSeqNo + '">{ RAW }</a>';
+    output += '<br><a href ="/api/tx/raw/' + data.heightSeqNo == "0-0"? data.si + '">{ RAW }</a>';
 
     //	output += data.Json ;
 

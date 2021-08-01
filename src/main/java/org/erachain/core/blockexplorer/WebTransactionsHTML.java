@@ -178,8 +178,8 @@ public class WebTransactionsHTML {
 
         transaction.setDC(dcSet, true);
 
-        List<Transaction> tt = new ArrayList<Transaction>();
-        tt.add(transaction);
+        //List<Transaction> tt = new ArrayList<Transaction>();
+        //tt.add(transaction);
         //explorer.transactionsJSON(null, tt, 0, BlockExplorer.pageSize, "tx");
         //JSONObject tras_json = (JSONObject) ((LinkedHashMap) ((LinkedHashMap) explorer.output.get("Transactions"))
         //        .get("transactions")).get(0);
@@ -221,6 +221,9 @@ public class WebTransactionsHTML {
         } else {
             explorer.output.put("tx", outTX);
         }
+
+        outTX.put("heightSeqNo", transaction.viewHeightSeq());
+        outTX.put("signature", transaction.viewSignature());
 
     }
 
