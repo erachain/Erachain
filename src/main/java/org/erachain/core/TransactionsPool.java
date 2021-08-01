@@ -49,12 +49,24 @@ public class TransactionsPool extends MonitoredThread {
 
     }
 
+    /**
+     * check utxMap.isClosed
+     *
+     * @param sign
+     * @return
+     */
     public boolean contains(byte[] sign) {
         if (utxMap.isClosed())
             return false;
         return utxMap.contains(sign);
     }
 
+    /**
+     * check utxMap.isClosed
+     *
+     * @param sign
+     * @return
+     */
     public Transaction get(byte[] sign) {
         if (utxMap.isClosed())
             return null;
