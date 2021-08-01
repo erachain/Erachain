@@ -2379,7 +2379,13 @@ public class BlockExplorer {
                 try {
                     byte[] signature = Base58.decode(filterStr);
                     Transaction one = map.get(signature);
-                    if (one != null) {
+                    if (one == null) {
+                        one = dcSet.getTransactionTab().get(signature);
+                        if (one != null) {
+                            transactions.add(one);
+                            needFound = false;
+                        }
+                    } else {
                         transactions.add(one);
                         needFound = false;
                     }
