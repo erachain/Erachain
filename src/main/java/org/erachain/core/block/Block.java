@@ -1750,7 +1750,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                     try {
                         if (!unconfirmedMap.isClosed() && unconfirmedMap.contains(transactionSignature)) {
                             if (isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature))) {
-                                // если трнзакция была в пуле ожидания - она уде провернная на Дубль
+                                // если транзакция была в пуле ожидания - она уже проверена на Дубль
                                 transaction.checkedByPool = true;
                             }
                         } else {

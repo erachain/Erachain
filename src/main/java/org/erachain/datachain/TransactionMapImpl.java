@@ -300,6 +300,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                 totalDeleted++;
                 transactionOld = get(key);
             }
+
+            // delete by key
             pool.offerMessage(key);
 
             return transactionOld;

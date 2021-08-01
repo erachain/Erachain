@@ -225,11 +225,26 @@ public class APITXResource {
     public Response raw(@PathParam("number") String numberStr) {
 
         Transaction tx = DCSet.getInstance().getTransactionFinalMap().getRecord(numberStr);
+        if (tx == null) {
+            try {
+                tx = DCSet.getInstance().getTransactionTab().get(Base58.decode(numberStr));
+            } catch (Exception e) {
+            }
+        }
+
+        String out;
+        if (tx == null) {
+            JSONObject json = new JSONObject();
+            Transaction.updateMapByErrorSimple2(json, Transaction.TX_NOT_FOUND, null, null);
+            out = json.toJSONString();
+        } else {
+            out = Base64.getEncoder().encodeToString(tx.toBytes(Transaction.FOR_NETWORK, true));
+        }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(Base64.getEncoder().encodeToString(tx.toBytes(Transaction.FOR_NETWORK, true)))
+                .entity(out)
                 .build();
     }
 

@@ -273,6 +273,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int INVALID_TITLE_LENGTH = 392;
     public static final int INVALID_DATA_FORMAT = 393;
 
+    public static final int TX_NOT_FOUND = 400;
+
     public static final int INVALID_EX_LINK_TYPE = 401;
     public static final int INVALID_EX_LINK_REF = 402;
     public static final int INVALID_RECEIVERS_LIST = 403;

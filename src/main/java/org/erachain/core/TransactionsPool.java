@@ -62,6 +62,7 @@ public class TransactionsPool extends MonitoredThread {
 
     protected Boolean EMPTY = Boolean.TRUE;
     protected boolean cutDeadTime;
+
     public synchronized void needClear(boolean cutDeadTime) {
         needClearMap = true;
         this.cutDeadTime = cutDeadTime;
@@ -70,6 +71,10 @@ public class TransactionsPool extends MonitoredThread {
 
     private int clearCount;
     private long pointClear;
+
+    /**
+     * If value as TransactionMessage - test sign and add. If value as Transaction - add without test sign, value as Long - delete
+     */
     public void processMessage(Object item) {
 
         if (item == null)
