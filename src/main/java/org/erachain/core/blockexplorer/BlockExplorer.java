@@ -2743,9 +2743,6 @@ public class BlockExplorer {
 
         output.put("creator_name", rNote.getCreator().getPersonAsString());
 
-        output.put("heightSeqNo", rNote.viewHeightSeq());
-        output.put("signature", rNote.viewSignature());
-
         rNote.getExData().makeJSONforHTML(output, block, seqNo, langObj);
 
         WebTransactionsHTML.getApps(output, rNote, langObj);

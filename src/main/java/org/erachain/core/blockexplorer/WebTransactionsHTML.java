@@ -222,9 +222,6 @@ public class WebTransactionsHTML {
             explorer.output.put("tx", outTX);
         }
 
-        outTX.put("heightSeqNo", transaction.viewHeightSeq());
-        outTX.put("signature", transaction.viewSignature());
-
     }
 
     private String get_Lang() {
