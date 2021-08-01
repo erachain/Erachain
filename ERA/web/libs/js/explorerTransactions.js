@@ -45,8 +45,6 @@ function tx(data) {
 
     output += '<br><a href ="/api/tx/raw/' + tx.signature + '">{ RAW }</a>';
 
-    //	output += data.Json ;
-
     return output;
 }
 
