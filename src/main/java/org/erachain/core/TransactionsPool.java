@@ -49,6 +49,18 @@ public class TransactionsPool extends MonitoredThread {
 
     }
 
+    public boolean contains(byte[] sign) {
+        if (utxMap.isClosed())
+            return false;
+        return utxMap.contains(sign);
+    }
+
+    public Transaction get(byte[] sign) {
+        if (utxMap.isClosed())
+            return null;
+        return utxMap.get(sign);
+    }
+
     /**
      * @param item
      */
@@ -101,6 +113,9 @@ public class TransactionsPool extends MonitoredThread {
             }
         } else if (item instanceof Long) {
             utxMap.deleteDirect((Long) item);
+
+        } else if (item instanceof byte[]) {
+            utxMap.deleteDirect((byte[]) item);
 
         } else if (item instanceof TransactionMessage) {
 
