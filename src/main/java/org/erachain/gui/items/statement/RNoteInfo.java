@@ -3,6 +3,7 @@ package org.erachain.gui.items.statement;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.blockexplorer.WebTransactionsHTML;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exActions.ExAction;
 import org.erachain.core.exdata.exLink.ExLinkAuthor;
@@ -27,6 +28,7 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -141,6 +143,16 @@ public class RNoteInfo extends RecDetailsFrame {
                     }
                 }
             });
+
+            JButton getPassword = new JButton(Lang.T("Retrieve Password"));
+            getPassword.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    retrievePassword(statement);
+                }
+            });
+
+            cryptPanel.add(getPassword);
 
             JButton decryptByPassword = new JButton(Lang.T("Decrypt by Password"));
             decryptByPassword.addActionListener(new ActionListener() {
@@ -504,5 +516,46 @@ public class RNoteInfo extends RecDetailsFrame {
 
         jTextArea_Body.setText(resultStr);
 
+    }
+
+    public static void retrievePassword(RSignNote rNote) {
+        if (rNote.isEncrypted()) {
+
+            Controller cntr = Controller.getInstance();
+            if (!cntr.isWalletUnlocked()) {
+                //ASK FOR PASSWORD
+                String password = PasswordPane.showUnlockWalletDialog(null);
+                if (!cntr.unlockWallet(password)) {
+                    //WRONG PASSWORD
+                    JOptionPane.showMessageDialog(null, Lang.T("Invalid password"), Lang.T("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+
+            Account account = cntr.getInvolvedAccount(rNote);
+            Fun.Tuple3<Integer, String, byte[]> result = rNote.getPassword(account);
+            if (result.a < 0) {
+                JOptionPane.showMessageDialog(null,
+                        Lang.T(result.b == null ? "Not exists Account access" : result.b),
+                        Lang.T("Not decrypted"), JOptionPane.ERROR_MESSAGE);
+                return;
+
+            } else if (result.b != null) {
+                JOptionPane.showMessageDialog(null,
+                        Lang.T(" In pos: " + result.a + " - " + result.b),
+                        Lang.T("Not decrypted"), JOptionPane.ERROR_MESSAGE);
+                return;
+
+            }
+
+            StringSelection stringSelection = new StringSelection(Base58.encode(result.c));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T("Password of the '%1' has been copy to buffer")
+                            .replace("%1", rNote.viewHeightSeq())
+                            + ".",
+                    Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+        }
     }
 }

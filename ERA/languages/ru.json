@@ -69,6 +69,7 @@
   "Address": "Адрес",
   "Address to Withdraw": "Адрес для вывода",
   "Address for Deposit": "Адрес для пополнения",
+  "Account was not found in the access list": "Счет не найден в списке доступа",
   "Addresses": "Адреса",
   "address is OK": "адрес годный",
   "address is unknown - can't encrypt for it, please use public key instead": "адрес неизвестен - невозможно зашифровать для него, пожалуйста используйте публичный ключ вместо него",
