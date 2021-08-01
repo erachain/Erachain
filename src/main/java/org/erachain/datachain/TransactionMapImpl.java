@@ -336,6 +336,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         return false;
     }
 
+    @Override
     public boolean contains(byte[] signature) {
         return this.contains(Longs.fromByteArray(signature));
     }

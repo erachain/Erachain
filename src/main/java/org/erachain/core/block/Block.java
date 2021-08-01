@@ -1717,7 +1717,8 @@ public class Block implements Closeable, ExplorerJsonLine {
             long processTimingLocal;
             long processTimingLocalDiff;
 
-            TransactionMapImpl unconfirmedMap = dcSetPlace.getTransactionTab();
+            //TransactionMapImpl unconfirmedMap = dcSetPlace.getTransactionTab();
+            TransactionsPool txMemPool = Controller.getInstance().transactionsPool;
             TransactionFinalMapImpl finalMap = dcSetPlace.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSigns = dcSetPlace.getTransactionFinalMapSigns();
 
@@ -1746,20 +1747,16 @@ public class Block implements Closeable, ExplorerJsonLine {
                     }
 
                     boolean isSignatureValid = false;
-                    // TRY QUCK check SIGNATURE by FIND in POOL
+                    // TRY QUICK check SIGNATURE by FIND in POOL
                     try {
-                        if (!unconfirmedMap.isClosed() && unconfirmedMap.contains(transactionSignature)) {
-                            if (isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature))) {
+                        if (txMemPool.contains(transactionSignature)) {
+                            if (isSignatureValid = transaction.trueEquals(txMemPool.get(transactionSignature))) {
                                 // если транзакция была в пуле ожидания - она уже проверена на Дубль
                                 transaction.checkedByPool = true;
                             }
-                        } else {
-                            unconfirmedMap = dcSetPlace.getTransactionTab();
                         }
                     } catch (java.lang.Throwable e) {
-                        if (e instanceof java.lang.IllegalAccessError) {
-                            // налетели на закрытую таблицу
-                            unconfirmedMap = dcSetPlace.getTransactionTab();
+                        if (false && e instanceof java.lang.IllegalAccessError) {
                         } else {
                             LOGGER.error(e.getMessage(), e);
                         }
@@ -1847,25 +1844,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                         //REMOVE FROM UNCONFIRMED DATABASE
                         ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                         processTimingLocal = System.nanoTime();
-                        try {
-                            if (!unconfirmedMap.isClosed()) {
-                                // так как здесь форкнутая база то напрямую - а не через Очередь
-                                unconfirmedMap.deleteDirect(transactionSignature);
-                            } else {
-                                unconfirmedMap = dcSetPlace.getTransactionTab();
-                                // так как здесь форкнутая база то напрямую - а не через Очередь
-                                unconfirmedMap.deleteDirect(transactionSignature);
-                            }
-                        } catch (java.lang.Throwable e) {
-                            if (e instanceof java.lang.IllegalAccessError) {
-                                // налетели на закрытую таблицу
-                                unconfirmedMap = dcSetPlace.getTransactionTab();
-                                // так как здесь форкнутая база то напрямую - а не через Очередь
-                                unconfirmedMap.deleteDirect(transactionSignature);
-                            } else {
-                                LOGGER.error(e.getMessage(), e);
-                            }
-                        }
+                        txMemPool.offerMessage(transactionSignature);
                         processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                         if (processTimingLocalDiff < 999999999999l)
                             timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;
