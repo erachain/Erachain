@@ -40,7 +40,9 @@ public abstract class AssetCls extends ItemCls {
 
     protected static final int ASSET_TYPE_LENGTH = 1;
 
-    protected static final long APP_DATA_DEX_AWARDS_MASK = 1;
+    protected static final long APP_DATA_DEX_AWARDS_MASK = 1L;
+    // untransferable
+    protected static final long APP_DATA_UNTRANSFERABLE_MASK = 2L;
 
     //
     protected int assetType;
@@ -353,8 +355,12 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static byte[] makeAppData(boolean iconAsURL, int iconType, boolean imageAsURL, int imageType,
-                                     Long startDate, Long stopDate, String tags, ExLinkAddress[] dexAwards) {
-        byte[] appData = ItemCls.makeAppData(dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK,
+                                     Long startDate, Long stopDate, String tags, ExLinkAddress[] dexAwards, boolean isUnTransferable) {
+        long flags = dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK;
+        if (isUnTransferable)
+            flags |= APP_DATA_UNTRANSFERABLE_MASK;
+
+        byte[] appData = ItemCls.makeAppData(flags,
                 iconAsURL, iconType, imageAsURL, imageType, startDate, stopDate, tags);
 
         if (dexAwards == null)
@@ -857,12 +863,17 @@ public abstract class AssetCls extends ItemCls {
         return isUnSpendable(key, assetType);
     }
 
-    public static boolean isUnTransferable(long key, int assetType, boolean senderIsAssetMaker) {
-        return false && assetType == AssetCls.AS_NON_FUNGIBLE && !senderIsAssetMaker;
+    /**
+     * нельзя передавать никак кроме со счета создателя - но торговать можно
+     *
+     * @return
+     */
+    public boolean isUnTransferable() {
+        return (flags & APP_DATA_UNTRANSFERABLE_MASK) != 0;
     }
 
     public boolean isUnTransferable(boolean senderIsAssetMaker) {
-        return isUnTransferable(key, assetType, senderIsAssetMaker);
+        return isUnTransferable() && !senderIsAssetMaker;
     }
 
     public boolean validPair(long pairAssetKey) {

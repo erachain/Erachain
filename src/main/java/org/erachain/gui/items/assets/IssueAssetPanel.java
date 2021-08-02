@@ -26,12 +26,13 @@ public class IssueAssetPanel extends IssueItemPanel {
     public static String NAME = "IssueAssetPanel";
     public static String TITLE = "Issue Asset";
 
-    private JLabel scaleJLabel = new JLabel(Lang.T("Scale") + ":");
-    private JLabel quantityJLabel = new JLabel(Lang.T("Quantity") + ":");
-    private JLabel typeJLabel = new JLabel(Lang.T("Type") + ":");
+    private final JLabel scaleJLabel = new JLabel(Lang.T("Scale") + ":");
+    private final JLabel quantityJLabel = new JLabel(Lang.T("Quantity") + ":");
+    private final JLabel typeJLabel = new JLabel(Lang.T("Type") + ":");
 
-    private JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
-    private JComboBox<String> textScale = new JComboBox<>();
+    private final JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
+    private final JComboBox<String> textScale = new JComboBox<>();
+    private final JCheckBox isUnTransferable = new JCheckBox(Lang.T("Not transferable"));
 
     private JTextPane textareasAssetTypeDescription;
     private MDecimalFormatedTextField textQuantity = new MDecimalFormatedTextField();
@@ -105,6 +106,10 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(textScale, fieldGBC);
+
+        isUnTransferable.setToolTipText(Lang.T("IssueAssetPanel.isUnTransferable.tip"));
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(isUnTransferable, fieldGBC);
 
         fieldGBC.gridy = gridy++;
         gridBagConstraints = new GridBagConstraints();
@@ -186,7 +191,7 @@ public class IssueAssetPanel extends IssueItemPanel {
                 !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
                 !startCheckBox.isSelected() ? null : startField.getCalendar().getTimeInMillis(),
                 !stopCheckBox.isSelected() ? null : stopField.getCalendar().getTimeInMillis(),
-                tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients());
+                tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients(), isUnTransferable.isSelected());
 
     }
 

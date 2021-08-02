@@ -1136,5 +1136,7 @@
   "Digital Vote": "Digital vote",
   "Digital Index": "Digital index",
   "Other Digital Right of Claim": "Other digital right of claim",
-  "AddImageLabel.externalURL.tip": "Set source by URL. Blockchain URL example: '/apiasset/image/{key}. External source not safe by blockchain."
+  "AddImageLabel.externalURL.tip": "Set source by URL. Blockchain URL example: '/apiasset/image/{key}. External source not safe by blockchain.",
+  "IssueAssetPanel.isUnTransferable.tip": "All transfers are prohibited except from the creator's account",
+  "": ""
 }

@@ -83,6 +83,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
+    /**
+     * 0 - type 1 - version
+     */
     protected byte[] typeBytes;
     protected PublicKeyAccount maker;
 
