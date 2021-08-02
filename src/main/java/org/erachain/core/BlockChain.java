@@ -226,11 +226,11 @@ public class BlockChain {
      * Если задан то это режим синхронизации со старым протоколом - значит нам нельзя генерить блоки и транзакции
      * и вести себя тихо - ничего не посылать никуда - чтобы не забанили
      */
-    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? (DEMO_MODE ? 0 : 0) : 1707784; // see in sidePROTOCOL.json as 'allValidBefore'
+    public static int ALL_VALID_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 1707784; // see in sidePROTOCOL.json as 'allValidBefore'
     public static final int WIN_VAL_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2023904;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 || !MAIN_MODE ? 0 : 2152137;
-    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2135000; //260120;
-    public static final int AUTO_CANCEL_ORDERS_FROM = TEST_DB > 0 || MAIN_MODE ? 2219177 : 0;
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 || !MAIN_MODE ? 0 : 2135000;
+    public static final int AUTO_CANCEL_ORDERS_FROM = TEST_DB > 0 || !MAIN_MODE ? 0 : 2219177;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам<bR>
      * !!! ВНИМАНИЕ !!! нельзя изменять походу собранной цепочки - так как съедут цены и индекс не удалится у некоторых ордеров - цена о другая.
@@ -279,7 +279,7 @@ public class BlockChain {
 
     public static final int START_ITEM_DUPLICATE = VERS_5_01_01;
 
-    public static final int START_ASSET_UNIQUE = DEMO_MODE ? 122000 : MAIN_MODE ? 1777777 : 0;
+    public static final int START_ASSET_UNIQUE = MAIN_MODE ? 1777777 : 0;
 
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
@@ -365,8 +365,8 @@ public class BlockChain {
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
     public static final int FREE_FEE_LENGTH = 1 << 10;
-    public static final int FREE_FEE_TO_SEQNO = DEMO_MODE ? 1 : MAIN_MODE ? 1 : -1;
-    public static final int FREE_FEE_FROM_HEIGHT = DEMO_MODE ? 1 : MAIN_MODE ? 1610000 : Integer.MAX_VALUE;
+    public static final int FREE_FEE_TO_SEQNO = CLONE_MODE ? -1 : 1;
+    public static final int FREE_FEE_FROM_HEIGHT = CLONE_MODE ? Integer.MAX_VALUE : MAIN_MODE ? 1610000 : 1;
 
     public static final int ADD_FEE_BYTES_FOR_COMMON_TX = 0;
 
@@ -873,7 +873,7 @@ public class BlockChain {
         if (CLONE_MODE)
             return BLOCKS_PERIOD;
 
-        if (VERS_30SEC > 0 && height <= VERS_30SEC) {
+        if (height > 0 && VERS_30SEC > 0 && height <= VERS_30SEC) {
             return 288; // old MainNet
         }
 

@@ -7,6 +7,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
@@ -29,6 +30,7 @@ import java.util.List;
 
 /**
  * Simple pay - for all same amount
+ * Result: recipient + Validate_Result {code, mess}
  */
 
 public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>>> {
@@ -44,7 +46,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
      */
     private final int flags; // byte[2]
 
-    private long assetKey;
     private final BigDecimal amount;
     private final int balancePos;
     final boolean backward;
@@ -67,16 +68,8 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
     }
 
-    public Long getAssetKey() {
-        return assetKey;
-    }
-
     public BigDecimal getAmount() {
         return amount;
-    }
-
-    public AssetCls getAsset() {
-        return asset;
     }
 
     public byte[][] getAddresses() {
@@ -91,8 +84,17 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         return addresses.length * 25;
     }
 
-    public BigDecimal getTotalPay() {
-        return totalPay;
+    @Override
+    public String viewResults(Transaction transactionParent) {
+        Crypto crypto = Crypto.getInstance();
+        String amountStr = " " + amount.toPlainString();
+        String results = "";
+        int i = 0;
+        for (byte[] address : addresses) {
+            results += ++i + " " + crypto.getAddressFromShort(address) + amountStr + "\n";
+        }
+
+        return results;
     }
 
     @Override

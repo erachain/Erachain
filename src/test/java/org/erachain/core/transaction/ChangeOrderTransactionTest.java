@@ -126,7 +126,7 @@ public class ChangeOrderTransactionTest {
         init(IDB.DBS_MAP_DB);
 
         //CREATE UPDATE ORDER
-        ChangeOrderTransaction tx = new ChangeOrderTransaction(maker, new byte[64], BigDecimal.TEN, useHave, FEE_POWER, timestamp, 0L);
+        ChangeOrderTransaction tx = new ChangeOrderTransaction(maker, new byte[64], BigDecimal.TEN, false, FEE_POWER, timestamp, 0L);
         tx.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -217,7 +217,7 @@ public class ChangeOrderTransactionTest {
 
                 // UPDATE ORDER 1
                 final ChangeOrderTransaction changeOrderTX_1 = new ChangeOrderTransaction(maker, createOrderTX.getSignature(),
-                        BigDecimal.TEN, useHave, FEE_POWER, ++timestamp, 0L);
+                        BigDecimal.TEN, false, FEE_POWER, ++timestamp, 0L);
                 changeOrderTX_1.sign(maker, Transaction.FOR_NETWORK);
                 changeOrderTX_1.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);
                 assertEquals(changeOrderTX_1.isValid(Transaction.FOR_NETWORK, 0L), Transaction.VALIDATE_OK);
@@ -238,7 +238,7 @@ public class ChangeOrderTransactionTest {
                 // UPDATE ORDER 2
                 BigDecimal newAmount = BigDecimal.TEN.add(BigDecimal.ONE);
                 final ChangeOrderTransaction changeOrderTX_2 = new ChangeOrderTransaction(maker, changeOrderTX_1.getSignature(),
-                        newAmount, useHave, FEE_POWER, ++timestamp, 0L);
+                        newAmount, false, FEE_POWER, ++timestamp, 0L);
                 changeOrderTX_2.sign(maker, Transaction.FOR_NETWORK);
                 changeOrderTX_2.setDC(dcSet, Transaction.FOR_NETWORK, ++height, 1, true);
                 assertEquals(changeOrderTX_2.isValid(Transaction.FOR_NETWORK, 0L), Transaction.VALIDATE_OK);

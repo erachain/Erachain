@@ -5,7 +5,6 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
@@ -133,7 +132,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
      * @param cutMaximum - образать список только по максимальному размеру, инаяе образать список и по времени протухания
      */
     protected long pointClear;
-    public int clearByDeadTimeAndLimit(long timestamp, boolean cutMaximum) {
+    public int clearByDeadTimeAndLimit(long keepTime, boolean cutMaximum) {
 
         // займем просецц или установим флаг
         if (isClearProcessedAndSet())
@@ -151,9 +150,6 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
                 long tickerIter = realTime;
                 int deletions = 0;
-                long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
-
-                timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
 
                 /**
                  * по несколько секунд итератор берется - при том что таблица пустая -
@@ -178,11 +174,11 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                         transaction = this.map.get(key);
                         if (transaction == null) {
                             // такая ошибка уже было
-                            break;
+                            continue;
                         }
 
                         long deadline = transaction.getDeadline();
-                        if (deadline < timestamp
+                        if (deadline < keepTime
                                 || size - deletions >
                                 (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3
                                         : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
@@ -300,6 +296,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                 totalDeleted++;
                 transactionOld = get(key);
             }
+
+            // delete by key
             pool.offerMessage(key);
 
             return transactionOld;
@@ -334,6 +332,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         return false;
     }
 
+    @Override
     public boolean contains(byte[] signature) {
         return this.contains(Longs.fromByteArray(signature));
     }

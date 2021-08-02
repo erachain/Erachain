@@ -41,7 +41,6 @@ public class AssetInfo extends JTextPane {
 
     //private BalancesTableModel balancesTableModel;
     private static String img_Local_URL = "http:\\img";
-    BufferedImage image1;
     private AssetCls asset;
     private Transaction transaction;
     private AssetInfo th;

@@ -75,6 +75,7 @@ public class WebTransactionsHTML {
         outTX.put("head", out);
         outTX.put("timestampLabel", Lang.T("Date", langObj));
         outTX.put("timestamp", transaction.getTimestamp());
+        outTX.put("signature", transaction.viewSignature());
 
         if (transaction.isWiped())
             return outTX;
@@ -178,8 +179,8 @@ public class WebTransactionsHTML {
 
         transaction.setDC(dcSet, true);
 
-        List<Transaction> tt = new ArrayList<Transaction>();
-        tt.add(transaction);
+        //List<Transaction> tt = new ArrayList<Transaction>();
+        //tt.add(transaction);
         //explorer.transactionsJSON(null, tt, 0, BlockExplorer.pageSize, "tx");
         //JSONObject tras_json = (JSONObject) ((LinkedHashMap) ((LinkedHashMap) explorer.output.get("Transactions"))
         //        .get("transactions")).get(0);

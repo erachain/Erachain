@@ -1505,6 +1505,7 @@ public class ExData {
         }
     }
 
+    static String ERR_01 = "Account was not found in the access list";
     public Fun.Tuple3<Integer, String, ExData> decrypt(PublicKeyAccount account, Account recipient) {
 
         byte[] password;
@@ -1521,7 +1522,7 @@ public class ExData {
         }
 
         if (pos < 0) {
-            return new Fun.Tuple3<>(pos, "Address not found", null);
+            return new Fun.Tuple3<>(pos, ERR_01, null);
         }
 
         try {
@@ -1573,7 +1574,7 @@ public class ExData {
         }
 
         if (pos < 0) {
-            return new Fun.Tuple3<>(pos, "Address not found", null);
+            return new Fun.Tuple3<>(pos, ERR_01, null);
         }
 
         try {

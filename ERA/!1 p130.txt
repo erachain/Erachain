@@ -17,6 +17,9 @@ test2:
 EuP1MXmCSRXioYwiVn7gukvwY9myEQXSvV2x4kMcXr1i
 
 
+mobile test seed
+4oMU9FZrkhgDZ6ntxR4Dz6XB9Z6GUi5idmAaLXLJWwNPHoypNHavrPMJNPG7vAbhyoc6iX1cvn2T3Exr4Vtjdzps
+
 test SEEDs of many transactions
 era-59 42KstyCe8GGyjnyjS279PifuhCDVtvL9oAb5jvKTkkdV
 era-60 G4CYuoNtie1keHAhEzj9CiQq92vW5KxeEH3SRwBcoukk - 1.5mln

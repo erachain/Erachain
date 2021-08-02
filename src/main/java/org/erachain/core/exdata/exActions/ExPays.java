@@ -76,7 +76,6 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
      */
     private int flags; // 4
 
-    private Long assetKey; // 12
     private int balancePos; // 13
     private boolean backward; // 14
     private int payMethod; // 15 0 - by Total, 1 - by Percent
@@ -210,20 +209,8 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         this.totalFeeBytes = totalFeeBytes;
     }
 
-    public Long getAssetKey() {
-        return assetKey;
-    }
-
-    public AssetCls getAsset() {
-        return asset;
-    }
-
     public int getResultsCount() {
         return resultsCount;
-    }
-
-    public BigDecimal getTotalPay() {
-        return totalPay;
     }
 
     public long getTotalFeeBytes() {
@@ -292,6 +279,26 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     public boolean hasTXTypeFilterActiveEnd() {
         return (this.flags & ACTIVE_END_FLAG_MASK) != 0;
+    }
+
+    @Override
+    public String viewResults(Transaction transactionParent) {
+
+        if (results == null) {
+            preProcess(transactionParent);
+        }
+
+        if (payMethod == PAYMENT_METHOD_TOTAL) {
+            calcAccrualsForMethodTotal();
+        }
+
+        String out = "";
+        int i = 0;
+        for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
+            out += ++i + " " + item.a.getAddress() + " " + item.c.toPlainString() + "\n";
+        }
+
+        return out;
     }
 
     @Override
@@ -1108,7 +1115,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public int isValid(RSignNote rNote) {
 
         if (hasAmount()) {
-            if (this.assetKey == null || this.assetKey == 0L) {
+            if (this.assetKey == 0L) {
                 errorValue = "Accruals: assetKey == null or ZERO";
                 return Transaction.INVALID_ITEM_KEY;
             } else if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
@@ -1150,8 +1157,8 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             return Transaction.INVALID_TRANSACTION_TYPE;
         }
 
-        if (assetKey != null && filterAssetKey != null
-                && assetKey.equals(filterAssetKey)
+        if (assetKey != 0 && filterAssetKey != null
+                && assetKey == filterAssetKey
                 && balancePos == filterBalancePos
                 && payMethod != PAYMENT_METHOD_ABSOLUTE) {
             // при откате невозможно тогда будет правильно рассчитать - так как съехала общая сумма

@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
@@ -55,7 +56,7 @@ public class TransactionSuitRocksDBTabTest {
         Transaction transaction;
 
         //CREATE MESSAGE TRANSACTION
-        transaction = new RSend(creator, feePow, recipient, 01, new BigDecimal("0.00000001"), timestamp++, 0L);
+        transaction = new RSend(creator, feePow, recipient, 0L, new BigDecimal("0.00000001"), timestamp++, 0L);
 
         transaction.sign(creator, Transaction.FOR_NETWORK);
         transaction.setDC(db, Transaction.FOR_NETWORK, blockHeight, seqNo++, true);
@@ -69,7 +70,9 @@ public class TransactionSuitRocksDBTabTest {
 
         db.getTransactionTab().put(transaction);
 
-        db.getTransactionTab().clearByDeadTimeAndLimit(++timestamp, false);
+        long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
+        keepTime = timestamp - (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
+        db.getTransactionTab().clearByDeadTimeAndLimit(keepTime, false);
 
         List<Transaction> txs1 = db.getTransactionTab().getTransactions(1000, false);
         List<Transaction> txs2 = db.getTransactionTab().getTransactions(1000, false);

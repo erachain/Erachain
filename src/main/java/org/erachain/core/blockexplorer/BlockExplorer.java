@@ -1655,14 +1655,10 @@ public class BlockExplorer {
 
         Map output = new LinkedHashMap();
         Map balances = new LinkedHashMap();
-        BigDecimal all = BigDecimal.ZERO;
-        BigDecimal alloreders = BigDecimal.ZERO;
 
-        List<Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> top100s = new ArrayList();
+        List<Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> top100s = new ArrayList();
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        //BigDecimal total = BigDecimal.ZERO;
-        //BigDecimal totalNeg = BigDecimal.ZERO;
         byte[] key;
         Crypto crypto = Crypto.getInstance();
 
@@ -1678,8 +1674,8 @@ public class BlockExplorer {
                     if (balance.a.b.signum() == 0 && balance.b.b.signum() == 0 && balance.c.b.signum() == 0 && balance.d.b.signum() == 0)
                         continue;
 
-                    top100s.add(Fun.t5(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)),
-                            balance.a.b, balance.b.b, balance.c.b, balance.d.b));
+                    top100s.add(Fun.t6(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)),
+                            balance.a.b, balance.b.b, balance.c.b, balance.d.b, balance.e.b));
                 } catch (java.lang.ArrayIndexOutOfBoundsException e) {
                     logger.error("Wrong key raw: ");
                 }
@@ -1688,18 +1684,12 @@ public class BlockExplorer {
             logger.error(e.getMessage(), e);
         }
 
-        Collection<Order> orders = dcSet.getOrderMap().getOrders(assetKey);
-
-        for (Order order : orders) {
-            alloreders = alloreders.add(order.getAmountHaveLeft());
-        }
-
         Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_top100()));
 
         int couter = 0;
         AssetCls asset = Controller.getInstance().getAsset(assetKey);
 
-        for (Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal> top100 : top100s) {
+        for (Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> top100 : top100s) {
 
             couter++;
 
@@ -1711,6 +1701,7 @@ public class BlockExplorer {
             balance.put("DEBT", top100.c.setScale(asset.getScale()).toPlainString());
             balance.put("HOLD", top100.d.setScale(asset.getScale()).toPlainString());
             balance.put("SPEND", top100.e.setScale(asset.getScale()).toPlainString());
+            balance.put("PLEDGE", top100.f.setScale(asset.getScale()).toPlainString());
 
             Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
@@ -1769,7 +1760,6 @@ public class BlockExplorer {
 
         output.put("Label_Top", Lang.T("Top", langObj));
 
-        output.put("allinOrders", alloreders.stripTrailingZeros().toPlainString());
         output.put("assetKey", assetKey);
         output.put("limit", limit);
         output.put("count", couter);
@@ -2389,7 +2379,13 @@ public class BlockExplorer {
                 try {
                     byte[] signature = Base58.decode(filterStr);
                     Transaction one = map.get(signature);
-                    if (one != null) {
+                    if (one == null) {
+                        one = dcSet.getTransactionTab().get(signature);
+                        if (one != null) {
+                            transactions.add(one);
+                            needFound = false;
+                        }
+                    } else {
                         transactions.add(one);
                         needFound = false;
                     }
@@ -2782,7 +2778,6 @@ public class BlockExplorer {
             } else {
                 new WebTransactionsHTML().get_HTML(this, transaction);
                 output.put("Label_Transaction", Lang.T("Transaction", langObj));
-                output.put("heightSeqNo", transaction.viewHeightSeq());
             }
         }
 
@@ -3021,20 +3016,17 @@ public class BlockExplorer {
 
     }
 
-    public class BigDecimalComparator_top100 implements Comparator<Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> {
+    public class BigDecimalComparator_top100 implements Comparator<Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> {
 
         @Override
-        public int compare(Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal> a, Tuple5<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal> b) {
-            try {
-                int result = a.c.compareTo(b.c);
-                if (result != 0)
-                    return result;
+        public int compare(Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> a,
+                           Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> b) {
+            if (a.b == null || a.f == null)
+                return -1;
+            else if (b.b == null || b.f == null)
+                return 1;
 
-                // учет еще по Должен
-                return a.b.compareTo(b.b);
-            } catch (Exception e) {
-                return 0;
-            }
+            return a.b.add(a.f).compareTo(b.b.add(b.f));
         }
 
     }

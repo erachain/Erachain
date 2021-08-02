@@ -34,7 +34,7 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
 
     IteratorCloseable<Long> getTimestampIterator(boolean descending);
 
-    int clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
+    int clearByDeadTimeAndLimit(long keepTime, boolean cutDeadTime);
 
     //boolean set(byte[] signature, Transaction transaction);
 
