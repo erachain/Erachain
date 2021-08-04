@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.voting.Poll;
 import org.erachain.core.voting.PollOption;
-import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 
@@ -66,12 +65,12 @@ public class PollOptionsTableModel extends AbstractTableModel {
 
             case COLUMN_VOTES:
 
-                return NumberAsString.formatAsString(option.getVotes(this.asset.getKey(DCSet.getInstance())));
+                return NumberAsString.formatAsString(option.getVotes(this.asset.getKey()));
 
             case COLUMN_PERCENTAGE:
 
-                BigDecimal total = this.poll.getTotalVotes(this.asset.getKey(DCSet.getInstance()));
-                BigDecimal votes = option.getVotes(this.asset.getKey(DCSet.getInstance()));
+                BigDecimal total = this.poll.getTotalVotes(this.asset.getKey());
+                BigDecimal votes = option.getVotes(this.asset.getKey());
 
                 if (votes.compareTo(BigDecimal.ZERO) == 0) {
                     return "0 %";

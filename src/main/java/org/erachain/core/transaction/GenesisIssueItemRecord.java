@@ -30,7 +30,7 @@ public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
     }
 
     public long getAssetKey(DCSet db) {
-        return this.getItem().getKey(db);
+        return this.getItem().getKey();
     }
 
     @Override

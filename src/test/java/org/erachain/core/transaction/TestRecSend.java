@@ -113,7 +113,7 @@ public class TestRecSend {
 
         AssetCls asset23 = new AssetVenture(itemAppData, maker, "AAA", icon, image, ".", 0, TransactionAmount.maxSCALE, 0L);
         asset23.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
-        long assetKey23 = asset23.getKey(db);
+        long assetKey23 = asset23.getKey();
 
         //int shift = 64;
         int scale;
@@ -230,7 +230,7 @@ public class TestRecSend {
         int thisScale = 5;
         AssetCls assetA = new AssetVenture(itemAppData, maker, "AAA", icon, image, ".", 0, thisScale, 0L);
         assetA.insertToMap(db, 0l);
-        long assetKey = assetA.getKey(db);
+        long assetKey = assetA.getKey();
         head = "";
         data = null;
 
@@ -266,7 +266,7 @@ public class TestRecSend {
         // INVALID
         assetA = new AssetVenture(itemAppData, maker, "AAA", icon, image, ".", 0, 30, 0L);
         assetA.insertToMap(db, 0l);
-        assetKey = assetA.getKey(db);
+        assetKey = assetA.getKey();
 
         r_Send = new RSend(maker, exLink, FEE_POWER, recipient, assetKey,
                 amountInvalid,
@@ -321,7 +321,7 @@ public class TestRecSend {
 
         AssetCls assetBIG = new AssetVenture(itemAppData, maker, "AAA", icon, image, ".", 0, fromScale + 2, 0L);
         assetBIG.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
-        long assetKeyBIG = assetBIG.getKey(db);
+        long assetKeyBIG = assetBIG.getKey();
 
         RSend r_Send;
         byte[] raw_r_Send;
@@ -431,7 +431,7 @@ public class TestRecSend {
         int thisScale = 5;
         AssetCls assetA = new AssetVenture(itemAppData, maker, "AAA", icon, image, ".", 0, thisScale, 0L);
         assetA.insertToMap(db, 0l);
-        long assetKey = assetA.getKey(db);
+        long assetKey = assetA.getKey();
         head = "";
         data = null;
 

@@ -167,17 +167,17 @@ public class TestTemplateAsPack {
         Long makerReference = maker.getLastTimestamp(db)[0];
         issueTemplateRecord.process(gb, asPack);
 
-        LOGGER.info("template KEY: " + template.getKey(db));
+        LOGGER.info("template KEY: " + template.getKey());
 
         //CHECK PLATE EXISTS SENDER
-        long key = db.getIssueTemplateMap().get(issueTemplateRecord);
+        long key = issueTemplateRecord.key;
         assertEquals(true, db.getItemTemplateMap().contains(key));
 
         TemplateCls template_2 = new Template(itemAppData, maker, "test132_2", icon, image, "2_12345678910strontje");
         IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2);
         issueTemplateTransaction_2.sign(maker, asPack);
         issueTemplateTransaction_2.process(gb, asPack);
-        LOGGER.info("template_2 KEY: " + template_2.getKey(db));
+        LOGGER.info("template_2 KEY: " + template_2.getKey());
         issueTemplateTransaction_2.orphan(gb, asPack);
         ItemTemplateMap templateMap = db.getItemTemplateMap();
         int mapSize = templateMap.size();
@@ -204,7 +204,7 @@ public class TestTemplateAsPack {
         issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
         issueTemplateRecord.sign(maker, asPack);
         issueTemplateRecord.process(gb, asPack);
-        long key = db.getIssueTemplateMap().get(issueTemplateRecord);
+        long key = issueTemplateRecord.key;
         assertEquals((long) makerReference, (long) maker.getLastTimestamp(db)[0]);
 
         issueTemplateRecord.orphan(gb, asPack);

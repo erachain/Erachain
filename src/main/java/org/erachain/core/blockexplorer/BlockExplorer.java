@@ -1609,7 +1609,7 @@ public class BlockExplorer {
                 ItemCls item = record.getItem();
                 ///logger.warn(item.viewName());
 
-                myPersonJSON.put("key", item.getKey(dcSet));
+                myPersonJSON.put("key", item.getKey());
                 myPersonJSON.put("name", item.viewName());
 
                 myPersonJSON.put("seqNo", myIssuePerson.viewHeightSeq());

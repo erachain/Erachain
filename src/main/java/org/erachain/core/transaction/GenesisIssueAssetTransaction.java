@@ -83,7 +83,7 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
         long quantity = asset.getQuantity();
         if (quantity > 0L) {
             Account maker = item.getMaker();
-            Long assetKey = item.getKey(dcSet);
+            Long assetKey = item.getKey();
             // надо добавить баланс на счет
             maker.changeBalance(dcSet, false, false, assetKey,
                     new BigDecimal(quantity).setScale(0), false, false, false);

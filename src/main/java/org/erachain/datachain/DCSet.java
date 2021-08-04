@@ -157,24 +157,16 @@ public class DCSet extends DBASet implements Closeable {
     private HashtagPostMap hashtagPostMap;
     private VoteOnItemPollMap voteOnItemPollMap;
     private ItemAssetMap itemAssetMap;
-    private IssueAssetMap issueAssetMap;
     private OrderMapImpl orderMap;
     private CompletedOrderMapImpl completedOrderMap;
     private TradeMapImpl tradeMap;
     private ItemStatusMap itemStatusMap;
-    private IssueStatusMap issueStatusMap;
     private ItemImprintMap itemImprintMap;
-    private IssueImprintMap issueImprintMap;
     private ItemPollMap itemPollMap;
-    private IssuePollMap issuePollMap;
     private ItemTemplateMap itemTemplateMap;
-    private IssueTemplateMap issueTemplateMap;
     private ItemStatementMap itemStatementMap;
-    private IssueStatementMap issueStatementMap;
     private ItemPersonMap itemPersonMap;
-    private IssuePersonMap issuePersonMap;
     private ItemUnionMap itemUnionMap;
-    private IssueUnionMap issueUnionMap;
     private ATMap atMap;
     private ATStateMap atStateMap;
     private ATTransactionMap atTransactionMap;
@@ -285,28 +277,13 @@ public class DCSet extends DBASet implements Closeable {
             this.voteOnItemPollMap = new VoteOnItemPollMap(this, database);
 
             this.itemAssetMap = new ItemAssetMap(this, database);
-            this.issueAssetMap = new IssueAssetMap(this, database);
-
             this.itemImprintMap = new ItemImprintMap(this, database);
-            this.issueImprintMap = new IssueImprintMap(this, database);
-
             this.itemTemplateMap = new ItemTemplateMap(this, database);
-            this.issueTemplateMap = new IssueTemplateMap(this, database);
-
             this.itemPersonMap = new ItemPersonMap(this, database);
-            this.issuePersonMap = new IssuePersonMap(this, database);
-
             this.itemPollMap = new ItemPollMap(this, database);
-            this.issuePollMap = new IssuePollMap(this, database);
-
             this.itemStatementMap = new ItemStatementMap(this, database);
-            this.issueStatementMap = new IssueStatementMap(this, database);
-
             this.itemStatusMap = new ItemStatusMap(this, database);
-            this.issueStatusMap = new IssueStatusMap(this, database);
-
             this.itemUnionMap = new ItemUnionMap(this, database);
-            this.issueUnionMap = new IssueUnionMap(this, database);
 
             this.atMap = new ATMap(this, database);
             this.atStateMap = new ATStateMap(this, database);
@@ -452,28 +429,13 @@ public class DCSet extends DBASet implements Closeable {
         this.voteOnItemPollMap = new VoteOnItemPollMap(parent.voteOnItemPollMap, this);
 
         this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap, this);
-        this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap(), this);
-
         this.itemImprintMap = new ItemImprintMap(parent.itemImprintMap, this);
-        this.issueImprintMap = new IssueImprintMap(parent.issueImprintMap, this);
-
         this.itemTemplateMap = new ItemTemplateMap(parent.itemTemplateMap, this);
-        this.issueTemplateMap = new IssueTemplateMap(parent.getIssueTemplateMap(), this);
-
         this.itemStatementMap = new ItemStatementMap(parent.itemStatementMap, this);
-        this.issueStatementMap = new IssueStatementMap(parent.issueStatementMap, this);
-
         this.itemPersonMap = new ItemPersonMap(parent.getItemPersonMap(), this);
-        this.issuePersonMap = new IssuePersonMap(parent.getIssuePersonMap(), this);
-
         this.itemPollMap = new ItemPollMap(parent.itemPollMap, this);
-        this.issuePollMap = new IssuePollMap(parent.issuePollMap, this);
-
         this.itemStatusMap = new ItemStatusMap(parent.itemStatusMap, this);
-        this.issueStatusMap = new IssueStatusMap(parent.issueStatusMap, this);
-
         this.itemUnionMap = new ItemUnionMap(parent.itemUnionMap, this);
-        this.issueUnionMap = new IssueUnionMap(parent.issueUnionMap, this);
 
         this.atMap = new ATMap(parent.atMap, this);
         this.atStateMap = new ATStateMap(parent.atStateMap, this);
@@ -832,22 +794,14 @@ public class DCSet extends DBASet implements Closeable {
 
         this.orderMap.clear();
         this.completedOrderMap.clear();
-        this.issueAssetMap.clear();
         this.itemAssetMap.clear();
-        this.issueImprintMap.clear();
         this.itemImprintMap.clear();
-        this.issueTemplateMap.clear();
         this.itemStatementMap.clear();
-        this.issueStatementMap.clear();
         this.itemTemplateMap.clear();
 
-        this.issuePersonMap.clear();
         this.itemPersonMap.clear();
-        this.issuePollMap.clear();
         this.itemPollMap.clear();
-        this.issueStatusMap.clear();
         this.itemStatusMap.clear();
-        this.issueUnionMap.clear();
         this.itemUnionMap.clear();
         this.atMap.clear();
         this.atStateMap.clear();
@@ -1317,15 +1271,6 @@ public class DCSet extends DBASet implements Closeable {
     }
 
     /**
-     * see datachain.IssueItemMap
-     *
-     * @return
-     */
-    public IssueAssetMap getIssueAssetMap() {
-        return this.issueAssetMap;
-    }
-
-    /**
      * Хранение ордеров на бирже
      * Ключ: ссылка на запись создавшую заказ
      * Значение: Ордер
@@ -1361,15 +1306,6 @@ public class DCSet extends DBASet implements Closeable {
     }
 
     /**
-     * see datachain.IssueItemMap
-     *
-     * @return
-     */
-    public IssueImprintMap getIssueImprintMap() {
-        return this.issueImprintMap;
-    }
-
-    /**
      * Хранение активов.<br>
      * Ключ: номер (автоинкремент)<br>
      * Значение: Шаблон<br>
@@ -1378,26 +1314,8 @@ public class DCSet extends DBASet implements Closeable {
         return this.itemTemplateMap;
     }
 
-    /**
-     * see datachain.IssueItemMap
-     *
-     * @return
-     */
-    public IssueTemplateMap getIssueTemplateMap() {
-        return this.issueTemplateMap;
-    }
-
     public ItemStatementMap getItemStatementMap() {
         return this.itemStatementMap;
-    }
-
-    /**
-     * see datachain.IssueItemMap
-     *
-     * @return
-     */
-    public IssueStatementMap getIssueStatementMap() {
-        return this.issueStatementMap;
     }
 
     /**
@@ -1410,30 +1328,12 @@ public class DCSet extends DBASet implements Closeable {
     }
 
     /**
-     * see datachain.IssueItemMap
-     *
-     * @return
-     */
-    public IssuePersonMap getIssuePersonMap() {
-        return this.issuePersonMap;
-    }
-
-    /**
      * see datachain.ItemMap
      *
      * @return
      */
     public ItemPollMap getItemPollMap() {
         return this.itemPollMap;
-    }
-
-    /**
-     * see datachain.IssueItemMap
-     *
-     * @return
-     */
-    public IssuePollMap getIssuePollMap() {
-        return this.issuePollMap;
     }
 
     /**
@@ -1446,30 +1346,12 @@ public class DCSet extends DBASet implements Closeable {
     }
 
     /**
-     * see datachain.IssueItemMap
-     *
-     * @return
-     */
-    public IssueStatusMap getIssueStatusMap() {
-        return this.issueStatusMap;
-    }
-
-    /**
      * see datachain.ItemMap
      *
      * @return
      */
     public ItemUnionMap getItemUnionMap() {
         return this.itemUnionMap;
-    }
-
-    /**
-     * see datachain.IssueItemMap
-     *
-     * @return
-     */
-    public IssueUnionMap getIssueUnionMap() {
-        return this.issueUnionMap;
     }
 
     /**

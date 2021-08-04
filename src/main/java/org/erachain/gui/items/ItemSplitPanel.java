@@ -357,7 +357,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
             itemCls = (ItemCls) item;
         }
 
-        itemCls.getKey(DCSet.getInstance());
+        itemCls.getKey();
         return itemCls;
 
     }

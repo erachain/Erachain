@@ -106,7 +106,7 @@ public class TestRecAsset {
         asset.setReference(Crypto.getInstance().digest(asset.toBytes(forDeal, false, false)), dbRef);
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(db, 0l);
-        key = asset.getKey(db);
+        key = asset.getKey();
 
         assetMovable = new AssetVenture(itemAppData, maker, "movable", icon, image, "...", 0, 8, 500l);
         assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(forDeal, false, false)), dbRef);
@@ -143,7 +143,7 @@ public class TestRecAsset {
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
                 asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
 
-                long assetKey = asset.getKey(db);
+                long assetKey = asset.getKey();
 
                 long timestamp = NTP.getTime();
 
@@ -331,13 +331,13 @@ public class TestRecAsset {
 
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
 
-                LOGGER.info("asset KEY: " + asset.getKey(db));
+                long key = asset.getKey();
+                LOGGER.info("asset KEY: " + key);
 
                 //CHECK BALANCE ISSUER
-                assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(asset.getKey(db), db));
+                assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 
                 //CHECK ASSET EXISTS SENDER
-                long key = db.getIssueAssetMap().get(issueAssetTransaction);
                 assertEquals(true, db.getItemAssetMap().contains(key));
 
                 //CHECK ASSET IS CORRECT
@@ -371,7 +371,7 @@ public class TestRecAsset {
                 issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
                 issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
-                long key = db.getIssueAssetMap().get(issueAssetTransaction);
+                long key = asset.getKey();
                 assertEquals(new BigDecimal(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
                 assertEquals((long) issueAssetTransaction.getTimestamp(), (long) maker.getLastTimestamp(db)[0]);
 
@@ -412,7 +412,7 @@ public class TestRecAsset {
                 issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
                 issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
-                long key = db.getIssueAssetMap().get(issueAssetTransaction);
+                long key = asset.getKey();
 
                 //CREATE SIGNATURE
                 Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -456,7 +456,7 @@ public class TestRecAsset {
                         txFlags | Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT));
 
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
-                long key = asset.getKey(db);
+                long key = asset.getKey();
                 assertEquals(new BigDecimal(asset.getQuantity()), maker.getBalanceUSE(key, db));
 
                 //CREATE SIGNATURE
@@ -669,7 +669,7 @@ public class TestRecAsset {
                 issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
                 issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
                 issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
-                long key = db.getIssueAssetMap().get(issueAssetTransaction);
+                long key = asset.getKey();
 
                 //CREATE SIGNATURE
                 Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -717,7 +717,7 @@ public class TestRecAsset {
 
                 issueMessageTransaction.sign(maker, Transaction.FOR_NETWORK);
                 issueMessageTransaction.process(gb, Transaction.FOR_NETWORK);
-                long key = asset.getKey(db);
+                long key = asset.getKey();
                 //assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
                 assertEquals(new BigDecimal(asset.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 

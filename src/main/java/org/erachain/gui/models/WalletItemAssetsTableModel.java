@@ -37,7 +37,7 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
                 return asset.getConfirmations(dcSet);
 
             case COLUMN_KEY:
-                return asset.getKey(DCSet.getInstance());
+                return asset.getKey();
 
             case COLUMN_NAME:
                 return asset; // for Icon

@@ -8,7 +8,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 
 import java.util.Arrays;
@@ -73,10 +72,6 @@ public abstract class ImprintCls extends ItemCls {
     // DB
     public ItemMap getDBMap(DCSet db) {
         return db.getItemImprintMap();
-    }
-
-    public IssueItemMap getDBIssueMap(DCSet db) {
-        return db.getIssueImprintMap();
     }
 
 }

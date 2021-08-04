@@ -72,7 +72,7 @@ public class TestRecGenesisPerson2 {
         genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);
         if (toProcess) {
             genesisIssuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
-            keyPerson = person.getKey(db);
+            keyPerson = person.getKey();
         }
 
     }
@@ -169,7 +169,7 @@ public class TestRecGenesisPerson2 {
             //CHECK DESCRIPTION
             assertEquals(genesisIssuePersonTransaction.getItem().getDescription(), parsedGenesisIssuePersonRecord.getItem().getDescription());
 
-            assertEquals(genesisIssuePersonTransaction.getItem().getKey(db), parsedGenesisIssuePersonRecord.getItem().getKey(db));
+            assertEquals(genesisIssuePersonTransaction.getItem().getKey(), parsedGenesisIssuePersonRecord.getItem().getKey());
 
         } catch (Exception e) {
             fail("Exception while parsing transaction." + e);
@@ -201,11 +201,11 @@ public class TestRecGenesisPerson2 {
         //assertNotEquals((long)genesisIssuePersonTransaction.getTimestamp(), (long)maker.getLastReference(db));
         genesisIssuePersonTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         genesisIssuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
-        keyPerson = person.getKey(db);
+        keyPerson = person.getKey();
 
         //CHECK PERSON EXISTS SENDER
         assertEquals(true, db.getItemPersonMap().contains(keyPerson));
-        assertEquals(genesisIssuePersonTransaction.getItem().getKey(db), keyPerson);
+        assertEquals(genesisIssuePersonTransaction.getItem().getKey(), keyPerson);
         assertEquals(genesisIssuePersonTransaction.getItem().getName(), person.getName());
 
         //CHECK PERSON IS CORRECT

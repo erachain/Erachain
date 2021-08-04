@@ -14,7 +14,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.PairMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
@@ -454,13 +453,6 @@ public abstract class AssetCls extends ItemCls {
     public ItemMap getDBMap(DCSet db) {
         return db.getItemAssetMap();
     }
-
-    @Override
-    public IssueItemMap getDBIssueMap(DCSet db) {
-        return db.getIssueAssetMap();
-    }
-
-    //public abstract long getQuantity();
 
     public abstract BigDecimal getReleased();
     public abstract BigDecimal getReleased(DCSet dc);

@@ -5,7 +5,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 
 public abstract class StatementCls extends ItemCls {
@@ -56,10 +55,6 @@ public abstract class StatementCls extends ItemCls {
     // DB
     public ItemMap getDBMap(DCSet db) {
         return db.getItemStatementMap();
-    }
-
-    public IssueItemMap getDBIssueMap(DCSet db) {
-        return db.getIssueStatementMap();
     }
 
 }

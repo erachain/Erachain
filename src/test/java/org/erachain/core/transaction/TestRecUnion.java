@@ -135,7 +135,7 @@ public class TestRecUnion {
         issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         issueUnionTransaction.process(gb, Transaction.FOR_NETWORK);
-        unionKey = union.getKey(db);
+        unionKey = union.getKey();
 
         assertEquals(1, unionKey);
         //assertEquals( null, dbPS.getItem(unionKey));
@@ -300,14 +300,14 @@ public class TestRecUnion {
 
         issueUnionTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        LOGGER.info("union KEY: " + union.getKey(db));
+        LOGGER.info("union KEY: " + union.getKey());
 
         //CHECK BALANCE ISSUER
         assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
         assertEquals(BigDecimal.valueOf(1).subtract(issueUnionTransaction.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, db));
 
         //CHECK UNION EXISTS DB AS CONFIRMED:  key > -1
-        long key = db.getIssueUnionMap().get(issueUnionTransaction);
+        long key = issueUnionTransaction.key;
         assertEquals(1, key);
         assertEquals(true, db.getItemUnionMap().contains(key));
 

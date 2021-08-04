@@ -106,7 +106,7 @@ public class TestRecSendInSideAsset {
             issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
             issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
     
-            assetKey = assetInSide.getKey(db);
+            assetKey = assetInSide.getKey();
         }
 
     }

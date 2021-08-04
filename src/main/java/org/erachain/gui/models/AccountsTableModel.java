@@ -6,7 +6,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.FavoriteAccountsMap;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
@@ -50,7 +49,7 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
 
     public void setAsset(AssetCls asset) {
         this.asset = asset;
-        assetKey = asset.getKey(DCSet.getInstance());
+        assetKey = asset.getKey();
 
         fireTableDataChanged();
         needUpdate = false;

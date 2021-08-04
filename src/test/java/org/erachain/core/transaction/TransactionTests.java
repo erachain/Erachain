@@ -961,13 +961,13 @@ public class TransactionTests {
 
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        LOGGER.info("asset KEY: " + asset.getKey(DCSet.getInstance()));
+        LOGGER.info("asset KEY: " + asset.getKey());
 
         //CHECK BALANCE ISSUER
-        assertEquals(BigDecimal.valueOf(50000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(asset.getKey(db), db));
+        assertEquals(BigDecimal.valueOf(50000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(asset.getKey(), db));
 
         //CHECK ASSET EXISTS SENDER
-        long key = db.getIssueAssetMap().get(issueAssetTransaction);
+        long key = issueAssetTransaction.key;
         assertEquals(true, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET IS CORRECT
@@ -994,7 +994,7 @@ public class TransactionTests {
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, null, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
-        long key = db.getIssueAssetMap().get(issueAssetTransaction);
+        long key = issueAssetTransaction.key;
         assertEquals(new BigDecimal(50000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
         assertEquals(issueAssetTransaction.getTimestamp(), maker.getLastTimestamp(db));
 

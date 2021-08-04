@@ -2033,11 +2033,11 @@ public class API {
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
         byte[] pkBytes = publicKeyAccount.getPublicKey();
-        if (!DCSet.getInstance().getIssuePersonMap().contains(pkBytes)) {
+        if (!DCSet.getInstance().getTransactionFinalMapSigns().contains(pkBytes)) {
             throw ApiErrorFactory.getInstance().createError(
                     Transaction.ITEM_PERSON_NOT_EXIST);
         } else {
-            Long key = DCSet.getInstance().getIssuePersonMap().get(pkBytes);
+            Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(pkBytes);
             if (key == null || key == 0) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.ITEM_PERSON_NOT_EXIST);
@@ -2158,11 +2158,11 @@ public class API {
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
         byte[] pkBytes = publicKeyAccount.getPublicKey();
-        if (!DCSet.getInstance().getIssuePersonMap().contains(pkBytes)) {
+        if (!DCSet.getInstance().getTransactionFinalMapSigns().contains(pkBytes)) {
             throw ApiErrorFactory.getInstance().createError(
                     Transaction.ITEM_PERSON_NOT_EXIST);
         } else {
-            Long key = DCSet.getInstance().getIssuePersonMap().get(pkBytes);
+            Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(pkBytes);
             if (key == null || key == 0) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.ITEM_PERSON_NOT_EXIST);

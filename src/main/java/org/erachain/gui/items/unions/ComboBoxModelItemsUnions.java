@@ -2,7 +2,6 @@ package org.erachain.gui.items.unions;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 
 import javax.swing.*;
@@ -61,7 +60,7 @@ public class ComboBoxModelItemsUnions extends DefaultComboBoxModel<UnionCls> imp
             //RESET SELECTED ITEM
             if (this.getIndexOf(selected) != -1) {
                 for (UnionCls union : unions) {
-                    if (union.getKey() == selected.getKey(DCSet.getInstance())) {
+                    if (union.getKey() == selected.getKey()) {
                         this.setSelectedItem(union);
                         return;
                     }

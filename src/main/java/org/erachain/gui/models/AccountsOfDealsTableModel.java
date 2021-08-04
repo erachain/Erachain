@@ -5,7 +5,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
@@ -60,7 +59,7 @@ public class AccountsOfDealsTableModel extends AbstractTableModel implements Obs
 
         BigDecimal ss = new BigDecimal(0);
         for (PublicKeyAccount acc : this.publicKeyAccounts) {
-            ss = ss.add(acc.getBalance(this.asset.getKey(DCSet.getInstance())).a.b);
+            ss = ss.add(acc.getBalance(this.asset.getKey()).a.b);
 
         }
 
@@ -75,9 +74,9 @@ public class AccountsOfDealsTableModel extends AbstractTableModel implements Obs
         BigDecimal ss = new BigDecimal(0);
         BigDecimal sW = new BigDecimal(0);
         for (PublicKeyAccount account : this.publicKeyAccounts) {
-            ss = ss.add(account.getBalance(this.asset.getKey(DCSet.getInstance())).a.b);
+            ss = ss.add(account.getBalance(this.asset.getKey()).a.b);
 
-            sW = sW.add(account.getUnconfirmedBalance(this.asset.getKey(DCSet.getInstance())).a);
+            sW = sW.add(account.getUnconfirmedBalance(this.asset.getKey()).a);
 
         }
 
@@ -160,13 +159,13 @@ public class AccountsOfDealsTableModel extends AbstractTableModel implements Obs
                 return account.getPersonAsString();
             case COLUMN_CONFIRMED_BALANCE:
                 if (this.asset == null) return "-";
-                balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
+                balance = account.getBalance(this.asset.getKey());
                 str = NumberAsString.formatAsString(balance.a.b.setScale(asset.getScale()));
                 return str;
             case COLUMN_WAINTING_BALANCE:
                 if (this.asset == null) return "-";
-                balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
-                unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DCSet.getInstance()));
+                balance = account.getBalance(this.asset.getKey());
+                unconfBalance = account.getUnconfirmedBalance(this.asset.getKey());
                 str = NumberAsString.formatAsString(unconfBalance.a.subtract(balance.a.b).setScale(asset.getScale()));
                 //	+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
                 //	+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
@@ -236,7 +235,7 @@ public class AccountsOfDealsTableModel extends AbstractTableModel implements Obs
             if (this.asset == null) {
                 totalBalance = totalBalance.add(account.getBalanceUSE(Transaction.FEE_KEY));
             } else {
-                totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DCSet.getInstance())));
+                totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey()));
             }
         }
 

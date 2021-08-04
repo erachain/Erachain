@@ -57,7 +57,7 @@ public class TestRecGenesisAsset {
         genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(asset);
         if (toProcess) {
             genesisIssueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
-            key = asset.getKey(db);
+            key = asset.getKey();
         }
 
     }
@@ -198,7 +198,7 @@ public class TestRecGenesisAsset {
         //assertEquals(BigDecimal.valueOf(asset.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getConfirmedBalance(key, db));
 
         //CHECK ASSET EXISTS SENDER
-        long key = db.getIssueAssetMap().get(genesisIssueAssetTransaction);
+        long key = asset.getKey();
         assertEquals(true, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET IS CORRECT

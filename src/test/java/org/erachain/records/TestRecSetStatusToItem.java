@@ -94,11 +94,11 @@ public class TestRecSetStatusToItem {
         issuePersonTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
         person = (PersonCls) issuePersonTransaction.getItem();
-        personkey = person.getKey(db);
+        personkey = person.getKey();
 
         timestamp += 100;
         setStatusTransaction = new RSetStatusToItem(maker, FEE_POWER, status_key,
-                person.getItemType(), person.getKey(db),
+                person.getItemType(), person.getKey(),
                 to_date, birthDay + 1000,
                 45646533, 987978972,
                 "teasdsdst TEST".getBytes(StandardCharsets.UTF_8),
@@ -126,7 +126,7 @@ public class TestRecSetStatusToItem {
 
         //INVALID SIGNATURE
         setStatusTransaction = new RSetStatusToItem(maker, FEE_POWER, status_key,
-                person.getItemType(), person.getKey(db), to_date, null,
+                person.getItemType(), person.getKey(), to_date, null,
                 323234, 2342342, null, "test TEST 11".getBytes(StandardCharsets.UTF_8), 0l, null,
                 timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
@@ -208,7 +208,7 @@ public class TestRecSetStatusToItem {
         init();
         setStatusTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, setStatusTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
-        assertEquals(db.getPersonStatusMap().get(person.getKey(db)).size(), 0);
+        assertEquals(db.getPersonStatusMap().get(person.getKey()).size(), 0);
 
         Tuple5<Long, Long, byte[], Integer, Integer> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
         // TEST TIME and EXPIRE TIME for ALIVE person
@@ -226,7 +226,7 @@ public class TestRecSetStatusToItem {
 
         to_date = timestamp + 1234L * 84600000L;
         RSetStatusToItem setStatusTransaction_2 = new RSetStatusToItem(maker, FEE_POWER, status_key,
-                person.getItemType(), person.getKey(db), to_date, null,
+                person.getItemType(), person.getKey(), to_date, null,
                 234354, 546567,
                 "wersdfsdfsdftest TEST".getBytes(StandardCharsets.UTF_8),
                 "test TEST".getBytes(StandardCharsets.UTF_8),

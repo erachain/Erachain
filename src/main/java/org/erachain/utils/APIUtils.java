@@ -12,7 +12,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
@@ -311,7 +310,7 @@ public class APIUtils {
         Integer result;
         // SEND ASSET PAYMENT
         Transaction transaction = Controller.getInstance().r_Send(account, null, feePow, new Account(recipient),
-                asset.getKey(DCSet.getInstance()), bdAmount, title,
+                asset.getKey(), bdAmount, title,
                 message, isText, isEncrypted, 0);
         
         int confirmed = IssueConfirmDialog.CONFIRM;
