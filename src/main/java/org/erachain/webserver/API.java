@@ -2182,6 +2182,7 @@ public class API {
         }
     }
 
+    @Deprecated
     @GET
     @Path("personbyownerpublickey32/{publickey}")
     public Response getPersonByOwnerPublicKey32(@PathParam("publickey") String publicKey32) {
