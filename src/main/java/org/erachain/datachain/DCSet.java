@@ -42,7 +42,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 533; // vers 5.4.1
+    final static int CURRENT_VERSION = 533; // vers 5.4.1 (remove getDBIssueMap
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
