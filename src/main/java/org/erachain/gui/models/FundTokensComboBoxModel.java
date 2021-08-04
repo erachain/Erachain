@@ -34,6 +34,8 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
                 this.addElement(Controller.getInstance().getAsset(AssetCls.ERA_KEY));
                 this.addElement(Controller.getInstance().getAsset(AssetCls.FEE_KEY));
             } else {
+                this.addElement(Controller.getInstance().getAsset(AssetCls.ERA_KEY));
+                this.addElement(Controller.getInstance().getAsset(AssetCls.FEE_KEY));
             }
 
             for (Long key : new Long[]{
