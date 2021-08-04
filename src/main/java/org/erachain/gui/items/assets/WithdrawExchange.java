@@ -43,11 +43,11 @@ public class WithdrawExchange extends IconPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     private MButton jButton_ShowForm;
     private MButton jButton_Confirm;
-    private JComboBox<Account> jComboBox_YourAddress;
-    public JComboBox<AssetCls> cbxAssets;
-    private JLabel jLabel_Address;
+    public JComboBox<AssetCls> cbxOutAssets;
+    private JLabel jLabel_OutAddress;
     private JLabel jLabelAdressCheck;
-    private JLabel jLabel_Asset;
+    private JLabel jLabel_InAsset;
+    private JLabel jLabel_OutAsset;
     private JLabel jLabel_Details;
     private JLabel jLabel_YourAddress;
     private JTextField jTextField_Address = new JTextField();
@@ -87,7 +87,7 @@ public class WithdrawExchange extends IconPanel {
 
             // GET RATE
             String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
-            assetIn = (AssetCls) cbxAssets.getSelectedItem();
+            assetIn = (AssetCls) cbxOutAssets.getSelectedItem();
             String abbrevIN = assetIn.getName();
             switch ((int) assetIn.getKey()) {
                 case 1840:
@@ -208,66 +208,64 @@ public class WithdrawExchange extends IconPanel {
 
         GridBagConstraints gridBagConstraints;
 
-        //paneAssetInfo = new JScrollPane();
         jLabel_YourAddress = new JLabel();
-        jComboBox_YourAddress = new JComboBox<>();
-        jLabel_Address = new JLabel();
-        jLabel_Asset = new JLabel();
+        jLabel_OutAddress = new JLabel();
+        jLabel_InAsset = new JLabel();
 
         jLabelAdressCheck = new JLabel();
         jLabel_Details = new JLabel();
 
         GridBagLayout layout = new GridBagLayout();
-        layout.columnWidths = new int[]{0, 9, 0, 9, 0, 9, 0};
-        layout.rowHeights = new int[]{0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
-        //getContentPane().setLayout(layout);
         this.setLayout(layout);
 
-        int gridy = 0;
+        GridBagConstraints labelGBC = new GridBagConstraints();
+        labelGBC.gridx = 0;
+        labelGBC.anchor = GridBagConstraints.LINE_END;
+        labelGBC.insets = new Insets(10, 15, 0, 0);
 
-        JLabel jText_Title = new JLabel();
+        GridBagConstraints textGBC = new GridBagConstraints();
+        textGBC.gridx = 1;
+        textGBC.gridy = 0;
+        textGBC.weightx = 0.1;
+        textGBC.gridwidth = 4;
+        textGBC.fill = GridBagConstraints.HORIZONTAL;
+        textGBC.anchor = GridBagConstraints.LINE_END;
+        textGBC.insets = new Insets(10, 5, 0, 15);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jText_Title, gridBagConstraints);
-        jText_Title.setText("<html><h1>" + Lang.T("Withdraw from the Exchange") + "</h1></html>");
+        GridBagConstraints fieldGBC = new GridBagConstraints();
+        fieldGBC.fill = GridBagConstraints.HORIZONTAL;
+        fieldGBC.anchor = GridBagConstraints.LINE_END;
+        textGBC.weightx = 0.1;
+        fieldGBC.gridwidth = 3;
+        fieldGBC.gridx = 1;
+        fieldGBC.insets = new Insets(10, 5, 0, 15);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jText_Help, gridBagConstraints);
+        JLabel jText_Title = new JLabel("<html><h1>" + Lang.T("Withdraw from the Exchange") + "</h1></html>");
+        add(jText_Title, textGBC);
+
+        ++textGBC.gridy;
+        add(jText_Help, textGBC);
 
         /////////////// ASSET
-        jLabel_Asset.setText(Lang.T("Asset") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        // gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-        gridBagConstraints.insets = new Insets(21, 27, 0, 0);
-        add(jLabel_Asset, gridBagConstraints);
+        labelGBC.gridy = ++textGBC.gridy;
+        add(jLabel_InAsset, labelGBC);
 
-        GridBagConstraints favoritesGBC = new GridBagConstraints();
-        favoritesGBC.insets = new Insets(21, 0, 0, 13);
-        favoritesGBC.fill = GridBagConstraints.HORIZONTAL;
-        favoritesGBC.anchor = GridBagConstraints.LINE_END;
-        favoritesGBC.gridwidth = 3;
-        favoritesGBC.gridx = 2;
-        favoritesGBC.gridy = gridy;
+        fieldGBC.gridy = ++labelGBC.gridy;
 
-        cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(false));
-        this.add(cbxAssets, favoritesGBC);
+        cbxOutAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(false));
+        this.add(cbxOutAssets, fieldGBC);
 
-        cbxAssets.addItemListener(new ItemListener() {
+        /////////////// ASSET
+        jLabel_InAsset.setText(Lang.T("OUT") + ":");
+        ++labelGBC.gridy;
+        add(jLabel_InAsset, labelGBC);
+
+        cbxOutAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(false));
+
+        fieldGBC.gridy = labelGBC.gridy;
+        this.add(cbxOutAssets, fieldGBC);
+
+        cbxOutAssets.addItemListener(new ItemListener() {
 
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -277,16 +275,11 @@ public class WithdrawExchange extends IconPanel {
             }
         });
 
-        gridy += 3;
 
         ////////////////
-        jLabel_Address.setText(Lang.T("Address to Withdraw") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
-        add(jLabel_Address, gridBagConstraints);
+        jLabel_OutAddress.setText(Lang.T("Address to Withdraw") + ":");
+        ++labelGBC.gridy;
+        add(jLabel_OutAddress, labelGBC);
 
         if (account == null) {
             jLabelAdressCheck.setText(Lang.T("Insert Withdraw Address"));
@@ -294,14 +287,10 @@ public class WithdrawExchange extends IconPanel {
             jTextField_Address.setText(account.getAddress());
         }
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jTextField_Address, gridBagConstraints);
+        fieldGBC.gridy = labelGBC.gridy;
+        fieldGBC.fill = GridBagConstraints.;
+        fieldGBC.anchor = GridBagConstraints.PAGE_START;
+        add(jTextField_Address, fieldGBC);
 
         // BUTN NEXT
         jButton_Confirm = new MButton(Lang.T("Next"), 1);
@@ -312,19 +301,13 @@ public class WithdrawExchange extends IconPanel {
             }
         });
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jButton_Confirm, gridBagConstraints);
+        fieldGBC.gridx = 2;
+        add(jButton_Confirm, fieldGBC);
 
         // TIP
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.gridy = ++labelGBC.gridy;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
@@ -339,8 +322,6 @@ public class WithdrawExchange extends IconPanel {
         jText_History.setBackground(UIManager.getColor("Panel.background"));
         // не пашет - надо внутри ручками в тексте jText_History.setFont(UIManager.getFont("Label.font"));
 
-        gridy += 2;
-
         jButton_ShowForm = new MButton(Lang.T("See Withdraw Transactions"), 2);
         jButton_ShowForm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -351,7 +332,7 @@ public class WithdrawExchange extends IconPanel {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridy = labelGBC.gridy;
         //gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
@@ -378,7 +359,7 @@ public class WithdrawExchange extends IconPanel {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.gridy = ++labelGBC.gridy;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.weightx = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -390,7 +371,7 @@ public class WithdrawExchange extends IconPanel {
     }
 
     private void reset() {
-        asset = (AssetCls) cbxAssets.getSelectedItem();
+        asset = (AssetCls) cbxOutAssets.getSelectedItem();
 
         String cryto;
         switch ((int) asset.getKey()) {
