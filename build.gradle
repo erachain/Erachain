@@ -131,7 +131,8 @@ jar {
 sourceSets {
     main {
         java {
-            srcDir 'src/main/java'
+            //srcDir 'src/main/java'
+            workingDir = 'ERA'
         }
         resources {
             srcDir 'ERA/resources'
@@ -140,10 +141,11 @@ sourceSets {
 
     test {
         java {
+            workingDir = 'ERA_TEST'
             srcDir 'src/test/java'
         }
         resources {
-            srcDir 'ERA/resources'
+            srcDir 'ERA_TEST/resources'
         }
     }
 

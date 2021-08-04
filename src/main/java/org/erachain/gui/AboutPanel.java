@@ -1,7 +1,7 @@
 package org.erachain.gui;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,7 +19,7 @@ public class AboutPanel extends JPanel {
         try {
             image = ImageIO.read(new File("images/about.png"));
         } catch (IOException ex) {
-            LOGGER.error(ex.getMessage());
+            LOGGER.error(ex.getMessage() + " - " + new File("images/about.png").getAbsolutePath());
         }
     }
 
