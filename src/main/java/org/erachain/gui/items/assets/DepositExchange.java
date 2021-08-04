@@ -116,13 +116,17 @@ public class DepositExchange extends IconPanel {
         String assetOutputName;
 
         switch ((int) assetBuy.getKey()) {
-            case 1:
+            case (int) AssetCls.ERA_KEY:
                 assetOutput = "ERA/";
                 assetOutputName = "ERA";
                 break;
-            case 2:
+            case (int) AssetCls.FEE_KEY:
                 assetOutput = "COMPU/";
                 assetOutputName = "COMPU";
+                break;
+            case (int) AssetCls.USD_KEY:
+                assetOutput = "@USD/";
+                assetOutputName = "USD";
                 break;
             case (int) DepositExchange.TEST_ASSET:
                 /// http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/ETH/@ETH/7KmL1nheVHYVmdaEB4rsRjiENUD3sTr7EE/1
@@ -132,7 +136,7 @@ public class DepositExchange extends IconPanel {
                 assetInput = assetBuy;
                 break;
             default:
-                assetOutput = "f" + assetBuy.getName() + "/";
+                assetOutput = "@" + assetBuy.getName() + "/";
                 assetOutputName = assetBuy.getName();
                 assetInput = assetBuy;
         }
@@ -143,15 +147,7 @@ public class DepositExchange extends IconPanel {
         String assetIncomeABBR;
 
         switch ((int) assetInput.getKey()) {
-            case 1:
-                urlPars = assetInput.getName() + "/" + urlPars + "/500";
-                assetIncomeName = assetIncomeABBR = assetInput.getName();
-                break;
-            case 2:
-                urlPars = assetInput.getName() + "/" + urlPars + "/1";
-                assetIncomeName = assetIncomeABBR = assetInput.getName();
-                break;
-            case 12:
+            case (int) AssetCls.BTC_KEY:
                 urlPars = assetInput.getName() + "/" + urlPars + "/0.001";
                 assetIncomeName = "bitcoins";
                 assetIncomeABBR = assetInput.getName();
@@ -234,8 +230,9 @@ public class DepositExchange extends IconPanel {
                 //LOGGER.debug(StrJSonFine.convert(jsonObject));
 
                 switch ((int) assetBuy.getKey()) {
-                    case 1:
-                    case 2:
+                    case (int) AssetCls.ERA_KEY:
+                    case (int) AssetCls.FEE_KEY:
+                    case (int) AssetCls.USD_KEY:
                         help += Lang.T("Transfer <b>%1</b> to this address for buy")
                                 .replace("%1", assetIncomeName) + " <b>" + assetOutputName + "</b>"
                                 + " " + Lang.T("by rate") + ": <b>" + rate + "</b>"
@@ -260,7 +257,7 @@ public class DepositExchange extends IconPanel {
                 }
 
                 help += "<p>" + Lang.T("Minimal payment in equivalent")
-                        + " <b>" + 2.5 + " USD</b>";
+                        + " <b>" + 5 + " USD</b>";
 
                 payToAddressField.setText(jsonObject.get("addr_in").toString());
                 payToAddressCheck.setText(help);
@@ -604,8 +601,9 @@ public class DepositExchange extends IconPanel {
 
 
         switch ((int) asset.getKey()) {
-            case 1:
-            case 2:
+            case (int) AssetCls.ERA_KEY:
+            case (int) AssetCls.FEE_KEY:
+            case (int) AssetCls.USD_KEY:
                 //jLabel_Details.setText(Lang.T("Address for buy") + ":");
                 refreshReceiverDetails(Lang.T("Payment details for buy") + " " + asset.getName(),
                         detailsHead);

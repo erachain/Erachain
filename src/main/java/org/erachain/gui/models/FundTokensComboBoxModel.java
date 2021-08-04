@@ -33,6 +33,7 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
             if (deposit) {
                 this.addElement(Controller.getInstance().getAsset(AssetCls.ERA_KEY));
                 this.addElement(Controller.getInstance().getAsset(AssetCls.FEE_KEY));
+                this.addElement(Controller.getInstance().getAsset(AssetCls.USD_KEY));
             } else {
                 this.addElement(Controller.getInstance().getAsset(AssetCls.ERA_KEY));
                 this.addElement(Controller.getInstance().getAsset(AssetCls.FEE_KEY));

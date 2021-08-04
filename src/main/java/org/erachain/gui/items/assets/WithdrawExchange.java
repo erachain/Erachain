@@ -159,7 +159,6 @@ public class WithdrawExchange extends IconPanel {
 
         if (assetIn != null && accountTo != null && rate != null) {
 
-            rate = jsonObject.get("rate").toString();
             String bal = jsonObject.get("bal").toString();
 
             String formTitle;
