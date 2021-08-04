@@ -31,7 +31,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
                 //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
                 MainPanel.getInstance().insertNewTab(Lang.T("Send asset"),
-                        new AccountAssetSendPanel(null,
+                        new AccountAssetSendPanel(null, null,
                                 null, itemTableSelected.getMaker(), null, null, false));
 
             }

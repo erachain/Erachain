@@ -159,15 +159,6 @@ public class WithdrawExchange extends IconPanel {
 
         if (assetIn != null && accountTo != null && rate != null) {
 
-            message += ":" + textFieldAddress.getText();
-            AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn,
-                    null, new Account(accountTo), null, message, false);
-
-            panel.jTextFieldTXTitle.setEnabled(false);
-            panel.jComboBox_Asset.setEnabled(false);
-            panel.recipientAddress.setEnabled(false);
-            panel.jTextArea_Message.setEnabled(false);
-            labelAddressCheck.setText("");
             rate = jsonObject.get("rate").toString();
             String bal = jsonObject.get("bal").toString();
 
@@ -194,7 +185,18 @@ public class WithdrawExchange extends IconPanel {
                         + incomeAssetName;
             }
 
-            panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
+            formTitle = "<html><h2>" + formTitle + "</h2></html>";
+
+            message += ":" + textFieldAddress.getText();
+            AccountAssetSendPanel panel = new AccountAssetSendPanel(formTitle, assetIn,
+                    null, new Account(accountTo), null, message, false);
+
+            panel.jTextFieldTXTitle.setEnabled(false);
+            panel.jComboBox_Asset.setEnabled(false);
+            panel.recipientAddress.setEnabled(false);
+            panel.jTextArea_Message.setEnabled(false);
+            labelAddressCheck.setText("");
+
             panel.setName(Lang.T("Withdraw"));
 
             MainPanel.getInstance().removeTab(panel.getName());

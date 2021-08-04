@@ -45,6 +45,8 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class AccountAssetActionPanelCls extends IconPanel implements RecipientAddress.RecipientAddressInterface {
 
+    String formTitle;
+
     public Account creator;
 
     public Account recipient;
@@ -83,11 +85,11 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     private AccountsComboBoxModel accountsModel;
 
-    public AccountAssetActionPanelCls(String panelName, String title, boolean backward, AssetCls assetIn,
+    public AccountAssetActionPanelCls(String panelName, String formTitle, boolean backward, AssetCls assetIn,
                                       int action,
                                       Account accountFrom, Account accountTo, String message) {
 
-        super(panelName, title);
+        super(panelName, formTitle);
         if (assetIn == null)
             this.asset = Controller.getInstance().getAsset(2L);
         else
@@ -98,13 +100,15 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
         // поэтому тут только приватную переменную юзаем дальше
-        if (title == null) {
+        if (formTitle == null) {
             this.title = asset.viewAssetTypeActionTitle(backward, action,
                     accountFrom != null && accountFrom.equals(asset.getMaker()));
+        } else {
+            this.formTitle = formTitle;
         }
 
         if (panelName == null) {
-            this.panelName = title + " [" + asset.getKey() + " ]";
+            this.panelName = this.title + " [" + asset.getKey() + " ]";
             setName(this.panelName);
         }
 
@@ -117,6 +121,11 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         }
 
         initComponents(message);
+
+        if (formTitle != null) {
+            jLabel_Title.setText(formTitle);
+        }
+
 
         this.jLabel_RecipientDetail.setText("");
         this.jTextFieldTXTitle.setText("");
@@ -304,11 +313,13 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         String title = Lang.T(asset.viewAssetTypeActionTitle(backward, action, senderIsOwner));
         String addAssetType = asset.viewAssetTypeAdditionAction(backward, action, senderIsOwner);
-        if (addAssetType == null) {
-            jLabel_Title.setText(title + " - " + asset.viewName());
-        } else {
-            jLabel_Title.setText(title + " - " + asset.viewName()
-                    + " (" + Lang.T(addAssetType) + ")");
+        if (formTitle == null || formTitle.isEmpty()) {
+            if (addAssetType == null) {
+                jLabel_Title.setText(title + " - " + asset.viewName());
+            } else {
+                jLabel_Title.setText(title + " - " + asset.viewName()
+                        + " (" + Lang.T(addAssetType) + ")");
+            }
         }
 
         setName(title + " [" + asset.getKey() + "]");

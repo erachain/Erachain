@@ -342,7 +342,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 Tuple2<String, Tuple3<String, String, String>> item = accountModel.getItem(row);
                 Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
                 MainPanel.getInstance().insertNewTab(Lang.T("Send asset"),
-                        new AccountAssetSendPanel(null,
+                        new AccountAssetSendPanel(null, null,
                                 null, accountTo, null, null, false));
 
 
