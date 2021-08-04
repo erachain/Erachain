@@ -164,13 +164,15 @@ public class WithdrawExchange extends IconPanel {
 
             String formTitle;
             String incomeAssetName = assetIn.getName();
+            String outcomeAssetABBREV = assetOut.getName();
             switch ((int) assetIn.getKey()) {
-                case 1:
-                case 2:
+                case (int) AssetCls.ERA_KEY:
+                case (int) AssetCls.FEE_KEY:
+                case (int) AssetCls.USD_KEY:
                     formTitle = Lang.T("Transfer <b>%1</b> to this address for buy")
-                            .replace("%1", incomeAssetName) + " <b>BTC</B>"
+                            .replace("%1", incomeAssetName) + " <b>" + outcomeAssetABBREV + "</b>"
                             + " " + Lang.T("by rate") + ": <b>" + rate + "</b>"
-                            + ", " + Lang.T("max buy amount") + ": <b>" + bal + "</b> BTC";
+                            + ", " + Lang.T("max buy amount") + ": <b>" + bal + "</b> " + outcomeAssetABBREV;
                     break;
                 case (int) DepositExchange.TEST_ASSET:
                     incomeAssetName = "ZEN";
