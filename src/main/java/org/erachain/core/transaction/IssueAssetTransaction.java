@@ -357,35 +357,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
         }
     }
 
-	/*
-	@Override
-	public HashSet<Account> getInvolvedAccounts()
-	{
-		return this.getRecipientAccounts();
-	}
-
-	@Override
-	public HashSet<Account> getRecipientAccounts()
-	{
-		HashSet<Account> accounts = new HashSet<>();
-		accounts.add(this.creator);
-		return accounts;
-	}
-
-	@Override
-	public boolean isInvolved(Account account)
-	{
-		String address = account.getAddress();
-
-		if(address.equals(this.creator.getAddress()))
-		{
-			return true;
-		}
-
-		return false;
-	}
-	 */
-
     //@Override
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
         Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();

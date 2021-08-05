@@ -31,6 +31,11 @@ public class AssetFactory {
                 //PARSE PAYMENT TRANSACTION
                 return AssetUnique.parse(forDeal, data, includeReference);
 
+            case AssetCls.UNIQUE_SERIA:
+
+                //PARSE PAYMENT TRANSACTION
+                return AssetUniqueSeries.parse(forDeal, data, includeReference);
+
             case AssetCls.NAME:
 
                 //PARSE REGISTER NAME TRANSACTION

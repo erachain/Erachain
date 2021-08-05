@@ -161,6 +161,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static final int INVALID_MAX_ITEMS_COUNT = 85;
 
+    public static final int INVALID_MAX_COUNT = 87;
+    public static final int INVALID_ITEM_INDEX = 88;
+
     public static final int NOT_ENOUGH_ERA_OWN = 101;
     public static final int NOT_ENOUGH_ERA_USE = 102;
     public static final int NOT_ENOUGH_ERA_OWN_10 = 103;

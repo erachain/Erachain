@@ -94,6 +94,7 @@ public abstract class AssetCls extends ItemCls {
     public static final int UNIQUE = 1;
     public static final int VENTURE = 2;
     public static final int NAME = 3;
+    public static final int UNIQUE_SERIA = 4;
     public static final int INITIAL_FAVORITES = 100;
 
     ///////////////////////////////////////////////////
