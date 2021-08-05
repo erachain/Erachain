@@ -1390,7 +1390,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     //
-    public Long insertToMap(DCSet db, long startKey) {
+    public long insertToMap(DCSet db, long startKey) {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);
 

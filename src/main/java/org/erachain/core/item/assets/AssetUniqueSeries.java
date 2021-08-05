@@ -204,7 +204,27 @@ public class AssetUniqueSeries extends AssetUnique {
         return data;
     }
 
+    public int getDataLength(boolean includeReference) {
+        return super.getDataLength(includeReference) + 4;
+    }
+
     //OTHER
+    public byte[] remakeAppdata() {
+        return appData;
+    }
+
+    /**
+     * Make new indexed AssetUniqueSeries
+     *
+     * @return
+     */
+    public AssetUniqueSeries copy(int index, byte[] remakeAppData) {
+        AssetUniqueSeries unique = new AssetUniqueSeries(typeBytes, remakeAppData, maker, name, icon, image, description,
+                assetType, total, index);
+
+        return unique;
+    }
+
     public String makeHTMLView() {
 
         String text = super.makeHTMLHeadView();
