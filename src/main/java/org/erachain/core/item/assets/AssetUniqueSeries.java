@@ -31,10 +31,10 @@ public class AssetUniqueSeries extends AssetUnique {
         this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, assetType);
     }
 
-    //GETTERS/SETTERS
+    // GETTERS/SETTERS
     @Override
     public String getItemSubType() {
-        return "unique seria";
+        return "unique series";
     }
 
     @Override
