@@ -16,38 +16,32 @@ import java.util.Arrays;
 
 public class AssetUniqueSeries extends AssetUnique {
 
-    private static final int TYPE_ID = UNIQUE_SERIA;
+    private static final int TYPE_ID = UNIQUE_SERIES;
 
-    private int index;
     private int total;
 
     public AssetUniqueSeries(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon,
-                             byte[] image, String description, int assetType, int total, int index) {
+                             byte[] image, String description, int assetType, int total) {
         super(typeBytes, appData, maker, name, icon, image, description, assetType);
 
-        this.index = index;
         this.total = total;
 
     }
 
     public AssetUniqueSeries(int props, byte[] appData, PublicKeyAccount maker, String name, byte[] icon,
                              byte[] image, String description, int assetType, int total, int index) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, appData, maker, name, icon, image, description, assetType, total, index);
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, appData, maker, name, icon, image, description, assetType, total);
     }
 
     public AssetUniqueSeries(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image,
                              String description, int assetType, int total, int index) {
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, assetType, total, index);
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, assetType, total);
     }
 
     // GETTERS/SETTERS
     @Override
     public String getItemSubType() {
         return "unique series";
-    }
-
-    public int getIndex() {
-        return index;
     }
 
     public int getTotal() {
@@ -59,9 +53,7 @@ public class AssetUniqueSeries extends AssetUnique {
         if (total > 500) {
             return Transaction.INVALID_MAX_COUNT;
         }
-        if (index > total || index < 1) {
-            return Transaction.INVALID_ITEM_INDEX;
-        }
+
         return super.isValid();
     }
 
@@ -171,14 +163,10 @@ public class AssetUniqueSeries extends AssetUnique {
         int total = Shorts.fromByteArray(totalBytes);
         position += Short.BYTES;
 
-        //READ TOTAL
-        byte[] indexBytes = Arrays.copyOfRange(data, position, position + Short.BYTES);
-        int index = Shorts.fromByteArray(indexBytes);
-        position += Short.BYTES;
-
         //RETURN
-        AssetUniqueSeries unique = new AssetUniqueSeries(typeBytes, appData, maker, name, icon, image, description,
-                Byte.toUnsignedInt(assetTypeBytes[0]), total, index);
+        AssetUniqueSeries unique = new AssetUniqueSeries(typeBytes, appData, maker, name, icon,
+                image, description, Byte.toUnsignedInt(assetTypeBytes[0]), total);
+
         if (includeReference) {
             unique.setReference(reference, dbRef);
         }
@@ -191,13 +179,12 @@ public class AssetUniqueSeries extends AssetUnique {
 
         byte[] data = super.toBytes(forDeal, includeReference, forMakerSign);
 
-        byte[] addData = new byte[5];
+        byte[] addData = new byte[3];
 
         //WRITE ASSET TYPE
         addData[0] = (byte) this.getAssetType();
 
         System.arraycopy(Shorts.toByteArray((short) total), 0, addData, 1, Short.BYTES);
-        System.arraycopy(Shorts.toByteArray((short) index), 0, addData, 1 + 2, 2);
 
         data = Bytes.concat(data, appData);
 
@@ -205,7 +192,7 @@ public class AssetUniqueSeries extends AssetUnique {
     }
 
     public int getDataLength(boolean includeReference) {
-        return super.getDataLength(includeReference) + 4;
+        return super.getDataLength(includeReference) + 2;
     }
 
     //OTHER
@@ -220,7 +207,7 @@ public class AssetUniqueSeries extends AssetUnique {
      */
     public AssetUniqueSeries copy(int index, byte[] remakeAppData) {
         AssetUniqueSeries unique = new AssetUniqueSeries(typeBytes, remakeAppData, maker, name, icon, image, description,
-                assetType, total, index);
+                assetType, total);
 
         return unique;
     }
@@ -229,7 +216,7 @@ public class AssetUniqueSeries extends AssetUnique {
 
         String text = super.makeHTMLHeadView();
         text += Lang.T("Series") + ":&nbsp;" + getTotal() + ", "
-                + Lang.T("Index") + ":&nbsp;" + getIndex() + "<br>";
+                + "<br>";
         text += super.makeHTMLFootView(true);
 
         return text;

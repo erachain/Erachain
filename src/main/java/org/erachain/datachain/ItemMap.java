@@ -166,6 +166,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         }
 
         item.setKey(key);
+        item.loadExtData(this);
         return item;
     }
 

@@ -133,6 +133,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     protected int parsedPos;
 
+    // нужно для AssetUniqueSeries
+    public ItemCls(byte[] typeBytes) {
+        this.typeBytes = typeBytes;
+    }
+
     public ItemCls(byte[] data, boolean includeReference, int forDeal) throws Exception {
         parseHead(data, includeReference, forDeal);
     }
@@ -153,6 +158,12 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public ItemCls(int type, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description) {
         this(new byte[TYPE_LENGTH], appData, maker, name, icon, image, description);
         this.typeBytes[0] = (byte) type;
+    }
+
+    /**
+     * У некооторых типо сущностей (актив.уникальный.срия AssetUniqueSeries) нужно подгружать данные из базы
+     */
+    public void loadExtData(ItemMap itemMap) {
     }
 
     public void parseHead(byte[] data, boolean includeReference, int forDeal) throws Exception {
@@ -513,7 +524,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public String getTickerName() {
-        String[] words = this.name.split(" ");
+        String[] words = getName().split(" ");
         String name = words[0].trim();
         if (name.length() > 6) {
             name = name.substring(0, 6);
@@ -610,7 +621,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public String getIconURL() {
         if (iconAsURL) {
             // внешняя ссылка - обработаем ее
-            return new String(icon, StandardCharsets.UTF_8);
+            return new String(getIcon(), StandardCharsets.UTF_8);
         } else if (getIcon() != null && getIcon().length > 0) {
             return "/api" + getItemTypeName() + "/icon/" + key;
         }
@@ -673,7 +684,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public String getImageURL() {
         if (imageAsURL) {
             // внешняя ссылка - обработаем ее
-            return new String(image, StandardCharsets.UTF_8);
+            return new String(getImage(), StandardCharsets.UTF_8);
         } else if (getImage() != null && getImage().length > 0) {
             return "/api" + getItemTypeName() + "/image/" + key;
         }

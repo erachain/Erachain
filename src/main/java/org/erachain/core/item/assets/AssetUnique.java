@@ -23,6 +23,10 @@ public class AssetUnique extends AssetCls {
         super(typeBytes, appData, maker, name, icon, image, description, assetType);
     }
 
+    public AssetUnique(byte[] typeBytes) {
+        super(typeBytes);
+    }
+
     public AssetUnique(int props, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         this(new byte[]{(byte) TYPE_ID, (byte) props}, appData, maker, name, icon, image, description, assetType);
     }
