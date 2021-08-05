@@ -84,10 +84,10 @@ public class WithdrawExchange extends IconPanel {
             urlGetDetails += DepositExchange.getOutExtName(assetInName) + "/" + assetOut + "/" + address + "/";
 
             switch (assetInName) {
-                case AssetCls.ERA_ABBREV:
+                case AssetCls.ERA_NAME:
                     urlGetDetails += "1000";
                     break;
-                case AssetCls.FEE_ABBREV:
+                case AssetCls.FEE_NAME:
                     urlGetDetails += "1";
                     break;
                 case "DOGE":
@@ -376,7 +376,7 @@ public class WithdrawExchange extends IconPanel {
                 + ". " + Lang.T("Where You need to set only amount of withdraw asset in the panel for payment")
                 + ".</h3>"
                 + Lang.T("Minimal payment in equivalent")
-                + " <b>" + 5 + " USD</b>" + "<br>"
+                + " <b>" + 25 + " USD</b>" + "<br>"
                 + Lang.T("Service will have some commission");
 
         jText_Help.setText(help);

@@ -49,7 +49,7 @@ public class ResultDialog {
             if (n == JOptionPane.YES_OPTION) {
                 BigDecimal amountBuy = transaction.getFee().multiply(new BigDecimal(2));
                 MainPanel.getInstance().insertNewTab(
-                        Lang.T("Buy") + " " + AssetCls.FEE_ABBREV, new DepositExchange(AssetCls.FEE_ABBREV, transaction.getCreator(),
+                        Lang.T("Buy") + " " + AssetCls.FEE_NAME, new DepositExchange(AssetCls.FEE_NAME, transaction.getCreator(),
                                 amountBuy));
             }
 

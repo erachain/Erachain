@@ -1414,6 +1414,7 @@
   "Sent": "Отправлено",
   "Seq": "№",
   "SeqNo": "Номер транз",
+  "Service can accept a maximum of %1 now": "Сервис может принять сейчас максимум %1",
   "Service ID": "ID сервиса",
   "Service will take commission fee approx - %1%": "Сервис возьмет комиссию примерно - %1%",
   "Service will have some commission": "Сервис возьмет некоторую комиссию",
