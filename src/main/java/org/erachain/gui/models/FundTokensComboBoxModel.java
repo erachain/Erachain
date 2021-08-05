@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.gui.items.assets.DepositExchange;
 
 import javax.swing.*;
 
@@ -21,7 +20,7 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
             } else {
             }
 
-            for (Long key : new Long[]{AssetCls.FEE_KEY, DepositExchange.TEST_ASSET, 1078L, 1079L}) {
+            for (Long key : new Long[]{AssetCls.FEE_KEY, 1078L, 1079L}) {
                 asset = Controller.getInstance().getAsset(key);
                 if (asset == null)
                     continue;

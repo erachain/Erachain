@@ -53,7 +53,7 @@ public class WithdrawExchange extends IconPanel {
     JLabel jText_Help = new JLabel();
 
     private AssetCls assetIn;
-    private AssetCls assetOut;
+    private String assetOut;
 
     public WithdrawExchange(AssetCls assetIn, Account account) {
         super(NAME, TITLE);
@@ -63,7 +63,7 @@ public class WithdrawExchange extends IconPanel {
 
     public void onGoClick() {
 
-
+        String assetInName = assetIn.getName();
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
         //String url_string = "https://api.face2face.cash/apipay/index.json";
         //String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
@@ -80,36 +80,29 @@ public class WithdrawExchange extends IconPanel {
 
             // GET RATE
             String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
-            String abbrevIN = assetIn.getName();
 
-            String abbrevOut = assetOut.getName();
-            String outURL = "/" + abbrevOut + "/" + address + "/";
+            urlGetDetails += DepositExchange.getOutExtName(assetInName) + "/" + assetOut + "/" + address + "/";
 
-            switch ((int) assetIn.getKey()) {
-                case (int) AssetCls.ERA_KEY:
-                    urlGetDetails += abbrevIN + outURL + "1000";
-                    message += abbrevOut;
+            switch (assetInName) {
+                case AssetCls.ERA_ABBREV:
+                    urlGetDetails += "1000";
                     break;
-                case (int) AssetCls.FEE_KEY:
-                    urlGetDetails += abbrevIN + outURL + "1";
-                    message += abbrevOut;
+                case AssetCls.FEE_ABBREV:
+                    urlGetDetails += "1";
                     break;
-                case (int) AssetCls.USD_KEY:
-                    urlGetDetails += "@" + abbrevIN + outURL + "1000";
-                    message += abbrevIN;
+                case "DOGE":
+                    urlGetDetails += "1000";
                     break;
-                case (int) AssetCls.BTC_KEY:
-                    urlGetDetails += "@" + abbrevIN + outURL + "0.1";
-                    message += abbrevIN;
+                case "BTC":
+                    urlGetDetails += "0.1";
                     break;
-                case (int) DepositExchange.TEST_ASSET:
+                case DepositExchange.TEST_ASSET:
                     urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
                     urlGetDetails += "fZEN/ZEN/" + address + "/30"; // eZEN -> ZEN
                     message += "ZEN";
                     break;
                 default:
-                    urlGetDetails += "@" + abbrevIN + outURL + "100";
-                    message += abbrevIN;
+                    urlGetDetails += "100";
             }
 
             // CREATE CONNECTION
@@ -162,28 +155,18 @@ public class WithdrawExchange extends IconPanel {
             String bal = jsonObject.get("bal").toString();
 
             String formTitle;
-            String incomeAssetName = assetIn.getName();
-            String outcomeAssetABBREV = assetOut.getName();
-            switch ((int) assetIn.getKey()) {
-                case (int) AssetCls.ERA_KEY:
-                case (int) AssetCls.FEE_KEY:
-                case (int) AssetCls.USD_KEY:
-                    formTitle = Lang.T("Transfer <b>%1</b> to this address for buy")
-                            .replace("%1", incomeAssetName) + " <b>" + outcomeAssetABBREV + "</b>"
-                            + " " + Lang.T("by rate") + ": <b>" + rate + "</b>"
-                            + ", " + Lang.T("max buy amount") + ": <b>" + bal + "</b> " + outcomeAssetABBREV;
-                    break;
-                case (int) DepositExchange.TEST_ASSET:
-                    incomeAssetName = "ZEN";
-                    formTitle = Lang.T("Withdraw %1 to").replace("%1", incomeAssetName) + " " + address;
-                    break;
-                default:
-                    formTitle = Lang.T("Withdraw %1 to").replace("%1", incomeAssetName) + " " + address;
-            }
+            if (DepositExchange.isStableCoin(assetInName))
+                formTitle = Lang.T("Withdraw %1 to").replace("%1", assetInName) + " " + address;
+            else
+                formTitle = Lang.T("Transfer <b>%1</b> to this address for buy")
+                        .replace("%1", assetInName) + " <b>" + assetOut + "</b>"
+                        + " " + Lang.T("by rate") + ": <b>" + rate + "</b>"
+                        + ", " + Lang.T("max buy amount") + ": <b>" + bal + "</b> " + assetOut;
 
-            if (jsonObject.containsKey("may_pay")) {
+
+            if (!DepositExchange.isStableCoin(assetInName) && jsonObject.containsKey("may_pay")) {
                 formTitle += "<br>" + Lang.T("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
-                        + incomeAssetName;
+                        + assetIn;
             }
 
             formTitle = "<html><h2>" + formTitle + "</h2></html>";
@@ -212,7 +195,7 @@ public class WithdrawExchange extends IconPanel {
     private void initComponents(AssetCls assetIn, Account account) {
 
         if (assetIn == null) {
-            this.assetIn = Controller.getInstance().getAsset(2L);
+            this.assetIn = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
         } else {
             this.assetIn = assetIn;
         }
@@ -372,28 +355,20 @@ public class WithdrawExchange extends IconPanel {
     private void reset() {
         assetIn = (AssetCls) cbxInAssets.getSelectedItem();
 
-        boolean stableCoin = assetIn.getKey() > 10 && assetIn.getKey() < 24;
+        String assetInName = assetIn.getName();
+        boolean stableCoin = DepositExchange.isStableCoin(assetInName);
         cbxOutAssets.setVisible(!stableCoin);
         labelOutAsset.setVisible(!stableCoin);
 
-        String crytoOUT;
         String help = "<html><h3>2. ";
         if (stableCoin) {
             labelInAsset.setText(Lang.T("Withdraw") + ":");
-            assetOut = assetIn;
-            switch ((int) assetIn.getKey()) {
-                case (int) DepositExchange.TEST_ASSET:
-                    crytoOUT = "ZEN";
-                    break;
-                default:
-                    crytoOUT = assetOut.getName();
-            }
-            help += Lang.T("Set the address to which you want to withdraw") + " " + crytoOUT;
+            assetOut = assetInName;
+            help += Lang.T("Set the address to which you want to withdraw") + " " + assetOut;
         } else {
             labelInAsset.setText(Lang.T("Sell") + ":");
-            assetOut = (AssetCls) cbxOutAssets.getSelectedItem();
-            crytoOUT = assetOut.getName();
-            help += Lang.T("Set the address to which you want to send") + " " + crytoOUT;
+            assetOut = (String) cbxOutAssets.getSelectedItem();
+            help += Lang.T("Set the address to which you want to send") + " " + assetOut;
         }
 
         help += ". " + Lang.T("And click button '%1' to open the panel for payment").replace("%1",
