@@ -205,10 +205,10 @@ public class DepositExchange extends IconPanel {
                 /// ВНИМАНИЕ - НЕЛЬЗЯ делать setText("") - без HTML - иначе мягкий перенос слов перестанет работать
                 String help = "<html><p>";
 
-                String rate = jsonObject.get("rate").toString();
+                String rate = "" + (float) (double) jsonObject.get("rate");
                 String bal = jsonObject.get("bal").toString();
 
-                LOGGER.debug(StrJSonFine.convert(jsonObject));
+                //LOGGER.debug(StrJSonFine.convert(jsonObject));
 
                 if (isStableCoin(assetBuy)) {
                     help += Lang.T("Transfer <b>%1</B> to this address for deposit your account on Exchange")
@@ -335,6 +335,7 @@ public class DepositExchange extends IconPanel {
 
                 jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
                 jText_Help.setText("");
+                reset();
 
             }
         });

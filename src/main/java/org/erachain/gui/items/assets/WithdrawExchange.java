@@ -39,11 +39,12 @@ public class WithdrawExchange extends IconPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
+    private static int MIN_PAY = 25;
     private static final long serialVersionUID = 2717571093561259483L;
     private MButton buttonShowForm;
     private MButton jButton_Confirm;
     public JComboBox<AssetCls> cbxInAssets;
-    public JComboBox<AssetCls> cbxOutAssets;
+    public JComboBox<String> cbxOutAssets;
     private JLabel labelOutAddress;
     private JLabel labelAddressCheck;
     private JLabel labelInAsset;
@@ -138,7 +139,7 @@ public class WithdrawExchange extends IconPanel {
             LOGGER.debug(StrJSonFine.convert(jsonObject));
 
             accountTo = jsonObject.get("addr_in").toString();
-            rate = jsonObject.get("rate").toString();
+            rate = "" + (1.0d / (double) jsonObject.get("rate"));
 
         } catch (Exception e) {
             if (jsonObject != null && jsonObject.containsKey("wrong")) {
@@ -156,20 +157,27 @@ public class WithdrawExchange extends IconPanel {
 
             String formTitle;
             if (DepositExchange.isStableCoin(assetInName))
-                formTitle = Lang.T("Withdraw %1 to").replace("%1", assetInName) + " " + address;
+                formTitle = "<h2>" + Lang.T("Withdraw %1 to").replace("%1", assetInName) + " " + address + "</h2>";
             else
-                formTitle = Lang.T("Transfer <b>%1</b> to this address for buy")
-                        .replace("%1", assetInName) + " <b>" + assetOut + "</b>"
-                        + " " + Lang.T("by rate") + ": <b>" + rate + "</b>"
-                        + ", " + Lang.T("max buy amount") + ": <b>" + bal + "</b> " + assetOut;
+                formTitle = "<h2>" + Lang.T("Transfer <b>%1</b> to this address for buy")
+                        .replace("%1", assetInName) + " <b>" + assetOut + "</b></h2>"
+                        + Lang.T("by rate") + ": <b>" + rate + "</b>"
+                        + "<br>" + Lang.T("max buy amount") + ": <b>" + bal + "</b> " + assetOut;
 
 
             if (!DepositExchange.isStableCoin(assetInName) && jsonObject.containsKey("may_pay")) {
-                formTitle += "<br>" + Lang.T("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
-                        + assetIn;
+                formTitle += Lang.T("Service can accept a maximum of %1 now")
+                        .replace("%1",
+                                "<b>" + jsonObject.get("may_pay").toString() + " " + assetIn + "</b>"
+                        ) + ".";
+                //formTitle += "<br>" + Lang.T("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
+                //        + assetIn;
             }
 
-            formTitle = "<html><h2>" + formTitle + "</h2></html>";
+            formTitle += "<br>" + Lang.T("Minimal payment in equivalent")
+                    + " <b>" + MIN_PAY + " USD</b>" + "<br>";
+
+            formTitle = "<html>" + formTitle + "</html>";
 
             message += ":" + textFieldAddress.getText();
             AccountAssetSendPanel panel = new AccountAssetSendPanel(formTitle, assetIn,
@@ -249,7 +257,7 @@ public class WithdrawExchange extends IconPanel {
         ++labelGBC.gridy;
         add(labelOutAsset, labelGBC);
 
-        cbxOutAssets = new JComboBox<>(new FundTokensComboBoxModel(new long[]{AssetCls.BTC_KEY}));
+        cbxOutAssets = new JComboBox<>(new String[]{"BTC", "DOGE", "LTC", "DASH"});
         fieldGBC.gridy = labelGBC.gridy;
         this.add(cbxOutAssets, fieldGBC);
 
@@ -376,7 +384,7 @@ public class WithdrawExchange extends IconPanel {
                 + ". " + Lang.T("Where You need to set only amount of withdraw asset in the panel for payment")
                 + ".</h3>"
                 + Lang.T("Minimal payment in equivalent")
-                + " <b>" + 25 + " USD</b>" + "<br>"
+                + " <b>" + MIN_PAY + " USD</b>" + "<br>"
                 + Lang.T("Service will have some commission");
 
         jText_Help.setText(help);

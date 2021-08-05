@@ -30,20 +30,15 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
         } else {
 
             if (deposit) {
-                this.addElement(Controller.getInstance().getAsset(AssetCls.ERA_KEY));
-                this.addElement(Controller.getInstance().getAsset(AssetCls.FEE_KEY));
-                this.addElement(Controller.getInstance().getAsset(AssetCls.USD_KEY));
+                //this.addElement(Controller.getInstance().getAsset(AssetCls.ERA_KEY));
             } else {
-                this.addElement(Controller.getInstance().getAsset(AssetCls.ERA_KEY));
-                this.addElement(Controller.getInstance().getAsset(AssetCls.FEE_KEY));
-                this.addElement(Controller.getInstance().getAsset(AssetCls.USD_KEY));
             }
 
             for (Long key : new Long[]{
-                    AssetCls.BTC_KEY, // BTC
-                    //21L, // GOLD
-                    //95L, 92L,
-                    //1114L
+                    AssetCls.ERA_KEY,
+                    AssetCls.FEE_KEY,
+                    AssetCls.BTC_KEY,
+                    AssetCls.USD_KEY
             }) {
                 asset = Controller.getInstance().getAsset(key);
                 if (asset == null)
