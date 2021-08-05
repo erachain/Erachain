@@ -15,7 +15,6 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.PairMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
-import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
@@ -2389,15 +2388,7 @@ public abstract class AssetCls extends ItemCls {
         text += Lang.T("Asset Class") + ":&nbsp;"
                 + Lang.T(getItemSubType() + "") + "<br>"
                 + Lang.T("Asset Type") + ":&nbsp;"
-                + "<b>" + charAssetType() + viewAssetTypeAbbrev() + "</b>:" + Lang.T(viewAssetTypeFull() + "") + "<br>"
-                + Lang.T("Quantity") + ":&nbsp;" + getQuantity() + ", "
-                + Lang.T("Scale") + ":&nbsp;" + getScale() + "<br>"
-                + Lang.T("Description") + ":<br>";
-        if (getKey() > 0 && getKey() < START_KEY()) {
-            text += Library.to_HTML(Lang.T(viewDescription())) + "<br>";
-        } else {
-            text += Library.to_HTML(viewDescription()) + "<br>";
-        }
+                + "<b>" + charAssetType() + viewAssetTypeAbbrev() + "</b>:" + Lang.T(viewAssetTypeFull() + "") + "<br>";
 
         return text;
 

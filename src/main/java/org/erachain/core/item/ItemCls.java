@@ -1331,7 +1331,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public String makeHTMLView() {
-        return "";
+
+        String text = makeHTMLHeadView();
+        text += makeHTMLFootView(true);
+
+        return text;
     }
 
     public String makeHTMLHeadView() {

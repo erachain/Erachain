@@ -5,9 +5,11 @@ package org.erachain.core.item.assets;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.lang.Lang;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -19,22 +21,37 @@ public class AssetUniqueSeries extends AssetUnique {
     private int index;
     private int total;
 
-    public AssetUniqueSeries(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
+    public AssetUniqueSeries(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon,
+                             byte[] image, String description, int assetType, int total, int index) {
         super(typeBytes, appData, maker, name, icon, image, description, assetType);
+
+        this.index = index;
+        this.total = total;
+
     }
 
-    public AssetUniqueSeries(int props, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        this(new byte[]{(byte) TYPE_ID, (byte) props}, appData, maker, name, icon, image, description, assetType);
+    public AssetUniqueSeries(int props, byte[] appData, PublicKeyAccount maker, String name, byte[] icon,
+                             byte[] image, String description, int assetType, int total, int index) {
+        this(new byte[]{(byte) TYPE_ID, (byte) props}, appData, maker, name, icon, image, description, assetType, total, index);
     }
 
-    public AssetUniqueSeries(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
-        this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, assetType);
+    public AssetUniqueSeries(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image,
+                             String description, int assetType, int total, int index) {
+        this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, assetType, total, index);
     }
 
     // GETTERS/SETTERS
     @Override
     public String getItemSubType() {
         return "unique series";
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public int getTotal() {
+        return total;
     }
 
     @Override
@@ -149,8 +166,19 @@ public class AssetUniqueSeries extends AssetUnique {
         byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
         position += ASSET_TYPE_LENGTH;
 
+        //READ TOTAL
+        byte[] totalBytes = Arrays.copyOfRange(data, position, position + Short.BYTES);
+        int total = Shorts.fromByteArray(totalBytes);
+        position += Short.BYTES;
+
+        //READ TOTAL
+        byte[] indexBytes = Arrays.copyOfRange(data, position, position + Short.BYTES);
+        int index = Shorts.fromByteArray(indexBytes);
+        position += Short.BYTES;
+
         //RETURN
-        AssetUniqueSeries unique = new AssetUniqueSeries(typeBytes, appData, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
+        AssetUniqueSeries unique = new AssetUniqueSeries(typeBytes, appData, maker, name, icon, image, description,
+                Byte.toUnsignedInt(assetTypeBytes[0]), total, index);
         if (includeReference) {
             unique.setReference(reference, dbRef);
         }
@@ -163,8 +191,15 @@ public class AssetUniqueSeries extends AssetUnique {
 
         byte[] data = super.toBytes(forDeal, includeReference, forMakerSign);
 
+        byte[] addData = new byte[5];
+
         //WRITE ASSET TYPE
-        data = Bytes.concat(data, new byte[]{(byte) this.getAssetType()});
+        addData[0] = (byte) this.getAssetType();
+
+        System.arraycopy(Shorts.toByteArray((short) total), 0, addData, 1, Short.BYTES);
+        System.arraycopy(Shorts.toByteArray((short) index), 0, addData, 1 + 2, 2);
+
+        data = Bytes.concat(data, appData);
 
         return data;
     }
@@ -173,6 +208,8 @@ public class AssetUniqueSeries extends AssetUnique {
     public String makeHTMLView() {
 
         String text = super.makeHTMLHeadView();
+        text += Lang.T("Series") + ":&nbsp;" + getTotal() + ", "
+                + Lang.T("Index") + ":&nbsp;" + getIndex() + "<br>";
         text += super.makeHTMLFootView(true);
 
         return text;
