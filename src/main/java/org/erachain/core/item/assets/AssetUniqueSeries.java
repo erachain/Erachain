@@ -205,11 +205,8 @@ public class AssetUniqueSeries extends AssetUnique {
      *
      * @return
      */
-    public AssetUniqueSeries copy(int index, byte[] remakeAppData) {
-        AssetUniqueSeries unique = new AssetUniqueSeries(typeBytes, remakeAppData, maker, name, icon, image, description,
-                assetType, total);
-
-        return unique;
+    public AssetUniqueSeriesCopy copy(int index) {
+        return new AssetUniqueSeriesCopy(this, index);
     }
 
     public String makeHTMLView() {

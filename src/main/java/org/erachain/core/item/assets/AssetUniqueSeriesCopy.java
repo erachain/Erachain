@@ -15,7 +15,7 @@ import java.util.Arrays;
  */
 public class AssetUniqueSeriesCopy extends AssetUnique {
 
-    private static final int TYPE_ID = UNIQUE_SERIES;
+    private static final int TYPE_ID = UNIQUE_COPY;
 
     private int index;
     private AssetUniqueSeries baseItem;
@@ -25,6 +25,15 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
         this.index = index;
 
+    }
+
+    public AssetUniqueSeriesCopy(int index) {
+        this(new byte[]{TYPE_ID, 0}, index);
+    }
+
+    public AssetUniqueSeriesCopy(AssetUniqueSeries baseItem, int index) {
+        this(new byte[]{TYPE_ID, 0}, index);
+        this.baseItem = baseItem;
     }
 
     // GETTERS/SETTERS
@@ -88,22 +97,10 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     //OTHER
 
-    /**
-     * Make new indexed AssetUniqueSeries
-     *
-     * @return
-     */
-    public AssetUniqueSeriesCopy copy(int index, byte[] remakeAppData) {
-        AssetUniqueSeriesCopy unique = new AssetUniqueSeriesCopy(typeBytes, remakeAppData, maker, name, icon, image, description,
-                assetType, total, index);
-
-        return unique;
-    }
-
     public String makeHTMLView() {
 
         String text = super.makeHTMLHeadView();
-        text += Lang.T("Series") + ":&nbsp;" + getTotal() + ", "
+        text += Lang.T("Series") + ":&nbsp;" + baseItem.getTotal() + ", "
                 + Lang.T("Index") + ":&nbsp;" + getIndex() + "<br>";
         text += super.makeHTMLFootView(true);
 

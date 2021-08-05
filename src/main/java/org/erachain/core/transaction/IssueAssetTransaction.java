@@ -5,10 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.assets.AssetFactory;
-import org.erachain.core.item.assets.AssetUnique;
-import org.erachain.core.item.assets.AssetUniqueSeries;
+import org.erachain.core.item.assets.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
 import org.mapdb.Fun;
@@ -342,13 +339,12 @@ public class IssueAssetTransaction extends IssueItemRecord {
         if (asset instanceof AssetUniqueSeries) {
             AssetUniqueSeries uniqueSeries = (AssetUniqueSeries) asset;
             byte[] newData = uniqueSeries.remakeAppdata();
-            AssetUniqueSeries uniqueSeriesCopy;
+            AssetUniqueSeriesCopy uniqueSeriesCopy;
             long copyKey;
             ItemMap map = asset.getDBMap(dcSet);
             for (int indexCopy = 2; indexCopy <= uniqueSeries.getTotal(); indexCopy++) {
 
-                uniqueSeriesCopy = uniqueSeries.copy(indexCopy, newData);
-                uniqueSeriesCopy.setReference(this.signature, dbRef);
+                uniqueSeriesCopy = uniqueSeries.copy(indexCopy);
 
                 //INSERT INTO DATABASE
                 copyKey = map.incrementPut(uniqueSeriesCopy);
