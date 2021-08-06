@@ -6,6 +6,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
@@ -13,6 +14,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemPersonMap;
 import org.erachain.datachain.KKPersonStatusMap;
+import org.erachain.utils.NumberAsString;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -142,13 +144,14 @@ public class APIItemPerson {
 
     /**
      * Get Status for Person
-     *                 block = value.b.d;
-     *                 recNo = value.b.e;
-     *                 record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
-     *                 return record == null ? null : record.viewTimestamp();
+     * block = value.b.d;
+     * recNo = value.b.e;
+     * record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
+     * return record == null ? null : record.viewTimestamp();
+     *
      * @param personKey
      * @param statusKey
-     * @param history true - get history of changes
+     * @param history   true - get history of changes
      * @return
      */
     @GET
@@ -442,4 +445,79 @@ public class APIItemPerson {
         }
     }
 
+    @GET
+    @Path("balances/{key}")
+    public Response getAppBals(@PathParam("key") Long key) {
+
+        if (DCSet.getInstance().getItemPersonMap().get(key) == null) {
+            JSONObject out = new JSONObject();
+            out.put("error", "Person not Found");
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(out.toJSONString())
+                    .build();
+        }
+
+        TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+
+        int i = 0;
+        for (String address : addresses.keySet()) {
+
+            Stack<Fun.Tuple3<Integer, Integer, Integer>> stack = addresses.get(address);
+            if (stack == null || stack.isEmpty()) {
+                continue;
+            }
+
+            Fun.Tuple3<Integer, Integer, Integer> item = stack.peek();
+            Transaction transactionIssue = transactionsMap.get(item.b, item.c);
+
+            Map accountJSON = new LinkedHashMap();
+            accountJSON.put("address", address);
+            accountJSON.put("to_date", item.a * 86400000l);
+            accountJSON.put("verifier", transactionIssue.getCreator().getAddress());
+            if (transactionIssue.getCreator().getPerson() != null) {
+                accountJSON.put("verifier_key", transactionIssue.getCreator().getPerson().b.getKey());
+                accountJSON.put("verifier_name", transactionIssue.getCreator().getPerson().b.viewName());
+            } else {
+                accountJSON.put("verifier_key", "");
+                accountJSON.put("verifier_name", "");
+            }
+
+            accountsJSON.put(i++, accountJSON);
+
+            Account account = new Account(address);
+            List<Transaction> issuedPersons = transactionsMap.getTransactionsByAddressAndType(account.getShortAddressBytes(),
+                    Transaction.ISSUE_PERSON_TRANSACTION, 200, 0);
+            if (issuedPersons != null) {
+                myIssuePersons.addAll(issuedPersons);
+            }
+
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance
+                    = account.getBalance(AssetCls.ERA_KEY);
+
+            eraBalanceA = eraBalanceA.add(balance.a.b);
+            eraBalanceB = eraBalanceB.add(balance.b.b);
+            eraBalanceC = eraBalanceC.add(balance.c.b);
+            eraBalanceTotal = eraBalanceA.add(eraBalanceB).add(eraBalanceC);
+
+            balance = account.getBalance(AssetCls.FEE_KEY);
+            compuBalance = compuBalance.add(balance.a.b);
+
+            balance = account.getBalance(AssetCls.LIA_KEY);
+            liaBalanceA = liaBalanceA.add(balance.a.b);
+            liaBalanceB = liaBalanceB.add(balance.b.b);
+        }
+        output.put("era_balance_a", NumberAsString.formatAsString(eraBalanceA));
+        output.put("era_balance_b", NumberAsString.formatAsString(eraBalanceB));
+        output.put("era_balance_c", NumberAsString.formatAsString(eraBalanceC));
+        output.put("era_balance_total", NumberAsString.formatAsString(eraBalanceTotal));
+        output.put("compu_balance", NumberAsString.formatAsString(compuBalance));
+        output.put("lia_balance_a", NumberAsString.formatAsString(liaBalanceA));
+        output.put("lia_balance_b", NumberAsString.formatAsString(liaBalanceB));
+
+
+        output.put("accounts", accountsJSON);
+
+    }
 }
