@@ -34,7 +34,7 @@ public class DWSet extends DBASet {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 533; // vers 5.4ю1
+    final static int CURRENT_VERSION = 533; // vers 5.4.1
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DWSet.class);
 
