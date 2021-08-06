@@ -151,7 +151,7 @@ public class OrderProcessTest {
 
                 BigDecimal have1 = new BigDecimal("8.12");
                 BigDecimal want1 = new BigDecimal("0.01771142");
-                orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(), assetB.getKey(),
                         have1, want1,
                         (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
@@ -173,7 +173,7 @@ public class OrderProcessTest {
                 // https://explorer.erachain.org/index/blockexplorer.html?order=2068416-1&lang=en
                 BigDecimal have2 = new BigDecimal("0.01112428");
                 BigDecimal want2 = new BigDecimal("5.10005");
-                orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet),
+                orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(), assetA.getKey(),
                         have2, want2,
                         (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
@@ -217,7 +217,7 @@ public class OrderProcessTest {
                 // https://explorer.erachain.org/index/blockexplorer.html?order=2068567-2&lang=en
                 BigDecimal have3 = new BigDecimal("0.00658715");
                 BigDecimal want3 = new BigDecimal("3.01994853");
-                orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet),
+                orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(), assetA.getKey(),
                         have3, want3,
                         (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
@@ -312,7 +312,7 @@ public class OrderProcessTest {
                     BigDecimal amountSell = new BigDecimal("100");
                     BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
 
-                    orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
+                    orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(), assetA.getKey(), amountBuy,
                             amountSell, (byte) 0, timestamp++, 0L);
                     orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                     orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
@@ -343,7 +343,7 @@ public class OrderProcessTest {
                 }
                 assertEquals(count, len);
 
-                List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
+                List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(), assetA.getKey(),
                         null);
                 assertEquals(orders.size(), len);
 
@@ -372,7 +372,7 @@ public class OrderProcessTest {
                 }
                 assertEquals(count, len);
 
-                orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
+                orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(), assetA.getKey(),
                         null);
                 assertEquals(orders.size(), len);
 
@@ -388,8 +388,8 @@ public class OrderProcessTest {
         try {
             init(IDB.DBS_ROCK_DB);
 
-            long have = assetB.getKey(dcSet);
-            long want = assetA.getKey(dcSet);
+            long have = assetB.getKey();
+            long want = assetA.getKey();
 
             int count = 0;
 
@@ -459,7 +459,7 @@ public class OrderProcessTest {
                 BigDecimal amount1 = BigDecimal.ONE;
                 BigDecimal amount10 = BigDecimal.TEN;
                 BigDecimal amount100 = new BigDecimal("100");
-                CreateOrderTransaction orderCreation1 = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                CreateOrderTransaction orderCreation1 = new CreateOrderTransaction(accountA, assetA.getKey(), assetB.getKey(),
                         amount10, amount100,
                         (byte) 0, timestamp++, 0L);
                 orderCreation1.sign(accountA, Transaction.FOR_NETWORK);
@@ -468,7 +468,7 @@ public class OrderProcessTest {
 
                 assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, amount10);
 
-                CreateOrderTransaction orderCreation2 = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet),
+                CreateOrderTransaction orderCreation2 = new CreateOrderTransaction(accountB, assetB.getKey(), assetA.getKey(),
                         amount10,
                         amount1, (byte) 0, timestamp++, 0L);
                 orderCreation2.sign(accountB, Transaction.FOR_NETWORK);

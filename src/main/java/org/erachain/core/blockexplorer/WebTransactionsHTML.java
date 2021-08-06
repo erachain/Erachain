@@ -233,7 +233,7 @@ public class WebTransactionsHTML {
     }
 
     public String itemNameHTML(ItemCls item) {
-        String out = "<a href=?" + item.getItemTypeName() + "=" + item.getKey(dcSet) + get_Lang() + ">";
+        String out = "<a href=?" + item.getItemTypeName() + "=" + item.getKey() + get_Lang() + ">";
         if (item.getKey() >= item.getStartKey()) {
             out += "[" + item.getKey() + "] ";
         }

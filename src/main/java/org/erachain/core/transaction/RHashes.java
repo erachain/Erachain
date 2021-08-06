@@ -418,7 +418,7 @@ public class RHashes extends Transaction {
         long personKey;
         Tuple2<Integer, PersonCls> asPerson = this.creator.getPerson(dcSet, height);
         if (asPerson != null && asPerson.a >= 0) {
-            personKey = asPerson.b.getKey(dcSet);
+            personKey = asPerson.b.getKey();
         } else {
             personKey = 0l;
         }

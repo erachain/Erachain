@@ -345,8 +345,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         // Это нужно для быстрого поиска по публичному ключу создателя персоны,
         // которая еще не удостоверена вообще
         // но надо понимать что тут будет только последняя запись создания персоны и номер на нее
-        // used in org.erachain.webserver.API.getPersonKeyByOwnerPublicKey
-        this.dcSet.getIssuePersonMap().put(makerBytes, person.getKey());
+        this.dcSet.getTransactionFinalMapSigns().put(makerBytes, person.getKey());
 
         if (person.isMustBeSigned()) {
             // for quick search public keys by address - use PUB_KEY from Person DATA owner
@@ -370,7 +369,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getMaker();
         byte[] makerBytes = maker.getPublicKey();
-        this.dcSet.getIssuePersonMap().delete(makerBytes);
+        this.dcSet.getTransactionFinalMapSigns().delete(makerBytes);
 
         if (person.isMustBeSigned()) {
             dcSet.getTransactionFinalMapSigns().delete(person.getMakerSignature());

@@ -47,10 +47,10 @@ public class ResultDialog {
             );
 
             if (n == JOptionPane.YES_OPTION) {
-                AssetCls feeAsset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
-                BigDecimal amountBuy = transaction.getFee();
-                MainPanel.getInstance().insertNewTab(Lang.T("Deposit") + " COMPU", new DepositExchange(feeAsset, transaction.getCreator(),
-                        amountBuy, feeAsset));
+                BigDecimal amountBuy = transaction.getFee().multiply(new BigDecimal(2));
+                MainPanel.getInstance().insertNewTab(
+                        Lang.T("Buy") + " " + AssetCls.FEE_NAME, new DepositExchange(AssetCls.FEE_NAME, transaction.getCreator(),
+                                amountBuy));
             }
 
         } else {

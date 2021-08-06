@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
@@ -32,7 +31,7 @@ public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
                 return union.getConfirmations(dcSet);
 
             case COLUMN_KEY:
-                return union.getKey(DCSet.getInstance());
+                return union.getKey();
 
             case COLUMN_NAME:
                 return union;

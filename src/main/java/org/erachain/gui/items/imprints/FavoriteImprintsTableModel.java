@@ -41,7 +41,7 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable implement
                 return item.getConfirmations(dcSet);
 
             case COLUMN_KEY:
-                return item.getKey(DCSet.getInstance());
+                return item.getKey();
 
             case COLUMN_NAME:
                 return item;

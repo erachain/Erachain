@@ -423,7 +423,7 @@ public class MainPanel extends javax.swing.JPanel {
             }
 
             if (str.equals(Lang.T("Deposit Exchange")) || str.equals(DepositExchange.class.getSimpleName())) {
-                insertTab(new DepositExchange(null, null, null, null));
+                insertTab(new DepositExchange(null, null, null));
                 return;
             }
 

@@ -59,7 +59,7 @@ public class AssetUnique extends AssetCls {
 
     @Override
     public BigDecimal getReleased(DCSet dcSet) {
-        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> bals = this.getMaker().getBalance(this.getKey(dcSet));
+        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> bals = this.getMaker().getBalance(this.getKey());
         return BigDecimal.ONE.subtract(bals.a.b).stripTrailingZeros();
     }
 

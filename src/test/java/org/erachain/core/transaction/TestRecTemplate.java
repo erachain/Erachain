@@ -98,7 +98,7 @@ public class TestRecTemplate {
         issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
         if (process) {
             issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);
-            templateKey = template.getKey(db);
+            templateKey = template.getKey();
         }
     }
 
@@ -205,17 +205,17 @@ public class TestRecTemplate {
         issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);
         int mapSize = templateMap.size();
 
-        LOGGER.info("template KEY: " + template.getKey(db));
+        LOGGER.info("template KEY: " + template.getKey());
 
         //CHECK PLATE EXISTS SENDER
-        long key = db.getIssueTemplateMap().get(issueTemplateRecord);
+        long key = issueTemplateRecord.key;
         assertEquals(true, templateMap.contains(key));
 
         TemplateCls template_2 = new Template(itemAppData, maker, "test132_2", icon, image, "2_12345678910strontje");
         IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, null, template_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db)[0]);
         issueTemplateTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueTemplateTransaction_2.process(gb, Transaction.FOR_NETWORK);
-        LOGGER.info("template_2 KEY: " + template_2.getKey(db));
+        LOGGER.info("template_2 KEY: " + template_2.getKey());
         issueTemplateTransaction_2.orphan(gb, Transaction.FOR_NETWORK);
         assertEquals(mapSize, templateMap.size());
 
@@ -242,7 +242,7 @@ public class TestRecTemplate {
         issueTemplateRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
         issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);
-        long key = db.getIssueTemplateMap().get(issueTemplateRecord);
+        long key = issueTemplateRecord.key;
         assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
 
         issueTemplateRecord.orphan(gb, Transaction.FOR_NETWORK);

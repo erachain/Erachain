@@ -205,13 +205,13 @@ public class TransactionTests3AssetsAsPack {
 
         issueAssetTransaction.process(gb, asPack);
 
-        LOGGER.info("asset KEY: " + asset.getKey(db));
+        LOGGER.info("asset KEY: " + asset.getKey());
 
         //CHECK BALANCE ISSUER
-        assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(asset.getKey(db), db));
+        assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(asset.getKey(), db));
 
         //CHECK ASSET EXISTS SENDER
-        long key = db.getIssueAssetMap().get(issueAssetTransaction);
+        long key = issueAssetTransaction.getKey();
         assertEquals(true, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET IS CORRECT
@@ -238,7 +238,7 @@ public class TransactionTests3AssetsAsPack {
         issueAssetTransaction.sign(maker, asPack);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.process(gb, asPack);
-        long key = db.getIssueAssetMap().get(issueAssetTransaction);
+        long key = issueAssetTransaction.getKey();
         assertEquals(new BigDecimal(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
         assertEquals(issueAssetTransaction.getSignature(), Transaction.FOR_NETWORK);
 
@@ -272,7 +272,7 @@ public class TransactionTests3AssetsAsPack {
         issueAssetTransaction.sign(maker, asPack);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.process(gb, asPack);
-        long key = db.getIssueAssetMap().get(issueAssetTransaction);
+        long key = issueAssetTransaction.getKey();
 
         //CREATE SIGNATURE
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -307,7 +307,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         issueAssetTransaction.process(gb, asPack);
-        long key = asset.getKey(db);
+        long key = asset.getKey();
         //assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
         assertEquals(new BigDecimal(asset.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 
@@ -514,7 +514,7 @@ public class TransactionTests3AssetsAsPack {
         issueAssetTransaction.sign(maker, asPack);
         issueAssetTransaction.process(gb, asPack);
         //logger.info("IssueAssetTransaction .creator.getBalance(1, db): " + account.getBalance(1, dcSet));
-        key = asset.getKey(db);
+        key = asset.getKey();
 
         //CREATE ORDER
         CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), 0l, new byte[]{5, 6});
@@ -641,7 +641,7 @@ public class TransactionTests3AssetsAsPack {
         issueAssetTransaction.sign(maker, asPack);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueAssetTransaction.process(gb, asPack);
-        key = asset.getKey(db);
+        key = asset.getKey();
 
         //CREATE ORDER
         CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), 0l, new byte[]{5, 6});
@@ -678,7 +678,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
         issueAssetTransaction.process(gb, asPack);
 
-        long key = asset.getKey(db);
+        long key = asset.getKey();
         LOGGER.info("asset.getReg(): " + asset.getReference());
         LOGGER.info("asset.getKey(): " + key);
 

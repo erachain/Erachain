@@ -3,7 +3,6 @@ package org.erachain.gui.transaction;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.GenesisIssuePersonRecord;
-import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -33,7 +32,7 @@ public class GenesisPersonalizeDetailsFrame extends RecGenesis_DetailsFrame {
 
         //PERSON
         ++detailGBC.gridy;
-        JTextField asset = new JTextField(String.valueOf(Controller.getInstance().getPerson(record.getItem().getKey(DCSet.getInstance())).toString()));
+        JTextField asset = new JTextField(String.valueOf(Controller.getInstance().getPerson(record.getItem().getKey()).toString()));
         asset.setEditable(false);
         MenuPopupUtil.installContextMenu(asset);
         this.add(asset, detailGBC);

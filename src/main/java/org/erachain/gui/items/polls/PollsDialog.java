@@ -8,7 +8,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.VoteOnItemPollTransaction;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.ResultDialog;
@@ -147,7 +146,7 @@ public class PollsDialog extends JDialog {
                 AssetCls asset = ((AssetCls) cbxAssets.getSelectedItem());
 
                 if (asset != null) {
-                    ((AccountRenderer) cbxAccount.getRenderer()).setAsset(asset.getKey(DCSet.getInstance()));
+                    ((AccountRenderer) cbxAccount.getRenderer()).setAsset(asset.getKey());
                     cbxAccount.repaint();
                     cbxOptions.repaint();
 
@@ -163,7 +162,7 @@ public class PollsDialog extends JDialog {
         // CBX ACCOUNT
         detailGBC.gridy = 4;
         this.cbxAccount = new JComboBox<Account>(new AccountsComboBoxModel());
-        cbxAccount.setRenderer(new AccountRenderer(asset.getKey(DCSet.getInstance())));
+        cbxAccount.setRenderer(new AccountRenderer(asset.getKey()));
 
         this.add(this.cbxAccount, detailGBC);
 
@@ -276,7 +275,7 @@ public class PollsDialog extends JDialog {
 
         int option = this.cbxOptions.getSelectedIndex();
 
-        Transaction transaction = Controller.getInstance().createItemPollVote(creator, poll.getKey(DCSet.getInstance()),
+        Transaction transaction = Controller.getInstance().createItemPollVote(creator, poll.getKey(),
                 option, feePow);
 
         // CHECK VALIDATE MESSAGE

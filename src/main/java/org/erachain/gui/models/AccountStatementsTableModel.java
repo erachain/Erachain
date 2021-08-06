@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.templates.TemplateCls;
-import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 
@@ -79,7 +78,7 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
                 return account.getPersonAsString();
             case COLUMN_TEMPLATE_KEY:
                 if (this.template == null) return "-";
-                return this.template.getKey(DCSet.getInstance());
+                return this.template.getKey();
             case COLUMN_TEMPLATE_NAME:
                 if (this.template == null) return "-";
                 return this.template.viewName();

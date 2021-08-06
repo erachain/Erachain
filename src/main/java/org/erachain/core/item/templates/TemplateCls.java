@@ -6,7 +6,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
@@ -106,10 +105,6 @@ public abstract class TemplateCls extends ItemCls {
     // DB
     public ItemMap getDBMap(DCSet db) {
         return db.getItemTemplateMap();
-    }
-
-    public IssueItemMap getDBIssueMap(DCSet db) {
-        return db.getIssueTemplateMap();
     }
 
     public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {

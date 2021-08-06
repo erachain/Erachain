@@ -101,7 +101,7 @@ public class TestRecSendMovable {
             issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
             issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
     
-            assetKey = assetMovable.getKey(db);
+            assetKey = assetMovable.getKey();
         }
 
     }
@@ -116,7 +116,7 @@ public class TestRecSendMovable {
 
         init(true);
 
-        long keyMovable = assetMovable.getKey(db);
+        long keyMovable = assetMovable.getKey();
 
         producerBalance = producer.getBalance(db, keyMovable);
 

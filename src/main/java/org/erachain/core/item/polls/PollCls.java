@@ -8,7 +8,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.VoteOnItemPollMap;
 import org.erachain.lang.Lang;
@@ -87,10 +86,6 @@ public abstract class PollCls extends ItemCls {
     @Override
     public ItemMap getDBMap(DCSet dc) {
         return dc.getItemPollMap();
-    }
-
-    public IssueItemMap getDBIssueMap(DCSet dc) {
-        return dc.getIssuePollMap();
     }
 
     public boolean hasVotes(DCSet dc) {

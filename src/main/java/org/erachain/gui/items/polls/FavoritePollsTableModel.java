@@ -45,7 +45,7 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
                 return poll.getConfirmations(dcSet);
 
             case COLUMN_KEY:
-                return poll.getKey(DCSet.getInstance());
+                return poll.getKey();
 
             case COLUMN_NAME:
                 return poll;

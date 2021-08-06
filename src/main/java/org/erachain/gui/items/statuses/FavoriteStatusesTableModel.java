@@ -41,7 +41,7 @@ public class FavoriteStatusesTableModel extends FavoriteItemModelTable {
                 return status.getConfirmations(dcSet);
 
             case COLUMN_KEY:
-                return status.getKey(DCSet.getInstance());
+                return status.getKey();
 
             case COLUMN_NAME:
                 return status;

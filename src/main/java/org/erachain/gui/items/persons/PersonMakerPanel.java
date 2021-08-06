@@ -123,7 +123,7 @@ public class PersonMakerPanel extends JPanel {
         JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.T("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertNewTab(Lang.T("Send asset"), new AccountAssetSendPanel(null,
+                MainPanel.getInstance().insertNewTab(Lang.T("Send asset"), new AccountAssetSendPanel(null, null,
                         null, null, person_Accounts_Model.getItem(row), null, false));
 
             }

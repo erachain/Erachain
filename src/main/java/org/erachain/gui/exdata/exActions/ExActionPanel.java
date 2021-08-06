@@ -52,7 +52,7 @@ public class ExActionPanel extends IconPanel {
         selectBox.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
                 Lang.T("Without Action"),
                 Lang.T("Calculated Filtered Accruals"),
-                Lang.T("Simple List Accruals (Air Drop)")
+                Lang.T("Accrual according by List (AirDrop)")
         }));
 
         selectBox.addItemListener(new ItemListener() {

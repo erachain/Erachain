@@ -5,7 +5,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.ItemStatusMap;
 import org.erachain.lang.Lang;
@@ -75,10 +74,6 @@ public abstract class StatusCls extends ItemCls {
     // DB
     public ItemMap getDBMap(DCSet db) {
         return db.getItemStatusMap();
-    }
-
-    public IssueItemMap getDBIssueMap(DCSet db) {
-        return db.getIssueStatusMap();
     }
 
     static SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");

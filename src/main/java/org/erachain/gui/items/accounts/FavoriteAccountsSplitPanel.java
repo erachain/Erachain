@@ -247,7 +247,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
             public void actionPerformed(ActionEvent e) {
                 Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
                 Account accountTo = FavoriteAccountsMap.detPublicKeyOrAccount(item.a, item.b);
-                MainPanel.getInstance().insertNewTab(Lang.T("Send"), new AccountAssetSendPanel(null,
+                MainPanel.getInstance().insertNewTab(Lang.T("Send"), new AccountAssetSendPanel(null, null,
                         null, accountTo, null, null, false));
 
             }

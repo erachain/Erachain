@@ -32,7 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-//public class PersonConfirm extends JDialog { // InternalFrame  {
 public class WithdrawExchange extends IconPanel {
 
     public static String NAME = "WithdrawExchange";
@@ -40,36 +39,39 @@ public class WithdrawExchange extends IconPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
+    private static int MIN_PAY = 25;
     private static final long serialVersionUID = 2717571093561259483L;
-    private MButton jButton_ShowForm;
+    private MButton buttonShowForm;
     private MButton jButton_Confirm;
-    private JComboBox<Account> jComboBox_YourAddress;
-    public JComboBox<AssetCls> cbxAssets;
-    private JLabel jLabel_Address;
-    private JLabel jLabelAdressCheck;
-    private JLabel jLabel_Asset;
-    private JLabel jLabel_Details;
-    private JLabel jLabel_YourAddress;
-    private JTextField jTextField_Address = new JTextField();
+    public JComboBox<AssetCls> cbxInAssets;
+    public JComboBox<String> cbxOutAssets;
+    private JLabel labelOutAddress;
+    private JLabel labelAddressCheck;
+    private JLabel labelInAsset;
+    private JLabel labelOutAsset;
+    private JLabel labelDetails;
+    private JTextField textFieldAddress = new JTextField();
     JLabel jText_Help = new JLabel();
 
-    private AssetCls asset;
+    private AssetCls assetIn;
+    private String assetOut;
 
-    public WithdrawExchange(AssetCls asset, Account account) {
+    public WithdrawExchange(AssetCls assetIn, Account account) {
         super(NAME, TITLE);
-        initComponents(asset, account);
+
+        cbxInAssets = new JComboBox<>(new FundTokensComboBoxModel(false));
+
+        cbxOutAssets = new JComboBox<>(new String[]{"BTC",
+                //, "DOGE", "LTC", "DASH"
+        });
+
+        initComponents(assetIn, account);
         this.setVisible(true);
-    }
-
-    private void refreshReceiverDetails(String text, JLabel pubKeyDetails) {
-        // CHECK IF RECIPIENT IS VALID ADDRESS
-        pubKeyDetails.setText("<html>" + text + "</html>");
-
     }
 
     public void onGoClick() {
 
-
+        String assetInName = assetIn.getName();
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
         //String url_string = "https://api.face2face.cash/apipay/index.json";
         //String urlGetRate = "https://api.face2face.cash/apipay/get_rate.json/10/9/1";
@@ -81,27 +83,34 @@ public class WithdrawExchange extends IconPanel {
         String accountTo;
         String message = "";
         String rate = null;
-        AssetCls assetIn = null;
-        String address = jTextField_Address.getText().trim();
+        String address = textFieldAddress.getText().trim();
         try {
 
             // GET RATE
             String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
-            assetIn = (AssetCls) cbxAssets.getSelectedItem();
-            String abbrevIN = assetIn.getName();
-            switch ((int) assetIn.getKey()) {
-                case 1840:
-                    urlGetDetails += "fUSD/BTC/" + address + "/100"; // eUSD -> BTC
-                    message += "BTC";
+
+            urlGetDetails += DepositExchange.getOutExtName(assetInName) + "/" + assetOut + "/" + address + "/";
+
+            switch (assetInName) {
+                case AssetCls.ERA_NAME:
+                    urlGetDetails += "1000";
                     break;
-                case (int) DepositExchange.TEST_ASSET:
+                case AssetCls.FEE_NAME:
+                    urlGetDetails += "1";
+                    break;
+                case "DOGE":
+                    urlGetDetails += "1000";
+                    break;
+                case "BTC":
+                    urlGetDetails += "0.1";
+                    break;
+                case DepositExchange.TEST_ASSET:
                     urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
                     urlGetDetails += "fZEN/ZEN/" + address + "/30"; // eZEN -> ZEN
                     message += "ZEN";
                     break;
                 default:
-                    urlGetDetails += "f" + abbrevIN + "/" + abbrevIN + "/" + address + "/10";
-                    message += abbrevIN;
+                    urlGetDetails += "100";
             }
 
             // CREATE CONNECTION
@@ -131,19 +140,19 @@ public class WithdrawExchange extends IconPanel {
             jsonObject = (JSONObject) JSONValue.parse(inputText);
 
             if (BlockChain.TEST_MODE) {
-                jLabelAdressCheck.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+                labelAddressCheck.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
             LOGGER.debug(StrJSonFine.convert(jsonObject));
 
             accountTo = jsonObject.get("addr_in").toString();
-            rate = jsonObject.get("rate").toString();
+            rate = "" + (1.0d / (double) jsonObject.get("rate"));
 
         } catch (Exception e) {
             if (jsonObject != null && jsonObject.containsKey("wrong")) {
-                jLabelAdressCheck.setText(jsonObject.get("wrong").toString());
+                labelAddressCheck.setText(jsonObject.get("wrong").toString());
             } else {
-                jLabelAdressCheck.setText(inputText + " " + e.getMessage());
+                labelAddressCheck.setText(inputText + " " + e.getMessage());
             }
             jsonObject = null;
             accountTo = null;
@@ -151,42 +160,42 @@ public class WithdrawExchange extends IconPanel {
 
         if (assetIn != null && accountTo != null && rate != null) {
 
-            message += ":" + jTextField_Address.getText();
-            AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn,
+            String bal = jsonObject.get("bal").toString();
+
+            String formTitle;
+            if (DepositExchange.isStableCoin(assetInName))
+                formTitle = "<h2>" + Lang.T("Withdraw %1 to").replace("%1", assetInName) + " " + address + "</h2>";
+            else
+                formTitle = "<h2>" + Lang.T("Transfer <b>%1</b> to this address for buy")
+                        .replace("%1", assetInName) + " <b>" + assetOut + "</b></h2>"
+                        + Lang.T("by rate") + ": <b>" + rate + "</b>"
+                        + "<br>" + Lang.T("max buy amount") + ": <b>" + bal + "</b> " + assetOut;
+
+
+            if (!DepositExchange.isStableCoin(assetInName) && jsonObject.containsKey("may_pay")) {
+                formTitle += Lang.T("Service can accept a maximum of %1 now")
+                        .replace("%1",
+                                "<b>" + jsonObject.get("may_pay").toString() + " " + assetIn + "</b>"
+                        ) + ".";
+                //formTitle += "<br>" + Lang.T("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
+                //        + assetIn;
+            }
+
+            formTitle += "<br>" + Lang.T("Minimal payment in equivalent")
+                    + " <b>" + MIN_PAY + " USD</b>" + "<br>";
+
+            formTitle = "<html>" + formTitle + "</html>";
+
+            message += ":" + textFieldAddress.getText();
+            AccountAssetSendPanel panel = new AccountAssetSendPanel(formTitle, assetIn,
                     null, new Account(accountTo), null, message, false);
 
             panel.jTextFieldTXTitle.setEnabled(false);
             panel.jComboBox_Asset.setEnabled(false);
             panel.recipientAddress.setEnabled(false);
             panel.jTextArea_Message.setEnabled(false);
-            jLabelAdressCheck.setText("");
-            rate = jsonObject.get("rate").toString();
-            String bal = jsonObject.get("bal").toString();
+            labelAddressCheck.setText("");
 
-            String formTitle;
-            String incomeAssetName = assetIn.getName();
-            switch ((int) assetIn.getKey()) {
-                case 1:
-                case 2:
-                    formTitle = Lang.T("Transfer <b>%1</b> to this address for buy")
-                            .replace("%1", incomeAssetName) + " <b>BTC</B>"
-                            + " " + Lang.T("by rate") + ": <b>" + rate + "</b>"
-                            + ", " + Lang.T("max buy amount") + ": <b>" + bal + "</b> BTC";
-                    break;
-                case (int) DepositExchange.TEST_ASSET:
-                    incomeAssetName = "ZEN";
-                    formTitle = Lang.T("Withdraw %1 to").replace("%1", incomeAssetName) + " " + address;
-                    break;
-                default:
-                    formTitle = Lang.T("Withdraw %1 to").replace("%1", incomeAssetName) + " " + address;
-            }
-
-            if (jsonObject.containsKey("may_pay")) {
-                formTitle += "<br>" + Lang.T("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
-                        + incomeAssetName;
-            }
-
-            panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
             panel.setName(Lang.T("Withdraw"));
 
             MainPanel.getInstance().removeTab(panel.getName());
@@ -201,74 +210,71 @@ public class WithdrawExchange extends IconPanel {
     private void initComponents(AssetCls assetIn, Account account) {
 
         if (assetIn == null) {
-            asset = Controller.getInstance().getAsset(2L);
+            this.assetIn = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
         } else {
-            asset = assetIn;
+            this.assetIn = assetIn;
         }
 
         GridBagConstraints gridBagConstraints;
 
-        //paneAssetInfo = new JScrollPane();
-        jLabel_YourAddress = new JLabel();
-        jComboBox_YourAddress = new JComboBox<>();
-        jLabel_Address = new JLabel();
-        jLabel_Asset = new JLabel();
+        labelOutAddress = new JLabel();
+        labelInAsset = new JLabel();
+        labelOutAsset = new JLabel();
 
-        jLabelAdressCheck = new JLabel();
-        jLabel_Details = new JLabel();
+        labelAddressCheck = new JLabel();
+        labelDetails = new JLabel();
 
         GridBagLayout layout = new GridBagLayout();
-        layout.columnWidths = new int[]{0, 9, 0, 9, 0, 9, 0};
-        layout.rowHeights = new int[]{0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
-        //getContentPane().setLayout(layout);
         this.setLayout(layout);
 
-        int gridy = 0;
+        GridBagConstraints labelGBC = new GridBagConstraints();
+        labelGBC.gridx = 0;
+        labelGBC.anchor = GridBagConstraints.LINE_END;
+        labelGBC.insets = new Insets(10, 15, 0, 0);
 
-        JLabel jText_Title = new JLabel();
+        GridBagConstraints textGBC = new GridBagConstraints();
+        textGBC.gridx = 1;
+        textGBC.gridwidth = 4;
+        textGBC.fill = GridBagConstraints.HORIZONTAL;
+        textGBC.insets = new Insets(10, 5, 0, 15);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jText_Title, gridBagConstraints);
-        jText_Title.setText("<html><h1>" + Lang.T("Withdraw from the Exchange") + "</h1></html>");
+        GridBagConstraints fieldGBC = new GridBagConstraints();
+        fieldGBC.gridx = 1;
+        fieldGBC.gridwidth = 3;
+        fieldGBC.weightx = 0.1;
+        fieldGBC.fill = GridBagConstraints.HORIZONTAL;
+        fieldGBC.insets = new Insets(10, 5, 0, 15);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jText_Help, gridBagConstraints);
+        JLabel jText_Title = new JLabel("<html><h2>" + Lang.T("Withdraw from the Exchange") + "</h2></html>");
+        textGBC.gridy = 0;
+        add(jText_Title, textGBC);
 
-        /////////////// ASSET
-        jLabel_Asset.setText(Lang.T("Asset") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        // gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-        gridBagConstraints.insets = new Insets(21, 27, 0, 0);
-        add(jLabel_Asset, gridBagConstraints);
+        ++textGBC.gridy;
+        add(jText_Help, textGBC);
 
-        GridBagConstraints favoritesGBC = new GridBagConstraints();
-        favoritesGBC.insets = new Insets(21, 0, 0, 13);
-        favoritesGBC.fill = GridBagConstraints.HORIZONTAL;
-        favoritesGBC.anchor = GridBagConstraints.LINE_END;
-        favoritesGBC.gridwidth = 3;
-        favoritesGBC.gridx = 2;
-        favoritesGBC.gridy = gridy;
+        /////////////// ASSET IN
+        labelGBC.gridy = ++textGBC.gridy;
+        add(labelInAsset, labelGBC);
 
-        cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(false));
-        this.add(cbxAssets, favoritesGBC);
+        fieldGBC.gridy = labelGBC.gridy;
+        this.add(cbxInAssets, fieldGBC);
 
-        cbxAssets.addItemListener(new ItemListener() {
+        /////////////// ASSET OUT
+        ++labelGBC.gridy;
+        add(labelOutAsset, labelGBC);
 
+        fieldGBC.gridy = labelGBC.gridy;
+        this.add(cbxOutAssets, fieldGBC);
+
+        cbxInAssets.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    reset();
+                }
+            }
+        });
+        cbxOutAssets.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -277,33 +283,21 @@ public class WithdrawExchange extends IconPanel {
             }
         });
 
-        gridy += 3;
-
         ////////////////
-        jLabel_Address.setText(Lang.T("Address to Withdraw") + ":");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
-        add(jLabel_Address, gridBagConstraints);
+        labelOutAddress.setText(Lang.T("Address to Withdraw") + ":");
+        ++labelGBC.gridy;
+        add(labelOutAddress, labelGBC);
 
         if (account == null) {
-            jLabelAdressCheck.setText(Lang.T("Insert Withdraw Address"));
+            labelAddressCheck.setText(Lang.T("Insert Withdraw Address"));
         } else {
-            jTextField_Address.setText(account.getAddress());
+            textFieldAddress.setText(account.getAddress());
         }
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jTextField_Address, gridBagConstraints);
+        fieldGBC.gridy = labelGBC.gridy;
+        add(textFieldAddress, fieldGBC);
 
-        // BUTN NEXT
+        // GO NEXT
         jButton_Confirm = new MButton(Lang.T("Next"), 1);
         jButton_Confirm.setToolTipText("");
         jButton_Confirm.addActionListener(new ActionListener() {
@@ -312,24 +306,13 @@ public class WithdrawExchange extends IconPanel {
             }
         });
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        add(jButton_Confirm, gridBagConstraints);
+        fieldGBC.gridy = ++labelGBC.gridy;
+        add(jButton_Confirm, fieldGBC);
 
         // TIP
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        jLabelAdressCheck.setText("");
-        add(jLabelAdressCheck, gridBagConstraints);
+        textGBC.gridy = ++labelGBC.gridy;
+        labelAddressCheck.setText("");
+        add(labelAddressCheck, textGBC);
 
         //////////////////////////
         JEditorPane jText_History = new JEditorPane();
@@ -339,23 +322,16 @@ public class WithdrawExchange extends IconPanel {
         jText_History.setBackground(UIManager.getColor("Panel.background"));
         // не пашет - надо внутри ручками в тексте jText_History.setFont(UIManager.getFont("Label.font"));
 
-        gridy += 2;
-
-        jButton_ShowForm = new MButton(Lang.T("See Withdraw Transactions"), 2);
-        jButton_ShowForm.addActionListener(new ActionListener() {
+        buttonShowForm = new MButton(Lang.T("See Withdraw Transactions"), 2);
+        buttonShowForm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jText_History.setText(DepositExchange.showHistory(null,
-                        jTextField_Address.getText(), jLabelAdressCheck));
+                        textFieldAddress.getText(), labelAddressCheck));
             }
         });
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = gridy;
-        //gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
-        gridBagConstraints.insets = new Insets(1, 0, 29, 0);
-        add(jButton_ShowForm, gridBagConstraints);
+        fieldGBC.gridy = ++labelGBC.gridy;
+        add(buttonShowForm, fieldGBC);
 
 
         jText_History.addHyperlinkListener(new HyperlinkListener() {
@@ -378,7 +354,7 @@ public class WithdrawExchange extends IconPanel {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.gridy = ++labelGBC.gridy;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.weightx = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -390,27 +366,33 @@ public class WithdrawExchange extends IconPanel {
     }
 
     private void reset() {
-        asset = (AssetCls) cbxAssets.getSelectedItem();
+        assetIn = (AssetCls) cbxInAssets.getSelectedItem();
 
-        String cryto;
-        switch ((int) asset.getKey()) {
-            case (int) DepositExchange.TEST_ASSET:
-                cryto = "ZEN";
-                break;
-            default:
-                cryto = asset.getName();
+        String assetInName = assetIn.getName();
+        boolean stableCoin = DepositExchange.isStableCoin(assetInName);
+        cbxOutAssets.setVisible(!stableCoin);
+        labelOutAsset.setVisible(!stableCoin);
+
+        String help = "<html><h3>2. ";
+        if (stableCoin) {
+            labelInAsset.setText(Lang.T("Withdraw") + ":");
+            assetOut = assetInName;
+            help += Lang.T("Set the address to which you want to withdraw") + " " + assetOut;
+        } else {
+            labelInAsset.setText(Lang.T("Sell") + ":");
+            assetOut = (String) cbxOutAssets.getSelectedItem();
+            help += Lang.T("Set the address to which you want to send") + " " + assetOut;
         }
 
-        jText_Help.setText("<html><h3>2. " + Lang.T("Set the address to which you want to withdraw")
-                + " " + cryto
-                + ". " + Lang.T("And click button '%1' to open the panel for payment").replace("%1",
+        help += ". " + Lang.T("And click button '%1' to open the panel for payment").replace("%1",
                 Lang.T("Next"))
                 + ". " + Lang.T("Where You need to set only amount of withdraw asset in the panel for payment")
                 + ".</h3>"
                 + Lang.T("Minimal payment in equivalent")
-                + " <b>" + 2.5 + " USD</b>" + "<br>"
-                + Lang.T("Service will have some commission")
-        );
+                + " <b>" + MIN_PAY + " USD</b>" + "<br>"
+                + Lang.T("Service will have some commission");
+
+        jText_Help.setText(help);
 
     }
 }
