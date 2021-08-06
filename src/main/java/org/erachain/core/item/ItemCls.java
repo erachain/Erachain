@@ -484,6 +484,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public abstract String getItemSubType();
 
+    public byte[] getAppData() {
+        return appData;
+    }
+
     public abstract ItemMap getDBMap(DCSet db);
 
     public byte[] getTypeBytes() {
@@ -531,6 +535,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         }
         return name;
 
+    }
+
+    public String getTagsSelf() {
+        return tags;
     }
 
     /**

@@ -4,7 +4,6 @@ package org.erachain.core.item.assets;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Shorts;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
 
@@ -27,10 +26,6 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     }
 
-    public AssetUniqueSeriesCopy(int index) {
-        this(new byte[]{TYPE_ID, 0}, index);
-    }
-
     public AssetUniqueSeriesCopy(AssetUniqueSeries baseItem, int index) {
         this(new byte[]{TYPE_ID, 0}, index);
         this.baseItem = baseItem;
@@ -46,20 +41,28 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         return index;
     }
 
-    @Override
-    public int isValid() {
-        if (index > baseItem.getTotal() || index < 1) {
-            return Transaction.INVALID_ITEM_INDEX;
-        }
-
-        return Transaction.VALIDATE_OK;
-    }
-
     /**
      *
      */
     public void loadExtData(ItemMap itemMap) {
         baseItem = (AssetUniqueSeries) itemMap.get(key - index + 1);
+        flags = baseItem.getFlags();
+        name = baseItem.getName();
+        appData = baseItem.getAppData();
+        description = baseItem.getDescription();
+        icon = baseItem.getIcon();
+        iconAsURL = baseItem.hasIconURL();
+        image = baseItem.getImage();
+        imageAsURL = baseItem.hasImageURL();
+        startDate = baseItem.getStartDate();
+        startDate = baseItem.getStopDate();
+        tags = baseItem.getTagsSelf();
+
+
+    }
+
+    public int getTotal() {
+        return baseItem.getTotal();
     }
 
     //PARSE
