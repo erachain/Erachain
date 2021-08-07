@@ -2,7 +2,6 @@ package org.erachain.gui.items.unions;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
@@ -79,11 +78,10 @@ public class IssueUnionPanel extends IssueItemPanel {
         return true;
     }
 
+    @Override
     protected void makeTransaction() {
 
-        super.makeTransaction();
-
-        transaction = (IssueUnionRecord) Controller.getInstance().issueUnion(
+        transaction = Controller.getInstance().issueUnion(
                 itemAppData, creator, exLink, this.nameField.getText(), birthday, parent, textAreaDescription.getText(),
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
                 feePow);

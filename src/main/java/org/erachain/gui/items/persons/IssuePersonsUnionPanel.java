@@ -4,7 +4,6 @@ import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonsUnion;
-import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
@@ -259,14 +258,13 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
     }
 
 
+    @Override
     protected void makeTransaction() {
-
-        super.makeTransaction();
 
         PersonsUnion union = new PersonsUnion(itemAppData, creator, nameField.getText(),
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(), textAreaDescription.getText(), (byte) 0);
 
-        transaction = (IssuePersonRecord) Controller.getInstance().issuePerson(creator, exLink, feePow,
+        transaction = Controller.getInstance().issuePerson(creator, exLink, feePow,
                 union);
     }
 

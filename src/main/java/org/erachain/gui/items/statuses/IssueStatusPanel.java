@@ -2,7 +2,6 @@ package org.erachain.gui.items.statuses;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.statuses.StatusCls;
-import org.erachain.core.transaction.IssueStatusRecord;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
@@ -54,11 +53,10 @@ public class IssueStatusPanel extends IssueItemPanel {
         return true;
     }
 
+    @Override
     protected void makeTransaction() {
 
-        super.makeTransaction();
-
-        transaction = (IssueStatusRecord) Controller.getInstance().issueStatus(itemAppData, creator,
+        transaction = Controller.getInstance().issueStatus(itemAppData, creator,
                 exLink, nameField.getText(), textAreaDescription.getText(), unique,
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
                 feePow);

@@ -5,7 +5,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
-import org.erachain.core.transaction.IssueItemRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
@@ -52,7 +51,7 @@ public abstract class MakeTXPanel extends IconPanel {
     protected PrivateKeyAccount creator;
     protected ExLink exLink = null;
     protected int feePow;
-    protected IssueItemRecord transaction;
+    protected Transaction transaction;
     protected String confirmMess;
     protected String issueMess;
 
@@ -168,11 +167,20 @@ public abstract class MakeTXPanel extends IconPanel {
 
     protected abstract boolean checkValues();
 
+    protected abstract void preMakeTransaction();
+
     protected abstract void makeTransaction();
 
     protected abstract String makeTransactionView();
 
-    protected abstract String makeHeadView(String nameLabel);
+    protected String makeHeadView(String nameLabel) {
+
+        String out = "<h2>" + transaction.viewFullTypeName() + "</h2>"
+                + Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
+
+        return out;
+    }
 
     public void onIssueClick() {
 
@@ -211,6 +219,7 @@ public abstract class MakeTXPanel extends IconPanel {
                 return;
             }
 
+            preMakeTransaction();
             makeTransaction();
 
             IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,

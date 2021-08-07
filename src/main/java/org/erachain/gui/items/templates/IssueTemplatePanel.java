@@ -1,7 +1,6 @@
 package org.erachain.gui.items.templates;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.transaction.IssueTemplateRecord;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
@@ -27,11 +26,10 @@ public class IssueTemplatePanel extends IssueItemPanel {
         return true;
     }
 
+    @Override
     protected void makeTransaction() {
 
-        super.makeTransaction();
-
-        transaction = (IssueTemplateRecord) Controller.getInstance().issueTemplate(itemAppData, creator,
+        transaction = Controller.getInstance().issueTemplate(itemAppData, creator,
                 exLink, nameField.getText(), textAreaDescription.getText(),
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
                 feePow);

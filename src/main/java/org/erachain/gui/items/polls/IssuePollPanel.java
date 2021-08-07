@@ -1,7 +1,6 @@
 package org.erachain.gui.items.polls;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.transaction.IssuePollRecord;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
@@ -76,11 +75,10 @@ public class IssuePollPanel extends IssueItemPanel {
         return true;
     }
 
+    @Override
     protected void makeTransaction() {
 
-        super.makeTransaction();
-
-        transaction = (IssuePollRecord) Controller.getInstance().issuePoll(itemAppData, creator,
+        transaction = Controller.getInstance().issuePoll(itemAppData, creator,
                 exLink, nameField.getText(), textAreaDescription.getText(),
                 optionsTableModel.getOptions(),
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(), feePow);

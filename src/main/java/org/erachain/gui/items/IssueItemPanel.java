@@ -1,17 +1,9 @@
 package org.erachain.gui.items;
 
 import com.toedter.calendar.JDateChooser;
-import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.MainFrame;
-import org.erachain.gui.ResultDialog;
 import org.erachain.gui.library.AddImageLabel;
-import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MakeTXPanel;
-import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -22,7 +14,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import static org.erachain.gui.items.utils.GUIConstants.*;
-import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 /**
  * @author Саша
@@ -111,13 +102,16 @@ public abstract class IssueItemPanel extends MakeTXPanel {
 
     }
 
-    protected void makeTransaction() {
+    @Override
+    protected void preMakeTransaction() {
         // соберем данные общего класса
         makeAppData();
 
     }
 
     protected String makeHeadView(String nameLabel) {
+
+        String out = super.makeHeadView();
         ItemCls item = transaction.getItem();
         String im = "";
         if (item.hasIconURL())
@@ -134,6 +128,10 @@ public abstract class IssueItemPanel extends MakeTXPanel {
                 + "[" + item.getKey() + "]" + Lang.T(nameLabel) + ":&nbsp;" + item.viewName() + "<br>"
                 + im;
 
+        if (item.hasThasStartDate() || item.hasStopDate()) {
+
+        }
+
         if (item.hasStartDate() || item.hasStopDate()) {
             out += Lang.T("Validity period") + ":"
                     + (item.hasStartDate() ? item.viewStartDate() : "-")
@@ -143,60 +141,6 @@ public abstract class IssueItemPanel extends MakeTXPanel {
         }
 
         return out;
-    }
-
-    public void onIssueClick() {
-
-        // DISABLE
-        issueJButton.setEnabled(false);
-        if (checkWalletUnlock(issueJButton)) {
-            issueJButton.setEnabled(true);
-            return;
-        }
-
-        // READ CREATOR
-        Account creatorAccount = (Account) fromJComboBox.getSelectedItem();
-
-        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
-        if (linkRef != null) {
-            exLink = new ExLinkAppendix(linkRef);
-        }
-
-        try {
-            //READ FEE POW
-            feePow = Integer.parseInt((String) this.textFeePow.getSelectedItem());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(new JFrame(), Lang.T("Invalid fee Power!"), Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-            issueJButton.setEnabled(true);
-            return;
-        }
-
-        if (checkValues()) {
-
-            creator = Controller.getInstance().getWalletPrivateKeyAccountByAddress(creatorAccount.getAddress());
-            if (creator == null) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                issueJButton.setEnabled(true);
-                return;
-            }
-
-            makeTransaction();
-
-            IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                    makeTransactionView(), (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), "",
-                    Lang.T(confirmMess));
-            confirmDialog.setLocationRelativeTo(this);
-            confirmDialog.setVisible(true);
-
-            if (confirmDialog.isConfirm > 0) {
-                ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, null);
-            }
-        }
-
-        //ENABLE
-        this.issueJButton.setEnabled(true);
     }
 
     //

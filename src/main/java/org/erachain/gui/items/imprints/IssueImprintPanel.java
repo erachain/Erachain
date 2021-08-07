@@ -2,7 +2,6 @@ package org.erachain.gui.items.imprints;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.Imprint;
-import org.erachain.core.transaction.IssueImprintRecord;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.gui.library.Library;
@@ -109,11 +108,10 @@ public class IssueImprintPanel extends IssueItemPanel {
         return true;
     }
 
+    @Override
     protected void makeTransaction() {
 
-        super.makeTransaction();
-
-        transaction = (IssueImprintRecord) Controller.getInstance().issueImprint1(itemAppData, creator, exLink, name_total,
+        transaction = Controller.getInstance().issueImprint1(itemAppData, creator, exLink, name_total,
                 textAreaDescription.getText(),
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
                 feePow);

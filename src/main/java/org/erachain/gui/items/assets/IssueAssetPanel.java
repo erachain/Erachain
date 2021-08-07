@@ -6,7 +6,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.item.assets.AssetVenture;
-import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
@@ -196,9 +195,8 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     }
 
+    @Override
     protected void makeTransaction() {
-
-        super.makeTransaction();
 
         AssetCls asset;
         if (AssetCls.isTypeUnique(assetType, quantity)) {
@@ -210,7 +208,7 @@ public class IssueAssetPanel extends IssueItemPanel {
                     addImageLabel.getMediaBytes(), textAreaDescription.getText(),
                     assetType, scale, quantity);
         }
-        transaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
+        transaction = Controller.getInstance().issueAsset(
                 creator, exLink, feePow, asset);
 
     }
