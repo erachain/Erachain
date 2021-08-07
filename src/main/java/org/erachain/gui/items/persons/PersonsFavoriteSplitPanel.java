@@ -82,4 +82,5 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         return new PersonInfo002((PersonCls) item, true);
     }
 
+
 }

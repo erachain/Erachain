@@ -16,6 +16,7 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
 
     public static String NAME = "AssetsFavoriteSplitPanel";
     public static String TITLE = "Favorite Assets";
+    JMenuItem issueSeriesMenuItem;
 
     private static final long serialVersionUID = 2717571093561259483L;
 
@@ -55,8 +56,8 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
         });
         this.menuTable.add(set_Status_Item);
 
-        JMenuItem issueSeries = new JMenuItem(Lang.T("IssueSeries"));
-        issueSeries.addActionListener(new ActionListener() {
+        issueSeriesMenuItem = new JMenuItem(Lang.T("Issue Series"));
+        issueSeriesMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -65,7 +66,7 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
 
             }
         });
-        this.menuTable.add(issueSeries);
+        this.menuTable.add(issueSeriesMenuItem);
 
         menuTable.add(exchange);
         menuTable.addSeparator();
@@ -82,10 +83,14 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
         return new AssetInfo((AssetCls) item, true);
     }
 
-    @Override
-    protected void tableMouse2Click(ItemCls item) {
+    protected void afterSelectItem() {
+        issueSeriesMenuItem.setEnabled(((AssetCls) itemTableSelected).isUnique());
+    }
 
-        AssetCls asset = (AssetCls) item;
+    @Override
+    protected void tableMouse2Click() {
+
+        AssetCls asset = (AssetCls) itemTableSelected;
         AssetCls assetSell = Settings.getInstance().getDefaultPairAsset();
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");

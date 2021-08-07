@@ -121,9 +121,9 @@ public class AssetsMySplitPanel extends ItemSplitPanel {
     }
 
     @Override
-    protected void tableMouse2Click(ItemCls item) {
+    protected void tableMouse2Click() {
 
-        AssetCls asset = (AssetCls) item;
+        AssetCls asset = (AssetCls) itemTableSelected;
         AssetCls assetSell = Settings.getInstance().getDefaultPairAsset();
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
