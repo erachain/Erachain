@@ -118,15 +118,15 @@ public abstract class IssueItemPanel extends MakeTXPanel {
 
         item = ((IssueItemRecord) transaction).getItem();
 
+        out += "<h3>" + item.viewName() + "</h3>";
+
         String im = "";
         if (item.hasIconURL())
-            im += "icon: " + ItemCls.viewMediaType(item.getIconType()) + ":" + item.getIconURL();
+            im += "icon: " + ItemCls.viewMediaType(item.getIconType()) + ":" + item.getIconURL() + "<br>";
         if (item.hasImageURL()) {
-            im += (im.isEmpty() ? "" : ", ") + "image: " + ItemCls.viewMediaType(item.getImageType()) + ":" + item.getImageURL();
+            im += (im.isEmpty() ? "" : ", ") + "image: " + ItemCls.viewMediaType(item.getImageType()) + ":" + item.getImageURL() + "<br>";
         }
-
-        out += "[" + item.getKey() + "] :&nbsp;" + item.viewName() + "<br>"
-                + im + "<br>";
+        out += im;
 
         String tagsSelf = item.getTagsSelf();
         if (tagsSelf != null && !tagsSelf.isEmpty()) {
@@ -146,7 +146,7 @@ public abstract class IssueItemPanel extends MakeTXPanel {
 
     @Override
     protected String makeTailView() {
-        String out = super.makeBodyView();
+        String out = super.makeTailView();
         out += Lang.T("Description") + ":<br>"
                 + Library.to_HTML(item.getDescription());
         return out;

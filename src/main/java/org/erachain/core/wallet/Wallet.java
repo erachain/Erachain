@@ -579,7 +579,10 @@ public class Wallet extends Observable implements Observer {
 			try {
 				dwSet.clear(false);
 			} catch (NullPointerException e) {
+				LOGGER.error(e.getMessage(), e);
+
 				// видимо цепочку другую взяли и в ней таких сущностей нет и падает на создании меток
+				// поставим версию невалидную чтобы база пересоздалась сама
 				DBASet.setVersion(this.dwSet.database, 1);
 				this.dwSet.hardFlush();
 				this.dwSet.close();

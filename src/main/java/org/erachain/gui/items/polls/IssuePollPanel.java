@@ -87,7 +87,7 @@ public class IssuePollPanel extends IssueItemPanel {
 
     protected String makeBodyView() {
 
-        String out = super.makeTailView();
+        String out = super.makeBodyView();
 
         PollCls poll = ((PollCls) item);
 

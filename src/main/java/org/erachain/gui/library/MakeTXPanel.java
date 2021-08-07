@@ -176,19 +176,14 @@ public abstract class MakeTXPanel extends IconPanel {
     }
 
     protected String makeBodyView() {
-
-        String out = "<h2>" + transaction.viewFullTypeName() + "</h2>"
-                + Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
-                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>");
-
-        return out;
+        return "";
     }
 
     private String makeTransactionView() {
         return "<HTML><body><h2>" + transaction.viewFullTypeName() + "</h2>"
                 + Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator().getPersonAsString() + "</b><br>"
-                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
-                + makeBodyView() + makeTailView();
+                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><hr>")
+                + makeBodyView() + "<hr>" + makeTailView();
     }
 
     public void onIssueClick() {
