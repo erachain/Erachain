@@ -1,6 +1,5 @@
 package org.erachain.gui.items.assets;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
@@ -48,12 +47,17 @@ public class IssueAssetSeriesPanel extends IssueItemPanel {
     }
 
     @Override
+    protected boolean checkValues() {
+        return true;
+    }
+
+    @Override
     protected void makeTransaction() {
 
-        transaction = Controller.getInstance().issueStatus(itemAppData, creator,
-                exLink, nameField.getText(), textAreaDescription.getText(), unique,
-                addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
-                feePow);
+        //transaction = Controller.getInstance().issueStatus(itemAppData, creator,
+        //        exLink, nameField.getText(), textAreaDescription.getText(), unique,
+        //        addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
+        //        feePow);
 
     }
 

@@ -2,14 +2,10 @@ package org.erachain.gui.items.assets;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.gui.library.MButton;
-import org.erachain.gui.library.MakeTXPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 
 public class IssueAssetSeriesDialog extends JDialog {
@@ -76,51 +72,13 @@ public class IssueAssetSeriesDialog extends JDialog {
         jLabel_RecordInfo.setBorder(BorderFactory.createEtchedBorder());
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        //    gridBagConstraints.insets = new java.awt.Insets(12, 9, 0, 9);
-        gridBagConstraints.insets = new Insets(0, 9, 0, 9);
-        getContentPane().add(jLabel_RecordInfo, gridBagConstraints);
-
-
-        MButton jButton_Cansel = new MButton(Lang.T("Cancel"), 2);
-        jButton_Cansel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                dispose();
-            }
-        });
-
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 19;
         gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
-        getContentPane().add(jButton_Cansel, gridBagConstraints);
 
 
-        MakeTXPanel makePanel = new MakeTXPanel("Issue Series", "Issue Asset Series", "Issue Series", "Confirmation Transaction") {
-            @Override
-            protected boolean checkValues() {
-                return false;
-            }
-
-            @Override
-            protected void preMakeTransaction() {
-
-            }
-
-            @Override
-            protected void makeTransaction() {
-
-            }
-        };
-
-        makePanel = new IssueAssetPanel();
+        AssetInfo makePanel = new AssetInfo(origAsset, false);
         //jLabel_RecordInfo.setViewportView(makePanel);
 
         makePanel.setVisible(true);

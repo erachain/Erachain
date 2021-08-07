@@ -18,6 +18,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import static org.erachain.gui.items.utils.GUIConstants.FONT_TITLE;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
@@ -34,8 +36,11 @@ public abstract class MakeTXPanel extends IconPanel {
     protected JLabel feeJLabel = new JLabel(Lang.T("Fee Power") + ":");
     protected JComboBox<String> textFeePow = new JComboBox<>();
     protected JComboBox<Account> fromJComboBox = new JComboBox<>(new AccountsComboBoxModel());
+    protected JButton cancelJButton = new JButton(Lang.T("Cancel"));
     protected JButton issueJButton = new JButton(Lang.T("Issue"));
     protected JScrollPane jScrollPane1 = new JScrollPane();
+
+    JDialog parentDialog;
 
     protected JPanel jPanelMain = new JPanel();
     protected JPanel jPanelAdd = new JPanel();
@@ -55,8 +60,10 @@ public abstract class MakeTXPanel extends IconPanel {
     protected String confirmMess;
     protected String issueMess;
 
-    public MakeTXPanel(String name, String title, String issueMess, String confirmMess) {
+    public MakeTXPanel(String name, String title, String issueMess, String confirmMess, JDialog parentDialog) {
         super(name, title);
+
+        this.parentDialog = parentDialog;
 
         this.issueMess = issueMess;
         this.confirmMess = confirmMess;
@@ -70,6 +77,15 @@ public abstract class MakeTXPanel extends IconPanel {
         textFeePow.setSelectedItem("0");
         feeJLabel.setVisible(Gui.SHOW_FEE_POWER);
         textFeePow.setVisible(Gui.SHOW_FEE_POWER);
+
+        if (parentDialog != null) {
+            cancelJButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    parentDialog.dispose();
+                }
+            });
+        }
+
         issueJButton.addActionListener(arg0 -> onIssueClick());
 
         exLinkDescription.setEditable(false);
@@ -307,6 +323,13 @@ public abstract class MakeTXPanel extends IconPanel {
     protected void initBottom(int y) {
 
         labelGBC.gridy = ++y;
+
+        if (parentDialog != null) {
+            fieldGBC.gridy = y;
+            fieldGBC.insets = new Insets(10, 5, 15, 5);
+            jPanelMain.add(cancelJButton, fieldGBC);
+
+        }
 
         fieldGBC.gridy = y;
         fieldGBC.insets = new Insets(10, 5, 15, 5);
