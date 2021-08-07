@@ -361,7 +361,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
         int gridy = 0;
 
-        jCheckBoxAccrualsUse.setText(Lang.T("Make Air Drops"));
+        jCheckBoxAccrualsUse.setText(Lang.T("Make Payouts"));
         add(jCheckBoxAccrualsUse, fieldGBC);
 
         jLabel_Help.setText("<html>" + Lang.T("ExAirDropPanel_Help") + "</html>");
