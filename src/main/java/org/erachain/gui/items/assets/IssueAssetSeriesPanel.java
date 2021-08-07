@@ -1,55 +1,50 @@
-package org.erachain.gui.items.statuses;
+package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
+import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
-import java.awt.*;
 
-public class IssueStatusPanel extends IssueItemPanel {
+public class IssueAssetSeriesPanel extends IssueItemPanel {
 
-    public static String NAME = "IssueStatusPanel";
-    public static String TITLE = "Issue Status";
+    public static String NAME = "IssueAssetSeriesPanel";
+    public static String TITLE = "Issue Asset Series";
 
-    private final JCheckBox checkUnique;
+    //private JCheckBox jcheckUnique;
+    public JTextField assetRefField = new JTextField("");
+    private MDecimalFormatedTextField totalField = new MDecimalFormatedTextField(Short.class);
 
-
-    public IssueStatusPanel() {
-        super(NAME, TITLE, "Status issue has been sent", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true, true);
+    public IssueAssetSeriesPanel() {
+        super(NAME, TITLE, "Series issue has been sent", true,
+                GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true, true);
 
         initComponents();
 
         // вывод верхней панели
         int gridy = initTopArea(true);
 
-        JLabel singleLabel = new JLabel(Lang.T("Single") + ":");
+        JLabel signLabel = new JLabel(Lang.T("Asset Issue TX Signature") + ":");
         labelGBC.gridy = gridy;
-        jPanelAdd.add(singleLabel, labelGBC);
-
-        checkUnique = new JCheckBox();
-        GridBagConstraints gbcJCheckUnique = new GridBagConstraints();
-        gbcJCheckUnique.gridx = 8;
-        //gbcJCheckUnique.gridy = gridy++;
-        gbcJCheckUnique.anchor = GridBagConstraints.NORTHEAST;
+        jPanelAdd.add(signLabel, labelGBC);
 
         fieldGBC.gridy = gridy++;
-        jPanelAdd.add(checkUnique, fieldGBC);
+        jPanelAdd.add(assetRefField, fieldGBC);
+
+        JLabel totalLabel = new JLabel(Lang.T("Series Total") + ":");
+        labelGBC.gridy = gridy;
+        jPanelAdd.add(totalLabel, labelGBC);
+
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(totalField, fieldGBC);
 
         // вывод подвала
         initBottom(gridy);
 
         setVisible(true);
-    }
-
-    boolean unique;
-
-    protected boolean checkValues() {
-
-        unique = checkUnique.isSelected();
-        return true;
     }
 
     @Override
