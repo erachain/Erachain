@@ -55,6 +55,18 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
         });
         this.menuTable.add(set_Status_Item);
 
+        JMenuItem issueSeries = new JMenuItem(Lang.T("IssueSeries"));
+        issueSeries.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                @SuppressWarnings("unused")
+                IssueAssetSeriesDialog fm = new IssueAssetSeriesDialog((AssetCls) itemTableSelected);
+
+            }
+        });
+        this.menuTable.add(issueSeries);
+
         menuTable.add(exchange);
         menuTable.addSeparator();
         menuTable.add(buy);

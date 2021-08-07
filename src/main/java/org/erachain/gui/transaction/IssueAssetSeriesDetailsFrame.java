@@ -9,28 +9,40 @@ import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class IssueAssetSeriesDetailsFrame extends RecDetailsFrame {
-    public IssueAssetSeriesDetailsFrame(IssueAssetSeriesTransaction orderUpdate) {
-        super(orderUpdate, true);
+    public IssueAssetSeriesDetailsFrame(IssueAssetSeriesTransaction assetSeriesTX) {
+        super(assetSeriesTX, true);
 
-        orderUpdate.setDC(DCSet.getInstance(), true);
+        assetSeriesTX.setDC(DCSet.getInstance(), true);
 
-        //LABEL HAVE
+        //LABEL original REF
         ++labelGBC.gridy;
-        JLabel haveLabel = new JLabel(Lang.T("Have") + ":");
-        this.add(haveLabel, labelGBC);
-
-        //LABEL PRICE
-        ++labelGBC.gridy;
-        JLabel priceLabel = new JLabel(Lang.T("Price") + ":");
-        this.add(priceLabel, labelGBC);
-
+        this.add(new JLabel(Lang.T("Asset Reference") + ":"), labelGBC);
         //PRICE
         ++fieldGBC.gridy;
-        JTextField price = new JTextField(orderUpdate.getPriceCalc().toPlainString()
-                + " / " + orderUpdate.getPriceCalcReverse().toPlainString());
-        price.setEditable(false);
-        MenuPopupUtil.installContextMenu(price);
-        this.add(price, fieldGBC);
+        JTextField origRef = new JTextField(assetSeriesTX.viewOrigAssetRef());
+        origRef.setEditable(false);
+        MenuPopupUtil.installContextMenu(origRef);
+        this.add(origRef, fieldGBC);
+
+        ++labelGBC.gridy;
+        this.add(new JLabel(Lang.T("Asset") + ":"), labelGBC);
+        //PRICE
+        ++fieldGBC.gridy;
+        JTextField origKey = new JTextField(assetSeriesTX.getAsset().toString());
+        origKey.setEditable(false);
+        MenuPopupUtil.installContextMenu(origKey);
+        this.add(origKey, fieldGBC);
+
+        //LABEL TOTAL
+        ++labelGBC.gridy;
+        this.add(new JLabel(Lang.T("Total") + ":"), labelGBC);
+
+        //TOTAL
+        ++fieldGBC.gridy;
+        JTextField total = new JTextField(assetSeriesTX.getTotal());
+        total.setEditable(false);
+        MenuPopupUtil.installContextMenu(total);
+        this.add(total, fieldGBC);
 
         //PACK
         //		this.pack();

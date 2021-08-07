@@ -480,48 +480,19 @@ public class WebTransactionsHTML {
 
         String out = "";
 
-        IssueAssetSeriesTransaction orderUpdate = (IssueAssetSeriesTransaction) transaction;
+        IssueAssetSeriesTransaction assetSeriesTX = (IssueAssetSeriesTransaction) transaction;
 
-        Long orderID = orderUpdate.getOrderId();
+        Long origAssetKey = assetSeriesTX.getOrigAssetKey();
         //
-        Order orderOrig = null;
-        String statusOrig;
-        if (dcSet.getOrderMap().contains(orderID)) {
-            orderOrig = dcSet.getOrderMap().get(orderID);
-        } else if (dcSet.getCompletedOrderMap().contains(orderID)) {
-            orderOrig = dcSet.getCompletedOrderMap().get(orderID);
-        }
-        if (orderOrig == null) {
-            statusOrig = "Unknown";
-        } else {
-            statusOrig = orderOrig.viewStatus();
-        }
+        AssetCls origAsset = dcSet.getItemAssetMap().get(origAssetKey);
 
-        out += "<h4><a href='?order=" + Transaction.viewDBRef(orderID) + get_Lang() + "'>" + Lang.T(statusOrig, langObj) + "</a>";
+        out += "<h4><a href='?asset=" + origAssetKey + get_Lang() + "'>" + origAsset.toString() + "</a></h4>";
 
-        Long refDB = orderUpdate.getDBRef();
-        //
-        Order order = null;
-        String status;
-        if (dcSet.getOrderMap().contains(refDB)) {
-            order = dcSet.getOrderMap().get(refDB);
-        } else if (dcSet.getCompletedOrderMap().contains(refDB)) {
-            order = dcSet.getCompletedOrderMap().get(refDB);
-        }
-        if (order == null) {
-            status = "Unknown";
-        } else {
-            status = order.viewStatus();
-        }
+        out += Lang.T("Asset Issue Signature", langObj) + ": <a href='?tx=" + Base58.encode(assetSeriesTX.getOrigAssetRef()) + "'><b>"
+                + Base58.encode(assetSeriesTX.getOrigAssetRef()) + "</b></a><br>";
 
-        out += " - <a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang() + "'>" + Lang.T(status, langObj) + "</a></h4>";
-
-        out += Lang.T("Order Signature", langObj) + ": <a href='?tx=" + Base58.encode(orderUpdate.getOrderRef()) + "'><b>"
-                + Base58.encode(orderUpdate.getOrderRef()) + "</b></a><br>";
-
-        out += Lang.T("Update Price", langObj) + ": <b>"
-                + orderUpdate.makeUpdatedOrder().calcPrice().toPlainString()
-                + " / " + orderUpdate.makeUpdatedOrder().calcPriceReverse().toPlainString() + "</b><br>";
+        out += Lang.T("Total", langObj) + ": <b>"
+                + assetSeriesTX.getTotal() + "</b><br>";
 
         return out;
     }

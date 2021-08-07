@@ -36,8 +36,8 @@ public class IssueAssetSeriesTransaction extends Transaction {
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
     private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH + Long.BYTES;
 
-    private byte[] origAssetRef;
-    private int total;
+    private final byte[] origAssetRef;
+    private final int total;
 
     /**
      * Нужно чтобы запомнить с какого номер началась Серия - для быстрого удаления всех
@@ -120,6 +120,10 @@ public class IssueAssetSeriesTransaction extends Transaction {
         return origAsset.getName();
     }
 
+    public int getTotal() {
+        return total;
+    }
+
     @Override
     public long calcBaseFee(boolean withFreeProtocol) {
 
@@ -139,8 +143,17 @@ public class IssueAssetSeriesTransaction extends Transaction {
         return origAssetKey;
     }
 
+    @Override
+    public AssetCls getAsset() {
+        return origAsset;
+    }
+
     public byte[] getOrigAssetRef() {
         return this.origAssetRef;
+    }
+
+    public String viewOrigAssetRef() {
+        return Base58.encode(this.origAssetRef);
     }
 
     @Override

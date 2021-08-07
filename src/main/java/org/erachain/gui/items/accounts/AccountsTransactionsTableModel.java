@@ -254,9 +254,9 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
         } else if (transaction.getType() == Transaction.ISSUE_ASSET_SERIES_TRANSACTION) {
             IssueAssetSeriesTransaction issueAssetSeries = (IssueAssetSeriesTransaction) transaction;
 
-            trr.amount = issueAssetSeries.getNewAmount();
+            trr.amount = new BigDecimal(issueAssetSeries.getTotal());
             trr.recipient = ""; // + updateOrder.getAmountWant();
-            trr.title = "" + issueAssetSeries.getNewAmount().toPlainString();
+            trr.title = "" + issueAssetSeries.getTitle();
 
         } else {
             trr.recipient = "";
