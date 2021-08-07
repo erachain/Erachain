@@ -206,7 +206,7 @@ public class AssetUniqueSeries extends AssetUnique {
      * @return
      */
     public AssetUniqueSeriesCopy copy(int index) {
-        return new AssetUniqueSeriesCopy(this, index);
+        return new AssetUniqueSeriesCopy(this, total, index);
     }
 
     public String makeHTMLView() {

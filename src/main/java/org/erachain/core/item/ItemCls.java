@@ -82,9 +82,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
-    /**
-     * 0 - type 1 - version
-     */
     protected byte[] typeBytes;
     protected PublicKeyAccount maker;
 
@@ -164,6 +161,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     /**
+     * load fields after get or delete in DB
      * У некоторых типов сущностей (актив.уникальный.серия AssetUniqueSeries) нужно подгружать данные из базы.
      * Так же при создании вторичных ключей надо вызывать это.
      */

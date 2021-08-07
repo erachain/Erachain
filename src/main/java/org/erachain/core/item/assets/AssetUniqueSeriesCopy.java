@@ -2,7 +2,6 @@ package org.erachain.core.item.assets;
 
 //import java.math.BigDecimal;
 
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Shorts;
 import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
@@ -16,18 +15,22 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     private static final int TYPE_ID = UNIQUE_COPY;
 
+    protected static final int BASE_LENGTH = TYPE_LENGTH + 2 * Short.BYTES;
+
+    private int total;
     private int index;
     private AssetUniqueSeries baseItem;
 
-    public AssetUniqueSeriesCopy(byte[] typeBytes, int index) {
+    public AssetUniqueSeriesCopy(byte[] typeBytes, int total, int index) {
         super(typeBytes);
 
+        this.total = total;
         this.index = index;
 
     }
 
-    public AssetUniqueSeriesCopy(AssetUniqueSeries baseItem, int index) {
-        this(new byte[]{TYPE_ID, 0}, index);
+    public AssetUniqueSeriesCopy(AssetUniqueSeries baseItem, int total, int index) {
+        this(new byte[]{TYPE_ID, 0}, total, index);
         this.baseItem = baseItem;
     }
 
@@ -37,13 +40,14 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         return "unique copy";
     }
 
+    public int getTotal() {
+        return total;
+    }
+
     public int getIndex() {
         return index;
     }
 
-    /**
-     *
-     */
     public void loadExtData(ItemMap itemMap) {
         baseItem = (AssetUniqueSeries) itemMap.get(key - index + 1);
         flags = baseItem.getFlags();
@@ -58,11 +62,6 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         startDate = baseItem.getStopDate();
         tags = baseItem.getTagsSelf();
 
-
-    }
-
-    public int getTotal() {
-        return baseItem.getTotal();
     }
 
     //PARSE
@@ -73,13 +72,18 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
         int position = TYPE_LENGTH;
 
+        //READ TOTAL
+        byte[] totalBytes = Arrays.copyOfRange(data, position, position + Short.BYTES);
+        int total = Shorts.fromByteArray(totalBytes);
+        position += Short.BYTES;
+
         //READ INDEX
         byte[] indexBytes = Arrays.copyOfRange(data, position, position + Short.BYTES);
         int index = Shorts.fromByteArray(indexBytes);
         position += Short.BYTES;
 
         //RETURN
-        AssetUniqueSeriesCopy unique = new AssetUniqueSeriesCopy(typeBytes, index);
+        AssetUniqueSeriesCopy unique = new AssetUniqueSeriesCopy(typeBytes, total, index);
 
         return unique;
     }
@@ -87,15 +91,19 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
     @Override
     public byte[] toBytes(int forDeal, boolean includeReference, boolean forMakerSign) {
 
-        byte[] data = this.typeBytes;
+        byte[] data = new byte[BASE_LENGTH];
 
-        data = Bytes.concat(data, Shorts.toByteArray((short) index));
+        //WRITE ASSET TYPE
+        data[0] = (byte) TYPE_ID;
+
+        System.arraycopy(Shorts.toByteArray((short) total), 0, data, 2, Short.BYTES);
+        System.arraycopy(Shorts.toByteArray((short) index), 0, data, 4, Short.BYTES);
 
         return data;
     }
 
     public int getDataLength(boolean includeReference) {
-        return TYPE_LENGTH + Short.BYTES;
+        return BASE_LENGTH;
     }
 
     //OTHER
@@ -103,8 +111,8 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
     public String makeHTMLView() {
 
         String text = super.makeHTMLHeadView();
-        text += Lang.T("Series") + ":&nbsp;" + baseItem.getTotal() + ", "
-                + Lang.T("Index") + ":&nbsp;" + getIndex() + "<br>";
+        text += Lang.T("Series") + ":&nbsp;" + total + ", "
+                + Lang.T("Index") + ":&nbsp;" + index + "<br>";
         text += super.makeHTMLFootView(true);
 
         return text;

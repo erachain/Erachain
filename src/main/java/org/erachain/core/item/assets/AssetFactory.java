@@ -27,8 +27,8 @@ public class AssetFactory {
             case AssetCls.UNIQUE:
                 return AssetUnique.parse(forDeal, data, includeReference);
 
-            case AssetCls.UNIQUE_SERIES:
-                return AssetUniqueSeries.parse(forDeal, data, includeReference);
+            //case AssetCls.UNIQUE_SERIES:
+            //    return AssetUniqueSeries.parse(forDeal, data, includeReference);
 
             case AssetCls.UNIQUE_COPY:
                 return AssetUniqueSeriesCopy.parse(forDeal, data, includeReference);
