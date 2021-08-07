@@ -63,7 +63,7 @@ public class IssueAssetSeriesDialog extends JDialog {
         this.setIconImages(icons);
 
         initComponents();
-        setPreferredSize(new Dimension(1000, 600));
+        setPreferredSize(new Dimension(0, 600));
         //setMinimumSize(new Dimension(1000, 600));
         //setMaximumSize(new Dimension(1000, 600));
 

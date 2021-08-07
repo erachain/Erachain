@@ -67,6 +67,7 @@ public class IssueAssetPanel extends IssueItemPanel {
     }
 
     protected void initComponents() {
+
         super.initComponents();
 
         // вывод верхней панели
