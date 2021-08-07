@@ -329,6 +329,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int SIGN_TRANSACTION = 40;
     // HASHES
     public static final int HASHES_RECORD = 41;
+    public static final int ISSUE_ASSET_SERIES_TRANSACTION = 42;
+
     // exchange of assets
     public static final int CREATE_ORDER_TRANSACTION = 50;
     public static final int CANCEL_ORDER_TRANSACTION = 51;

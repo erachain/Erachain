@@ -5,9 +5,10 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.item.assets.*;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetFactory;
+import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemMap;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -336,32 +337,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
         }
 
-        if (asset instanceof AssetUniqueSeries) {
-            AssetUniqueSeries uniqueSeries = (AssetUniqueSeries) asset;
-            byte[] newData = uniqueSeries.remakeAppdata();
-            AssetUniqueSeriesCopy uniqueSeriesCopy;
-            long copyKey;
-            ItemMap map = asset.getDBMap(dcSet);
-            for (int indexCopy = 2; indexCopy <= uniqueSeries.getTotal(); indexCopy++) {
-
-                uniqueSeriesCopy = uniqueSeries.copy(indexCopy);
-
-                //INSERT INTO DATABASE
-                copyKey = map.incrementPut(uniqueSeriesCopy);
-
-                // SET BALANCES
-                creator.changeBalance(dcSet, false, false, copyKey,
-                        BigDecimal.ONE, false, false, false);
-
-                // make HOLD balance
-                if (!uniqueSeriesCopy.isUnHoldable()) {
-                    creator.changeBalance(dcSet, false, true, copyKey,
-                            BigDecimal.ONE.negate(), false, false, false);
-                }
-
-            }
-
-        }
     }
 
     //@Override
@@ -383,31 +358,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
                 creator.changeBalance(dcSet, true, true, assetKey,
                         new BigDecimal(-quantity).setScale(0), false, false, false);
             }
-        }
-
-        if (asset instanceof AssetUniqueSeries) {
-            AssetUniqueSeries uniqueSeries = (AssetUniqueSeries) asset;
-            long copyKey;
-            ItemMap map = asset.getDBMap(dcSet);
-            for (int indexDel = 1; indexDel < uniqueSeries.getTotal(); indexDel++) {
-
-                copyKey = assetKey + indexDel;
-
-                //DELETE FROM DATABASE
-                map.decrementDelete(copyKey);
-
-                // SET BALANCES
-                creator.changeBalance(dcSet, true, false, copyKey,
-                        BigDecimal.ONE, false, false, false);
-
-                // make HOLD balance
-                if (!asset.isUnHoldable()) {
-                    creator.changeBalance(dcSet, true, true, copyKey,
-                            BigDecimal.ONE.negate(), false, false, false);
-                }
-
-            }
-
         }
 
     }
