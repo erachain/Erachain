@@ -85,19 +85,19 @@ public class IssuePollPanel extends IssueItemPanel {
 
     }
 
-    protected String makeHeadView() {
+    protected String makeBodyView() {
 
-        String out = makeBodyView();
-
-        out += "<br>" + Lang.T("Options") + ":<br>";
+        String out = super.makeTailView();
 
         PollCls poll = ((PollCls) item);
+
+        out += Lang.T("Options") + ":<br>";
         List<String> options = poll.getOptions();
         for (int i = 0; i < options.size(); i++) {
-            out += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + options.get(i);
+            out += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + options.get(i) + "<br>";
 
         }
-        out += "<br>    ";
+        out += "<br>";
 
         return out;
 

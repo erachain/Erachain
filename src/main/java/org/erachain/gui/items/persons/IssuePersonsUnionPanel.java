@@ -6,7 +6,6 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonsUnion;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
-import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -266,19 +265,6 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
 
         transaction = Controller.getInstance().issuePerson(creator, exLink, feePow,
                 union);
-    }
-
-    @Override
-    protected String makeHeadView() {
-
-        String out = super.makeHeadView();
-        out += Lang.T("Confirmation Transaction") + ":&nbsp;"
-                + Lang.T("Issue Union") + "<br><br><br>"
-                + makeHeadView();
-        out += "<br>" + Lang.T("Description") + ":<br>"
-                + Library.to_HTML(item.getDescription()) + "<br>";
-
-        return out;
     }
 
 }

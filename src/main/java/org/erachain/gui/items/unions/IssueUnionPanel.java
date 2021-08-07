@@ -86,9 +86,9 @@ public class IssueUnionPanel extends IssueItemPanel {
                 feePow);
     }
 
-    protected String makeHeadView() {
+    protected String makeBodyView() {
 
-        String out = super.makeHeadView();
+        String out = super.makeBodyView();
 
         out += Lang.T("Date") + ":&nbsp;" + ((UnionCls) item).getBirthday() + "<br>";
         out += Lang.T("Parent") + ":&nbsp;" + ((UnionCls) item).getParent() + "<br>";

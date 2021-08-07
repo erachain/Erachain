@@ -214,9 +214,9 @@ public class IssueAssetPanel extends IssueItemPanel {
     }
 
     @Override
-    protected String makeHeadView() {
+    protected String makeBodyView() {
 
-        String out = super.makeHeadView();
+        String out = super.makeBodyView();
         AssetCls asset = (AssetCls) item;
 
         out += Lang.T("Asset Class") + ":&nbsp;"
@@ -235,22 +235,18 @@ public class IssueAssetPanel extends IssueItemPanel {
             out += "<br>";
         }
 
-        out += Lang.T("Description") + ":<br>";
-
-
         return out;
 
     }
 
     @Override
-    protected String makeBodyView() {
+    protected String makeTailView() {
         String out = "";
-        out += Lang.T("Description") + ":<br>"
-                + Library.to_HTML(item.getDescription()) + "<br>";
+        out += Lang.T("Description") + ":<br>";
         if (item.getKey() > 0 && item.getKey() < 1000) {
-            out += Library.to_HTML(Lang.T(item.viewDescription())) + "<br>";
+            out += Library.to_HTML(Lang.T(item.viewDescription()));
         } else {
-            out += Library.to_HTML(item.viewDescription()) + "<br>";
+            out += Library.to_HTML(item.viewDescription());
         }
 
         return out;

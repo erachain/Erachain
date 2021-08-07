@@ -112,9 +112,9 @@ public abstract class IssueItemPanel extends MakeTXPanel {
 
     }
 
-    protected String makeHeadView() {
+    protected String makeBodyView() {
 
-        String out = super.makeHeadView();
+        String out = super.makeBodyView();
 
         item = ((IssueItemRecord) transaction).getItem();
 
@@ -144,10 +144,11 @@ public abstract class IssueItemPanel extends MakeTXPanel {
         return out;
     }
 
-    protected String makeBodyView() {
-        String out = super.makeHeadView();
+    @Override
+    protected String makeTailView() {
+        String out = super.makeBodyView();
         out += Lang.T("Description") + ":<br>"
-                + Library.to_HTML(item.getDescription()) + "<br>";
+                + Library.to_HTML(item.getDescription());
         return out;
     }
 

@@ -63,13 +63,14 @@ public class IssueStatusPanel extends IssueItemPanel {
     }
 
     @Override
-    protected String makeHeadView() {
+    protected String makeBodyView() {
 
-        String out = super.makeHeadView();
+        String out = super.makeBodyView();
 
         StatusCls status = (StatusCls) item;
         out += Lang.T("Unique") + ": " + status.isUnique()
                 + "<br>";
+
         return out;
 
     }
