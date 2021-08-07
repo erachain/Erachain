@@ -2,7 +2,9 @@ package org.erachain.gui.items;
 
 import com.toedter.calendar.JDateChooser;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.IssueItemRecord;
 import org.erachain.gui.library.AddImageLabel;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MakeTXPanel;
 import org.erachain.lang.Lang;
 
@@ -41,6 +43,7 @@ public abstract class IssueItemPanel extends MakeTXPanel {
     protected JTextField exLinkDescription = new JTextField();
     boolean useIcon;
 
+    protected ItemCls item;
     protected byte[] itemAppData;
 
     public IssueItemPanel(String name, String title, String issueMess, boolean useIcon, int cropWidth, int cropHeight, boolean originalSize, boolean useExtURL) {
@@ -109,10 +112,12 @@ public abstract class IssueItemPanel extends MakeTXPanel {
 
     }
 
-    protected String makeHeadView(String nameLabel) {
+    protected String makeHeadView() {
 
         String out = super.makeHeadView();
-        ItemCls item = transaction.getItem();
+
+        item = ((IssueItemRecord) transaction).getItem();
+
         String im = "";
         if (item.hasIconURL())
             im += "icon: " + ItemCls.viewMediaType(item.getIconType()) + ":" + item.getIconURL();
@@ -120,16 +125,12 @@ public abstract class IssueItemPanel extends MakeTXPanel {
             im += (im.isEmpty() ? "" : ", ") + "image: " + ItemCls.viewMediaType(item.getImageType()) + ":" + item.getImageURL();
         }
 
-        if (!im.isEmpty())
-            im += "<br>";
+        out += "[" + item.getKey() + "] :&nbsp;" + item.viewName() + "<br>"
+                + im + "<br>";
 
-        String out = Lang.T("Creator") + ":&nbsp;<b>" + transaction.getCreator() + "</b><br>"
-                + (exLink == null ? "" : Lang.T("Append to") + ":&nbsp;<b>" + exLink.viewRef() + "</b><br>")
-                + "[" + item.getKey() + "]" + Lang.T(nameLabel) + ":&nbsp;" + item.viewName() + "<br>"
-                + im;
-
-        if (item.hasThasStartDate() || item.hasStopDate()) {
-
+        String tagsSelf = item.getTagsSelf();
+        if (tagsSelf != null && !tagsSelf.isEmpty()) {
+            out += Lang.T("Tags") + ": " + tagsSelf + "<br>";
         }
 
         if (item.hasStartDate() || item.hasStopDate()) {
@@ -140,6 +141,13 @@ public abstract class IssueItemPanel extends MakeTXPanel {
                     + "<br>";
         }
 
+        return out;
+    }
+
+    protected String makeBodyView() {
+        String out = super.makeHeadView();
+        out += Lang.T("Description") + ":<br>"
+                + Library.to_HTML(item.getDescription()) + "<br>";
         return out;
     }
 

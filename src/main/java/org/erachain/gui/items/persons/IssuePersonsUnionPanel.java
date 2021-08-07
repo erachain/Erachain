@@ -269,15 +269,16 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
     }
 
     @Override
-    protected String makeTransactionView() {
-        String text = "<HTML><body>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
-                + Lang.T("Issue Union") + "<br><br><br>"
-                + makeHeadView("Name");
-        text += "<br>" + Lang.T("Description") + ":<br>"
-                + Library.to_HTML(this.textAreaDescription.getText()) + "<br>";
+    protected String makeHeadView() {
 
-        return text;
+        String out = super.makeHeadView();
+        out += Lang.T("Confirmation Transaction") + ":&nbsp;"
+                + Lang.T("Issue Union") + "<br><br><br>"
+                + makeHeadView();
+        out += "<br>" + Lang.T("Description") + ":<br>"
+                + Library.to_HTML(item.getDescription()) + "<br>";
+
+        return out;
     }
 
 }

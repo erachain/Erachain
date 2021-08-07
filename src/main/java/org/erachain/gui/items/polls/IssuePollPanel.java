@@ -1,9 +1,9 @@
 package org.erachain.gui.items.polls;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.polls.PollCls;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.CreateOptionsTableModel;
 import org.erachain.lang.Lang;
@@ -85,25 +85,21 @@ public class IssuePollPanel extends IssueItemPanel {
 
     }
 
-    protected String makeTransactionView() {
+    protected String makeHeadView() {
 
-        String text = "<HTML><body>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
-                + Lang.T("Issue Voting") + "<br><br><br>"
-                + makeHeadView("Title");
-        text += "<br>" + Lang.T("Description") + ":<br>"
-                + Library.to_HTML(this.textAreaDescription.getText()) + "<br>";
-        text += "<br>" + Lang.T("Options") + ":<br>";
+        String out = makeBodyView();
 
-        List<String> options = optionsTableModel.getOptions();
+        out += "<br>" + Lang.T("Options") + ":<br>";
 
+        PollCls poll = ((PollCls) item);
+        List<String> options = poll.getOptions();
         for (int i = 0; i < options.size(); i++) {
-            text += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + options.get(i);
+            out += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + options.get(i);
 
         }
-        text += "<br>    ";
+        out += "<br>    ";
 
-        return text;
+        return out;
 
     }
 

@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
-import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -63,17 +62,15 @@ public class IssueStatusPanel extends IssueItemPanel {
 
     }
 
-    protected String makeTransactionView() {
+    @Override
+    protected String makeHeadView() {
 
-        String text = "<HTML><body>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
-                + Lang.T("Create Status") + "<br><br><br>"
-                + makeHeadView("Name");
-        text += Lang.T("Description") + ":<br>"
-                + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
-        text += Lang.T("Unique") + ": " + ((StatusCls) transaction.getItem()).isUnique()
+        String out = super.makeHeadView();
+
+        StatusCls status = (StatusCls) item;
+        out += Lang.T("Unique") + ": " + status.isUnique()
                 + "<br>";
-        return text;
+        return out;
 
     }
 

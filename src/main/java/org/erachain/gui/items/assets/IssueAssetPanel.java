@@ -213,15 +213,13 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     }
 
-    protected String makeTransactionView() {
+    @Override
+    protected String makeHeadView() {
 
-        AssetCls asset = (AssetCls) transaction.getItem();
+        String out = super.makeHeadView();
+        AssetCls asset = (AssetCls) item;
 
-        String text = "<body><h2>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
-                + Lang.T("Issue Asset") + "</h2>"
-                + makeHeadView("Name")
-                + Lang.T("Asset Class") + ":&nbsp;"
+        out += Lang.T("Asset Class") + ":&nbsp;"
                 + Lang.T(asset.getItemSubType() + "") + "<br>"
                 + Lang.T("Asset Type") + ":&nbsp;"
                 + "<b>" + asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:" + Lang.T(asset.viewAssetTypeFull() + "") + "<br>"
@@ -229,24 +227,33 @@ public class IssueAssetPanel extends IssueItemPanel {
                 + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>";
 
         if (asset.getDEXAwards() != null) {
-            text += Lang.T("DEX Awards" + ":");
+            out += Lang.T("DEX Awards" + ":");
             for (ExLinkAddress award : asset.getDEXAwards()) {
-                text += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
+                out += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
                         + (award.getMemo() == null || award.getMemo().isEmpty() ? "" : " - " + award.getMemo());
             }
-            text += "<br>";
+            out += "<br>";
         }
 
-        text += Lang.T("Description") + ":<br>";
+        out += Lang.T("Description") + ":<br>";
 
-        if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            text += Library.to_HTML(Lang.T(asset.viewDescription())) + "<br>";
+
+        return out;
+
+    }
+
+    @Override
+    protected String makeBodyView() {
+        String out = "";
+        out += Lang.T("Description") + ":<br>"
+                + Library.to_HTML(item.getDescription()) + "<br>";
+        if (item.getKey() > 0 && item.getKey() < 1000) {
+            out += Library.to_HTML(Lang.T(item.viewDescription())) + "<br>";
         } else {
-            text += Library.to_HTML(asset.viewDescription()) + "<br>";
+            out += Library.to_HTML(item.viewDescription()) + "<br>";
         }
 
-        return text;
-
+        return out;
     }
 
 }

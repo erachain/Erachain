@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
-import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,16 +86,14 @@ public class IssueUnionPanel extends IssueItemPanel {
                 feePow);
     }
 
-    protected String makeTransactionView() {
+    protected String makeHeadView() {
 
-        String text = "<HTML><body>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Union") + "<br><br><br>"
-                + makeHeadView("Union");
-        text += Lang.T("Description") + ":<br>" + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
-        text += Lang.T("Date") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getBirthday() + "<br>";
-        text += Lang.T("Parent") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getParent() + "<br>";
+        String out = super.makeHeadView();
 
-        return text;
+        out += Lang.T("Date") + ":&nbsp;" + ((UnionCls) item).getBirthday() + "<br>";
+        out += Lang.T("Parent") + ":&nbsp;" + ((UnionCls) item).getParent() + "<br>";
+
+        return out;
     }
 
     protected void initComponents() {
