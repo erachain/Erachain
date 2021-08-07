@@ -337,6 +337,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
 
     protected void makeTransaction() {
+        super.makeTransaction();
     }
 
     @Override

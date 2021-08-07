@@ -78,6 +78,8 @@ public class IssuePollPanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
+        super.makeTransaction();
+
         transaction = (IssuePollRecord) Controller.getInstance().issuePoll(itemAppData, creator,
                 exLink, nameField.getText(), textAreaDescription.getText(),
                 optionsTableModel.getOptions(),

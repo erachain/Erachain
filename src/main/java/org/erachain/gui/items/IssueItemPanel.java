@@ -44,9 +44,6 @@ public abstract class IssueItemPanel extends MakeTXPanel {
     protected JDateChooser startField;
     protected JCheckBox stopCheckBox = new JCheckBox(Lang.T("Stop"));
     protected JDateChooser stopField;
-    protected GridBagConstraints gridBagConstraints;
-    protected GridBagConstraints labelGBC;
-    protected GridBagConstraints fieldGBC;
     protected JLabel exLinkTextLabel = new JLabel(Lang.T("Append to") + ":");
     protected JLabel exLinkDescriptionLabel = new JLabel(Lang.T("Parent") + ":");
     protected JTextField exLinkText = new JTextField();
@@ -97,7 +94,6 @@ public abstract class IssueItemPanel extends MakeTXPanel {
 
         super.initComponents();
 
-
         if (useIcon) {
             jPanelLeft.add(addIconLabel);
         }
@@ -112,6 +108,12 @@ public abstract class IssueItemPanel extends MakeTXPanel {
                 !startCheckBox.isSelected() ? null : startField.getCalendar().getTimeInMillis(),
                 !stopCheckBox.isSelected() ? null : stopField.getCalendar().getTimeInMillis(),
                 tagsField.getText());
+
+    }
+
+    protected void makeTransaction() {
+        // соберем данные общего класса
+        makeAppData();
 
     }
 
@@ -179,9 +181,6 @@ public abstract class IssueItemPanel extends MakeTXPanel {
                 issueJButton.setEnabled(true);
                 return;
             }
-
-            // соберем данные общего класса
-            makeAppData();
 
             makeTransaction();
 

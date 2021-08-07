@@ -232,6 +232,7 @@ public abstract class MakeTXPanel extends IconPanel {
     // выводит верхние поля панели
     // возвращает номер сроки с которой можно продолжать вывод инфы на панель
     protected int initTopArea() {
+
         int y = 0;
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;

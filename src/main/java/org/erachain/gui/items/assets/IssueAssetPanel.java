@@ -198,6 +198,8 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
+        super.makeTransaction();
+
         AssetCls asset;
         if (AssetCls.isTypeUnique(assetType, quantity)) {
             asset = new AssetUnique(itemAppData, creator, nameField.getText(), addIconLabel.getMediaBytes(),

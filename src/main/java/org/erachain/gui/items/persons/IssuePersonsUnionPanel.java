@@ -261,6 +261,8 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
 
     protected void makeTransaction() {
 
+        super.makeTransaction();
+
         PersonsUnion union = new PersonsUnion(itemAppData, creator, nameField.getText(),
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(), textAreaDescription.getText(), (byte) 0);
 
