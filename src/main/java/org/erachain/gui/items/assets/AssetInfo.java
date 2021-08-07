@@ -57,6 +57,9 @@ public class AssetInfo extends JTextPane {
     public AssetInfo(AssetCls asset, boolean fullView) {
         super();
 
+        if (asset == null)
+            return;
+
         try {
             //   initComponents();
             th = this;
