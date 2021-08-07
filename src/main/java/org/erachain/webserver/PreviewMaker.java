@@ -1,5 +1,6 @@
 package org.erachain.webserver;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.slf4j.Logger;
@@ -63,8 +64,9 @@ public class PreviewMaker {
             return null;
 
         String outputName = getItemName(item);
-        String path = "dataPreviews" + File.separator + outputName;
-        String pathIn = "dataPreviews" + File.separator + "orig" + File.separator + outputName;
+        String mainFolder = "dataPreviews" + (BlockChain.DEMO_MODE ? "_demo" : BlockChain.TEST_MODE ? "_test" : "");
+        String path = mainFolder + File.separator + outputName;
+        String pathIn = mainFolder + File.separator + "orig" + File.separator + outputName;
         File fileOut = new File(path + ".mp4");
 
         fileOut.getParentFile().mkdirs();
