@@ -19,7 +19,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     private int total;
     private int index;
-    private AssetUniqueSeries baseItem;
+    private AssetUnique baseItem;
 
     public AssetUniqueSeriesCopy(byte[] typeBytes, int total, int index) {
         super(typeBytes);
@@ -29,7 +29,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     }
 
-    public AssetUniqueSeriesCopy(AssetUniqueSeries baseItem, int total, int index) {
+    public AssetUniqueSeriesCopy(AssetUnique baseItem, int total, int index) {
         this(new byte[]{TYPE_ID, 0}, total, index);
         this.baseItem = baseItem;
     }
@@ -49,7 +49,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
     }
 
     public void loadExtData(ItemMap itemMap) {
-        baseItem = (AssetUniqueSeries) itemMap.get(key - index + 1);
+        baseItem = (AssetUnique) itemMap.get(key - index + 1);
         flags = baseItem.getFlags();
         name = baseItem.getName();
         appData = baseItem.getAppData();

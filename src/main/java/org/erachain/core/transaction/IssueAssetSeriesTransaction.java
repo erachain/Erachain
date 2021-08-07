@@ -11,6 +11,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
@@ -86,7 +87,7 @@ public class IssueAssetSeriesTransaction extends Transaction {
 
     public IssueAssetSeriesTransaction(PublicKeyAccount creator, byte[] assetRef,
                                        int total, boolean useHave, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, useHave ? HAVE_AMOUNT_MASK : 0}, creator, assetRef, total, feePow, timestamp,
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, assetRef, total, feePow, timestamp,
                 reference);
     }
 
@@ -239,7 +240,7 @@ public class IssueAssetSeriesTransaction extends Transaction {
 
         // READ TOTAL
         byte[] totalBytes = Arrays.copyOfRange(data, position, position + Short.BYTES);
-        int total = Shorts.fromByteArray(totalBytes)
+        int total = Shorts.fromByteArray(totalBytes);
         position += Short.BYTES;
 
         return new IssueAssetSeriesTransaction(typeBytes, creator, assetRef, total, feePow, timestamp,
@@ -344,14 +345,13 @@ public class IssueAssetSeriesTransaction extends Transaction {
     public void process(Block block, int forDeal) {
         super.process(block, forDeal);
 
-        AssetUniqueSeries uniqueSeries = (AssetUniqueSeries) asset;
-        byte[] newData = uniqueSeries.remakeAppdata();
+        AssetUnique uniqueAsset = (AssetUnique) origAsset;
         AssetUniqueSeriesCopy uniqueSeriesCopy;
+        ItemMap map = uniqueAsset.getDBMap(dcSet);
         long copyKey;
-        ItemMap map = asset.getDBMap(dcSet);
-        for (int indexCopy = 2; indexCopy <= uniqueSeries.getTotal(); indexCopy++) {
+        for (int indexCopy = 1; indexCopy <= total; indexCopy++) {
 
-            uniqueSeriesCopy = new AssetUniqueSeriesCopy(uniqueSeries, total, indexCopy);
+            uniqueSeriesCopy = new AssetUniqueSeriesCopy(uniqueAsset, total, indexCopy);
 
             //INSERT INTO DATABASE
             copyKey = map.incrementPut(uniqueSeriesCopy);
@@ -374,10 +374,9 @@ public class IssueAssetSeriesTransaction extends Transaction {
     public void orphan(Block block, int forDeal) {
         super.orphan(block, forDeal);
 
-        AssetUniqueSeries uniqueSeries = (AssetUniqueSeries) asset;
         long copyKey;
-        ItemMap map = asset.getDBMap(dcSet);
-        for (int indexDel = 1; indexDel < uniqueSeries.getTotal(); indexDel++) {
+        ItemMap map = origAsset.getDBMap(dcSet);
+        for (int indexDel = 1; indexDel <= total; indexDel++) {
 
             copyKey = assetKey + indexDel;
 
@@ -389,7 +388,7 @@ public class IssueAssetSeriesTransaction extends Transaction {
                     BigDecimal.ONE, false, false, false);
 
             // make HOLD balance
-            if (!asset.isUnHoldable()) {
+            if (!origAsset.isUnHoldable()) {
                 creator.changeBalance(dcSet, true, true, copyKey,
                         BigDecimal.ONE.negate(), false, false, false);
             }

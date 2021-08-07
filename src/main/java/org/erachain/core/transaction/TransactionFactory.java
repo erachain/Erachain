@@ -147,6 +147,11 @@ public class TransactionFactory {
                 //PARSE ISSUE PLATE TRANSACTION
                 return IssueUnionRecord.Parse(data, forDeal);
 
+            case Transaction.ISSUE_ASSET_SERIES_TRANSACTION:
+
+                //PARSE ISSUE ASSET SERIES TRANSACTION
+                return IssueAssetSeriesTransaction.Parse(data, forDeal);
+
             case Transaction.CALCULATED_TRANSACTION:
 
                 //PARSE ISSUE PLATE TRANSACTION
