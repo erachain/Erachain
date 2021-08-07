@@ -172,7 +172,7 @@ public class ChangeOrderTransaction extends Transaction {
     }
 
     @Override
-    public long getAssetKey() {
+    public long getOrigAssetKey() {
         return order.getHaveAssetKey();
     }
 

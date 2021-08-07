@@ -34,44 +34,48 @@ public class IssueAssetSeriesTransaction extends Transaction {
     private static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
     private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
-    private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
+    private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH + Long.BYTES;
 
-    private byte[] assetRef;
+    private byte[] origAssetRef;
     private int total;
 
-    long assetKey;
+    /**
+     * Нужно чтобы запомнить с какого номер началась Серия - для быстрого удаления всех
+     */
+    long lastCopyKey;
+    long origAssetKey;
     private AssetCls origAsset;
 
     /**
      * @param typeBytes
      * @param creator
-     * @param assetRef  signature of Creating or last Changing Order transaction
+     * @param origAssetRef signature of Creating or last Changing Order transaction
      * @param total
      * @param feePow
      * @param timestamp
      * @param reference
      */
-    public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] assetRef,
+    public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] origAssetRef,
                                        int total, byte feePow, long timestamp, Long reference) {
         super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
 
-        this.assetRef = assetRef;
+        this.origAssetRef = origAssetRef;
         this.total = total;
 
     }
 
-    public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] assetRef,
+    public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] origAssetRef,
                                        int total, byte feePow, long timestamp, Long reference,
                                        byte[] signature) {
-        this(typeBytes, creator, assetRef, total, feePow, timestamp, reference);
+        this(typeBytes, creator, origAssetRef, total, feePow, timestamp, reference);
         this.signature = signature;
 
     }
 
-    public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] assetRef,
+    public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] origAssetRef,
                                        int total, byte feePow, long timestamp, Long reference,
                                        byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, assetRef, total, feePow, timestamp, reference);
+        this(typeBytes, creator, origAssetRef, total, feePow, timestamp, reference);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
@@ -79,15 +83,15 @@ public class IssueAssetSeriesTransaction extends Transaction {
 
     }
 
-    public IssueAssetSeriesTransaction(PublicKeyAccount creator, byte[] assetRef,
+    public IssueAssetSeriesTransaction(PublicKeyAccount creator, byte[] origAssetRef,
                                        int total, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, assetRef, total, feePow, timestamp, reference,
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, origAssetRef, total, feePow, timestamp, reference,
                 signature);
     }
 
-    public IssueAssetSeriesTransaction(PublicKeyAccount creator, byte[] assetRef,
+    public IssueAssetSeriesTransaction(PublicKeyAccount creator, byte[] origAssetRef,
                                        int total, boolean useHave, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, assetRef, total, feePow, timestamp,
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, origAssetRef, total, feePow, timestamp,
                 reference);
     }
 
@@ -98,14 +102,14 @@ public class IssueAssetSeriesTransaction extends Transaction {
         super.setDC(dcSet, false);
 
         // на выходе может быть NULL - он в long не преобразуется - поэтому сначала исследуем
-        Long res = dcSet.getTransactionFinalMapSigns().get(assetRef);
+        Long res = dcSet.getTransactionFinalMapSigns().get(origAssetRef);
 
         if (res == null) {
             return;
         }
 
-        assetKey = res;
-        origAsset = dcSet.getItemAssetMap().get(assetKey);
+        origAssetKey = res;
+        origAsset = dcSet.getItemAssetMap().get(origAssetKey);
 
         if (andUpdateFromState && !isWiped())
             updateFromStateDB();
@@ -127,16 +131,16 @@ public class IssueAssetSeriesTransaction extends Transaction {
 
     @Override
     public long getKey() {
-        return assetKey;
+        return origAssetKey;
     }
 
     @Override
-    public long getAssetKey() {
-        return assetKey;
+    public long getOrigAssetKey() {
+        return origAssetKey;
     }
 
-    public byte[] getAssetRef() {
-        return this.assetRef;
+    public byte[] getOrigAssetRef() {
+        return this.origAssetRef;
     }
 
     @Override
@@ -152,8 +156,8 @@ public class IssueAssetSeriesTransaction extends Transaction {
         // GET BASE
         JSONObject json = this.getJsonBase();
 
-        json.put("asset", Base58.encode(assetRef));
-        json.put("assetKey", assetKey);
+        json.put("asset", Base58.encode(origAssetRef));
+        json.put("assetKey", origAssetKey);
         json.put("total", total);
 
         return json;
@@ -243,18 +247,35 @@ public class IssueAssetSeriesTransaction extends Transaction {
         int total = Shorts.fromByteArray(totalBytes);
         position += Short.BYTES;
 
-        return new IssueAssetSeriesTransaction(typeBytes, creator, assetRef, total, feePow, timestamp,
+        IssueAssetSeriesTransaction transaction = new IssueAssetSeriesTransaction(typeBytes, creator, assetRef, total, feePow, timestamp,
                 reference, signatureBytes, seqNo, feeLong);
+
+        long lastCopyKey = 0;
+        if (forDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] lastCopyKeyBytes = Arrays.copyOfRange(data, position, position + Long.BYTES);
+            lastCopyKey = Longs.fromByteArray(lastCopyKeyBytes);
+            position += Long.BYTES;
+
+            transaction.lastCopyKey = lastCopyKey;
+        }
+
+        return transaction;
     }
 
     public byte[] toBytes(int forDeal, boolean withSignature) {
         byte[] data = super.toBytes(forDeal, withSignature);
 
         // WRITE ASSET REF
-        data = Bytes.concat(data, this.assetRef);
+        data = Bytes.concat(data, this.origAssetRef);
 
         // WRITE TOTAL
         data = Bytes.concat(data, Shorts.toByteArray((short) total));
+
+        if (forDeal == FOR_DB_RECORD) {
+            // WRITE LAST COPY KEY
+            data = Bytes.concat(data, Longs.toByteArray(lastCopyKey));
+        }
 
         return data;
     }
@@ -289,7 +310,7 @@ public class IssueAssetSeriesTransaction extends Transaction {
             return VALIDATE_OK;
         }
 
-        if (assetKey == 0L
+        if (origAssetKey == 0L
                 || origAsset == null) {
             return ITEM_ASSET_NOT_EXIST;
         }
@@ -316,18 +337,18 @@ public class IssueAssetSeriesTransaction extends Transaction {
             return;
         }
 
-        if (assetKey == 0)
+        if (origAssetKey == 0)
             return;
 
         if (creatorPersonDuration != null) {
             // запомним что тут две сущности
             itemsKeys = new Object[][]{
                     new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
-                    new Object[]{origAsset.getItemType(), assetKey, origAsset.getTags()}
+                    new Object[]{origAsset.getItemType(), origAssetKey, origAsset.getTags()}
             };
         } else {
             itemsKeys = new Object[][]{
-                    new Object[]{origAsset.getItemType(), assetKey, origAsset.getTags()}
+                    new Object[]{origAsset.getItemType(), origAssetKey, origAsset.getTags()}
             };
         }
     }
@@ -348,21 +369,20 @@ public class IssueAssetSeriesTransaction extends Transaction {
         AssetUnique uniqueAsset = (AssetUnique) origAsset;
         AssetUniqueSeriesCopy uniqueSeriesCopy;
         ItemMap map = uniqueAsset.getDBMap(dcSet);
-        long copyKey;
         for (int indexCopy = 1; indexCopy <= total; indexCopy++) {
 
             uniqueSeriesCopy = new AssetUniqueSeriesCopy(uniqueAsset, total, indexCopy);
 
             //INSERT INTO DATABASE
-            copyKey = map.incrementPut(uniqueSeriesCopy);
+            lastCopyKey = map.incrementPut(uniqueSeriesCopy);
 
             // SET BALANCES
-            creator.changeBalance(dcSet, false, false, copyKey,
+            creator.changeBalance(dcSet, false, false, lastCopyKey,
                     BigDecimal.ONE, false, false, false);
 
             // make HOLD balance
             if (!uniqueSeriesCopy.isUnHoldable()) {
-                creator.changeBalance(dcSet, false, true, copyKey,
+                creator.changeBalance(dcSet, false, true, lastCopyKey,
                         BigDecimal.ONE.negate(), false, false, false);
             }
 
@@ -376,9 +396,9 @@ public class IssueAssetSeriesTransaction extends Transaction {
 
         long copyKey;
         ItemMap map = origAsset.getDBMap(dcSet);
-        for (int indexDel = 1; indexDel <= total; indexDel++) {
+        for (int indexDel = 0; indexDel < total; indexDel++) {
 
-            copyKey = assetKey + indexDel;
+            copyKey = lastCopyKey - indexDel;
 
             //DELETE FROM DATABASE
             map.decrementDelete(copyKey);

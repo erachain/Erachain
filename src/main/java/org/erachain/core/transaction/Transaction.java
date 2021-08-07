@@ -329,6 +329,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int SIGN_TRANSACTION = 40;
     // HASHES
     public static final int HASHES_RECORD = 41;
+
     public static final int ISSUE_ASSET_SERIES_TRANSACTION = 42;
 
     // exchange of assets
@@ -771,6 +772,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 CANCEL_ORDER_TRANSACTION,
                 CHANGE_ORDER_TRANSACTION,
 
+                ISSUE_ASSET_SERIES_TRANSACTION,
+
                 // voting
                 VOTE_ON_ITEM_POLL_TRANSACTION
 
@@ -839,6 +842,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 return CancelOrderTransaction.TYPE_NAME;
             case CHANGE_ORDER_TRANSACTION:
                 return ChangeOrderTransaction.TYPE_NAME;
+            case ISSUE_ASSET_SERIES_TRANSACTION:
+                return IssueAssetSeriesTransaction.TYPE_NAME;
 
             // voting
             case VOTE_ON_ITEM_POLL_TRANSACTION:
@@ -1046,7 +1051,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return this.feePow;
     }
 
-    public long getAssetKey() {
+    public long getOrigAssetKey() {
         return 0L;
     }
 

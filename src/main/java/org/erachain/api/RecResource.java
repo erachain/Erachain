@@ -121,6 +121,12 @@ public class RecResource {
                     //return CreateOrderTransaction.Parse(data, releaserReference);
                     break;
 
+                case Transaction.ISSUE_ASSET_SERIES_TRANSACTION:
+
+                    //PARSE ORDER CREATION TRANSACTION
+                    //return CreateOrderTransaction.Parse(data, releaserReference);
+                    break;
+
                 case Transaction.MULTI_PAYMENT_TRANSACTION:
 
                     //PARSE MULTI PAYMENT

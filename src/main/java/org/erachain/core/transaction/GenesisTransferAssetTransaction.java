@@ -124,7 +124,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     }
 
     @Override
-    public long getAssetKey() {
+    public long getOrigAssetKey() {
         return this.key;
     }
 

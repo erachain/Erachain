@@ -65,7 +65,7 @@ public class CreditsTableModel extends TimerTableModelCls<Transaction> implement
         this.transactions_Asset.clear();
 
         for (Transaction trans : this.list) {
-            long a = trans.getAssetKey();
+            long a = trans.getOrigAssetKey();
             if (a == asset_Key || a == -asset_Key) {
                 this.transactions_Asset.add(trans);
             }

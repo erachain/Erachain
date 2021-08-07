@@ -65,6 +65,11 @@ public class TransactionFactory {
                 //PARSE UPDATE CREATION TRANSACTION
                 return ChangeOrderTransaction.Parse(data, forDeal);
 
+            case Transaction.ISSUE_ASSET_SERIES_TRANSACTION:
+
+                //PARSE ISSUE ASSET SERIES TRANSACTION
+                return IssueAssetSeriesTransaction.Parse(data, forDeal);
+
             case Transaction.MULTI_PAYMENT_TRANSACTION:
 
                 //PARSE MULTI PAYMENT
@@ -146,11 +151,6 @@ public class TransactionFactory {
 
                 //PARSE ISSUE PLATE TRANSACTION
                 return IssueUnionRecord.Parse(data, forDeal);
-
-            case Transaction.ISSUE_ASSET_SERIES_TRANSACTION:
-
-                //PARSE ISSUE ASSET SERIES TRANSACTION
-                return IssueAssetSeriesTransaction.Parse(data, forDeal);
 
             case Transaction.CALCULATED_TRANSACTION:
 
