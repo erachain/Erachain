@@ -161,7 +161,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     /**
-     * У некооторых типо сущностей (актив.уникальный.срия AssetUniqueSeries) нужно подгружать данные из базы
+     * У некоторых типов сущностей (актив.уникальный.серия AssetUniqueSeries) нужно подгружать данные из базы.
+     * Так же при создании вторичных ключей надо вызывать это.
      */
     public void loadExtData(ItemMap itemMap) {
     }

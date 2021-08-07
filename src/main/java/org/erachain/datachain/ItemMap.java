@@ -129,6 +129,10 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         Bind.secondaryKey((BTreeMap) map, this.makerKeyMap, new Fun.Function2<String, Long, ItemCls>() {
             @Override
             public String run(Long key, ItemCls value) {
+
+                // нарастим данные
+                value.loadExtData(ItemMap.this);
+
                 return value.getMaker().getAddress();
             }
         });
@@ -140,6 +144,10 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                 new Fun.Function2<String[], Long, ItemCls>() {
                     @Override
                     public String[] run(Long key, ItemCls item) {
+
+                        // нарастим данные
+                        item.loadExtData(ItemMap.this);
+
                         String[] keys = item.getName().toLowerCase().split(Transaction.SPLIT_CHARS);
                         for (int i = 0; i < keys.length; ++i) {
                             if (keys[i].length() > CUT_NAME_INDEX) {
