@@ -7,7 +7,7 @@ import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.PersonAccountsModel;
-import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui.records.VouchTransactionDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun.Tuple3;
@@ -92,7 +92,7 @@ public class PersonWorkDialog extends JDialog {
                 Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
                 int blockNo = transaction.getBlockHeight();
                 int recNo = transaction.getSeqNo();
-                new toSignRecordDialog(blockNo, recNo);
+                new VouchTransactionDialog(blockNo, recNo);
                 dispose();
             }
         });

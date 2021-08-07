@@ -9,7 +9,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.WalletTableRenderer;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui.records.VouchTransactionDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -123,7 +123,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                 Transaction trans = incoming_Mails_Model.getItem(row);
                 int blockNo = trans.getBlockHeight();
                 int recNo = trans.getSeqNo();
-                new toSignRecordDialog(blockNo, recNo, ((RSend) trans).getRecipient());
+                new VouchTransactionDialog(blockNo, recNo, ((RSend) trans).getRecipient());
 
             }
         });

@@ -5,7 +5,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
-import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui.records.VouchTransactionDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
@@ -76,7 +76,7 @@ public class PersonListAddPopupMenuItem {
                 Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
                 int blockNo = transaction.getBlockHeight();
                 int recNo = transaction.getSeqNo();
-                new toSignRecordDialog(blockNo, recNo);
+                new VouchTransactionDialog(blockNo, recNo);
 
             }
         });

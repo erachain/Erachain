@@ -13,7 +13,7 @@ import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui.records.VouchTransactionDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -194,7 +194,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
         vouchMenu.addActionListener(e -> {
             DCSet db = DCSet.getInstance();
             Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
-            new toSignRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
+            new VouchTransactionDialog(transaction.getBlockHeight(), transaction.getSeqNo());
 
         });
         menuTable.add(vouchMenu);

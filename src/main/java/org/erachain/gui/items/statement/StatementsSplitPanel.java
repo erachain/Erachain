@@ -15,7 +15,7 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.gui.models.WalletTableModel;
-import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui.records.VouchTransactionDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -110,7 +110,7 @@ public abstract class StatementsSplitPanel<T> extends SplitPanel {
 
         vouch_Item.addActionListener(e -> {
             if (rNote == null) return;
-            new toSignRecordDialog(rNote.getBlockHeight(), rNote.getSeqNo());
+            new VouchTransactionDialog(rNote.getBlockHeight(), rNote.getSeqNo());
         });
 
         menu.add(vouch_Item);
