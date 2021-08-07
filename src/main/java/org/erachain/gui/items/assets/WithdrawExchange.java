@@ -58,6 +58,13 @@ public class WithdrawExchange extends IconPanel {
 
     public WithdrawExchange(AssetCls assetIn, Account account) {
         super(NAME, TITLE);
+
+        cbxInAssets = new JComboBox<>(new FundTokensComboBoxModel(false));
+
+        cbxOutAssets = new JComboBox<>(new String[]{"BTC",
+                //, "DOGE", "LTC", "DASH"
+        });
+
         initComponents(assetIn, account);
         this.setVisible(true);
     }
@@ -250,14 +257,12 @@ public class WithdrawExchange extends IconPanel {
         add(labelInAsset, labelGBC);
 
         fieldGBC.gridy = labelGBC.gridy;
-        cbxInAssets = new JComboBox<>(new FundTokensComboBoxModel(false));
         this.add(cbxInAssets, fieldGBC);
 
         /////////////// ASSET OUT
         ++labelGBC.gridy;
         add(labelOutAsset, labelGBC);
 
-        cbxOutAssets = new JComboBox<>(new String[]{"BTC", "DOGE", "LTC", "DASH"});
         fieldGBC.gridy = labelGBC.gridy;
         this.add(cbxOutAssets, fieldGBC);
 

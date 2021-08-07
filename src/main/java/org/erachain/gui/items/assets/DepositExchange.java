@@ -82,14 +82,16 @@ public class DepositExchange extends IconPanel {
     public DepositExchange(String asset, Account account, BigDecimal amount) {
         super(NAME, TITLE);
 
-        cbxAssetsInput = new JComboBox<>(new String[]{"BTC",
-                "DOGE", "LTC",
-                "DASH"
+        cbxAssetsInput = new JComboBox<>(new String[]{
+                "BTC",
+                //"DOGE", "LTC",
+                //"DASH"
         });
 
-        cbxAssetsBuy = new JComboBox<>(new String[]{AssetCls.ERA_ABBREV, AssetCls.FEE_NAME,
+        cbxAssetsBuy = new JComboBox<>(new String[]{
+                //AssetCls.ERA_ABBREV, AssetCls.FEE_NAME,
                 "BTC",
-                "USD" //, "DOGE", "LTC", "DASH"
+                //"USD" //, "DOGE", "LTC", "DASH"
         });
 
         this.amount = amount;
