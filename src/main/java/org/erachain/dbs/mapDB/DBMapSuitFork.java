@@ -55,7 +55,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                         + (Controller.MIN_MEMORY_TAIL << 1)) {
                     logger.error("Heap Memory Overflow");
-                    Controller.getInstance().stopAll(1011);
+                    Controller.getInstance().stopAndExit(1011);
                 }
             }
         }

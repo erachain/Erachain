@@ -31,7 +31,7 @@ public class GuiTimer extends Thread {
                 observer.repaintGUI();
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(2056);
+                Controller.getInstance().stopAndExit(2056);
                 return;
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);

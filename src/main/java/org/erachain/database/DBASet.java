@@ -121,7 +121,7 @@ abstract public class DBASet implements IDB {
         } catch (java.lang.OutOfMemoryError e) {
             logger.error(e.getMessage(), e);
             this.outUses();
-            Controller.getInstance().stopAll(1013);
+            Controller.getInstance().stopAndExit(1013);
         } finally {
             this.outUses();
         }

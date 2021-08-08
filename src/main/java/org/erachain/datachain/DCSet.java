@@ -332,7 +332,7 @@ public class DCSet extends DBASet implements Closeable {
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                         + (Controller.MIN_MEMORY_TAIL << 1)) {
                     logger.error("Heap Memory Overflow");
-                    Controller.getInstance().stopAll(1091);
+                    Controller.getInstance().stopAndExit(1091);
                     return;
                 }
             }
@@ -1524,7 +1524,7 @@ public class DCSet extends DBASet implements Closeable {
 
             this.outUses();
 
-            Controller.getInstance().stopAll(1113);
+            Controller.getInstance().stopAndExit(1113);
             return null;
         }
 
@@ -1558,7 +1558,7 @@ public class DCSet extends DBASet implements Closeable {
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                         + (Controller.MIN_MEMORY_TAIL << 1)) {
                     logger.error("Heap Memory Overflow before commit");
-                    Controller.getInstance().stopAll(9618);
+                    Controller.getInstance().stopAndExit(9618);
                     return;
                 }
             }
@@ -1578,13 +1578,13 @@ public class DCSet extends DBASet implements Closeable {
             logger.error(e.getMessage(), e);
 
             // база битая - выходим!! Хотя rollback должен сработать
-            Controller.getInstance().stopAll(9613);
+            Controller.getInstance().stopAndExit(9613);
             return;
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
 
             // база битая - выходим!! Хотя rollback должен сработать
-            Controller.getInstance().stopAll(9615);
+            Controller.getInstance().stopAndExit(9615);
         }
 
     }

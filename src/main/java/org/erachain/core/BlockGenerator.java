@@ -829,7 +829,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 // если ошибка то выход делаем чтобы зарегистрировать ошибку
                                 // так как это наша личная ошибка внутри
                                 LOGGER.error(e.getMessage(), e);
-                                ctrl.stopAll(104);
+                                ctrl.stopAndExit(104);
                                 return;
                             }
                         }
@@ -1146,12 +1146,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     } catch (Exception e) {
                                         LOGGER.error(e.getMessage(), e);
                                         if (BlockChain.CHECK_BUGS > 7) {
-                                            ctrl.stopAll(106);
+                                            ctrl.stopAndExit(106);
                                             return;
                                         }
                                     } catch (java.lang.OutOfMemoryError e) {
                                         LOGGER.error(e.getMessage(), e);
-                                        ctrl.stopAll(105);
+                                        ctrl.stopAndExit(105);
                                         return;
                                     }
                                 }
@@ -1341,7 +1341,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 }
                             } catch (java.lang.OutOfMemoryError e) {
                                 LOGGER.error(e.getMessage(), e);
-                                ctrl.stopAll(135);
+                                ctrl.stopAndExit(135);
                                 return;
                             }
 
@@ -1412,7 +1412,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         } catch (java.lang.OutOfMemoryError e) {
             LOGGER.error(e.getMessage(), e);
-            ctrl.stopAll(196);
+            ctrl.stopAndExit(196);
             return;
         } catch (Exception e) {
             if (ctrl.isOnStopping()) {

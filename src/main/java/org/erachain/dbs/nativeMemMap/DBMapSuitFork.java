@@ -59,7 +59,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                 System.gc();
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                         + (Controller.MIN_MEMORY_TAIL << 1))
-                    Controller.getInstance().stopAll(1021);
+                    Controller.getInstance().stopAndExit(1021);
             }
         }
 

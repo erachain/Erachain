@@ -50,7 +50,7 @@ public class PeerManager extends MonitoredThread {
                         Controller.getInstance().reCreateDB();
                     } catch (Exception eIO2) {
                         LOGGER.error(eIO.getMessage(), eIO2);
-                        Controller.getInstance().stopAll(271);
+                        Controller.getInstance().stopAndExit(271);
                     }
                 }
 
@@ -92,7 +92,7 @@ public class PeerManager extends MonitoredThread {
                 peer = blockingQueue.poll(10, TimeUnit.SECONDS);
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(273);
+                Controller.getInstance().stopAndExit(273);
                 break;
             } catch (java.lang.IllegalMonitorStateException e) {
                 break;
