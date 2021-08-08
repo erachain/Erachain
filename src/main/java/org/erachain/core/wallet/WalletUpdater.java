@@ -275,7 +275,7 @@ public class WalletUpdater extends MonitoredThread {
                 LOGGER.error(e.getMessage(), e);
             } catch (OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                controller.stopAll(686);
+                controller.stopAndExit(686);
                 return;
             }
 

@@ -586,11 +586,11 @@ public class Wallet extends Observable implements Observer {
 				DBASet.setVersion(this.dwSet.database, 1);
 				this.dwSet.hardFlush();
 				LOGGER.error("  !!!  NEED to RELOAD wallet");
-				System.exit(2005);
+				Controller.getInstance().stopAndExit(2005);
 
 			}
 
-			LOGGER.info("   >>>>  Maps was Resetted");
+			LOGGER.info("   >>>>  Maps was Resetting");
 
 			// REPROCESS BLOCKS
 			blockStart = new GenesisBlock();
@@ -650,7 +650,7 @@ public class Wallet extends Observable implements Observer {
 					} catch (java.lang.OutOfMemoryError e) {
 						LOGGER.error(e.getMessage(), e);
 						// внутрення ошибка - выходим для лога
-						Controller.getInstance().stopAll(644);
+						Controller.getInstance().stopAndExit(644);
 						return;
 					}
 

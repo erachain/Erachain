@@ -74,7 +74,7 @@ public class CoreResource {
 
         //STOP
         Thread thread = new Thread(() -> {
-            Controller.getInstance().stopAll(0);
+            Controller.getInstance().stopAndExit(0);
         });
         thread.start();
 

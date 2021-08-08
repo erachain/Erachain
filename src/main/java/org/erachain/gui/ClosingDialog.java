@@ -17,7 +17,7 @@ public class ClosingDialog  {
            public void run() {
                Controller.getInstance().deleteObservers();
                Controller.getInstance().addSingleObserver(AboutFrame.getInstance());
-               Controller.getInstance().stopAll(0);
+               Controller.getInstance().stopAndExit(0);
                //       aa.setVisible(false);
            }
        }.start();

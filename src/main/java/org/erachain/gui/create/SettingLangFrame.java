@@ -139,7 +139,7 @@ public class SettingLangFrame extends JDialog {
         //CLOSE NICELY
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                Controller.getInstance().stopAll(0);
+                Controller.getInstance().stopAndExit(0);
                 // 		System.exit(0);
             }
         });

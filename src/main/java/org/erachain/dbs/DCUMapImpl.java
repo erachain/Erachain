@@ -79,7 +79,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                 if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                         + (Controller.MIN_MEMORY_TAIL << 1)) {
                     LOGGER.error("Heap Memory Overflow");
-                    Controller.getInstance().stopAll(1192);
+                    Controller.getInstance().stopAndExit(1192);
                 }
             }
         }

@@ -77,7 +77,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                 }
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(222);
+                Controller.getInstance().stopAndExit(222);
                 break;
             } catch (java.net.SocketException e) {
 
@@ -161,7 +161,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                 }
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(225);
+                Controller.getInstance().stopAndExit(225);
                 break;
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
