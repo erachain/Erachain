@@ -66,13 +66,13 @@ import java.io.File;
 /**
  * @author DarkRaha
  */
-public class treeMenu extends JPanel { // implements TreeSelectionListener {
+public class MainTreeMenu extends JPanel { // implements TreeSelectionListener {
 
     private static final long serialVersionUID = 1L;
     public JTree tree;
     public JTextField jtf = new JTextField();
 
-    public treeMenu() {
+    public MainTreeMenu() {
         // ------------------------------------------
         // Container c = getContentPane();
         setLayout(new BorderLayout());
@@ -156,6 +156,7 @@ public class treeMenu extends JPanel { // implements TreeSelectionListener {
         assets_Node.add(new ASMutableTreeNode(AssetsMySplitPanel.NAME, AssetsMySplitPanel.TITLE));
         assets_Node.add(new ASMutableTreeNode(SearchAssetsSplitPanel.NAME, SearchAssetsSplitPanel.TITLE));
         assets_Node.add(new ASMutableTreeNode(IssueAssetPanel.NAME, IssueAssetPanel.TITLE));
+        assets_Node.add(new ASMutableTreeNode(IssueAssetSeriesPanel.NAME, IssueAssetSeriesPanel.TITLE));
         assets_Node.add(new ASMutableTreeNode(MyBalanceTab.NAME, MyBalanceTab.TITLE));
 
         if (Settings.EXCHANGE_IN_OUT) {

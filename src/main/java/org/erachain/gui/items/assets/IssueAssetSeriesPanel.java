@@ -11,7 +11,7 @@ import javax.swing.*;
 public class IssueAssetSeriesPanel extends IssueItemPanel {
 
     public static String NAME = "IssueAssetSeriesPanel";
-    public static String TITLE = "Issue Asset Series";
+    public static String TITLE = "Issue Series";
 
     //private JCheckBox jcheckUnique;
     public JTextField assetRefField = new JTextField("");
