@@ -110,7 +110,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         }
 
         origAssetKey = res;
-        origAsset = dcSet.getItemAssetMap().get(origAssetKey);
+        origAsset = (AssetUnique) dcSet.getItemAssetMap().get(origAssetKey);
 
         if (andUpdateFromState && !isWiped())
             updateFromStateDB();
@@ -140,6 +140,10 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     public String viewOrigAssetRef() {
         return Base58.encode(this.origAssetRef);
+    }
+
+    public int getTotal() {
+        return (int) ((AssetVenture) item).getQuantity();
     }
 
     @Override

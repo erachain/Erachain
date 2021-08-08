@@ -7,7 +7,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.utils.GUIConstants;
-import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -15,7 +14,7 @@ import javax.swing.*;
 /**
  * @author Саша
  */
-public class IssueAssetCopyPanel extends IssueAssetPanel {
+public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
     public static String NAME = "IssueAssetCopyPanel";
     public static String TITLE = "Issue Series";
@@ -36,8 +35,6 @@ public class IssueAssetCopyPanel extends IssueAssetPanel {
         super.initComponents();
 
         quantityJLabel.setText(Lang.T("Series Total") + ":");
-        textScale.setVisible(false);
-        scaleJLabel.setVisible(false);
 
         int gridy = initTopArea(true);
 
@@ -86,16 +83,6 @@ public class IssueAssetCopyPanel extends IssueAssetPanel {
     }
 
     @Override
-    protected void makeAppData() {
-        itemAppData = AssetCls.makeAppData(!addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
-                !startCheckBox.isSelected() ? null : startField.getCalendar().getTimeInMillis(),
-                !stopCheckBox.isSelected() ? null : stopField.getCalendar().getTimeInMillis(),
-                tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients(), isUnTransferable.isSelected());
-
-    }
-
-    @Override
     protected void makeTransaction() {
 
         // PROTOTYPE ASSET
@@ -131,19 +118,6 @@ public class IssueAssetCopyPanel extends IssueAssetPanel {
 
         return out;
 
-    }
-
-    @Override
-    protected String makeTailView() {
-        String out = "";
-        out += Lang.T("Description") + ":<br>";
-        if (item.getKey() > 0 && item.getKey() < 1000) {
-            out += Library.to_HTML(Lang.T(item.viewDescription()));
-        } else {
-            out += Library.to_HTML(item.viewDescription());
-        }
-
-        return out;
     }
 
 }

@@ -78,8 +78,8 @@ public class IssueAssetSeriesDialog extends JDialog {
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
 
 
-        AssetInfo makePanel = new AssetInfo(origAsset, false);
-        //jLabel_RecordInfo.setViewportView(makePanel);
+        IssueAssetCopyPanel makePanel = new IssueAssetCopyPanel();
+        jLabel_RecordInfo.setViewportView(makePanel);
 
         makePanel.setVisible(true);
         gridBagConstraints = new GridBagConstraints();

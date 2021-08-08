@@ -7,11 +7,7 @@ import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
-import org.erachain.gui.library.Library;
-import org.erachain.gui.library.MDecimalFormatedTextField;
-import org.erachain.gui.library.MultipleRoyaltyPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -20,38 +16,16 @@ import java.awt.*;
 /**
  * @author Саша
  */
-public class IssueAssetPanel extends IssueItemPanel {
+public class IssueAssetPanel extends IssueAssetPanelCls {
 
     public static String NAME = "IssueAssetPanel";
     public static String TITLE = "Issue Asset";
 
     protected final JLabel scaleJLabel = new JLabel(Lang.T("Scale") + ":");
-    protected final JLabel quantityJLabel = new JLabel(Lang.T("Quantity") + ":");
-    protected final JLabel typeJLabel = new JLabel(Lang.T("Type") + ":");
-
-    protected final JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
     protected final JComboBox<String> textScale = new JComboBox<>();
-    protected final JCheckBox isUnTransferable = new JCheckBox(Lang.T("Not transferable"));
-
-    protected JTextPane textAreasAssetTypeDescription;
-    protected MDecimalFormatedTextField textQuantity = new MDecimalFormatedTextField();
-
-    protected AssetTypesComboBoxModel assetTypesComboBoxModel;
-
-    protected MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel(fromJComboBox, assetTypeJComboBox);
-
-
-    public IssueAssetPanel(String name, String title, String issueMess, boolean useIcon,
-                           int cropWidth, int cropHeight, boolean originalSize, boolean useExtURL) {
-        super(name, title, issueMess, useIcon, cropWidth, cropHeight, originalSize, useExtURL);
-
-        textQuantity.setText("0");
-
-
-    }
 
     public IssueAssetPanel() {
-        this(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
+        super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
                 true, true);
 
         textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
@@ -159,6 +133,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     }
 
+    @Override
     protected boolean checkValues() {
 
         assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
@@ -192,16 +167,6 @@ public class IssueAssetPanel extends IssueItemPanel {
         }
 
         return true;
-    }
-
-    @Override
-    protected void makeAppData() {
-        itemAppData = AssetCls.makeAppData(!addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
-                !startCheckBox.isSelected() ? null : startField.getCalendar().getTimeInMillis(),
-                !stopCheckBox.isSelected() ? null : stopField.getCalendar().getTimeInMillis(),
-                tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients(), isUnTransferable.isSelected());
-
     }
 
     @Override
@@ -246,19 +211,6 @@ public class IssueAssetPanel extends IssueItemPanel {
 
         return out;
 
-    }
-
-    @Override
-    protected String makeTailView() {
-        String out = "";
-        out += Lang.T("Description") + ":<br>";
-        if (item.getKey() > 0 && item.getKey() < 1000) {
-            out += Library.to_HTML(Lang.T(item.viewDescription()));
-        } else {
-            out += Library.to_HTML(item.viewDescription());
-        }
-
-        return out;
     }
 
 }
