@@ -257,6 +257,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int NAME_NOT_LOWER_CASE = 5065;
     public static final int NAME_WITH_SPACE = 5066;
 
+    public static final int CREATOR_NOT_MAKER = 366;
     public static final int CREATOR_NOT_OWNER = 367;
     public static final int NAME_KEY_ALREADY_EXISTS = 368;
     public static final int NAME_KEY_NOT_EXISTS = 369;

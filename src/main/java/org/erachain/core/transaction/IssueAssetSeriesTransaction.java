@@ -16,6 +16,7 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -334,6 +335,12 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             return Transaction.INVALID_IMAGE_TYPE;
         }
 
+        // проверим - а он имеет баланс Оригинала для выпуска Серии?
+        Fun.Tuple2<BigDecimal, BigDecimal> own = creator.getBalance(dcSet, origAssetKey, Account.BALANCE_POS_OWN);
+        if (own.b.signum() <= 0) {
+            return Transaction.CREATOR_NOT_OWNER;
+        }
+
         // выше уже не проверяем обертку
         return super.isValid(forDeal, flags | NOT_VALIDATE_ITEM);
     }
@@ -379,15 +386,14 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     public void process(Block block, int forDeal) {
         super.process(block, forDeal);
 
-        AssetCls uniqueAsset = origAsset;
-        long uniqueAssetKey = uniqueAsset.getKey();
+        long origAssetKey = origAsset.getKey();
         AssetVenture foilAsset = (AssetVenture) item;
         AssetUniqueSeriesCopy uniqueSeriesCopy;
-        ItemMap map = uniqueAsset.getDBMap(dcSet);
+        ItemMap map = item.getDBMap(dcSet);
         int total = (int) foilAsset.getQuantity();
         for (int indexCopy = 1; indexCopy <= total; indexCopy++) {
 
-            uniqueSeriesCopy = AssetUniqueSeriesCopy.makeCopy(uniqueAsset, foilAsset, uniqueAssetKey, total, indexCopy);
+            uniqueSeriesCopy = AssetUniqueSeriesCopy.makeCopy(foilAsset, origAssetKey, total, indexCopy);
 
             //INSERT INTO DATABASE
             lastCopyKey = map.incrementPut(uniqueSeriesCopy);

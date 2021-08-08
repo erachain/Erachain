@@ -429,8 +429,11 @@ public class OnDealClick {
             case Transaction.INVALID_ITEM_VALUE:
                 mess = "Invalid item value";
                 break;
-            case Transaction.CREATOR_NOT_OWNER:
+            case Transaction.CREATOR_NOT_MAKER:
                 mess = "Creator not maker";
+                break;
+            case Transaction.CREATOR_NOT_OWNER:
+                mess = "Creator not owner";
                 break;
 
             case Transaction.ITEM_DOES_NOT_EXIST:

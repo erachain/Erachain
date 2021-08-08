@@ -72,26 +72,24 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
     }
 
     /**
-     * Первая копия - содержит обертку полностью, все остальные только номера
+     * Первая копия - содержит обертку полностью, все остальные только номера/ Оригинал тут вообще не используем.
      *
-     * @param baseItem
      * @param foilAsset
      * @param origKey
      * @param total
      * @param index
      * @return
      */
-    public static AssetUniqueSeriesCopy makeCopy(AssetCls baseItem, AssetCls foilAsset, long origKey, int total, int index) {
-        byte[] appData = null;
-        byte[] icon = null;
-        byte[] image = null;
-        String description = null;
+    public static AssetUniqueSeriesCopy makeCopy(AssetCls foilAsset, long origKey, int total, int index) {
+        String copyName = foilAsset.getName() + " #" + index + "/" + total;
         if (index == 1)
-            return new AssetUniqueSeriesCopy(appData, foilAsset.getMaker(), baseItem.getName() + " #" + index + "/" + total,
-                    icon, image, description, origKey, total, index);
+            // Make FOIL
+            return new AssetUniqueSeriesCopy(foilAsset.getAppData(), foilAsset.getMaker(), copyName,
+                    foilAsset.getIcon(), foilAsset.getImage(), foilAsset.getDescription(), origKey, total, index);
 
-        return new AssetUniqueSeriesCopy(appData, foilAsset.getMaker(), baseItem.getName() + " #" + index + "/" + total,
-                icon, image, description, origKey, total, index);
+        // Make COPY
+        return new AssetUniqueSeriesCopy(foilAsset.getAppData(), foilAsset.getMaker(), copyName,
+                null, null, foilAsset.getDescription(), origKey, total, index);
 
     }
 
