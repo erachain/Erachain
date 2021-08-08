@@ -587,7 +587,7 @@ public class Wallet extends Observable implements Observer {
 
 			}
 
-			LOGGER.info("   >>>>  Maps was Resetted");
+			LOGGER.info("   >>>>  Maps was Resetting");
 
 			// REPROCESS BLOCKS
 			blockStart = new GenesisBlock();
