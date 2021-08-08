@@ -23,7 +23,7 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
     byte[] origAssetTXSign;
 
     public IssueAssetCopyPanel() {
-        super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
+        super(NAME, TITLE, "Asset series issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
                 true, true);
 
         initComponents();

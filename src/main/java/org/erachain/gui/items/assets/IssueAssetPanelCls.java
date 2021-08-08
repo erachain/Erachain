@@ -9,6 +9,7 @@ import org.erachain.gui.library.MultipleRoyaltyPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * @author Саша
@@ -39,6 +40,24 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
 
     }
 
+    protected void initBottom(int gridy) {
+
+        isUnTransferable.setToolTipText(Lang.T("IssueAssetPanel.isUnTransferable.tip"));
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(isUnTransferable, fieldGBC);
+
+        fieldGBC.gridy = gridy++;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = fieldGBC.gridy;
+        gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        jPanelAdd.add(multipleRoyaltyPanel, gridBagConstraints);
+
+        super.initBottom(gridy);
+    }
 
     long quantity;
     int assetType;

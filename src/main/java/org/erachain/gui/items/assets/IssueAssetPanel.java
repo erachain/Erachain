@@ -11,7 +11,6 @@ import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * @author Саша
@@ -23,6 +22,8 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
 
     protected final JLabel scaleJLabel = new JLabel(Lang.T("Scale") + ":");
     protected final JComboBox<String> textScale = new JComboBox<>();
+
+    int scale;
 
     public IssueAssetPanel() {
         super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
@@ -90,27 +91,9 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(textScale, fieldGBC);
 
-        isUnTransferable.setToolTipText(Lang.T("IssueAssetPanel.isUnTransferable.tip"));
-        fieldGBC.gridy = gridy++;
-        jPanelAdd.add(isUnTransferable, fieldGBC);
-
-        fieldGBC.gridy = gridy++;
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = fieldGBC.gridy;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        jPanelAdd.add(multipleRoyaltyPanel, gridBagConstraints);
-
         // вывод подвала
         super.initBottom(gridy);
     }
-
-    int scale;
-    long quantity;
-    int assetType;
 
     private void refreshLabels(AssetType assetType) {
         int fontSize = textScale.getFontMetrics(textScale.getFont()).getHeight();
