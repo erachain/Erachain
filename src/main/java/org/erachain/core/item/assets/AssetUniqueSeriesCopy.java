@@ -8,7 +8,6 @@ import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.datachain.ItemAssetMap;
 import org.erachain.lang.Lang;
 
 import java.nio.charset.StandardCharsets;
@@ -39,27 +38,25 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     public AssetUniqueSeriesCopy(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image,
                                  String description, long origKey, int total, int index) {
-        this(new byte[]{TYPE_ID, 0}, appData, maker, name, icon, image, description, AssetCls.UNION_TYPE,
+        this(new byte[]{TYPE_ID, 0}, appData, maker, name, icon, image, description, AssetCls.AS_NON_FUNGIBLE,
                 origKey, total, index);
 
     }
 
     public AssetUniqueSeriesCopy(long origKey, AssetVenture prototypeAsset, int total, int index) {
-        this(new byte[]{TYPE_ID, 0},
-                prototypeAsset.getAppData(),
+        this(prototypeAsset.getAppData(),
                 prototypeAsset.getMaker(),
                 prototypeAsset.getName(),
                 prototypeAsset.getIcon(),
                 prototypeAsset.getImage(),
                 prototypeAsset.getDescription(),
-                AssetCls.UNION_TYPE,
                 origKey, total, index);
     }
 
     // GETTERS/SETTERS
     @Override
     public String getItemSubType() {
-        return "unique copy";
+        return "series";
     }
 
     public long getOrigKey() {
@@ -79,12 +76,9 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         byte[] icon = null;
         byte[] image = null;
         String description = null;
-        return new AssetUniqueSeriesCopy(new byte[]{TYPE_ID, 0}, appData, prototypeAsset.getMaker(), baseItem.getName() + " #" + index + "/" + total,
-                icon, image, description, AssetCls.AS_NON_FUNGIBLE, origKey, total, index);
+        return new AssetUniqueSeriesCopy(appData, prototypeAsset.getMaker(), baseItem.getName() + " #" + index + "/" + total,
+                icon, image, description, origKey, total, index);
 
-    }
-
-    public void loadExtData(ItemAssetMap map) {
     }
 
     //PARSE

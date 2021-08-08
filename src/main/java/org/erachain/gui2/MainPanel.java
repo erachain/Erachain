@@ -414,8 +414,8 @@ public class MainPanel extends javax.swing.JPanel {
             if (str.equals(Lang.T("Issue Asset")) || str.equals("IssueAssetPanel")) {
                 insertTab(new IssueAssetPanel());
                 return;
-            } else if (str.equals(Lang.T("Issue Series")) || str.equals("IssueAssetSeriesPanel")) {
-                insertTab(new IssueAssetSeriesPanel());
+            } else if (str.equals(Lang.T("Issue Series")) || str.equals("IssueAssetCopyPanel")) {
+                insertTab(new IssueAssetCopyPanel());
                 return;
             } else if (str.equals(Lang.T("Exchange")) || str.equals("ExchangePanel")) {
                 insertTab(new ExchangePanel(null, null, null, null));

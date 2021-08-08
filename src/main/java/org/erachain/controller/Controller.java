@@ -3255,6 +3255,13 @@ public class Controller extends Observable {
         }
     }
 
+    public Transaction issueAssetSeries(PrivateKeyAccount creator, ExLink linkTo, int feePow, byte[] origAssetTXSign, AssetVenture prototypeAsset) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueAssetSeriesTransaction(creator, linkTo, origAssetTXSign, prototypeAsset, feePow);
+        }
+    }
+
     public Transaction issueImprint1(byte[] itemAppData, PrivateKeyAccount creator, ExLink exLink, String name, String description, byte[] icon,
                                      byte[] image, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME

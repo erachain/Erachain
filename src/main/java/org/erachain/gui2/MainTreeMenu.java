@@ -156,7 +156,7 @@ public class MainTreeMenu extends JPanel { // implements TreeSelectionListener {
         assets_Node.add(new ASMutableTreeNode(AssetsMySplitPanel.NAME, AssetsMySplitPanel.TITLE));
         assets_Node.add(new ASMutableTreeNode(SearchAssetsSplitPanel.NAME, SearchAssetsSplitPanel.TITLE));
         assets_Node.add(new ASMutableTreeNode(IssueAssetPanel.NAME, IssueAssetPanel.TITLE));
-        assets_Node.add(new ASMutableTreeNode(IssueAssetSeriesPanel.NAME, IssueAssetSeriesPanel.TITLE));
+        assets_Node.add(new ASMutableTreeNode(IssueAssetCopyPanel.NAME, IssueAssetCopyPanel.TITLE));
         assets_Node.add(new ASMutableTreeNode(MyBalanceTab.NAME, MyBalanceTab.TITLE));
 
         if (Settings.EXCHANGE_IN_OUT) {

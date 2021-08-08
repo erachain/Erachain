@@ -25,34 +25,43 @@ public class IssueAssetPanel extends IssueItemPanel {
     public static String NAME = "IssueAssetPanel";
     public static String TITLE = "Issue Asset";
 
-    private final JLabel scaleJLabel = new JLabel(Lang.T("Scale") + ":");
-    private final JLabel quantityJLabel = new JLabel(Lang.T("Quantity") + ":");
-    private final JLabel typeJLabel = new JLabel(Lang.T("Type") + ":");
+    protected final JLabel scaleJLabel = new JLabel(Lang.T("Scale") + ":");
+    protected final JLabel quantityJLabel = new JLabel(Lang.T("Quantity") + ":");
+    protected final JLabel typeJLabel = new JLabel(Lang.T("Type") + ":");
 
-    private final JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
-    private final JComboBox<String> textScale = new JComboBox<>();
-    private final JCheckBox isUnTransferable = new JCheckBox(Lang.T("Not transferable"));
+    protected final JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
+    protected final JComboBox<String> textScale = new JComboBox<>();
+    protected final JCheckBox isUnTransferable = new JCheckBox(Lang.T("Not transferable"));
 
-    private JTextPane textareasAssetTypeDescription;
-    private MDecimalFormatedTextField textQuantity = new MDecimalFormatedTextField();
+    protected JTextPane textAreasAssetTypeDescription;
+    protected MDecimalFormatedTextField textQuantity = new MDecimalFormatedTextField();
 
-    private AssetTypesComboBoxModel assetTypesComboBoxModel;
+    protected AssetTypesComboBoxModel assetTypesComboBoxModel;
 
-    private MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel(fromJComboBox, assetTypeJComboBox);
+    protected MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel(fromJComboBox, assetTypeJComboBox);
+
+
+    public IssueAssetPanel(String name, String title, String issueMess, boolean useIcon,
+                           int cropWidth, int cropHeight, boolean originalSize, boolean useExtURL) {
+        super(name, title, issueMess, useIcon, cropWidth, cropHeight, originalSize, useExtURL);
+
+        textQuantity.setText("0");
+
+
+    }
 
     public IssueAssetPanel() {
-        super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true, true);
+        this(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
+                true, true);
+
+        textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
+        textScale.setSelectedIndex(8);
 
         assetTypesComboBoxModel = new AssetTypesComboBoxModel();
         assetTypeJComboBox.setModel(assetTypesComboBoxModel);
         //assetTypeJComboBox.setRenderer(new RenderComboBoxAssetActions());
 
-        textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
-        textScale.setSelectedIndex(8);
-
         initComponents();
-
-        textQuantity.setText("0");
 
         // select combobox Asset type
         assetTypeJComboBox.addActionListener(e -> {
@@ -78,10 +87,10 @@ public class IssueAssetPanel extends IssueItemPanel {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(assetTypeJComboBox, fieldGBC);
 
-        textareasAssetTypeDescription = new JTextPane();
-        textareasAssetTypeDescription.setEditable(false);
-        textareasAssetTypeDescription.setBackground(this.getBackground());
-        textareasAssetTypeDescription.setContentType("text/html");
+        textAreasAssetTypeDescription = new JTextPane();
+        textAreasAssetTypeDescription.setEditable(false);
+        textAreasAssetTypeDescription.setBackground(this.getBackground());
+        textAreasAssetTypeDescription.setContentType("text/html");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = fieldGBC.gridx;
@@ -92,7 +101,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.weighty = 0.3;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.insets = fieldGBC.insets;
-        jPanelAdd.add(textareasAssetTypeDescription, gridBagConstraints);
+        jPanelAdd.add(textAreasAssetTypeDescription, gridBagConstraints);
 
         ////
         labelGBC.gridy = ++gridy;
@@ -134,7 +143,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         String fontStyle = textScale.getFont().getFontName();
         fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
 
-        textareasAssetTypeDescription.setText(fontStyle + assetType.getDescription());
+        textAreasAssetTypeDescription.setText(fontStyle + assetType.getDescription());
 
         if (AssetCls.isTypeUnique(assetType.getId(), 0)) {
             textQuantity.setVisible(false);

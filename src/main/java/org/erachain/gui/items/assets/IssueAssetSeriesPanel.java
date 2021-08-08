@@ -26,7 +26,7 @@ public class IssueAssetSeriesPanel extends IssueItemPanel {
         // вывод верхней панели
         int gridy = initTopArea(true);
 
-        JLabel signLabel = new JLabel(Lang.T("Asset Issue TX Signature") + ":");
+        JLabel signLabel = new JLabel(Lang.T("Original Asset Issue TX Signature") + ":");
         labelGBC.gridy = gridy;
         jPanelAdd.add(signLabel, labelGBC);
 
@@ -43,7 +43,7 @@ public class IssueAssetSeriesPanel extends IssueItemPanel {
         // вывод подвала
         initBottom(gridy);
 
-        setVisible(true);
+        //setVisible(true);
     }
 
     @Override

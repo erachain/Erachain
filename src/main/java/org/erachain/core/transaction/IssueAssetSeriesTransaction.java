@@ -8,7 +8,10 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.item.assets.*;
+import org.erachain.core.item.assets.AssetFactory;
+import org.erachain.core.item.assets.AssetUnique;
+import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
+import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
 import org.json.simple.JSONObject;
@@ -33,7 +36,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
      */
     long lastCopyKey;
     long origAssetKey;
-    private AssetCls origAsset;
+    private AssetUnique origAsset;
 
     /**
      * @param typeBytes
@@ -47,7 +50,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
      */
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator,
                                        ExLink linkTo, byte[] origAssetRef,
-                                       AssetCls prototypeAsset, byte feePow, long timestamp, Long reference) {
+                                       AssetVenture prototypeAsset, byte feePow, long timestamp, Long reference) {
         super(typeBytes, creator, linkTo, prototypeAsset, feePow, timestamp, reference);
 
         this.origAssetRef = origAssetRef;
@@ -55,7 +58,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     }
 
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetCls prototypeAsset, byte feePow, long timestamp, Long reference,
+                                       AssetVenture prototypeAsset, byte feePow, long timestamp, Long reference,
                                        byte[] signature) {
         this(typeBytes, creator, linkTo, origAssetRef, prototypeAsset, feePow, timestamp, reference);
         this.signature = signature;
@@ -63,7 +66,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     }
 
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetCls prototypeAsset, byte feePow, long timestamp, Long reference,
+                                       AssetVenture prototypeAsset, byte feePow, long timestamp, Long reference,
                                        byte[] signature, long seqNo, long feeLong) {
         this(typeBytes, creator, linkTo, origAssetRef, prototypeAsset, feePow, timestamp, reference);
         this.signature = signature;
@@ -75,16 +78,21 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     // as pack
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetCls prototypeAsset, byte[] signature) {
+                                       AssetVenture prototypeAsset, byte[] signature) {
         super(typeBytes, creator, linkTo, prototypeAsset, (byte) 0, 0L, null, signature);
         this.origAssetRef = origAssetRef;
 
     }
 
     public IssueAssetSeriesTransaction(PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetCls prototypeAsset, byte feePow, long timestamp, Long reference, byte[] signature) {
+                                       AssetVenture prototypeAsset, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, prototypeAsset, feePow, timestamp, reference,
                 signature);
+    }
+
+    public IssueAssetSeriesTransaction(PublicKeyAccount creator, ExLink linkTo,
+                                       byte[] origAssetRef, AssetVenture prototypeAsset, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, prototypeAsset, feePow, timestamp, reference);
     }
 
 
@@ -114,7 +122,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
         int len = getFeeLength();
 
-        return (len + ((AssetCls) item).getQuantity() * 5000L) * BlockChain.FEE_PER_BYTE;
+        return (len + ((AssetVenture) item).getQuantity() * 5000L) * BlockChain.FEE_PER_BYTE;
 
     }
 
@@ -126,7 +134,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         return origAssetKey;
     }
 
-    public AssetCls getOrigAsset() {
+    public AssetUnique getOrigAsset() {
         return origAsset;
     }
 
@@ -228,7 +236,8 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
         // READ PROTOTYPE ASSET
         // asset parse without reference - if is = signature
-        AssetCls prototypeAsset = AssetFactory.getInstance().parse(forDeal, Arrays.copyOfRange(data, position, data.length), false);
+        AssetVenture prototypeAsset = (AssetVenture) AssetFactory.getInstance().parse(forDeal,
+                Arrays.copyOfRange(data, position, data.length), false);
         position += prototypeAsset.getDataLength(false);
 
         if (forDeal == FOR_DB_RECORD) {
@@ -287,7 +296,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         }
 
         // CHECK IF AMOUNT POSITIVE
-        int total = (int) ((AssetCls) item).getQuantity();
+        int total = (int) ((AssetVenture) item).getQuantity();
         if (total <= 0 || total > 100) {
             return INVALID_AMOUNT;
         }
@@ -337,7 +346,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     public void process(Block block, int forDeal) {
         super.process(block, forDeal);
 
-        AssetUnique uniqueAsset = (AssetUnique) origAsset;
+        AssetUnique uniqueAsset = origAsset;
         long uniqueAssetKey = uniqueAsset.getKey();
         AssetVenture prototypeAsset = (AssetVenture) item;
         AssetUniqueSeriesCopy uniqueSeriesCopy;
@@ -370,7 +379,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
         long copyKey;
         ItemMap map = origAsset.getDBMap(dcSet);
-        int total = (int) ((AssetCls) item).getQuantity();
+        int total = (int) ((AssetVenture) item).getQuantity();
         for (int indexDel = 0; indexDel < total; indexDel++) {
 
             copyKey = lastCopyKey - indexDel;
@@ -416,7 +425,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     @Override
     public BigDecimal getAmount(Account account) {
-        return new BigDecimal(((AssetCls) item).getQuantity());
+        return new BigDecimal(((AssetVenture) item).getQuantity());
     }
 
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
