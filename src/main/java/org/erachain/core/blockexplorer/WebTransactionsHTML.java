@@ -492,7 +492,7 @@ public class WebTransactionsHTML {
                 + Base58.encode(assetSeriesTX.getOrigAssetRef()) + "</b></a><br>";
 
         out += Lang.T("Total", langObj) + ": <b>"
-                + assetSeriesTX.getTotal() + "</b><br>";
+                + assetSeriesTX.getAsset().getQuantity() + "</b><br>";
 
         return out;
     }

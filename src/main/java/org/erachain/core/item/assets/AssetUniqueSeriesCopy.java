@@ -2,10 +2,16 @@ package org.erachain.core.item.assets;
 
 //import java.math.BigDecimal;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
-import org.erachain.datachain.ItemMap;
+import org.erachain.core.BlockChain;
+import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.datachain.ItemAssetMap;
 import org.erachain.lang.Lang;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -15,29 +21,49 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     private static final int TYPE_ID = UNIQUE_COPY;
 
-    protected static final int BASE_LENGTH = TYPE_LENGTH + 2 * Short.BYTES;
+    protected static final int BASE_LENGTH = Long.BYTES + 2 * Short.BYTES;
 
-    private int total;
-    private int index;
-    private AssetUnique baseItem;
+    private final long origKey;
+    private final int total;
+    private final int index;
 
-    public AssetUniqueSeriesCopy(byte[] typeBytes, int total, int index) {
-        super(typeBytes);
+    public AssetUniqueSeriesCopy(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image,
+                                 String description, int assetType, long origKey, int total, int index) {
+        super(typeBytes, appData, maker, name, icon, image, description, assetType);
 
+        this.origKey = origKey;
         this.total = total;
         this.index = index;
 
     }
 
-    public AssetUniqueSeriesCopy(AssetUnique baseItem, AssetCls prototypeAsset, int total, int index) {
-        this(new byte[]{TYPE_ID, 0}, total, index);
-        this.baseItem = baseItem;
+    public AssetUniqueSeriesCopy(byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image,
+                                 String description, long origKey, int total, int index) {
+        this(new byte[]{TYPE_ID, 0}, appData, maker, name, icon, image, description, AssetCls.UNION_TYPE,
+                origKey, total, index);
+
+    }
+
+    public AssetUniqueSeriesCopy(long origKey, AssetVenture prototypeAsset, int total, int index) {
+        this(new byte[]{TYPE_ID, 0},
+                prototypeAsset.getAppData(),
+                prototypeAsset.getMaker(),
+                prototypeAsset.getName(),
+                prototypeAsset.getIcon(),
+                prototypeAsset.getImage(),
+                prototypeAsset.getDescription(),
+                AssetCls.UNION_TYPE,
+                origKey, total, index);
     }
 
     // GETTERS/SETTERS
     @Override
     public String getItemSubType() {
         return "unique copy";
+    }
+
+    public long getOrigKey() {
+        return origKey;
     }
 
     public int getTotal() {
@@ -48,20 +74,17 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         return index;
     }
 
-    public void loadExtData(ItemMap itemMap) {
-        baseItem = (AssetUnique) itemMap.get(key - index + 1);
-        flags = baseItem.getFlags();
-        name = baseItem.getName();
-        appData = baseItem.getAppData();
-        description = baseItem.getDescription();
-        icon = baseItem.getIcon();
-        iconAsURL = baseItem.hasIconURL();
-        image = baseItem.getImage();
-        imageAsURL = baseItem.hasImageURL();
-        startDate = baseItem.getStartDate();
-        startDate = baseItem.getStopDate();
-        tags = baseItem.getTagsSelf();
+    public static AssetUniqueSeriesCopy makeCopy(AssetUnique baseItem, AssetCls prototypeAsset, long origKey, int total, int index) {
+        byte[] appData = null;
+        byte[] icon = null;
+        byte[] image = null;
+        String description = null;
+        return new AssetUniqueSeriesCopy(new byte[]{TYPE_ID, 0}, appData, prototypeAsset.getMaker(), baseItem.getName() + " #" + index + "/" + total,
+                icon, image, description, AssetCls.AS_NON_FUNGIBLE, origKey, total, index);
 
+    }
+
+    public void loadExtData(ItemAssetMap map) {
     }
 
     //PARSE
@@ -71,6 +94,105 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
         int position = TYPE_LENGTH;
+
+        //READ CREATOR
+        byte[] makerBytes = Arrays.copyOfRange(data, position, position + MAKER_LENGTH);
+        PublicKeyAccount maker = new PublicKeyAccount(makerBytes);
+        position += MAKER_LENGTH;
+
+        //READ NAME
+        //byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
+        //int nameLength = Ints.fromByteArray(nameLengthBytes);
+        //position += NAME_SIZE_LENGTH;
+        int nameLength = Byte.toUnsignedInt(data[position]);
+        position++;
+
+        if (nameLength < 1 || nameLength > MAX_NAME_LENGTH) {
+            throw new Exception("Invalid name length: " + nameLength);
+        }
+
+        byte[] nameBytes = Arrays.copyOfRange(data, position, position + nameLength);
+        String name = new String(nameBytes, StandardCharsets.UTF_8);
+        position += nameLength;
+
+        //READ ICON
+        byte[] iconLengthBytes = Arrays.copyOfRange(data, position, position + ICON_SIZE_LENGTH);
+        int iconLength = Ints.fromBytes((byte) 0, (byte) 0, iconLengthBytes[0], iconLengthBytes[1]);
+        position += ICON_SIZE_LENGTH;
+
+        if (iconLength < 0 || iconLength > MAX_ICON_LENGTH) {
+            throw new Exception("Invalid icon length" + name + ": " + iconLength);
+        }
+
+        byte[] icon = Arrays.copyOfRange(data, position, position + iconLength);
+        position += iconLength;
+
+        //READ IMAGE
+        byte[] imageLengthBytes = Arrays.copyOfRange(data, position, position + IMAGE_SIZE_LENGTH);
+        int imageLength = Ints.fromByteArray(imageLengthBytes);
+        position += IMAGE_SIZE_LENGTH;
+
+        // TEST APP DATA
+        boolean hasAppData = (imageLength & APP_DATA_MASK) != 0;
+        if (hasAppData)
+            // RESET LEN
+            imageLength &= ~APP_DATA_MASK;
+
+        if (imageLength < 0 || imageLength > MAX_IMAGE_LENGTH) {
+            throw new Exception("Invalid image length" + name + ": " + imageLength);
+        }
+
+        byte[] image = Arrays.copyOfRange(data, position, position + imageLength);
+        position += imageLength;
+
+        byte[] appData;
+        if (hasAppData) {
+            // READ APP DATA
+            int appDataLen = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + APP_DATA_LENGTH));
+            position += APP_DATA_LENGTH;
+
+            appData = Arrays.copyOfRange(data, position, position + appDataLen);
+            position += appDataLen;
+
+        } else {
+            appData = null;
+        }
+
+        //READ DESCRIPTION
+        byte[] descriptionLengthBytes = Arrays.copyOfRange(data, position, position + DESCRIPTION_SIZE_LENGTH);
+        int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
+        position += DESCRIPTION_SIZE_LENGTH;
+
+        if (descriptionLength > BlockChain.MAX_REC_DATA_BYTES) {
+            throw new Exception("Invalid description length" + name + ": " + descriptionLength);
+        }
+
+        byte[] descriptionBytes = Arrays.copyOfRange(data, position, position + descriptionLength);
+        String description = new String(descriptionBytes, StandardCharsets.UTF_8);
+        position += descriptionLength;
+
+        byte[] reference = null;
+        long dbRef = 0;
+        if (includeReference) {
+            //READ REFERENCE
+            reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+            position += REFERENCE_LENGTH;
+
+            //READ SEQNO
+            byte[] dbRefBytes = Arrays.copyOfRange(data, position, position + DBREF_LENGTH);
+            dbRef = Longs.fromByteArray(dbRefBytes);
+            position += DBREF_LENGTH;
+        }
+
+        //READ ASSET TYPE
+        byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
+        int assetType = Ints.fromByteArray(assetTypeBytes);
+        position += ASSET_TYPE_LENGTH;
+
+        //READ ORIGINAL ASSET KEY
+        byte[] origKeyBytes = Arrays.copyOfRange(data, position, position + Long.BYTES);
+        long origKey = Longs.fromByteArray(origKeyBytes);
+        position += Long.BYTES;
 
         //READ TOTAL
         byte[] totalBytes = Arrays.copyOfRange(data, position, position + Short.BYTES);
@@ -83,27 +205,32 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         position += Short.BYTES;
 
         //RETURN
-        AssetUniqueSeriesCopy unique = new AssetUniqueSeriesCopy(typeBytes, total, index);
+        AssetUniqueSeriesCopy uniqueCopy = new AssetUniqueSeriesCopy(typeBytes, appData, maker, name, icon, image,
+                description, assetType, origKey, total, index);
 
-        return unique;
+        if (includeReference) {
+            uniqueCopy.setReference(reference, dbRef);
+        }
+
+        return uniqueCopy;
     }
 
     @Override
     public byte[] toBytes(int forDeal, boolean includeReference, boolean forMakerSign) {
 
+        byte[] parentData = super.toBytes(forDeal, includeReference, forMakerSign);
+
         byte[] data = new byte[BASE_LENGTH];
 
-        //WRITE ASSET TYPE
-        data[0] = (byte) TYPE_ID;
+        System.arraycopy(Longs.toByteArray(origKey), 0, data, 0, Long.BYTES);
+        System.arraycopy(Shorts.toByteArray((short) total), 0, data, 8, Short.BYTES);
+        System.arraycopy(Shorts.toByteArray((short) index), 0, data, 10, Short.BYTES);
 
-        System.arraycopy(Shorts.toByteArray((short) total), 0, data, 2, Short.BYTES);
-        System.arraycopy(Shorts.toByteArray((short) index), 0, data, 4, Short.BYTES);
-
-        return data;
+        return Bytes.concat(parentData, data);
     }
 
     public int getDataLength(boolean includeReference) {
-        return BASE_LENGTH;
+        return super.getDataLength(includeReference) + BASE_LENGTH;
     }
 
     //OTHER

@@ -8,10 +8,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.assets.AssetFactory;
-import org.erachain.core.item.assets.AssetUnique;
-import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
+import org.erachain.core.item.assets.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
 import org.json.simple.JSONObject;
@@ -341,13 +338,14 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         super.process(block, forDeal);
 
         AssetUnique uniqueAsset = (AssetUnique) origAsset;
-        AssetCls prototypeAsset = (AssetCls) item;
+        long uniqueAssetKey = uniqueAsset.getKey();
+        AssetVenture prototypeAsset = (AssetVenture) item;
         AssetUniqueSeriesCopy uniqueSeriesCopy;
         ItemMap map = uniqueAsset.getDBMap(dcSet);
         int total = (int) prototypeAsset.getQuantity();
         for (int indexCopy = 1; indexCopy <= total; indexCopy++) {
 
-            uniqueSeriesCopy = new AssetUniqueSeriesCopy(uniqueAsset, prototypeAsset, total, indexCopy);
+            uniqueSeriesCopy = AssetUniqueSeriesCopy.makeCopy(uniqueAsset, prototypeAsset, uniqueAssetKey, total, indexCopy);
 
             //INSERT INTO DATABASE
             lastCopyKey = map.incrementPut(uniqueSeriesCopy);
