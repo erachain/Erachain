@@ -582,8 +582,8 @@ public class Wallet extends Observable implements Observer {
 				// видимо цепочку другую взяли и в ней таких сущностей нет и падает на создании меток
 				DBASet.setVersion(this.dwSet.database, 1);
 				this.dwSet.hardFlush();
-				this.dwSet.close();
-				dwSet = DWSet.reCreateDB(dcSet, dwSet.isWithObserver(), dwSet.isDynamicGUI());
+				LOGGER.error("  !!!  NEED to RELOAD wallet");
+				System.exit(2005);
 
 			}
 
