@@ -8,6 +8,7 @@ import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.lang.Lang;
 
 import java.nio.charset.StandardCharsets;
@@ -80,17 +81,24 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
      * @param index
      * @return
      */
-    public static AssetUniqueSeriesCopy makeCopy(AssetCls foilAsset, long origKey, int total, int index) {
+    public static AssetUniqueSeriesCopy makeCopy(Transaction tx, AssetCls foilAsset, long origKey, int total, int index) {
         String copyName = foilAsset.getName() + " #" + index + "/" + total;
-        if (index == 1)
+
+        AssetUniqueSeriesCopy copy;
+        if (index == 1) {
             // Make FOIL
-            return new AssetUniqueSeriesCopy(foilAsset.getAppData(), foilAsset.getMaker(), copyName,
+            copy = new AssetUniqueSeriesCopy(foilAsset.getAppData(), foilAsset.getMaker(), copyName,
                     foilAsset.getIcon(), foilAsset.getImage(), foilAsset.getDescription(), origKey, total, index);
 
-        // Make COPY
-        return new AssetUniqueSeriesCopy(foilAsset.getAppData(), foilAsset.getMaker(), copyName,
-                null, null, foilAsset.getDescription(), origKey, total, index);
+        } else {
+            // Make COPY
+            copy = new AssetUniqueSeriesCopy(foilAsset.getAppData(), foilAsset.getMaker(), copyName,
+                    null, null, foilAsset.getDescription(), origKey, total, index);
+        }
 
+        copy.setReference(tx.getSignature(), tx.getDBRef());
+
+        return copy;
     }
 
     //PARSE

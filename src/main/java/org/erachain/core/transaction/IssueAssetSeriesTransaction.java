@@ -401,7 +401,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         int total = (int) foilAsset.getQuantity();
         for (int indexCopy = 1; indexCopy <= total; indexCopy++) {
 
-            uniqueSeriesCopy = AssetUniqueSeriesCopy.makeCopy(foilAsset, origAssetKey, total, indexCopy);
+            uniqueSeriesCopy = AssetUniqueSeriesCopy.makeCopy(this, foilAsset, origAssetKey, total, indexCopy);
 
             //INSERT INTO DATABASE
             lastCopyKey = map.incrementPut(uniqueSeriesCopy);
