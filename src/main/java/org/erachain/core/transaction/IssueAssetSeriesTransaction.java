@@ -8,6 +8,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
@@ -23,7 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- *
+ * Здесь item - это обертка (FOIL) - в ней данные по бертки, а все остальное а Оригинале.
+ * В Обертку грзим рамки как картинки
  */
 public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     public static final byte TYPE_ID = (byte) Transaction.ISSUE_ASSET_SERIES_TRANSACTION;
@@ -43,34 +45,38 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
      * @param creator
      * @param linkTo
      * @param origAssetRef   signature of Creating or last Changing Order transaction
-     * @param prototypeAsset
+     * @param foilAsset
      * @param feePow
      * @param timestamp
      * @param reference
      */
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator,
                                        ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture prototypeAsset, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, creator, linkTo, prototypeAsset, feePow, timestamp, reference);
+                                       AssetVenture foilAsset, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, creator, linkTo, foilAsset, feePow, timestamp, reference);
 
         this.origAssetRef = origAssetRef;
 
     }
 
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture prototypeAsset, byte feePow, long timestamp, Long reference,
+                                       AssetVenture foilAsset, byte feePow, long timestamp, Long reference,
                                        byte[] signature) {
-        this(typeBytes, creator, linkTo, origAssetRef, prototypeAsset, feePow, timestamp, reference);
+        this(typeBytes, creator, linkTo, origAssetRef, foilAsset, feePow, timestamp, reference);
         this.signature = signature;
 
     }
 
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture prototypeAsset, byte feePow, long timestamp, Long reference,
+                                       long origAssetKey,
+                                       AssetVenture foilAsset, byte feePow, long timestamp, Long reference,
                                        byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, linkTo, origAssetRef, prototypeAsset, feePow, timestamp, reference);
+        this(typeBytes, creator, linkTo, origAssetRef, foilAsset, feePow, timestamp, reference);
+
+        this.origAssetKey = origAssetKey;
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
 
@@ -78,21 +84,21 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     // as pack
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture prototypeAsset, byte[] signature) {
-        super(typeBytes, creator, linkTo, prototypeAsset, (byte) 0, 0L, null, signature);
+                                       AssetVenture foilAsset, byte[] signature) {
+        super(typeBytes, creator, linkTo, foilAsset, (byte) 0, 0L, null, signature);
         this.origAssetRef = origAssetRef;
 
     }
 
     public IssueAssetSeriesTransaction(PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture prototypeAsset, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, prototypeAsset, feePow, timestamp, reference,
+                                       AssetVenture foilAsset, byte feePow, long timestamp, Long reference, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, foilAsset, feePow, timestamp, reference,
                 signature);
     }
 
     public IssueAssetSeriesTransaction(PublicKeyAccount creator, ExLink linkTo,
-                                       byte[] origAssetRef, AssetVenture prototypeAsset, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, prototypeAsset, feePow, timestamp, reference);
+                                       byte[] origAssetRef, AssetVenture foilAsset, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, foilAsset, feePow, timestamp, reference);
     }
 
 
@@ -134,6 +140,10 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     public long getOrigAssetKey() {
         return origAssetKey;
+    }
+
+    public void setOrigAssetKey(long origAssetKey) {
+        this.origAssetKey = origAssetKey;
     }
 
     public AssetCls getOrigAsset() {
@@ -240,19 +250,25 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             position += FEE_LENGTH;
         }
 
-        // READ PROTOTYPE ASSET
+        // READ FOIL ASSET
         // asset parse without reference - if is = signature
-        AssetVenture prototypeAsset = (AssetVenture) AssetFactory.getInstance().parse(forDeal,
+        AssetVenture foilAsset = (AssetVenture) AssetFactory.getInstance().parse(forDeal,
                 Arrays.copyOfRange(data, position, data.length), false);
-        position += prototypeAsset.getDataLength(false);
+        position += foilAsset.getDataLength(false);
 
+        long origKey = 0;
         if (forDeal == FOR_DB_RECORD) {
-            //READ KEY
+            //READ FOIL KEY
             byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
             long key = Longs.fromByteArray(keyBytes);
             position += KEY_LENGTH;
 
-            prototypeAsset.setKey(key);
+            foilAsset.setKey(key);
+
+            //READ ORIGINAL KEY
+            keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            origKey = Longs.fromByteArray(keyBytes);
+            position += KEY_LENGTH;
 
         }
 
@@ -261,10 +277,10 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         position += SIGNATURE_LENGTH;
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssueAssetSeriesTransaction(typeBytes, creator, linkTo, assetRef, prototypeAsset, feePow, timestamp,
+            return new IssueAssetSeriesTransaction(typeBytes, creator, linkTo, assetRef, origKey, foilAsset, feePow, timestamp,
                     reference, signatureBytes, seqNo, feeLong);
         } else {
-            return new IssueAssetSeriesTransaction(typeBytes, creator, linkTo, assetRef, prototypeAsset, signatureBytes);
+            return new IssueAssetSeriesTransaction(typeBytes, creator, linkTo, assetRef, foilAsset, signatureBytes);
         }
     }
 
@@ -281,7 +297,11 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
-        return super.getDataLength(forDeal, withSignature) + SIGNATURE_LENGTH;
+        int len = super.getDataLength(forDeal, withSignature) + SIGNATURE_LENGTH;
+        if (forDeal == Transaction.FOR_DB_RECORD) {
+            len += KEY_LENGTH;
+        }
+        return len;
     }
 
     @Override
@@ -307,7 +327,14 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             return INVALID_AMOUNT;
         }
 
-        // выше уже не проверяем прототип
+        if (item.getIconType() != ItemCls.MEDIA_TYPE_IMG) {
+            return Transaction.INVALID_ICON_TYPE;
+        }
+        if (item.getImageType() != ItemCls.MEDIA_TYPE_IMG) {
+            return Transaction.INVALID_IMAGE_TYPE;
+        }
+
+        // выше уже не проверяем обертку
         return super.isValid(forDeal, flags | NOT_VALIDATE_ITEM);
     }
 
@@ -354,13 +381,13 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
         AssetCls uniqueAsset = origAsset;
         long uniqueAssetKey = uniqueAsset.getKey();
-        AssetVenture prototypeAsset = (AssetVenture) item;
+        AssetVenture foilAsset = (AssetVenture) item;
         AssetUniqueSeriesCopy uniqueSeriesCopy;
         ItemMap map = uniqueAsset.getDBMap(dcSet);
-        int total = (int) prototypeAsset.getQuantity();
+        int total = (int) foilAsset.getQuantity();
         for (int indexCopy = 1; indexCopy <= total; indexCopy++) {
 
-            uniqueSeriesCopy = AssetUniqueSeriesCopy.makeCopy(uniqueAsset, prototypeAsset, uniqueAssetKey, total, indexCopy);
+            uniqueSeriesCopy = AssetUniqueSeriesCopy.makeCopy(uniqueAsset, foilAsset, uniqueAssetKey, total, indexCopy);
 
             //INSERT INTO DATABASE
             lastCopyKey = map.incrementPut(uniqueSeriesCopy);

@@ -43,13 +43,13 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     }
 
-    public AssetUniqueSeriesCopy(long origKey, AssetVenture prototypeAsset, int total, int index) {
-        this(prototypeAsset.getAppData(),
-                prototypeAsset.getMaker(),
-                prototypeAsset.getName(),
-                prototypeAsset.getIcon(),
-                prototypeAsset.getImage(),
-                prototypeAsset.getDescription(),
+    public AssetUniqueSeriesCopy(long origKey, AssetVenture foilAsset, int total, int index) {
+        this(foilAsset.getAppData(),
+                foilAsset.getMaker(),
+                foilAsset.getName(),
+                foilAsset.getIcon(),
+                foilAsset.getImage(),
+                foilAsset.getDescription(),
                 origKey, total, index);
     }
 
@@ -71,12 +71,26 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         return index;
     }
 
-    public static AssetUniqueSeriesCopy makeCopy(AssetCls baseItem, AssetCls prototypeAsset, long origKey, int total, int index) {
+    /**
+     * Первая копия - содержит обертку полностью, все остальные только номера
+     *
+     * @param baseItem
+     * @param foilAsset
+     * @param origKey
+     * @param total
+     * @param index
+     * @return
+     */
+    public static AssetUniqueSeriesCopy makeCopy(AssetCls baseItem, AssetCls foilAsset, long origKey, int total, int index) {
         byte[] appData = null;
         byte[] icon = null;
         byte[] image = null;
         String description = null;
-        return new AssetUniqueSeriesCopy(appData, prototypeAsset.getMaker(), baseItem.getName() + " #" + index + "/" + total,
+        if (index == 1)
+            return new AssetUniqueSeriesCopy(appData, foilAsset.getMaker(), baseItem.getName() + " #" + index + "/" + total,
+                    icon, image, description, origKey, total, index);
+
+        return new AssetUniqueSeriesCopy(appData, foilAsset.getMaker(), baseItem.getName() + " #" + index + "/" + total,
                 icon, image, description, origKey, total, index);
 
     }

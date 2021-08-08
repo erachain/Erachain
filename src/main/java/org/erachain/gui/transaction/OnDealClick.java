@@ -209,6 +209,9 @@ public class OnDealClick {
                 mess = "Invalid icon type";
                 break;
 
+            case Transaction.INVALID_IMAGE_TYPE:
+                mess = "Invalid image type";
+                break;
             case Transaction.INVALID_IMAGE_LENGTH_MIN:
                 mess = "Invalid image MIN length";
                 break;
