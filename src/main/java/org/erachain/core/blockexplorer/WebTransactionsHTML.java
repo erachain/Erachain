@@ -486,13 +486,15 @@ public class WebTransactionsHTML {
         //
         AssetCls origAsset = dcSet.getItemAssetMap().get(origAssetKey);
 
-        out += "<h4><a href='?asset=" + origAssetKey + get_Lang() + "'>" + origAsset.toString() + "</a></h4>";
+        out += Lang.T("Original Asset Issue Signature", langObj) + ": <a href='?tx=" + assetSeriesTX.viewOrigAssetRef() + "'><b>"
+                + assetSeriesTX.viewOrigAssetRef() + "</b></a><br>";
 
-        out += Lang.T("Asset Issue Signature", langObj) + ": <a href='?tx=" + Base58.encode(assetSeriesTX.getOrigAssetRef()) + "'><b>"
-                + Base58.encode(assetSeriesTX.getOrigAssetRef()) + "</b></a><br>";
+        out += Lang.T("Original Asset", langObj) + ": <a href='?asset=" + origAssetKey + get_Lang() + "'>" + origAsset.toString() + "</a><br>";
+
+        out += "<h4><a href='?asset=" + assetSeriesTX.getKey() + get_Lang() + "'>" + assetSeriesTX.getItem().toString() + "</a></h4>";
 
         out += Lang.T("Total", langObj) + ": <b>"
-                + assetSeriesTX.getAsset().getQuantity() + "</b><br>";
+                + assetSeriesTX.getTotal() + "</b><br>";
 
         return out;
     }

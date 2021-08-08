@@ -143,10 +143,6 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         return origAssetKey;
     }
 
-    public void setOrigAssetKey(long origAssetKey) {
-        this.origAssetKey = origAssetKey;
-    }
-
     public AssetCls getOrigAsset() {
         return origAsset;
     }
@@ -172,8 +168,8 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         // GET BASE
         JSONObject json = super.toJson();
 
-        json.put("assetRef", Base58.encode(origAssetRef));
-        json.put("assetKey", origAssetKey);
+        json.put("originalRef", Base58.encode(origAssetRef));
+        json.put("originalKey", origAssetKey);
 
         return json;
     }
@@ -287,6 +283,18 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     public byte[] toBytes(int forDeal, boolean withSignature) {
         byte[] data = super.toBytes(forDeal, withSignature);
+
+        if (forDeal == FOR_DB_RECORD) {
+            if (origAssetKey == 0) {
+                // для неподтвержденных когда еще номера нету
+                data = Bytes.concat(data, new byte[KEY_LENGTH]);
+            } else {
+                byte[] keyBytes = Longs.toByteArray(origAssetKey);
+                keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
+                data = Bytes.concat(data, keyBytes);
+            }
+
+        }
 
         // WRITE ASSET REF
         data = Bytes.concat(data, this.origAssetRef);
