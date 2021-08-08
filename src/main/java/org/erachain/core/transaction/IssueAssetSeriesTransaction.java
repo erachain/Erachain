@@ -8,8 +8,8 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
-import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
@@ -36,7 +36,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
      */
     long lastCopyKey;
     long origAssetKey;
-    private AssetUnique origAsset;
+    private AssetCls origAsset;
 
     /**
      * @param typeBytes
@@ -103,14 +103,16 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         super.setDC(dcSet, false);
 
         // на выходе может быть NULL - он в long не преобразуется - поэтому сначала исследуем
-        Long res = dcSet.getTransactionFinalMapSigns().get(origAssetRef);
+        Long seqNo = dcSet.getTransactionFinalMapSigns().get(origAssetRef);
 
-        if (res == null) {
+        if (seqNo == null) {
             return;
         }
 
-        origAssetKey = res;
-        origAsset = (AssetUnique) dcSet.getItemAssetMap().get(origAssetKey);
+        IssueAssetTransaction tx = (IssueAssetTransaction) dcSet.getTransactionFinalMap().get(seqNo);
+
+        origAssetKey = tx.getKey();
+        origAsset = dcSet.getItemAssetMap().get(origAssetKey);
 
         if (andUpdateFromState && !isWiped())
             updateFromStateDB();
@@ -134,7 +136,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         return origAssetKey;
     }
 
-    public AssetUnique getOrigAsset() {
+    public AssetCls getOrigAsset() {
         return origAsset;
     }
 
@@ -301,7 +303,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
         // CHECK IF AMOUNT POSITIVE
         int total = (int) ((AssetVenture) item).getQuantity();
-        if (total <= 0 || total > 100) {
+        if (total <= 5 || total > 100) {
             return INVALID_AMOUNT;
         }
 
@@ -350,7 +352,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     public void process(Block block, int forDeal) {
         super.process(block, forDeal);
 
-        AssetUnique uniqueAsset = origAsset;
+        AssetCls uniqueAsset = origAsset;
         long uniqueAssetKey = uniqueAsset.getKey();
         AssetVenture prototypeAsset = (AssetVenture) item;
         AssetUniqueSeriesCopy uniqueSeriesCopy;

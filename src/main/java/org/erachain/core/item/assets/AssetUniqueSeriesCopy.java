@@ -71,7 +71,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         return index;
     }
 
-    public static AssetUniqueSeriesCopy makeCopy(AssetUnique baseItem, AssetCls prototypeAsset, long origKey, int total, int index) {
+    public static AssetUniqueSeriesCopy makeCopy(AssetCls baseItem, AssetCls prototypeAsset, long origKey, int total, int index) {
         byte[] appData = null;
         byte[] icon = null;
         byte[] image = null;

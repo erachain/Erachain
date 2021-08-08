@@ -26,6 +26,7 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
         super(NAME, TITLE, "Asset series issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
                 true, true);
 
+        quantityJLabel.setText(Lang.T("Series Total") + ":");
         initComponents();
 
     }
@@ -33,8 +34,6 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
     protected void initComponents() {
 
         super.initComponents();
-
-        quantityJLabel.setText(Lang.T("Series Total") + ":");
 
         int gridy = initTopArea(true);
 
@@ -44,6 +43,12 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(assetRefField, fieldGBC);
+
+        labelGBC.gridy = ++gridy;
+        jPanelAdd.add(quantityJLabel, labelGBC);
+
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(textQuantity, fieldGBC);
 
         // вывод подвала
         super.initBottom(gridy);
