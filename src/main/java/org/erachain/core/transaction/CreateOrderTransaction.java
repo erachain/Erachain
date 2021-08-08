@@ -285,7 +285,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     }
 
     @Override
-    public long getOrigAssetKey() {
+    public long getAssetKey() {
         return this.haveKey;
     }
 

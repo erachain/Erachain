@@ -29,7 +29,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     }
 
-    public AssetUniqueSeriesCopy(AssetUnique baseItem, int total, int index) {
+    public AssetUniqueSeriesCopy(AssetUnique baseItem, AssetCls prototypeAsset, int total, int index) {
         this(new byte[]{TYPE_ID, 0}, total, index);
         this.baseItem = baseItem;
     }

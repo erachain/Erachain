@@ -204,7 +204,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     @Override
-    public long getOrigAssetKey() {
+    public long getAssetKey() {
         return this.key;
     }
 

@@ -74,11 +74,12 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int FOR_DB_RECORD = 4; // use all + calcalated fields (FEE, BlockNo + SeqNo)
 
     // FLAGS for VALIDATING
-    public static final long NOT_VALIDATE_FLAG_FEE = 1l;
-    public static final long NOT_VALIDATE_FLAG_PERSONAL = 2l;
-    public static final long NOT_VALIDATE_FLAG_PUBLIC_TEXT = 4l;
-    public static final long NOT_VALIDATE_FLAG_BALANCE = 8l;
-    public static final long NOT_VALIDATE_KEY_COLLISION = 16l;
+    public static final long NOT_VALIDATE_FLAG_FEE = 1L;
+    public static final long NOT_VALIDATE_FLAG_PERSONAL = 2L;
+    public static final long NOT_VALIDATE_FLAG_PUBLIC_TEXT = 4L;
+    public static final long NOT_VALIDATE_FLAG_BALANCE = 8L;
+    public static final long NOT_VALIDATE_KEY_COLLISION = 16L;
+    public static final long NOT_VALIDATE_ITEM = 32L;
 
     //
     public static final int MAX_TITLE_BYTES_LENGTH = (1 << 8) - 2;
@@ -1051,7 +1052,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return this.feePow;
     }
 
-    public long getOrigAssetKey() {
+    public long getAssetKey() {
         return 0L;
     }
 

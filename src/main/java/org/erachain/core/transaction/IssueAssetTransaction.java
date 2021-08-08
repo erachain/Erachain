@@ -157,37 +157,39 @@ public class IssueAssetTransaction extends IssueItemRecord {
             return result;
         }
 
-        //CHECK QUANTITY
-        AssetCls asset = (AssetCls) this.getItem();
+        if ((flags & NOT_VALIDATE_ITEM) == 0) {
+            //CHECK QUANTITY
+            AssetCls asset = (AssetCls) this.getItem();
 
-        if (height > BlockChain.START_ASSET_UNIQUE && asset.isUnique()) {
-            if (asset instanceof AssetUnique) {
-                ;
+            if (height > BlockChain.START_ASSET_UNIQUE && asset.isUnique()) {
+                if (asset instanceof AssetUnique) {
+                    ;
+                } else {
+                    // так как тип актива считываем в конце парсинга - по нему сразу не определить что было создано
+                    // и может появиться ошибка сборки байт кода
+                    return INVALID_ASSET_TYPE;
+                }
             } else {
-                // так как тип актива считываем в конце парсинга - по нему сразу не определить что было создано
-                // и может появиться ошибка сборки байт кода
-                return INVALID_ASSET_TYPE;
-            }
-        } else {
-            //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
-            long maxQuantity = Long.MAX_VALUE;
-            long quantity = asset.getQuantity();
-            //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
-            if (quantity > maxQuantity || quantity < -1) {
-                errorValue = "quantity > maxQuantity  or < -1: " + quantity + " > " + maxQuantity;
-                return INVALID_QUANTITY;
-            }
-
-            if (((AssetCls) this.item).isAccounting() && quantity != 0) {
-                errorValue = "Asset is Accounting and quantity != 0";
-                return INVALID_QUANTITY;
-            }
-
-            if (this.item.isNovaItem(this.dcSet) > 0) {
-                Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
-                if (item.b < quantity) {
-                    errorValue = "Nova asset quantity > set : " + quantity + " > " + item.b;
+                //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
+                long maxQuantity = Long.MAX_VALUE;
+                long quantity = asset.getQuantity();
+                //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
+                if (quantity > maxQuantity || quantity < -1) {
+                    errorValue = "quantity > maxQuantity  or < -1: " + quantity + " > " + maxQuantity;
                     return INVALID_QUANTITY;
+                }
+
+                if (((AssetCls) this.item).isAccounting() && quantity != 0) {
+                    errorValue = "Asset is Accounting and quantity != 0";
+                    return INVALID_QUANTITY;
+                }
+
+                if (this.item.isNovaItem(this.dcSet) > 0) {
+                    Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
+                    if (item.b < quantity) {
+                        errorValue = "Nova asset quantity > set : " + quantity + " > " + item.b;
+                        return INVALID_QUANTITY;
+                    }
                 }
             }
         }
@@ -277,8 +279,8 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
         if (forDeal == FOR_DB_RECORD) {
             //READ KEY
-            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-            long key = Longs.fromByteArray(timestampBytes);
+            byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            long key = Longs.fromByteArray(keyBytes);
             position += KEY_LENGTH;
 
             asset.setKey(key);
