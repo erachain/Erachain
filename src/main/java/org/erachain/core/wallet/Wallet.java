@@ -585,8 +585,8 @@ public class Wallet extends Observable implements Observer {
 				// поставим версию невалидную чтобы база пересоздалась сама
 				DBASet.setVersion(this.dwSet.database, 1);
 				this.dwSet.hardFlush();
-				this.dwSet.close();
-				dwSet = DWSet.reCreateDB(dcSet, dwSet.isWithObserver(), dwSet.isDynamicGUI());
+				LOGGER.error("  !!!  NEED to RELOAD wallet");
+				System.exit(2005);
 
 			}
 

@@ -2111,9 +2111,20 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     }
 
+    @Deprecated
     public JSONObject makeErrorJSON(int error) {
         JSONObject out = new JSONObject();
         out.put("error", error);
+        out.put("message", OnDealClick.resultMess(error));
+        if (errorValue != null) {
+            out.put("value", errorValue);
+        }
+        return out;
+    }
+
+    public JSONObject makeErrorJSON2(int error) {
+        JSONObject out = new JSONObject();
+        out.put("code", error);
         out.put("message", OnDealClick.resultMess(error));
         if (errorValue != null) {
             out.put("value", errorValue);
@@ -2145,7 +2156,21 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
     }
 
-    public void updateMapByError2(HashMap out, int error, String lang) {
+    public static void updateMapByError2static(HashMap out, int error, String lang) {
+        JSONObject json = new JSONObject();
+        json.put("code", error);
+        json.put("message", OnDealClick.resultMess(error));
+        if (lang != null) {
+            JSONObject langObj = Lang.getInstance().getLangJson(lang);
+            if (langObj != null) {
+                json.put("lang", lang);
+                json.put("local", Lang.T(OnDealClick.resultMess(error), langObj));
+            }
+        }
+        out.put("error", json);
+    }
+
+    public static void updateMapByError2static(HashMap out, int error, String errorValue, String lang) {
         JSONObject json = new JSONObject();
         json.put("code", error);
         json.put("message", OnDealClick.resultMess(error));
@@ -2162,6 +2187,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         out.put("error", json);
     }
 
+    public void updateMapByError2(HashMap out, int error, String lang) {
+        updateMapByError2static(out, error, errorValue, lang);
+    }
+
     @Deprecated
     public void updateMapByError(int error, String errorMess, HashMap out) {
         out.put("error", error);
@@ -2171,6 +2200,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
     }
 
+    /*
     public void updateMapByError2(int error, String errorMess, HashMap out) {
         JSONObject json = new JSONObject();
         json.put("code", error);
@@ -2180,6 +2210,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
         out.put("error", json);
     }
+
+     */
 
     @Deprecated
     public void updateMapByError(int error, String errorMess, HashMap out, String lang) {
