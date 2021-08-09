@@ -1,6 +1,5 @@
 package org.erachain.gui.items.templates;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemsTableModel;
@@ -15,11 +14,6 @@ public class TemplatesItemsTableModel extends SearchItemsTableModel {
     public TemplatesItemsTableModel() {
         super(DCSet.getInstance().getItemTemplateMap(), new String[]{"Key", "Name", "Creator", "Favorite"},
                 new Boolean[]{false, true, true, false}, COLUMN_FAVORITE);
-    }
-
-    @Override
-    protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
     }
 
     @Override

@@ -1,6 +1,5 @@
 package org.erachain.gui.items.polls;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemsTableModel;
@@ -16,11 +15,6 @@ public class PollsItemsTableModel extends SearchItemsTableModel {
     public PollsItemsTableModel() {
         super(DCSet.getInstance().getItemPollMap(), new String[]{"Key", "Name", "Creator", "Votes", "Favorite"},
                 null, COLUMN_FAVORITE);
-    }
-
-    @Override
-    protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
     }
 
     @Override
