@@ -44,6 +44,13 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        getInterval();
+
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
 
         if (this.list == null || row > this.list.size() - 1) {

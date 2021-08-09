@@ -80,6 +80,9 @@ public class Wallet extends Observable implements Observer {
 
 			walletUpdater = new WalletUpdater(Controller.getInstance(), this);
 
+			this.setChanged();
+			this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_DB_OPEN, this));
+
 		}
 
 	}
@@ -426,6 +429,10 @@ public class Wallet extends Observable implements Observer {
 		} else {
 			Settings.getInstance().setWalletKeysPath(oldPath);
 		}
+
+		this.setChanged();
+		this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_DB_OPEN, this));
+
 		return res;
 	}
 
@@ -583,9 +590,17 @@ public class Wallet extends Observable implements Observer {
 
 				DBASet.setVersion(this.dwSet.database, 1);
 				this.dwSet.hardFlush();
-				if (false) {
+				if (true) {
+
+					this.setChanged();
+					this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_DB_CLOSED, true));
+
 					this.dwSet.close();
 					dwSet = DWSet.reCreateDB(dcSet, dwSet.isWithObserver(), dwSet.isDynamicGUI());
+
+					this.setChanged();
+					this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_DB_OPEN, this));
+
 				} else {
 					LOGGER.error("  !!!  NEED to RELOAD wallet");
 					Controller.getInstance().stopAndExit(2005);

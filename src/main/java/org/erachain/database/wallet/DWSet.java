@@ -508,10 +508,15 @@ public class DWSet extends DBASet {
         }
 
         this.uses++;
-        this.database.commit();
-        this.database.close();
-        this.tables = null;
-        this.uses--;
+        try {
+
+            this.database.commit();
+            this.database.close();
+            this.tables = null;
+            this.database = null;
+        } finally {
+            this.uses--;
+        }
 
     }
 

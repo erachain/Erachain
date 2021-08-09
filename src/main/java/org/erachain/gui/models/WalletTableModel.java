@@ -3,6 +3,9 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.gui.ObserverWaiter;
+import org.erachain.utils.ObserverMessage;
+
+import java.util.Observable;
 
 @SuppressWarnings("serial")
 /**
@@ -18,6 +21,29 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
 
     public WalletTableModel(String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
         super(columnNames, columnAutoHeight, descending);
+    }
+
+    protected void updateMap() {
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
+        ObserverMessage message = (ObserverMessage) arg;
+        if (message.getType() == ObserverMessage.WALLET_DB_CLOSED) {
+            needUpdate = false;
+            list = null;
+            map = null;
+            this.fireTableDataChanged();
+            return;
+        } else if (message.getType() == ObserverMessage.WALLET_DB_OPEN) {
+            needUpdate = false;
+            updateMap();
+            getInterval();
+            this.fireTableDataChanged();
+            return;
+        }
+        super.update(o, arg);
     }
 
     public void addObservers() {
