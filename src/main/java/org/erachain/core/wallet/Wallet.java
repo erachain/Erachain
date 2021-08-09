@@ -580,10 +580,16 @@ public class Wallet extends Observable implements Observer {
 				dwSet.clear(false);
 			} catch (NullPointerException e) {
 				// видимо цепочку другую взяли и в ней таких сущностей нет и падает на создании меток
+
 				DBASet.setVersion(this.dwSet.database, 1);
 				this.dwSet.hardFlush();
-				LOGGER.error("  !!!  NEED to RELOAD wallet");
-				Controller.getInstance().stopAndExit(2005);
+				if (false) {
+					this.dwSet.close();
+					dwSet = DWSet.reCreateDB(dcSet, dwSet.isWithObserver(), dwSet.isDynamicGUI());
+				} else {
+					LOGGER.error("  !!!  NEED to RELOAD wallet");
+					Controller.getInstance().stopAndExit(2005);
+				}
 
 			}
 
