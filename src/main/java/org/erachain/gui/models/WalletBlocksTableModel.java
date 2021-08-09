@@ -29,6 +29,11 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         try {
             if (list == null || list.size() - 1 < row) {

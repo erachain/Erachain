@@ -1,5 +1,6 @@
 package org.erachain.gui.items.statuses;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemsTableModel;
@@ -16,6 +17,11 @@ public class StatusesItemsTableModel extends SearchItemsTableModel {
         super(DCSet.getInstance().getItemStatusMap(), new String[]{"Key", "Name", "Creator", "Unique", "Favorite"},
                 new Boolean[]{false, true, true, false},
                 COLUMN_FAVORITE);
+    }
+
+    @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
     }
 
     @Override

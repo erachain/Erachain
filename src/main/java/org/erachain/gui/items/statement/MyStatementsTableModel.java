@@ -38,6 +38,11 @@ public class MyStatementsTableModel extends WalletTableModel<Tuple2<Tuple2<Long,
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         // TODO Auto-generated method stub
         try {

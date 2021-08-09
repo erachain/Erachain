@@ -185,6 +185,9 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         U item;
         int count = 0;
         list = new ArrayList<>();
+        if (map == null)
+            return;
+
         if (startKey == null) {
             try (IteratorCloseable iterator = map.getIndexIterator(0, descending)) {
                 while (iterator.hasNext() && count < step) {
@@ -227,6 +230,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
     public void addObservers() {
         Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+        Controller.getInstance().getWallet().addObserver(this); // обработка repaintGUI
         if (map != null) {
 
             RESET_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_RESET);

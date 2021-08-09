@@ -36,7 +36,7 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
      * org.erachain.gui.items.records.MyTransactionsSplitPanel#setIntervalPanel
      */
     public WalletTransactionsTableModel() {
-        super(Controller.getInstance().getWallet().dwSet.getTransactionMap(),
+        super(null,
                 new String[]{"№", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size", "Favorite"},
                 new Boolean[]{true, true, true, true, true, true, true, false, false, true, true},
                 true, COLUMN_FAVORITE);
@@ -46,8 +46,6 @@ public class WalletTransactionsTableModel extends WalletTableModel<Tuple2<Tuple2
     @Override
     protected void updateMap() {
         map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
-        getInterval();
-
     }
 
     @Override

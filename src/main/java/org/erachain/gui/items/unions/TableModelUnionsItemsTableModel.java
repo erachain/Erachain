@@ -1,5 +1,6 @@
 package org.erachain.gui.items.unions;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemsTableModel;
@@ -15,6 +16,11 @@ public class TableModelUnionsItemsTableModel extends SearchItemsTableModel {
         super(DCSet.getInstance().getItemUnionMap(), new String[]{"Key", "Name", "Creator", "Favorite"},
                 null,
                 COLUMN_FAVORITE);
+    }
+
+    @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
     }
 
     @Override

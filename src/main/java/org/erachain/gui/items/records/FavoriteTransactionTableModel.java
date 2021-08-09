@@ -38,12 +38,17 @@ public class FavoriteTransactionTableModel extends FavoriteItemModelTable {
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.list == null || this.list.size() - 1 < row) {
             return null;
         }
 
-        Transaction transaction = (Transaction)this.list.get(row);
+        Transaction transaction = (Transaction) this.list.get(row);
 
         switch (column) {
             case COLUMN_IS_OUTCOME:

@@ -35,6 +35,11 @@ public class PaymentOrdersTableModel extends WalletTableModel<Transaction> imple
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         //try
         //{

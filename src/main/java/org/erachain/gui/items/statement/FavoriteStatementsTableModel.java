@@ -33,6 +33,11 @@ public class FavoriteStatementsTableModel extends FavoriteItemModelTable {
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         try {
             if (this.list == null || this.list.isEmpty()) {

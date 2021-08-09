@@ -5,6 +5,7 @@ import org.erachain.dbs.DBTabImpl;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.utils.ObserverMessage;
 
+import java.util.ArrayList;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
@@ -15,7 +16,7 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
 
     public WalletTableModel(DBTabImpl map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending, int columnFavorite) {
         super(map, columnNames, column_AutoHeight, columnFavorite, descending);
-
+        updateMap();
         addObservers();
     }
 
@@ -23,8 +24,7 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
         super(columnNames, columnAutoHeight, descending);
     }
 
-    protected void updateMap() {
-    }
+    protected abstract void updateMap();
 
     @Override
     public void update(Observable o, Object arg) {
@@ -32,7 +32,7 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
         ObserverMessage message = (ObserverMessage) arg;
         if (message.getType() == ObserverMessage.WALLET_DB_CLOSED) {
             needUpdate = false;
-            list = null;
+            list = new ArrayList<>();
             map = null;
             this.fireTableDataChanged();
             return;
