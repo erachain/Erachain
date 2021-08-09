@@ -49,7 +49,7 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        map = Controller.getInstance().getWallet().dwSet.getAccountMap();
     }
 
     public void setAsset(AssetCls asset) {

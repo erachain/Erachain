@@ -20,7 +20,7 @@ public class WalletItemUnionsTableModel extends WalletTableModel<UnionCls> {
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        map = Controller.getInstance().getWallet().dwSet.getUnionMap();
     }
 
     @Override

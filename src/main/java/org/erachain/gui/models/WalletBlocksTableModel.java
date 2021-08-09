@@ -30,7 +30,7 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        map = Controller.getInstance().getWallet().dwSet.getBlocksHeadMap();
     }
 
     @Override

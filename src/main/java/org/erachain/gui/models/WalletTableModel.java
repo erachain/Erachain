@@ -24,6 +24,10 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
         super(columnNames, columnAutoHeight, descending);
     }
 
+    protected void clearMap() {
+        map = null;
+    }
+
     protected abstract void updateMap();
 
     @Override
@@ -33,7 +37,7 @@ public abstract class WalletTableModel<T> extends TimerTableModelCls<T> implemen
         if (message.getType() == ObserverMessage.WALLET_DB_CLOSED) {
             needUpdate = false;
             list = new ArrayList<>();
-            map = null;
+            clearMap();
             this.fireTableDataChanged();
             return;
         } else if (message.getType() == ObserverMessage.WALLET_DB_OPEN) {

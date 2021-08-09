@@ -25,7 +25,7 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        map = Controller.getInstance().getWallet().dwSet.getAssetMap();
     }
 
     @Override

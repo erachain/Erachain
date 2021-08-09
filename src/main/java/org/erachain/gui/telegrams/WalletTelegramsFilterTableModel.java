@@ -42,7 +42,7 @@ public class WalletTelegramsFilterTableModel extends WalletTableModel<Transactio
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        map = Controller.getInstance().getWallet().dwSet.getTelegramsMap();
     }
 
     @Override

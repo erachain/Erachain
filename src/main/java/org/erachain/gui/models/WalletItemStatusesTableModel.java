@@ -21,7 +21,7 @@ public class WalletItemStatusesTableModel extends WalletTableModel<StatusCls> {
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        map = Controller.getInstance().getWallet().dwSet.getStatusMap();
     }
 
     @Override

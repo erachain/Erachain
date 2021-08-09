@@ -1,6 +1,5 @@
 package org.erachain.gui.items.imprints;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemsTableModel;
@@ -20,11 +19,6 @@ public class ImprintsSearchTableModel extends SearchItemsTableModel {
                 new Boolean[]{false, true, true, false},
                 COLUMN_FAVORITE);
         logger = LoggerFactory.getLogger(ImprintsSearchTableModel.class);
-    }
-
-    @Override
-    protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
     }
 
     @Override

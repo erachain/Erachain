@@ -24,7 +24,7 @@ public class WalletItemPersonsTableModel extends WalletItemTableModel<PersonCls>
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        map = Controller.getInstance().getWallet().dwSet.getPersonMap();
     }
 
     @Override

@@ -50,6 +50,11 @@ public abstract class FavoriteItemModelTable extends WalletItemTableModel implem
     }
 
     @Override
+    protected void clearMap() {
+        favoriteMap = null;
+    }
+
+    @Override
     public void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 

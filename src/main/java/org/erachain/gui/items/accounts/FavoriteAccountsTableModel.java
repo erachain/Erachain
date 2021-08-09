@@ -35,7 +35,7 @@ public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, 
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        map = Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap();
     }
 
     @Override

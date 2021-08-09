@@ -27,7 +27,7 @@ public class FavoriteStatusesTableModel extends FavoriteItemModelTable {
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        favoriteMap = Controller.getInstance().getWallet().dwSet.getStatusFavoritesSet();
     }
 
     @Override

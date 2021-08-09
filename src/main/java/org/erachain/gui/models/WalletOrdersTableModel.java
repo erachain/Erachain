@@ -35,7 +35,7 @@ public class WalletOrdersTableModel extends WalletTableModel<Order> implements O
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        map = Controller.getInstance().getWallet().dwSet.getOrderMap();
     }
 
     @Override

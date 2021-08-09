@@ -20,7 +20,7 @@ public class WalletItemImprintsTableModel extends WalletTableModel<ImprintCls> {
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        map = Controller.getInstance().getWallet().dwSet.getImprintMap();
     }
 
     @Override

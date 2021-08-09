@@ -31,7 +31,7 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
 
     @Override
     protected void updateMap() {
-        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+        favoriteMap = Controller.getInstance().getWallet().dwSet.getPollFavoritesSet();
     }
 
     @Override
