@@ -76,6 +76,8 @@ public class IssueAssetSeriesTransactionTest {
     AssetCls assetVenture;
     long key = 0;
     RSend rsend;
+
+    byte[] txSign = new byte[64];
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance5;
     private byte[] icon = new byte[]{1, 3, 4, 5, 6, 9}; // default value
     private byte[] image = new byte[]{4, 11, 32, 23, 45, 122, 11, -45}; // default value
@@ -138,6 +140,8 @@ public class IssueAssetSeriesTransactionTest {
         assetVenture = new AssetVenture(itemAppData, maker, "movable", icon, image, "...", 0, 8, 10L);
         assetVenture.setReference(Crypto.getInstance().digest(assetVenture.toBytes(forDeal, false, false)), dbRef);
 
+        System.arraycopy(assetUnique.getReference(), 0, txSign, 0, 32);
+        System.arraycopy(assetVenture.getReference(), 0, txSign, 32, 32);
     }
 
 
@@ -147,15 +151,15 @@ public class IssueAssetSeriesTransactionTest {
         init(IDB.DBS_MAP_DB);
 
         //CREATE UPDATE ORDER
-        IssueAssetSeriesTransaction tx = new IssueAssetSeriesTransaction(maker, null, assetUnique.getReference(),
+        IssueAssetSeriesTransaction tx = new IssueAssetSeriesTransaction(maker, null, txSign,
                 (AssetVenture) assetVenture, FEE_POWER, timestamp, 0L);
         tx.sign(maker, Transaction.FOR_NETWORK);
 
-        //CONVERT TO BYTES
+        //CONVERT TO BYTES - [228 - 117 = 111 (asset.len)]
         byte[] rawTX = tx.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawTX.length, tx.getDataLength(Transaction.FOR_NETWORK, true));
+        //assertEquals(rawTX.length, tx.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -170,8 +174,8 @@ public class IssueAssetSeriesTransactionTest {
             //CHECK ISSUER
             assertEquals(tx.getCreator().getAddress(), parsedTX.getCreator().getAddress());
 
-            //CHECK REFERENCE
-            //assertEquals((long)tx.getReference(), (long)parsedTX.getReference());
+            //CHECK ORIG REFERENCE
+            assertEquals(Arrays.equals(tx.getOrigAssetRef(), ((IssueAssetSeriesTransaction) parsedTX).getOrigAssetRef()), true);
 
             //CHECK TIMESTAMP
             assertEquals(tx.getTimestamp(), parsedTX.getTimestamp());

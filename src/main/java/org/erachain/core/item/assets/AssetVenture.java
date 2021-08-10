@@ -270,8 +270,8 @@ public class AssetVenture extends AssetCls {
 
     @Override
     public int getDataLength(boolean includeReference) {
-        return super.getDataLength(includeReference)
-                + SCALE_LENGTH + QUANTITY_LENGTH;
+        int len = super.getDataLength(includeReference);
+        return len + SCALE_LENGTH + QUANTITY_LENGTH;
     }
 
     //OTHER

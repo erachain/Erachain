@@ -45,7 +45,7 @@ public class AssetVentureTest {
         //CONVERT TO BYTES
         byte[] rawAsset = assetVenture.toBytes(Transaction.FOR_NETWORK, false, false);
 
-        //CHECK DATA LENGTH
+        //CHECK DATA LENGTH - 157
         assertEquals(rawAsset.length, assetVenture.getDataLength(false));
 
         try {
