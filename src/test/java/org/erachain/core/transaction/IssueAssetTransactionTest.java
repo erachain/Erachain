@@ -184,7 +184,6 @@ public class IssueAssetTransactionTest {
 
         assetMovable = new AssetVenture(itemAppData, maker, "movable-111", icon, image, "...", 0, 8, 500L);
 
-        //CREATE UPDATE ORDER
         IssueAssetTransaction tx = new IssueAssetTransaction(maker, assetMovable, feePow, System.currentTimeMillis(), 0L);
         tx.sign(maker, Transaction.FOR_NETWORK);
 

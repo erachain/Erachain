@@ -81,7 +81,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
      * @param index
      * @return
      */
-    public static AssetUniqueSeriesCopy makeCopy(Transaction tx, AssetCls foilAsset, long origKey, int total, int index) {
+    public static AssetUniqueSeriesCopy makeCopy(Transaction issueTX, AssetCls foilAsset, long origKey, int total, int index) {
         String copyName = foilAsset.getName() + " #" + index + "/" + total;
 
         AssetUniqueSeriesCopy copy;
@@ -96,7 +96,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
                     null, null, foilAsset.getDescription(), origKey, total, index);
         }
 
-        copy.setReference(tx.getSignature(), tx.getDBRef());
+        copy.setReference(issueTX.getSignature(), issueTX.getDBRef());
 
         return copy;
     }
@@ -199,8 +199,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         }
 
         //READ ASSET TYPE
-        byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
-        int assetType = Ints.fromByteArray(assetTypeBytes);
+        int assetType = Byte.toUnsignedInt(Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH)[0]);
         position += ASSET_TYPE_LENGTH;
 
         //READ ORIGINAL ASSET KEY

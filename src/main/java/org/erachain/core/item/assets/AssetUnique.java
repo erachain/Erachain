@@ -166,11 +166,11 @@ public class AssetUnique extends AssetCls {
         }
 
         //READ ASSET TYPE
-        byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
+        int assetType = Byte.toUnsignedInt(Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH)[0]);
         position += ASSET_TYPE_LENGTH;
 
         //RETURN
-        AssetUnique unique = new AssetUnique(typeBytes, appData, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]));
+        AssetUnique unique = new AssetUnique(typeBytes, appData, maker, name, icon, image, description, assetType);
         if (includeReference) {
             unique.setReference(reference, dbRef);
         }
