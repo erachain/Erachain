@@ -24,6 +24,11 @@ public class WalletItemPollsTableModel extends WalletTableModel<PollCls> {
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getPollMap();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.list == null || row > this.list.size() - 1) {
             return null;

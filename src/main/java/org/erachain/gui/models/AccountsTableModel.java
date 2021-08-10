@@ -47,6 +47,11 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
 
     }
 
+    @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getAccountMap();
+    }
+
     public void setAsset(AssetCls asset) {
         this.asset = asset;
         assetKey = asset.getKey();
@@ -112,7 +117,7 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
 
     public Tuple4<BigDecimal, BigDecimal, BigDecimal, BigDecimal> getTotalBalance() {
 
-        if (this.asset == null)
+        if (this.asset == null || list == null)
             return new Tuple4(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
 
         BigDecimal totalBalance1 = BigDecimal.ZERO;

@@ -32,8 +32,10 @@ public class ObserverMessage {
     public static final int REMOVE_ALL_ACCOUNT_TYPE = 33;
     public static final int LIST_ALL_ACCOUNT_TYPE = 34;
 
-    public static final int WALLET_STATUS = 36;
-    public static final int NETWORK_STATUS = 37;
+    public static final int WALLET_DB_CLOSED = 36;
+    public static final int WALLET_DB_OPEN = 37;
+    public static final int WALLET_STATUS = 38;
+    public static final int NETWORK_STATUS = 39;
 
     public static final int RESET_NAME_TYPE = 41;
     public static final int ADD_NAME_TYPE = 42;

@@ -24,6 +24,11 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getAssetMap();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.list == null || row > this.list.size() - 1) {
             return null;

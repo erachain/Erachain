@@ -14,7 +14,7 @@ public class PollsItemsTableModel extends SearchItemsTableModel {
 
     public PollsItemsTableModel() {
         super(DCSet.getInstance().getItemPollMap(), new String[]{"Key", "Name", "Creator", "Votes", "Favorite"},
-            null, COLUMN_FAVORITE);
+                null, COLUMN_FAVORITE);
     }
 
     @Override
