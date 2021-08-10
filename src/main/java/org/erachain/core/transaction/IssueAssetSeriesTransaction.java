@@ -65,6 +65,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
                                        byte[] signature) {
         this(typeBytes, creator, linkTo, origAssetRef, foilAsset, feePow, timestamp, reference);
         this.signature = signature;
+        item.setReference(signature, dbRef);
 
     }
 
@@ -76,6 +77,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
         this.origAssetKey = origAssetKey;
         this.signature = signature;
+        item.setReference(signature, dbRef);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
 
         if (seqNo > 0)
@@ -290,7 +292,6 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
                 data = Bytes.concat(data, new byte[KEY_LENGTH]);
             } else {
                 byte[] keyBytes = Longs.toByteArray(origAssetKey);
-                keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
                 data = Bytes.concat(data, keyBytes);
             }
 
