@@ -10,6 +10,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -247,6 +248,18 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
     }
 
     //OTHER
+
+    public JSONObject toJson() {
+
+        JSONObject assetJSON = super.toJson();
+
+        // ADD DATA of ORIGINAL
+        assetJSON.put("originalKey", origKey);
+        JSONObject original = new JSONObject();
+
+        assetJSON.put("origina", original);
+
+    }
 
     public String makeHTMLView() {
 
