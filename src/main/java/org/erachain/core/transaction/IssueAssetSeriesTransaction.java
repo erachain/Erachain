@@ -5,7 +5,6 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
@@ -34,10 +33,6 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     private final byte[] origAssetRef;
 
-    /**
-     * Нужно чтобы запомнить с какого номер началась Серия - для быстрого удаления всех
-     */
-    long lastCopyKey;
     long origAssetKey;
     private AssetCls origAsset;
 
@@ -387,13 +382,9 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     /**
      * Суть такова что мы делаем новый ордер с новым ID так как иначе сортировка Сделок будет нарушена так как
      * будет по Инициатору ключ, а его мы тогда берем старый ИД. А надо новый чтобы история действий не менялась
-     *
-     * @param block
-     * @param forDeal
      */
     @Override
-    public void process(Block block, int forDeal) {
-        super.process(block, forDeal);
+    protected void processItem() {
 
         long origAssetKey = origAsset.getKey();
         AssetVenture foilAsset = (AssetVenture) item;
@@ -405,15 +396,15 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             uniqueSeriesCopy = AssetUniqueSeriesCopy.makeCopy(this, foilAsset, origAssetKey, total, indexCopy);
 
             //INSERT INTO DATABASE
-            lastCopyKey = map.incrementPut(uniqueSeriesCopy);
+            key = map.incrementPut(uniqueSeriesCopy);
 
             // SET BALANCES
-            creator.changeBalance(dcSet, false, false, lastCopyKey,
+            creator.changeBalance(dcSet, false, false, key,
                     BigDecimal.ONE, false, false, false);
 
             // make HOLD balance
             if (!uniqueSeriesCopy.isUnHoldable()) {
-                creator.changeBalance(dcSet, false, true, lastCopyKey,
+                creator.changeBalance(dcSet, false, true, key,
                         BigDecimal.ONE.negate(), false, false, false);
             }
 
@@ -422,15 +413,14 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
-        super.orphan(block, forDeal);
+    protected void orphanItem() {
 
         long copyKey;
         ItemMap map = origAsset.getDBMap(dcSet);
         int total = (int) ((AssetVenture) item).getQuantity();
         for (int indexDel = 0; indexDel < total; indexDel++) {
 
-            copyKey = lastCopyKey - indexDel;
+            copyKey = key - indexDel;
 
             //DELETE FROM DATABASE
             map.decrementDelete(copyKey);

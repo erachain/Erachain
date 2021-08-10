@@ -3,7 +3,6 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.imprints.Imprint;
@@ -237,22 +236,16 @@ public class IssueImprintRecord extends IssueItemRecord {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int forDeal) {
-        //UPDATE CREATOR
-        super.process(block, forDeal);
-
+    protected void processItem() {
+        super.processItem();
         dcSet.getTransactionFinalMapSigns().put(((ImprintCls) item).hashName(), dbRef);
-
     }
 
     //@Override
     @Override
-    public void orphan(Block block, int forDeal) {
-        //UPDATE CREATOR
-        super.orphan(block, forDeal);
-
+    protected void orphanItem() {
+        super.orphanItem();
         dcSet.getTransactionFinalMapSigns().delete(((ImprintCls) item).hashName());
-
     }
 
 }

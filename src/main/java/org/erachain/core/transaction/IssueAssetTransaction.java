@@ -3,7 +3,6 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
@@ -311,11 +310,10 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     //PROCESS/ORPHAN
 
-    //@Override
-    @Override
-    public void process(Block block, int forDeal) {
-        //UPDATE CREATOR
-        super.process(block, forDeal);
+    protected void processItem() {
+
+        super.processItem();
+
         //ADD ASSETS TO OWNER
         AssetCls asset = (AssetCls) this.getItem();
         long assetKey = asset.getKey();
@@ -341,11 +339,10 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     }
 
-    //@Override
-    @Override
-    public void orphan(Block block, int forDeal) {
-        //UPDATE CREATOR
-        super.orphan(block, forDeal);
+    protected void orphanItem() {
+
+        super.orphanItem();
+
         //REMOVE ASSETS FROM OWNER
         AssetCls asset = (AssetCls) this.getItem();
         long quantity = asset.getQuantity();
