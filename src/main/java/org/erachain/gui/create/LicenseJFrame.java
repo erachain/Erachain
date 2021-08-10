@@ -220,7 +220,7 @@ public class LicenseJFrame extends JDialog {
                     parent.setVisible(true);
                     dispose();
                 } else {
-                    Controller.getInstance().stopAll(0);
+                    Controller.getInstance().stopAndExit(0);
                     // System.exit(0);
                 }
             }
@@ -242,8 +242,8 @@ public class LicenseJFrame extends JDialog {
                 
                 if (!needAccept)
                     return;
-                
-                Controller.getInstance().stopAll(0);
+
+                Controller.getInstance().stopAndExit(0);
                 
             }
         });

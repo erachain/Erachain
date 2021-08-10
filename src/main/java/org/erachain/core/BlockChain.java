@@ -837,7 +837,7 @@ public class BlockChain {
                     dcSet = Controller.getInstance().reCreateDC(Controller.getInstance().inMemoryDC);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
-                    Controller.getInstance().stopAll(101);
+                    Controller.getInstance().stopAndExit(101);
                 }
             }
 
@@ -1461,7 +1461,7 @@ public class BlockChain {
             LOGGER.error(e.getMessage(), e);
             if (BlockChain.CHECK_BUGS > 9) {
                 // тут нельзя выходить так как просто битым блоком смогут все ноды убить при атаке
-                Controller.getInstance().stopAll(1104);
+                Controller.getInstance().stopAndExit(1104);
             } else {
                 noValid = 999;
                 peer.ban(30, "Block ERROR: " + e.getMessage());
@@ -1469,7 +1469,7 @@ public class BlockChain {
         } catch (Throwable e) {
             LOGGER.error(e.getMessage(), e);
             // тут ошибка памяти прилетит - можно выходить
-            Controller.getInstance().stopAll(1105);
+            Controller.getInstance().stopAndExit(1105);
         }
 
         // FULL VALIDATE because before was only HEAD validating

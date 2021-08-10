@@ -140,7 +140,7 @@ public class TestRecPoll {
         issuePollTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         issuePollTransaction.process(gb, Transaction.FOR_NETWORK);
-        pollKey = poll.getKey(db);
+        pollKey = poll.getKey();
 
         assertEquals(1, pollKey);
         //assertEquals( null, dbPS.getItem(pollKey));
@@ -301,14 +301,14 @@ public class TestRecPoll {
         issuePollTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issuePollTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        LOGGER.info("poll KEY: " + poll.getKey(db));
+        LOGGER.info("poll KEY: " + poll.getKey());
 
         //CHECK BALANCE ISSUER
         //assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, registrar.getBalanceUSE(ERM_KEY, db));
         //assertEquals(issuePollTransaction.getFee().setScale(BlockChain.AMOUNT_DEDAULT_SCALE), registrar.getBalanceUSE(FEE_KEY, db));
 
         //CHECK POLL EXISTS DB AS CONFIRMED:  key > -1
-        long key = db.getIssuePollMap().get(issuePollTransaction);
+        long key = issuePollTransaction.key;
         assertEquals(1l, key);
         assertEquals(true, db.getItemPollMap().contains(key));
 

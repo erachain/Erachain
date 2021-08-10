@@ -12,10 +12,14 @@ import java.math.BigDecimal;
 
 public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
 
-    public AccountAssetSendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message, boolean backward) {
-        super(null, null, backward, assetIn, TransactionAmount.ACTION_SEND, accountFrom, accountTo, message);
+    public AccountAssetSendPanel(String formTitle, AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message, boolean backward) {
+        super(null, formTitle, backward, assetIn, TransactionAmount.ACTION_SEND, accountFrom, accountTo, message);
 
         iconName = "AccountAssetSendPanel";
+    }
+
+    public AccountAssetSendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message, boolean backward) {
+        this(null, assetIn, accountFrom, accountTo, person, message, backward);
     }
 
     protected BigDecimal getAmount() {

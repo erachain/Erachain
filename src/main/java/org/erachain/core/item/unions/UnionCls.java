@@ -9,7 +9,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
@@ -85,10 +84,6 @@ public abstract class UnionCls extends ItemCls {
         return db.getItemUnionMap();
     }
 
-    public IssueItemMap getDBIssueMap(DCSet db) {
-        return db.getIssueUnionMap();
-    }
-
     // PARSE
     public byte[] toBytes(int forDeal, boolean includeReference, boolean onlyBody) {
 
@@ -116,14 +111,14 @@ public abstract class UnionCls extends ItemCls {
 
     @Override
     public String toString(DCSet db) {
-        long key = this.getKey(db);
+        long key = this.getKey();
         return (key < 0 ? "?" : key) + "." + this.typeBytes[0] + " " + this.name
                 + " !" + parent + " " + DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "");
     }
 
     @Override
     public String getShort(DCSet db) {
-        long key = this.getKey(db);
+        long key = this.getKey();
         return (key < 0 ? "?" : key) + "." + this.typeBytes[0] + " "
                 + this.name.substring(0, Math.min(this.name.length(), 20))
                 + " !" + parent + " " + DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "");

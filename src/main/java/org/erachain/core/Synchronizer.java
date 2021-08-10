@@ -187,7 +187,7 @@ public class Synchronizer extends Thread {
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 // выход - так как поймали внутреннюю ошибку базы
-                ctrl.stopAll(311);
+                ctrl.stopAndExit(311);
             }
 
             if (BlockChain.CHECK_BUGS > 5) {
@@ -394,7 +394,11 @@ public class Synchronizer extends Thread {
             // освободим всю память
             dcSet.clearCache();
             if (ctrl.doesWalletExists()) {
-                ctrl.getWallet().dwSet.clearCache();
+                try {
+                    ctrl.getWallet().dwSet.clearCache();
+                } catch (Exception ee) {
+                }
+
             }
 
             ConcurrentHashMap<Long, Transaction> orphanedTransactions
@@ -680,14 +684,14 @@ public class Synchronizer extends Thread {
                                 LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES << 1;
                                 if (BlockChain.CHECK_BUGS > 9) {
-                                    ctrl.stopAll(339);
+                                    ctrl.stopAndExit(339);
                                 }
                                 break;
                             } catch (Throwable e) {
                                 errorMess = "invalid PARSE! " + e.getMessage();
                                 LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES << 1;
-                                ctrl.stopAll(339);
+                                ctrl.stopAndExit(339);
                                 break;
                             }
 
@@ -702,7 +706,7 @@ public class Synchronizer extends Thread {
                                 errorMess = "error io isValid! [" + blockFromPeer.heightBlock + "] " + e.getMessage();
                                 LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES;
-                                ctrl.stopAll(340);
+                                ctrl.stopAndExit(340);
                                 break;
                             } catch (Exception e) {
 
@@ -714,14 +718,14 @@ public class Synchronizer extends Thread {
                                 LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES;
                                 if (BlockChain.CHECK_BUGS > 9) {
-                                    ctrl.stopAll(340);
+                                    ctrl.stopAndExit(340);
                                 }
                                 break;
                             } catch (Throwable e) {
                                 errorMess = "error io isValid! [" + blockFromPeer.heightBlock + "] " + e.getMessage();
                                 LOGGER.debug(errorMess, e);
                                 banTime = BAN_BLOCK_TIMES;
-                                ctrl.stopAll(341);
+                                ctrl.stopAndExit(341);
                                 break;
                             }
                             LOGGER.debug("BLOCK is Valid");
@@ -759,7 +763,7 @@ public class Synchronizer extends Thread {
                             blockBuffer.stopThread();
 
                             LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(343);
+                            ctrl.stopAndExit(343);
 
                         } finally {
                             blockFromPeer.close();
@@ -1097,11 +1101,11 @@ public class Synchronizer extends Thread {
                             dcSet.rollback();
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(322);
+                            ctrl.stopAndExit(322);
                             return;
                         } catch (Throwable e) {
                             LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(327);
+                            ctrl.stopAndExit(327);
                             return;
                         }
 
@@ -1118,15 +1122,15 @@ public class Synchronizer extends Thread {
                             dcSet.rollback();
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(324);
+                            ctrl.stopAndExit(324);
                             return;
                         } catch (Throwable e) {
                             LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(337);
+                            ctrl.stopAndExit(337);
                             return;
                         }
 
-                        ctrl.stopAll(335);
+                        ctrl.stopAndExit(335);
 
                     }
 
@@ -1210,11 +1214,11 @@ public class Synchronizer extends Thread {
                             dcSet.rollback();
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(346);
+                            ctrl.stopAndExit(346);
                             return;
                         } catch (Throwable e) {
                             LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(347);
+                            ctrl.stopAndExit(347);
                             return;
                         }
 
@@ -1225,15 +1229,15 @@ public class Synchronizer extends Thread {
                         try {
                             // was BREAK - try ROLLBACK
                             dcSet.rollback();
-                            ctrl.stopAll(351);
+                            ctrl.stopAndExit(351);
                             return;
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(352);
+                            ctrl.stopAndExit(352);
                             return;
                         } catch (Throwable e) {
                             LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(353);
+                            ctrl.stopAndExit(353);
                             return;
                         }
 
@@ -1380,7 +1384,7 @@ public class Synchronizer extends Thread {
 
             } catch (OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                ctrl.stopAll(396);
+                ctrl.stopAndExit(396);
                 return;
             } catch (IllegalMonitorStateException e) {
                 break;

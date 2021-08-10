@@ -24,6 +24,11 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getAssetMap();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.list == null || row > this.list.size() - 1) {
             return null;
@@ -37,7 +42,7 @@ public class WalletItemAssetsTableModel extends WalletTableModel<AssetCls> {
                 return asset.getConfirmations(dcSet);
 
             case COLUMN_KEY:
-                return asset.getKey(DCSet.getInstance());
+                return asset.getKey();
 
             case COLUMN_NAME:
                 return asset; // for Icon

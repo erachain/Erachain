@@ -182,12 +182,12 @@ public class TestRecImprint {
 
         issueImprintRecord.process(gb, Transaction.FOR_NETWORK);
 
-        LOGGER.info("imprint KEY: " + imprint.getKey(db));
+        LOGGER.info("imprint KEY: " + imprint.getKey());
 
         //CHECK IMPRINT EXISTS SENDER
         ///////// NOT FONT THROUGHT db.get(issueImprintRecord)
         //long key = db.getIssueImprintMap().get(issueImprintRecord);
-        long key = issueImprintRecord.getItem().getKey(db);
+        long key = issueImprintRecord.getItem().getKey();
         assertEquals(true, db.getItemImprintMap().contains(key));
 
         ImprintCls imprint_2 = new Imprint(itemAppData, maker, Imprint.hashNameToBase58("test132_2"), icon, image, "e");
@@ -195,7 +195,7 @@ public class TestRecImprint {
         issueImprintTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueImprintTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 2, true);
         issueImprintTransaction_2.process(gb, Transaction.FOR_NETWORK);
-        LOGGER.info("imprint_2 KEY: " + imprint_2.getKey(db));
+        LOGGER.info("imprint_2 KEY: " + imprint_2.getKey());
         issueImprintTransaction_2.orphan(gb, Transaction.FOR_NETWORK);
         ItemImprintMap imprintMap = db.getItemImprintMap();
         int mapSize = imprintMap.size();
@@ -219,7 +219,7 @@ public class TestRecImprint {
         issueImprintRecord.sign(maker, Transaction.FOR_NETWORK);
         issueImprintRecord.setDC(db, Transaction.FOR_NETWORK, 1, 2, true);
         issueImprintRecord.process(gb, Transaction.FOR_NETWORK);
-        long key = db.getIssueImprintMap().get(issueImprintRecord);
+        long key = issueImprintRecord.getKey();
         //		assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference()));
 
         issueImprintRecord.orphan(gb, Transaction.FOR_NETWORK);

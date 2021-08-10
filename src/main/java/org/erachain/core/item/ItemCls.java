@@ -15,7 +15,6 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.Iconable;
@@ -83,6 +82,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
+    /**
+     * 0 - type 1 - version
+     */
     protected byte[] typeBytes;
     protected PublicKeyAccount maker;
 
@@ -476,8 +478,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public abstract ItemMap getDBMap(DCSet db);
 
-    public abstract IssueItemMap getDBIssueMap(DCSet db);
-
     public byte[] getTypeBytes() {
         return this.typeBytes;
     }
@@ -692,33 +692,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return this.key;
     }
 
-    public long getKey(DCSet db) {
-        // resolve key in that DB
-        ////resolveKey(db);
-        return this.key;
-    }
-
     public long resolveKey(DCSet db) {
 
         if (this.reference == null || BlockChain.isWiped(this.reference))
             return 0L;
-
-        if (false && this.key == 0 // & this.reference != null
-        ) {
-            if (this.getDBIssueMap(db).contains(this.reference)) {
-                this.key = this.getDBIssueMap(db).get(this.reference);
-            } else if (BlockChain.CHECK_BUGS > 0
-                    && !BlockChain.CLONE_MODE && !BlockChain.TEST_MODE
-                    && Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
-
-            ) {
-                LOGGER.error("Item [" + this.name + "] not found for REFERENCE: " + Base58.encode(this.reference));
-                if (BlockChain.CHECK_BUGS > 3) {
-                    Long error = null;
-                    error++;
-                }
-            }
-        }
 
         return this.key;
     }
@@ -865,11 +842,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public boolean isConfirmed(DCSet db) {
-        if (true) {
-            return key != 0;
-        } else {
-            return this.getDBIssueMap(db).contains(this.reference);
-        }
+        return key != 0;
     }
 
     public int getConfirmations(DCSet db) {
@@ -1006,7 +979,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     //OTHER
 
     public String toString(DCSet db) {
-        long key = this.getKey(db);
+        long key = this.getKey();
         return (key < getStartKey() ? "" : "[" + key + "] ") + this.viewName();
     }
 
@@ -1447,19 +1420,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         this.key = newKey;
 
-        if (false) {
-            // теперь ключ прямо в записи храним и не нужно его отдельно хранить
-            //SET ORPHAN DATA
-            this.getDBIssueMap(db).put(this.reference, newKey);
-        }
-
         return key;
     }
 
     public long deleteFromMap(DCSet db, long startKey) {
         //DELETE FROM DATABASE
 
-        long thisKey = this.getKey(db);
+        long thisKey = this.getKey();
 
         ItemMap map = this.getDBMap(db);
         if (thisKey > startKey) {
@@ -1474,15 +1441,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         } else {
             if (false && BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
-                thisKey = this.getKey(db);
+                thisKey = this.getKey();
             }
             map.delete(thisKey);
-        }
-
-        if (false) {
-            // теперь ключ прямо в записи храним и не нужно его отдельно хранить
-            //DELETE ORPHAN DATA
-            this.getDBIssueMap(db).delete(this.reference);
         }
 
         return thisKey;

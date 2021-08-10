@@ -30,6 +30,11 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
     }
 
     @Override
+    protected void updateMap() {
+        favoriteMap = Controller.getInstance().getWallet().dwSet.getAssetFavoritesSet();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (list == null || row >= list.size()) {
             return null;

@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.imprints.ImprintCls;
-import org.erachain.datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class WalletItemImprintsTableModel extends WalletTableModel<ImprintCls> {
@@ -20,6 +19,11 @@ public class WalletItemImprintsTableModel extends WalletTableModel<ImprintCls> {
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getImprintMap();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.list == null || row > this.list.size() - 1) {
             return null;
@@ -29,7 +33,7 @@ public class WalletItemImprintsTableModel extends WalletTableModel<ImprintCls> {
 
         switch (column) {
             case COLUMN_KEY:
-                return imprint.getKey(DCSet.getInstance());
+                return imprint.getKey();
 
             case COLUMN_NAME:
                 return imprint;

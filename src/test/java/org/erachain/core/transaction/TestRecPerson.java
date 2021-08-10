@@ -159,7 +159,7 @@ public class TestRecPerson {
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", makerSignature);
         person.setReference(makerSignature, dbRef);
         dcSet.getItemPersonMap().incrementPut(person);
-        long keyRegistrar = person.getKey(dcSet);
+        long keyRegistrar = person.getKey();
 
         makerSignature = new byte[64];
         makerSignature[1] = (byte) 2;
@@ -168,7 +168,7 @@ public class TestRecPerson {
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", makerSignature);
         person.setReference(makerSignature, dbRef);
         dcSet.getItemPersonMap().incrementPut(person);
-        long keyCertifier = person.getKey(dcSet);
+        long keyCertifier = person.getKey();
 
         // внесем его как удостовренную персону
         Fun.Tuple3<Integer, Integer, Integer> itemPRegistrar = new Fun.Tuple3<Integer, Integer, Integer>(999999, 2, 2);
@@ -238,7 +238,7 @@ public class TestRecPerson {
         dcSet.getTransactionFinalMap().put(issuePersonTransaction);
         dcSet.getTransactionFinalMapSigns().put(issuePersonTransaction.signature, issuePersonTransaction.dbRef);
 
-        personKey = person.getKey(dcSet);
+        personKey = person.getKey();
 
         // issue 1 genesis person in init() here
         //assertEquals( genesisPersonKey + 1, personKey);
@@ -446,7 +446,7 @@ public class TestRecPerson {
 
                 issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-                LOGGER.info("person KEY: " + person.getKey(dcSet));
+                LOGGER.info("person KEY: " + person.getKey());
 
                 BigDecimal eraUSE = new BigDecimal("1000");
                 if (BlockChain.ERA_COMPU_ALL_UP) {
@@ -464,7 +464,7 @@ public class TestRecPerson {
                         registrar.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK PERSON EXISTS DB AS CONFIRMED:  key > -1
-                long key = dcSet.getIssuePersonMap().get(issuePersonTransaction);
+                long key = issuePersonTransaction.getKey();
                 assertEquals(true, key >= 0);
                 assertEquals(true, dcSet.getItemPersonMap().contains(key));
 

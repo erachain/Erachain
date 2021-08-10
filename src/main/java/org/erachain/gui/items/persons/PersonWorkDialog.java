@@ -110,7 +110,7 @@ public class PersonWorkDialog extends JDialog {
                     if (addresses.isEmpty()) {
 
                     } else {
-                        MainPanel.getInstance().insertNewTab(Lang.T("Send Asset to Person"), new AccountAssetSendPanel(null,
+                        MainPanel.getInstance().insertNewTab(Lang.T("Send Asset to Person"), new AccountAssetSendPanel(null, null,
                                 null, null, person, null, false));
 
                     }

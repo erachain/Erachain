@@ -80,6 +80,9 @@ public class Wallet extends Observable implements Observer {
 
 			walletUpdater = new WalletUpdater(Controller.getInstance(), this);
 
+			this.setChanged();
+			this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_DB_OPEN, this));
+
 		}
 
 	}
@@ -426,6 +429,10 @@ public class Wallet extends Observable implements Observer {
 		} else {
 			Settings.getInstance().setWalletKeysPath(oldPath);
 		}
+
+		this.setChanged();
+		this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_DB_OPEN, this));
+
 		return res;
 	}
 
@@ -580,14 +587,28 @@ public class Wallet extends Observable implements Observer {
 				dwSet.clear(false);
 			} catch (NullPointerException e) {
 				// видимо цепочку другую взяли и в ней таких сущностей нет и падает на создании меток
+
 				DBASet.setVersion(this.dwSet.database, 1);
 				this.dwSet.hardFlush();
-				this.dwSet.close();
-				dwSet = DWSet.reCreateDB(dcSet, dwSet.isWithObserver(), dwSet.isDynamicGUI());
+				if (true) {
+
+					this.setChanged();
+					this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_DB_CLOSED, true));
+
+					this.dwSet.close();
+					dwSet = DWSet.reCreateDB(dcSet, dwSet.isWithObserver(), dwSet.isDynamicGUI());
+
+					this.setChanged();
+					this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_DB_OPEN, this));
+
+				} else {
+					LOGGER.error("  !!!  NEED to RELOAD wallet");
+					Controller.getInstance().stopAndExit(2005);
+				}
 
 			}
 
-			LOGGER.info("   >>>>  Maps was Resetted");
+			LOGGER.info("   >>>>  Maps was Resetting");
 
 			// REPROCESS BLOCKS
 			blockStart = new GenesisBlock();
@@ -647,7 +668,7 @@ public class Wallet extends Observable implements Observer {
 					} catch (java.lang.OutOfMemoryError e) {
 						LOGGER.error(e.getMessage(), e);
 						// внутрення ошибка - выходим для лога
-						Controller.getInstance().stopAll(644);
+						Controller.getInstance().stopAndExit(644);
 						return;
 					}
 

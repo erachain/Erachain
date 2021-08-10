@@ -26,6 +26,11 @@ public class FavoriteStatusesTableModel extends FavoriteItemModelTable {
     }
 
     @Override
+    protected void updateMap() {
+        favoriteMap = Controller.getInstance().getWallet().dwSet.getStatusFavoritesSet();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.list == null || row > this.list.size() - 1) {
             return null;
@@ -41,7 +46,7 @@ public class FavoriteStatusesTableModel extends FavoriteItemModelTable {
                 return status.getConfirmations(dcSet);
 
             case COLUMN_KEY:
-                return status.getKey(DCSet.getInstance());
+                return status.getKey();
 
             case COLUMN_NAME:
                 return status;

@@ -112,7 +112,7 @@ public class ChangeOrderTransactionTest {
         asset.setReference(Crypto.getInstance().digest(asset.toBytes(forDeal, false, false)), dbRef);
         asset.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(dcSet, 0L);
-        key = asset.getKey(dcSet);
+        key = asset.getKey();
 
         assetMovable = new AssetVenture(itemAppData, maker, "movable", icon, image, "...", 0, 8, 500L);
         assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(forDeal, false, false)), dbRef);

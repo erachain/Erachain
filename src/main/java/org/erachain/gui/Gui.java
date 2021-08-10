@@ -129,7 +129,7 @@ public class Gui extends JFrame {
     }
 
     public void onCancelCreateWallet() {
-        Controller.getInstance().stopAll(0);
+        Controller.getInstance().stopAndExit(0);
 //		System.exit(0);
     }
 

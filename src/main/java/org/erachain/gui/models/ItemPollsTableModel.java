@@ -51,7 +51,7 @@ public class ItemPollsTableModel extends TimerTableModelCls<ItemCls> implements 
 
             case COLUMN_VOTES:
 
-                BigDecimal amo = poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()));
+                BigDecimal amo = poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey());
                 if (amo == null)
                     return BigDecimal.ZERO;
                 return amo;

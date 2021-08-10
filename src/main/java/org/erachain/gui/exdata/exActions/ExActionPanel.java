@@ -50,9 +50,9 @@ public class ExActionPanel extends IconPanel {
 
         selectBox = new JComboBox<>();
         selectBox.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
-                Lang.T("Without Action"),
-                Lang.T("Calculated Filtered Accruals"),
-                Lang.T("Simple List Accruals (Air Drop)")
+                Lang.T("Without Action / Payments"),
+                Lang.T("Mass Accruals by Filter"),
+                Lang.T("Mass Payments by List (airdrop)")
         }));
 
         selectBox.addItemListener(new ItemListener() {

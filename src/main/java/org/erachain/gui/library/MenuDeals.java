@@ -39,7 +39,7 @@ public class MenuDeals extends JMenu {
             public void actionPerformed(ActionEvent e) {
                 //
                 MainPanel.getInstance().insertNewTab(Lang.T("Send"),
-                        new AccountAssetSendPanel(null,
+                        new AccountAssetSendPanel(null, null,
                                 null, null, null, null, false));
 
             }

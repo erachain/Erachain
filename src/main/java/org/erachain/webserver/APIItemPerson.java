@@ -6,6 +6,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
@@ -13,6 +14,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemPersonMap;
 import org.erachain.datachain.KKPersonStatusMap;
+import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -55,6 +57,9 @@ public class APIItemPerson {
                 "Get Asset Key balance in Position [1..5] for Person Key. Balance Side =0 - total debit; =1 - left; =2 - total credit");
         help.put("GET apiperson/status/{personKey}/{statusKey}?history=true",
                 "Get Status data for Person Key. JSON ARRAY format: [timeFrom, timeTo, [par1, par2, str1, str2, reference, description], block, txNo]");
+
+        help.put("GET apiperson/protocolbals/{personKey}",
+                "Get all addresses for Person Key and protocol balances");
 
         help.put("GET apiperson/addresses/{key}?full", "Get Person Addresses");
         help.put("GET apiperson/statuses/{key}", "Get Person Statuses");
@@ -142,13 +147,14 @@ public class APIItemPerson {
 
     /**
      * Get Status for Person
-     *                 block = value.b.d;
-     *                 recNo = value.b.e;
-     *                 record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
-     *                 return record == null ? null : record.viewTimestamp();
+     * block = value.b.d;
+     * recNo = value.b.e;
+     * record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
+     * return record == null ? null : record.viewTimestamp();
+     *
      * @param personKey
      * @param statusKey
-     * @param history true - get history of changes
+     * @param history   true - get history of changes
      * @return
      */
     @GET
@@ -442,4 +448,84 @@ public class APIItemPerson {
         }
     }
 
+    /**
+     * ERA + COMPU
+     *
+     * @param key
+     * @return
+     */
+    @GET
+    @Path("protocolbals/{key}")
+    public Response getProtocolBals(@PathParam("key") Long key) {
+
+        if (DCSet.getInstance().getItemPersonMap().get(key) == null) {
+            JSONObject out = new JSONObject();
+            Transaction.updateMapByError2static(out, Transaction.ITEM_PERSON_NOT_EXIST, null);
+            out.put("error", "Person not Found");
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(out.toJSONString())
+                    .build();
+        }
+
+        JSONObject output = new JSONObject();
+        TreeMap<String, Stack<Fun.Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(key);
+        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal,
+                BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance;
+        JSONArray accountsArray = new JSONArray();
+
+        TransactionFinalMap transactionsMap = DCSet.getInstance().getTransactionFinalMap();
+        BigDecimal eraBalanceA = BigDecimal.ZERO;
+        BigDecimal eraBalanceB = BigDecimal.ZERO;
+        BigDecimal compuBalance = BigDecimal.ZERO;
+
+        for (String address : addresses.keySet()) {
+
+            Stack<Fun.Tuple3<Integer, Integer, Integer>> stack = addresses.get(address);
+            if (stack == null || stack.isEmpty()) {
+                continue;
+            }
+
+            Map accountJSON = new LinkedHashMap();
+            accountJSON.put("address", address);
+
+            Account account = new Account(address);
+
+            balance = account.getBalance(AssetCls.ERA_KEY);
+            eraBalanceA = eraBalanceA.add(balance.a.b);
+            eraBalanceB = eraBalanceB.add(balance.b.b);
+
+            balance = account.getBalance(AssetCls.FEE_KEY);
+            compuBalance = compuBalance.add(balance.a.b);
+
+            accountJSON.put("asset1_balance_own", eraBalanceA);
+            accountJSON.put("asset1_balance_debt", eraBalanceB);
+            accountJSON.put("asset2_balance_own", compuBalance);
+
+            if (false) {
+                Fun.Tuple3<Integer, Integer, Integer> item = stack.peek();
+                Transaction transactionIssue = transactionsMap.get(item.b, item.c);
+
+                accountJSON.put("verified_to_date", item.a * 86400000L);
+                accountJSON.put("verifier", transactionIssue.getCreator().getAddress());
+                if (transactionIssue.getCreator().getPerson() != null) {
+                    accountJSON.put("verifier_key", transactionIssue.getCreator().getPerson().b.getKey());
+                    accountJSON.put("verifier_name", transactionIssue.getCreator().getPerson().b.viewName());
+                }
+            }
+
+            accountsArray.add(accountJSON);
+
+        }
+
+        output.put("accounts", accountsArray);
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(output.toJSONString())
+                .build();
+
+    }
 }

@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.voting.PollOption;
-import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.Pair;
@@ -59,7 +58,7 @@ public class VotesTableModel extends AbstractTableModel {
 
             case COLUMN_VOTES:
 
-                return NumberAsString.formatAsString(vote.getA().getBalanceUSE(asset.getKey(DCSet.getInstance())));
+                return NumberAsString.formatAsString(vote.getA().getBalanceUSE(asset.getKey()));
 
         }
 

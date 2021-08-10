@@ -58,7 +58,7 @@ public class MemoryViewer extends Thread {
 
                     if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
                             + (Controller.MIN_MEMORY_TAIL << 1))
-                        Controller.getInstance().stopAll(1000);
+                        Controller.getInstance().stopAndExit(1000);
                 }
             }
 

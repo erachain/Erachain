@@ -210,7 +210,7 @@ public class DatabaseTests {
         for (ItemCls asset : assets) {
             //Asset asset = DLSet.getInstance().getAssetMap().get(key);
             AssetCls aa = (AssetCls) asset;
-            LOGGER.info("ASSET - " + asset.getKey(dcSet) + " : " + asset.getName()
+            LOGGER.info("ASSET - " + asset.getKey() + " : " + asset.getName()
                     + " : " + aa.getQuantity()
                     + " - " + aa.getReference().length
                     + ": " + aa.getReference());
@@ -237,7 +237,7 @@ public class DatabaseTests {
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         //logger.info(asset.toString() + " getQuantity " + asset.getQuantity());
 
-        long key = asset.getKey(dcSet);
+        long key = asset.getKey();
 
         ItemAssetMap assetDB = dcSet.getItemAssetMap();
         Collection<ItemCls> assets = assetDB.values();

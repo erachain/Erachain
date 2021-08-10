@@ -183,10 +183,10 @@ public class TestRecStatus {
         issueStatusRecord.sign(maker, Transaction.FOR_NETWORK);
         issueStatusRecord.process(gb, Transaction.FOR_NETWORK);
 
-        LOGGER.info("status KEY: " + status.getKey(db));
+        LOGGER.info("status KEY: " + status.getKey());
 
         //CHECK STATUS EXISTS SENDER
-        long key = db.getIssueStatusMap().get(issueStatusRecord);
+        long key = issueStatusRecord.key;
         assertEquals(true, db.getItemStatusMap().contains(key));
 
         StatusCls status_2 = new Status(itemAppData, maker, "test132_2", icon, image, "2_12345678910strontje", true);
@@ -194,7 +194,7 @@ public class TestRecStatus {
         issueStatusTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueStatusTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueStatusTransaction_2.process(gb, Transaction.FOR_NETWORK);
-        LOGGER.info("status_2 KEY: " + status_2.getKey(db));
+        LOGGER.info("status_2 KEY: " + status_2.getKey());
         issueStatusTransaction_2.orphan(gb, Transaction.FOR_NETWORK);
         assertEquals(mapSize + 1, statusMap.size());
 

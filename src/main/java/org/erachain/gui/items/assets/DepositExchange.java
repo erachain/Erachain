@@ -1,13 +1,11 @@
 package org.erachain.gui.items.assets;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
-import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Converter;
@@ -44,7 +42,7 @@ public class DepositExchange extends IconPanel {
     public static String NAME = "DepositExchange";
     public static String TITLE = "Deposit Exchange";
 
-    public final static long TEST_ASSET = -1; // ETH - 1048583L
+    public final static String TEST_ASSET = "-"; // "ETH"
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
@@ -60,8 +58,8 @@ public class DepositExchange extends IconPanel {
     private JButton jButton_copyAddress = new JButton();
     private JButton jButton_copyDetails = new JButton();
     private JComboBox<Account> jComboBox_YourAddress;
-    public JComboBox<AssetCls> cbxAssets;
-    public JComboBox<AssetCls> cbxAssetsInput;
+    public JComboBox<String> cbxAssetsBuy;
+    public JComboBox<String> cbxAssetsInput;
     private JLabel jLabel_Address;
     private JLabel jLabel_Adress_Check;
     private JLabel jLabel_Asset;
@@ -79,17 +77,32 @@ public class DepositExchange extends IconPanel {
     private JTextField jTextField_Address = new JTextField();
     protected int step = 0;
 
-    public DepositExchange(AssetCls asset, Account account, BigDecimal amount, AssetCls assetInput) {
+    BigDecimal amount;
+
+    public DepositExchange(String asset, Account account, BigDecimal amount) {
         super(NAME, TITLE);
 
-        initComponents(asset, account, amount);
+        cbxAssetsInput = new JComboBox<>(new String[]{
+                "BTC",
+                //"DOGE", "LTC",
+                //"DASH"
+        });
+
+        cbxAssetsBuy = new JComboBox<>(new String[]{
+                //AssetCls.ERA_ABBREV, AssetCls.FEE_NAME,
+                "BTC",
+                //"USD" //, "DOGE", "LTC", "DASH"
+        });
+
+        this.amount = amount;
+
+        initComponents(asset, account);
+
         this.setVisible(true);
     }
 
-    private void refreshReceiverDetails(String text, JLabel details) {
-        // CHECK IF RECIPIENT IS VALID ADDRESS
+    private void setPaymentDetails(String text, JLabel details) {
         details.setText("<html>" + text + "</html>");
-
     }
 
     public void onGoClick(JLabel jText_Help) {
@@ -109,67 +122,33 @@ public class DepositExchange extends IconPanel {
 
         String urlGetDetails = "https://api.face2face.cash/apipay/get_uri_in.json/2/";
 
-        AssetCls assetBuy = (AssetCls) cbxAssets.getSelectedItem();
-        AssetCls assetInput = (AssetCls) cbxAssetsInput.getSelectedItem();
+        String assetBuy = (String) cbxAssetsBuy.getSelectedItem();
+        String assetInput = (String) cbxAssetsInput.getSelectedItem();
 
-        String assetOutput;
-        String assetOutputName;
-
-        switch ((int) assetBuy.getKey()) {
-            case 1:
-                assetOutput = "ERA/";
-                assetOutputName = "ERA";
-                break;
-            case 2:
-                assetOutput = "COMPU/";
-                assetOutputName = "COMPU";
-                break;
-            case (int) DepositExchange.TEST_ASSET:
+        switch (assetBuy) {
+            case DepositExchange.TEST_ASSET:
                 /// http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/ETH/@ETH/7KmL1nheVHYVmdaEB4rsRjiENUD3sTr7EE/1
                 urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
-                assetOutput = "@ETH/";
-                assetOutputName = "ETH";
                 assetInput = assetBuy;
                 break;
             default:
-                assetOutput = "f" + assetBuy.getName() + "/";
-                assetOutputName = assetBuy.getName();
-                assetInput = assetBuy;
         }
 
-        String urlPars = assetOutput + jTextField_Address.getText();
+        urlGetDetails += assetInput + "/" + getOutExtName(assetBuy) + "/" + jTextField_Address.getText() + "/";
 
-        String assetIncomeName;
-        String assetIncomeABBR;
-
-        switch ((int) assetInput.getKey()) {
-            case 1:
-                urlPars = assetInput.getName() + "/" + urlPars + "/500";
-                assetIncomeName = assetIncomeABBR = assetInput.getName();
+        switch (assetInput) {
+            case "BTC":
+                urlGetDetails += "0.01";
                 break;
-            case 2:
-                urlPars = assetInput.getName() + "/" + urlPars + "/1";
-                assetIncomeName = assetIncomeABBR = assetInput.getName();
-                break;
-            case 12:
-                urlPars = assetInput.getName() + "/" + urlPars + "/0.001";
-                assetIncomeName = "bitcoins";
-                assetIncomeABBR = assetInput.getName();
-                break;
-            case (int) DepositExchange.TEST_ASSET:
-                urlPars = "ETH/" + urlPars + "/1";
-                assetIncomeName = "etheriums";
-                assetIncomeABBR = "ETH";
+            case "DOGE":
+                urlGetDetails += "1000";
                 break;
             default:
                 // rate not need
-                urlPars = assetInput.getName() + "/" + urlPars + "/10";
-                assetIncomeName = assetIncomeABBR = assetInput.getName();
+                urlGetDetails += "100";
         }
 
-        urlGetDetails += urlPars;
-
-        //LOGGER.info(urlGetDetails);
+        LOGGER.info(urlGetDetails);
 
         String inputText = "";
         try {
@@ -214,7 +193,7 @@ public class DepositExchange extends IconPanel {
                 payToAddressCheck.setText("<html><b>" + jsonObject.get("wrong") + "</b></html>");
                 payToAddressField.setText(jsonObject.get("addr_in").toString());
 
-                if (jsonObject.containsKey("addr_out_full") && assetBuy.getKey() == DepositExchange.TEST_ASSET) {
+                if (jsonObject.containsKey("addr_out_full") && assetBuy == DepositExchange.TEST_ASSET) {
                     String payMess = jsonObject.get("addr_out_full").toString();
                     jLabel_AreaDetails.setVisible(true);
                     jButton_copyDetails.setVisible(true);
@@ -228,25 +207,23 @@ public class DepositExchange extends IconPanel {
                 /// ВНИМАНИЕ - НЕЛЬЗЯ делать setText("") - без HTML - иначе мягкий перенос слов перестанет работать
                 String help = "<html><p>";
 
-                String rate = jsonObject.get("rate").toString();
+                String rate = "" + (float) (double) jsonObject.get("rate");
                 String bal = jsonObject.get("bal").toString();
 
                 //LOGGER.debug(StrJSonFine.convert(jsonObject));
 
-                switch ((int) assetBuy.getKey()) {
-                    case 1:
-                    case 2:
-                        help += Lang.T("Transfer <b>%1</b> to this address for buy")
-                                .replace("%1", assetIncomeName) + " <b>" + assetOutputName + "</b>"
-                                + " " + Lang.T("by rate") + ": <b>" + rate + "</b>"
-                                + ", " + Lang.T("max buy amount") + ": <b>" + bal + "</b> " + assetOutputName;
-                        break;
-                    default:
-                        help += Lang.T("Transfer <b>%1</B> to this address for deposit your account on Exchange")
-                                .replace("%1", assetIncomeName);
+                if (isStableCoin(assetBuy)) {
+                    help += Lang.T("Transfer <b>%1</B> to this address for deposit your account on Exchange")
+                            .replace("%1", assetInput);
+                } else {
+                    help += Lang.T("Transfer <b>%1</b> to this address for buy")
+                            .replace("%1", assetInput) + " <b>" + assetBuy + "</b>"
+                            + " " + Lang.T("by rate") + ": <b>" + rate + "</b>.";
+
+                    //help += " " + Lang.T("max buy amount") + ": <b>" + bal + "</b> " + assetBuy;
                 }
 
-                if (assetBuy.getKey() == DepositExchange.TEST_ASSET) {
+                if (assetBuy == "ETH") {
                     String payMess = jsonObject.get("addr_out_full").toString();
                     jLabel_AreaDetails.setVisible(true);
                     jButton_copyDetails.setVisible(true);
@@ -254,13 +231,15 @@ public class DepositExchange extends IconPanel {
                     payToAddressDetails.setText("0x" + Converter.toHex(payMess.getBytes(StandardCharsets.UTF_8)));
                 }
 
-                if (jsonObject.containsKey("may_pay")) {
-                    help += "<p>" + Lang.T("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
-                            + assetIncomeABBR;
+                if (!isStableCoin(assetBuy) && jsonObject.containsKey("may_pay")) {
+                    help += "<p>" + Lang.T("Service can accept a maximum of %1 now")
+                            .replace("%1",
+                                    "<b>" + jsonObject.get("may_pay").toString() + " " + assetInput + "</b>"
+                            ) + ".";
                 }
 
                 help += "<p>" + Lang.T("Minimal payment in equivalent")
-                        + " <b>" + 2.5 + " USD</b>";
+                        + " <b>" + 10 + " USD</b>.";
 
                 payToAddressField.setText(jsonObject.get("addr_in").toString());
                 payToAddressCheck.setText(help);
@@ -279,16 +258,16 @@ public class DepositExchange extends IconPanel {
 
     }
 
-    private void initComponents(AssetCls asset_in, Account account, BigDecimal amount) {
+    private void initComponents(String asset_in, Account account) {
 
         setLayout(new GridLayout(1, 2));
 
         jPanelMain.setLayout(new GridBagLayout());
         jPanelHistory.setLayout(new GridBagLayout());
 
-        AssetCls asset;
+        String asset;
         if (asset_in == null) {
-            asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
+            asset = AssetCls.ERA_ABBREV;
         } else {
             asset = asset_in;
         }
@@ -358,6 +337,7 @@ public class DepositExchange extends IconPanel {
 
                 jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
                 jText_Help.setText("");
+                reset();
 
             }
         });
@@ -393,24 +373,17 @@ public class DepositExchange extends IconPanel {
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_Asset, labelGBC);
 
-        cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(true));
-        fieldGBC.gridy = gridy;
-        this.jPanelMain.add(cbxAssets, fieldGBC);
-
         if (asset != null) {
-            cbxAssets.setSelectedItem(asset);
+            cbxAssetsBuy.setSelectedItem(asset);
         }
+        fieldGBC.gridy = gridy;
+        this.jPanelMain.add(cbxAssetsBuy, fieldGBC);
 
         /////////////// INPUT ASSET
         jLabel_AssetInput.setText(Lang.T("What to pay") + ":");
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_AssetInput, labelGBC);
 
-        cbxAssetsInput = new JComboBox<AssetCls>(new FundTokensComboBoxModel(
-                new long[]{AssetCls.BTC_KEY,
-                        18L, 20L, 22L,
-                        DepositExchange.TEST_ASSET
-                }));
         fieldGBC.gridy = gridy;
         this.jPanelMain.add(cbxAssetsInput, fieldGBC);
 
@@ -494,7 +467,7 @@ public class DepositExchange extends IconPanel {
         jButtonHistory.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
 
-                jText_History.setText(showHistory((AssetCls) cbxAssets.getSelectedItem(),
+                jText_History.setText(showHistory((String) cbxAssetsBuy.getSelectedItem(),
                         jTextField_Address.getText(), jLabel_Adress_Check));
 
             }
@@ -530,7 +503,14 @@ public class DepositExchange extends IconPanel {
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         jPanelHistory.add(jText_History, titleGBC);
 
-        cbxAssets.addItemListener(new ItemListener() {
+        cbxAssetsBuy.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                reset();
+            }
+        });
+
+        cbxAssetsInput.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 reset();
@@ -592,7 +572,7 @@ public class DepositExchange extends IconPanel {
     }
 
     private void reset() {
-        AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
+        String assetBuy = (String) cbxAssetsBuy.getSelectedItem();
 
         payToAddressField.setText("");
         payToAddressDetails.setText("");
@@ -603,19 +583,20 @@ public class DepositExchange extends IconPanel {
         jButton_copyDetails.setVisible(false);
 
 
-        switch ((int) asset.getKey()) {
-            case 1:
-            case 2:
+        switch (assetBuy) {
+            case AssetCls.ERA_NAME:
+            case AssetCls.FEE_NAME:
+            case "USD":
                 //jLabel_Details.setText(Lang.T("Address for buy") + ":");
-                refreshReceiverDetails(Lang.T("Payment details for buy") + " " + asset.getName(),
+                setPaymentDetails(Lang.T("Payment details for buy") + " " + assetBuy,
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to buy"));
                 jLabel_AssetInput.setVisible(true);
                 cbxAssetsInput.setVisible(true);
                 break;
-            case (int) DepositExchange.TEST_ASSET:
+            case "ETH":
                 //jLabel_Details.setText(Lang.T("Address to deposit") + " ETH" + ":");
-                refreshReceiverDetails(Lang.T("Payment details to deposit") + " ETH",
+                setPaymentDetails(Lang.T("Payment details to deposit") + " ETH",
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to deposit"));
                 jLabel_AssetInput.setVisible(false);
@@ -623,7 +604,7 @@ public class DepositExchange extends IconPanel {
                 break;
             default:
                 //jLabel_Details.setText(Lang.T("Address to deposit") + ":");
-                refreshReceiverDetails(Lang.T("Payment details to deposit") + " " + asset.getName(),
+                setPaymentDetails(Lang.T("Payment details to deposit") + " " + assetBuy,
                         detailsHead);
                 jLabel_Asset.setText(Lang.T("What to deposit"));
                 jLabel_AssetInput.setVisible(false);
@@ -636,7 +617,7 @@ public class DepositExchange extends IconPanel {
 
     }
 
-    public static String showHistory(AssetCls asset, String address, JLabel tip) {
+    public static String showHistory(String asset, String address, JLabel tip) {
         JSONObject jsonObject;
 
         // [TOKEN]/[ADDRESS]
@@ -644,48 +625,8 @@ public class DepositExchange extends IconPanel {
 
         String txURLin;
         String txURLout;
-        boolean isWithdraw = asset == null;
-        if (isWithdraw) {
-            // значит это биткоин как стандарт вывода
-            urlGetDetails += "BTC/";
-        } else {
 
-            switch ((int) asset.getKey()) {
-                case 1:
-                    urlGetDetails += "FOIL/";
-                    break;
-                case 12:
-                    urlGetDetails += "fBTC/";
-                    break;
-                case 14:
-                    urlGetDetails += "fETH-/";
-                    break;
-                case 18:
-                    urlGetDetails += "fDOGE/";
-                    break;
-                case 20:
-                    urlGetDetails += "fLTC/";
-                    break;
-                case 22:
-                    urlGetDetails += "fDASH/";
-                    break;
-                case 1643:
-                    urlGetDetails += "fRUB/";
-                    break;
-                case 1840:
-                    urlGetDetails += "fUSD/";
-                    break;
-                case (int) DepositExchange.TEST_ASSET:
-                    urlGetDetails += "fETH--/";
-                    break;
-                default:
-                    urlGetDetails += "MVLT/";
-            }
-
-        }
-
-        urlGetDetails += address;
-
+        urlGetDetails += getOutExtName(asset) + "/" + address;
         LOGGER.info(urlGetDetails);
 
         String inputText = "";
@@ -819,7 +760,7 @@ public class DepositExchange extends IconPanel {
 
                                 JSONObject pay_out = (JSONObject) json.get("pay_out");
 
-                                if (isWithdraw) {
+                                if (isStableCoin(asset)) {
                                     txURLin = Settings.getInstance().getBlockexplorerURL()
                                             + "/index/blockexplorer.html"
                                             + "?tx=";
@@ -909,4 +850,36 @@ public class DepositExchange extends IconPanel {
         }
     }
 
+    /**
+     * ABBREV on SWAP
+     *
+     * @param assetBuy
+     * @return
+     */
+    public static String getOutExtName(String assetBuy) {
+        switch (assetBuy) {
+            case "ERA":
+            case "COMPU":
+                return assetBuy;
+            default:
+                return "@" + assetBuy;
+        }
+    }
+
+    /**
+     * used as Depose or Withdraw
+     *
+     * @param assetBuy
+     * @return
+     */
+    public static boolean isStableCoin(String assetBuy) {
+        switch (assetBuy) {
+            case AssetCls.ERA_NAME:
+            case AssetCls.FEE_NAME:
+            case "USD":
+                return false;
+            default:
+                return true;
+        }
+    }
 }

@@ -175,7 +175,7 @@ public class OrderTest {
                     BigDecimal amountSell = new BigDecimal("100");
                     BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
 
-                    orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
+                    orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(), assetA.getKey(), amountBuy,
                             amountSell, (byte) 0, timestamp++, 0L);
                     orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                     orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
@@ -215,12 +215,12 @@ public class OrderTest {
 
                 // тут в базе форкнутой должен быть ордер из стенки в измененном виде
                 // а повторный расчет в форке не должен его дублировать
-                List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
+                List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(), assetA.getKey(),
                         null);
 
                 DCSet forkDC = dcSet.fork(this.toString());
                 // создадим первый ордер который изменит ордера стенки
-                orderCreation = new CreateOrderTransaction(accountB, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                orderCreation = new CreateOrderTransaction(accountB, assetA.getKey(), assetB.getKey(),
                         new BigDecimal("10"),
                         new BigDecimal("10"), (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountB, Transaction.FOR_NETWORK);
@@ -230,7 +230,7 @@ public class OrderTest {
                 ordersMap = forkDC.getOrderMap();
                 // тут в базе форкнутой должен быть ордер из стенки в измененном виде
                 // а повторный расчет в форке не должен его дублировать
-                orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(forkDC), assetA.getKey(forkDC), null);
+                orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(), assetA.getKey(), null);
 
                 assertEquals(orders.size(), len);
                 if (ordersMap.isSizeEnable()) {
@@ -329,7 +329,7 @@ public class OrderTest {
                     BigDecimal amountSell = new BigDecimal("100");
                     BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
 
-                    orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
+                    orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(), assetA.getKey(), amountBuy,
                             amountSell, (byte) 0, timestamp++, 0L);
                     orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                     orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo, true);
@@ -360,7 +360,7 @@ public class OrderTest {
                 }
                 assertEquals(count, len);
 
-                List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
+                List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(), assetA.getKey(),
                         null);
                 assertEquals(orders.size(), len);
 
@@ -389,7 +389,7 @@ public class OrderTest {
                 }
                 assertEquals(count, len);
 
-                orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
+                orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(), assetA.getKey(),
                         null);
                 assertEquals(orders.size(), len);
 
@@ -405,8 +405,8 @@ public class OrderTest {
         try {
             init(IDB.DBS_ROCK_DB);
 
-            long have = assetB.getKey(dcSet);
-            long want = assetA.getKey(dcSet);
+            long have = assetB.getKey();
+            long want = assetA.getKey();
 
             int count = 0;
 
@@ -476,7 +476,7 @@ public class OrderTest {
                 BigDecimal amount1 = BigDecimal.ONE;
                 BigDecimal amount10 = BigDecimal.TEN;
                 BigDecimal amount100 = new BigDecimal("100");
-                CreateOrderTransaction orderCreation1 = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                CreateOrderTransaction orderCreation1 = new CreateOrderTransaction(accountA, assetA.getKey(), assetB.getKey(),
                         amount10, amount100,
                         (byte) 0, timestamp++, 0L);
                 orderCreation1.sign(accountA, Transaction.FOR_NETWORK);
@@ -485,7 +485,7 @@ public class OrderTest {
 
                 assertEquals(accountA.getBalanceForPosition(assetA.getKey(), Account.BALANCE_POS_PLEDGE).b, amount10);
 
-                CreateOrderTransaction orderCreation2 = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet),
+                CreateOrderTransaction orderCreation2 = new CreateOrderTransaction(accountB, assetB.getKey(), assetA.getKey(),
                         amount10,
                         amount1, (byte) 0, timestamp++, 0L);
                 orderCreation2.sign(accountB, Transaction.FOR_NETWORK);

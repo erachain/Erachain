@@ -23,6 +23,11 @@ public class WalletItemPersonsTableModel extends WalletItemTableModel<PersonCls>
     }
 
     @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getPersonMap();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.list == null || row > this.list.size() - 1) {
             return null;

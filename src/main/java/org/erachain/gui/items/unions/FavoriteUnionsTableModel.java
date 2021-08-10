@@ -26,6 +26,11 @@ public class FavoriteUnionsTableModel extends FavoriteItemModelTable {
     }
 
     @Override
+    protected void updateMap() {
+        favoriteMap = Controller.getInstance().getWallet().dwSet.getUnionFavoritesSet();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.list == null || row > this.list.size() - 1) {
             return null;

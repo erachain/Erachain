@@ -27,6 +27,11 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable implement
     }
 
     @Override
+    protected void updateMap() {
+        favoriteMap = Controller.getInstance().getWallet().dwSet.getImprintFavoritesSet();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.list == null || row > this.list.size() - 1) {
             return null;
@@ -41,7 +46,7 @@ public class FavoriteImprintsTableModel extends FavoriteItemModelTable implement
                 return item.getConfirmations(dcSet);
 
             case COLUMN_KEY:
-                return item.getKey(DCSet.getInstance());
+                return item.getKey();
 
             case COLUMN_NAME:
                 return item;

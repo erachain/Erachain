@@ -146,7 +146,7 @@ public class RCertifyPubKeysTest {
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         person.setReference(ownerSignature, dbRef);
         dcSet.getItemPersonMap().incrementPut(person);
-        long keyRegistrar = person.getKey(dcSet);
+        long keyRegistrar = person.getKey();
 
         ownerSignature = new byte[64];
         ownerSignature[1] = (byte) 2;
@@ -155,7 +155,7 @@ public class RCertifyPubKeysTest {
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         person.setReference(ownerSignature, dbRef);
         dcSet.getItemPersonMap().incrementPut(person);
-        long keyCertifier = person.getKey(dcSet);
+        long keyCertifier = person.getKey();
 
         // внесем его как удостовренную персону
         Fun.Tuple3<Integer, Integer, Integer> itemPRegistrar = new Fun.Tuple3<Integer, Integer, Integer>(999999, 2, 2);
@@ -225,7 +225,7 @@ public class RCertifyPubKeysTest {
         dcSet.getTransactionFinalMap().put(issuePersonTransaction);
         dcSet.getTransactionFinalMapSigns().put(issuePersonTransaction.signature, issuePersonTransaction.dbRef);
 
-        personKey = person.getKey(dcSet);
+        personKey = person.getKey();
 
         // issue 1 genesis person in init() here
         //assertEquals( genesisPersonKey + 1, personKey);
@@ -250,7 +250,7 @@ public class RCertifyPubKeysTest {
             assertNotEquals(registrar.getLastTimestamp(dcSet), null);
 
             RCertifyPubKeys certPubKey = new RCertifyPubKeys(0, registrar, FEE_POWER,
-                    person.getKey(dcSet), certifiedPublicKeys, timestamp, 0L);
+                    person.getKey(), certifiedPublicKeys, timestamp, 0L);
             certPubKey.sign(registrar, Transaction.FOR_NETWORK);
             certPubKey.setDC(dcSet, Transaction.FOR_NETWORK, 3, 5, true);
             certPubKey.process(null, Transaction.FOR_NETWORK);

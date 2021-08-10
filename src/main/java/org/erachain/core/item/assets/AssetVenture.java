@@ -82,10 +82,10 @@ public class AssetVenture extends AssetCls {
     public BigDecimal getReleased(DCSet dcSet) {
         if (quantity > 0) {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                    bals = this.getMaker().getBalance(this.getKey(dcSet));
+                    bals = this.getMaker().getBalance(this.getKey());
             return new BigDecimal(quantity).subtract(bals.a.b).stripTrailingZeros();
         } else {
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> bals = this.getMaker().getBalance(this.getKey(dcSet));
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> bals = this.getMaker().getBalance(this.getKey());
             return bals.a.b.negate().stripTrailingZeros();
         }
     }

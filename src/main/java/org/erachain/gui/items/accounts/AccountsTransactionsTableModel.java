@@ -48,6 +48,11 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
     }
 
+    @Override
+    protected void updateMap() {
+        map = Controller.getInstance().getWallet().dwSet.getTransactionMap();
+    }
+
     public void setAccount(Account sender) {
         this.filterAccount = sender;
     }

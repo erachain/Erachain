@@ -30,6 +30,11 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
     }
 
     @Override
+    protected void updateMap() {
+        favoriteMap = Controller.getInstance().getWallet().dwSet.getPollFavoritesSet();
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.list == null || row > this.list.size() - 1) {
             return null;
@@ -45,7 +50,7 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
                 return poll.getConfirmations(dcSet);
 
             case COLUMN_KEY:
-                return poll.getKey(DCSet.getInstance());
+                return poll.getKey();
 
             case COLUMN_NAME:
                 return poll;
