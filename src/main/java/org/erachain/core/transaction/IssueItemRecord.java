@@ -148,6 +148,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public void sign(PrivateKeyAccount creator, int forDeal) {
         super.sign(creator, forDeal);
+        item.setReference(signature, dbRef);
     }
 
     //PARSE CONVERT

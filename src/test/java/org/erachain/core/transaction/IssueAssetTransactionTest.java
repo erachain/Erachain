@@ -15,12 +15,16 @@ import org.junit.Test;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 @Slf4j
 public class IssueAssetTransactionTest {
+
+    byte feePow = (byte) 0;
 
     long FEE_KEY = AssetCls.FEE_KEY;
     byte[] itemAppData = null;
@@ -171,6 +175,67 @@ public class IssueAssetTransactionTest {
             } while (++k < step);
 
         }
+    }
+
+    @Test
+    public void parse() {
+
+        init(IDB.DBS_MAP_DB);
+
+        assetMovable = new AssetVenture(itemAppData, maker, "movable-111", icon, image, "...", 0, 8, 500L);
+
+        //CREATE UPDATE ORDER
+        IssueAssetTransaction tx = new IssueAssetTransaction(maker, assetMovable, feePow, System.currentTimeMillis(), 0L);
+        tx.sign(maker, Transaction.FOR_NETWORK);
+
+        //CONVERT TO BYTES
+        byte[] rawTX = tx.toBytes(Transaction.FOR_NETWORK, true);
+
+        //CHECK DATA LENGTH
+        assertEquals(rawTX.length, tx.getDataLength(Transaction.FOR_NETWORK, true));
+
+        try {
+            //PARSE FROM BYTES
+            Transaction parsedTX = TransactionFactory.getInstance().parse(rawTX, Transaction.FOR_NETWORK);
+
+            //CHECK INSTANCE
+            assertEquals(true, parsedTX instanceof IssueAssetTransaction);
+
+            //CHECK SIGNATURE
+            assertEquals(true, Arrays.equals(tx.getSignature(), parsedTX.getSignature()));
+
+            //CHECK ISSUER
+            assertEquals(tx.getCreator().getAddress(), parsedTX.getCreator().getAddress());
+
+            //CHECK REFERENCE
+            //assertEquals((long)tx.getReference(), (long)parsedTX.getReference());
+
+            //CHECK TIMESTAMP
+            assertEquals(tx.getTimestamp(), parsedTX.getTimestamp());
+
+            assertEquals(tx.getItem(), ((IssueAssetTransaction) parsedTX).getItem());
+
+            assertEquals(Arrays.equals(tx.getItem().getAppData(), ((IssueAssetTransaction) parsedTX).getItem().getAppData()), true);
+
+            assertEquals(((AssetVenture) tx.getItem()).getQuantity(), ((AssetVenture) ((IssueAssetTransaction) parsedTX).getItem()).getQuantity());
+
+        } catch (Exception e) {
+            fail("Exception while parsing transaction.");
+        }
+
+        //PARSE TRANSACTION FROM WRONG BYTES
+        rawTX = new byte[tx.getDataLength(Transaction.FOR_NETWORK, true)];
+
+        try {
+            //PARSE FROM BYTES
+            TransactionFactory.getInstance().parse(rawTX, Transaction.FOR_NETWORK);
+
+            //FAIL
+            fail("this should throw an exception");
+        } catch (Exception e) {
+            //EXCEPTION IS THROWN OK
+        }
+
     }
 
     @Test

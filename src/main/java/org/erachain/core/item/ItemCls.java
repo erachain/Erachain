@@ -890,9 +890,12 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     @Override
-    public boolean equals(Object item) {
-        if (item instanceof ItemCls)
-            return Arrays.equals(this.reference, ((ItemCls) item).reference);
+    public boolean equals(Object obj) {
+        if (obj instanceof ItemCls) {
+            ItemCls item = (ItemCls) obj;
+            if (this.reference != null && item.reference != null)
+                return Arrays.equals(this.reference, item.reference);
+        }
         return false;
     }
 
