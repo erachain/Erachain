@@ -155,7 +155,7 @@ public class IssueAssetSeriesTransactionTest {
         byte[] rawTX = tx.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        //assertEquals(rawTX.length, tx.getDataLength(Transaction.FOR_NETWORK, true));
+        assertEquals(rawTX.length, tx.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
