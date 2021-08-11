@@ -37,6 +37,7 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
     protected void initComponents() {
 
         super.initComponents();
+        addImageLabel.label.setText(Lang.T("Add a frame"));
 
         int gridy = initTopArea(true);
 
