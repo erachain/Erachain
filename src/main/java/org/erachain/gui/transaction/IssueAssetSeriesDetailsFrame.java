@@ -16,8 +16,7 @@ public class IssueAssetSeriesDetailsFrame extends RecDetailsFrame {
 
         //LABEL original REF
         ++labelGBC.gridy;
-        this.add(new JLabel(Lang.T("Asset Reference") + ":"), labelGBC);
-        //PRICE
+        this.add(new JLabel(Lang.T("Original Reference") + ":"), labelGBC);
         ++fieldGBC.gridy;
         JTextField origRef = new JTextField(assetSeriesTX.viewOrigAssetRef());
         origRef.setEditable(false);
@@ -25,24 +24,20 @@ public class IssueAssetSeriesDetailsFrame extends RecDetailsFrame {
         this.add(origRef, fieldGBC);
 
         ++labelGBC.gridy;
-        this.add(new JLabel(Lang.T("Asset") + ":"), labelGBC);
+        this.add(new JLabel(Lang.T("Original Asset") + ":"), labelGBC);
+        ++fieldGBC.gridy;
+        JTextField origAsset = new JTextField(assetSeriesTX.getOrigAsset().toString());
+        origAsset.setEditable(false);
+        this.add(origAsset, fieldGBC);
+
+        ++labelGBC.gridy;
+        this.add(new JLabel(Lang.T("Series") + ":"), labelGBC);
         //PRICE
         ++fieldGBC.gridy;
-        JTextField origKey = new JTextField(assetSeriesTX.getAsset().toString());
+        JTextField origKey = new JTextField(assetSeriesTX.getAsset().toString() + " #1/" + assetSeriesTX.getTotal());
         origKey.setEditable(false);
         MenuPopupUtil.installContextMenu(origKey);
         this.add(origKey, fieldGBC);
-
-        //LABEL TOTAL
-        ++labelGBC.gridy;
-        this.add(new JLabel(Lang.T("Total") + ":"), labelGBC);
-
-        //TOTAL
-        ++fieldGBC.gridy;
-        JTextField total = new JTextField(assetSeriesTX.getTotal());
-        total.setEditable(false);
-        MenuPopupUtil.installContextMenu(total);
-        this.add(total, fieldGBC);
 
         //PACK
         //		this.pack();

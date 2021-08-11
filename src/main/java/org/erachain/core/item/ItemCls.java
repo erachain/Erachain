@@ -1141,7 +1141,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         if (txSeqNo != null) {
             // если транзакция еще не подтверждена - чтобы ошибок не было при отображении в блокэксплорере
             itemJSON.put("tx_seqNo", Transaction.viewDBRef(txSeqNo));
-            referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
+            if (referenceTx == null)
+                referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
+
             if (referenceTx != null) {
                 PublicKeyAccount creator = referenceTx.getCreator();
                 if (creator == null) {
@@ -1325,20 +1327,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             itemJson.put("maker_person_image_media_type", person.b.getImageMediaType().toString());
 
         }
-
-        itemJson.put("iconType", getIconType());
-        itemJson.put("iconTypeName", viewMediaType(iconType));
-
-        String iconURL = getIconURL();
-        if (iconURL != null)
-            itemJson.put("iconURL", iconURL);
-
-        itemJson.put("imageType", getImageType());
-        itemJson.put("imageTypeName", viewMediaType(imageType));
-
-        String imageURL = getImageURL();
-        if (imageURL != null)
-            itemJson.put("imageURL", imageURL);
 
         if (referenceTx != null) {
             if (referenceTx.getCreator() != null) {

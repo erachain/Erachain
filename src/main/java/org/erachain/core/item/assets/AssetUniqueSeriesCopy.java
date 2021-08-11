@@ -6,8 +6,10 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.transaction.IssueAssetSeriesTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
@@ -251,13 +253,36 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     public JSONObject toJson() {
 
+        // тут же referenceTx определяется
         JSONObject assetJSON = super.toJson();
+        assetJSON.put("originalKey", origKey);
 
         // ADD DATA of ORIGINAL
-        assetJSON.put("originalKey", origKey);
-        JSONObject original = new JSONObject();
+        JSONObject originalJson = new JSONObject();
 
-        assetJSON.put("origina", original);
+        IssueAssetSeriesTransaction issueTX = (IssueAssetSeriesTransaction) referenceTx;
+        if (issueTX.getDCSet() == null) {
+            issueTX.setDC(Controller.getInstance().getDCSet(), false);
+        }
+        AssetCls original = issueTX.getOrigAsset();
+
+        originalJson.put("iconType", original.getIconType());
+        originalJson.put("iconTypeName", viewMediaType(original.getIconType()));
+
+        String iconURL = original.getIconURL();
+        if (iconURL != null)
+            originalJson.put("iconURL", iconURL);
+
+        originalJson.put("imageType", original.getImageType());
+        originalJson.put("imageTypeName", viewMediaType(original.getImageType()));
+
+        String imageURL = original.getImageURL();
+        if (imageURL != null)
+            originalJson.put("imageURL", imageURL);
+
+        assetJSON.put("original", originalJson);
+
+        return assetJSON;
 
     }
 

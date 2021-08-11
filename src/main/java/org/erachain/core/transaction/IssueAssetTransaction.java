@@ -87,6 +87,11 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     @Override
+    public AssetCls getAsset() {
+        return (AssetCls) getItem();
+    }
+
+    @Override
     public BigDecimal getAmount() {
         return new BigDecimal(((AssetCls) getItem()).getQuantity());
     }
