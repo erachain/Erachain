@@ -100,18 +100,21 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
             // SET ICON and IMAGE URL
             byte[] appDataOfCopy = foilAsset.getAppData();
-            if (appDataOfCopy != null) {
+            if (appDataOfCopy == null) {
+                appDataOfCopy = AssetCls.makeEmptyAppData();
+            } else {
                 appDataOfCopy = appDataOfCopy.clone();
-                if (icon != null && icon.length > 0) {
-                    appDataOfCopy[10] = (byte) foilAsset.getIconType();
-                    appDataOfCopy[10] |= ITEM_HAS_URL_MASK;
-                    icon = foilAsset.getIconURL().getBytes();
-                }
-                if (image != null && image.length > 0) {
-                    appDataOfCopy[11] = (byte) foilAsset.getImageType();
-                    appDataOfCopy[11] |= ITEM_HAS_URL_MASK;
-                    image = foilAsset.getImageURL().getBytes();
-                }
+            }
+
+            if (icon != null && icon.length > 0) {
+                appDataOfCopy[10] = (byte) foilAsset.getIconType();
+                appDataOfCopy[10] |= ITEM_HAS_URL_MASK;
+                icon = foilAsset.getIconURL().getBytes();
+            }
+            if (image != null && image.length > 0) {
+                appDataOfCopy[11] = (byte) foilAsset.getImageType();
+                appDataOfCopy[11] |= ITEM_HAS_URL_MASK;
+                image = foilAsset.getImageURL().getBytes();
             }
 
             copy = new AssetUniqueSeriesCopy(appDataOfCopy, foilAsset.getMaker(), copyName,

@@ -397,6 +397,10 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
             //INSERT INTO DATABASE
             key = map.incrementPut(uniqueSeriesCopy);
+            if (indexCopy == 1) {
+                // Set KEY for foilAsset - it need foe other copies
+                foilAsset.setKey(key);
+            }
 
             // SET BALANCES
             creator.changeBalance(dcSet, false, false, key,

@@ -357,6 +357,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         }
     }
 
+    public static byte[] makeEmptyAppData() {
+        return new byte[12];
+    }
+
     public static Pair<Integer, Long> resolveDateFromStr(String str, Long defaultVol) {
         if (str.length() == 0) return new Pair<Integer, Long>(0, defaultVol);
         else if (str.length() == 1) {
