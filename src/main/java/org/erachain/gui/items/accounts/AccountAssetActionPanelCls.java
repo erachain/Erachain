@@ -146,7 +146,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jComboBoxCreator.setRenderer(new AccountRenderer(asset.getKey()));
 
         // favorite combo box
-        jComboBox_Asset.setModel(new ComboBoxAssetsModel());
+        jComboBox_Asset.setModel(new ComboBoxAssetsModel(AssetCls.FEE_KEY));
         jComboBox_Asset.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
         jComboBox_Asset.setEditable(false);
         //this.jComboBox_Asset.setEnabled(assetIn != null);

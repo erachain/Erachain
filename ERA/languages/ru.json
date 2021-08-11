@@ -1422,6 +1422,7 @@
   "Seq": "№",
   "SeqNo": "Номер транз",
   "Series": "Серия",
+  "Series Size": "Размер Серии",
   "Service can accept a maximum of %1 now": "Сервис может принять сейчас максимум %1",
   "Service ID": "ID сервиса",
   "Service will take commission fee approx - %1%": "Сервис возьмет комиссию примерно - %1%",

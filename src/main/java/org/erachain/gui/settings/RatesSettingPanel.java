@@ -106,7 +106,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         //gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        cbxFavoritesRate = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
+        cbxFavoritesRate = new JComboBox<ItemCls>(new ComboBoxAssetsModel(AssetCls.FEE_KEY));
         cbxFavoritesRate.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
 
         long key = Settings.getInstance().getCompuRateAsset();
@@ -146,7 +146,7 @@ public class RatesSettingPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
         // DEFAULT PAIR ASSET
-        cbxFavoritesPair = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
+        cbxFavoritesPair = new JComboBox<ItemCls>(new ComboBoxAssetsModel(AssetCls.FEE_KEY));
         cbxFavoritesPair.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
         asset = Settings.getInstance().getDefaultPairAsset();
         cbxFavoritesPair.setSelectedItem(asset);

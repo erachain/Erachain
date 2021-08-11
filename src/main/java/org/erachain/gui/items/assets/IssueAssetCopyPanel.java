@@ -1,12 +1,13 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLinkAddress;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.utils.GUIConstants;
+import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -21,12 +22,14 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
     public JTextField assetRefField = new JTextField("");
     byte[] origAssetTXSign;
+    public javax.swing.JComboBox<ItemCls> jComboBox_Asset;
+
 
     public IssueAssetCopyPanel() {
         super(NAME, TITLE, "Asset series issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
                 true, true);
 
-        quantityJLabel.setText(Lang.T("Series Total") + ":");
+        quantityJLabel.setText(Lang.T("Series Size") + ":");
         initComponents();
 
     }
@@ -37,12 +40,19 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
         int gridy = initTopArea(true);
 
-        JLabel signLabel = new JLabel(Lang.T("Original Asset Issue TX Signature") + ":");
+        // favorite combo box
+        jComboBox_Asset = new javax.swing.JComboBox<>();
+        jComboBox_Asset.setModel(new ComboBoxAssetsNFTModel());
+        jComboBox_Asset.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
+        jComboBox_Asset.setEditable(false);
+        //this.jComboBox_Asset.setEnabled(assetIn != null);
+
+        JLabel signLabel = new JLabel(Lang.T("Original Asset") + ":");
         labelGBC.gridy = gridy;
         jPanelAdd.add(signLabel, labelGBC);
 
         fieldGBC.gridy = gridy++;
-        jPanelAdd.add(assetRefField, fieldGBC);
+        jPanelAdd.add(jComboBox_Asset, fieldGBC);
 
         labelGBC.gridy = ++gridy;
         jPanelAdd.add(quantityJLabel, labelGBC);
@@ -58,11 +68,11 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
         assetType = AssetCls.AS_NON_FUNGIBLE;
 
+        AssetCls asset = (AssetCls) this.jComboBox_Asset.getSelectedItem();
+        origAssetTXSign = asset.getReference();
+
         int parseStep = 0;
         try {
-
-            // READ ORIG SIGNATURE
-            origAssetTXSign = Base58.decode(assetRefField.getText());
 
             // READ QUANTITY
             parseStep++;
@@ -70,11 +80,6 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
         } catch (Exception e) {
             switch (parseStep) {
-                case 0:
-                    JOptionPane.showMessageDialog(MainFrame.getInstance(),
-                            Lang.T("Invalid original signature!"), Lang.T("Error"),
-                            JOptionPane.ERROR_MESSAGE);
-                    break;
                 case 1:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(),
                             Lang.T("Invalid quantity!"), Lang.T("Error"),
