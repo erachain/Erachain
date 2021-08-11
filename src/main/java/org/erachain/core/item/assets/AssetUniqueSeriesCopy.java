@@ -88,15 +88,34 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         String copyName = foilAsset.getName() + " #" + index + "/" + total;
 
         AssetUniqueSeriesCopy copy;
+        byte[] icon = foilAsset.getIcon();
+        byte[] image = foilAsset.getImage();
         if (index == 1) {
             // Make FOIL
             copy = new AssetUniqueSeriesCopy(foilAsset.getAppData(), foilAsset.getMaker(), copyName,
-                    foilAsset.getIcon(), foilAsset.getImage(), foilAsset.getDescription(), origKey, total, index);
+                    icon, image, foilAsset.getDescription(), origKey, total, index);
 
         } else {
             // Make COPY
-            copy = new AssetUniqueSeriesCopy(foilAsset.getAppData(), foilAsset.getMaker(), copyName,
-                    null, null, foilAsset.getDescription(), origKey, total, index);
+
+            // SET ICON and IMAGE URL
+            byte[] appDataOfCopy = foilAsset.getAppData();
+            if (appDataOfCopy != null) {
+                appDataOfCopy = appDataOfCopy.clone();
+                if (icon != null && icon.length > 0) {
+                    appDataOfCopy[10] = (byte) foilAsset.getIconType();
+                    appDataOfCopy[10] |= ITEM_HAS_URL_MASK;
+                    icon = foilAsset.getIconURL().getBytes();
+                }
+                if (image != null && image.length > 0) {
+                    appDataOfCopy[11] = (byte) foilAsset.getImageType();
+                    appDataOfCopy[11] |= ITEM_HAS_URL_MASK;
+                    image = foilAsset.getImageURL().getBytes();
+                }
+            }
+
+            copy = new AssetUniqueSeriesCopy(appDataOfCopy, foilAsset.getMaker(), copyName,
+                    icon, image, foilAsset.getDescription(), origKey, total, index);
         }
 
         copy.setReference(issueTX.getSignature(), issueTX.getDBRef());
