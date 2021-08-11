@@ -53,6 +53,9 @@ public class TransactionDetailsFactory {
             case Transaction.CHANGE_ORDER_TRANSACTION:
                 return new UpdateOrderDetailsFrame((ChangeOrderTransaction) transaction);
 
+            case Transaction.ISSUE_ASSET_SERIES_TRANSACTION:
+                return new IssueAssetSeriesDetailsFrame((IssueAssetSeriesTransaction) transaction);
+
             case Transaction.MULTI_PAYMENT_TRANSACTION:
                 return new MultiPaymentDetailsFrame((MultiPaymentTransaction) transaction);
 

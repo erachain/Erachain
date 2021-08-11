@@ -13,7 +13,7 @@ import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui.records.VouchTransactionDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -33,8 +33,6 @@ import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
-import java.util.Timer;
-import java.util.TimerTask;
 //import java.util.TimerTask;
 
 public abstract class ItemSplitPanel extends SplitPanel {
@@ -43,8 +41,9 @@ public abstract class ItemSplitPanel extends SplitPanel {
     protected TimerTableModelCls tableModel;
     protected JMenuItem favoriteMenuItems;
     protected JPopupMenu menuTable;
-    //protected ItemCls itemMenu;
+
     protected ItemCls itemTableSelected;
+
     protected static Logger logger = LoggerFactory.getLogger(ItemSplitPanel.class);
 
 
@@ -95,26 +94,27 @@ public abstract class ItemSplitPanel extends SplitPanel {
             }
 
             try {
-                itemTableSelected = getItem(jTableJScrollPanelLeftPanel.getSelectedRow());
+                getItem(jTableJScrollPanelLeftPanel.getSelectedRow());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 return;
             }
             if (itemTableSelected == null) {
+                jScrollPaneJPanelRightPanel.setViewportView(null);
                 return;
             }
             try {
-                // TODO почемуто при выборе персоны сюда 2 раза прилетает и перерисовка дважды идет
-                jScrollPaneJPanelRightPanel.setViewportView(null);
+                // TODO почему-то при выборе персоны сюда 2 раза прилетает и перерисовка дважды идет
+                //jScrollPaneJPanelRightPanel.setViewportView(null);
                 jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 try {
-                    jScrollPaneJPanelRightPanel.setViewportView(null);
-                    jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
+                    //jScrollPaneJPanelRightPanel.setViewportView(null);
+                    //jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
                 } catch (Exception e1) {
-                    jScrollPaneJPanelRightPanel.setViewportView(null);
-                    jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
+                    //jScrollPaneJPanelRightPanel.setViewportView(null);
+                    //jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
                 }
 
             }
@@ -123,32 +123,20 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
         // UPDATE FILTER ON TEXT CHANGE
 
-        // mouse from favorine column
+        // mouse from favorite column
         jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
 
-                Point point = e.getPoint();
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
+                if (e.getClickCount() == 2) {
+                    tableMouse2Click();
+                }
 
-                    int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
-                    jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
-
-                    itemTableSelected = getItem(row);
-
-                    if (e.getClickCount() == 2) {
-                        tableMouse2Click(itemTableSelected);
+                if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
+                    if (jTableJScrollPanelLeftPanel.getSelectedColumn() == ItemSplitPanel.this.tableModel.COLUMN_FAVORITE) {
+                        favoriteSet();
                     }
-
-                    if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
-                        if (jTableJScrollPanelLeftPanel.getSelectedColumn() == ItemSplitPanel.this.tableModel.COLUMN_FAVORITE) {
-                            favoriteSet(itemTableSelected);
-                        }
-                    }
-                }}, 10);
+                }
             }
         });
 
@@ -157,8 +145,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
         favoriteMenuItems = new JMenuItem();
         favoriteMenuItems.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-                favoriteSet(getItem(row));
+                favoriteSet();
             }
         });
 
@@ -175,8 +162,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-                itemTableSelected = getItem(jTableJScrollPanelLeftPanel.getSelectedRow());
-                // IF ASSET CONFIRMED AND NOT ERM
+
                 favoriteMenuItems.setVisible(true);
                 // CHECK IF FAVORITES
                 if (Controller.getInstance().isItemFavorite(itemTableSelected)) {
@@ -194,7 +180,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
         vouchMenu.addActionListener(e -> {
             DCSet db = DCSet.getInstance();
             Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
-            new toSignRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
+            new VouchTransactionDialog(transaction.getBlockHeight(), transaction.getSeqNo());
 
         });
         menuTable.add(vouchMenu);
@@ -330,15 +316,15 @@ public abstract class ItemSplitPanel extends SplitPanel {
         tableModel.deleteObservers();
     }
 
-    private void favoriteSet(ItemCls itemCls) {
+    private void favoriteSet() {
         // CHECK IF FAVORITES
-        if (Controller.getInstance().isItemFavorite(itemCls)) {
+        if (Controller.getInstance().isItemFavorite(itemTableSelected)) {
             int showConfirmDialog = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.T("Delete from favorite") + "?", Lang.T("Delete from favorite"), JOptionPane.OK_CANCEL_OPTION);
             if (showConfirmDialog == 0) {
-                Controller.getInstance().removeItemFavorite(itemCls);
+                Controller.getInstance().removeItemFavorite(itemTableSelected);
             }
         } else {
-            Controller.getInstance().addItemFavorite(itemCls);
+            Controller.getInstance().addItemFavorite(itemTableSelected);
         }
         ((TimerTableModelCls) jTableJScrollPanelLeftPanel.getModel()).fireTableDataChanged();
 
@@ -346,23 +332,27 @@ public abstract class ItemSplitPanel extends SplitPanel {
 
     abstract protected Component getShow(ItemCls item);
 
-
-    private ItemCls getItem(int row) {
+    private void getItem(int row) {
         int crow = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
         Object item = tableModel.getItem(crow);
-        ItemCls itemCls;
+
         if (item instanceof Fun.Tuple2) {
-            itemCls = (ItemCls) ((Fun.Tuple2) item).b;
+            itemTableSelected = (ItemCls) ((Fun.Tuple2) item).b;
         } else {
-            itemCls = (ItemCls) item;
+            itemTableSelected = (ItemCls) item;
         }
 
-        itemCls.getKey();
-        return itemCls;
+        afterSelectItem();
 
     }
 
-    protected void tableMouse2Click(ItemCls item) {
+    /**
+     * setup Menu etc
+     */
+    protected void afterSelectItem() {
+    }
+
+    protected void tableMouse2Click() {
     }
 
 }

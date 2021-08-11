@@ -6,54 +6,37 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.item.assets.AssetVenture;
-import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.gui.MainFrame;
-import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
-import org.erachain.gui.library.Library;
-import org.erachain.gui.library.MDecimalFormatedTextField;
-import org.erachain.gui.library.MultipleRoyaltyPanel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * @author Саша
  */
-public class IssueAssetPanel extends IssueItemPanel {
+public class IssueAssetPanel extends IssueAssetPanelCls {
 
     public static String NAME = "IssueAssetPanel";
     public static String TITLE = "Issue Asset";
 
-    private final JLabel scaleJLabel = new JLabel(Lang.T("Scale") + ":");
-    private final JLabel quantityJLabel = new JLabel(Lang.T("Quantity") + ":");
-    private final JLabel typeJLabel = new JLabel(Lang.T("Type") + ":");
+    protected final JLabel scaleJLabel = new JLabel(Lang.T("Scale") + ":");
+    protected final JComboBox<String> textScale = new JComboBox<>();
 
-    private final JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
-    private final JComboBox<String> textScale = new JComboBox<>();
-    private final JCheckBox isUnTransferable = new JCheckBox(Lang.T("Not transferable"));
-
-    private JTextPane textareasAssetTypeDescription;
-    private MDecimalFormatedTextField textQuantity = new MDecimalFormatedTextField();
-
-    private AssetTypesComboBoxModel assetTypesComboBoxModel;
-
-    private MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel(fromJComboBox, assetTypeJComboBox);
+    int scale;
 
     public IssueAssetPanel() {
-        super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true, true);
+        super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
+                true, true);
+
+        textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
+        textScale.setSelectedIndex(8);
 
         assetTypesComboBoxModel = new AssetTypesComboBoxModel();
         assetTypeJComboBox.setModel(assetTypesComboBoxModel);
         //assetTypeJComboBox.setRenderer(new RenderComboBoxAssetActions());
 
-        textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
-        textScale.setSelectedIndex(8);
-
         initComponents();
-
-        textQuantity.setText("0");
 
         // select combobox Asset type
         assetTypeJComboBox.addActionListener(e -> {
@@ -67,6 +50,7 @@ public class IssueAssetPanel extends IssueItemPanel {
     }
 
     protected void initComponents() {
+
         super.initComponents();
 
         // вывод верхней панели
@@ -78,10 +62,10 @@ public class IssueAssetPanel extends IssueItemPanel {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(assetTypeJComboBox, fieldGBC);
 
-        textareasAssetTypeDescription = new JTextPane();
-        textareasAssetTypeDescription.setEditable(false);
-        textareasAssetTypeDescription.setBackground(this.getBackground());
-        textareasAssetTypeDescription.setContentType("text/html");
+        textAreasAssetTypeDescription = new JTextPane();
+        textAreasAssetTypeDescription.setEditable(false);
+        textAreasAssetTypeDescription.setBackground(this.getBackground());
+        textAreasAssetTypeDescription.setContentType("text/html");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = fieldGBC.gridx;
@@ -92,7 +76,7 @@ public class IssueAssetPanel extends IssueItemPanel {
         gridBagConstraints.weighty = 0.3;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.insets = fieldGBC.insets;
-        jPanelAdd.add(textareasAssetTypeDescription, gridBagConstraints);
+        jPanelAdd.add(textAreasAssetTypeDescription, gridBagConstraints);
 
         ////
         labelGBC.gridy = ++gridy;
@@ -107,34 +91,16 @@ public class IssueAssetPanel extends IssueItemPanel {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(textScale, fieldGBC);
 
-        isUnTransferable.setToolTipText(Lang.T("IssueAssetPanel.isUnTransferable.tip"));
-        fieldGBC.gridy = gridy++;
-        jPanelAdd.add(isUnTransferable, fieldGBC);
-
-        fieldGBC.gridy = gridy++;
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = fieldGBC.gridy;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        jPanelAdd.add(multipleRoyaltyPanel, gridBagConstraints);
-
         // вывод подвала
         super.initBottom(gridy);
     }
-
-    int scale;
-    long quantity;
-    int assetType;
 
     private void refreshLabels(AssetType assetType) {
         int fontSize = textScale.getFontMetrics(textScale.getFont()).getHeight();
         String fontStyle = textScale.getFont().getFontName();
         fontStyle = "<body style='font: " + (fontSize - 2) + "pt " + fontStyle + "'>";
 
-        textareasAssetTypeDescription.setText(fontStyle + assetType.getDescription());
+        textAreasAssetTypeDescription.setText(fontStyle + assetType.getDescription());
 
         if (AssetCls.isTypeUnique(assetType.getId(), 0)) {
             textQuantity.setVisible(false);
@@ -150,6 +116,7 @@ public class IssueAssetPanel extends IssueItemPanel {
 
     }
 
+    @Override
     protected boolean checkValues() {
 
         assetType = ((AssetType) assetTypesComboBoxModel.getSelectedItem()).getId();
@@ -186,15 +153,6 @@ public class IssueAssetPanel extends IssueItemPanel {
     }
 
     @Override
-    protected void makeAppData() {
-        itemAppData = AssetCls.makeAppData(!addIconLabel.isInternalMedia(), addIconLabel.getMediaType(),
-                !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
-                !startCheckBox.isSelected() ? null : startField.getCalendar().getTimeInMillis(),
-                !stopCheckBox.isSelected() ? null : stopField.getCalendar().getTimeInMillis(),
-                tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients(), isUnTransferable.isSelected());
-
-    }
-
     protected void makeTransaction() {
 
         AssetCls asset;
@@ -207,20 +165,18 @@ public class IssueAssetPanel extends IssueItemPanel {
                     addImageLabel.getMediaBytes(), textAreaDescription.getText(),
                     assetType, scale, quantity);
         }
-        transaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
+        transaction = Controller.getInstance().issueAsset(
                 creator, exLink, feePow, asset);
 
     }
 
-    protected String makeTransactionView() {
+    @Override
+    protected String makeBodyView() {
 
-        AssetCls asset = (AssetCls) transaction.getItem();
+        String out = super.makeBodyView();
+        AssetCls asset = (AssetCls) item;
 
-        String text = "<body><h2>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
-                + Lang.T("Issue Asset") + "</h2>"
-                + makeHeadView("Name")
-                + Lang.T("Asset Class") + ":&nbsp;"
+        out += Lang.T("Asset Class") + ":&nbsp;"
                 + Lang.T(asset.getItemSubType() + "") + "<br>"
                 + Lang.T("Asset Type") + ":&nbsp;"
                 + "<b>" + asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:" + Lang.T(asset.viewAssetTypeFull() + "") + "<br>"
@@ -228,23 +184,15 @@ public class IssueAssetPanel extends IssueItemPanel {
                 + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>";
 
         if (asset.getDEXAwards() != null) {
-            text += Lang.T("DEX Awards" + ":");
+            out += Lang.T("DEX Awards" + ":");
             for (ExLinkAddress award : asset.getDEXAwards()) {
-                text += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
+                out += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
                         + (award.getMemo() == null || award.getMemo().isEmpty() ? "" : " - " + award.getMemo());
             }
-            text += "<br>";
+            out += "<br>";
         }
 
-        text += Lang.T("Description") + ":<br>";
-
-        if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            text += Library.to_HTML(Lang.T(asset.viewDescription())) + "<br>";
-        } else {
-            text += Library.to_HTML(asset.viewDescription()) + "<br>";
-        }
-
-        return text;
+        return out;
 
     }
 

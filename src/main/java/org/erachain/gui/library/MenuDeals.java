@@ -4,7 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
-import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui.records.VouchTransactionDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
@@ -124,7 +124,7 @@ public class MenuDeals extends JMenu {
         dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.T("Vouching record"));
         dealsMenuVouchRecord.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new toSignRecordDialog(null, null);
+                new VouchTransactionDialog(null, null);
             }
         });
         add(dealsMenuVouchRecord);
@@ -160,7 +160,7 @@ public class MenuDeals extends JMenu {
 		        	public void actionPerformed(ActionEvent e)
 		        	{
 		        		// 
-		        		//selectOrAdd(new toSignRecordDialog(), MainFrame.desktopPane.getAllFrames());
+		        		//selectOrAdd(new VouchTransactionDialog(), MainFrame.desktopPane.getAllFrames());
 		        		selectOrAdd(new Sign_Frame(null, null), MainFrame.desktopPane.getAllFrames());
 		        	}
 		        });
@@ -323,7 +323,7 @@ public class MenuDeals extends JMenu {
         FindHashFromDir.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                //selectOrAdd(new toSignRecordDialog(), MainFrame.desktopPane.getAllFrames());
+                //selectOrAdd(new VouchTransactionDialog(), MainFrame.desktopPane.getAllFrames());
                 new FindHashFrmDirDialog();
             }
         });

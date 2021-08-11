@@ -24,7 +24,7 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
 
     //show details
     @Override
-    protected Component getShow(ItemCls item) {
+    public Component getShow(ItemCls item) {
         return new TemplateInfo((TemplateCls) item);
 
     }

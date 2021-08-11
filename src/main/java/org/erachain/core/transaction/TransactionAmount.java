@@ -697,7 +697,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     if (asset.isSelfManaged()) {
                         // учетная единица - само контролируемая
                         if (!creator.equals(asset.getMaker())) {
-                            return new Fun.Tuple2<>(CREATOR_NOT_OWNER, "creator != asset maker");
+                            return new Fun.Tuple2<>(CREATOR_NOT_MAKER, "creator != asset maker");
                         }
                         if (creator.equals(recipient)) {
                             return new Fun.Tuple2<>(INVALID_ADDRESS, "creator == recipient");
@@ -1043,7 +1043,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         return new Fun.Tuple2<>(INVALID_BACKWARD_ACTION, null);
                                 } else {
                                     if (!asset.getMaker().equals(creator))
-                                        return new Fun.Tuple2<>(CREATOR_NOT_OWNER, "asset maker != creator");
+                                        return new Fun.Tuple2<>(CREATOR_NOT_MAKER, "asset maker != creator");
                                 }
 
                                 // if asset is unlimited and me is creator of this

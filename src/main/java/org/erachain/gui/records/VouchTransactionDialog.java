@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class toSignRecordDialog extends JDialog {
+public class VouchTransactionDialog extends JDialog {
 
     private static final long serialVersionUID = 2717571093561259483L;
 
@@ -50,11 +50,11 @@ public class toSignRecordDialog extends JDialog {
     private javax.swing.JLabel jLabel_Name_Records;
     private javax.swing.JLabel jLabel_YourAddress;
 
-    public toSignRecordDialog(Integer block_No, Integer rec_No, Account account) {
+    public VouchTransactionDialog(Integer block_No, Integer rec_No, Account account) {
         toSign(block_No, rec_No, account);
     }
 
-    public toSignRecordDialog(Integer block_No, Integer rec_No) {
+    public VouchTransactionDialog(Integer block_No, Integer rec_No) {
         toSign(block_No, rec_No, null);
     }
 
@@ -77,7 +77,7 @@ public class toSignRecordDialog extends JDialog {
 
         if (block_No != null && rec_No != null) {
             jTextField_recordID.setText(block_No.toString() + "-" + rec_No.toString());
-            toSignRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
+            VouchTransactionDialog.record = refreshRecordDetails(jTextField_recordID.getText());
             jTextField_recordID.setEnabled(false);
         }
 
@@ -244,12 +244,12 @@ public class toSignRecordDialog extends JDialog {
 
             @Override
             public void insertUpdate(DocumentEvent arg0) {
-                toSignRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
+                VouchTransactionDialog.record = refreshRecordDetails(jTextField_recordID.getText());
             }
 
             @Override
             public void removeUpdate(DocumentEvent arg0) {
-                toSignRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
+                VouchTransactionDialog.record = refreshRecordDetails(jTextField_recordID.getText());
             }
         });
 

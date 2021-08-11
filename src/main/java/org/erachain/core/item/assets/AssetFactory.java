@@ -22,18 +22,18 @@ public class AssetFactory {
 
         switch (type) {
             case AssetCls.VENTURE:
-
-                //PARSE UPDATE NAME TRANSACTION
                 return AssetVenture.parse(forDeal, data, includeReference);
 
             case AssetCls.UNIQUE:
-
-                //PARSE PAYMENT TRANSACTION
                 return AssetUnique.parse(forDeal, data, includeReference);
 
-            case AssetCls.NAME:
+            //case AssetCls.UNIQUE_SERIES:
+            //    return AssetUniqueSeries.parse(forDeal, data, includeReference);
 
-                //PARSE REGISTER NAME TRANSACTION
+            case AssetCls.UNIQUE_COPY:
+                return AssetUniqueSeriesCopy.parse(forDeal, data, includeReference);
+
+            case AssetCls.NAME:
                 //return RegisterNameTransaction.Parse(data, includeReference);
 
         }

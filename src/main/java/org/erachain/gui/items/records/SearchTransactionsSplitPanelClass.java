@@ -13,7 +13,7 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SignLibraryPanel;
 import org.erachain.gui.models.SearchTableModelCls;
-import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui.records.VouchTransactionDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -139,7 +139,7 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 if (selectedTransaction == null) return;
-                new toSignRecordDialog(selectedTransaction.getBlockHeight(), selectedTransaction.getSeqNo());
+                new VouchTransactionDialog(selectedTransaction.getBlockHeight(), selectedTransaction.getSeqNo());
 
             }
         });

@@ -209,6 +209,9 @@ public class OnDealClick {
                 mess = "Invalid icon type";
                 break;
 
+            case Transaction.INVALID_IMAGE_TYPE:
+                mess = "Invalid image type";
+                break;
             case Transaction.INVALID_IMAGE_LENGTH_MIN:
                 mess = "Invalid image MIN length";
                 break;
@@ -426,8 +429,11 @@ public class OnDealClick {
             case Transaction.INVALID_ITEM_VALUE:
                 mess = "Invalid item value";
                 break;
-            case Transaction.CREATOR_NOT_OWNER:
+            case Transaction.CREATOR_NOT_MAKER:
                 mess = "Creator not maker";
+                break;
+            case Transaction.CREATOR_NOT_OWNER:
+                mess = "Creator not owner";
                 break;
 
             case Transaction.ITEM_DOES_NOT_EXIST:

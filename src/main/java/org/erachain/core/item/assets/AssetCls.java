@@ -15,7 +15,6 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.PairMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
-import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
@@ -96,6 +95,7 @@ public abstract class AssetCls extends ItemCls {
     public static final int UNIQUE = 1;
     public static final int VENTURE = 2;
     public static final int NAME = 3;
+    public static final int UNIQUE_COPY = 4;
     public static final int INITIAL_FAVORITES = 100;
 
     ///////////////////////////////////////////////////
@@ -312,6 +312,10 @@ public abstract class AssetCls extends ItemCls {
     protected AssetCls(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
         super(typeBytes, appData, maker, name, icon, image, description);
         this.assetType = assetType;
+    }
+
+    public AssetCls(byte[] typeBytes) {
+        super(typeBytes);
     }
 
     public AssetCls(int type, byte pars, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image, String description, int assetType) {
@@ -701,8 +705,8 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public byte[] getImage() {
-        if (key < 1000 && image.length > 0)
-            return new byte[0];
+        //if (key < getStartKey() && image.length > 0)
+        //    return new byte[0];
 
         return image;
     }
@@ -2399,15 +2403,7 @@ public abstract class AssetCls extends ItemCls {
         text += Lang.T("Asset Class") + ":&nbsp;"
                 + Lang.T(getItemSubType() + "") + "<br>"
                 + Lang.T("Asset Type") + ":&nbsp;"
-                + "<b>" + charAssetType() + viewAssetTypeAbbrev() + "</b>:" + Lang.T(viewAssetTypeFull() + "") + "<br>"
-                + Lang.T("Quantity") + ":&nbsp;" + getQuantity() + ", "
-                + Lang.T("Scale") + ":&nbsp;" + getScale() + "<br>"
-                + Lang.T("Description") + ":<br>";
-        if (getKey() > 0 && getKey() < START_KEY()) {
-            text += Library.to_HTML(Lang.T(viewDescription())) + "<br>";
-        } else {
-            text += Library.to_HTML(viewDescription()) + "<br>";
-        }
+                + "<b>" + charAssetType() + viewAssetTypeAbbrev() + "</b>:" + Lang.T(viewAssetTypeFull() + "") + "<br>";
 
         return text;
 

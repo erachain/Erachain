@@ -13,8 +13,8 @@ public class FavoriteAssetsTableModel extends FavoriteItemModelTable {
     public static final int COLUMN_ADDRESS = 2;
     private static final int COLUMN_ASSET_TYPE = 3;
     public static final int COLUMN_AMOUNT = 4;
-    private static final int COLUMN_I_OWNER = 5;
-    public static final int COLUMN_FAVORITE = 6;
+    public static final int COLUMN_FAVORITE = 5;
+    private static final int COLUMN_I_OWNER = 6;
 
     public FavoriteAssetsTableModel() {
         super(DCSet.getInstance().getItemAssetMap(),

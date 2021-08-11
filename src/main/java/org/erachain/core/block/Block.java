@@ -1856,6 +1856,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                     ///logger.debug("[" + seqNo + "] try finalMap.set" );
                     processTimingLocal = System.nanoTime();
                     Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
+
+                    // добавляем после процессинга, когда в транзакции новые данные наросли
                     finalMap.put(key, transaction);
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                     if (processTimingLocalDiff < 999999999999l)
@@ -2538,6 +2540,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 ///LOGGER.debug("[" + seqNo + "] try finalMap.set" + transaction );
                 timerStart = System.currentTimeMillis();
+                // добавляем после процессинга, когда в транзакции новые данные наросли
                 finalMap.put(key, transaction);
                 timerFinalMap_set += System.currentTimeMillis() - timerStart;
                 //logger.debug("[" + seqNo + "] try transFinalMapSigns.set" );

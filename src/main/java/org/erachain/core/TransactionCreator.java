@@ -11,6 +11,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
@@ -211,7 +212,7 @@ public class TransactionCreator {
         long time = NTP.getTime();
 
         Transaction arbitraryTransaction;
-        arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, service, data, (byte) feePow, time, 0l);
+        arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, service, data, (byte) feePow, time, 0L);
         arbitraryTransaction.sign(creator, Transaction.FOR_NETWORK);
         arbitraryTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
@@ -228,7 +229,7 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        asset.setKey(this.fork.getItemAssetMap().getLastKey() + 1l);
+        asset.setKey(this.fork.getItemAssetMap().getLastKey() + 1L);
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, linkTo, asset, (byte) feePow, time, 0L);
@@ -236,6 +237,26 @@ public class TransactionCreator {
         issueAssetTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
         return issueAssetTransaction;
+    }
+
+    public Transaction createIssueAssetSeriesTransaction(PrivateKeyAccount creator, ExLink linkTo,
+                                                         byte[] origAssetTXSign, AssetVenture prototypeAsset, int feePow) {
+        //CHECK FOR UPDATES
+        // all unconfirmed org.erachain.records insert in FORK for calc last account REFERENCE
+        this.checkUpdate();
+
+        //TIME
+        long time = NTP.getTime();
+
+        //asset.setKey(this.fork.getItemAssetMap().getLastKey() + 1l);
+
+        //CREATE ISSUE ASSET TRANSACTION
+        IssueAssetTransaction issueAssetSeriesTransaction = new IssueAssetSeriesTransaction(creator, linkTo,
+                origAssetTXSign, prototypeAsset, (byte) feePow, time, 0L);
+        issueAssetSeriesTransaction.sign(creator, Transaction.FOR_NETWORK);
+        issueAssetSeriesTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
+
+        return issueAssetSeriesTransaction;
     }
 
     public Transaction createIssueImprintTransaction1(byte[] itemAppData, PrivateKeyAccount creator, ExLink linkTo, String name, String description,

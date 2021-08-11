@@ -2,10 +2,8 @@ package org.erachain.gui.items.unions;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
-import org.erachain.core.transaction.IssueUnionRecord;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
-import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,24 +77,23 @@ public class IssueUnionPanel extends IssueItemPanel {
         return true;
     }
 
+    @Override
     protected void makeTransaction() {
 
-        transaction = (IssueUnionRecord) Controller.getInstance().issueUnion(
+        transaction = Controller.getInstance().issueUnion(
                 itemAppData, creator, exLink, this.nameField.getText(), birthday, parent, textAreaDescription.getText(),
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
                 feePow);
     }
 
-    protected String makeTransactionView() {
+    protected String makeBodyView() {
 
-        String text = "<HTML><body>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;" + Lang.T("Issue Union") + "<br><br><br>"
-                + makeHeadView("Union");
-        text += Lang.T("Description") + ":<br>" + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
-        text += Lang.T("Date") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getBirthday() + "<br>";
-        text += Lang.T("Parent") + ":&nbsp;" + ((UnionCls) transaction.getItem()).getParent() + "<br>";
+        String out = super.makeBodyView();
 
-        return text;
+        out += Lang.T("Date") + ":&nbsp;" + ((UnionCls) item).getBirthday() + "<br>";
+        out += Lang.T("Parent") + ":&nbsp;" + ((UnionCls) item).getParent() + "<br>";
+
+        return out;
     }
 
     protected void initComponents() {

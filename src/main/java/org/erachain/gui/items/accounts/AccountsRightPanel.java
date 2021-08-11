@@ -17,7 +17,7 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererBigDecimals;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui.records.VouchTransactionDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -231,7 +231,7 @@ public class AccountsRightPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
 
                 AccountsTransactionsTableModel.Trans transaction = tableModel.getItem(th.row);
-                new toSignRecordDialog(transaction.transaction.getBlockHeight(), transaction.transaction.getSeqNo());
+                new VouchTransactionDialog(transaction.transaction.getBlockHeight(), transaction.transaction.getSeqNo());
 
             }
         });

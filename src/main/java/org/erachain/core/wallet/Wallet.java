@@ -586,8 +586,10 @@ public class Wallet extends Observable implements Observer {
 			try {
 				dwSet.clear(false);
 			} catch (NullPointerException e) {
-				// видимо цепочку другую взяли и в ней таких сущностей нет и падает на создании меток
+				LOGGER.error(e.getMessage(), e);
 
+				// видимо цепочку другую взяли и в ней таких сущностей нет и падает на создании меток
+				// поставим версию невалидную чтобы база пересоздалась сама
 				DBASet.setVersion(this.dwSet.database, 1);
 				this.dwSet.hardFlush();
 				if (true) {
@@ -1524,11 +1526,23 @@ public class Wallet extends Observable implements Observer {
 		if (item == null)
 			return;
 
-		// ADD ASSET
-		this.dwSet.putItem(item);
-		// ADD to FAVORITES
-		this.dwSet.addItemFavorite(item);
-
+		if (issueItem instanceof IssueAssetSeriesTransaction) {
+			IssueAssetSeriesTransaction issueSeries = (IssueAssetSeriesTransaction) issueItem;
+			int total = issueSeries.getTotal();
+			long copyKey = issueSeries.getKey() - total;
+			while (total-- > 0) {
+				item = dcSet.getItemAssetMap().get(copyKey++);
+				// ADD ASSET
+				this.dwSet.putItem(item);
+				// ADD to FAVORITES
+				this.dwSet.addItemFavorite(item);
+			}
+		} else {
+			// ADD ASSET
+			this.dwSet.putItem(item);
+			// ADD to FAVORITES
+			this.dwSet.addItemFavorite(item);
+		}
 	}
 
 	private void orphanItemIssue(IssueItemRecord issueItem) {
@@ -1540,10 +1554,25 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE OWNER
 		ItemCls item = issueItem.getItem();
 
-		// DELETE ASSET
-		this.dwSet.deleteItem(item);
-		// DELETE FAVORITE
-		this.dwSet.deleteItemFavorite(item);
+		if (issueItem instanceof IssueAssetSeriesTransaction) {
+			IssueAssetSeriesTransaction issueSeries = (IssueAssetSeriesTransaction) issueItem;
+			int total = issueSeries.getTotal();
+			long copyKey = issueSeries.getKey() - total;
+			while (total-- > 0) {
+				item = dcSet.getItemAssetMap().get(copyKey++);
+				// ADD ASSET
+				this.dwSet.deleteItem(item);
+				// ADD to FAVORITES
+				this.dwSet.deleteItemFavorite(item);
+			}
+		} else {
+
+			// DELETE ASSET
+			this.dwSet.deleteItem(item);
+
+			// DELETE FAVORITE
+			this.dwSet.deleteItemFavorite(item);
+		}
 
 	}
 

@@ -100,8 +100,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.4.01";
-    public static String buildTime = "2021-08-05 12:00:00 UTC";
+    public static String version = "5.5.01";
+    public static String buildTime = "2021-08-15 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -3252,6 +3252,13 @@ public class Controller extends Observable {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createIssueAssetTransaction(creator, linkTo, asset, feePow);
+        }
+    }
+
+    public Transaction issueAssetSeries(PrivateKeyAccount creator, ExLink linkTo, int feePow, byte[] origAssetTXSign, AssetVenture prototypeAsset) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createIssueAssetSeriesTransaction(creator, linkTo, origAssetTXSign, prototypeAsset, feePow);
         }
     }
 

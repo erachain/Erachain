@@ -2,10 +2,8 @@ package org.erachain.gui.items.statuses;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.statuses.StatusCls;
-import org.erachain.core.transaction.IssueStatusRecord;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
-import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -16,7 +14,7 @@ public class IssueStatusPanel extends IssueItemPanel {
     public static String NAME = "IssueStatusPanel";
     public static String TITLE = "Issue Status";
 
-    private JCheckBox jcheckUnique;
+    private final JCheckBox checkUnique;
 
 
     public IssueStatusPanel() {
@@ -31,14 +29,14 @@ public class IssueStatusPanel extends IssueItemPanel {
         labelGBC.gridy = gridy;
         jPanelAdd.add(singleLabel, labelGBC);
 
-        jcheckUnique = new JCheckBox();
+        checkUnique = new JCheckBox();
         GridBagConstraints gbcJCheckUnique = new GridBagConstraints();
         gbcJCheckUnique.gridx = 8;
         //gbcJCheckUnique.gridy = gridy++;
         gbcJCheckUnique.anchor = GridBagConstraints.NORTHEAST;
 
         fieldGBC.gridy = gridy++;
-        jPanelAdd.add(jcheckUnique, fieldGBC);
+        jPanelAdd.add(checkUnique, fieldGBC);
 
         // вывод подвала
         initBottom(gridy);
@@ -50,30 +48,30 @@ public class IssueStatusPanel extends IssueItemPanel {
 
     protected boolean checkValues() {
 
-        unique = jcheckUnique.isSelected();
+        unique = checkUnique.isSelected();
         return true;
     }
 
+    @Override
     protected void makeTransaction() {
 
-        transaction = (IssueStatusRecord) Controller.getInstance().issueStatus(itemAppData, creator,
+        transaction = Controller.getInstance().issueStatus(itemAppData, creator,
                 exLink, nameField.getText(), textAreaDescription.getText(), unique,
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
                 feePow);
 
     }
 
-    protected String makeTransactionView() {
+    @Override
+    protected String makeBodyView() {
 
-        String text = "<HTML><body>";
-        text += Lang.T("Confirmation Transaction") + ":&nbsp;"
-                + Lang.T("Create Status") + "<br><br><br>"
-                + makeHeadView("Name");
-        text += Lang.T("Description") + ":<br>"
-                + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
-        text += Lang.T("Unique") + ": " + ((StatusCls) transaction.getItem()).isUnique()
+        String out = super.makeBodyView();
+
+        StatusCls status = (StatusCls) item;
+        out += Lang.T("Unique") + ": " + status.isUnique()
                 + "<br>";
-        return text;
+
+        return out;
 
     }
 

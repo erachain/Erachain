@@ -220,12 +220,11 @@ public class AssetVenture extends AssetCls {
         position += SCALE_LENGTH;
 
         //READ ASSET TYPE
-        byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
-        //boolean divisible = divisibleBytes[0] == 1;
+        int assetType = Byte.toUnsignedInt(Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH)[0]);
         position += ASSET_TYPE_LENGTH;
 
         //RETURN
-        AssetVenture venture = new AssetVenture(typeBytes, appData, maker, name, icon, image, description, Byte.toUnsignedInt(assetTypeBytes[0]), scale, quantity);
+        AssetVenture venture = new AssetVenture(typeBytes, appData, maker, name, icon, image, description, assetType, scale, quantity);
         if (includeReference) {
             venture.setReference(reference, dbRef);
         }
@@ -270,8 +269,8 @@ public class AssetVenture extends AssetCls {
 
     @Override
     public int getDataLength(boolean includeReference) {
-        return super.getDataLength(includeReference)
-                + SCALE_LENGTH + QUANTITY_LENGTH;
+        int len = super.getDataLength(includeReference);
+        return len + SCALE_LENGTH + QUANTITY_LENGTH;
     }
 
     //OTHER

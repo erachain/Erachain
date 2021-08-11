@@ -1,11 +1,8 @@
 package org.erachain.gui.items.templates;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.transaction.IssueTemplateRecord;
 import org.erachain.gui.items.IssueItemPanel;
 import org.erachain.gui.items.utils.GUIConstants;
-import org.erachain.gui.library.Library;
-import org.erachain.lang.Lang;
 
 @SuppressWarnings("serial")
 public class IssueTemplatePanel extends IssueItemPanel {
@@ -27,24 +24,13 @@ public class IssueTemplatePanel extends IssueItemPanel {
         return true;
     }
 
+    @Override
     protected void makeTransaction() {
 
-        transaction = (IssueTemplateRecord) Controller.getInstance().issueTemplate(itemAppData, creator,
+        transaction = Controller.getInstance().issueTemplate(itemAppData, creator,
                 exLink, nameField.getText(), textAreaDescription.getText(),
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(),
                 feePow);
-    }
-
-    protected String makeTransactionView() {
-
-        String text = "<HTML><body>";
-        text += Lang.T("Confirmation transaction issue template") + "<br><br><br>"
-                + makeHeadView("Title");
-        text += Lang.T("Description") + ":<br>"
-                + Library.to_HTML(transaction.getItem().getDescription()) + "<br>";
-
-        return text;
-
     }
 
 }

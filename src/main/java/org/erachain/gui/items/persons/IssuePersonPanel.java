@@ -11,6 +11,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
+import org.erachain.core.transaction.IssueItemRecord;
 import org.erachain.core.transaction.IssuePersonRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
@@ -336,12 +337,8 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
     }
 
 
-    protected void makeTransaction() {
-    }
-
     @Override
-    protected String makeTransactionView() {
-        return null;
+    protected void makeTransaction() {
     }
 
     public void onIssueClick() {
@@ -397,12 +394,12 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
                     height, addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(), textAreaDescription.getText(),
                     creator, null);
 
-            transaction = (IssuePersonRecord) result.getA();
+            transaction = result.getA();
 
             // CHECK VALIDATE MESSAGE
             if (result.getB() == Transaction.VALIDATE_OK) {
                 if (!forIssue) {
-                    PersonHuman personHuman = (PersonHuman) transaction.getItem();
+                    PersonHuman personHuman = (PersonHuman) ((IssueItemRecord) transaction).getItem();
                     // SIGN
                     personHuman.sign(creator);
                     byte[] issueBytes = personHuman.toBytes(Transaction.FOR_NETWORK, false, false);

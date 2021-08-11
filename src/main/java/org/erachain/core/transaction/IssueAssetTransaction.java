@@ -3,7 +3,6 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
@@ -88,6 +87,11 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     @Override
+    public AssetCls getAsset() {
+        return (AssetCls) getItem();
+    }
+
+    @Override
     public BigDecimal getAmount() {
         return new BigDecimal(((AssetCls) getItem()).getQuantity());
     }
@@ -157,37 +161,39 @@ public class IssueAssetTransaction extends IssueItemRecord {
             return result;
         }
 
-        //CHECK QUANTITY
-        AssetCls asset = (AssetCls) this.getItem();
+        if ((flags & NOT_VALIDATE_ITEM) == 0) {
+            //CHECK QUANTITY
+            AssetCls asset = (AssetCls) this.getItem();
 
-        if (height > BlockChain.START_ASSET_UNIQUE && asset.isUnique()) {
-            if (asset instanceof AssetUnique) {
-                ;
+            if (height > BlockChain.START_ASSET_UNIQUE && asset.isUnique()) {
+                if (asset instanceof AssetUnique) {
+                    ;
+                } else {
+                    // так как тип актива считываем в конце парсинга - по нему сразу не определить что было создано
+                    // и может появиться ошибка сборки байт кода
+                    return INVALID_ASSET_TYPE;
+                }
             } else {
-                // так как тип актива считываем в конце парсинга - по нему сразу не определить что было создано
-                // и может появиться ошибка сборки байт кода
-                return INVALID_ASSET_TYPE;
-            }
-        } else {
-            //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
-            long maxQuantity = Long.MAX_VALUE;
-            long quantity = asset.getQuantity();
-            //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
-            if (quantity > maxQuantity || quantity < -1) {
-                errorValue = "quantity > maxQuantity  or < -1: " + quantity + " > " + maxQuantity;
-                return INVALID_QUANTITY;
-            }
-
-            if (((AssetCls) this.item).isAccounting() && quantity != 0) {
-                errorValue = "Asset is Accounting and quantity != 0";
-                return INVALID_QUANTITY;
-            }
-
-            if (this.item.isNovaItem(this.dcSet) > 0) {
-                Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
-                if (item.b < quantity) {
-                    errorValue = "Nova asset quantity > set : " + quantity + " > " + item.b;
+                //long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
+                long maxQuantity = Long.MAX_VALUE;
+                long quantity = asset.getQuantity();
+                //if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
+                if (quantity > maxQuantity || quantity < -1) {
+                    errorValue = "quantity > maxQuantity  or < -1: " + quantity + " > " + maxQuantity;
                     return INVALID_QUANTITY;
+                }
+
+                if (((AssetCls) this.item).isAccounting() && quantity != 0) {
+                    errorValue = "Asset is Accounting and quantity != 0";
+                    return INVALID_QUANTITY;
+                }
+
+                if (this.item.isNovaItem(this.dcSet) > 0) {
+                    Fun.Tuple3<Long, Long, byte[]> item = BlockChain.NOVA_ASSETS.get(this.item.getName());
+                    if (item.b < quantity) {
+                        errorValue = "Nova asset quantity > set : " + quantity + " > " + item.b;
+                        return INVALID_QUANTITY;
+                    }
                 }
             }
         }
@@ -277,8 +283,8 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
         if (forDeal == FOR_DB_RECORD) {
             //READ KEY
-            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-            long key = Longs.fromByteArray(timestampBytes);
+            byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            long key = Longs.fromByteArray(keyBytes);
             position += KEY_LENGTH;
 
             asset.setKey(key);
@@ -309,82 +315,56 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     //PROCESS/ORPHAN
 
-    //@Override
-    @Override
-    public void process(Block block, int forDeal) {
-        //UPDATE CREATOR
-        super.process(block, forDeal);
+    protected void processItem() {
+
+        super.processItem();
+
         //ADD ASSETS TO OWNER
         AssetCls asset = (AssetCls) this.getItem();
+        long assetKey = asset.getKey();
+
         long quantity = asset.getQuantity();
         if (quantity > 0) {
-            creator.changeBalance(dcSet, false, false, asset.getKey(),
+            creator.changeBalance(dcSet, false, false, assetKey,
                     new BigDecimal(quantity).setScale(0), false, false, false);
 
             // make HOLD balance
             if (!asset.isUnHoldable()) {
-                creator.changeBalance(dcSet, false, true, asset.getKey(),
+                creator.changeBalance(dcSet, false, true, assetKey,
                         new BigDecimal(-quantity).setScale(0), false, false, false);
             }
 
         } else if (quantity == 0) {
             // безразмерные - нужно баланс в таблицу нулевой записать чтобы в блокэксплорере он отображался у счета
             // см. https://lab.erachain.org/erachain/Erachain/issues/1103
-            this.creator.changeBalance(this.dcSet, false, false, asset.getKey(),
+            this.creator.changeBalance(this.dcSet, false, false, assetKey,
                     BigDecimal.ZERO.setScale(0), false, false, false);
 
         }
 
     }
 
-    //@Override
-    @Override
-    public void orphan(Block block, int forDeal) {
-        //UPDATE CREATOR
-        super.orphan(block, forDeal);
+    protected void orphanItem() {
+
+        super.orphanItem();
+
         //REMOVE ASSETS FROM OWNER
         AssetCls asset = (AssetCls) this.getItem();
         long quantity = asset.getQuantity();
+        long assetKey = asset.getKey();
+
         if (quantity > 0) {
-            this.creator.changeBalance(this.dcSet, true, false, asset.getKey(),
+            this.creator.changeBalance(this.dcSet, true, false, assetKey,
                     new BigDecimal(quantity).setScale(0), false, false, false);
 
             // на балансе На Руках - добавляем тоже
             if (!asset.isUnHoldable()) {
-                creator.changeBalance(dcSet, true, true, asset.getKey(),
+                creator.changeBalance(dcSet, true, true, assetKey,
                         new BigDecimal(-quantity).setScale(0), false, false, false);
             }
         }
+
     }
-
-	/*
-	@Override
-	public HashSet<Account> getInvolvedAccounts()
-	{
-		return this.getRecipientAccounts();
-	}
-
-	@Override
-	public HashSet<Account> getRecipientAccounts()
-	{
-		HashSet<Account> accounts = new HashSet<>();
-		accounts.add(this.creator);
-		return accounts;
-	}
-
-	@Override
-	public boolean isInvolved(Account account)
-	{
-		String address = account.getAddress();
-
-		if(address.equals(this.creator.getAddress()))
-		{
-			return true;
-		}
-
-		return false;
-	}
-	 */
 
     //@Override
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {

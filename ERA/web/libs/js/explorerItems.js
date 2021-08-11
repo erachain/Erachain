@@ -3,6 +3,36 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
     var output = '<td>';
     var type = item.item_type;
 
+    var origSource;
+    var origFullShow;
+
+    if (item.original) {
+        if (item.original.imageURL) {
+            origSource = item.original.imageURL;
+        } else if (item.original.imageTypeName == 'video') {
+            origSource = '/api' + item.original.item_type + '/image/' + item.original.key;
+        }
+
+        if (origSource) {
+            if (item.original.imageTypeName == 'video') {
+                output += '<a href="#"><video id="video-holder" style="display:none;" onclick="style.display=\'none\';this.stop()" loop controls ></video></a>';
+                output += '<a href="#"><video id="video-orig" autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\''
+                    + origSource + '\')" style="position: absolute;"><source src="' + origSource + '"></video></a>';
+                origFullShow = 'onclick="document.getElementById(\'video-orig\').pause();showWindowVideo(\'' + origSource + '\')"';
+
+            } else if (item.imageTypeName == 'audio') {
+                output += '<a href="#"><audio controls autoplay loop><source src="' + origSource + '" type="audio/mp3"></audio></a>';
+
+            } else {
+                output += '<a href="#"><img id="image-holder" onclick="style.display=\'none\'"></a>';
+                output += '<a href="#" onclick="showWindowImage(\'' + origSource + '\')" ><img width="350" src="'
+                        + origSource + '" style="position: absolute;"/></a>';
+                origFullShow = 'onclick="showWindowImage(\'' + origSource + '\')"';
+            }
+
+        }
+    }
+
     var source;
 
     // FACE - for AUDIO
@@ -13,7 +43,6 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
         } else {
             output += '<img width="350" src="' + imageFaceURL + '" />';
         }
-
 
     }
 
@@ -26,23 +55,26 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
     }
 
     if (source) {
-        if (item.imageTypeName == 'video') {
-            output += '<video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls ></video>';
-            output += '<video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video>';
+        if (!origSource && item.imageTypeName == 'video') {
+            output += '<a href="#"><video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls ></video></a>';
+            output += '<a href="#"><video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video></a>';
 
-        } else if (item.imageTypeName == 'audio') {
-            //output += '<video controls="" autoplay="" name="media"><source src="' + source + '" type="audio/mp3">';
-            //output += '<source src="' + item.maker_person_image_url + '" type="' + item.maker_person_image_media_type + '"></video>';
-            output += '<audio controls autoplay loop><source src="' + source + '" type="audio/mp3"></audio>';
+        } else if (!origSource && item.imageTypeName == 'audio') {
+            output += '<a href="#"><audio controls autoplay loop><source src="' + source + '" type="audio/mp3"></audio></a>';
 
         } else {
-            output += '<img id="image-holder" onclick="style.display=\'none\'">';
-            output += '<a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
+            if (origSource) {
+                // + 10 % for FRAME
+                output += '<a href="#" ' + origFullShow + ' style="position:absolute; "><img width="420" src="' + source + '" style="margin: -35px;" /></a>';
+            } else {
+                output += '<a href="#"><img id="image-holder" onclick="style.display=\'none\'"></a>';
+                output += '<a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
+            }
         }
 
-        output += '</td><td style ="width: 70%; padding-left:20px"><br>';
-
     }
+
+    output += '</td><td style ="width: 70%; padding-left:20px"><br>';
 
 
     output += '<h3 style="display:inline;">';

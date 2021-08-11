@@ -69,16 +69,16 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
     //show details
     @Override
-    protected Component getShow(ItemCls item) {
+    public Component getShow(ItemCls item) {
         return new AssetInfo((AssetCls) item, false);
 
     }
 
     // mouse 2 click
     @Override
-    protected void tableMouse2Click(ItemCls item) {
+    protected void tableMouse2Click() {
 
-        AssetCls asset = (AssetCls) item;
+        AssetCls asset = (AssetCls) itemTableSelected;
         AssetCls assetSell = Settings.getInstance().getDefaultPairAsset();
         String action = null;
         ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");

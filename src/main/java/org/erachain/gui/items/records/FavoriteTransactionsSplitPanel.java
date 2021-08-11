@@ -11,7 +11,7 @@ import org.erachain.gui.items.persons.ItemsPersonsTableModel;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.records.toSignRecordDialog;
+import org.erachain.gui.records.VouchTransactionDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -95,7 +95,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
             Transaction transaction = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (transaction == null) return;
-            new toSignRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
+            new VouchTransactionDialog(transaction.getBlockHeight(), transaction.getSeqNo());
         });
 
         menu.add(vouchItem);

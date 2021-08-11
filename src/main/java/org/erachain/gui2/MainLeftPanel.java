@@ -11,7 +11,7 @@ package org.erachain.gui2;
  */
 public class MainLeftPanel extends javax.swing.JPanel {
 
-    public treeMenu tree;
+    public MainTreeMenu tree;
     // Variables declaration - do not modify
     public javax.swing.JButton jButton1;
     public javax.swing.JButton jButton2;
@@ -65,7 +65,7 @@ public class MainLeftPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.weighty = 0.1;
-        tree = new treeMenu();
+        tree = new MainTreeMenu();
         add(tree, gridBagConstraints);
 
 

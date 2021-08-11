@@ -23,7 +23,7 @@ public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
                 Transaction trans = db.getTransactionFinalMap().get(itemTableSelected.getReference());
-                new toSignRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
+                new VouchTransactionDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });

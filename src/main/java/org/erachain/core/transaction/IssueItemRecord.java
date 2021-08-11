@@ -148,6 +148,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     @Override
     public void sign(PrivateKeyAccount creator, int forDeal) {
         super.sign(creator, forDeal);
+        item.setReference(signature, dbRef);
     }
 
     //PARSE CONVERT
@@ -260,12 +261,8 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     }
 
     //PROCESS/ORPHAN
-    //@Override
-    @Override
-    public void process(Block block, int forDeal) {
 
-        //UPDATE CREATOR
-        super.process(block, forDeal);
+    protected void processItem() {
 
         this.item.setReference(this.signature, dbRef);
 
@@ -274,14 +271,28 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     }
 
-    //@Override
+    @Override
+    public void process(Block block, int forDeal) {
+
+        //UPDATE CREATOR
+        super.process(block, forDeal);
+
+        processItem();
+
+    }
+
+    protected void orphanItem() {
+        //DELETE FROM DATABASE
+        key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
+    }
+
     @Override
     public void orphan(Block block, int forDeal) {
         //UPDATE CREATOR
         super.orphan(block, forDeal);
 
-        //DELETE FROM DATABASE
-        key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
+        orphanItem();
+
     }
 
     @Override

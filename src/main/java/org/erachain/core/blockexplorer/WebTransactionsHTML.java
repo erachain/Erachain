@@ -138,6 +138,9 @@ public class WebTransactionsHTML {
             case Transaction.CHANGE_ORDER_TRANSACTION:
                 outTX.put("body", update_Order_HTML(transaction));
                 break;
+            case Transaction.ISSUE_ASSET_SERIES_TRANSACTION:
+                outTX.put("body", issueAssetCopy(transaction));
+                break;
             case Transaction.VOTE_ON_ITEM_POLL_TRANSACTION:
                 outTX.put("body", vote_On_Item_Poll_HTML(transaction));
                 break;
@@ -468,6 +471,30 @@ public class WebTransactionsHTML {
         out += Lang.T("Update Price", langObj) + ": <b>"
                 + orderUpdate.makeUpdatedOrder().calcPrice().toPlainString()
                 + " / " + orderUpdate.makeUpdatedOrder().calcPriceReverse().toPlainString() + "</b><br>";
+
+        return out;
+    }
+
+    private String issueAssetCopy(Transaction transaction) {
+        // TODO Auto-generated method stub
+
+        String out = "";
+
+        IssueAssetSeriesTransaction assetSeriesTX = (IssueAssetSeriesTransaction) transaction;
+
+        Long origAssetKey = assetSeriesTX.getOrigAssetKey();
+        //
+        AssetCls origAsset = dcSet.getItemAssetMap().get(origAssetKey);
+
+        out += Lang.T("Original Asset Issue Signature", langObj) + ": <a href='?tx=" + assetSeriesTX.viewOrigAssetRef() + "'><b>"
+                + assetSeriesTX.viewOrigAssetRef() + "</b></a><br>";
+
+        out += Lang.T("Original Asset", langObj) + ": <a href='?asset=" + origAssetKey + get_Lang() + "'>" + origAsset.toString() + "</a><br>";
+
+        out += "<h4><a href='?asset=" + assetSeriesTX.getKey() + get_Lang() + "'>" + assetSeriesTX.getItem().toString() + "</a></h4>";
+
+        out += Lang.T("Total", langObj) + ": <b>"
+                + assetSeriesTX.getTotal() + "</b><br>";
 
         return out;
     }
