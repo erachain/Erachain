@@ -255,10 +255,10 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
         // тут же referenceTx определяется
         JSONObject assetJSON = super.toJson();
-        assetJSON.put("originalKey", origKey);
 
         // ADD DATA of ORIGINAL
         JSONObject originalJson = new JSONObject();
+        originalJson.put("key", origKey);
 
         IssueAssetSeriesTransaction issueTX = (IssueAssetSeriesTransaction) referenceTx;
         if (issueTX.getDCSet() == null) {

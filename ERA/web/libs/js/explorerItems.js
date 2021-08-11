@@ -3,6 +3,34 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
     var output = '<td>';
     var type = item.item_type;
 
+    var origSource;
+
+    if (item.original) {
+        if (item.original.imageURL) {
+            origSource = item.original.imageURL;
+        } else if (item.original.imageTypeName == 'video') {
+            origSource = '/api' + item.original.item_type + '/image/' + item.original.key;
+        }
+
+        if (origSource) {
+            if (item.original.imageTypeName == 'video') {
+                output += '<video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls ></video>';
+                output += '<video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\''
+                    + origSource + '\')" style="position:absolute; z-index:-1"><source src="' + origSource + '"></video>';
+
+            } else if (item.imageTypeName == 'audio') {
+                output += '<audio controls autoplay loop><source src="' + origSource + '" type="audio/mp3"></audio>';
+
+            } else {
+                output += '<img id="image-holder" onclick="style.display=\'none\'">';
+                output += '<a href="#" onclick="showWindowImage(\'' + origSource + '\')" ><img width="350" src="' + origSource + '" /></a>';
+            }
+
+            output += '</td><td style ="width: 70%; padding-left:20px"><br>';
+
+        }
+    }
+
     var source;
 
     // FACE - for AUDIO
@@ -13,7 +41,6 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
         } else {
             output += '<img width="350" src="' + imageFaceURL + '" />';
         }
-
 
     }
 
@@ -37,7 +64,11 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
 
         } else {
             output += '<img id="image-holder" onclick="style.display=\'none\'">';
-            output += '<a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
+            if (origSource) {
+                output += '<img width="350" src="' + source + '" />';
+            } else {
+                output += '<a href="#" onclick="showWindowImage(\'' + source + '\')" ><img width="350" src="' + source + '" /></a>';
+            }
         }
 
         output += '</td><td style ="width: 70%; padding-left:20px"><br>';
