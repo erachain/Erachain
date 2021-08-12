@@ -65,7 +65,7 @@ public class AccountsPanel extends JPanel // implements ItemListener
         buttonGBC.gridy = 0;
 
         //ASSET FAVORITES
-        cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel());
+        cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel(AssetCls.FEE_KEY));
         cbxFavorites.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
         this.add(cbxFavorites, buttonGBC);
 

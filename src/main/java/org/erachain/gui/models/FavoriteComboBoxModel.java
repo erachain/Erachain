@@ -58,6 +58,15 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
         }
     }
 
+    protected void addElementFiltered(Object o) {
+        ItemCls item = getElementByEvent((Long) o);
+        if (item == null)
+            return;
+
+        items.add(item);
+        super.addElement(item);
+    }
+
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
@@ -66,8 +75,7 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
         if (type == LIST_EVENT || type == RESET_EVENT) {
             sortAndAdd();
         } else if (type == ADD_EVENT) {
-            this.addElement(getElementByEvent((Long) message.getValue()));
-
+            addElementFiltered(message.getValue());
         } else if (type == DELETE_EVENT) {
             this.removeElement(getElementByEvent((Long) message.getValue()));
         }
@@ -78,6 +86,10 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
     }
 
     public abstract void setObservable();
+
+    public boolean filter(ItemCls item) {
+        return true;
+    }
 
     // public abstract void sortAndAdd();
     public void sortAndAdd() {
@@ -93,14 +105,14 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
 
                 //GET ASSET
                 ItemCls item = Controller.getInstance().getItem(item_type, iterator.next());
-                if (item == null)
+                if (item == null || !filter(item))
                     continue;
 
                 items.add(item);
 
                 //ADD
 
-                this.addElement(item);
+                addElement(item);
 
                 if (selected != null && item.getKey() == selected.getKey()) {
                     selected = item; // need for SELECT as OBJECT
@@ -167,7 +179,6 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
         }
 
     }
-
 
     public void removeObservers() {
         if (Controller.getInstance().doesWalletDatabaseExists())

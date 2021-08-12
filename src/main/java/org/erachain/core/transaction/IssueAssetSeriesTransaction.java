@@ -321,14 +321,18 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             return ITEM_ASSET_NOT_EXIST;
         }
 
+        if (origAsset.getAssetType() != AssetCls.AS_NON_FUNGIBLE) {
+            errorValue = "original not NFT";
+            return INVALID_ASSET_TYPE;
+        }
         if (!origAsset.isUnique()) {
-            errorValue = "not unique";
+            errorValue = "original not unique";
             return INVALID_ASSET_TYPE;
         }
 
         // CHECK IF AMOUNT POSITIVE
         int total = (int) ((AssetVenture) item).getQuantity();
-        if (total <= 5 || total > 100) {
+        if (total < 5 || total > 100) {
             return INVALID_AMOUNT;
         }
 

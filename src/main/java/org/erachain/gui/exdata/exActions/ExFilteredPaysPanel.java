@@ -54,8 +54,8 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         this.parent = parent;
         initComponents();
 
-        assetsModel = new ComboBoxAssetsModel();
-        assetsModel1 = new ComboBoxAssetsModel();
+        assetsModel = new ComboBoxAssetsModel(AssetCls.FEE_KEY);
+        assetsModel1 = new ComboBoxAssetsModel(AssetCls.FEE_KEY);
         this.jComboBoxAccrualAsset.setModel(assetsModel);
         this.jComboBoxFilterAsset.setModel(assetsModel1);
         jComboBoxFilterBalancePosition.setModel(new DefaultComboBoxModel(new Integer[]{

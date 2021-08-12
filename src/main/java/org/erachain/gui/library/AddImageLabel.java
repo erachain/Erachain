@@ -38,7 +38,7 @@ public class AddImageLabel extends JPanel {
     private int baseWidth;
     private int baseHeight;
     private Logger logger = LoggerFactory.getLogger(getClass());
-    private JLabel label;
+    public JLabel label;
     private JLabel labelSize = new JLabel();
     private JLabel mainLabel = new JLabel();
     private JScrollPane jScrollImage = new JScrollPane();
