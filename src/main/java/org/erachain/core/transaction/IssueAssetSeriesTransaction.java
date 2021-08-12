@@ -328,7 +328,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
         // CHECK IF AMOUNT POSITIVE
         int total = (int) ((AssetVenture) item).getQuantity();
-        if (total <= 5 || total > 100) {
+        if (total < 5 || total > 100) {
             return INVALID_AMOUNT;
         }
 
