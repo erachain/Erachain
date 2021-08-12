@@ -1113,7 +1113,10 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     public int isValid(RSignNote rNote) {
 
-        if (hasAmount()) {
+        if (!hasAmount()) {
+            errorValue = "Accruals: assetKey == null or ZERO";
+            return Transaction.INVALID_AMOUNT_IS_NULL;
+        } else {
             if (this.assetKey == 0L) {
                 errorValue = "Accruals: assetKey == null or ZERO";
                 return Transaction.INVALID_ITEM_KEY;
