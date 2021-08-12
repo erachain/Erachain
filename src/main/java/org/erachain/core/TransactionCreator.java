@@ -251,7 +251,7 @@ public class TransactionCreator {
         //asset.setKey(this.fork.getItemAssetMap().getLastKey() + 1l);
 
         //CREATE ISSUE ASSET TRANSACTION
-        IssueAssetTransaction issueAssetSeriesTransaction = new IssueAssetSeriesTransaction(creator, linkTo,
+        IssueAssetSeriesTransaction issueAssetSeriesTransaction = new IssueAssetSeriesTransaction(creator, linkTo,
                 origAssetTXSign, prototypeAsset, (byte) feePow, time, 0L);
         issueAssetSeriesTransaction.sign(creator, Transaction.FOR_NETWORK);
         issueAssetSeriesTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());

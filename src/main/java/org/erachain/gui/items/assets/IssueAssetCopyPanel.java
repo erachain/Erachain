@@ -29,7 +29,7 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
 
     public IssueAssetCopyPanel() {
-        super(NAME, TITLE, "IssueAssetCopyPanel.titleDescription", "Asset series issue has been sent",
+        super(NAME, TITLE, "IssueAssetCopyPanel.titleDescription", null,
                 true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
                 true, true);
 
