@@ -1115,7 +1115,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
         if (!hasAmount()) {
             errorValue = "Accruals: assetKey == null or ZERO";
-            return Transaction.INVALID_AMOUNT_IS_NULL;
+            return Transaction.INVALID_ITEM_KEY;
         } else {
             if (this.assetKey == 0L) {
                 errorValue = "Accruals: assetKey == null or ZERO";
@@ -1264,6 +1264,8 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
             boolean backwardAction;
 
+            List<Fun.Tuple3<Account, BigDecimal, Boolean>> saveResults = new ArrayList();
+
             Account recipient;
             for (Fun.Tuple4 item : results) {
 
@@ -1294,6 +1296,8 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
                         asset, actionPayKey, actionPayAmount, backwardAction,
                         incomeReverse);
 
+                // creator, actionPayKey, incomeReverse - is same
+                saveResults.add(new Fun.Tuple3<Account, BigDecimal, Boolean>(recipient, actionPayAmount, backwardAction));
 
             }
         }
