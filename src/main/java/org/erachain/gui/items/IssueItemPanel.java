@@ -46,8 +46,8 @@ public abstract class IssueItemPanel extends MakeTXPanel {
     protected ItemCls item;
     protected byte[] itemAppData;
 
-    public IssueItemPanel(String name, String title, String issueMess, boolean useIcon, int cropWidth, int cropHeight, boolean originalSize, boolean useExtURL) {
-        super(name, title, issueMess, "Confirmation Transaction", null);
+    public IssueItemPanel(String name, String title, String titleDescription, String issueMess, boolean useIcon, int cropWidth, int cropHeight, boolean originalSize, boolean useExtURL) {
+        super(name, title, titleDescription, issueMess, "Confirmation Transaction", null);
 
         this.useIcon = useIcon;
 

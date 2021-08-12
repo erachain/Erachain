@@ -26,7 +26,7 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
     int scale;
 
     public IssueAssetPanel() {
-        super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
+        super(NAME, TITLE, null, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
                 true, true);
 
         textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));

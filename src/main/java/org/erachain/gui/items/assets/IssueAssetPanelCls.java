@@ -31,9 +31,9 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
     protected final JLabel typeJLabel = new JLabel(Lang.T("Type") + ":");
 
 
-    public IssueAssetPanelCls(String name, String title, String issueMess, boolean useIcon,
+    public IssueAssetPanelCls(String name, String title, String titleDescription, String issueMess, boolean useIcon,
                               int cropWidth, int cropHeight, boolean originalSize, boolean useExtURL) {
-        super(name, title, issueMess, useIcon, cropWidth, cropHeight, originalSize, useExtURL);
+        super(name, title, titleDescription, issueMess, useIcon, cropWidth, cropHeight, originalSize, useExtURL);
 
         textQuantity.setText("0");
 
