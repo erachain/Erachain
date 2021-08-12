@@ -161,8 +161,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             }
         }
 
-        if (true || // запретить без фильтрации по активу - так как это не письма явно - письма отдельно!
-                filterAssetKey != null && filterAssetKey != 0L) {
+        if (filterAssetKey != null && filterAssetKey != 0L) {
             this.flags |= BALANCE_FLAG_MASK;
             this.filterAssetKey = filterAssetKey;
             this.filterBalancePos = filterBalancePos;
@@ -1250,7 +1249,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void processBody(Transaction rNote, boolean asOrphan, Block block) {
         PublicKeyAccount creator = rNote.getCreator();
 
-        if (hasAssetFilter()) {
+        if (hasAmount()) {
             long absKey = assetKey;
 
             // возьмем знаки (минус) для создания позиции баланса такой
