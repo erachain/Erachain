@@ -1529,7 +1529,7 @@ public class Wallet extends Observable implements Observer {
 		if (issueItem instanceof IssueAssetSeriesTransaction) {
 			IssueAssetSeriesTransaction issueSeries = (IssueAssetSeriesTransaction) issueItem;
 			int total = issueSeries.getTotal();
-			long copyKey = issueSeries.getKey() - total;
+			long copyKey = issueSeries.getKey() - total + 1;
 			while (total-- > 0) {
 				item = dcSet.getItemAssetMap().get(copyKey++);
 				// ADD ASSET
@@ -1557,7 +1557,7 @@ public class Wallet extends Observable implements Observer {
 		if (issueItem instanceof IssueAssetSeriesTransaction) {
 			IssueAssetSeriesTransaction issueSeries = (IssueAssetSeriesTransaction) issueItem;
 			int total = issueSeries.getTotal();
-			long copyKey = issueSeries.getKey() - total;
+			long copyKey = issueSeries.getKey() - total + 1;
 			while (total-- > 0) {
 				item = dcSet.getItemAssetMap().get(copyKey++);
 				// ADD ASSET
