@@ -278,31 +278,33 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         // тут же referenceTx определяется
         JSONObject assetJSON = super.toJson();
 
-        // ADD DATA of ORIGINAL
-        JSONObject originalJson = new JSONObject();
-        originalJson.put("key", origKey);
+        if (origKey > 0) {
+            // ADD DATA of ORIGINAL
+            JSONObject originalJson = new JSONObject();
+            originalJson.put("key", origKey);
 
-        IssueAssetSeriesTransaction issueTX = (IssueAssetSeriesTransaction) referenceTx;
-        if (issueTX.getDCSet() == null) {
-            issueTX.setDC(Controller.getInstance().getDCSet(), false);
+            IssueAssetSeriesTransaction issueTX = (IssueAssetSeriesTransaction) referenceTx;
+            if (issueTX.getDCSet() == null) {
+                issueTX.setDC(Controller.getInstance().getDCSet(), false);
+            }
+            AssetCls original = issueTX.getOrigAsset();
+
+            originalJson.put("iconType", original.getIconType());
+            originalJson.put("iconTypeName", viewMediaType(original.getIconType()));
+
+            String iconURL = original.getIconURL();
+            if (iconURL != null)
+                originalJson.put("iconURL", iconURL);
+
+            originalJson.put("imageType", original.getImageType());
+            originalJson.put("imageTypeName", viewMediaType(original.getImageType()));
+
+            String imageURL = original.getImageURL();
+            if (imageURL != null)
+                originalJson.put("imageURL", imageURL);
+
+            assetJSON.put("original", originalJson);
         }
-        AssetCls original = issueTX.getOrigAsset();
-
-        originalJson.put("iconType", original.getIconType());
-        originalJson.put("iconTypeName", viewMediaType(original.getIconType()));
-
-        String iconURL = original.getIconURL();
-        if (iconURL != null)
-            originalJson.put("iconURL", iconURL);
-
-        originalJson.put("imageType", original.getImageType());
-        originalJson.put("imageTypeName", viewMediaType(original.getImageType()));
-
-        String imageURL = original.getImageURL();
-        if (imageURL != null)
-            originalJson.put("imageURL", imageURL);
-
-        assetJSON.put("original", originalJson);
 
         return assetJSON;
 
@@ -311,6 +313,9 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
     public String makeHTMLView() {
 
         String text = super.makeHTMLHeadView();
+        if (origKey > 0) {
+            text += Lang.T("Original Asset") + ":&nbsp;" + origKey + "<br>";
+        }
         text += Lang.T("Series") + ":&nbsp;" + total + ", "
                 + Lang.T("Index") + ":&nbsp;" + index + "<br>";
         text += super.makeHTMLFootView(true);
