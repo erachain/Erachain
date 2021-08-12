@@ -78,7 +78,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
     }
 
     public IssuePersonPanel(String name, String title) {
-        super(name, title, null, "Person issue has been sent!", false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false, false);
+        super(name, title, null, null, false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false, false);
         initComponents(true);
         initLabels();
 
