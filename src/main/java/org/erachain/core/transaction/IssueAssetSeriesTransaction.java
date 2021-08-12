@@ -321,8 +321,8 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             return ITEM_ASSET_NOT_EXIST;
         }
 
-        if (!origAsset.isUnique()) {
-            errorValue = "not unique";
+        if (origAsset.getAssetType() != AssetCls.AS_NON_FUNGIBLE) {
+            errorValue = "type not NFT";
             return INVALID_ASSET_TYPE;
         }
 
