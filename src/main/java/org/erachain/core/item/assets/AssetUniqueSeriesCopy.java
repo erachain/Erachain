@@ -47,13 +47,13 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     }
 
-    public AssetUniqueSeriesCopy(long origKey, AssetVenture foilAsset, int total, int index) {
-        this(foilAsset.getAppData(),
-                foilAsset.getMaker(),
-                foilAsset.getName(),
-                foilAsset.getIcon(),
-                foilAsset.getImage(),
-                foilAsset.getDescription(),
+    public AssetUniqueSeriesCopy(long origKey, AssetVenture templateAsset, int total, int index) {
+        this(templateAsset.getAppData(),
+                templateAsset.getMaker(),
+                templateAsset.getName(),
+                templateAsset.getIcon(),
+                templateAsset.getImage(),
+                templateAsset.getDescription(),
                 origKey, total, index);
     }
 
@@ -78,28 +78,28 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
     /**
      * Первая копия - содержит обертку полностью, все остальные только номера/ Оригинал тут вообще не используем.
      *
-     * @param foilAsset
+     * @param templateAsset
      * @param origKey
      * @param total
      * @param index
      * @return
      */
-    public static AssetUniqueSeriesCopy makeCopy(Transaction issueTX, AssetCls foilAsset, long origKey, int total, int index) {
-        String copyName = foilAsset.getName() + " #" + index + "/" + total;
+    public static AssetUniqueSeriesCopy makeCopy(Transaction issueTX, AssetCls templateAsset, long origKey, int total, int index) {
+        String copyName = templateAsset.getName() + " #" + index + "/" + total;
 
         AssetUniqueSeriesCopy copy;
-        byte[] icon = foilAsset.getIcon();
-        byte[] image = foilAsset.getImage();
+        byte[] icon = templateAsset.getIcon();
+        byte[] image = templateAsset.getImage();
         if (index == 1) {
-            // Make FOIL
-            copy = new AssetUniqueSeriesCopy(foilAsset.getAppData(), foilAsset.getMaker(), copyName,
-                    icon, image, foilAsset.getDescription(), origKey, total, index);
+            // Make template
+            copy = new AssetUniqueSeriesCopy(templateAsset.getAppData(), templateAsset.getMaker(), copyName,
+                    icon, image, templateAsset.getDescription(), origKey, total, index);
 
         } else {
             // Make COPY
 
             // SET ICON and IMAGE URL
-            byte[] appDataOfCopy = foilAsset.getAppData();
+            byte[] appDataOfCopy = templateAsset.getAppData();
             if (appDataOfCopy == null) {
                 appDataOfCopy = AssetCls.makeEmptyAppData();
             } else {
@@ -107,18 +107,18 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
             }
 
             if (icon != null && icon.length > 0) {
-                appDataOfCopy[10] = (byte) foilAsset.getIconType();
+                appDataOfCopy[10] = (byte) templateAsset.getIconType();
                 appDataOfCopy[10] |= ITEM_HAS_URL_MASK;
-                icon = foilAsset.getIconURL().getBytes();
+                icon = templateAsset.getIconURL().getBytes();
             }
             if (image != null && image.length > 0) {
-                appDataOfCopy[11] = (byte) foilAsset.getImageType();
+                appDataOfCopy[11] = (byte) templateAsset.getImageType();
                 appDataOfCopy[11] |= ITEM_HAS_URL_MASK;
-                image = foilAsset.getImageURL().getBytes();
+                image = templateAsset.getImageURL().getBytes();
             }
 
-            copy = new AssetUniqueSeriesCopy(appDataOfCopy, foilAsset.getMaker(), copyName,
-                    icon, image, foilAsset.getDescription(), origKey, total, index);
+            copy = new AssetUniqueSeriesCopy(appDataOfCopy, templateAsset.getMaker(), copyName,
+                    icon, image, templateAsset.getDescription(), origKey, total, index);
         }
 
         copy.setReference(issueTX.getSignature(), issueTX.getDBRef());
