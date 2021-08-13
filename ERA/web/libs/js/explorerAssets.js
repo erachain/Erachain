@@ -106,7 +106,7 @@ function asset(data, forPrint) {
     if (item.isUnique) {
         output += '<b>' + item.Label_Unique + '</b>';
         if (item.index) {
-        output += ', <b>' + item.Label_Unique + '</b>';
+            output += ', <b>' + item.Label_Series + ' #' + item.total + '</b>';
         }
     } else {
         if (item.isUnlimited) {

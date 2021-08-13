@@ -333,6 +333,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
     public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
         JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
         itemJson.put("Label_Original_Asset", Lang.T("Original Asset", langObj));
+        itemJson.put("Label_Series", Lang.T("Series", langObj));
 
         return itemJson;
     }
