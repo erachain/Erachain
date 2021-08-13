@@ -59,7 +59,8 @@ public class APIItems {
                                     preViewMaker.errorMess);
                         }
                     }
-                    mediaType = WebResource.TYPE_VIDEO;
+                    //mediaType = WebResource.TYPE_VIDEO;
+                    mediaType = item.getImageMediaType();
                 } else {
                     mediaType = item.getImageMediaType();
                 }
