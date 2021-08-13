@@ -57,6 +57,22 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
                 origKey, total, index);
     }
 
+    @Override
+    public int hashCode() {
+        return (reference == null ? 0 : Ints.fromByteArray(reference)) + index;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof AssetUniqueSeriesCopy) {
+            AssetUniqueSeriesCopy item = (AssetUniqueSeriesCopy) obj;
+            if (this.reference != null && item.reference != null)
+                if (Arrays.equals(this.reference, item.reference))
+                    return item.index == index;
+        }
+        return false;
+    }
+
     // GETTERS/SETTERS
     @Override
     public String getItemSubType() {
