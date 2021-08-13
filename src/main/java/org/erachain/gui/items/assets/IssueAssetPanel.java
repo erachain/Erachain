@@ -26,14 +26,12 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
     int scale;
 
     public IssueAssetPanel() {
-        super(NAME, TITLE, "Asset issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
+        super(NAME, TITLE, null, null, true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
                 true, true);
 
         textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
         textScale.setSelectedIndex(8);
 
-        assetTypesComboBoxModel = new AssetTypesComboBoxModel();
-        assetTypeJComboBox.setModel(assetTypesComboBoxModel);
         //assetTypeJComboBox.setRenderer(new RenderComboBoxAssetActions());
 
         initComponents();

@@ -231,7 +231,7 @@ public class IssueLinkedHashPanel extends SplitPanel {
         confirmDialog.setVisible(true);
 
         if (confirmDialog.isConfirm > 0) {
-            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, null);
+            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, null, null);
         }
 
         // ENABLE

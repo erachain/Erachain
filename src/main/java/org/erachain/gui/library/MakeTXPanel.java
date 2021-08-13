@@ -32,6 +32,8 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 public abstract class MakeTXPanel extends IconPanel {
 
     protected JLabel titleJLabel = new JLabel();
+    protected JTextPane titleDescription;
+
     protected JLabel accountJLabel = new JLabel(Lang.T("Account") + ":");
     protected JLabel feeJLabel = new JLabel(Lang.T("Fee Power") + ":");
     protected JComboBox<String> textFeePow = new JComboBox<>();
@@ -60,7 +62,7 @@ public abstract class MakeTXPanel extends IconPanel {
     protected String confirmMess;
     protected String issueMess;
 
-    public MakeTXPanel(String name, String title, String issueMess, String confirmMess, JDialog parentDialog) {
+    public MakeTXPanel(String name, String title, String titleDescription, String issueMess, String confirmMess, JDialog parentDialog) {
         super(name, title);
 
         this.parentDialog = parentDialog;
@@ -72,6 +74,19 @@ public abstract class MakeTXPanel extends IconPanel {
         titleJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleJLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         titleJLabel.setText(Lang.T(title));
+
+        if (titleDescription != null) {
+            this.titleDescription = new JTextPane();
+            this.titleDescription.setEditable(false);
+            this.titleDescription.setBackground(this.getBackground());
+            this.titleDescription.setContentType("text/html");
+
+            int fontSize = textFeePow.getFontMetrics(textFeePow.getFont()).getHeight();
+            String fontStyle = textFeePow.getFont().getFontName();
+            fontStyle = "<body style='font: " + fontSize + "pt " + fontStyle + "'>";
+            this.titleDescription.setText(fontStyle + Lang.T(titleDescription));
+
+        }
 
         textFeePow.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(9)));
         textFeePow.setSelectedItem("0");
@@ -249,7 +264,7 @@ public abstract class MakeTXPanel extends IconPanel {
             confirmDialog.setVisible(true);
 
             if (confirmDialog.isConfirm > 0) {
-                ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, null);
+                ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, null, issueMess);
             }
         }
 
@@ -272,6 +287,18 @@ public abstract class MakeTXPanel extends IconPanel {
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         jPanelMain.add(titleJLabel, gridBagConstraints);
 
+        if (titleDescription != null) {
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = fieldGBC.gridx;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = fieldGBC.gridwidth;
+            gridBagConstraints.anchor = fieldGBC.anchor;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.weighty = 0.3;
+            gridBagConstraints.weightx = 0.3;
+            gridBagConstraints.insets = fieldGBC.insets;
+            jPanelMain.add(titleDescription, gridBagConstraints);
+        }
 
         labelGBC.gridy = y;
         jPanelMain.add(accountJLabel, labelGBC);

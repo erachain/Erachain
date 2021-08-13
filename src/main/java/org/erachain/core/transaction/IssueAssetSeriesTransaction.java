@@ -24,12 +24,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Здесь item - это обертка (FOIL) - в ней данные по бертки, а все остальное а Оригинале.
+ * Здесь item - это Шаблон - в ней данные по обертки (если задан Оригинал) или активов, а все остальное а Оригинале.
  * В Обертку грзим рамки как картинки
  */
 public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     public static final byte TYPE_ID = (byte) Transaction.ISSUE_ASSET_SERIES_TRANSACTION;
     public static final String TYPE_NAME = "Issue Asset Series";
+
+    public static final byte WITHOUT_ORIGINAL_MASK = 1;
+    /**
+     * typeBytes[3] = WITHOUT_ORIGINAL_MASK
+     */
 
     private final byte[] origAssetRef;
 
@@ -40,25 +45,27 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
      * @param typeBytes
      * @param creator
      * @param linkTo
-     * @param origAssetRef   signature of Creating or last Changing Order transaction
-     * @param foilAsset
+     * @param origAssetRef  signature of Creating or last Changing Order transaction
+     * @param templateAsset
      * @param feePow
      * @param timestamp
      * @param reference
      */
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator,
                                        ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture foilAsset, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, creator, linkTo, foilAsset, feePow, timestamp, reference);
+                                       AssetVenture templateAsset, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, creator, linkTo, templateAsset, feePow, timestamp, reference);
 
         this.origAssetRef = origAssetRef;
+        if (origAssetRef == null)
+            typeBytes[3] |= WITHOUT_ORIGINAL_MASK;
 
     }
 
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture foilAsset, byte feePow, long timestamp, Long reference,
+                                       AssetVenture templateAsset, byte feePow, long timestamp, Long reference,
                                        byte[] signature) {
-        this(typeBytes, creator, linkTo, origAssetRef, foilAsset, feePow, timestamp, reference);
+        this(typeBytes, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, reference);
         this.signature = signature;
         item.setReference(signature, dbRef);
 
@@ -66,9 +73,9 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
                                        long origAssetKey,
-                                       AssetVenture foilAsset, byte feePow, long timestamp, Long reference,
+                                       AssetVenture templateAsset, byte feePow, long timestamp, Long reference,
                                        byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, linkTo, origAssetRef, foilAsset, feePow, timestamp, reference);
+        this(typeBytes, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, reference);
 
         this.origAssetKey = origAssetKey;
         this.signature = signature;
@@ -82,21 +89,23 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     // as pack
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture foilAsset, byte[] signature) {
-        super(typeBytes, creator, linkTo, foilAsset, (byte) 0, 0L, null, signature);
+                                       AssetVenture templateAsset, byte[] signature) {
+        super(typeBytes, creator, linkTo, templateAsset, (byte) 0, 0L, null, signature);
         this.origAssetRef = origAssetRef;
+        if (origAssetRef == null)
+            typeBytes[3] |= WITHOUT_ORIGINAL_MASK;
 
     }
 
     public IssueAssetSeriesTransaction(PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture foilAsset, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, foilAsset, feePow, timestamp, reference,
+                                       AssetVenture templateAsset, byte feePow, long timestamp, Long reference, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, reference,
                 signature);
     }
 
     public IssueAssetSeriesTransaction(PublicKeyAccount creator, ExLink linkTo,
-                                       byte[] origAssetRef, AssetVenture foilAsset, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, foilAsset, feePow, timestamp, reference);
+                                       byte[] origAssetRef, AssetVenture templateAsset, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, reference);
     }
 
 
@@ -106,21 +115,27 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
         super.setDC(dcSet, false);
 
-        // на выходе может быть NULL - он в long не преобразуется - поэтому сначала исследуем
-        Long seqNo = dcSet.getTransactionFinalMapSigns().get(origAssetRef);
+        if (hasOriginal()) {
+            // на выходе может быть NULL - он в long не преобразуется - поэтому сначала исследуем
+            Long seqNo = dcSet.getTransactionFinalMapSigns().get(origAssetRef);
 
-        if (seqNo == null) {
-            return;
+            if (seqNo == null) {
+                return;
+            }
+
+            IssueAssetTransaction tx = (IssueAssetTransaction) dcSet.getTransactionFinalMap().get(seqNo);
+
+            origAssetKey = tx.getKey();
+            origAsset = dcSet.getItemAssetMap().get(origAssetKey);
         }
-
-        IssueAssetTransaction tx = (IssueAssetTransaction) dcSet.getTransactionFinalMap().get(seqNo);
-
-        origAssetKey = tx.getKey();
-        origAsset = dcSet.getItemAssetMap().get(origAssetKey);
 
         if (andUpdateFromState && !isWiped())
             updateFromStateDB();
 
+    }
+
+    public boolean hasOriginal() {
+        return (typeBytes[3] & WITHOUT_ORIGINAL_MASK) == 0;
     }
 
     @Override
@@ -145,7 +160,9 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     }
 
     public String viewOrigAssetRef() {
-        return Base58.encode(this.origAssetRef);
+        if (hasOriginal())
+            return Base58.encode(this.origAssetRef);
+        return "";
     }
 
     public int getTotal() {
@@ -165,8 +182,10 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         // GET BASE
         JSONObject json = super.toJson();
 
-        json.put("originalRef", Base58.encode(origAssetRef));
-        json.put("originalKey", origAssetKey);
+        if (hasOriginal()) {
+            json.put("originalRef", Base58.encode(origAssetRef));
+            json.put("originalKey", origAssetKey);
+        }
 
         return json;
     }
@@ -244,37 +263,44 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             position += FEE_LENGTH;
         }
 
-        // READ FOIL ASSET
+        // READ TEMPLATE ASSET
         // asset parse without reference - if is = signature
-        AssetVenture foilAsset = (AssetVenture) AssetFactory.getInstance().parse(forDeal,
+        AssetVenture templateAsset = (AssetVenture) AssetFactory.getInstance().parse(forDeal,
                 Arrays.copyOfRange(data, position, data.length), false);
-        position += foilAsset.getDataLength(false);
+        position += templateAsset.getDataLength(false);
 
         long origKey = 0;
         if (forDeal == FOR_DB_RECORD) {
-            //READ FOIL KEY
+            //READ TEMPLATE KEY
             byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
             long key = Longs.fromByteArray(keyBytes);
             position += KEY_LENGTH;
 
-            foilAsset.setKey(key);
+            templateAsset.setKey(key);
 
             //READ ORIGINAL KEY
-            keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-            origKey = Longs.fromByteArray(keyBytes);
-            position += KEY_LENGTH;
+            if ((typeBytes[3] & WITHOUT_ORIGINAL_MASK) == 0) {
+                keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+                origKey = Longs.fromByteArray(keyBytes);
+                position += KEY_LENGTH;
+            }
 
         }
 
         // READ ORIGINAL ASSET TX SIGNATURE
-        byte[] assetRef = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-        position += SIGNATURE_LENGTH;
+        byte[] assetRef;
+        if ((typeBytes[3] & WITHOUT_ORIGINAL_MASK) == 0) {
+            assetRef = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+            position += SIGNATURE_LENGTH;
+        } else {
+            assetRef = null;
+        }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssueAssetSeriesTransaction(typeBytes, creator, linkTo, assetRef, origKey, foilAsset, feePow, timestamp,
+            return new IssueAssetSeriesTransaction(typeBytes, creator, linkTo, assetRef, origKey, templateAsset, feePow, timestamp,
                     reference, signatureBytes, seqNo, feeLong);
         } else {
-            return new IssueAssetSeriesTransaction(typeBytes, creator, linkTo, assetRef, foilAsset, signatureBytes);
+            return new IssueAssetSeriesTransaction(typeBytes, creator, linkTo, assetRef, templateAsset, signatureBytes);
         }
     }
 
@@ -282,18 +308,22 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         byte[] data = super.toBytes(forDeal, withSignature);
 
         if (forDeal == FOR_DB_RECORD) {
-            if (origAssetKey == 0) {
-                // для неподтвержденных когда еще номера нету
-                data = Bytes.concat(data, new byte[KEY_LENGTH]);
-            } else {
-                byte[] keyBytes = Longs.toByteArray(origAssetKey);
-                data = Bytes.concat(data, keyBytes);
+            if (hasOriginal()) {
+                if (origAssetKey == 0) {
+                    // для неподтвержденных когда еще номера нету
+                    data = Bytes.concat(data, new byte[KEY_LENGTH]);
+                } else {
+                    byte[] keyBytes = Longs.toByteArray(origAssetKey);
+                    data = Bytes.concat(data, keyBytes);
+                }
             }
 
         }
 
         // WRITE ASSET REF
-        data = Bytes.concat(data, this.origAssetRef);
+        if (hasOriginal()) {
+            data = Bytes.concat(data, this.origAssetRef);
+        }
 
         return data;
     }
@@ -302,10 +332,16 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
-        int len = super.getDataLength(forDeal, withSignature) + SIGNATURE_LENGTH;
-        if (forDeal == Transaction.FOR_DB_RECORD) {
-            len += KEY_LENGTH;
+        int len = super.getDataLength(forDeal, withSignature);
+
+        if (hasOriginal()) {
+            len += SIGNATURE_LENGTH;
+
+            if (forDeal == Transaction.FOR_DB_RECORD) {
+                len += KEY_LENGTH;
+            }
         }
+
         return len;
     }
 
@@ -316,18 +352,34 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             return VALIDATE_OK;
         }
 
-        if (origAssetKey == 0L
-                || origAsset == null) {
-            return ITEM_ASSET_NOT_EXIST;
-        }
+        if (hasOriginal()) {
+            if (origAssetKey == 0L
+                    || origAsset == null) {
+                return ITEM_ASSET_NOT_EXIST;
+            }
 
-        if (origAsset.getAssetType() != AssetCls.AS_NON_FUNGIBLE) {
-            errorValue = "original not NFT";
-            return INVALID_ASSET_TYPE;
-        }
-        if (!origAsset.isUnique()) {
-            errorValue = "original not unique";
-            return INVALID_ASSET_TYPE;
+            if (origAsset.getAssetType() != AssetCls.AS_NON_FUNGIBLE) {
+                errorValue = "original not NFT";
+                return INVALID_ASSET_TYPE;
+            }
+            if (!origAsset.isUnique()) {
+                errorValue = "original not unique";
+                return INVALID_ASSET_TYPE;
+            }
+
+            if (item.getIconType() != ItemCls.MEDIA_TYPE_IMG) {
+                return Transaction.INVALID_ICON_TYPE;
+            }
+            if (item.getImageType() != ItemCls.MEDIA_TYPE_IMG) {
+                return Transaction.INVALID_IMAGE_TYPE;
+            }
+
+            // проверим - а он имеет баланс Оригинала для выпуска Серии?
+            Fun.Tuple2<BigDecimal, BigDecimal> own = creator.getBalance(dcSet, origAssetKey, Account.BALANCE_POS_OWN);
+            if (own.b.signum() <= 0) {
+                return Transaction.CREATOR_NOT_OWNER;
+            }
+
         }
 
         // CHECK IF AMOUNT POSITIVE
@@ -336,74 +388,40 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             return INVALID_AMOUNT;
         }
 
-        if (item.getIconType() != ItemCls.MEDIA_TYPE_IMG) {
-            return Transaction.INVALID_ICON_TYPE;
-        }
-        if (item.getImageType() != ItemCls.MEDIA_TYPE_IMG) {
-            return Transaction.INVALID_IMAGE_TYPE;
-        }
-
-        // проверим - а он имеет баланс Оригинала для выпуска Серии?
-        Fun.Tuple2<BigDecimal, BigDecimal> own = creator.getBalance(dcSet, origAssetKey, Account.BALANCE_POS_OWN);
-        if (own.b.signum() <= 0) {
-            return Transaction.CREATOR_NOT_OWNER;
-        }
-
         // выше уже не проверяем обертку
         return super.isValid(forDeal, flags | NOT_VALIDATE_ITEM);
     }
-
-    /*
-    @Override
-    public void makeItemsKeys() {
-        if (isWiped()
-                || origAsset == null // это может быть с инвалидной ссылкой на ордер
-        ) {
-            itemsKeys = new Object[][]{};
-            return;
-        }
-
-        if (origAssetKey == 0)
-            return;
-
-        if (creatorPersonDuration != null) {
-            // запомним что тут две сущности
-            itemsKeys = new Object[][]{
-                    new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
-                    new Object[]{origAsset.getItemType(), origAssetKey, origAsset.getTags()}
-            };
-        } else {
-            itemsKeys = new Object[][]{
-                    new Object[]{origAsset.getItemType(), origAssetKey, origAsset.getTags()}
-            };
-        }
-    }
-
-     */
 
     // PROCESS/ORPHAN
 
     /**
      * Суть такова что мы делаем новый ордер с новым ID так как иначе сортировка Сделок будет нарушена так как
-     * будет по Инициатору ключ, а его мы тогда берем старый ИД. А надо новый чтобы история действий не менялась
+     * будет по Инициатору ключ, а его мы тогда берем старый ИД. А надо новый чтобы история действий не менялась<br>
+     * !!!!! <b>ATTENTION</b> Any Asset may be inserted before for setup StartKey!
      */
     @Override
     protected void processItem() {
 
-        long origAssetKey = origAsset.getKey();
-        AssetVenture foilAsset = (AssetVenture) item;
+        long origAssetKey;
+        if (hasOriginal()) {
+            origAssetKey = origAsset.getKey();
+        } else {
+            origAssetKey = 0L;
+        }
+
+        AssetVenture templateAsset = (AssetVenture) item;
         AssetUniqueSeriesCopy uniqueSeriesCopy;
         ItemMap map = item.getDBMap(dcSet);
-        int total = (int) foilAsset.getQuantity();
+        int total = (int) templateAsset.getQuantity();
         for (int indexCopy = 1; indexCopy <= total; indexCopy++) {
 
-            uniqueSeriesCopy = AssetUniqueSeriesCopy.makeCopy(this, foilAsset, origAssetKey, total, indexCopy);
+            uniqueSeriesCopy = AssetUniqueSeriesCopy.makeCopy(this, templateAsset, origAssetKey, total, indexCopy);
 
             //INSERT INTO DATABASE
             key = map.incrementPut(uniqueSeriesCopy);
             if (indexCopy == 1) {
-                // Set KEY for foilAsset - it need foe other copies
-                foilAsset.setKey(key);
+                // Set KEY for templateAsset - it need foe other copies
+                templateAsset.setKey(key);
             }
 
             // SET BALANCES
@@ -411,7 +429,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
                     BigDecimal.ONE, false, false, false);
 
             // make HOLD balance
-            if (!uniqueSeriesCopy.isUnHoldable()) {
+            if (!templateAsset.isUnHoldable()) {
                 creator.changeBalance(dcSet, false, true, key,
                         BigDecimal.ONE.negate(), false, false, false);
             }
@@ -424,8 +442,9 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     protected void orphanItem() {
 
         long copyKey;
-        ItemMap map = origAsset.getDBMap(dcSet);
-        int total = (int) ((AssetVenture) item).getQuantity();
+        AssetVenture templateAsset = (AssetVenture) item;
+        ItemMap map = templateAsset.getDBMap(dcSet);
+        int total = (int) templateAsset.getQuantity();
         for (int indexDel = 0; indexDel < total; indexDel++) {
 
             copyKey = key - indexDel;
@@ -438,7 +457,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
                     BigDecimal.ONE, false, false, false);
 
             // make HOLD balance
-            if (!origAsset.isUnHoldable()) {
+            if (!templateAsset.isUnHoldable()) {
                 creator.changeBalance(dcSet, true, true, copyKey,
                         BigDecimal.ONE.negate(), false, false, false);
             }

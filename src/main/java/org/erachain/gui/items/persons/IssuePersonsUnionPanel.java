@@ -44,14 +44,16 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
     }
 
     public IssuePersonsUnionPanel(String name, String title) {
-        super(name, title, "Person issue has been sent!", false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false, false);
+        super(name, title, null, null,
+                false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false, false);
         initComponents(true);
         initLabels();
 
     }
 
     public IssuePersonsUnionPanel(String name, String title, String issueMess) {
-        super(name, title, issueMess, false, GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false, false);
+        super(name, title, "IssuePersonsUnionPanel.titleDescription", issueMess, false,
+                GUIConstants.WIDTH_IMAGE, GUIConstants.HEIGHT_IMAGE, false, false);
     }
 
     protected void initLabels() {

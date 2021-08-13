@@ -1138,5 +1138,6 @@
   "Other Digital Right of Claim": "Other digital right of claim",
   "AddImageLabel.externalURL.tip": "Set source by URL. Blockchain URL example: '/apiasset/image/{key}. External source not safe by blockchain.",
   "IssueAssetPanel.isUnTransferable.tip": "All transfers are prohibited except from the creator's account",
+  "IssueAssetCopyPanel.titleDescription": "Release of a Series of unique assets of the NFT type. When using the Original, the image specified here will be used as a frame superimposed on top of the media from the Original with an increase in the frame size by 10% on all sides",
   "": ""
 }

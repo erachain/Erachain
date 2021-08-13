@@ -631,7 +631,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // JOptionPane.OK_OPTION
         if (confirmDialog.isConfirm > 0) {
-            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, jLabel_Title.getText());
+            ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, jLabel_Title.getText(), null);
         }
 
         // ENABLE

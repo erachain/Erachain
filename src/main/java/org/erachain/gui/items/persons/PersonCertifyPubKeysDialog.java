@@ -237,7 +237,7 @@ public class PersonCertifyPubKeysDialog extends JDialog {
 
         // JOptionPane.OK_OPTION
         if (confirmDialog.isConfirm > 0) {
-            if (ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, null)) {
+            if (ResultDialog.make(this, transaction, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, null, null)) {
                 dispose();
             }
         }

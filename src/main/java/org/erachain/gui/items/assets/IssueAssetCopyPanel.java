@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.utils.GUIConstants;
@@ -11,6 +12,8 @@ import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author Саша
@@ -21,15 +24,20 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
     public static String TITLE = "Issue Series";
 
     public JTextField assetRefField = new JTextField("");
+    public JCheckBox hasOriginal = new JCheckBox(Lang.T("Original Asset") + ":");
     byte[] origAssetTXSign;
     public javax.swing.JComboBox<ItemCls> jComboBox_Asset;
 
 
     public IssueAssetCopyPanel() {
-        super(NAME, TITLE, "Asset series issue has been sent!", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
+        super(NAME, TITLE, "IssueAssetCopyPanel.titleDescription", null,
+                true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE,
                 true, true);
 
         quantityJLabel.setText(Lang.T("Series Size") + ":");
+        // всегда NFT - для правильного выбора Роялти по умолчанию
+        assetTypeJComboBox.setSelectedItem(new AssetType(AssetCls.AS_NON_FUNGIBLE));
+
         initComponents();
 
     }
@@ -48,9 +56,9 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
         jComboBox_Asset.setEditable(false);
         //this.jComboBox_Asset.setEnabled(assetIn != null);
 
-        JLabel signLabel = new JLabel(Lang.T("Original Asset") + ":");
         labelGBC.gridy = gridy;
-        jPanelAdd.add(signLabel, labelGBC);
+        hasOriginal.setSelected(true);
+        jPanelAdd.add(hasOriginal, labelGBC);
 
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(jComboBox_Asset, fieldGBC);
@@ -61,6 +69,13 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(textQuantity, fieldGBC);
 
+        hasOriginal.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jComboBox_Asset.setEnabled(hasOriginal.isSelected());
+            }
+        });
+
         // вывод подвала
         super.initBottom(gridy);
     }
@@ -69,8 +84,12 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
         assetType = AssetCls.AS_NON_FUNGIBLE;
 
-        AssetCls asset = (AssetCls) this.jComboBox_Asset.getSelectedItem();
-        origAssetTXSign = asset.getReference();
+        if (hasOriginal.isSelected()) {
+            AssetCls asset = (AssetCls) this.jComboBox_Asset.getSelectedItem();
+            origAssetTXSign = asset.getReference();
+        } else {
+            origAssetTXSign = null;
+        }
 
         int parseStep = 0;
         try {

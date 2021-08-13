@@ -423,8 +423,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + TIMESTAMP_LENGTH + FEE_LENGTH;
 
-    public static final byte HAS_EXLINK_MASK = 32;
-
     /**
      * Используется для разделения строки поисковых слов для всех трнзакций.<br>
      * % @ # - пусть они будут служебные и по ним не делать разделения
@@ -441,6 +439,12 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected DCSet dcSet;
     protected String TYPE_NAME = "unknown";
     // protected int type;
+
+    /////////   MASKS amd PARS
+    public static final byte HAS_EXLINK_MASK = 32;
+    /**
+     * typeBytes[2] = HAS_EXLINK_MASK
+     */
     protected byte[] typeBytes;
 
     protected int height;

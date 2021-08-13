@@ -11,7 +11,7 @@ public class IssueTemplatePanel extends IssueItemPanel {
     public static String TITLE = "Issue Template";
 
     public IssueTemplatePanel() {
-        super(NAME, TITLE, "Template issue has been sent", true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true, true);
+        super(NAME, TITLE, null, null, true, GUIConstants.WIDTH_IMAGE, GUIConstants.WIDTH_IMAGE, true, true);
 
         initComponents();
 
