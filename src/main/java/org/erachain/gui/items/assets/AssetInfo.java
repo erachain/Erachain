@@ -3,6 +3,7 @@ package org.erachain.gui.items.assets;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ImageCropDialog;
@@ -118,6 +119,10 @@ public class AssetInfo extends JTextPane {
             if (record != null)
                 text += "<td><div  style='float:left'><div><b>" + Lang.T("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
             text += "<div><b>" + Lang.T("Name") + ": </b>" + asset.viewName() + "</div>";
+            if (asset instanceof AssetUniqueSeriesCopy && ((AssetUniqueSeriesCopy) asset).hasOriginal()) {
+                text += "<div><b>" + Lang.T("Original Asset") + ": </b>" + ((AssetUniqueSeriesCopy) asset).getOrigKey() + "</div>";
+            }
+
             if (asset.getTagsStr() != null) {
                 text += "<div><b>" + Lang.T("Tags") + ": </b>" + asset.getTagsStr() + "</div>";
             }
@@ -138,8 +143,16 @@ public class AssetInfo extends JTextPane {
             text += " " + Lang.T("Type") + ": <a href='!!Type'><b>" +
                     asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:"
                     + Lang.T(asset.viewAssetTypeFull()) + "</a>,";
-            text += " " + Lang.T("Accuracy") + ": <b>" + asset.getScale() + "</b>,";
-            text += " " + Lang.T("Quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
+
+            if (asset.isUnique()) {
+                text += " <b>" + Lang.T("Unique") + "</b>,";
+                if (asset instanceof AssetUniqueSeriesCopy) {
+                    text += " <b>" + Lang.T("Series") + " #" + ((AssetUniqueSeriesCopy) asset).getTotal() + "</b>,";
+                }
+            } else {
+                text += " " + Lang.T("Quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
+                text += " " + Lang.T("Accuracy") + ": <b>" + asset.getScale() + "</b>,";
+            }
             text += " " + Lang.T("Released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
 
             if (asset.getDEXAwards() != null) {

@@ -84,6 +84,10 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         return origKey;
     }
 
+    public boolean hasOriginal() {
+        return origKey > 0;
+    }
+
     public int getTotal() {
         return total;
     }

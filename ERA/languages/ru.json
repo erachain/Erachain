@@ -1423,6 +1423,7 @@
   "Sent": "Отправлено",
   "Seq": "№",
   "SeqNo": "Номер транз",
+  "series": "серия",
   "Series": "Серия",
   "Series Size": "Размер Серии",
   "Service can accept a maximum of %1 now": "Сервис может принять сейчас максимум %1",
