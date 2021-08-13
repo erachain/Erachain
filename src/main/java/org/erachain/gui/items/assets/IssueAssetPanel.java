@@ -32,8 +32,6 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
         textScale.setModel(new DefaultComboBoxModel<>(fillAndReceiveStringArray(24)));
         textScale.setSelectedIndex(8);
 
-        assetTypesComboBoxModel = new AssetTypesComboBoxModel();
-        assetTypeJComboBox.setModel(assetTypesComboBoxModel);
         //assetTypeJComboBox.setRenderer(new RenderComboBoxAssetActions());
 
         initComponents();

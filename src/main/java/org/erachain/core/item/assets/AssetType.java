@@ -40,6 +40,20 @@ public class AssetType {
     }
 
     @Override
+    public int hashCode() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof AssetType)
+            if (((AssetType) o).id == id)
+                return true;
+
+        return false;
+    }
+
+    @Override
     public String toString() {
 
         return "<HTML> {"

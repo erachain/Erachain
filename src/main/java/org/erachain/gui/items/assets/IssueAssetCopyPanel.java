@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetType;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.utils.GUIConstants;
@@ -34,6 +35,9 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
                 true, true);
 
         quantityJLabel.setText(Lang.T("Series Size") + ":");
+        // всегда NFT - для правильного выбора Роялти по умолчанию
+        assetTypeJComboBox.setSelectedItem(new AssetType(AssetCls.AS_NON_FUNGIBLE));
+
         initComponents();
 
     }

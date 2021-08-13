@@ -35,6 +35,9 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
                               int cropWidth, int cropHeight, boolean originalSize, boolean useExtURL) {
         super(name, title, titleDescription, issueMess, useIcon, cropWidth, cropHeight, originalSize, useExtURL);
 
+        assetTypesComboBoxModel = new AssetTypesComboBoxModel();
+        assetTypeJComboBox.setModel(assetTypesComboBoxModel);
+
         textQuantity.setText("0");
 
 
