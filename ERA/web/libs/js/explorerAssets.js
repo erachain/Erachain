@@ -99,9 +99,15 @@ function asset(data, forPrint) {
 
     //////// BODY
     output += '<p style="font-size:1.3em; margin-top:0.5em; margin-bottom:0px">';
+    if (item.original) {
+        output += '<b>' + item.Label_Original_Asset + ':</b> <a href="?asset=' + item.original.key + get_lang() + '">' + item.original.key + '</a><br>';
+    }
 
     if (item.isUnique) {
         output += '<b>' + item.Label_Unique + '</b>';
+        if (item.index) {
+        output += ', <b>' + item.Label_Unique + '</b>';
+        }
     } else {
         if (item.isUnlimited) {
             output += '<b>' + item.Label_Unlimited + '</b>';
