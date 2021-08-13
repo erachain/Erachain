@@ -14,7 +14,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     protected SearchItemsTableModel search_Table_Model;
-    public MDecimalFormatedTextField key_Item;
+    public MDecimalFormatedTextField itemKey;
     public JButton buttonGetLasts = new JButton(Lang.T("Get Last"));
 
 
@@ -32,17 +32,17 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
         // search Panel
         searchToolBar_LeftPanel.setVisible(true);
         searchToolBar_LeftPanel.add(new JLabel("  " + Lang.T("Find Key") + ":"));
-        key_Item = new MDecimalFormatedTextField();
-        key_Item.setToolTipText("");
-        key_Item.setAlignmentX(1.0F);
-        key_Item.setText("");
-        key_Item.setMinimumSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
-        key_Item.setMinimumSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
-        key_Item.setPreferredSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
+        itemKey = new MDecimalFormatedTextField();
+        itemKey.setToolTipText("");
+        itemKey.setAlignmentX(1.0F);
+        itemKey.setText("");
+        itemKey.setMinimumSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
+        itemKey.setMinimumSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
+        itemKey.setPreferredSize(new Dimension(100, (int) (UIManager.getFont("Label.font").getSize() * 1.4)));
 
-        MenuPopupUtil.installContextMenu(key_Item);
+        MenuPopupUtil.installContextMenu(itemKey);
 
-        key_Item.addActionListener(new ActionListener() {
+        itemKey.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -51,7 +51,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
             }
         });
 
-        searchToolBar_LeftPanel.add(key_Item, gridBagConstraints);
+        searchToolBar_LeftPanel.add(itemKey, gridBagConstraints);
 
         ////toolBarLeftPanel.add(buttonGetLasts, gridBagConstraints);
         searchToolBar_LeftPanel.add(buttonGetLasts);
@@ -93,7 +93,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
             jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
             return;
         }
-        key_Item.setText("");
+        itemKey.setText("");
 
         Label_search_Info_Panel.setText(Lang.T("Waiting..."));
         jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
@@ -120,7 +120,7 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
         new Thread() {
             @Override
             public void run() {
-                String seqNo = key_Item.getText();
+                String seqNo = itemKey.getText();
                 if (seqNo == null || seqNo.isEmpty()) {
                     search_Table_Model.getLast();
                 } else {
