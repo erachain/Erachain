@@ -11,6 +11,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.IssueAssetSeriesTransaction;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
@@ -293,6 +294,8 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
         // тут же referenceTx определяется
         JSONObject assetJSON = super.toJson();
+        assetJSON.put("index", index);
+        assetJSON.put("total", total);
 
         if (origKey > 0) {
             // ADD DATA of ORIGINAL
@@ -324,6 +327,14 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
         return assetJSON;
 
+    }
+
+    @Override
+    public JSONObject jsonForExplorerInfo(DCSet dcSet, JSONObject langObj, boolean forPrint) {
+        JSONObject itemJson = super.jsonForExplorerInfo(dcSet, langObj, forPrint);
+        itemJson.put("Label_Original_Asset", Lang.T("Original Asset", langObj));
+
+        return itemJson;
     }
 
     public String makeHTMLView() {
