@@ -1109,19 +1109,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJSON.put("iconType", getIconType());
         itemJSON.put("iconTypeName", viewMediaType(iconType));
 
-        if (true) {
-            String iconURL = getIconURL();
-            if (iconURL != null)
-                itemJSON.put("iconURL", iconURL);
-
-        } else {
-            // OLD version
-            if (hasIconURL()) {
-                itemJSON.put("iconURL", getIconURL());
-            } else {
-                if (withIcon && getIconType() == ItemCls.MEDIA_TYPE_IMG && this.getIcon() != null && this.getIcon().length > 0)
-                    itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
-            }
+        String iconURL = getIconURL();
+        if (iconURL != null) {
+            itemJSON.put("iconURL", getIconURL());
+            itemJSON.put("iconMediaType", getIconMediaType().toString());
         }
 
         itemJSON.put("maker", this.maker.getAddress());
@@ -1188,7 +1179,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         String iconURL = getIconURL();
         if (iconURL != null) {
             itemJSON.put("iconURL", getIconURL());
-            itemJSON.put("iconMediaType", getIconMediaType());
+            itemJSON.put("iconMediaType", getIconMediaType().toString());
         }
 
         itemJSON.put("imageType", getImageType());
@@ -1197,8 +1188,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         String imageURL = getImageURL();
         if (imageURL != null) {
             itemJSON.put("imageURL", imageURL);
-            itemJSON.put("imageMediaType", getImageMediaType());
-            itemJSON.put("imagePreviewMediaType", PreviewMaker.getPreviewType(this));
+            itemJSON.put("imageMediaType", getImageMediaType().toString());
+            itemJSON.put("imagePreviewMediaType", PreviewMaker.getPreviewType(this).toString());
         }
 
         if (startDate != null)
