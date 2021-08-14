@@ -140,16 +140,16 @@ public class PreviewMaker {
             String parQV;
             String parRV;
             if (image.length > 4000000) {
-                parQV = "20";
+                parQV = "40";
                 parRV = "8";
-            } else if (image.length > 1500000) {
-                parQV = "18";
+            } else if (image.length > 1000000) {
+                parQV = "30";
                 parRV = "9";
-            } else if (image.length > 600000) {
-                parQV = "16";
+            } else if (image.length > 500000) {
+                parQV = "22";
                 parRV = "10";
             } else {
-                parQV = "14";
+                parQV = "18";
                 parRV = "10";
             }
 
@@ -176,7 +176,7 @@ public class PreviewMaker {
 
                 boolean isWindows = System.getProperty("os.name").startsWith("Windows");
                 ProcessBuilder builder;
-                // -i %1 -y -fs 512k -vcodec h264 -s 256x256 -q:v %2 -r:v %3 %4
+                // -i %1 -y -fs 512k -vcodec h264 -q:v %2 -r:v %3 %4
                 if (isWindows) {
                     builder = new ProcessBuilder("makePreview.bat",
                             fileIn.toPath().toString(),
@@ -191,8 +191,12 @@ public class PreviewMaker {
                             "-y", "-fs", "512k",
                             "-pix_fmt", "yuv420p", // for FireFox (neg error NS_ERROR_DOM_MEDIA_FATAL_ERR see https://github.com/ccrisan/motioneye/issues/1067
                             "-vcodec", "h264", "-an",
-                            "-vf", "scale=256:-2,setsar=1:1", // "-s", "256x256",
-                            "-q:v", parQV, "-r:v", parRV, fileOut.toPath().toString()
+                            "-vf",
+                            "scale=256:-2,setsar=1:1",
+                            // old par "-q:v", parQV,
+                            "-crf", parQV,
+                            //"-b:v", "35k", // bitrate
+                            "-r:v", parRV, fileOut.toPath().toString()
                     );
                 }
                 // указываем перенаправление stderr в stdout, чтобы проще было отлаживать
