@@ -23,6 +23,7 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.Pair;
+import org.erachain.webserver.PreviewMaker;
 import org.erachain.webserver.WebResource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -1185,15 +1186,20 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJSON.put("iconTypeName", viewMediaType(iconType));
 
         String iconURL = getIconURL();
-        if (iconURL != null)
+        if (iconURL != null) {
             itemJSON.put("iconURL", getIconURL());
+            itemJSON.put("iconMediaType", getIconMediaType());
+        }
 
         itemJSON.put("imageType", getImageType());
         itemJSON.put("imageTypeName", viewMediaType(imageType));
 
         String imageURL = getImageURL();
-        if (imageURL != null)
+        if (imageURL != null) {
             itemJSON.put("imageURL", imageURL);
+            itemJSON.put("imageMediaType", getImageMediaType());
+            itemJSON.put("imagePreviewMediaType", PreviewMaker.getPreviewType(this));
+        }
 
         if (startDate != null)
             itemJSON.put("startDate", startDate);
