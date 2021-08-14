@@ -141,16 +141,16 @@ public class PreviewMaker {
             String parRV;
             if (image.length > 4000000) {
                 parQV = "20";
-                parRV = "10";
+                parRV = "8";
             } else if (image.length > 1500000) {
+                parQV = "18";
+                parRV = "9";
+            } else if (image.length > 600000) {
                 parQV = "16";
-                parRV = "12";
-            } else if (image.length > 500000) {
-                parQV = "14";
-                parRV = "14";
+                parRV = "10";
             } else {
-                parQV = "12";
-                parRV = "15";
+                parQV = "14";
+                parRV = "10";
             }
 
             String pathIn = mainFolder + File.separator + "orig" + File.separator + outputName;
