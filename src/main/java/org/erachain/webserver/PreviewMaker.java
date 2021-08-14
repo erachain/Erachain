@@ -73,7 +73,6 @@ public class PreviewMaker {
         String outputName = getItemName(item);
         String mainFolder = "dataPreviews" + (BlockChain.DEMO_MODE ? "_demo" : BlockChain.TEST_MODE ? "_test" : "");
         String path = mainFolder + File.separator + outputName;
-        String pathIn = mainFolder + File.separator + "orig" + File.separator + outputName;
         String mediaExt = item.getImageTypeExt();
         File fileOut = new File(path + "." + mediaExt);
 
@@ -86,77 +85,87 @@ public class PreviewMaker {
             return null;
         }
 
-        String output = pathIn + ".log";
-        File outLog = new File(output);
-        outLog.getParentFile().mkdirs();
-
-        if (outLog.exists())
-            return null;
-
-        // иначе некоторые картинки дают сбой при конвертации в ffmpeg
-        pathIn += "." + mediaExt;
-        File fileIn = new File(pathIn);
-        try (FileOutputStream fos = new FileOutputStream(fileIn)) {
-            fos.write(image);
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-            errorMess = e.getMessage();
-            return null;
-        }
-
-        try {
-            if (item.getImageType() == ItemCls.MEDIA_TYPE_IMG) {
-                ImageIcon imageIcon = new ImageIcon(pathIn);
-                BufferedImage bufferedImage = ImagesTools.imageToBufferedImage(imageIcon.getImage());
-                String[] props = bufferedImage.getPropertyNames();
-                int imageSize;
-                try {
-                    byte[] imageBytes = ImagesTools.bufferedImageToBytes(bufferedImage, mediaExt);
-                    imageSize = imageBytes.length;
+        if (item.getImageType() == ItemCls.MEDIA_TYPE_IMG && mediaExt != "gif") {
+            // JPEG and PNG simple resize
+            ImageIcon imageIcon;
+            if (false) {
+                imageIcon = new ImageIcon(image, mediaExt == "png" ? "gif" : "JPEG");
+            } else {
+                String pathIn = mainFolder + File.separator + "orig" + File.separator + outputName;
+                pathIn += "." + mediaExt;
+                File fileIn = new File(pathIn);
+                try (FileOutputStream fos = new FileOutputStream(fileIn)) {
+                    fos.write(image);
                 } catch (IOException e) {
                     LOGGER.error(e.getMessage(), e);
                     errorMess = e.getMessage();
                     return null;
                 }
-                float coefficient = (float) Math.sqrt((double) IMAGE_USE_ORIG_LEN / (double) imageSize);
-                int width = (int) (imageIcon.getIconWidth() * coefficient);
-                int height = (int) (imageIcon.getIconHeight() * coefficient);
-
-                try {
-                    if (mediaExt.equals("gif")) {
-                        imageIcon.setImage(imageIcon.getImage().getScaledInstance(width, height, Image.SCALE_DEFAULT));
-                        bufferedImage = ImagesTools.imageToBufferedImage(imageIcon.getImage());
-                        ImageIO.write(bufferedImage, mediaExt, fileOut);
-                        return fileOut;
-                    } else {
-                        imageIcon.setImage(imageIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
-                        bufferedImage = ImagesTools.imageToBufferedImage(imageIcon.getImage());
-                        ImageIO.write(bufferedImage, mediaExt, fileOut);
-                        return fileOut;
-                    }
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
-                    errorMess = e.getMessage();
-                    return null;
+                imageIcon = new ImageIcon(pathIn);
+                if (fileOut.exists()) {
+                    fileIn.delete();
                 }
 
-            } else if (item.getImageType() == ItemCls.MEDIA_TYPE_VIDEO) {
+            }
+            //ImageIcon imageIcon = new ImageIcon(new URL(""));
+            float coefficient = (float) Math.sqrt((double) IMAGE_USE_ORIG_LEN / (double) image.length);
+            int width = (int) (imageIcon.getIconWidth() * coefficient);
+            int height = (int) (imageIcon.getIconHeight() * coefficient);
 
-                String parQV;
-                String parRV;
-                if (image.length > 4000000) {
-                    parQV = "20";
-                    parRV = "10";
-                } else if (image.length > 1500000) {
-                    parQV = "16";
-                    parRV = "12";
-                } else if (image.length > 500000) {
-                    parQV = "14";
-                    parRV = "14";
-                } else {
-                    parQV = "12";
-                    parRV = "15";
-                }
+            BufferedImage bufferedImage;
+            try {
+                imageIcon.setImage(imageIcon.getImage().getScaledInstance(width, height,
+                        //mediaExt == "png"? Image.SCALE_DEFAULT : Image.SCALE_SMOOTH
+                        Image.SCALE_DEFAULT
+                ));
+                bufferedImage = ImagesTools.imageToBufferedImage(imageIcon.getImage());
+                ImageIO.write(bufferedImage, mediaExt, fileOut);
+
+                return fileOut;
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
+                errorMess = e.getMessage();
+                return null;
+            }
+
+        } else {
+
+            String parQV;
+            String parRV;
+            if (image.length > 4000000) {
+                parQV = "20";
+                parRV = "10";
+            } else if (image.length > 1500000) {
+                parQV = "16";
+                parRV = "12";
+            } else if (image.length > 500000) {
+                parQV = "14";
+                parRV = "14";
+            } else {
+                parQV = "12";
+                parRV = "15";
+            }
+
+            String pathIn = mainFolder + File.separator + "orig" + File.separator + outputName;
+            String output = pathIn + ".log";
+            File outLog = new File(output);
+            if (outLog.exists())
+                return null;
+
+            outLog.getParentFile().mkdirs();
+
+            // иначе некоторые картинки дают сбой при конвертации в ffmpeg
+            pathIn += "." + mediaExt;
+            File fileIn = new File(pathIn);
+            try (FileOutputStream fos = new FileOutputStream(fileIn)) {
+                fos.write(image);
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
+                errorMess = e.getMessage();
+                return null;
+            }
+
+            try {
 
                 boolean isWindows = System.getProperty("os.name").startsWith("Windows");
                 ProcessBuilder builder;
@@ -192,18 +201,14 @@ public class PreviewMaker {
                     errorMess = e.getMessage();
                     return null;
                 }
+            } finally {
+                if (fileOut.exists()) {
+                    fileIn.delete();
+                }
 
-            }
-
-        } finally {
-            if (fileOut.exists()) {
-                fileIn.delete();
             }
 
         }
-
-        // some errors was happen
-        return null;
 
     }
 
