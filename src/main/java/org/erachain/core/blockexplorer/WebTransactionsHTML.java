@@ -482,14 +482,13 @@ public class WebTransactionsHTML {
 
         IssueAssetSeriesTransaction assetSeriesTX = (IssueAssetSeriesTransaction) transaction;
 
-        Long origAssetKey = assetSeriesTX.getOrigAssetKey();
-        //
-        AssetCls origAsset = dcSet.getItemAssetMap().get(origAssetKey);
-
-        out += Lang.T("Original Asset Issue Signature", langObj) + ": <a href='?tx=" + assetSeriesTX.viewOrigAssetRef() + "'><b>"
-                + assetSeriesTX.viewOrigAssetRef() + "</b></a><br>";
-
-        out += Lang.T("Original Asset", langObj) + ": <a href='?asset=" + origAssetKey + get_Lang() + "'>" + origAsset.toString() + "</a><br>";
+        if (assetSeriesTX.hasOriginal()) {
+            Long origAssetKey = assetSeriesTX.getOrigAssetKey();
+            AssetCls origAsset = dcSet.getItemAssetMap().get(origAssetKey);
+            out += Lang.T("Original Asset Issue Signature", langObj) + ": <a href='?tx=" + assetSeriesTX.viewOrigAssetRef() + "'><b>"
+                    + assetSeriesTX.viewOrigAssetRef() + "</b></a><br>";
+            out += Lang.T("Original Asset", langObj) + ": <a href='?asset=" + origAssetKey + get_Lang() + "'>" + origAsset.toString() + "</a><br>";
+        }
 
         out += "<h4><a href='?asset=" + assetSeriesTX.getKey() + get_Lang() + "'>" + assetSeriesTX.getItem().toString() + "</a></h4>";
 
