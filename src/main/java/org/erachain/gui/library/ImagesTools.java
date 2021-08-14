@@ -11,6 +11,8 @@ import java.io.IOException;
 
 public class ImagesTools {
 
+    // types in Java: tiff, jpeg|jpg, gif, png
+
     public static byte[] bufferedImageToBytes(final BufferedImage bufferedImage, final String outputFormat)
             throws IOException {
         if (bufferedImage == null) {
@@ -30,8 +32,8 @@ public class ImagesTools {
         }
     }
 
-    public static BufferedImage imageToBufferedImage(Image im) {
-        BufferedImage bi = new BufferedImage(im.getWidth(null), im.getHeight(null), BufferedImage.TYPE_INT_RGB);
+    public static BufferedImage imageToBufferedImage(Image im, int typeOfRGB) {
+        BufferedImage bi = new BufferedImage(im.getWidth(null), im.getHeight(null), typeOfRGB);
 
         Graphics bg = bi.getGraphics();
         bg.drawImage(im, 0, 0, null);
@@ -40,7 +42,7 @@ public class ImagesTools {
     }
 
     // image to byte[] with set Widht scale
-    public static byte[] ImageToByte(Image img, int widht) {
+    public static byte[] ImageToByte(Image img, int widht, int typeOfRGB) {
         BufferedImage outputImage;
 
         if (widht != 0) {
@@ -59,7 +61,7 @@ public class ImagesTools {
 
             }
             // input buffer +
-            BufferedImage inputbuffered = ImagesTools.imageToBufferedImage(img);
+            BufferedImage inputbuffered = ImagesTools.imageToBufferedImage(img, typeOfRGB);
             int scaledWidth = x1;
             int scaledHeight = y;
             // creates output image
@@ -71,7 +73,7 @@ public class ImagesTools {
         }
         // if not scale
         else {
-            outputImage = ImagesTools.imageToBufferedImage(img);
+            outputImage = ImagesTools.imageToBufferedImage(img, typeOfRGB);
         }
 
         byte[] b;
@@ -87,9 +89,9 @@ public class ImagesTools {
         return b;
     }
 
-    public static ImageIcon resizeMaxWidth(ImageIcon imageIcon, int preferredWidth) {
+    public static ImageIcon resizeMaxWidth(ImageIcon imageIcon, int preferredWidth, int typeOfRGB) {
         try {
-            BufferedImage bufferedImage = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+            BufferedImage bufferedImage = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), typeOfRGB);
             bufferedImage.getGraphics().drawImage(imageIcon.getImage(), 0, 0, null);
 
             int bufferedWidth = bufferedImage.getWidth();
@@ -99,7 +101,8 @@ public class ImagesTools {
                 float scaleView = (float) preferredWidth / bufferedWidth;
                 Image imagePack = bufferedImage.getScaledInstance(preferredWidth,
                         (int) (scaleView * bufferedImage.getHeight()),
-                        Image.SCALE_AREA_AVERAGING);
+                        Image.SCALE_DEFAULT // DEFAULT for GIF and PNG -  Alpha layout
+                );
                 return new ImageIcon(imagePack);
             } else {
                 return new ImageIcon(bufferedImage);

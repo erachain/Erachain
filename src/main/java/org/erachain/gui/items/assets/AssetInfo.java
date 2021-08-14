@@ -3,6 +3,7 @@ package org.erachain.gui.items.assets;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.ImageCropDialog;
@@ -107,7 +108,7 @@ public class AssetInfo extends JTextPane {
                     + UIManager.getFont("Label.font").getFamily() + "; font-size: " + UIManager.getFont("Label.font").getSize() + "pt;'>";
 
             text += "<table><tr valign='top' align = 'left'><td>";
-            text += "<DIV  style='float:left'><b>" + Lang.T("Key") + ": </b>" + asset.getKey() + "</DIV>";
+            text += "<DIV  style='float:left'>" + Lang.T("Key") + ": <b>" + asset.getKey() + "</b></DIV>";
 
             // ADD IMAGE to HTML
             if (cachedImage != null) {
@@ -116,10 +117,16 @@ public class AssetInfo extends JTextPane {
 
             Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
             if (record != null)
-                text += "<td><div  style='float:left'><div><b>" + Lang.T("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
-            text += "<div><b>" + Lang.T("Name") + ": </b>" + asset.viewName() + "</div>";
+                text += "<td><div  style='float:left'><div>" + Lang.T("Block-SeqNo") + ": <b>" + record.viewHeightSeq() + "</b></div>";
+            text += "<div>" + Lang.T("Name") + ": <b>" + asset.viewName() + "</b></div>";
+
+            if (asset instanceof AssetUniqueSeriesCopy && ((AssetUniqueSeriesCopy) asset).hasOriginal()) {
+                long origKey = ((AssetUniqueSeriesCopy) asset).getOrigKey();
+                text += "<div>" + Lang.T("Original Asset") + ": <a href = '!!OrigKey'><b>" + origKey + "</b></a></div>";
+            }
+
             if (asset.getTagsStr() != null) {
-                text += "<div><b>" + Lang.T("Tags") + ": </b>" + asset.getTagsStr() + "</div>";
+                text += "<div>" + Lang.T("Tags") + ": <b>" + asset.getTagsStr() + "</b></div>";
             }
 
             text += "<div   style='word-wrap: break-word; '>";
@@ -138,8 +145,16 @@ public class AssetInfo extends JTextPane {
             text += " " + Lang.T("Type") + ": <a href='!!Type'><b>" +
                     asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:"
                     + Lang.T(asset.viewAssetTypeFull()) + "</a>,";
-            text += " " + Lang.T("Accuracy") + ": <b>" + asset.getScale() + "</b>,";
-            text += " " + Lang.T("Quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
+
+            if (asset.isUnique()) {
+                text += " <b>" + Lang.T("Unique") + "</b>,";
+                if (asset instanceof AssetUniqueSeriesCopy) {
+                    text += " <b>" + Lang.T("Series") + " #" + ((AssetUniqueSeriesCopy) asset).getTotal() + "</b>,";
+                }
+            } else {
+                text += " " + Lang.T("Quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
+                text += " " + Lang.T("Accuracy") + ": <b>" + asset.getScale() + "</b>,";
+            }
             text += " " + Lang.T("Released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
 
             if (asset.getDEXAwards() != null) {
@@ -184,11 +199,19 @@ public class AssetInfo extends JTextPane {
                         hl_Maker.get_PopupMenu().show(th, x, y);
                         return;
                     } else if (arg0.getDescription().equals("!!img")) {
-                        ImageCropDialog window = new ImageCropDialog(image) {
+                        ImageCropDialog window = new ImageCropDialog(image,
+                                image.getDescription().equals("jpg") ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB) {
                             @Override
                             public void onFinish(BufferedImage image, TypeOfImage typeOfImage, boolean useOriginal) {
                             }
                         };
+
+                    } else if (arg0.getDescription().equals("!!OrigKey")) {
+                        SearchAssetsSplitPanel panel = new SearchAssetsSplitPanel(false);
+                        long origKey = ((AssetUniqueSeriesCopy) asset).getOrigKey();
+                        panel.itemKey.setText("" + origKey);
+                        panel.startSearchKey();
+                        MainPanel.getInstance().insertNewTab(Lang.T("Search") + " :" + origKey, panel);
 
                     } else if (arg0.getDescription().equals("!!Type")) {
                         String find = asset.viewAssetTypeAbbrev();

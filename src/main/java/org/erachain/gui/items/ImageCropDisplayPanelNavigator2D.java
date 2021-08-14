@@ -70,11 +70,11 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
     }
 
-    public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, ImageIcon imageIcon, int cropWidth, int cropHeight) {
+    public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, ImageIcon imageIcon, int cropWidth, int cropHeight, int typeOfRGB) {
 
         this.parent = parent;
 
-        image = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        image = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), typeOfRGB);
         image.getGraphics().drawImage(imageIcon.getImage(), 0, 0, null);
 
         //this.image = image;

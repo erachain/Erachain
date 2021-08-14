@@ -520,7 +520,6 @@ public class PersonInfo002 extends javax.swing.JPanel {
         person_Maker_Panel.delay_on_close();
         personSignedPanel.delay_on_close();
 
-
     }
 
     // End of variables declaration
@@ -528,7 +527,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         @Override
         public void mousePressed(MouseEvent e) {
 
-            new ImageCropDialog(image) {
+            new ImageCropDialog(image, image.getDescription().equals("jpg") ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB) {
                 @Override
                 public void onFinish(BufferedImage image, TypeOfImage typeOfImage, boolean useOriginal) {
                 }

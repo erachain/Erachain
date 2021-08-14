@@ -47,10 +47,10 @@ public abstract class ImageCropDialog extends JDialog {
         setVisible(true);
     }
 
-    public ImageCropDialog(ImageIcon image) {
+    public ImageCropDialog(ImageIcon image, int typeOfRGB) {
         //setTitle();
         JPanel contentPanel = new JPanel(new BorderLayout());
-        imageCropPanel = new ImageCropPanelNavigator2D(image);
+        imageCropPanel = new ImageCropPanelNavigator2D(image, typeOfRGB);
         contentPanel.add(imageCropPanel, BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();

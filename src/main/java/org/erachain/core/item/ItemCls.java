@@ -620,6 +620,25 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return null;
     }
 
+    public String getImageTypeExt() {
+        if (imageType == ItemCls.MEDIA_TYPE_VIDEO) {
+            return "mp4";
+        } else if (imageType == ItemCls.MEDIA_TYPE_AUDIO) {
+            return "mp3";
+        }
+        if (image.length > 20) {
+            byte[] header = new byte[20];
+            System.arraycopy(image, 0, header, 0, 20);
+            String typeName = new String(header).trim();
+            if (typeName.contains("PNG")) {
+                return "png";
+            } else if (typeName.contains("GIF")) {
+                return "gif";
+            }
+        }
+        return "jpg";
+    }
+
     public MediaType getImageMediaType() {
         return getMediaType(imageType, image);
     }

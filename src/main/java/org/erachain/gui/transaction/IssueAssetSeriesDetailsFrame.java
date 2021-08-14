@@ -14,21 +14,23 @@ public class IssueAssetSeriesDetailsFrame extends RecDetailsFrame {
 
         assetSeriesTX.setDC(DCSet.getInstance(), true);
 
-        //LABEL original REF
-        ++labelGBC.gridy;
-        this.add(new JLabel(Lang.T("Original Reference") + ":"), labelGBC);
-        ++fieldGBC.gridy;
-        JTextField origRef = new JTextField(assetSeriesTX.viewOrigAssetRef());
-        origRef.setEditable(false);
-        MenuPopupUtil.installContextMenu(origRef);
-        this.add(origRef, fieldGBC);
+        if (assetSeriesTX.hasOriginal()) {
+            //LABEL original REF
+            ++labelGBC.gridy;
+            this.add(new JLabel(Lang.T("Original Reference") + ":"), labelGBC);
+            ++fieldGBC.gridy;
+            JTextField origRef = new JTextField(assetSeriesTX.viewOrigAssetRef());
+            origRef.setEditable(false);
+            MenuPopupUtil.installContextMenu(origRef);
+            this.add(origRef, fieldGBC);
 
-        ++labelGBC.gridy;
-        this.add(new JLabel(Lang.T("Original Asset") + ":"), labelGBC);
-        ++fieldGBC.gridy;
-        JTextField origAsset = new JTextField(assetSeriesTX.getOrigAsset().toString());
-        origAsset.setEditable(false);
-        this.add(origAsset, fieldGBC);
+            ++labelGBC.gridy;
+            this.add(new JLabel(Lang.T("Original Asset") + ":"), labelGBC);
+            ++fieldGBC.gridy;
+            JTextField origAsset = new JTextField(assetSeriesTX.getOrigAsset().toString());
+            origAsset.setEditable(false);
+            this.add(origAsset, fieldGBC);
+        }
 
         ++labelGBC.gridy;
         this.add(new JLabel(Lang.T("Series") + ":"), labelGBC);

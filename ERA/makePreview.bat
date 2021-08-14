@@ -8,5 +8,5 @@ rem !!! use '-pix_fmt yuv420p for images converting - for FireFox!!! see https:/
 rem param 2 and 3 - for make small video
 
 rem FireFox good!
-"C:\Program Files\ffmpeg\bin\ffmpeg.exe" -i %1 -y -fs 512k -pix_fmt yuv420p -vcodec h264 -an -vf scale=256:-2,setsar=1:1 -q:v %2 -r:v %3 %4
+"C:\Program Files\ffmpeg\bin\ffmpeg.exe" -i %1 -y -fs 512k -pix_fmt yuv420p -vcodec h264 -an -vf scale=256:-2,setsar=1:1 -crf %2 -r:v %3 %4
 

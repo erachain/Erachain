@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.util.Objects;
@@ -59,9 +60,9 @@ public class VideoRanger {
      * Оптимально 250 к и выше. 250к - это 68мс задержка загрузки - т о есть полностью запрос обрабатывается за 120мс
      * Но зато если бить мельче то одновременная загрузка большого числа видео будет меньше грузить сервер
      */
-    static int RANGE_LEN = 1 << 19;
+    static int RANGE_LEN = 1 << 18;
 
-    public static Response getRange(HttpServletRequest request, byte[] data, boolean asPreview) {
+    public static Response getRange(HttpServletRequest request, byte[] data, MediaType mediaType, boolean asPreview) {
 
         long lastUpdated = cnt.blockChain.getGenesisTimestamp();
         String headerSince = request.getHeader("If-Modified-Since");
@@ -71,7 +72,7 @@ public class VideoRanger {
             return Response.status(304) // not modified
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Connection", "keep-alive")
-                    .header("Content-Type", "video/mp4")
+                    .header("Content-Type", mediaType.toString())
                     .header("Accept-Range", "bytes")
                     .build();
         }
@@ -90,7 +91,7 @@ public class VideoRanger {
                     .header("Connection", "keep-alive")
                     //.header("Cache-Control", "public, max-age=31536000")
                     .header("Content-Transfer-Encoding", "binary")
-                    .header("Content-Type", "video/mp4")
+                    .header("Content-Type", mediaType.toString())
                     .header("Accept-Range", "bytes")
                     // ****
                     // для плеера на андроиде надо именно так - все данные в буфер пихать
@@ -130,7 +131,7 @@ public class VideoRanger {
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Connection", "keep-alive")
                     .header("Content-Transfer-Encoding", "binary")
-                    .header("Content-Type", "video/mp4")
+                    .header("Content-Type", mediaType.toString())
                     .header("Accept-Range", "bytes")
                     .header("Content-Length", 0)
                     .header("Content-Range", "bytes 0-0/" + data.length)
@@ -143,7 +144,7 @@ public class VideoRanger {
         return Response.status(206)
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Connection", "keep-alive")
-                .header("Content-Type", "video/mp4")
+                .header("Content-Type", mediaType.toString())
                 //.header("Cache-Control", "public, max-age=31536000")
                 .header("Content-Transfer-Encoding", "binary")
                 .header("Accept-Range", "bytes")
@@ -153,8 +154,8 @@ public class VideoRanger {
                 .build();
     }
 
-    public Response getRange(HttpServletRequest request, boolean asPreview) {
-        return getRange(request, data, asPreview);
+    public Response getRange(HttpServletRequest request, MediaType mediaType, boolean asPreview) {
+        return getRange(request, data, mediaType, asPreview);
     }
 
 }
