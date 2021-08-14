@@ -209,15 +209,7 @@ public class AddImageLabel extends JPanel {
     }
 
     private ImageIcon createEmptyImage(Color color, int width, int height) {
-        if (true) {
-            return new ImageIcon(emptyImage);
-        } else {
-            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            Graphics2D graphics = image.createGraphics();
-            graphics.setPaint(color);
-            graphics.fillRect(0, 0, width, height);
-            return new ImageIcon(image);
-        }
+        return new ImageIcon(emptyImage);
     }
 
     private void addImage(int minSize, int maxSize, boolean originalSize) {
@@ -262,22 +254,35 @@ public class AddImageLabel extends JPanel {
                     public void onFinish(BufferedImage bufferedImage, TypeOfImage typeOfImage, boolean useOriginal) {
 
                         externalURL.setText("");
+                        String filePath = chooser.getSelectedFile().getPath();
+                        String fileExt;
+                        if (filePath.toLowerCase().endsWith(".gif"))
+                            fileExt = "gif";
+                        else if (filePath.toLowerCase().endsWith(".png"))
+                            fileExt = "png";
+                        else
+                            fileExt = "jpg";
 
                         if (useOriginal) {
                             URL url;
                             try {
-                                url = new URL("file", "", chooser.getSelectedFile().getPath());
+                                url = new URL("file", "", filePath);
                                 mediaBytes = Files.readAllBytes(chooser.getSelectedFile().toPath());
                                 labelSize.setText(Lang.T("Size") + ": " + (mediaBytes.length >> 10) + " kB");
                             } catch (Exception e) {
                                 url = null;
                             }
 
-                            if (chooser.getSelectedFile().getPath().toLowerCase().endsWith(".gif")
-                                    || chooser.getSelectedFile().getPath().toLowerCase().endsWith(".png")) {
-                                mainLabel.setIcon(new ImageIcon(url));
+                            if (fileExt.equals("gif")) {
+                                //mainLabel.setIcon(new ImageIcon(url, "gif"));
+                                mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url, "gif"), 250, BufferedImage.TYPE_INT_ARGB));
+
+                            } else if (fileExt.equals("png")) {
+                                //mainLabel.setIcon(new ImageIcon(url, "png"));
+                                mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url, "png"), 250, BufferedImage.TYPE_INT_ARGB));
+
                             } else {
-                                mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url), 250));
+                                mainLabel.setIcon(ImagesTools.resizeMaxWidth(new ImageIcon(url, "jpeg"), 250, BufferedImage.TYPE_INT_RGB));
                             }
                             return;
 
@@ -310,11 +315,7 @@ public class AddImageLabel extends JPanel {
 
                             ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
 
-                            if (typeOfImage == TypeOfImage.GIF) {
-                                ImageIO.write(bufferedImage, "gif", imageStream);
-                            } else {
-                                ImageIO.write(bufferedImage, "jpeg", imageStream);
-                            }
+                            ImageIO.write(bufferedImage, fileExt, imageStream);
 
                             mediaBytes = imageStream.toByteArray();
 

@@ -88,8 +88,8 @@ public class PreviewMaker {
         if (item.getImageType() == ItemCls.MEDIA_TYPE_IMG && mediaExt != "gif") {
             // JPEG and PNG simple resize
             ImageIcon imageIcon;
-            if (false) {
-                imageIcon = new ImageIcon(image, mediaExt == "png" ? "gif" : "JPEG");
+            if (true) {
+                imageIcon = new ImageIcon(image, mediaExt);
             } else {
                 String pathIn = mainFolder + File.separator + "orig" + File.separator + outputName;
                 pathIn += "." + mediaExt;
@@ -118,7 +118,8 @@ public class PreviewMaker {
                         //mediaExt == "png"? Image.SCALE_DEFAULT : Image.SCALE_SMOOTH
                         Image.SCALE_DEFAULT
                 ));
-                bufferedImage = ImagesTools.imageToBufferedImage(imageIcon.getImage());
+                bufferedImage = ImagesTools.imageToBufferedImage(imageIcon.getImage(),
+                        mediaExt == "jpg" ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB);
                 ImageIO.write(bufferedImage, mediaExt, fileOut);
 
                 return fileOut;

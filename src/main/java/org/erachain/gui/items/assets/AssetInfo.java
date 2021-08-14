@@ -199,7 +199,8 @@ public class AssetInfo extends JTextPane {
                         hl_Maker.get_PopupMenu().show(th, x, y);
                         return;
                     } else if (arg0.getDescription().equals("!!img")) {
-                        ImageCropDialog window = new ImageCropDialog(image) {
+                        ImageCropDialog window = new ImageCropDialog(image,
+                                image.getDescription().equals("jpg") ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB) {
                             @Override
                             public void onFinish(BufferedImage image, TypeOfImage typeOfImage, boolean useOriginal) {
                             }
