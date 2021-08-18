@@ -671,13 +671,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return imageType;
     }
 
-    public String getIconTypeName() {
-        return viewMediaType(iconType);
-    }
+    //public String getIconTypeName() {
+    //    return viewMediaType(iconType);
+    //}
 
-    public String getImageTypeName() {
-        return viewMediaType(imageType);
-    }
+    //public String getImageTypeName() {
+    //    return viewMediaType(imageType);
+    //}
 
     public boolean hasImageURL() {
         return imageAsURL;
@@ -1198,25 +1198,19 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         JSONObject itemJSON = new JSONObject();
 
-        itemJSON.put("iconType", getIconType());
-        itemJSON.put("iconTypeName", viewMediaType(iconType));
+        //itemJSON.put("iconTypeName", viewMediaType(iconType));
 
         // ADD DATA
         if (hasIconURL()) {
             itemJSON.put("iconURL", getIconURL());
-        } else {
-            if (getIcon() != null && getIcon().length > 0)
-                itemJSON.put("icon", java.util.Base64.getEncoder().encodeToString(this.getIcon()));
+            itemJSON.put("iconType", getIconType());
+            itemJSON.put("iconMediaType", getIconMediaType().toString());
         }
-
-        itemJSON.put("imageType", getImageType());
-        itemJSON.put("imageTypeName", viewMediaType(imageType));
 
         if (hasImageURL()) {
             itemJSON.put("imageURL", getImageURL());
-        } else {
-            if (getImage() != null && getImage().length > 0)
-                itemJSON.put("image", java.util.Base64.getEncoder().encodeToString(this.getImage()));
+            itemJSON.put("imageType", getImageType());
+            itemJSON.put("imageMediaType", getImageMediaType().toString());
         }
 
         return itemJSON;
@@ -1334,7 +1328,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             itemJson.put("maker_person", person.b.getName());
             itemJson.put("maker_person_key", person.b.getKey());
             itemJson.put("maker_person_image_url", person.b.getImageURL());
-            itemJson.put("maker_person_image_type", person.b.getImageTypeName());
             itemJson.put("maker_person_image_media_type", person.b.getImageMediaType().toString());
 
         }

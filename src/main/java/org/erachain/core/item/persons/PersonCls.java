@@ -503,11 +503,10 @@ public abstract class PersonCls extends ItemCls {
         JSONObject json = super.jsonForExplorerPage(langObj, args);
         json.put("birthday", birthday);
 
-        json.put("imageType", getImageType());
-        json.put("imageTypeName", viewMediaType(imageType));
-
         if (hasImageURL()) {
             json.put("imageURL", getImageURL());
+            json.put("imageType", getImageType());
+            json.put("imageMediaType", getImageMediaType().toString());
         }
 
         return json;
