@@ -13,6 +13,7 @@ import org.erachain.core.transaction.IssueAssetSeriesTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.erachain.webserver.PreviewMaker;
 import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -312,19 +313,20 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
             }
             AssetCls original = issueTX.getOrigAsset();
 
-            originalJson.put("iconType", original.getIconType());
-            originalJson.put("iconTypeName", viewMediaType(original.getIconType()));
 
             String iconURL = original.getIconURL();
-            if (iconURL != null)
+            if (iconURL != null) {
                 originalJson.put("iconURL", iconURL);
-
-            originalJson.put("imageType", original.getImageType());
-            originalJson.put("imageTypeName", viewMediaType(original.getImageType()));
+                originalJson.put("iconType", original.getIconType());
+            }
 
             String imageURL = original.getImageURL();
-            if (imageURL != null)
+            if (imageURL != null) {
                 originalJson.put("imageURL", imageURL);
+                originalJson.put("imageType", original.getImageType());
+                originalJson.put("imageMediaType", original.getImageMediaType().toString());
+                originalJson.put("imagePreviewMediaType", PreviewMaker.getPreviewType(original).toString());
+            }
 
             assetJSON.put("original", originalJson);
         }
