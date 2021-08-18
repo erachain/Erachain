@@ -326,8 +326,8 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
             if (imageURL != null) {
                 originalJson.put("imageURL", imageURL);
                 originalJson.put("imageType", original.getImageType());
-                originalJson.put("imageTypeName", original.getImageTypeName());
-                //originalJson.put("imageMediaType", original.getImageMediaType().toString());
+                //originalJson.put("imageTypeName", original.getImageTypeName());
+                originalJson.put("imageMediaType", original.getImageMediaType().toString());
                 originalJson.put("imagePreviewMediaType", PreviewMaker.getPreviewType(original).toString());
             }
 
