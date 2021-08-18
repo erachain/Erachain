@@ -580,8 +580,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return iconType;
     }
 
-    public static String viewMediaType(int iconType) {
-        switch (iconType) {
+    public static String viewMediaType(int mediaType) {
+        switch (mediaType) {
             case MEDIA_TYPE_IMG:
                 return "img";
             case MEDIA_TYPE_VIDEO:
@@ -669,6 +669,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public int getImageType() {
         return imageType;
+    }
+
+    public String getIconTypeName() {
+        return viewMediaType(iconType);
     }
 
     public String getImageTypeName() {
@@ -1109,6 +1113,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         String iconURL = getIconURL();
         if (iconURL != null) {
             itemJSON.put("iconURL", getIconURL());
+            itemJSON.put("iconTypeName", getIconTypeName());
             itemJSON.put("iconMediaType", getIconMediaType().toString());
             itemJSON.put("iconType", getIconType());
         }
@@ -1175,6 +1180,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         if (imageURL != null) {
             itemJSON.put("imageURL", imageURL);
             itemJSON.put("imageType", getImageType());
+            itemJSON.put("imageTypeName", getImageType());
             itemJSON.put("imageMediaType", getImageMediaType().toString());
             itemJSON.put("imagePreviewMediaType", PreviewMaker.getPreviewType(this).toString());
         }
