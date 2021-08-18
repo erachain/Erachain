@@ -9,18 +9,18 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
     if (item.original) {
         if (item.original.imageURL) {
             origSource = item.original.imageURL;
-        } else if (item.original.imageTypeName == 'video') {
+        } else if (item.original.imageMediaType.startsWith('video')) {
             origSource = '/api' + item.original.item_type + '/image/' + item.original.key;
         }
 
         if (origSource) {
-            if (item.original.imageTypeName == 'video') {
+            if (item.original.imageMediaType.startsWith('video')) {
                 output += '<a href="#"><video id="video-holder" style="display:none;" onclick="style.display=\'none\';this.stop()" loop controls ></video></a>';
                 output += '<a href="#"><video id="video-orig" autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\''
                     + origSource + '\')" style="position: absolute;"><source src="' + origSource + '"></video></a>';
                 origFullShow = 'onclick="document.getElementById(\'video-orig\').pause();showWindowVideo(\'' + origSource + '\')"';
 
-            } else if (item.imageTypeName == 'audio') {
+            } else if (item.imageMediaType.startsWith('audio')) {
                 output += '<a href="#"><audio controls autoplay loop><source src="' + origSource + '" type="audio/mp3"></audio></a>';
 
             } else {
@@ -50,16 +50,16 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
         source = 'data:image/gif;base64,' + item.image;
     } else if (item.imageURL) {
         source = item.imageURL;
-    } else if (item.imageTypeName == 'video') {
+    } else if (item.imageMediaType.startsWith('video')) {
         source = '/api' + item.item_type + '/image/' + item.key;
     }
 
     if (source) {
-        if (!origSource && item.imageTypeName == 'video') {
+        if (!origSource && item.imageMediaType.startsWith('video')) {
             output += '<a href="#"><video style="display:none;" onclick="style.display=\'none\';this.stop()" id="video-holder" loop controls ></video></a>';
             output += '<a href="#"><video autoplay muted playsinline loop width="350" onclick="this.pause();showWindowVideo(\'' + source + '\')"><source src="' + source + '"></video></a>';
 
-        } else if (!origSource && item.imageTypeName == 'audio') {
+        } else if (!origSource && item.imageMediaType.startsWith('audio')) {
             output += '<a href="#"><audio controls autoplay loop><source src="' + source + '" type="audio/mp3"></audio></a>';
 
         } else {

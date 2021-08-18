@@ -318,7 +318,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
             if (iconURL != null) {
                 originalJson.put("iconURL", iconURL);
                 originalJson.put("iconType", original.getIconType());
-                originalJson.put("iconTypeName", original.getIconTypeName());
+                //originalJson.put("iconTypeName", original.getIconTypeName());
                 originalJson.put("iconMediaType", original.getIconMediaType().toString());
             }
 
@@ -327,7 +327,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
                 originalJson.put("imageURL", imageURL);
                 originalJson.put("imageType", original.getImageType());
                 originalJson.put("imageTypeName", original.getImageTypeName());
-                originalJson.put("imageMediaType", original.getImageMediaType().toString());
+                //originalJson.put("imageMediaType", original.getImageMediaType().toString());
                 originalJson.put("imagePreviewMediaType", PreviewMaker.getPreviewType(original).toString());
             }
 
