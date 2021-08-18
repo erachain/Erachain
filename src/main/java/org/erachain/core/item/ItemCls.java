@@ -597,20 +597,19 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     public static MediaType getMediaType(int mediaType, byte[] media) {
         if (mediaType == ItemCls.MEDIA_TYPE_IMG) {
-            if (media.length > 20) {
+            if (media != null && media.length > 20) {
                 byte[] header = new byte[20];
                 System.arraycopy(media, 0, header, 0, 20);
                 String typeName = new String(header).trim();
                 if (typeName.contains("PNG")) {
-                    typeName = "png";
+                    return WebResource.TYPE_PNH;
                 } else if (typeName.contains("GIF")) {
-                    typeName = "gif";
+                    return WebResource.TYPE_GIF;
                 } else {
-                    typeName = "jpeg";
+                    return WebResource.TYPE_JPEG;
                 }
-                return new MediaType("image", typeName);
             } else {
-                return WebResource.TYPE_JPEG;
+                return WebResource.TYPE_IMAGE;
             }
 
         } else if (mediaType == ItemCls.MEDIA_TYPE_VIDEO) {
@@ -641,11 +640,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public MediaType getImageMediaType() {
-        return getMediaType(imageType, image);
+        return getMediaType(imageType, hasImageURL() ? null : image);
     }
 
     public MediaType getIconMediaType() {
-        return getMediaType(iconType, icon);
+        return getMediaType(iconType, hasIconURL() ? null : icon);
     }
 
     public boolean hasIconURL() {
