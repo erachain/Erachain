@@ -1846,36 +1846,42 @@ public class Controller extends Observable {
     // https://127.0.0.1/7pay_in/tools/block_proc/ERA
     public void NotifyWalletIncoming(List<Transaction> transactions) {
 
-        if (!doesWalletExists())
-            return;
+        if (false) {
+            // уведомляем в любом случае что блок пришел!
+            // так как это надо для обновления подтверждений у внешнего сервиса
 
-        List<Account> accounts = this.wallet.getAccounts();
-        List<Integer> seqs = new ArrayList<Integer>();
+            if (!doesWalletExists())
+                return;
 
-        int seq = 0;
-        for (Transaction transaction : transactions) {
+            List<Account> accounts = this.wallet.getAccounts();
+            List<Integer> seqs = new ArrayList<Integer>();
 
-            transaction.setDC(dcSet);
+            int seq = 0;
+            for (Transaction transaction : transactions) {
 
-            // FOR ALL ACCOUNTS
-            synchronized (accounts) {
-                for (Account account : accounts) {
-                    // CHECK IF INVOLVED
-                    if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
-                        seqs.add(++seq);
-                        break;
+                transaction.setDC(dcSet);
+
+                // FOR ALL ACCOUNTS
+                synchronized (accounts) {
+                    for (Account account : accounts) {
+                        // CHECK IF INVOLVED
+                        if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
+                            seqs.add(++seq);
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        // Если моих транзакций нету
-        if (seqs.isEmpty()
-                // раз в 100 блоков уведомлять что обновиться  надо
-                && (++skipNotify < 10
-                || System.currentTimeMillis() - skipNotifyTime < 200000L
-                || isStatusSynchronizing()))
-            return;
+            // Если моих транзакций нету
+            if (seqs.isEmpty()
+                    // раз в 100 блоков уведомлять что обновиться  надо
+                    && (++skipNotify < 10
+                    || System.currentTimeMillis() - skipNotifyTime < 200000L
+                    || isStatusSynchronizing()))
+                return;
+
+        }
 
         skipNotify = 0;
         skipNotifyTime = System.currentTimeMillis();
