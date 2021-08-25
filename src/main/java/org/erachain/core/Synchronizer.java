@@ -1172,7 +1172,7 @@ public class Synchronizer extends Thread {
                     if (ctrl.isOnStopping())
                         return;
 
-                    if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
+                    if (!ctrl.isStatusSynchronizing() && Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
                         ctrl.NotifyWalletIncoming(block.getTransactions());
                     }
 
