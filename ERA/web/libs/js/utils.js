@@ -162,20 +162,14 @@ function makeMediaIcon(item, class1, style1) {
     var source;
     if (item.iconURL) {
         source = item.iconURL;
-    } else if (item.icon) {
-        source = 'data:image/gif;base64,' + item.icon;
-    } else if (item.iconTypeName == 'video') {
-        source = '/api' + item.item_type + '/icon/' + item.key;
-    }
-
-    if (!source)
-        return '';
-
-    if (item.iconTypeName == 'video') {
-        return '<video muted src="' + source + '" autoplay autoplay loop class="' + class1 + '" style="' + style1 + '"></video>';
-    } else {
+        if (item.iconMediaType.startsWith('video')) {
+            return '<video muted src="' + source + '" autoplay autoplay loop class="' + class1 + '" style="' + style1 + '"></video>';
+        }
         return '<img src="' + source + '" class="' + class1 + '" style="' + style1+ '" /> ';
     }
+
+    return '';
+
 }
 
 function makeMediaImage(item, class1, style1) {
@@ -183,18 +177,12 @@ function makeMediaImage(item, class1, style1) {
     var source;
     if (item.imageURL) {
         source = item.imageURL;
-    } else if (item.image) {
-        source = 'data:image/gif;base64,' + item.image;
-    } else if (item.imageTypeName == 'video') {
-        source = '/api' + item.item_type + '/image/' + item.key;
-    }
-
-    if (!source)
-        return '';
-
-    if (item.imageTypeName == 'video') {
-        return '<video muted src="' + source + '" autoplay playsinline loop class="' + class1 + '" style="' + style1 + '"></video>';
-    } else {
+        if (item.imageMediaType.startsWith('video')) {
+            return '<video muted src="' + source + '" autoplay playsinline loop class="' + class1 + '" style="' + style1 + '"></video>';
+        }
         return '<img src="' + source + '" class="' + class1 + '" style="' + style1 + '" /> ';
     }
+
+    return '';
+
 }
