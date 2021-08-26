@@ -58,6 +58,9 @@ import java.util.regex.Pattern;
 @Path("/")
 public class WebResource {
 
+    public static MediaType TYPE_IMAGE = new MediaType("image", "*");
+    public static MediaType TYPE_GIF = new MediaType("image", "gif");
+    public static MediaType TYPE_PNH = new MediaType("image", "png");
     public static MediaType TYPE_JPEG = new MediaType("image", "jpeg");
     public static MediaType TYPE_VIDEO = new MediaType("video", "mp4");
     public static MediaType TYPE_AUDIO = new MediaType("audio", "mp3");

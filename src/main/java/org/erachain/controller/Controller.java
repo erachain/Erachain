@@ -100,7 +100,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.5.01 dev 02";
+    public static String version = "5.5";
     public static String buildTime = "2021-08-15 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -1841,44 +1841,8 @@ public class Controller extends Observable {
         return true;
     }
 
-    private int skipNotify = 0;
-    private long skipNotifyTime = 0L;
     // https://127.0.0.1/7pay_in/tools/block_proc/ERA
     public void NotifyWalletIncoming(List<Transaction> transactions) {
-
-        if (!doesWalletExists())
-            return;
-
-        List<Account> accounts = this.wallet.getAccounts();
-        List<Integer> seqs = new ArrayList<Integer>();
-
-        int seq = 0;
-        for (Transaction transaction : transactions) {
-
-            transaction.setDC(dcSet);
-
-            // FOR ALL ACCOUNTS
-            synchronized (accounts) {
-                for (Account account : accounts) {
-                    // CHECK IF INVOLVED
-                    if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
-                        seqs.add(++seq);
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Если моих транзакций нету
-        if (seqs.isEmpty()
-                // раз в 100 блоков уведомлять что обновиться  надо
-                && (++skipNotify < 10
-                || System.currentTimeMillis() - skipNotifyTime < 200000L
-                || isStatusSynchronizing()))
-            return;
-
-        skipNotify = 0;
-        skipNotifyTime = System.currentTimeMillis();
 
         // SEE -
         // http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/

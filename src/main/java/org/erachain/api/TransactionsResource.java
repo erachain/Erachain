@@ -69,6 +69,28 @@ public class TransactionsResource {
         return transaction.toJson().toJSONString();
     }
 
+    @GET
+    @Path("seqno/{signature}")
+    public static String getSeqNoBySignature(@PathParam("signature") String signature) {
+        // DECODE SIGNATURE
+        byte[] signatureBytes;
+        try {
+            signatureBytes = Base58.decode(signature);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+        }
+
+        // GET TRANSACTION
+        Long seqNo = Controller.getInstance().getDCSet().getTransactionFinalMapSigns().get(signatureBytes);
+
+        // CHECK IF TRANSACTION EXISTS
+        if (seqNo == null) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
+        }
+
+        return Transaction.viewDBRef(seqNo);
+    }
+
 	/*
 	@GET
 	@Path("/{address}")

@@ -216,6 +216,11 @@ public class ApiClient {
                             "Errors: 101 - Invalid signature. 311 - Transaction does not exist."
                     },
                     {
+                            "GET transactions/seqno/<signature>",
+                            "Returns the transaction Seq-No by signature.",
+                            "Errors: 101 - Invalid signature. 311 - Transaction does not exist."
+                    },
+                    {
                             "GET transactions/network",
                             "Returns an array of all the unconfirmed transactions known to the client.",
                             ""

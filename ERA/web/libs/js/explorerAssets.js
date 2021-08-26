@@ -92,7 +92,7 @@ function asset(data, forPrint) {
     var item = data.item;
     ////// HEAD
     if (item.imageTypeName == 'audio') {
-        output += itemHead(item, forPrint, item.maker_person_image_url, item.maker_person_image_type);
+        output += itemHead(item, forPrint, item.maker_person_image_url, item.maker_person_image_media_type);
     } else {
         output += itemHead(item, forPrint);
     }

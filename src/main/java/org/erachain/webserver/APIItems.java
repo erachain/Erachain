@@ -68,7 +68,8 @@ public class APIItems {
 
         Controller cnt = Controller.getInstance();
 
-        if (image.length > PreviewMaker.IMAGE_USE_ORIG_LEN) {
+        if (image.length > PreviewMaker.IMAGE_USE_ORIG_LEN || mediaType.equals(WebResource.TYPE_VIDEO)) {
+            // для видео всегда нужен Range иначе мобилка не воспроизводит
             return VideoRanger.getRange(request, image, mediaType, preView);
         }
 
