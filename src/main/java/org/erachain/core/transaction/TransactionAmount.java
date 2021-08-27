@@ -8,6 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.EpochSmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -1235,6 +1236,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return KEY_COLLISION;
         }
 
+        errorValue = EpochSmartContract.isValid(this);
+        if (errorValue != null) {
+            return INVALID_EPOCH_SMART_CONTRCT;
+        }
+
         return VALIDATE_OK;
     }
 
@@ -1364,6 +1370,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         this.assetFee.negate(), "Asset Fee", this.dbRef);
             }
         }
+
+        EpochSmartContract.process(dcSet, block, this);
+
     }
 
     @Override

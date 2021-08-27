@@ -16,6 +16,7 @@ import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.blockexplorer.WebTransactionsHTML;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.EpochSmartContract;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
@@ -284,6 +285,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int INVALID_EX_LINK_TYPE = 401;
     public static final int INVALID_EX_LINK_REF = 402;
     public static final int INVALID_RECEIVERS_LIST = 403;
+
+    public static final int INVALID_EPOCH_SMART_CONTRCT = 451;
 
     public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 501;
     public static final int ACCOUNT_ACCSES_DENIED = 520;
@@ -2626,6 +2629,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             int error = 0;
             error++;
         }
+
+        EpochSmartContract.orphan(dcSet, block, this);
 
         if (forDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
