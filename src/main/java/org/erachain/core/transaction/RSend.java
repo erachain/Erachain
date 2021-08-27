@@ -250,7 +250,7 @@ public class RSend extends TransactionAmount {
 
         SmartContract smartContract;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.parse(data, position, forDeal);
+            smartContract = SmartContract.Parses(data, position, forDeal);
             position += smartContract.length(forDeal);
         } else {
             smartContract = null;

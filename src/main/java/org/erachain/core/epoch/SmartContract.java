@@ -8,38 +8,55 @@ import org.erachain.datachain.DCSet;
 
 public abstract class SmartContract {
 
-    static final int DOGE_PLANET_SC = 1;
-    protected PublicKeyAccount maker;
+    static final int DOGE_PLANET_1 = 1;
 
-    SmartContract() {
+
+    protected final int id;
+    protected final PublicKeyAccount maker;
+
+    SmartContract(int id, PublicKeyAccount maker) {
+        this.id = id;
+        this.maker = maker;
     }
 
-    SmartContract(PublicKeyAccount maker) {
-        this.maker = maker;
+    public int getID() {
+        return this.id;
     }
 
     public PublicKeyAccount getMaker() {
         return this.maker;
     }
 
+    /**
+     * Эпохальный, запускается самим протоколом. Поэтому он не передается в сеть
+     * Но для базы данных генерит данные, которые нужно читать и писать
+     *
+     * @return
+     */
+    public boolean isEpoch() {
+        return false;
+    }
+
     public int length(int forDeal) {
-        return 0;
+        return 4 + 32;
     }
 
     public byte[] toBytes(int forDeal) {
+        byte[] data = new byte[4 + 32];
+        System.arraycopy(Ints.toByteArray(id), 0, data, 0, 4);
+        System.arraycopy(maker.getPublicKey(), 0, data, 4, 36);
+
         return new byte[8];
     }
 
-    //abstract SmartContract Parse(byte[] data, int forDeal) throws Exception;
-
-    public static SmartContract parse(byte[] data, int position, int forDeal) throws Exception {
+    public static SmartContract Parses(byte[] data, int position, int forDeal) throws Exception {
 
         byte[] idBuffer = new byte[4];
         System.arraycopy(data, position, idBuffer, 0, 4);
         int id = Ints.fromByteArray(idBuffer);
         switch (id) {
-            case DOGE_PLANET_SC:
-                return new DogePlanet(data, position, forDeal);
+            case DOGE_PLANET_1:
+                return DogePlanet.Parse(data, position + 4, forDeal);
         }
 
         throw new Exception("wrong smart-contract id:" + id);
