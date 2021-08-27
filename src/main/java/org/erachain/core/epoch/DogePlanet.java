@@ -1,50 +1,43 @@
 package org.erachain.core.epoch;
 
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.transaction.RSend;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 
-import java.math.BigDecimal;
+public class DogePlanet extends SmartContract {
 
-public class DogePlanet {
+    private long key;
 
+    DogePlanet() {
+        super(new PublicKeyAccount("1"));
+    }
 
-    static public boolean isSelected(Transaction transaction) {
-
-        if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-            RSend txSend = (RSend) transaction;
-            if (txSend.getAbsKey() == 10234L
-                    && txSend.balancePosition() == TransactionAmount.ACTION_SPEND
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+    DogePlanet(byte[] data, int pos) {
 
     }
 
+    @Override
+    public boolean process(DCSet dcSet, Block block, Transaction transaction) {
 
-    static public String isValid(RSend transaction) {
+        AssetUnique planet = new AssetUnique(null, maker, "new planet", null, null,
+                null, AssetCls.AS_NON_FUNGIBLE);
+        planet.setReference(transaction.getSignature(), transaction.getDBRef());
 
-        if (!transaction.getAmount().equals(BigDecimal.ONE))
-            return "amount not 1";
-
-        return null;
-
-    }
-
-
-    static public boolean process(DCSet dcSet, Block block, RSend transaction) {
-
+        //INSERT INTO DATABASE
+        key = dcSet.getItemAssetMap().incrementPut(planet);
 
         return false;
     }
 
 
-    static public boolean orphan(DCSet dcSet, Block block, RSend transaction) {
+    @Override
+    public boolean orphan(DCSet dcSet, Transaction transaction) {
+
+        //DELETE FROM DATABASE
+        dcSet.getItemAssetMap().decrementDelete(key);
 
         return false;
     }

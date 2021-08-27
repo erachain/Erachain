@@ -1410,7 +1410,13 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         ItemMap dbMap = this.getDBMap(db);
 
         long newKey;
-        long novaKey = this.isNovaItem(db);
+
+        long novaKey;
+        if (startKey > 0)
+            novaKey = this.isNovaItem(db);
+        else
+            novaKey = 0;
+
         if (novaKey > 0) {
 
             // INSERT WITH NOVA KEY

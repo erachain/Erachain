@@ -1,42 +1,25 @@
 package org.erachain.core.epoch;
 
-import org.erachain.core.block.Block;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
+import org.erachain.core.transaction.TransactionAmount;
 
 public class EpochSmartContract {
 
-    static public String isValid(Transaction transaction) {
 
-        if (DogePlanet.isSelected(transaction)) {
-            return DogePlanet.isValid((RSend) transaction);
+    static public SmartContract isSelected(Transaction transaction) {
+
+        if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+            RSend txSend = (RSend) transaction;
+            if (txSend.getAbsKey() == 10234L
+                    && txSend.balancePosition() == TransactionAmount.ACTION_SPEND
+            ) {
+                return new DogePlanet();
+            }
         }
 
         return null;
+
     }
 
-    /**
-     * @param dcSet
-     * @param block
-     * @param transaction
-     * @return
-     */
-    static public boolean process(DCSet dcSet, Block block, Transaction transaction) {
-
-        if (DogePlanet.isSelected(transaction)) {
-            return DogePlanet.process(dcSet, block, (RSend) transaction);
-        }
-
-        return false;
-    }
-
-    static public boolean orphan(DCSet dcSet, Block block, Transaction transaction) {
-
-        if (DogePlanet.isSelected(transaction)) {
-            return DogePlanet.orphan(dcSet, block, (RSend) transaction);
-        }
-
-        return false;
-    }
 }
