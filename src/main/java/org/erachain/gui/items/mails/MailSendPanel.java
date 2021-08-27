@@ -8,6 +8,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.assets.AssetCls;
@@ -721,6 +722,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             exLink = new ExLinkAppendix(linkRef);
         }
 
+        SmartContract smartContract = null;
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(creator, exLink, smartContract, feePow, recipient, key,
                 amount, head, messageBytes, isTextByte, encrypted, 0);

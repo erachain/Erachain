@@ -121,7 +121,7 @@ public class RSendResource {
         }
 
         boolean needAmount = false;
-        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, exLink, smartContract, recipientStr, feePowStr,
+        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, exLink, null, recipientStr, feePowStr,
                 assetKey, true,
                 amount, needAmount,
                 title, message, encoding, encrypt, 0);
@@ -268,7 +268,7 @@ public class RSendResource {
         }
 
         boolean needAmount = false;
-        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, exLink, smartContract, recipientStr, feePowStr,
+        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, exLink, null, recipientStr, feePowStr,
                 assetKey, true,
                 amountStr, needAmount,
                 title, message, encoding, encrypt, 0);
@@ -448,7 +448,7 @@ public class RSendResource {
                     String address = creator.getAddress();
                     long counter = counters.get(address);
 
-                    WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, null, smartContract, (byte) 0, recipient, 2l, null,
+                    WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, null, null, (byte) 0, recipient, 2l, null,
                             "LoadTest_" + address.substring(1, 5) + " " + counter,
                             (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                             new byte[]{(byte) 1}, NTP.getTime(), 0l));
@@ -592,7 +592,7 @@ public class RSendResource {
                     if (false) {
                         // ERA - она еще форжинговые балансы изменяет - поэтому КОМПУ лучше всего
                         Transaction transaction = cnt.r_Send(creator,
-                                null, smartContract, 0, recipient,
+                                null, null, 0, recipient,
                                 2L, amount, "LoadTestSend_" + address.substring(1, 5) + " " + counter,
                                 (address + counter + "TEST SEND ERA").getBytes(StandardCharsets.UTF_8), encryptMessage,
                                 new byte[]{(byte) 1}, 0);
@@ -633,7 +633,7 @@ public class RSendResource {
 
                     } else {
 
-                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, null, smartContract, (byte) 0, recipient, 2L,
+                        WeakReference<RSend> weakRef = new WeakReference<>(new RSend(creator, null, null, (byte) 0, recipient, 2L,
                                 amount, "TEST" + counter, null, isText, encryptMessage, NTP.getTime(), 0L));
 
                         weakRef.get().sign(creator, Transaction.FOR_NETWORK);
@@ -896,7 +896,7 @@ public class RSendResource {
                             exLink = new ExLinkAppendix(exLinkRef);
                         }
 
-                        Pair<Integer, Transaction> result = cntr.make_R_Send(null, accountFrom, exLink, smartContract, recipientStr, feePow,
+                        Pair<Integer, Transaction> result = cntr.make_R_Send(null, accountFrom, exLink, null, recipientStr, feePow,
                                 assetKey, true,
                                 sendAmount, needAmount,
                                 title, null, 0, false, timestampThis++);
