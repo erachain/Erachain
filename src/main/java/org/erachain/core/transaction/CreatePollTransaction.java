@@ -28,7 +28,7 @@ public class CreatePollTransaction extends Transaction {
     private Poll poll;
 
     public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
 
         this.creator = creator;
         this.poll = poll;

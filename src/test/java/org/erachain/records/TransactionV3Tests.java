@@ -87,7 +87,7 @@ public class TransactionV3Tests {
 
 
         RSend messageTransactionV3 = new RSend(
-                maker, exLink, FEE_POWER, //	ATFunding
+                maker, exLink, smartContract, FEE_POWER, //	ATFunding
                 recipient,
                 ERM_KEY,
                 amount,

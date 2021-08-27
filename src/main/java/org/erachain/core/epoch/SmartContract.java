@@ -32,14 +32,14 @@ public abstract class SmartContract {
 
     //abstract SmartContract Parse(byte[] data, int forDeal) throws Exception;
 
-    public static SmartContract parse(byte[] data, int position) throws Exception {
+    public static SmartContract parse(byte[] data, int position, int forDeal) throws Exception {
 
         byte[] idBuffer = new byte[4];
         System.arraycopy(data, position, idBuffer, 0, 4);
         int id = Ints.fromByteArray(idBuffer);
         switch (id) {
             case DOGE_PLANET_SC:
-                return new DogePlanet(data, position);
+                return new DogePlanet(data, position, forDeal);
         }
 
         throw new Exception("wrong smart-contract id:" + id);

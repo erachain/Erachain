@@ -62,7 +62,7 @@ public class RSignNote extends Transaction implements Itemable {
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, Long reference) {
 
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
 
         this.key = templateKey;
         this.data = data;

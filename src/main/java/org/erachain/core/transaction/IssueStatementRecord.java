@@ -42,7 +42,7 @@ public class IssueStatementRecord extends Transaction {
 
     public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
 
         this.key = templateKey;
         this.data = data;

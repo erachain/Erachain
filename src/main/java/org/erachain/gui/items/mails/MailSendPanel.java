@@ -722,7 +722,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         }
 
         // CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send(creator, exLink, feePow, recipient, key,
+        Transaction transaction = Controller.getInstance().r_Send(creator, exLink, smartContract, feePow, recipient, key,
                 amount, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);

@@ -54,7 +54,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
     public RCertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, long key,
                            List<PublicKeyAccount> certifiedPublicKeys,
                            int add_day, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, exLink, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, exLink, null, feePow, timestamp, reference);
 
         this.key = key;
         this.certifiedPublicKeys = certifiedPublicKeys;

@@ -131,13 +131,13 @@ public class TestRecSendInSideAsset {
         //CREATE ASSET TRANSFER
         
         // INVALID
-        r_Send = new RSend(emitter, exLink, FEE_POWER, debtor, assetKey, BigDecimal.valueOf(1000),
+        r_Send = new RSend(emitter, exLink, smartContract, FEE_POWER, debtor, assetKey, BigDecimal.valueOf(1000),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NO_BALANCE);
 
-        r_Send = new RSend(emitter, exLink, FEE_POWER, creditor, assetKey, BigDecimal.valueOf(50),
+        r_Send = new RSend(emitter, exLink, smartContract, FEE_POWER, creditor, assetKey, BigDecimal.valueOf(50),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -186,7 +186,7 @@ public class TestRecSendInSideAsset {
 
         // INVALID
         r_Send = new RSend(
-                debtor, exLink, FEE_POWER, emitter, -assetKey, BigDecimal.valueOf(10),
+                debtor, exLink, smartContract, FEE_POWER, emitter, -assetKey, BigDecimal.valueOf(10),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -197,7 +197,7 @@ public class TestRecSendInSideAsset {
                 version,
                 prop1_backward,
                 prop2,
-                debtor, exLink, FEE_POWER, emitter, -assetKey, BigDecimal.valueOf(10),
+                debtor, exLink, smartContract, FEE_POWER, emitter, -assetKey, BigDecimal.valueOf(10),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -205,7 +205,7 @@ public class TestRecSendInSideAsset {
 
         // INVALID
         r_Send = new RSend(
-                creditor, exLink, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(100),
+                creditor, exLink, smartContract, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(100),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -213,7 +213,7 @@ public class TestRecSendInSideAsset {
 
         // GET CREDIT - дать в кредит актив
         r_Send = new RSend(
-                creditor, exLink, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(10),
+                creditor, exLink, smartContract, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(10),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -279,7 +279,7 @@ public class TestRecSendInSideAsset {
                 version,
                 prop1_backward,
                 prop2,
-                creditor, exLink, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(20),
+                creditor, exLink, smartContract, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(20),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -290,7 +290,7 @@ public class TestRecSendInSideAsset {
                 version,
                 prop1_backward,
                 prop2,
-                creditor, exLink, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(7),
+                creditor, exLink, smartContract, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(7),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -346,7 +346,7 @@ public class TestRecSendInSideAsset {
         r_Send.process(gb, Transaction.FOR_NETWORK);
 
         // SEND 2
-        r_Send = new RSend(emitter, exLink, FEE_POWER, debtor, assetKey, BigDecimal.valueOf(30),
+        r_Send = new RSend(emitter, exLink, smartContract, FEE_POWER, debtor, assetKey, BigDecimal.valueOf(30),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -361,7 +361,7 @@ public class TestRecSendInSideAsset {
         assertEquals(BigDecimal.valueOf(0), db.getCredit_AddressesMap().get(creditKeyReverse));
 
         // CREDIT 2
-        r_Send = new RSend(debtor, exLink, FEE_POWER, creditor, -assetKey, BigDecimal.valueOf(30),
+        r_Send = new RSend(debtor, exLink, smartContract, FEE_POWER, creditor, -assetKey, BigDecimal.valueOf(30),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
@@ -395,7 +395,7 @@ public class TestRecSendInSideAsset {
         ///////// теперь проверим возврат долга выше своего возможного значения
 
         // CREDIT INVALID
-        r_Send = new RSend(debtor, exLink, FEE_POWER, creditor, -assetKey, BigDecimal.valueOf(60),
+        r_Send = new RSend(debtor, exLink, smartContract, FEE_POWER, creditor, -assetKey, BigDecimal.valueOf(60),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);

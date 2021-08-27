@@ -44,7 +44,7 @@ public class RSetUnionStatusToItem extends Transaction {
 
     public RSetUnionStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
                                  Long beg_date, Long end_date, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
 
         this.key = key;
         this.itemType = itemType;

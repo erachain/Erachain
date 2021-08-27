@@ -19,6 +19,7 @@ import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -3514,7 +3515,7 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, String recipientStr,
+    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, SmartContract smartContract, String recipientStr,
                                                   int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
                                                   String title, String message, int messagecode, boolean encrypt, long timestamp) {
 
@@ -3629,26 +3630,26 @@ public class Controller extends Observable {
         }
 
         // CREATE RSend
-        return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, linkTo, feePow, recipient,
+        return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, linkTo, smartContract, feePow, recipient,
                 assetKey, amount, title, messageBytes, isTextByte, encrypted, timestamp));
 
     }
 
-    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, int feePow,
+    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, SmartContract smartContract, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage, long timestamp) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(sender, linkTo, recipient, key, amount, feePow, title, message, isText,
+            return this.transactionCreator.r_Send(sender, linkTo, smartContract, recipient, key, amount, feePow, title, message, isText,
                     encryptMessage, timestamp);
         }
     }
 
     public Transaction r_Send(byte version, byte property1, byte property2,
-                              PrivateKeyAccount sender, ExLink linkTo, int feePow,
+                              PrivateKeyAccount sender, ExLink linkTo, SmartContract smartContract, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, linkTo, feePow,
+            return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, linkTo, smartContract, feePow,
                     title, message, isText, encryptMessage);
         }
     }

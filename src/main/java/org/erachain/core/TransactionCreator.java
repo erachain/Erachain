@@ -8,6 +8,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -653,10 +654,8 @@ public class TransactionCreator {
 
     }
 
-    //public Pair<Transaction, Integer> r_Send(PrivateKeyAccount creator,
-
-    public Transaction r_Send(PrivateKeyAccount creator,
-                              ExLink linkTo, Account recipient, long key, BigDecimal amount, int feePow, String title, byte[] message, byte[] isText,
+    public Transaction r_Send(PrivateKeyAccount creator, ExLink linkTo, SmartContract smartContract, Account recipient,
+                              long key, BigDecimal amount, int feePow, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage, long timestamp_in) {
 
         this.checkUpdate();
@@ -667,7 +666,7 @@ public class TransactionCreator {
 
         //CREATE MESSAGE TRANSACTION
         //messageTx = new RSend(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
-        messageTx = new RSend(creator, linkTo, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0L);
+        messageTx = new RSend(creator, linkTo, smartContract, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0L);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
@@ -676,7 +675,7 @@ public class TransactionCreator {
 
     public Transaction r_Send(byte version, byte property1, byte property2,
                               PrivateKeyAccount creator,
-                              Account recipient, long key, BigDecimal amount, ExLink linkTo, int feePow, String title,
+                              Account recipient, long key, BigDecimal amount, ExLink linkTo, SmartContract smartContract, int feePow, String title,
                               byte[] message, byte[] isText, byte[] encryptMessage) {
 
         this.checkUpdate();
@@ -686,7 +685,7 @@ public class TransactionCreator {
         long timestamp = NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
-        messageTx = new RSend(version, property1, property2, creator, linkTo, (byte) feePow, recipient, key, amount, title,
+        messageTx = new RSend(version, property1, property2, creator, linkTo, smartContract, (byte) feePow, recipient, key, amount, title,
                 message, isText, encryptMessage, timestamp, 0L);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());

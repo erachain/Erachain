@@ -677,7 +677,7 @@ public class GeneratorTests {
         for (int i = 0; i < max_count; i++) {
 
             //CREATE VALID PAYMENT
-            Transaction payment = new RSend(generator, exLink, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001),
+            Transaction payment = new RSend(generator, exLink, smartContract, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001),
                     "sss", new byte[3000], new byte[]{1}, new byte[]{0},
                     timestamp++, generator.getLastTimestamp(snapshot)[0]);
 

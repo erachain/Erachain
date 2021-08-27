@@ -39,7 +39,7 @@ public class RVouch extends Transaction {
     protected int refSeqNo;
 
     public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int refHeight, int refSeqNo, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
 
         this.refHeight = refHeight;
         this.refSeqNo = refSeqNo;

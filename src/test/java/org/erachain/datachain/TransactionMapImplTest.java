@@ -91,7 +91,7 @@ public class TransactionMapImplTest {
                 BigDecimal amount = new BigDecimal(counter + "." + counter);
 
                 String address = creator.getAddress();
-                Transaction messageTx = new RSend(creator, exLink, (byte) 0, recipient, 1L, amount,
+                Transaction messageTx = new RSend(creator, exLink, smartContract, (byte) 0, recipient, 1L, amount,
                         "title test", null, new byte[]{(byte) 1},
                         new byte[]{(byte) 0}, timestamp + random.nextInt(10000), 0l);
                 messageTx.sign(creator, Transaction.FOR_NETWORK);

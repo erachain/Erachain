@@ -29,7 +29,7 @@ public class RecordReleasePack extends Transaction {
     private List<Transaction> transactions;
 
     public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
         this.transactions = transactions;
     }
 

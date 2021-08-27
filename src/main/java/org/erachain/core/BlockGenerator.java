@@ -279,7 +279,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
                         amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0L, sign);
             } else {
-                messageTx = new RSend(creator, null, (byte) 0, recipient, assetKey,
+                messageTx = new RSend(creator, null, null, (byte) 0, recipient, assetKey,
                         amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0L);
                 messageTx.sign(creator, Transaction.FOR_NETWORK);
             }
@@ -307,7 +307,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 PrivateKeyAccount creator = creators[random.nextInt(creators.length)];
 
-                messageTx = new RSend(creator, null, (byte) 0, recipient, assetKey,
+                messageTx = new RSend(creator, null, null, (byte) 0, recipient, assetKey,
                         amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage,
                         timestamp, 0L);
                 messageTx.sign(creator, Transaction.FOR_NETWORK);

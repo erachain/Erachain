@@ -8,6 +8,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
@@ -61,6 +62,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     int action;
 
     public ExLink exLink;
+
+    public SmartContract smartContract;
 
     public int feePow;
 
@@ -613,7 +616,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send((byte) 2, backward ? TransactionAmount.BACKWARD_MASK : 0,
-                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress()), exLink, feePow,
+                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress()), exLink, smartContract, feePow,
                 recipient, getAssetKey(), getAmount(), txTitle, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";

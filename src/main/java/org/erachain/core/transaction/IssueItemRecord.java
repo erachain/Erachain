@@ -25,7 +25,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     protected Long key = 0L;
 
     public IssueItemRecord(byte[] typeBytes, String TYPE_NAME, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, linkTo, null, feePow, timestamp, reference);
         this.item = item;
         if (item.getKey() != 0)
             key = item.getKey();

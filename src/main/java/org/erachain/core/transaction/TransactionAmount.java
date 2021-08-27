@@ -8,7 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.epoch.EpochSmartContract;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -135,9 +135,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected AssetCls asset;
 
     // need for calculate fee by feePow into GUI
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, byte feePow, Account recipient,
+    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
                                 BigDecimal amount, long key, long timestamp, Long reference) {
-        super(typeBytes, name, creator, exLink, feePow, timestamp, reference);
+        super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, reference);
         this.recipient = recipient;
 
         if (amount == null || amount.signum() == 0) {
@@ -152,12 +152,15 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
     }
 
+    /*
     // need for calculate fee
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
+    protected TransactionAmount(byte[] typeBytes, SmartContract smartContract, String name, PublicKeyAccount creator, byte feePow, Account recipient,
                                 BigDecimal amount, long key, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, name, creator, null, feePow, recipient, amount, key, timestamp, reference);
+        this(typeBytes, name, creator, null, smartContract, feePow, recipient, amount, key, timestamp, reference);
         this.signature = signature;
     }
+
+     */
 
     // GETTERS/SETTERS
     @Override
@@ -1236,11 +1239,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return KEY_COLLISION;
         }
 
-        errorValue = EpochSmartContract.isValid(this);
-        if (errorValue != null) {
-            return INVALID_EPOCH_SMART_CONTRCT;
-        }
-
         return VALIDATE_OK;
     }
 
@@ -1371,7 +1369,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
-        EpochSmartContract.process(dcSet, block, this);
+        if (smartContract != null)
+            smartContract.process(dcSet, block, this);
 
     }
 

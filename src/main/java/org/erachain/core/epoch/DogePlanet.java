@@ -15,7 +15,7 @@ public class DogePlanet extends SmartContract {
         super(new PublicKeyAccount("1"));
     }
 
-    DogePlanet(byte[] data, int pos) {
+    DogePlanet(byte[] data, int pos, int forDeal) {
 
     }
 
