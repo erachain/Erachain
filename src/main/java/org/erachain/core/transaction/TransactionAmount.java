@@ -8,6 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.EpochSmartContract;
 import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
@@ -1367,6 +1368,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 block.addCalculated(this.creator, absKey,
                         this.assetFee.negate(), "Asset Fee", this.dbRef);
             }
+        }
+
+        ///////// SMART CONTRACTS SESSION
+        if (smartContract == null) {
+            // если у трнзакции нет изначально контракта то попробуем сделать эпохальныый
+            smartContract = EpochSmartContract.make(this);
         }
 
         if (smartContract != null)

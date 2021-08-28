@@ -7,7 +7,13 @@ import org.erachain.core.transaction.TransactionAmount;
 public class EpochSmartContract {
 
 
-    static public SmartContract isSelected(Transaction transaction) {
+    /**
+     * Делает смотр-контракт протокольный (на эпоху).
+     *
+     * @param transaction
+     * @return
+     */
+    static public SmartContract make(Transaction transaction) {
 
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;

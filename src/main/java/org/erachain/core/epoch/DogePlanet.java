@@ -7,6 +7,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 
@@ -69,9 +70,14 @@ public class DogePlanet extends SmartContract {
     @Override
     public boolean process(DCSet dcSet, Block block, Transaction transaction) {
 
-        AssetUnique planet = new AssetUnique(null, maker, "new planet", null, null,
-                null, AssetCls.AS_NON_FUNGIBLE);
-        planet.setReference(transaction.getSignature(), transaction.getDBRef());
+        RSend txSend = (RSend) transaction;
+        AssetUnique planet;
+        int i = txSend.getAmount().intValue();
+        do {
+            planet = new AssetUnique(null, maker, "new planet", null, null,
+                    null, AssetCls.AS_NON_FUNGIBLE);
+            planet.setReference(transaction.getSignature(), transaction.getDBRef());
+        } while (--i > 0);
 
         //INSERT INTO DATABASE
         key = dcSet.getItemAssetMap().incrementPut(planet);
@@ -83,8 +89,13 @@ public class DogePlanet extends SmartContract {
     @Override
     public boolean orphan(DCSet dcSet, Transaction transaction) {
 
-        //DELETE FROM DATABASE
-        dcSet.getItemAssetMap().decrementDelete(key);
+        RSend txSend = (RSend) transaction;
+        int i = 0;
+        do {
+            //DELETE FROM DATABASE
+            dcSet.getItemAssetMap().decrementDelete(key - i);
+        } while (++i < txSend.getAmount().intValue());
+
 
         return false;
     }
