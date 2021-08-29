@@ -53,7 +53,7 @@ public class RHashes extends Transaction {
 
     public RHashes(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
 
-        super(typeBytes, TYPE_NAME, creator, exLink, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, exLink, feePow, timestamp, reference);
 
         this.url = url;
         this.data = data;
@@ -94,7 +94,6 @@ public class RHashes extends Transaction {
         this.setTypeBytes();
     }
 
-    щщ
     public static int getHashesLength(byte[] typeBytes) {
         return Ints.fromBytes((byte) 0, (byte) 0, typeBytes[2], typeBytes[3]);
     }
@@ -226,7 +225,6 @@ public class RHashes extends Transaction {
 
     }
 
-    00
     protected void setTypeBytes() {
 
         byte[] bytesLen = Ints.toByteArray(this.hashes.length);
