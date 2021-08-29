@@ -10,6 +10,8 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.SmartContractValues;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
@@ -112,8 +114,19 @@ public class DogePlanet extends SmartContract {
 
         AssetUnique planet;
         int i = count;
+        SmartContractValues valuesMap = dcSet.getSmartContractValues();
+
+        Fun.Tuple2 countValueKey = new Fun.Tuple2(id, "c");
+        Integer totalIssued = (Integer) valuesMap.get(countValueKey);
+        if (totalIssued == null)
+            totalIssued = 0;
+
         do {
-            planet = new AssetUnique(null, maker, "new planet", null, null,
+
+            totalIssued++;
+            valuesMap.put(countValueKey, totalIssued);
+
+            planet = new AssetUnique(null, maker, "Doge Planet #" + totalIssued, null, null,
                     null, AssetCls.AS_NON_FUNGIBLE);
             planet.setReference(transaction.getSignature(), transaction.getDBRef());
 

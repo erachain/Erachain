@@ -913,15 +913,21 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     @Override
     public int hashCode() {
-        return (reference == null ? 0 : Ints.fromByteArray(reference));
+        return (int) key + (reference == null ? 0 : Ints.fromByteArray(reference));
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ItemCls) {
             ItemCls item = (ItemCls) obj;
-            if (this.reference != null && item.reference != null)
-                return Arrays.equals(this.reference, item.reference);
+            if (item.getItemType() == getItemType()) {
+                if (key != 0 && item.key == key
+                        || this.reference != null && item.reference != null
+                        && Arrays.equals(this.reference, item.reference))
+                    /// сущности по смарт-контрактам, в момент когда еще нет Номера, могут совпадать reference
+                    /// но это разные сущности! надо имя сравнивать
+                    return item.name.equals(name);
+            }
         }
         return false;
     }

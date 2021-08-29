@@ -42,7 +42,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 533; // vers 5.4.1 (remove getDBIssueMap)
+    final static int CURRENT_VERSION = 535; // vers 5.5.1 epoch smart-contract
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
@@ -139,6 +139,8 @@ public class DCSet extends DBASet implements Closeable {
 
     private VouchRecordMap vouchRecordMap;
     private ExLinksMap exLinksMap;
+    private SmartContractValues smartContractValues;
+
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
 
@@ -262,6 +264,8 @@ public class DCSet extends DBASet implements Closeable {
 
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.exLinksMap = new ExLinksMap(this, database);
+            this.smartContractValues = new SmartContractValues(this, database);
+
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
             this.nameStorageMap = new NameStorageMap(this, database);
@@ -404,6 +408,8 @@ public class DCSet extends DBASet implements Closeable {
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
         this.exLinksMap = new ExLinksMap(parent.exLinksMap, this);
+        this.smartContractValues = new SmartContractValues(parent.smartContractValues, this);
+
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
 
@@ -767,6 +773,8 @@ public class DCSet extends DBASet implements Closeable {
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable.clear();
         this.vouchRecordMap.clear();
         this.exLinksMap.clear();
+        this.smartContractValues.clear();
+
         this.hashesMap.clear();
         this.hashesSignsMap.clear();
         this.blockMap.clear();
@@ -1067,6 +1075,9 @@ public class DCSet extends DBASet implements Closeable {
         return this.exLinksMap;
     }
 
+    public SmartContractValues getSmartContractValues() {
+        return this.smartContractValues;
+    }
 
     /**
      * Для поиска по хешу в транзакции множества хешей - саму запись
