@@ -645,13 +645,13 @@ public class Wallet extends Observable implements Observer {
 
 					try {
 						this.processBlock(block);
-						block.close();
-						block = null;
 					} catch (java.lang.OutOfMemoryError e) {
 						LOGGER.error(e.getMessage(), e);
 						// внутрення ошибка - выходим для лога
 						Controller.getInstance().stopAndExit(644);
 						return;
+					} finally {
+						block.close();
 					}
 
 					if (System.currentTimeMillis() - timePoint > 10000

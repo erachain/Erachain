@@ -85,7 +85,17 @@ public class WalletUpdater extends MonitoredThread {
             // PROCESS
             if (controller.isStatusOK() // только если нет синхронизации
                     && !wallet.checkNeedSyncWallet(pair.getB().getReference())) {
-                wallet.processBlock(pair.getB());
+
+                try {
+                    wallet.processBlock(pair.getB());
+                } catch (java.lang.OutOfMemoryError e) {
+                    LOGGER.error(e.getMessage(), e);
+                    // внутрення ошибка - выходим для лога
+                    Controller.getInstance().stopAndExit(1644);
+                    return;
+                } finally {
+                    pair.getB().close();
+                }
 
             } else {
                 // set then NEED SYNCH

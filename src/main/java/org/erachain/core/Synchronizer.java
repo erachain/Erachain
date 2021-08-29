@@ -1051,6 +1051,7 @@ public class Synchronizer extends Thread {
 
         Exception error = null;
         Throwable thrown = null;
+        boolean nedToCloseBlock = true;
 
         // нужно закрыть в любом случае блок по выходу так как он уже отыграл
         // и тем более если там был внутри ФоркБазы - ее надо закрыть
@@ -1200,7 +1201,7 @@ public class Synchronizer extends Thread {
                     }
                 } finally {
 
-                    block.close();
+                    ///block.close();
                     if (ctrl.isOnStopping()) {
                         // was BREAK - try ROLLBACK
                         dcSet.rollback();
@@ -1269,6 +1270,7 @@ public class Synchronizer extends Thread {
                 // только запись в нашу цепочку
 
                 if (ctrl.doesWalletExists() && !ctrl.noDataWallet && ctrl.getWallet().walletUpdater != null) {
+                    nedToCloseBlock = false; // не надо закрывать - он еще в очереди на обработку в кошельке томится - там закроют
                     ctrl.getWallet().walletUpdater.offerMessage(new Pair(doOrphan, block));
                 }
 
@@ -1285,8 +1287,9 @@ public class Synchronizer extends Thread {
             }
 
         } finally {
-            /// наруже уже закрываем
-            ///block.close();
+            /// иногда нельзя блок закрывать - вдруг он в кошелек пошел на обработку и если в этот момент закроется? там то по очереди
+            if (nedToCloseBlock)
+                block.close();
         }
 
     }
