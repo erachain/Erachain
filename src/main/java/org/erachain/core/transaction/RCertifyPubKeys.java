@@ -552,6 +552,10 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         if (!person.isAlive(this.timestamp))
             return Transaction.ITEM_PERSON_IS_DEAD;
 
+        if (certifiedPublicKeys.size() > 3) {
+            return INVALID_PUBLIC_KEY;
+        }
+
         ///////// PUBLIC KEYS
         for (PublicKeyAccount publicAccount : this.certifiedPublicKeys) {
             //CHECK IF PERSON PUBLIC KEY IS VALID
