@@ -2730,61 +2730,58 @@ public class Controller extends Observable {
         if (newBlock == null)
             return false;
 
-        try {
-            // if last block is changed by core.Synchronizer.process(DLSet, Block)
-            // clear this win block
-            if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
-                // see finalliy newBlock.close();
+        // if last block is changed by core.Synchronizer.process(DLSet, Block)
+        // clear this win block
+        if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
+            newBlock.close();
+            return false;
+        }
+
+        LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
+
+        if (!newBlock.isValidated()) {
+            // это может случиться при добавлении в момент синхронизации - тогда до расчета Победы не доходит
+            // или при добавлении моего сгнерированного блока т.к. он не проверился?
+
+            // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+            DCSet forked = dcSet.fork(DCSet.makeDBinMemory(), "flushNewBlockGenerated");
+            // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
+
+            if (newBlock.isValid(forked,
+                    onlyProtocolIndexing // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+            ) > 0) {
+                // очищаем занятые транзакциями ресурсы
+                // - see finalliy newBlock.close();
+
+                // освобождаем память от базы данных - так как мы ее к блоку не привязали
+                forked.close();
                 return false;
             }
 
-            LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
-
-            if (!newBlock.isValidated()) {
-                // это может случиться при добавлении в момент синхронизации - тогда до расчета Победы не доходит
-                // или при добавлении моего сгнерированного блока т.к. он не проверился?
-
-                // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-                DCSet forked = dcSet.fork(DCSet.makeDBinMemory(), "flushNewBlockGenerated");
-                // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
-
-                if (newBlock.isValid(forked,
-                        onlyProtocolIndexing // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
-                ) > 0) {
-                    // очищаем занятые транзакциями ресурсы
-                    // - see finalliy newBlock.close();
-
-                    // освобождаем память от базы данных - так как мы ее к блоку не привязали
-                    forked.close();
-                    return false;
-                }
-
-                // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
-                if (onlyProtocolIndexing) {
-                    // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
-                    newBlock.setValidatedForkDB(forked);
-                } else {
-                    // освобождаем память от базы данных - так как мы ее к блоку не привязали
-                    forked.close();
-                }
+            // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+            if (onlyProtocolIndexing) {
+                // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
+                newBlock.setValidatedForkDB(forked);
+            } else {
+                // освобождаем память от базы данных - так как мы ее к блоку не привязали
+                forked.close();
             }
+        }
 
-            try {
-                this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
+        try {
+            // тутв нутри будет сделан newBlock.close();
+            this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
 
-            } catch (Exception e) {
-                if (this.isOnStopping()) {
-                    throw new Exception("on stoping");
-                } else {
-                    LOGGER.error(e.getMessage(), e);
-                    return false;
-                }
+        } catch (Exception e) {
+            if (this.isOnStopping()) {
+                throw new Exception("on stoping");
+            } else {
+                LOGGER.error(e.getMessage(), e);
+                return false;
             }
-            if (network != null) {
-                this.network.clearHandledWinBlockMessages();
-            }
-        } finally {
-            newBlock.close();
+        }
+        if (network != null) {
+            this.network.clearHandledWinBlockMessages();
         }
 
         LOGGER.info("+++ flushNewBlockGenerated OK");

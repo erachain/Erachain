@@ -1228,7 +1228,7 @@ public class Wallet extends Observable implements Observer {
 			return false;
 		}
 
-		transaction.updateFromStateDB();
+		/// сейчас блок с мясом приходит - transaction.updateFromStateDB();
 
 		// FOR ALL ACCOUNTS
 		List<Account> accounts = this.getAccounts();

@@ -46,12 +46,11 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
 
     }
 
-    if (item.image) {
-        source = 'data:image/gif;base64,' + item.image;
-    } else if (item.imageURL) {
+    if (item.imageURL) {
         source = item.imageURL;
-    } else if (item.imageMediaType.startsWith('video')) {
-        source = '/api' + item.item_type + '/image/' + item.key;
+        if (item.imageMediaType.startsWith('video')) {
+            source = '/api' + item.item_type + '/image/' + item.key;
+        }
     }
 
     if (source) {

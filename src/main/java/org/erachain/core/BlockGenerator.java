@@ -748,7 +748,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (waitWin != null) {
                     // освободим память
-                    waitWin.close();
+                    if (false) {
+                        // НЕЛЬЗЯ - так как этот блок может еще на очереди в кошелек стоять и ему нельзя все мясо сбрасывать
+                        // там он сам сбросит в Synchronizer.pipeProcessOrOrphan
+                        ///waitWin.close();
+                    }
                 }
 
                 Block solvingBlock;
