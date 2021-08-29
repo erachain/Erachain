@@ -111,6 +111,9 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
      */
     @Override
     public void updateFromStateDB() {
+
+        super.updateFromStateDB();
+
         if (this.dbRef == 0) {
             // неподтвержденная транзакция не может быть обновлена
             return;

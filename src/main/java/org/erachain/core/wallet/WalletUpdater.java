@@ -55,6 +55,11 @@ public class WalletUpdater extends MonitoredThread {
         synchronizeMode = value;
     }
 
+    /**
+     * Сюда приходит блок очищенный от всех исчислений - транзакции сброшены до байт-кода...
+     *
+     * @param pair
+     */
     public void offerMessage(Pair<Boolean, Block> pair) {
         //LOGGER.debug(" offer: " + pair.toString());
         blockingQueue.offer(pair);

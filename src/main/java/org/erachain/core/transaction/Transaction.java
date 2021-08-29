@@ -736,6 +736,24 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * - для внесения в кошелек когда блок прилетел и из него сырые транзакции берем
      */
     public void updateFromStateDB() {
+        if (this.dbRef == 0) {
+            // неподтвержденная транзакция не может быть обновлена
+            return;
+        }
+
+        ///////// SMART CONTRACTS SESSION
+        if (smartContract == null) {
+            // эта транзакция взята как скелет из набора блока из Synchronizer.pipeProcessOrOrphan
+            // а значит если для нее был создан Эпохальный смарт-контракт - он очистился
+            // поэтому найдем его в сохраненной транзакции - в ней есть все данные
+            TransactionAmount thisTX = (TransactionAmount) dcSet.getTransactionFinalMap().get(this.dbRef);
+            if (thisTX == null) {
+                // это может быть при откате - транзакция уже удалена и пытается в кошельке ей мясо нарастить
+                return;
+            }
+            smartContract = thisTX.getSmartContract();
+        }
+
     }
 
     public boolean noDCSet() {

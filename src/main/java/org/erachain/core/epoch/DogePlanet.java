@@ -40,6 +40,11 @@ public class DogePlanet extends SmartContract {
 
     @Override
     public Object[][] getItemsKeys() {
+        if (keyEnd == 0) {
+            // not confirmed yet
+            return null;
+        }
+
         Object[][] itemKeys = new Object[count][];
 
         int i = 0;

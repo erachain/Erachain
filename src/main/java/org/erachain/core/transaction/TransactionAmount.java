@@ -164,6 +164,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
      */
 
     // GETTERS/SETTERS
+
     @Override
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         super.setDC(dcSet, false);
@@ -178,23 +179,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
 
-        if (andUpdateFromState && !isWiped())
+        if (false && andUpdateFromState && !isWiped())
             updateFromStateDB();
-
-    }
-
-    @Override
-    public void updateFromStateDB() {
-        if (this.dbRef == 0) {
-            // неподтвержденная транзакция не может быть обновлена
-            return;
-        }
-
-        ///////// SMART CONTRACTS SESSION
-        if (smartContract == null) {
-            // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
-            smartContract = EpochSmartContract.make(this);
-        }
 
     }
 
@@ -208,7 +194,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             debug = true;
         }
 
-        if (andUpdateFromState && !isWiped())
+        if (false && andUpdateFromState && !isWiped())
             updateFromStateDB();
     }
 
@@ -1390,6 +1376,13 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 block.addCalculated(this.creator, absKey,
                         this.assetFee.negate(), "Asset Fee", this.dbRef);
             }
+        }
+
+        ///////// SMART CONTRACTS SESSION
+        if (smartContract == null) {
+            // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
+            // потом он будет записан в базу данных и его можно найти загрузив эту трнзакцию
+            smartContract = EpochSmartContract.make(this);
         }
 
         if (smartContract != null)
