@@ -12,6 +12,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
@@ -1072,6 +1073,21 @@ public class Wallet extends Observable implements Observer {
 			} else {
 				if (!map.contains(key)) {
 					map.add(key);
+				}
+			}
+		}
+
+		SmartContract smartContract = transaction.getSmartContract();
+		if (smartContract != null) {
+			for (Object[] itemKey : smartContract.getItemsKeys()) {
+				map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
+				key = (Long) itemKey[1];
+				if (asOrphan) {
+					map.delete(key);
+				} else {
+					if (!map.contains(key)) {
+						map.add(key);
+					}
 				}
 			}
 		}

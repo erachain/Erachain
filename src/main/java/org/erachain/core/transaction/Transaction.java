@@ -974,6 +974,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return exLink;
     }
 
+    public SmartContract getSmartContract() {
+        return smartContract;
+    }
+
     public void makeItemsKeys() {
         if (isWiped()) {
             itemsKeys = new Object[][]{};

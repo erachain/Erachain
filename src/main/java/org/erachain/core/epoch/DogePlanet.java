@@ -8,7 +8,6 @@ import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
-import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 
@@ -47,16 +46,16 @@ public class DogePlanet extends SmartContract {
         if (forDeal == Transaction.FOR_DB_RECORD)
             return 16;
 
-        return 4;
+        return 8;
     }
 
     @Override
     public byte[] toBytes(int forDeal) {
 
         byte[] data = Ints.toByteArray(id);
+        data = Bytes.concat(data, Ints.toByteArray(count));
 
         if (forDeal == Transaction.FOR_DB_RECORD) {
-            data = Bytes.concat(data, Ints.toByteArray(count));
             return Bytes.concat(data, Longs.toByteArray(keyEnd));
         }
 
@@ -66,8 +65,12 @@ public class DogePlanet extends SmartContract {
 
     static DogePlanet Parse(byte[] data, int pos, int forDeal) {
 
+        // skip ID
+        pos += 4;
+
         byte[] countBuffer = new byte[4];
         System.arraycopy(data, pos, countBuffer, 0, 4);
+        pos += 4;
 
         if (forDeal == Transaction.FOR_DB_RECORD) {
             // возьмем в базе готовый ключ актива
@@ -112,7 +115,6 @@ public class DogePlanet extends SmartContract {
     @Override
     public boolean orphan(DCSet dcSet, Transaction transaction) {
 
-        RSend txSend = (RSend) transaction;
         int i = 0;
         do {
             //DELETE FROM DATABASE

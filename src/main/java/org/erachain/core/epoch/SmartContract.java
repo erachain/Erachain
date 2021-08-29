@@ -60,7 +60,7 @@ public abstract class SmartContract {
         int id = Ints.fromByteArray(idBuffer);
         switch (id) {
             case DOGE_PLANET_1:
-                return DogePlanet.Parse(data, position + 4, forDeal);
+                return DogePlanet.Parse(data, position, forDeal);
         }
 
         throw new Exception("wrong smart-contract id:" + id);
