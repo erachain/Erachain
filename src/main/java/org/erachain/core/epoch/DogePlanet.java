@@ -11,6 +11,8 @@ import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 
+import java.math.BigDecimal;
+
 public class DogePlanet extends SmartContract {
 
     static private final PublicKeyAccount MAKER = new PublicKeyAccount("1");
@@ -104,6 +106,8 @@ public class DogePlanet extends SmartContract {
 
             //INSERT INTO DATABASE
             keyEnd = dcSet.getItemAssetMap().incrementPut(planet);
+            transaction.getCreator().changeBalance(dcSet, false, false, keyEnd,
+                    BigDecimal.ONE, false, false, false);
 
         } while (--i > 0);
 
@@ -117,6 +121,10 @@ public class DogePlanet extends SmartContract {
 
         int i = 0;
         do {
+
+            transaction.getCreator().changeBalance(dcSet, true, false, keyEnd,
+                    BigDecimal.ONE, false, false, false);
+
             //DELETE FROM DATABASE
             dcSet.getItemAssetMap().decrementDelete(keyEnd - i);
         } while (++i < count);

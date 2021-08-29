@@ -148,7 +148,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         this.appData = appData;
         this.maker = maker;
         this.name = name.trim();
-        this.description = description;
+        this.description = description == null ? "" : description;
         this.icon = icon == null ? new byte[0] : icon;
         this.image = image == null ? new byte[0] : image;
 

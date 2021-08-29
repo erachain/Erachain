@@ -935,10 +935,6 @@ public class Controller extends Observable {
         }
     }
 
-    public void replaseFavoriteItems(int type) {
-        this.wallet.replaseFavoriteItems(type);
-    }
-
     public DCSet reCreateDC(boolean inMemory) throws IOException, Exception {
 
         if (inMemory) {

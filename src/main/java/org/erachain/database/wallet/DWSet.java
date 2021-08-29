@@ -413,6 +413,8 @@ public class DWSet extends DBASet {
         }
     }
 
+    //////////////// FAVORITES ///////////
+
     public void addItemFavorite(ItemCls item) {
         getItemFavoritesSet(item).add(item.getKey());
     }
@@ -421,7 +423,6 @@ public class DWSet extends DBASet {
         getItemFavoritesSet(item).delete(item.getKey());
     }
 
-    //////////////// FAVORITES ///////////
     public void addDocumentToFavorite(Transaction transaction) {
         getDocumentFavoritesSet().add(transaction.getDBRef());
     }
@@ -460,14 +461,6 @@ public class DWSet extends DBASet {
         json.put("description", description);
 
         getFavoriteAccountsMap().put(address, new Fun.Tuple3<>(pubKey, name, json.toJSONString()));
-    }
-
-    public void addItemToFavorite(ItemCls item) {
-        getItemFavoritesSet(item).add(item.getKey());
-    }
-
-    public void removeItemFromFavorite(ItemCls item) {
-        getItemFavoritesSet(item).delete(item.getKey());
     }
 
     public boolean isItemFavorite(ItemCls item) {

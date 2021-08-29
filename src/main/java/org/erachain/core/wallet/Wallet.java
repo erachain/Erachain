@@ -301,28 +301,6 @@ public class Wallet extends Observable implements Observer {
 		return this.dwSet.getBlocksHeadMap().get(account, limit);
 	}
 
-	// тут нужно понять где это используется
-	public void replaseFavoriteItems(int type) {
-		if (!this.walletKeysExists()) {
-			return;
-		}
-
-		switch (type) {
-			case ItemCls.ASSET_TYPE:
-				if (this.assetsFavorites != null) {
-					this.dwSet.getAssetFavoritesSet().replace(this.assetsFavorites.getKeys());
-				}
-			case ItemCls.TEMPLATE_TYPE:
-				if (this.templatesFavorites != null) {
-					this.dwSet.getTemplateFavoritesSet().replace(this.templatesFavorites.getKeys());
-				}
-			case ItemCls.PERSON_TYPE:
-				if (this.personsFavorites != null) {
-					this.dwSet.getPersonFavoritesSet().replace(this.personsFavorites.getKeys());
-				}
-		}
-	}
-
 	public void addAddressFavorite(String address, String pubKey, String name, String description) {
 		if (!this.walletKeysExists()) {
 			return;
@@ -336,7 +314,7 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		this.dwSet.addItemToFavorite(item);
+		this.dwSet.addItemFavorite(item);
 	}
 
 	public void removeItemFavorite(ItemCls item) {
@@ -344,7 +322,7 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		this.dwSet.removeItemFromFavorite(item);
+		this.dwSet.deleteItemFavorite(item);
 	}
 
 	public boolean isItemFavorite(ItemCls item) {
@@ -1065,23 +1043,15 @@ public class Wallet extends Observable implements Observer {
 
 		long key;
 		FavoriteItemMap map;
-		for (Object[] itemKey : transaction.getItemsKeys()) {
-			map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
-			key = (Long) itemKey[1];
-			if (asOrphan) {
-				map.delete(key);
-			} else {
-				if (!map.contains(key)) {
-					map.add(key);
-				}
-			}
-		}
-
-		SmartContract smartContract = transaction.getSmartContract();
-		if (smartContract != null) {
-			for (Object[] itemKey : smartContract.getItemsKeys()) {
+		// если созданная мной трзакция то она не обрасла еще мясом и тут все Сущности пустые и ключей не будет
+		Object[][] itemKeys = transaction.getItemsKeys();
+		if (itemKeys != null) {
+			for (Object[] itemKey : itemKeys) {
 				map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
 				key = (Long) itemKey[1];
+				if (key <= 0)
+					continue;
+
 				if (asOrphan) {
 					map.delete(key);
 				} else {
@@ -1090,14 +1060,23 @@ public class Wallet extends Observable implements Observer {
 					}
 				}
 			}
-		}
 
-		if (false) {
-			if (!asOrphan && transaction instanceof RSend) {
-				// ADD to FAVORITES
-				if (absKey > 0 && !this.dwSet.getAssetFavoritesSet().contains(transaction.getAbsKey()))
-					this.dwSet.getAssetFavoritesSet().add(transaction.getAbsKey());
+			SmartContract smartContract = transaction.getSmartContract();
+			if (smartContract != null) {
+				for (Object[] itemKey : smartContract.getItemsKeys()) {
+					map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
+					key = (Long) itemKey[1];
+					if (key <= 0)
+						continue;
 
+					if (asOrphan) {
+						map.delete(key);
+					} else {
+						if (!map.contains(key)) {
+							map.add(key);
+						}
+					}
+				}
 			}
 		}
 
