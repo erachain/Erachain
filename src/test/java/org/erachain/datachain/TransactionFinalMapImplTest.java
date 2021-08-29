@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.IssueAssetTransaction;
@@ -38,6 +39,7 @@ public class TransactionFinalMapImplTest {
     };
 
     ExLink exLink = null;
+    SmartContract smartContract = null;
 
     byte[] isText = new byte[]{1};
     byte[] enCrypted = new byte[]{0};

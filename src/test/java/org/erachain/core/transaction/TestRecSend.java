@@ -11,6 +11,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
@@ -43,9 +44,10 @@ public class TestRecSend {
     long dbRef = 0L;
 
     ExLink exLink = null;
+    SmartContract smartContract = null;
 
     byte[] itemAppData = null;
-    long txFlags = 0l;
+    long txFlags = 0L;
 
 
     //CREATE KNOWN ACCOUNT

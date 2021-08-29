@@ -7,6 +7,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
@@ -35,6 +36,7 @@ public class TestRecAsset {
     static Logger LOGGER = LoggerFactory.getLogger(TestRecAsset.class.getName());
 
     ExLink exLink = null;
+    SmartContract smartContract = null;
 
     int forDeal = Transaction.FOR_NETWORK;
 

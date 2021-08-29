@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -29,7 +30,7 @@ public class DCSetTest {
             new int[]{DCSet.DBS_ROCK_DB};
 
     ExLink exLink = null;
-
+    SmartContract smartContract = null;
 
     String testsPath = Settings.getInstance().getDataTempDir();
     DCSet dcSet;

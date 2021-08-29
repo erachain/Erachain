@@ -10,6 +10,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
@@ -45,6 +46,7 @@ public class TelegramManagerTest {
 
     DCSet dcSet;
     ExLink exLink = null;
+    SmartContract smartContract = null;
 
 
     long flags = 0l;

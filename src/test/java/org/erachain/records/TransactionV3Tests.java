@@ -5,6 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
@@ -41,6 +42,7 @@ public class TransactionV3Tests {
     long timestamp = NTP.getTime();
 
     ExLink exLink = null;
+    SmartContract smartContract = null;
 
     byte[] itemAppData = null;
     long txFlags = 0L;

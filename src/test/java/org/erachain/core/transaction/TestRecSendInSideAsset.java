@@ -5,6 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
@@ -37,6 +38,7 @@ public class TestRecSendInSideAsset {
     byte prop1_backward = org.erachain.core.transaction.TransactionAmount.BACKWARD_MASK;
 
     ExLink exLink = null;
+    SmartContract smartContract = null;
 
     Tuple3<String, Long, String> creditKey;
     Tuple3<String, Long, String> creditKeyReverse;
