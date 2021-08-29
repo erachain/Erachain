@@ -53,7 +53,7 @@ public class RHashes extends Transaction {
 
     public RHashes(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
 
-        super(typeBytes, TYPE_NAME, creator, exLink, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, exLink, null, feePow, timestamp, reference);
 
         this.url = url;
         this.data = data;
