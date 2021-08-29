@@ -41,7 +41,7 @@ public class RHashes extends Transaction {
     public static final int MAX_URL_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;
     private static final int HASH_LENGTH = 32;
 
-    protected static final int LOAD_LENGTH = URL_SIZE_LENGTH + DATA_SIZE_LENGTH;
+    protected static final int LOAD_LENGTH = URL_SIZE_LENGTH + DATA_SIZE_LENGTH + 4;
     protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
     protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
     protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
@@ -84,18 +84,10 @@ public class RHashes extends Transaction {
 
     public RHashes(PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, feePow, url, data, hashes, timestamp, reference, signature);
-        // set props
-        this.setTypeBytes();
     }
 
     public RHashes(PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, feePow, url, data, hashes, timestamp, reference);
-        // set props
-        this.setTypeBytes();
-    }
-
-    public static int getHashesLength(byte[] typeBytes) {
-        return Ints.fromBytes((byte) 0, (byte) 0, typeBytes[2], typeBytes[3]);
     }
 
     //public static String getName() { return "Statement"; }
@@ -209,7 +201,11 @@ public class RHashes extends Transaction {
 		position += IS_TEXT_LENGTH;
 		*/
 
-        int hashesLen = getHashesLength(typeBytes);
+        //READ HASHES SIZE
+        byte[] hashesSizeBytes = Arrays.copyOfRange(data, position, position + 4);
+        int hashesLen = Ints.fromByteArray(hashesSizeBytes);
+        position += 4;
+
         byte[][] hashes = new byte[hashesLen][];
         for (int i = 0; i < hashesLen; i++) {
             hashes[i] = Arrays.copyOfRange(data, position, position + HASH_LENGTH);
@@ -225,15 +221,6 @@ public class RHashes extends Transaction {
 
     }
 
-    protected void setTypeBytes() {
-
-        byte[] bytesLen = Ints.toByteArray(this.hashes.length);
-
-        this.typeBytes[2] = bytesLen[2];
-        this.typeBytes[3] = bytesLen[3];
-
-    }
-
     public byte[] getURL() {
         return this.url;
     }
@@ -243,7 +230,7 @@ public class RHashes extends Transaction {
     }
 
     public String[] getHashesB58() {
-        String[] strHashes = new String[RHashes.getHashesLength(this.typeBytes)];
+        String[] strHashes = new String[hashes.length];
         int i = 0;
         for (byte[] hash : this.hashes) {
             strHashes[i++] = Base58.encode(hash);
@@ -314,19 +301,13 @@ public class RHashes extends Transaction {
         data = Bytes.concat(data, this.url);
 
         //WRITE DATA SIZE
-        byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
-        data = Bytes.concat(data, dataSizeBytes);
+        data = Bytes.concat(data, Ints.toByteArray(this.data.length));
 
         //WRITE DATA
         data = Bytes.concat(data, this.data);
 
-		/*
-		//WRITE ENCRYPTED
-		data = Bytes.concat(data, this.encrypted);
-		
-		//WRITE ISTEXT
-		data = Bytes.concat(data, this.isText);
-		*/
+        //WRITE HASHES SIZE
+        data = Bytes.concat(data, Ints.toByteArray(this.data.length));
 
         for (int i = 0; i < this.hashes.length; i++)
             data = Bytes.concat(data, this.hashes[i]);
