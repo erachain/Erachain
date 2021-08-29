@@ -635,11 +635,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     return new Fun.Tuple2<>(ITEM_ASSET_NOT_EXIST, "key: " + key);
                 }
 
-                // самому себе нельзя пересылать
-                if (height > BlockChain.VERS_4_11 && creator.equals(recipient)) {
-                    return new Fun.Tuple2<>(INVALID_ADDRESS, "Equal recipient");
-                }
-
                 // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
                 if (absKey > BlockChain.AMOUNT_SCALE_FROM) {
                     byte[] amountBytes = amount.unscaledValue().toByteArray();
@@ -705,7 +700,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             return new Fun.Tuple2<>(CREATOR_NOT_MAKER, "creator != asset maker");
                         }
                         if (creator.equals(recipient)) {
-                            return new Fun.Tuple2<>(INVALID_ADDRESS, "creator == recipient");
+                            return new Fun.Tuple2<>(INVALID_ADDRESS, "Creator equal recipient");
                         }
 
                         // TRY FEE
@@ -716,6 +711,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         }
 
                     } else {
+
+                        // самому себе нельзя пересылать
+                        if (height > BlockChain.VERS_4_11 && creator.equals(recipient)
+                                && actionType != ACTION_SPEND) {
+                            return new Fun.Tuple2<>(INVALID_ADDRESS, "Creator equal recipient");
+                        }
 
                         // VALIDATE by ASSET TYPE
                         switch (assetType) {

@@ -27,6 +27,10 @@ public abstract class SmartContract {
         return this.maker;
     }
 
+    public Object[][] getItemsKeys() {
+        return null;
+    }
+
     /**
      * Эпохальный, запускается самим протоколом. Поэтому он не передается в сеть
      * Но для базы данных генерит данные, которые нужно читать и писать

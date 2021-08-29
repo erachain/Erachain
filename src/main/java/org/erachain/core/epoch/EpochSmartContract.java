@@ -17,10 +17,11 @@ public class EpochSmartContract {
 
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
-            if (txSend.getAbsKey() == 10234L
-                    && txSend.balancePosition() == TransactionAmount.ACTION_SPEND
+            if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
+                    && txSend.hasAmount() && txSend.getAmount().signum() < 0
+                // && txSend.getAbsKey() == 10234L
             ) {
-                return new DogePlanet();
+                return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
             }
         }
 

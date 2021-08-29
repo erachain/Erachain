@@ -392,6 +392,27 @@ public class DWSet extends DBASet {
         }
     }
 
+    public FavoriteItemMap getItemFavoritesSet(int itemType) {
+        switch (itemType) {
+            case ItemCls.ASSET_TYPE:
+                return assetFavoritesSet;
+            case ItemCls.IMPRINT_TYPE:
+                return imprintFavoritesSet;
+            case ItemCls.POLL_TYPE:
+                return pollFavoriteSet;
+            case ItemCls.TEMPLATE_TYPE:
+                return templateFavoritesSet;
+            case ItemCls.PERSON_TYPE:
+                return personFavoritesSet;
+            case ItemCls.STATUS_TYPE:
+                return statusFavoritesSet;
+            case ItemCls.UNION_TYPE:
+                return unionFavoritesSet;
+            default:
+                return null;
+        }
+    }
+
     public void addItemFavorite(ItemCls item) {
         getItemFavoritesSet(item).add(item.getKey());
     }

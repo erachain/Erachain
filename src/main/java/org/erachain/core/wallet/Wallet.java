@@ -19,6 +19,7 @@ import org.erachain.core.transaction.*;
 import org.erachain.database.DBASet;
 import org.erachain.database.wallet.AccountMap;
 import org.erachain.database.wallet.DWSet;
+import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.database.wallet.SecureWalletDatabase;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
@@ -1061,11 +1062,27 @@ public class Wallet extends Observable implements Observer {
 		long absKey = transaction.getAbsKey();
 		String address = account.getAddress();
 
-		if (!asOrphan && transaction instanceof RSend) {
-			// ADD to FAVORITES
-			if (absKey > 0 && !this.dwSet.getAssetFavoritesSet().contains(transaction.getAbsKey()))
-				this.dwSet.getAssetFavoritesSet().add(transaction.getAbsKey());
+		long key;
+		FavoriteItemMap map;
+		for (Object[] itemKey : transaction.getItemsKeys()) {
+			map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
+			key = (Long) itemKey[1];
+			if (asOrphan) {
+				map.delete(key);
+			} else {
+				if (!map.contains(key)) {
+					map.add(key);
+				}
+			}
+		}
 
+		if (false) {
+			if (!asOrphan && transaction instanceof RSend) {
+				// ADD to FAVORITES
+				if (absKey > 0 && !this.dwSet.getAssetFavoritesSet().contains(transaction.getAbsKey()))
+					this.dwSet.getAssetFavoritesSet().add(transaction.getAbsKey());
+
+			}
 		}
 
 		BigDecimal fee = transaction.getFee(account);
@@ -1223,6 +1240,26 @@ public class Wallet extends Observable implements Observer {
 						title == null || title.isEmpty() ? "" : title, description);
 			}
 
+			// CHECK IF ITEM ISSUE
+			else if (transaction instanceof IssueItemRecord) {
+				this.processItemIssue((IssueItemRecord) transaction);
+			}
+
+			// CHECK IF SERTIFY PErSON
+			else if (transaction instanceof RCertifyPubKeys) {
+				this.processCertifyPerson((RCertifyPubKeys) transaction);
+			}
+
+			// CHECK IF ORDER CREATION
+			if (transaction instanceof CreateOrderTransaction) {
+				this.processOrderCreation((CreateOrderTransaction) transaction);
+			}
+
+			// CHECK IF ORDER CHANGE
+			else if (transaction instanceof ChangeOrderTransaction) {
+				this.processOrderChanging((ChangeOrderTransaction) transaction);
+			}
+
 		}
 
 		return isInvolved;
@@ -1360,31 +1397,6 @@ public class Wallet extends Observable implements Observer {
 			return;
 
 		Controller.getInstance().playWalletEvent(transaction);
-
-		// SKIP PAYMENT TRANSACTIONS
-		if (transaction instanceof RSend) {
-			return;
-		}
-
-		// CHECK IF ITEM ISSUE
-		else if (transaction instanceof IssueItemRecord) {
-			this.processItemIssue((IssueItemRecord) transaction);
-		}
-
-		// CHECK IF SERTIFY PErSON
-		else if (transaction instanceof RCertifyPubKeys) {
-			this.processSertifyPerson((RCertifyPubKeys) transaction, height);
-		}
-
-		// CHECK IF ORDER CREATION
-		if (transaction instanceof CreateOrderTransaction) {
-			this.processOrderCreation((CreateOrderTransaction) transaction);
-		}
-
-		// CHECK IF ORDER CHANGE
-		else if (transaction instanceof ChangeOrderTransaction) {
-			this.processOrderChanging((ChangeOrderTransaction) transaction);
-		}
 
 	}
 
@@ -1538,10 +1550,8 @@ public class Wallet extends Observable implements Observer {
 				this.dwSet.addItemFavorite(item);
 			}
 		} else {
-			// ADD ASSET
+			// ADD to MY ITEMs
 			this.dwSet.putItem(item);
-			// ADD to FAVORITES
-			this.dwSet.addItemFavorite(item);
 		}
 	}
 
@@ -1576,7 +1586,7 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-	private void processSertifyPerson(RCertifyPubKeys certifyPubKeys, int height) {
+	private void processCertifyPerson(RCertifyPubKeys certifyPubKeys) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.walletKeysExists()) {
 			return;
@@ -1607,7 +1617,7 @@ public class Wallet extends Observable implements Observer {
 				///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 				// ISSUE NEW COMPU in chain
-				BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(height);
+				BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(transPersonIssue.getBlockHeight());
 
 				// GIFTs
 				if (this.accountExists(transPersonIssue.getCreator())) {
