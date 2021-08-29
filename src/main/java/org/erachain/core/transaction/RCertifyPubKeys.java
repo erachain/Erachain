@@ -600,7 +600,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
-        if (isWiped()) {
+        if (isWiped() || person == null) {
             itemsKeys = new Object[][]{};
         }
 

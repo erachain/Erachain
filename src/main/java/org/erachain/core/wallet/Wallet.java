@@ -1041,44 +1041,6 @@ public class Wallet extends Observable implements Observer {
 		long absKey = transaction.getAbsKey();
 		String address = account.getAddress();
 
-		long key;
-		FavoriteItemMap map;
-		// если созданная мной трзакция то она не обрасла еще мясом и тут все Сущности пустые и ключей не будет
-		Object[][] itemKeys = transaction.getItemsKeys();
-		if (itemKeys != null) {
-			for (Object[] itemKey : itemKeys) {
-				map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
-				key = (Long) itemKey[1];
-				if (key <= 0)
-					continue;
-
-				if (asOrphan) {
-					map.delete(key);
-				} else {
-					if (!map.contains(key)) {
-						map.add(key);
-					}
-				}
-			}
-
-			SmartContract smartContract = transaction.getSmartContract();
-			if (smartContract != null) {
-				for (Object[] itemKey : smartContract.getItemsKeys()) {
-					map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
-					key = (Long) itemKey[1];
-					if (key <= 0)
-						continue;
-
-					if (asOrphan) {
-						map.delete(key);
-					} else {
-						if (!map.contains(key)) {
-							map.add(key);
-						}
-					}
-				}
-			}
-		}
 
 		BigDecimal fee = transaction.getFee(account);
 		boolean isBackward = false;
@@ -1181,6 +1143,51 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
+
+	private void updateFavorites(Transaction transaction, boolean asOrphan) {
+
+		Object[][] itemKeys = transaction.getItemsKeys();
+		if (itemKeys == null || transaction.getAbsKey() == 0) {
+			// если созданная мной транзакция то она ЕЩЕ не обросла мясом и тут все Сущности пустые и ключей не будет
+			return;
+		}
+
+		long key;
+		FavoriteItemMap map;
+		for (Object[] itemKey : itemKeys) {
+			map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
+			key = (Long) itemKey[1];
+			if (key <= 0)
+				continue;
+
+			if (asOrphan) {
+				map.delete(key);
+			} else {
+				if (!map.contains(key)) {
+					map.add(key);
+				}
+			}
+		}
+
+		SmartContract smartContract = transaction.getSmartContract();
+		if (smartContract != null) {
+			for (Object[] itemKey : smartContract.getItemsKeys()) {
+				map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
+				key = (Long) itemKey[1];
+				if (key <= 0)
+					continue;
+
+				if (asOrphan) {
+					map.delete(key);
+				} else {
+					if (!map.contains(key)) {
+						map.add(key);
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Внимание! Здесь нельзя делать выход если один раз счет совпал - так как иначе не правильно обработаются балансы
 	 * и Входящая / Исходящая транзакции, например по АПИ. Поэтому если в одном кошельке
@@ -1205,59 +1212,61 @@ public class Wallet extends Observable implements Observer {
 			if (transaction.isInvolved(account)) {
 				isInvolved = true;
 				// ADD TO ACCOUNT TRANSACTIONS
-				if (!this.dwSet.getTransactionMap().set(account, transaction)) {
-					// UPDATE UNCONFIRMED BALANCE for ASSET
-					deal_transaction(account, transaction, false);
-				}
+				this.dwSet.getTransactionMap().set(account, transaction);
+				// UPDATE BALANCE
+				deal_transaction(account, transaction, false);
 			}
 		}
+
+		if (!isInvolved)
+			return false;
+
 
 		// ADD SENDER to FAVORITES
-		if (isInvolved) {
-			PublicKeyAccount creator = transaction.getCreator();
-			if (creator != null && !accountExists(creator) && !this.dwSet.getAccountMap().exists(creator)) {
-				String title = transaction.getTitle();
-				Tuple2<Integer, PersonCls> personItem = creator.getPerson();
-				if (personItem != null && personItem.b != null)
-					title = personItem.b.getName() + " - " + title;
+		updateFavorites(transaction, false);
 
-				String description = "";
-				if (transaction instanceof RSend) {
-					RSend rSend = (RSend) transaction;
-					if (!rSend.isEncrypted() && rSend.isText())
-						description = rSend.viewData();
-				} else if (transaction instanceof RSignNote) {
-					RSignNote rNote = (RSignNote) transaction;
-					if (!rNote.isEncrypted() && rNote.isText())
-						description = rNote.getMessage();
-				}
-				addAddressFavorite(creator.getAddress(), creator.getBase58(),
-						title == null || title.isEmpty() ? "" : title, description);
+		PublicKeyAccount creator = transaction.getCreator();
+		if (creator != null && !accountExists(creator) && !this.dwSet.getAccountMap().exists(creator)) {
+			String title = transaction.getTitle();
+			Tuple2<Integer, PersonCls> personItem = creator.getPerson();
+			if (personItem != null && personItem.b != null)
+				title = personItem.b.getName() + " - " + title;
+
+			String description = "";
+			if (transaction instanceof RSend) {
+				RSend rSend = (RSend) transaction;
+				if (!rSend.isEncrypted() && rSend.isText())
+					description = rSend.viewData();
+			} else if (transaction instanceof RSignNote) {
+				RSignNote rNote = (RSignNote) transaction;
+				if (!rNote.isEncrypted() && rNote.isText())
+					description = rNote.getMessage();
 			}
-
-			// CHECK IF ITEM ISSUE
-			else if (transaction instanceof IssueItemRecord) {
-				this.processItemIssue((IssueItemRecord) transaction);
-			}
-
-			// CHECK IF SERTIFY PErSON
-			else if (transaction instanceof RCertifyPubKeys) {
-				this.processCertifyPerson((RCertifyPubKeys) transaction);
-			}
-
-			// CHECK IF ORDER CREATION
-			if (transaction instanceof CreateOrderTransaction) {
-				this.processOrderCreation((CreateOrderTransaction) transaction);
-			}
-
-			// CHECK IF ORDER CHANGE
-			else if (transaction instanceof ChangeOrderTransaction) {
-				this.processOrderChanging((ChangeOrderTransaction) transaction);
-			}
-
+			addAddressFavorite(creator.getAddress(), creator.getBase58(),
+					title == null || title.isEmpty() ? "" : title, description);
 		}
 
-		return isInvolved;
+		// CHECK IF ITEM ISSUE
+		else if (transaction instanceof IssueItemRecord) {
+			this.processItemIssue((IssueItemRecord) transaction);
+		}
+
+		// CHECK IF SERTIFY PErSON
+		else if (transaction instanceof RCertifyPubKeys) {
+			this.processCertifyPerson((RCertifyPubKeys) transaction);
+		}
+
+		// CHECK IF ORDER CREATION
+		if (transaction instanceof CreateOrderTransaction) {
+			this.processOrderCreation((CreateOrderTransaction) transaction);
+		}
+
+		// CHECK IF ORDER CHANGE
+		else if (transaction instanceof ChangeOrderTransaction) {
+			this.processOrderChanging((ChangeOrderTransaction) transaction);
+		}
+
+		return true;
 	}
 
 	private void processATTransaction(Tuple2<Tuple2<Integer, Integer>, ATTransaction> atTx) {
@@ -1290,23 +1299,33 @@ public class Wallet extends Observable implements Observer {
 
 		/// FOR ALL ACCOUNTS
 		List<Account> accounts = this.getAccounts();
+		boolean isInvolved = false;
 
 		synchronized (accounts) {
 			for (Account account : accounts) {
 				// CHECK IF INVOLVED
 				if (transaction.isInvolved(account)) {
+					isInvolved = true;
+
 					// UPDATE UNCONFIRMED BALANCE
 					deal_transaction(account, transaction, true);
 
 					// 1. DELETE FROM ACCOUNT TRANSACTIONS - с нарощенным мясом
 					this.dwSet.getTransactionMap().delete(account, transaction);
 
-					// 2. а теперь сбросим все и сахраним без ссылки на блок
+					// 2. а теперь сбросим все и сохраним без ссылки на блок
 					transaction.resetSeqNo();
 					this.dwSet.getTransactionMap().put(account, transaction);
 
 				}
 			}
+
+			if (!isInvolved)
+				return;
+
+			// ADD SENDER to FAVORITES
+			updateFavorites(transaction, true);
+
 		}
 	}
 
@@ -1533,6 +1552,9 @@ public class Wallet extends Observable implements Observer {
 		if (item == null)
 			return;
 
+		if (issueItem.getKey() <= 0)
+			return;
+
 		if (issueItem instanceof IssueAssetSeriesTransaction) {
 			IssueAssetSeriesTransaction issueSeries = (IssueAssetSeriesTransaction) issueItem;
 			int total = issueSeries.getTotal();
@@ -1542,7 +1564,7 @@ public class Wallet extends Observable implements Observer {
 				// ADD ASSET
 				this.dwSet.putItem(item);
 				// ADD to FAVORITES
-				this.dwSet.addItemFavorite(item);
+				///this.dwSet.addItemFavorite(item);
 			}
 		} else {
 			// ADD to MY ITEMs
@@ -1568,15 +1590,13 @@ public class Wallet extends Observable implements Observer {
 				// ADD ASSET
 				this.dwSet.deleteItem(item);
 				// ADD to FAVORITES
-				this.dwSet.deleteItemFavorite(item);
+				///this.dwSet.deleteItemFavorite(item);
 			}
 		} else {
 
 			// DELETE ASSET
 			this.dwSet.deleteItem(item);
 
-			// DELETE FAVORITE
-			this.dwSet.deleteItemFavorite(item);
 		}
 
 	}
