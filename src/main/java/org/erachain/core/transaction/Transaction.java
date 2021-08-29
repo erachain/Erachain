@@ -444,9 +444,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     // protected int type;
 
     /////////   MASKS amd PARS
-    public static final byte HAS_SMART_CONTRACT_MASK = 64;
-    /////////   MASKS amd PARS
     public static final byte HAS_EXLINK_MASK = 32;
+    public static final byte HAS_SMART_CONTRACT_MASK = 16;
     /**
      * typeBytes[2] | HAS_EXLINK_MASK | HAS_SMART_CONTRACT_MASK
      */

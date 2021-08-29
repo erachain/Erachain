@@ -143,6 +143,7 @@ public class RCalculated extends TransactionAmount {
 
         long key = 0;
         BigDecimal amount = null;
+        щщ
         if (typeBytes[2] >= 0) {
             // IF here is AMOUNT
 

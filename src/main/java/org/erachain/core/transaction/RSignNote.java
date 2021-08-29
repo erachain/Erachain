@@ -45,8 +45,8 @@ public class RSignNote extends Transaction implements Itemable {
     PROPERTIES:
     [0] - type
     [1] - version
-    [2] bits[0] - =1 - has Template (OLD)
-    [2] bits [6,7] - signers: 0 - none; 1..3 = 1..3; 4 = LIST -> 1 byte for LIST.len + 3
+    [2] OLD - bits[0] - =1 - has Template (OLD)
+    [2] OLD - bits [6,7] - signers: 0 - none; 1..3 = 1..3; 4 = LIST -> 1 byte for LIST.len + 3
     [3] - < 0 - has DATA
      */
     protected long key; // key for Template
@@ -256,6 +256,7 @@ public class RSignNote extends Transaction implements Itemable {
         return extendedData.getSources();
     }
 
+    щщ
     public static int getSignersLength(byte[] typeBytes) {
         // Переверенем - а зачем? - типа 7 бит - это длинна
         byte mask = ~HAS_TEMPLATE_MASK;
@@ -271,6 +272,7 @@ public class RSignNote extends Transaction implements Itemable {
 
     }
 
+    щщ
     protected void setTypeBytes() {
 
         byte vers = 0;

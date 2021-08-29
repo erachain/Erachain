@@ -71,7 +71,7 @@ typeBytes[3].4-0 = point accuracy: -16..16 = BYTE - 16
  */
 public abstract class TransactionAmount extends Transaction implements Itemable{
     public static final byte[][] VALID_REC = new byte[][]{
-        //Base58.decode("2PLy4qTVeYnwAiESvaeaSUTWuGcERQr14bpGj3qo83c4vTP8RRMjnmRXnd6USsbvbLwWUNtjErcdvs5KtZMpyREC"),
+            //Base58.decode("2PLy4qTVeYnwAiESvaeaSUTWuGcERQr14bpGj3qo83c4vTP8RRMjnmRXnd6USsbvbLwWUNtjErcdvs5KtZMpyREC"),
     };
 
     static Logger LOGGER = LoggerFactory.getLogger(TransactionAmount.class.getName());
@@ -81,6 +81,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static final int maxSCALE = TransactionAmount.SCALE_MASK_HALF + BlockChain.AMOUNT_DEDAULT_SCALE - 1;
     public static final int minSCALE = BlockChain.AMOUNT_DEDAULT_SCALE - TransactionAmount.SCALE_MASK_HALF;
 
+    /**
+     * used over typeBytes[2]
+     */
     public static final byte BACKWARD_MASK = 64;
 
     // BALANCES types and ACTION with IT

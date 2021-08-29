@@ -94,6 +94,7 @@ public class RHashes extends Transaction {
         this.setTypeBytes();
     }
 
+    щщ
     public static int getHashesLength(byte[] typeBytes) {
         return Ints.fromBytes((byte) 0, (byte) 0, typeBytes[2], typeBytes[3]);
     }
@@ -225,6 +226,7 @@ public class RHashes extends Transaction {
 
     }
 
+    00
     protected void setTypeBytes() {
 
         byte[] bytesLen = Ints.toByteArray(this.hashes.length);

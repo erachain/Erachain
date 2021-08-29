@@ -122,6 +122,9 @@ public class IssueStatementRecord extends Transaction {
         return false;
     }
 
+    // TODO конфликт со всеми Флагами из Транзакции!!
+    оо
+
     public static int getSignersLength(byte[] typeBytes) {
         byte mask = ~HAS_TEMPLATE_MASK;
         return typeBytes[2] & mask;
@@ -291,6 +294,7 @@ public class IssueStatementRecord extends Transaction {
 
     protected void setTypeBytes() {
 
+        щщ
         byte vers = 0;
 
         byte prop1 = 0;

@@ -29,7 +29,7 @@ public class SmartContractValues extends DCUMap<Tuple2<Integer, String>, Object>
     public void openMap() {
         //OPEN MAP
         map = database.createHashMap("smart_contract_values")
-                .valueSerializer(SerializerBase.BYTE_ARRAY)
+                .valueSerializer(SerializerBase.BASIC)
                 .makeOrGet();
     }
 
