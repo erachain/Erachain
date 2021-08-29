@@ -16,9 +16,13 @@ public class DogePlanetTest {
         DogePlanet contract = new DogePlanet(3);
         byte[] data = contract.toBytes(Transaction.FOR_NETWORK);
         assertEquals(data.length, contract.length(Transaction.FOR_NETWORK));
+        DogePlanet contractParse = DogePlanet.Parse(data, 0, Transaction.FOR_NETWORK);
+        assertEquals(contractParse.getCount(), contract.getCount());
 
         data = contract.toBytes(Transaction.FOR_DB_RECORD);
         assertEquals(data.length, contract.length(Transaction.FOR_DB_RECORD));
+        contractParse = DogePlanet.Parse(data, 0, Transaction.FOR_DB_RECORD);
+        assertEquals(contractParse.getCount(), contract.getCount());
 
     }
 

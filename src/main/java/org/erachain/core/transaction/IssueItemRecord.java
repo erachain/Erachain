@@ -109,6 +109,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     /**
      * нельзя вызывать для Форка и для isWIPED
      */
+    @Override
     public void updateFromStateDB() {
         if (this.dbRef == 0) {
             // неподтвержденная транзакция не может быть обновлена

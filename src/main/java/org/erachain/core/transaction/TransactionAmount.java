@@ -178,8 +178,23 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
 
-        if (false && andUpdateFromState && !isWiped())
+        if (andUpdateFromState && !isWiped())
             updateFromStateDB();
+
+    }
+
+    @Override
+    public void updateFromStateDB() {
+        if (this.dbRef == 0) {
+            // неподтвержденная транзакция не может быть обновлена
+            return;
+        }
+
+        ///////// SMART CONTRACTS SESSION
+        if (smartContract == null) {
+            // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
+            smartContract = EpochSmartContract.make(this);
+        }
 
     }
 
@@ -193,12 +208,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             debug = true;
         }
 
-        if (false && andUpdateFromState && !isWiped())
+        if (andUpdateFromState && !isWiped())
             updateFromStateDB();
     }
 
     // public static String getName() { return "unknown subclass Amount"; }
-    
+
     public Account getRecipient() {
         return this.recipient;
     }
@@ -563,6 +578,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         if (exLink != null)
             base_len += exLink.length();
+
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
 
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
@@ -1369,12 +1390,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 block.addCalculated(this.creator, absKey,
                         this.assetFee.negate(), "Asset Fee", this.dbRef);
             }
-        }
-
-        ///////// SMART CONTRACTS SESSION
-        if (smartContract == null) {
-            // если у трнзакции нет изначально контракта то попробуем сделать эпохальныый
-            smartContract = EpochSmartContract.make(this);
         }
 
         if (smartContract != null)

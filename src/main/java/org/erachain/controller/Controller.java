@@ -3003,7 +3003,10 @@ public class Controller extends Observable {
 
         // ADD TO WALLET TRANSACTIONS
         if (doesWalletExists() && HARD_WORK < 4) {
-            wallet.processTransaction(transaction);
+            // они и так будут в transactionsPool добавляться, но там может и проскользуть мимо очерди
+            // если она очень занята
+            // поэтому тут добавим наверняка
+            wallet.insertUnconfirmedTransaction(transaction);
         }
 
     }

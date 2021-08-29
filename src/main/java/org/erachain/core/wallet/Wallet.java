@@ -1189,6 +1189,32 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	/**
+	 * Тут просто неподтвержденную прибавим ко всем учавствующим счетам и все
+	 *
+	 * @param transaction
+	 */
+	public void insertUnconfirmedTransaction(Transaction transaction) {
+		// CHECK IF WALLET IS OPEN
+		if (!this.isWalletDatabaseExisting()) {
+			return;
+		}
+
+		// FOR ALL ACCOUNTS
+		List<Account> accounts = this.getAccounts();
+		for (Account account : accounts) {
+			// CHECK IF INVOLVED
+			if (transaction.isInvolved(account)) {
+				// ADD TO ACCOUNT TRANSACTIONS
+				this.dwSet.getTransactionMap().set(account, transaction);
+
+				// UPDATE BALANCE
+				/// это неподтвержденный баланс - мы его не учитваем теперь?
+				// deal_transaction(account, transaction, false);
+			}
+		}
+	}
+
+	/**
 	 * Внимание! Здесь нельзя делать выход если один раз счет совпал - так как иначе не правильно обработаются балансы
 	 * и Входящая / Исходящая транзакции, например по АПИ. Поэтому если в одном кошельке
 	 * несколько счетов к которым эта транзакция подходит - то она добавится в кошелек длля каждого из них
@@ -1301,32 +1327,33 @@ public class Wallet extends Observable implements Observer {
 		List<Account> accounts = this.getAccounts();
 		boolean isInvolved = false;
 
-		synchronized (accounts) {
-			for (Account account : accounts) {
-				// CHECK IF INVOLVED
-				if (transaction.isInvolved(account)) {
-					isInvolved = true;
+		for (Account account : accounts) {
+			// CHECK IF INVOLVED
+			if (transaction.isInvolved(account)) {
+				isInvolved = true;
 
-					// UPDATE UNCONFIRMED BALANCE
-					deal_transaction(account, transaction, true);
+				// UPDATE UNCONFIRMED BALANCE
+				// НЕподтвержденные балансы не учитываем теперь
+				// deal_transaction(account, transaction, true);
 
-					// 1. DELETE FROM ACCOUNT TRANSACTIONS - с нарощенным мясом
-					this.dwSet.getTransactionMap().delete(account, transaction);
+				// 1. DELETE FROM ACCOUNT TRANSACTIONS - с нарощенным мясом
+				this.dwSet.getTransactionMap().delete(account, transaction);
 
-					// 2. а теперь сбросим все и сохраним без ссылки на блок
-					transaction.resetSeqNo();
-					this.dwSet.getTransactionMap().put(account, transaction);
+				// 2. а теперь сбросим все и сохраним без ссылки на блок
+				transaction.resetSeqNo();
 
-				}
+				// 3. добавим заново в кошелек уже как неподтвержденную
+				this.dwSet.getTransactionMap().put(account, transaction);
+
 			}
-
-			if (!isInvolved)
-				return;
-
-			// ADD SENDER to FAVORITES
-			updateFavorites(transaction, true);
-
 		}
+
+		if (!isInvolved)
+			return;
+
+		// ADD SENDER to FAVORITES
+		updateFavorites(transaction, true);
+
 	}
 
 	private void orphanATTransaction(Tuple2<Tuple2<Integer, Integer>, ATTransaction> atTx) {

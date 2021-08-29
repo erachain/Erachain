@@ -30,6 +30,14 @@ public class DogePlanet extends SmartContract {
         this.keyEnd = keyEnd;
     }
 
+    public int getCount() {
+        return count;
+    }
+
+    public long getKeyEnd() {
+        return keyEnd;
+    }
+
     @Override
     public Object[][] getItemsKeys() {
         Object[][] itemKeys = new Object[count][];
