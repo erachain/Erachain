@@ -262,8 +262,8 @@ public class Account {
                 // give CREDIT or BORROW CREDIT
                 type = BALANCE_POS_DEBT;
             } else {
-                // PRODUCE or SPEND
-                type = BALANCE_POS_SPEND;
+                // SPEND or backward PLEDGE
+                type = !isDirect && isBackward ? BALANCE_POS_6 : BALANCE_POS_SPEND;
             }
         }
 

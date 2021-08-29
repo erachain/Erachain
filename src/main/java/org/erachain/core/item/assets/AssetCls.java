@@ -989,7 +989,7 @@ public abstract class AssetCls extends ItemCls {
 
 
     /**
-     * в обычном сотоянии тут отрицательные балансы или нет?
+     * в обычном состоянии тут отрицательные балансы или нет?
      *
      * @param balPos
      * @return
@@ -999,8 +999,8 @@ public abstract class AssetCls extends ItemCls {
         switch (balPos) {
             case Account.BALANCE_POS_OWN:
                 return isReverseSend(assetType);
-            case Account.BALANCE_POS_SPEND:
-                return true;
+            //case Account.BALANCE_POS_SPEND:
+            //    return true;
         }
         return false;
     }

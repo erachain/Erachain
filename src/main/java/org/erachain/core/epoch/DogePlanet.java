@@ -114,17 +114,19 @@ public class DogePlanet extends SmartContract {
 
         AssetUnique planet;
         int i = count;
-        SmartContractValues valuesMap = dcSet.getSmartContractValues();
 
+        SmartContractValues valuesMap = dcSet.getSmartContractValues();
         Fun.Tuple2 countValueKey = new Fun.Tuple2(id, "c");
-        Integer totalIssued = (Integer) valuesMap.get(countValueKey);
-        if (totalIssued == null)
+        Integer totalIssuedObj = (Integer) valuesMap.get(countValueKey);
+        int totalIssued;
+        if (totalIssuedObj == null)
             totalIssued = 0;
+        else
+            totalIssued = totalIssuedObj;
 
         do {
 
             totalIssued++;
-            valuesMap.put(countValueKey, totalIssued);
 
             planet = new AssetUnique(null, maker, "Doge Planet #" + totalIssued, null, null,
                     null, AssetCls.AS_NON_FUNGIBLE);
@@ -137,6 +139,8 @@ public class DogePlanet extends SmartContract {
 
         } while (--i > 0);
 
+        valuesMap.put(countValueKey, totalIssued);
+
 
         return false;
     }
@@ -144,6 +148,10 @@ public class DogePlanet extends SmartContract {
 
     @Override
     public boolean orphan(DCSet dcSet, Transaction transaction) {
+
+        SmartContractValues valuesMap = dcSet.getSmartContractValues();
+        Fun.Tuple2 countValueKey = new Fun.Tuple2(id, "c");
+        Integer totalIssued = (Integer) valuesMap.get(countValueKey);
 
         int i = 0;
         do {
@@ -155,6 +163,7 @@ public class DogePlanet extends SmartContract {
             dcSet.getItemAssetMap().decrementDelete(keyEnd - i);
         } while (++i < count);
 
+        valuesMap.put(countValueKey, totalIssued - count);
 
         return false;
     }
