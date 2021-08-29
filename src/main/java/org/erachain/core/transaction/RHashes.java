@@ -79,15 +79,15 @@ public class RHashes extends Transaction {
         // not need this.calcFee();
     }
 
-    // OLD
+    // OLD VERS
     public RHashes(PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, feePow, url, data, hashes, timestamp, reference, signature);
         setTypeBytes();
     }
 
-    // NEW
+    // NEW VERS
     public RHashes(PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, feePow, url, data, hashes, timestamp, reference);
+        this(new byte[]{TYPE_ID, (byte) 1, 0, 0}, creator, exLink, feePow, url, data, hashes, timestamp, reference);
     }
 
     public static int getHashesLength(byte[] typeBytes) {
