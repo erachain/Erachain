@@ -38,7 +38,7 @@ public class AssetUnique extends AssetCls {
     @Override
     public String getImageURL() {
         if (maker.equals(DogePlanet.MAKER))
-            return "<img width=350 src=/apiasset/image/1017>";
+            return "<img width=350 src=/apiasset/image/1>";
 
         return super.getImageURL();
     }

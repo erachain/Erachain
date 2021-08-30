@@ -1080,25 +1080,9 @@ public class WebResource {
     @GET
     public Response image(@PathParam("filename") String filename) {
 
-        File file;
-        if (true) {
-            file = new File("web/img/" + filename);
-            if (!file.exists())
-                return error404(request, null);
-        } else {
-            // OLD
-            ArrayList<String> imgs = new ArrayList<String>();
-
-            imgs.addAll(Arrays.asList(imgsArray));
-
-            int imgnum = imgs.indexOf(filename);
-
-            if (imgnum == -1) {
-                return error404(request, null);
-            }
-
-            file = new File("web/img/" + imgs.get(imgnum));
-        }
+        File file = new File("web/img/" + filename);
+        if (!file.exists())
+            return error404(request, null);
 
         String type = "";
 
@@ -1127,6 +1111,37 @@ public class WebResource {
     @GET
     public Response imageIC(@PathParam("filename") String filename) {
         return image("ic/" + filename);
+    }
+
+    @Path("smartcontract/{id}/{filename}")
+    @GET
+    public Response smartcontractFiles(@PathParam("id") Integer id, @PathParam("filename") String filename) {
+
+        File file = new File("web/img/" + filename);
+        if (!file.exists())
+            return error404(request, null);
+
+        String type = "";
+
+        switch (getFileExtention(filename)) {
+            case "png":
+                type = "image/png";
+                break;
+            case "gif":
+                type = "image/gif";
+                break;
+            case "jpg":
+                type = "image/jpeg";
+                break;
+            case "svg":
+                type = "image/svg+xml";
+        }
+
+        if (file.exists()) {
+            return Response.ok(file, type).build();
+        } else {
+            return error404(request, null);
+        }
     }
 
     @Path("index/video/{filename}")
