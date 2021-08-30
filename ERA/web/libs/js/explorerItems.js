@@ -61,6 +61,8 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
         } else if (!origSource && item.imageMediaType.startsWith('audio')) {
             output += '<a href="#"><audio controls autoplay loop><source src="' + source + '" type="audio/mp3"></audio></a>';
 
+        if (!origSource && item.imageMediaType.startsWith('html')) {
+            output += source;
         } else {
             if (origSource) {
                 // + 10 % for FRAME
