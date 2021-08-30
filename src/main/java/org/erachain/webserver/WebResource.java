@@ -64,6 +64,7 @@ public class WebResource {
     public static MediaType TYPE_JPEG = new MediaType("image", "jpeg");
     public static MediaType TYPE_VIDEO = new MediaType("video", "mp4");
     public static MediaType TYPE_AUDIO = new MediaType("audio", "mp3");
+    public static MediaType TYPE_HTML = new MediaType("html", "*");
 
     private static final Logger logger = LoggerFactory.getLogger(WebResource.class);
     @Context

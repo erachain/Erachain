@@ -8,9 +8,12 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.epoch.DogePlanet;
 import org.erachain.datachain.DCSet;
+import org.erachain.webserver.WebResource;
 import org.mapdb.Fun;
 
+import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -32,6 +35,22 @@ public class AssetUnique extends AssetCls {
     }
 
     //GETTERS/SETTERS
+    @Override
+    public String getImageURL() {
+        if (maker.equals(DogePlanet.MAKER))
+            return "<img width=350 src=/apiasset/image/1017>";
+
+        return super.getImageURL();
+    }
+
+    @Override
+    public MediaType getImageMediaType() {
+        if (maker.equals(DogePlanet.MAKER))
+            return WebResource.TYPE_HTML;
+
+        return super.getImageMediaType();
+    }
+
     @Override
     public String getItemSubType() {
         return "unique";

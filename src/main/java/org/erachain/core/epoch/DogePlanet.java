@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 
 public class DogePlanet extends SmartContract {
 
-    static private final PublicKeyAccount MAKER = new PublicKeyAccount("1");
+    static public final PublicKeyAccount MAKER = new PublicKeyAccount("1");
     private int count;
     private long keyEnd;
 
