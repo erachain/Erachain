@@ -1417,11 +1417,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         long newKey;
 
-        long novaKey;
-        if (startKey > 0)
-            novaKey = this.isNovaItem(db);
-        else
-            novaKey = 0;
+        long novaKey = this.isNovaItem(db);
 
         if (novaKey > 0) {
 
