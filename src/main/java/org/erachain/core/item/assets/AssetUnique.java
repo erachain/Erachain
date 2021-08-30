@@ -38,7 +38,7 @@ public class AssetUnique extends AssetCls {
     @Override
     public String getImageURL() {
         if (maker.equals(DogePlanet.MAKER))
-            return "<img width=350 src=/apiasset/image/1>";
+            return "<img width=350 src=/smartcontract/epoch/000001/01/001.png>";
 
         return super.getImageURL();
     }

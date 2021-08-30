@@ -69,30 +69,6 @@ public class WebResource {
     private static final Logger logger = LoggerFactory.getLogger(WebResource.class);
     @Context
     HttpServletRequest request;
-    String[] imgsArray = {"Erachain.org.png", "logo_header.png", "Erachain.org-user.png",
-            "logo_bottom.png", "banner_01.png", "loading.gif",
-            "00_generating.png", "01_genesis.jpg", "02_payment_in.png",
-            "02_payment_out.png", "03_name_registration.png",
-            "04_name_update.png", "05_name_sale.png",
-            "06_cancel_name_sale.png", "07_name_purchase_in.png",
-            "07_name_purchase_out.png", "08_poll_creation.jpg",
-            "09_poll_vote.jpg", "10_arbitrary_transaction.png",
-            "11_asset_issue.png", "12_asset_transfer_in.png",
-            "12_asset_transfer_out.png", "13_order_creation.png",
-            "14_cancel_order.png", "15_multi_payment_in.png", "check-yes.png", "check-no.png",
-            "parentTx.png",
-            "15_multi_payment_out.png", "16_deploy_at.png",
-            "17_message_in.png", "17_message_out.png", "asset_trade.png",
-            "at_tx_in.png", "at_tx_out.png", "grleft.png", "grright.png",
-            "redleft.png", "redright.png", "bar.gif", "bar_left.gif",
-            "bar_right.gif", "locked.png", "unlocked.png", "exchange.png"
-    };
-    String[] videoArray = {
-            //"video01.mp4"
-    };
-    String[] audioArray = {
-            //"audi01.mp3"
-    };
 
     public static String selectTitleOpt(Document htmlDoc) {
         String title = selectFirstElementOpt(htmlDoc, "title");
@@ -1100,11 +1076,8 @@ public class WebResource {
                 type = "image/svg+xml";
         }
 
-        if (file.exists()) {
-            return Response.ok(file, type).build();
-        } else {
-            return error404(request, null);
-        }
+        return Response.ok(file, type).build();
+
     }
 
     @Path("ic/{filename}")
@@ -1113,11 +1086,18 @@ public class WebResource {
         return image("ic/" + filename);
     }
 
-    @Path("smartcontract/{id}/{filename}")
+    // http://127.0.0.1:9067/smartcontract/epoch/000001/01/001.png
+    @Path("smartcontract/epoch/{id}/{slot}/{filename}")
     @GET
-    public Response smartcontractFiles(@PathParam("id") Integer id, @PathParam("filename") String filename) {
+    public Response smartcontractFiles(@PathParam("id") String id, @PathParam("slot") String slot, @PathParam("filename") String filename) {
 
-        File file = new File("web/img/" + filename);
+        File file;
+        if (slot.isEmpty()) {
+            file = new File("smartcontracts/epoch/" + id + "/" + filename);
+        } else {
+            file = new File("smartcontracts/epoch/" + id + "/" + slot + "/" + filename);
+        }
+
         if (!file.exists())
             return error404(request, null);
 
@@ -1137,46 +1117,7 @@ public class WebResource {
                 type = "image/svg+xml";
         }
 
-        if (file.exists()) {
-            return Response.ok(file, type).build();
-        } else {
-            return error404(request, null);
-        }
-    }
-
-    @Path("index/video/{filename}")
-    @GET
-    public Response video(@PathParam("filename") String filename) {
-        ArrayList<String> videos = new ArrayList<String>();
-        videos.addAll(Arrays.asList(videoArray));
-
-        int index = videos.indexOf(filename);
-
-        if (index == -1) {
-            return error404(request, null);
-        }
-
-        File file = new File("web/video/" + videos.get(index));
-        String type = "";
-
-        switch (getFileExtention(videos.get(index))) {
-            case "mpeg4":
-            case "mp4":
-                type = "video/mp4";
-                break;
-            case "ogv":
-                type = "video/ogg";
-                break;
-            case "webm":
-                type = "video/webm";
-                break;
-        }
-
-        if (file.exists()) {
-            return Response.ok(file, type).build();
-        } else {
-            return error404(request, null);
-        }
+        return Response.ok(file, type).build();
     }
 
     @Deprecated
