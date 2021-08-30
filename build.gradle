@@ -174,6 +174,10 @@ task CopyResourse {
         into 'build/libs/Erachain/web'
     }
     copy {
+        from 'ERA/smartcontracts'
+        into 'build/libs/Erachain/smartcontracts'
+    }
+    copy {
         from 'ERA/languages'
         into 'build/libs/Erachain/languages'
     }
