@@ -165,7 +165,6 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         return this.person;
     }
 
-    щщ
     public static int getPublicKeysSize(byte[] typeBytes) {
         return typeBytes[2];
     }
@@ -332,7 +331,6 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         return this.add_day;
     }
 
-    00
     public int getPublicKeysSize() {
         return this.typeBytes[2];
     }
