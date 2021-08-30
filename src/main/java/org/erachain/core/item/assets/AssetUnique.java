@@ -38,7 +38,14 @@ public class AssetUnique extends AssetCls {
     @Override
     public String getImageURL() {
         if (maker.equals(DogePlanet.MAKER))
-            return "<img width=350 src=/smartcontract/epoch/000001/01/001.png>";
+            return "<img width=350 style='position:absolute;'src=/smartcontract/epoch/000001/01/001.png>"
+                    + "<img width=350 style='position:absolute;' src=/smartcontract/epoch/000001/02/001.png>"
+                    + "<img width=350 style='position:absolute;' src=/smartcontract/epoch/000001/03/001.png>"
+                    + "<img width=350 style='position:absolute;' src=/smartcontract/epoch/000001/04/001.png>"
+                    + "<img width=350 style='position:absolute;' src=/smartcontract/epoch/000001/05/001.png>"
+                    + "<img width=350 style='position:absolute;' src=/smartcontract/epoch/000001/06/001.png>"
+                    + "<img width=350 style='position:absolute;' src=/smartcontract/epoch/000001/07/001.png>"
+                    + "<img width=350 style='position:absolute;' src=/smartcontract/epoch/000001/08/001.png>";
 
         return super.getImageURL();
     }
