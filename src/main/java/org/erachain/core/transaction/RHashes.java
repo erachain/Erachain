@@ -23,14 +23,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 
-//import java.math.BigDecimal;
-//import java.math.BigInteger;
-//import java.util.List;
-//import java.util.LinkedHashMap;
-//import java.util.List;
-//import java.util.Map;
-//import org.slf4j.LoggerFactory;
 
+/**
+ * typeBytes[2].[3] in OLD vers - as HASHES.len
+ * vers 1 - HASHES.len in ext data
+ */
 
 public class RHashes extends Transaction {
 
@@ -41,7 +38,7 @@ public class RHashes extends Transaction {
     public static final int MAX_URL_LENGTH = Transaction.MAX_TITLE_BYTES_LENGTH;
     private static final int HASH_LENGTH = 32;
 
-    protected static final int LOAD_LENGTH = URL_SIZE_LENGTH + DATA_SIZE_LENGTH + 4;
+    protected static final int LOAD_LENGTH = URL_SIZE_LENGTH + DATA_SIZE_LENGTH;
     protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
     protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
     protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
@@ -82,12 +79,28 @@ public class RHashes extends Transaction {
         // not need this.calcFee();
     }
 
+    // OLD VERS
     public RHashes(PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, feePow, url, data, hashes, timestamp, reference, signature);
+        setTypeBytes();
     }
 
+    // NEW VERS
     public RHashes(PublicKeyAccount creator, ExLink exLink, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, feePow, url, data, hashes, timestamp, reference);
+        this(new byte[]{TYPE_ID, (byte) 1, 0, 0}, creator, exLink, feePow, url, data, hashes, timestamp, reference);
+    }
+
+    public static int getHashesLength(byte[] typeBytes) {
+        return Ints.fromBytes((byte) 0, (byte) 0, typeBytes[2], typeBytes[3]);
+    }
+
+    protected void setTypeBytes() {
+
+        byte[] bytesLen = Ints.toByteArray(this.hashes.length);
+
+        this.typeBytes[2] = bytesLen[2];
+        this.typeBytes[3] = bytesLen[3];
+
     }
 
     //public static String getName() { return "Statement"; }
@@ -202,9 +215,14 @@ public class RHashes extends Transaction {
 		*/
 
         //READ HASHES SIZE
-        byte[] hashesSizeBytes = Arrays.copyOfRange(data, position, position + 4);
-        int hashesLen = Ints.fromByteArray(hashesSizeBytes);
-        position += 4;
+        int hashesLen;
+        if (typeBytes[1] > 0) {
+            byte[] hashesSizeBytes = Arrays.copyOfRange(data, position, position + 4);
+            hashesLen = Ints.fromByteArray(hashesSizeBytes);
+            position += 4;
+        } else {
+            hashesLen = getHashesLength(typeBytes);
+        }
 
         byte[][] hashes = new byte[hashesLen][];
         for (int i = 0; i < hashesLen; i++) {
@@ -250,7 +268,7 @@ public class RHashes extends Transaction {
 
         if (true || data == null || data.length == 0)
             return false;
-        
+
         //if (Arrays.equals(this.encrypted,new byte[0]))
         //	return false;
 
@@ -294,7 +312,7 @@ public class RHashes extends Transaction {
         if (this.url == null) {
             this.url = new byte[0];
         }
-         
+
         data = Bytes.concat(data, new byte[]{(byte) this.url.length});
 
         //WRITE URL
@@ -306,8 +324,9 @@ public class RHashes extends Transaction {
         //WRITE DATA
         data = Bytes.concat(data, this.data);
 
-        //WRITE HASHES SIZE
-        data = Bytes.concat(data, Ints.toByteArray(this.data.length));
+        //WRITE HASHES SIZE - new VERS
+        if (typeBytes[1] > 0)
+            data = Bytes.concat(data, Ints.toByteArray(this.data.length));
 
         for (int i = 0; i < this.hashes.length; i++)
             data = Bytes.concat(data, this.hashes[i]);
@@ -334,6 +353,10 @@ public class RHashes extends Transaction {
 
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
+
+        // new VERS + SIZE
+        if (typeBytes[1] > 0)
+            base_len += 4;
 
         int add_len = this.url == null ? 0 : this.url.length
                 + this.data.length
