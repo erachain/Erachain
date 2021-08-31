@@ -52,13 +52,13 @@ public class AssetUnique extends AssetCls {
         byte[] hash2 = Ints.toByteArray((int) key);
         System.arraycopy(hash2, 0, hash, 0, hash2.length);
         //hash = Crypto.getInstance().digest(hash);
-        hash = Crypto.getInstance().digest512(Longs.toByteArray(System.currentTimeMillis()));
+        hash = Crypto.getInstance().digest(Longs.toByteArray(System.currentTimeMillis()));
         int slot = 0;
         int slotRare;
         String html = "";
         do {
-            html += String.format("<img width=350 style='position:absolute;'src=/smartcontract/epoch/000001/%02d/", ++slot);
-            slotRare = Ints.fromBytes((byte) 0, (byte) 0, hash[slot << 1], hash[slot << 1 + 1]);
+            html += String.format("<img style='position:absolute; height:inherit' src=/smartcontract/epoch/000001/%02d/", slot);
+            slotRare = Ints.fromBytes((byte) 0, (byte) 0, hash[slot << 1], hash[(slot << 1) + 1]);
             if ((slotRare >> 11) == 0) {
                 html += "5.png>";
             } else if ((slotRare >> 12) == 0) {
@@ -73,7 +73,7 @@ public class AssetUnique extends AssetCls {
                 html += "0.png>";
             }
 
-        } while (slot < 8);
+        } while (slot++ < 7);
 
         return html;
 

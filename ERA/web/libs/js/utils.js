@@ -139,6 +139,13 @@ function updateURLParameter(url, param, paramVal){
     return baseURL + "?" + newAdditionalURL + rows_txt;
 }
 
+function showWindowHtml() {
+  var holder = document.getElementById('image-holder');
+  //holder.src = source;
+  holder.style.display = 'block';
+  holder.style.resizable = 1;
+}
+
 function showWindowImage(source) {
   var img = document.getElementById('image-holder');
   img.src = source;
