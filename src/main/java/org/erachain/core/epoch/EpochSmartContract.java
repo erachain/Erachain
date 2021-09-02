@@ -1,5 +1,6 @@
 package org.erachain.core.epoch;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
@@ -15,7 +16,7 @@ public class EpochSmartContract {
      */
     static public SmartContract make(Transaction transaction) {
 
-        if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+        if (BlockChain.TEST_MODE && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
             if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
                     && txSend.hasAmount() && txSend.getAmount().signum() < 0
