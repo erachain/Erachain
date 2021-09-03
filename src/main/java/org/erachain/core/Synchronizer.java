@@ -40,8 +40,6 @@ public class Synchronizer extends Thread {
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 16;
     private static int MAX_ORPHAN_TRANSACTIONS_MY = (BlockChain.MAX_BLOCK_SIZE_GEN << 2);
-    // private boolean run = true;
-    // private Block runedBlock;
     private Peer fromPeer;
     Controller ctrl;
     BlockChain bchain;
@@ -531,7 +529,6 @@ public class Synchronizer extends Thread {
         try {
             fromPeer = peer;
 
-            //Controller cnt = Controller.getInstance();
             boolean isFromTrustedPeer = bchain.isPeerTrusted(peer);
 
             if (ctrl.isOnStopping())
@@ -632,9 +629,6 @@ public class Synchronizer extends Thread {
                             blockBuffer.stopThread();
                             throw new Exception("on stopping");
                         }
-
-                        ///blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
-                        ///logger.debug("BLOCK Calc Generating Balance");
 
                         if (ctrl.isOnStopping()) {
                             // STOP BLOCKBUFFER
@@ -787,9 +781,6 @@ public class Synchronizer extends Thread {
                     throw new Exception("on stopping");
                 }
 
-                // RECURSIVE CALL if new block is GENERATED
-                /////synchronize(dcSet, checkPointHeight, peer, peerHeight);
-
                 LOGGER.debug(
                         "STOP BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
 
@@ -821,12 +812,6 @@ public class Synchronizer extends Thread {
     }
 
     public List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception {
-
-        /*
-         * logger.
-         * error("core.Synchronizer.getBlockSignatures(byte[], Peer) for: " +
-         * Base58.encode(header));
-         */
 
         /// CREATE MESSAGE
         Message message = MessageFactory.getInstance().createGetHeadersMessage(header);
@@ -889,8 +874,6 @@ public class Synchronizer extends Thread {
 
                 String mess = "Peer is SAME as me";
                 LOGGER.debug(peer + " " + mess);
-                //peer.ban(0, mess);
-                //throw new Exception(mess);
                 return new Tuple2<byte[], List<byte[]>>(null, null);
             }
 
@@ -908,9 +891,6 @@ public class Synchronizer extends Thread {
             throw new Exception(mess);
         }
 
-        // int myChainHeight =
-        // Controller.getInstance().getBlockChain().getHeight();
-        //int maxChainHeight = dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
         final int myChainHeight = dcSet.getBlockMap().size();
         if (myChainHeight < checkPointHeight) {
             String mess = "Dishonest peer: my checkPointHeight[" + checkPointHeight + "\n -> not found";
@@ -922,7 +902,6 @@ public class Synchronizer extends Thread {
 
         // GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN
         // CHECKED
-        // int step = BlockChain.SYNCHRONIZE_PACKET>>2;
         byte[] lastCommonBlockSignature;
         int step = 2;
         int currentCheckChainHeight = myChainHeight;
@@ -991,7 +970,6 @@ public class Synchronizer extends Thread {
         LOGGER.debug("try get BLOCKS from common block SIZE:" + signatures.size() + " - " + peer);
 
         List<Block> blocks = new ArrayList<Block>();
-        //Controller cnt = Controller.getInstance();
 
         int bytesGet = 0;
         for (byte[] signature : signatures) {
@@ -1006,7 +984,6 @@ public class Synchronizer extends Thread {
 
             blocks.add(block);
             bytesGet += 1500 + block.getDataLength(false);
-            ///logger.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet / 1000);
             if (bytesGet > BYTES_MAX_GET) {
                 break;
             }
@@ -1028,7 +1005,6 @@ public class Synchronizer extends Thread {
     public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush,
                                                  boolean notStoreTXs)
             throws Exception {
-        //Controller cnt = Controller.getInstance();
 
         // CHECK IF WE ARE STILL PROCESSING BLOCKS
         if (ctrl.isOnStopping()) {
@@ -1042,12 +1018,6 @@ public class Synchronizer extends Thread {
         boolean observOn = ctrl.doesWalletExists() && ctrl.useGui;
         Integer countObserv_ADD = null;
         Integer countObserv_REMOVE = null;
-        Integer countObserv_COUNT = null;
-        if (observOn) {
-            //      countObserv_ADD = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_ADD);
-            //      countObserv_REMOVE = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_REMOVE);
-            //      countObserv_COUNT = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_COUNT);
-        }
 
         Exception error = null;
         Throwable thrown = null;
@@ -1062,7 +1032,6 @@ public class Synchronizer extends Thread {
                 try {
                     block.orphan(dcSet, notStoreTXs);
                     dcSet.getBlockMap().setProcessing(false);
-                    //dcSet.updateTxCounter(-block.getTransactionCount());
                     // FARDFLUSH not use in each case - only after accumulate size
                     dcSet.flush(txCount + 3, false, doOrphan);
 
@@ -1109,8 +1078,6 @@ public class Synchronizer extends Thread {
                             ctrl.stopAndExit(327);
                             return;
                         }
-
-                        ////ctrl.stopAll(323); - ниже ошибку наверх кидаем же
 
                         throw error;
 
@@ -1165,7 +1132,6 @@ public class Synchronizer extends Thread {
                     }
 
                     dcSet.getBlockMap().setProcessing(false);
-                    //dcSet.updateTxCounter(block.getTransactionCount());
 
                     // FLUSH not use in each case - only after accumulate size
                     dcSet.flush(txCount + 3, false, doOrphan);
@@ -1201,7 +1167,6 @@ public class Synchronizer extends Thread {
                     }
                 } finally {
 
-                    ///block.close();
                     if (ctrl.isOnStopping()) {
                         // was BREAK - try ROLLBACK
                         dcSet.rollback();

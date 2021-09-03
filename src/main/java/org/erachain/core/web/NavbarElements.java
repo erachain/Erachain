@@ -1,5 +1,6 @@
 package org.erachain.core.web;
 
+@Deprecated
 public enum NavbarElements {
     BlogNavbar("web/blogleftnavbar.html"), Searchnavbar("web/searchnavbar.html"), NoNavbar("");
 

@@ -1,14 +1,15 @@
 package org.erachain.core.web;
 
+import org.apache.commons.lang3.StringUtils;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
-import org.apache.commons.lang3.StringUtils;
 import org.erachain.utils.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Deprecated
 public class NameStorageTransactionHistory {
 
     private final List<NamestorageKeyValueHistory> keyvalueList;

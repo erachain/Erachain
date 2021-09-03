@@ -46,7 +46,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     private static Controller ctrl = Controller.getInstance();
     private static int local_status = 0;
     private PrivateKeyAccount acc_winner;
-    //private List<Block> lastBlocksForTarget;
     private byte[] solvingReference;
     private List<PrivateKeyAccount> cachedAccounts;
     private ForgingStatus forgingStatus = ForgingStatus.FORGING_DISABLED;
@@ -117,8 +116,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public boolean checkWeightPeers() {
         // MAY BE PAT SITUATION
 
-        //logger.debug("try check better WEIGHT peers");
-
         betterPeer = null;
 
         Peer peer;
@@ -132,7 +129,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             if (myHW.a < 5)
                 break;
             byte[] lastSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 2).signature;
-            //byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
 
             // не тестируем те узлы которые мы заткунули по Силе - они выдаются Силу выше хотя цепочка та же
             Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true, true);
@@ -142,8 +138,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             if (peer == null) {
                 return false;
             }
-
-            ///LOGGER.debug("better WEIGHT peers found: " + maxPeer);
 
             SignaturesMessage response = null;
             try {
@@ -682,8 +676,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     @Override
     public void run() {
 
-        //TransactionMap transactionsMap = dcSet.getTransactionMap();
-
         int heapOverflowCount = 0;
 
         long processTiming;
@@ -700,9 +692,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long flushPoint = 0;
         long timeUpdate = 0;
         int shift_height = 0;
-        //byte[] unconfirmedTransactionsHash;
-        //long winned_value_account;
-        //long max_winned_value_account;
         int height = BlockChain.getHeight(dcSet) + 1;
         int forgingValue;
         int winned_forgingValue;
@@ -724,11 +713,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         Random random = new Random();
         if (BlockChain.TEST_DB > 0) {
 
-            // REST balances! иначе там копится размер таблицы
-            //dcSet.getAssetBalanceMap().clear();
-
             byte[] seed = Crypto.getInstance().digest("test24243k2l3j42kl43j".getBytes());
-            byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
             BigDecimal balance = new BigDecimal("10000");
 
             for (int nonce = 0; nonce < BlockChain.TEST_DB_ACCOUNTS.length; nonce++) {
@@ -745,15 +730,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             while (!ctrl.isOnStopping()) {
 
                 int timeStartBroadcast = BlockChain.WIN_TIMEPOINT(height);
-
-                if (waitWin != null) {
-                    // освободим память
-                    if (false) {
-                        // НЕЛЬЗЯ - так как этот блок может еще на очереди в кошелек стоять и ему нельзя все мясо сбрасывать
-                        // там он сам сбросит в Synchronizer.pipeProcessOrOrphan
-                        ///waitWin.close();
-                    }
-                }
 
                 Block solvingBlock;
                 Peer peer = null;
@@ -958,8 +934,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                         if (BlockChain.TEST_DB == 0) {
 
-                            ///if (height > BlockChain.BLOCK_COUNT) return;
-
                             //PREVENT CONCURRENT MODIFY EXCEPTION
                             List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
                             if (knownAccounts == null) {
@@ -982,11 +956,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     continue;
 
                                 if (winValue > winned_winValue) {
-                                    //this.winners.put(account, winned_value);
                                     acc_winner = account;
                                     winned_winValue = winValue;
                                     winned_forgingValue = forgingValue;
-                                    //max_winned_value_account = winned_value_account;
 
                                 }
                             }
@@ -1470,7 +1442,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         // CONNECTION not NEED now !!
         // TARGET_WIN will be small
         if (status != Controller.STATUS_OK
-            ///|| ctrl.isProcessingWalletSynchronize()
         ) {
             setForgingStatus(ForgingStatus.FORGING_ENABLED);
             return;
@@ -1480,13 +1451,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             setForgingStatus(ForgingStatus.FORGING_WAIT);
         }
 
-		/*
-		// NOT NEED to wait - TARGET_WIN will be small
-		if (ctrl.isReadyForging())
-			setForgingStatus(ForgingStatus.FORGING);
-		else
-			setForgingStatus(ForgingStatus.FORGING_WAIT);
-			*/
     }
 
     public enum ForgingStatus {

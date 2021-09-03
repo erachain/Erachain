@@ -5,6 +5,7 @@ import org.erachain.core.account.Account;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+@Deprecated
 public class ProfileHelper {
 
     private static ProfileHelper instance;

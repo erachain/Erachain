@@ -8,6 +8,7 @@ import org.mapdb.DB;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 public class OrphanNameStorageMap extends DCUMap<byte[], Map<String, String>> {
 
     public OrphanNameStorageMap(DCSet dcSet, DB database) {

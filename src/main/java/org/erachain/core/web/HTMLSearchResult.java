@@ -2,6 +2,7 @@ package org.erachain.core.web;
 
 import java.util.List;
 
+@Deprecated
 public class HTMLSearchResult {
 
 

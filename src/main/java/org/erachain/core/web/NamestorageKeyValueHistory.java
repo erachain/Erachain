@@ -8,6 +8,7 @@ import org.erachain.utils.DiffHelper;
 import java.util.Arrays;
 import java.util.List;
 
+@Deprecated
 public class NamestorageKeyValueHistory {
 
 
