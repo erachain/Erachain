@@ -551,26 +551,31 @@ public class DCSet extends DBASet implements Closeable {
             // !!! - может быстро съесть память ((
             // !!! если записи (блоки или единичные транзакции) большого объема!!!
 
-            if (Controller.CACHE_DC.equals("lru")) {
-                // при норм размере и достаточной памяти скорость не хуже чем у остальных
-                // скорость зависит от памяти и настроек -
-                databaseStruc.cacheLRUEnable();
-                needClearCache = true;
-            } else if (Controller.CACHE_DC.equals("weak")) {
-                // analog new cacheSoftRefE - в случае нехватки памяти кеш сам чистится
-                databaseStruc.cacheWeakRefEnable();
-                needClearCache = false;
-            } else if (Controller.CACHE_DC.equals("soft")) {
-                // analog new WeakReference() - в случае нехватки памяти кеш сам чистится
-                databaseStruc.cacheSoftRefEnable();
-                needClearCache = false;
-            } else {
-                // это чистит сама память если осталось 25% от кучи - так что она безопасная
-                // самый быстрый
-                // но чистится каждые 10 тыс обращений - org.mapdb.Caches.HardRef
-                // - опасный так как может поесть память быстро!
-                databaseStruc.cacheHardRefEnable();
-                needClearCache = true;
+            switch (Controller.CACHE_DC) {
+                case "lru":
+                    // при норм размере и достаточной памяти скорость не хуже чем у остальных
+                    // скорость зависит от памяти и настроек -
+                    databaseStruc.cacheLRUEnable();
+                    needClearCache = true;
+                    break;
+                case "weak":
+                    // analog new cacheSoftRefE - в случае нехватки памяти кеш сам чистится
+                    databaseStruc.cacheWeakRefEnable();
+                    needClearCache = false;
+                    break;
+                case "soft":
+                    // analog new WeakReference() - в случае нехватки памяти кеш сам чистится
+                    databaseStruc.cacheSoftRefEnable();
+                    needClearCache = false;
+                    break;
+                default:
+                    // это чистит сама память если осталось 25% от кучи - так что она безопасная
+                    // самый быстрый
+                    // но чистится каждые 10 тыс обращений - org.mapdb.Caches.HardRef
+                    // - опасный так как может поесть память быстро!
+                    databaseStruc.cacheHardRefEnable();
+                    needClearCache = true;
+                    break;
             }
         }
 
@@ -584,8 +589,6 @@ public class DCSet extends DBASet implements Closeable {
 
     /**
      * Для проверки одного блока в памяти - при добавлении в цепочку или в буфер ожидания
-     *
-     * @return
      */
     public static boolean needResetUTXPoolMap = false;
 
@@ -598,10 +601,10 @@ public class DCSet extends DBASet implements Closeable {
                 .newMemoryDB()
                 .transactionDisable()
                 .deleteFilesAfterClose()
-                .asyncWriteEnable() // улучшает чуток и не падает так как нет транзакционности
+                .asyncWriteEnable() // улучшает чуток и не падает так как нет транзакционно
 
                 // это время добавляется к ожиданию конца - и если больше 100 то тормоз лишний
-                // но 1..10 - увеличивает скорость валидации трнзакций!
+                // но 1..10 - увеличивает скорость валидации транзакций!
                 .asyncWriteFlushDelay(2)
                 // тут не влияет .commitFileSyncDisable()
 

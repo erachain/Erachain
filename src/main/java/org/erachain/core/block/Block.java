@@ -667,13 +667,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         int version = Ints.fromByteArray(versionBytes);
         position += VERSION_LENGTH;
 
-		/*
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);
-		position += TIMESTAMP_LENGTH;
-		 */
-
         //READ REFERENCE
         byte[] reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
         position += REFERENCE_LENGTH;
@@ -711,11 +704,6 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             byte[] atBytes = Arrays.copyOfRange(data, position, position + atBytesCount);
             position += atBytesCount;
-
-            //byte[] atFees = Arrays.copyOfRange( data , position , position + 8 );
-            //position += 8;
-
-            //long atFeesL = Longs.fromByteArray(atFees);
 
             block = new Block(version, reference, generator, height, transactionsHash, atBytes, signature); //, atFeesL);
         } else {
@@ -768,44 +756,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         return this.heightBlock;
     }
 
-    /*
-    public void setHeight(int height) {
-        this.heightBlock = height;
-    }
-    */
-
-    /*
-    public void setHeadMind(int height, int forgingValue, long winValue, long previousTarget) {
-        this.heightBlock = height;
-        this.forgingValue = forgingValue;
-        this.winValue = winValue;
-        this.target = BlockChain.calcTarget(this.heightBlock, previousTarget, this.winValue);
-
-    }
-    */
-
-    /*
-    public int getHeight(DCSet db) {
-
-        if (this instanceof GenesisBlock
-                || Arrays.equals(this.signature,
-                Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
-            return 1;
-
-        if (heightBlock < 1) {
-            Integer item = db.getBlockSignsMap().get(this.signature);
-            if (item == null) {
-                heightBlock = -1;
-            } else {
-                heightBlock = item;
-            }
-        }
-
-        return heightBlock;
-
-    }
-    */
-
     public long getTarget() {
         return this.target;
     }
@@ -822,7 +772,6 @@ public class Block implements Closeable, ExplorerJsonLine {
     public Block getParent(DCSet dcSet) {
         try {
             int parentHeight = dcSet.getBlockSignsMap().get(this.reference);
-            //assert (parentHeight, this.heightBlock - 1);
             return dcSet.getBlockMap().getAndProcess(parentHeight);
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -837,8 +786,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         target = blockHead.target;
         totalFee = blockHead.totalFee;
         emittedFee = blockHead.emittedFee;
-        //this.transactionCount = blockHead.transactionsCount;
-        //this.version = blockHead.version;
     }
 
     /**
@@ -856,7 +803,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         final long currentTarget = this.parentBlockHead.target;
-        int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
         this.target = BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
 
         // STORE in HEAD
@@ -884,51 +830,15 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     }
 
-    /*
-    public int getHeightByParent(DCSet db) {
-
-        if (this.version == 0 // ||this instanceof GenesisBlock
-                || Arrays.equals(this.signature,
-                Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
-            return 1;
-
-
-        this.loadParentHead(db);
-        return this.heightBlock;
-
-    }
-    */
-
-
     public static long getTimestamp(int height) {
         BlockChain blockChain = Controller.getInstance().getBlockChain();
         return blockChain.getTimestamp(height);
     }
 
     public long getTimestamp() {
-
-        //int height = getHeight();
-
         BlockChain blockChain = Controller.getInstance().getBlockChain();
-
         return blockChain.getTimestamp(this.heightBlock);
     }
-
-	/*
-	private void setGeneratingBalance(int generatingBalance)
-	{
-		this.forgingValue = generatingBalance;
-	}
-	 */
-
-
-	/*
-	// CALCULATE and SET
-	public void setCalcGeneratingBalance(DCSet dcSet)
-	{
-		this.forgingValue = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-	}
-	*/
 
     // balance on creator account when making this block
     public int getForgingValue() {
@@ -980,35 +890,19 @@ public class Block implements Closeable, ExplorerJsonLine {
         // in OLD protocol it USED - and heightBlock get AS 1
         int inDay30 = BlockChain.BLOCKS_PER_DAY(1) * 30;
 
-        BigDecimal bonusFee; // = BlockChain.MIN_FEE_IN_BLOCK;
+        if (this.heightBlock < inDay30 << 1)
+            return BigDecimal.valueOf(70000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+        else if (this.heightBlock < inDay30 << 2) // 120 days = 4 mounth
+            return BigDecimal.valueOf(60000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+        else if (this.heightBlock < inDay30 << 3) // 16 mounth - 72000
+            return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+        else if (this.heightBlock > BlockChain.VERS_30SEC && this.heightBlock <= BlockChain.FREE_FEE_FROM_HEIGHT)
+            return BigDecimal.valueOf(2000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+        else if (this.heightBlock > BlockChain.FREE_FEE_FROM_HEIGHT)
+            return BigDecimal.valueOf(2125, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+        else
+            return BigDecimal.valueOf(20000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
 
-        if (true) {
-            bonusFee = BlockChain.MIN_FEE_IN_BLOCK_4_10;
-            if (this.heightBlock < inDay30 << 1)
-                return BigDecimal.valueOf(70000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (this.heightBlock < inDay30 << 2) // 120 days = 4 mounth
-                return BigDecimal.valueOf(60000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (this.heightBlock < inDay30 << 3) // 16 mounth - 72000
-                return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (this.heightBlock > BlockChain.VERS_30SEC && this.heightBlock <= BlockChain.FREE_FEE_FROM_HEIGHT)
-                return BigDecimal.valueOf(2000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (this.heightBlock > BlockChain.FREE_FEE_FROM_HEIGHT)
-                return BigDecimal.valueOf(2125, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else
-                return BigDecimal.valueOf(20000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-        } else {
-            bonusFee = BlockChain.MIN_FEE_IN_BLOCK;
-            if (this.heightBlock < inDay30 << 1)
-                ;
-            else if (this.heightBlock < inDay30 << 2) // 120 days = 4 mounth
-                bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.FEE_SCALE);
-            else if (this.heightBlock < inDay30 << 3) // 16 mounth
-                bonusFee = bonusFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.FEE_SCALE);
-            else
-                bonusFee = bonusFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.FEE_SCALE);
-        }
-
-        return bonusFee;
     }
 
     private BigDecimal getTotalFee(DCSet db) {
@@ -1026,9 +920,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         for (Transaction transaction : this.getTransactions()) {
             fee += transaction.getForgedFee();
         }
-
-        // TODO calculate AT FEE
-        // fee = fee.add(BigDecimal.valueOf(this.atFees, BlockChain.AMOUNT_DEDAULT_SCALE));
 
         return BigDecimal.valueOf(fee, BlockChain.FEE_SCALE);
 
@@ -1142,7 +1033,6 @@ public class Block implements Closeable, ExplorerJsonLine {
     }
 
     public BigDecimal getFeeAsBigDecimal() {
-
         return BigDecimal.valueOf(this.totalFee, BlockChain.FEE_SCALE);
     }
 
@@ -1284,15 +1174,11 @@ public class Block implements Closeable, ExplorerJsonLine {
                 System.arraycopy(atBytes, 0, data, pos, atBytes.length);
                 pos += atBytes.length;
 
-                //byte[] atByteFees = Longs.toByteArray(atFees);
-                //data = Bytes.concat(data,atByteFees);
             } else {
                 byte[] atBytesCount = new byte[AT_BYTES_LENGTH];
                 System.arraycopy(atBytesCount, 0, data, pos, AT_BYTES_LENGTH);
                 pos += AT_BYTES_LENGTH;
 
-                //byte[] atByteFees = Longs.toByteArray(0L);
-                //data = Bytes.concat(data,atByteFees);
             }
         }
 
@@ -1304,28 +1190,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         if (transactionCount > 0) {
             if (rawTransactionsLength == 0) {
-                if (true) {
-                    assert(false);
-                } else {
-                    // нужно заново создавать
-                    // запомним откуда идет сборка чтобы потом перекатать в сырые данные
-                    int startRAW = pos;
-                    for (Transaction transaction : this.getTransactions()) {
-                        //WRITE TRANSACTION LENGTH
-                        int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
-                        byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-                        transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
-                        System.arraycopy(transactionLengthBytes, 0, data, pos, TRANSACTION_SIZE_LENGTH);
-                        pos += TRANSACTION_SIZE_LENGTH;
-
-                        //WRITE TRANSACTION
-                        System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, data, pos, transactionLength);
-                        pos += transactionLength;
-                    }
-                    // сырые данные теперь запомним на всякий случай
-                    System.arraycopy(data, startRAW, rawTransactions, 0, pos);
-                    rawTransactionsLength = pos - startRAW;
-                }
+                assert (false);
             } else {
                 // уже есть готовые сырые данные
                 System.arraycopy(rawTransactions, 0, data, pos, rawTransactionsLength);
@@ -1422,25 +1287,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     // canonical definition of block version release schedule
     public int getNextBlockVersion(DCSet db) {
-
         return 1;
-
-		/*
-		int height = getHeight(db);
-
-		if(height < Transaction.getAT_BLOCK_HEIGHT_RELEASE())
-		{
-			return 1;
-		}
-		else if(getTimestamp() < Transaction.getPOWFIX_RELEASE())
-		{
-			return 2;
-		}
-		else
-		{
-			return 3;
-		}
-		 */
     }
 
     public long calcWinValue(DCSet dcSet) {
@@ -1477,26 +1324,16 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     public int isValidHead(DCSet dcSet) {
 
-        //Controller cnt = Controller.getInstance();
-
         if (BlockChain.BLOCK_COUNT > 0 && this.heightBlock > BlockChain.BLOCK_COUNT) {
             LOGGER.debug("*** Block[" + this.heightBlock + "] - Max count reached");
             return INVALID_MAX_COUNT;
         }
-
-        // for DEBUG
-        /*
-        if (this.heightBlock == 60624) {
-            int rrr = 0;
-        }
-        */
 
         //CHECK IF PARENT EXISTS
         if (this.heightBlock < 2 || this.reference == null) {
             LOGGER.debug("*** Block[" + this.heightBlock + "].reference invalid");
             return INVALID_REFERENCE;
         }
-        ///this.heightBlock = height;
 
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
         if (!Arrays.equals(lastSignature, this.reference)) {
@@ -1516,7 +1353,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         // TODO - show it to USER
         long blockTime = this.getTimestamp();
         long thisTimestamp = NTP.getTime();
-        //logger.debug("*** Block[" + height + "] " + new Timestamp(myTime));
 
         // необходимо разрешить более ранюю сборку - так чтобы мой собственный блок можно было собрать заранее
         // и потом его провалидировать и послать куда подальше
@@ -1529,8 +1365,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         //CHECK IF VERSION IS CORRECT
-        if (this.version != 1) //this.getParent(dcSet).getNextBlockVersion(dcSet))
-        {
+        if (this.version != 1) {
             LOGGER.debug("*** Block[" + this.heightBlock + "].version invalid");
             return INVALID_BLOCK_VERSION;
         }
@@ -1540,22 +1375,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             return INVALID_BLOCK_VERSION;
         }
 
-		/*
-		// STOP IF SO RAPIDLY
-		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dcSet, this.getCreator(), height);
-		if (previousForgingHeight < 1 || !cnt.isTestNet() && isSoRapidly(dcSet, height, this.getCreator(),
-				//cnt.getBlockChain().getLastBlocksForTarget(dcSet)
-				previousForgingHeight
-				) > 0) {
-			logger.debug("*** Block[" + height + "] REPEATED WIN invalid");
-			return false;
-		}
-		 */
-
         // TEST STRONG of win Value
-        //int base = BlockChain.getMinTarget(height);
-        ///int targetedWinValue = this.calcWinValueTargeted(dcSet);
-
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 
         this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
@@ -1837,18 +1657,12 @@ public class Block implements Closeable, ExplorerJsonLine {
                 if (andProcess) {
 
                     //SET PARENT
-                    ///logger.debug("[" + seqNo + "] try refsMap.set" );
-                    if (true // в любом случае нужно просчитывать если Полный Просчет
-                            // - чтобы потом слить в основную цепочку
-                                || isPrimarySet) {
-                        //REMOVE FROM UNCONFIRMED DATABASE
-                        ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
-                        processTimingLocal = System.nanoTime();
-                        txMemPool.offerMessage(transactionSignature);
-                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                        if (processTimingLocalDiff < 999999999999l)
-                            timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;
-                    }
+                    //REMOVE FROM UNCONFIRMED DATABASE
+                    processTimingLocal = System.nanoTime();
+                    txMemPool.offerMessage(transactionSignature);
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;
 
                     if (cnt.isOnStopping())
                         return INVALID_BRANCH;
@@ -2005,15 +1819,10 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
-                // сейчас у нас есть имя базы откуда открыли так что это не важно тут лог писать
-                // LOGGER.debug("validatedForkDB is closed: " + this.toString());
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
             validatedForkDB = null;
-        } else {
-            // пр синхронизации кошелька пользователя слишком много сообщений - так что закроем
-            //LOGGER.debug("validatedForkDB is closed NULL: " + this.toString());
         }
 
         if (transactions != null) {
@@ -2041,13 +1850,6 @@ public class Block implements Closeable, ExplorerJsonLine {
                 LOGGER.debug("validatedForkDB is FINALIZED: " + this.toString());
             }
         }
-
-        // улучшает работу финализера - так как перекрестные ссылки убирает и другие локи быстрее чистятся
-        // в close() это нельзя делать так как там тоблько база данных чиститья а блок дальше в ГУИ используется
-        // ПРОЫЕРЯЛОСЬ! действует
-        ///rawTransactions = null;
-        ///parentBlockHead = null;
-        ///blockHead = null;
 
         super.finalize();
     }
@@ -2319,15 +2121,6 @@ public class Block implements Closeable, ExplorerJsonLine {
                 }
             }
         }
-        
-		/*
-		if (!dcSet.isFork()) {
-			int lastHeight = dcSet.getBlocksHeadMap().getLastBlock().getHeight(dcSet);
-			logger.error("*** core.block.Block.process(DLSet)[" + (this.getParentHeight(dcSet) + 1)
-					+ "] SET new last Height: " + lastHeight
-					+ " getHeightMap().getHeight: " + this.height_process);
-		}
-		 */
 
         if (heightBlock % BlockChain.MAX_ORPHAN == 0) {
             cnt.blockchainSyncStatusUpdate(heightBlock);
@@ -2453,7 +2246,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         //PROCESS TRANSACTIONS
-        //byte[] blockSignature = this.getSignature();
         byte[] transactionSignature;
 
         // RESET forginf Info Updates
@@ -2473,7 +2265,6 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         if (this.transactionCount > 0) {
 
-            //DLSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = dcSet.getTransactionTab();
             TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSigns = dcSet.getTransactionFinalMapSigns();
@@ -2516,10 +2307,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                 transactionSignature = transaction.getSignature();
 
                 //SET PARENT
-                ///logger.debug("[" + seqNo + "] try refsMap.set" );
-
                 //REMOVE FROM UNCONFIRMED DATABASE
-                ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
                 try {
                     unconfirmedMap.delete(transactionSignature);
@@ -2538,12 +2326,10 @@ public class Block implements Closeable, ExplorerJsonLine {
                 if (cnt.isOnStopping())
                     throw new Exception("on stoping");
 
-                ///LOGGER.debug("[" + seqNo + "] try finalMap.set" + transaction );
                 timerStart = System.currentTimeMillis();
                 // добавляем после процессинга, когда в транзакции новые данные наросли
                 finalMap.put(key, transaction);
                 timerFinalMap_set += System.currentTimeMillis() - timerStart;
-                //logger.debug("[" + seqNo + "] try transFinalMapSigns.set" );
                 timerStart = System.currentTimeMillis();
                 transFinalMapSigns.put(transactionSignature, key);
                 List<byte[]> signatures = transaction.getOtherSignatures();
@@ -2585,7 +2371,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (cnt.isOnStopping())
             throw new Exception("on stoping");
 
-        //logger.debug("<<< core.block.Block.orphan(DLSet) #0");
         if (this.heightBlock < 2) {
             // GENESIS BLOCK cannot be orphaned
             return;
@@ -2610,13 +2395,10 @@ public class Block implements Closeable, ExplorerJsonLine {
         // CLEAR ASSETS FEE
         earnedAllAssets = new HashMap<>();
 
-        //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
         this.orphanTransactions(dcSet, heightBlock, notStoreTXs);
 
         //PROCESS ASSETS FEE - after orphanTransactions!
         assetsFeeProcess(dcSet, true);
-
-        //logger.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
 
         makeHoldRoyalty(dcSet, true);
 
@@ -2646,13 +2428,10 @@ public class Block implements Closeable, ExplorerJsonLine {
         //DELETE BLOCK FROM DB
         dcSet.getBlockMap().deleteAndProcess(this.signature, this.reference, this.creator, this.heightBlock);
 
-        //logger.debug("<<< core.block.Block.orphan(DLSet) #4");
-
         long tickets = System.currentTimeMillis() - start;
         LOGGER.debug("[" + this.heightBlock + "] orphaning time: " + (System.currentTimeMillis() - start) * 0.001
                 + " TXs = " + this.getTransactionCount() + " millsec/record:" + tickets / (this.getTransactionCount() + 1));
 
-        //this.parentBlock = null;
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
         if (!Arrays.equals(lastSignature, this.reference)) {
             LOGGER.debug("[" + this.heightBlock + "] orphaning time: " + (System.currentTimeMillis() - start) * 0.001
@@ -2665,8 +2444,6 @@ public class Block implements Closeable, ExplorerJsonLine {
             compareCOMPUbals(dcSet, heightBlock - 1, "after ORPHAN");
         }
 
-        //this.heightBlock = -1;
-
     }
 
     public void orphan(DCSet dcSet) throws Exception {
@@ -2676,7 +2453,6 @@ public class Block implements Closeable, ExplorerJsonLine {
     private void orphanTransactions(DCSet dcSet, int height, boolean notStoreTXs) throws Exception {
 
         Controller cnt = Controller.getInstance();
-        //DLSet dbSet = Controller.getInstance().getDBSet();
 
         TransactionMap unconfirmedMap = dcSet.getTransactionTab();
         TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
@@ -2701,7 +2477,6 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
 
             Transaction transaction = transactions.get(i);
-            //logger.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
             // (!) seqNo = i + 1
             transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo,
