@@ -5,7 +5,6 @@ import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
 public class WItemAssetMap extends WItemMap {
-    //static Logger logger = LoggerFactory.getLogger(WItemAssetMap.class.getName());
 
     static final String NAME = "asset";
     static final int TYPE = ItemCls.ASSET_TYPE;

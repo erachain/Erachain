@@ -6,7 +6,6 @@ import org.mapdb.DB;
 
 public class WItemTemplateMap extends WItemMap {
 
-    //static Logger logger = LoggerFactory.getLogger(WItemTemplateMap.class.getName());
     static final String NAME = "template";
     static final int TYPE = ItemCls.TEMPLATE_TYPE;
 

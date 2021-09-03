@@ -6,7 +6,6 @@ import org.mapdb.DB;
 
 public class WItemStatusMap extends WItemMap {
 
-    //static Logger logger = LoggerFactory.getLogger(WItemStatusMap.class.getName());
     static final String NAME = "status";
     static final int TYPE = ItemCls.STATUS_TYPE;
 
