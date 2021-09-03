@@ -10,9 +10,9 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.epoch.DogePlanet;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.epoch.DogePlanet;
 import org.erachain.webserver.WebResource;
 import org.mapdb.Fun;
 

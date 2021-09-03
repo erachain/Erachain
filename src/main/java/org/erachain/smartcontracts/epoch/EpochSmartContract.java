@@ -1,12 +1,28 @@
-package org.erachain.core.epoch;
+package org.erachain.smartcontracts.epoch;
 
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.smartcontracts.SmartContract;
 
-public class EpochSmartContract {
+public abstract class EpochSmartContract extends SmartContract {
 
+
+    EpochSmartContract(int id, PublicKeyAccount maker) {
+        super(id, maker);
+    }
+
+    /**
+     * Эпохальный смарт-контракт
+     *
+     * @return
+     */
+    @Override
+    public boolean isEpoch() {
+        return true;
+    }
 
     /**
      * Делает смотр-контракт протокольный (на эпоху).

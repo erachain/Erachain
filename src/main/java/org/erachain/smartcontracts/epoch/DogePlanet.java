@@ -1,4 +1,4 @@
-package org.erachain.core.epoch;
+package org.erachain.smartcontracts.epoch;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -10,17 +10,18 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.SmartContractState;
 import org.erachain.datachain.SmartContractValues;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
-public class DogePlanet extends SmartContract {
+public class DogePlanet extends EpochSmartContract {
 
     static public final PublicKeyAccount MAKER = new PublicKeyAccount("1");
     private int count;
     private long keyEnd;
+
+    static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(DOGE_PLANET_1, "c");
 
     DogePlanet(int count) {
         super(DOGE_PLANET_1, MAKER);
@@ -81,7 +82,7 @@ public class DogePlanet extends SmartContract {
 
     }
 
-    static DogePlanet Parse(byte[] data, int pos, int forDeal) {
+    public static DogePlanet Parse(byte[] data, int pos, int forDeal) {
 
         // skip ID
         pos += 4;
@@ -100,27 +101,16 @@ public class DogePlanet extends SmartContract {
         return new DogePlanet(Ints.fromByteArray(countBuffer));
     }
 
-    /**
-     * Эпохальный смарт-контракт
-     *
-     * @return
-     */
-    public boolean isEpoch() {
-        return true;
-    }
-
-
     @Override
     public boolean process(DCSet dcSet, Block block, Transaction transaction) {
 
         AssetUnique planet;
         int i = count;
 
-        SmartContractState stateMap = dcSet.getSmartContractState(); // not used here
+        //SmartContractState stateMap = dcSet.getSmartContractState(); // not used here
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
-        Fun.Tuple2 countValueKey = new Fun.Tuple2(id, "c");
-        Integer totalIssuedObj = (Integer) valuesMap.get(countValueKey);
+        Integer totalIssuedObj = (Integer) valuesMap.get(COUNT_KEY);
         int totalIssued;
         if (totalIssuedObj == null)
             totalIssued = 0;
@@ -142,7 +132,7 @@ public class DogePlanet extends SmartContract {
 
         } while (--i > 0);
 
-        valuesMap.put(countValueKey, totalIssued);
+        valuesMap.put(COUNT_KEY, totalIssued);
 
 
         return false;
@@ -153,8 +143,7 @@ public class DogePlanet extends SmartContract {
     public boolean orphan(DCSet dcSet, Transaction transaction) {
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
-        Fun.Tuple2 countValueKey = new Fun.Tuple2(id, "c");
-        Integer totalIssued = (Integer) valuesMap.get(countValueKey);
+        Integer totalIssued = (Integer) valuesMap.get(COUNT_KEY);
 
         int i = 0;
         do {
@@ -166,7 +155,7 @@ public class DogePlanet extends SmartContract {
             dcSet.getItemAssetMap().decrementDelete(keyEnd - i);
         } while (++i < count);
 
-        valuesMap.put(countValueKey, totalIssued - count);
+        valuesMap.put(COUNT_KEY, totalIssued - count);
 
         return false;
     }

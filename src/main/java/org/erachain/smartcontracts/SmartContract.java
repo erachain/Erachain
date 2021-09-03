@@ -1,20 +1,20 @@
-package org.erachain.core.epoch;
+package org.erachain.smartcontracts;
 
 import com.google.common.primitives.Ints;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.epoch.DogePlanet;
 
 public abstract class SmartContract {
 
-    static final int DOGE_PLANET_1 = 1;
-
+    protected static final int DOGE_PLANET_1 = 1;
 
     protected final int id;
     protected final PublicKeyAccount maker;
 
-    SmartContract(int id, PublicKeyAccount maker) {
+    protected SmartContract(int id, PublicKeyAccount maker) {
         this.id = id;
         this.maker = maker;
     }

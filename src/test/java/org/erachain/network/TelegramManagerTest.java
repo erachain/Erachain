@@ -10,7 +10,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.epoch.SmartContract;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
@@ -20,6 +19,7 @@ import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.ntp.NTP;
+import org.erachain.smartcontracts.SmartContract;
 import org.junit.Test;
 
 import java.math.BigDecimal;
