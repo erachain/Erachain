@@ -19,8 +19,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     static Logger LOGGER = LoggerFactory.getLogger(IssueItemRecord.class.getName());
 
-    //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
-
     protected ItemCls item;
     protected Long key = 0L;
 
@@ -44,7 +42,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Issue Item"; }
 
     @Override
     public ItemCls getItem() {

@@ -119,11 +119,4 @@ public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
 
     }
 
-	/*
-	@Override
-	public boolean isInvolved(Account account)
-	{
-		return true;
-	}
-	 */
 }

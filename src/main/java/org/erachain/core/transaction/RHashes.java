@@ -103,8 +103,6 @@ public class RHashes extends Transaction {
 
     }
 
-    //public static String getName() { return "Statement"; }
-
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
@@ -185,9 +183,6 @@ public class RHashes extends Transaction {
         //////// local parameters
 
         //READ NAME
-        //byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
-        //int nameLength = Ints.fromByteArray(nameLengthBytes);
-        //position += NAME_SIZE_LENGTH;
         int urlLength = Byte.toUnsignedInt(data[position]);
         position++;
 
@@ -206,13 +201,6 @@ public class RHashes extends Transaction {
         //READ DATA
         byte[] arbitraryData = Arrays.copyOfRange(data, position, position + dataSize);
         position += dataSize;
-		/*
-		encryptedByte = Arrays.copyOfRange(data, position, position + ENCRYPTED_LENGTH);
-		position += ENCRYPTED_LENGTH;
-
-		isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
-		position += IS_TEXT_LENGTH;
-		*/
 
         //READ HASHES SIZE
         int hashesLen;
@@ -269,9 +257,6 @@ public class RHashes extends Transaction {
         if (true || data == null || data.length == 0)
             return false;
 
-        //if (Arrays.equals(this.encrypted,new byte[0]))
-        //	return false;
-
         return true;
 
     }
@@ -289,9 +274,7 @@ public class RHashes extends Transaction {
             //transaction.put("data", Base58.encode(this.data));
         }
         if (url != null && url.length > 0) {
-            //transaction.put("url", new String(this.url, StandardCharsets.UTF_8));
             transaction.put("url", new String(this.url, StandardCharsets.UTF_8));
-            //transaction.put("data", Base58.encode(this.data));
         }
 
         JSONArray hashesArray = new JSONArray();

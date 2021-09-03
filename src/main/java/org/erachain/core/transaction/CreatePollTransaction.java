@@ -60,7 +60,6 @@ public class CreatePollTransaction extends Transaction {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Create Poll"; }
 
     @Override
     public boolean isWiped() {
@@ -242,16 +241,6 @@ public class CreatePollTransaction extends Transaction {
     }
 
     //VALIDATE
-
-	/*
-	public boolean isSignatureValid()
-	{
-		byte[] data = this.toBytes( false, null );
-		if ( data == null ) return false;
-
-		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
-	}
-	 */
 
     @Override
     public int isValid(int forDeal, long flags) {

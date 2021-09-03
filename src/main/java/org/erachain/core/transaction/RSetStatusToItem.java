@@ -173,8 +173,6 @@ public class RSetStatusToItem extends Transaction {
 
     //GETTERS/SETTERS
 
-    //public static String getName() { return "Send"; }
-
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         super.setDC(dcSet, false);
 

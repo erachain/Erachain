@@ -56,7 +56,6 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return NAME; }
 
     public static Transaction Parse(byte[] data) throws Exception {
 
@@ -66,7 +65,6 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         }
 
         // READ TYPE
-        //byte[] typeBytes = Arrays.copyOfRange(data, 0, SIMPLE_TYPE_LENGTH);
         int position = SIMPLE_TYPE_LENGTH;
 
         //READ RECIPIENT
@@ -287,21 +285,18 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
             // PROCESS FORGING DATA
             //// SKIP Genesis Block
-            ///this.recipient.setForgingData(this.dcSet, 1, this.amount.intValue());
             int currentForgingBalance = this.recipient.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
             this.recipient.setForgingData(this.dcSet, 1, currentForgingBalance);
         }
 
         if (key < 0) {
             // THIS is CREDIT
-            //this.maker.setBalance(key, this.owner.getBalance(db, key).subtract(this.amount), db);
             this.sender.changeBalance(this.dcSet, true, false, key, this.amount,
                     false, false, false);
             this.dcSet.getCredit_AddressesMap().add(
                     new Tuple3<String, Long, String>(
                             this.sender.getAddress(), -key,
                             this.recipient.getAddress()),
-                    //new Tuple3<String, Long, String>(this.owner.getAddress(), -key, this.recipient.getAddress()),
                     this.amount);
 
         } else {
@@ -334,30 +329,6 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
 		/* IT CANNOT BE orphanED !!!
 		 *
-		long key = this.key;
-		//UPDATE RECIPIENT
-		//this.recipient.setBalance(key, this.recipient.getBalance(db, key).subtract(this.amount), db);
-		this.recipient.changeBalance(db, true, key, this.amount);
-
-		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.removeReference(db);
-
-		if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
-			// ORPHAN FORGING DATA
-			////this.recipient.setLastForgingData(db, -1);
-			//this.recipient.delForgingData(db, 2);
-		}
-
-		if (key < 0) {
-			//this.owner.setBalance(key, this.owner.getBalance(db, key).add(this.amount), db);
-			this.owner.changeBalance(db, false, key, this.amount);
-			db.getCredit_AddressesMap().sub(
-					new Tuple3<String, Long, String>(this.owner.getAddress(), -key, this.recipient.getAddress()),
-					this.amount);
-		} else {
-			// CREATOR update
-			GenesisBlock.CREATOR.changeBalance(db, false, key, this.amount);
-		}
 		 */
 
     }

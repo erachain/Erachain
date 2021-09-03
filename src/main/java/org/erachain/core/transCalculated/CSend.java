@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-/*
+/**
 
 ## typeBytes
 0 - record type
@@ -102,8 +102,6 @@ public class CSend extends CalculatedAmount {
     }
 
     // GETTERS/SETTERS
-
-    // public static String getName() { return "Send"; }
 
     public static Calculated Parse(byte[] data) throws Exception {
 

@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/*
+/**
 
 #### PROPERTY 1
 typeBytes[2].3-7 = point accuracy for HAVE amount: -16..16 = BYTE - 16
@@ -117,8 +117,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             updateFromStateDB();
 
     }
-
-    // public static String getName() { return "Create Order"; }
 
     @Override
     public String getTitle() {
@@ -319,12 +317,10 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     }
 
     public BigDecimal getPriceCalc() {
-        // precision bad return Order.calcPrice(this.amountHave, this.amountWant);
         return makeOrder().calcPrice();
     }
 
     public BigDecimal getPriceCalcReverse() {
-        //return Order.calcPrice(this.amountWant, this.amountHave);
         return makeOrder().calcPriceReverse();
     }
 
@@ -352,10 +348,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         transaction.put("wantKey", this.wantKey);
         transaction.put("amountHave", this.amountHave.toPlainString());
         transaction.put("amountWant", this.amountWant.toPlainString());
-
-        //if (this.order != null) {
-        //	transaction.put("order", this.order.toJson());
-        //}
 
         return transaction;
     }
@@ -549,11 +541,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             }
 
 
-            ///// CHECK IF SENDER HAS ENOUGH FEE BALANCE
-            ///if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.fee) == -1) {
-            ///    return NOT_ENOUGH_FEE;
-            ///}
-
             // if asset is unlimited and me is creator of this asset
             boolean unLimited = haveAsset.isUnlimited(this.creator, false);
 
@@ -657,13 +644,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         super.process(block, forDeal);
 
         // PROCESS ORDER
-        // изменяемые объекты нужно заново создавать
-        //this.order.copy().process(this);
-        //this.order.process(this);
-
-        // изменяемые объекты нужно заново создавать
-        //.copy() // тут надо что-то сделать новым - а то значения в памяти по ссылке меняются
-        Order order = makeOrder(); //.copy();
+        Order order = makeOrder();
 
         // MOVE HAVE from OWN to PLEDGE
         creator.changeBalance(dcSet, true, false, haveKey, amountHave,

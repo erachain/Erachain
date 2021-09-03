@@ -1,7 +1,5 @@
 package org.erachain.core.transCalculated;
 
-//import com.google.common.primitives.Longs;
-
 public class CalculatedFactory {
 
     private static CalculatedFactory instance;

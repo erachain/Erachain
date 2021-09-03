@@ -1,8 +1,5 @@
 package org.erachain.core.transaction;
 
-//import java.math.BigDecimal;
-//import java.math.BigInteger;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -19,7 +16,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 
-// issue statement
 public class IssueStatementRecord extends Transaction {
 
     protected static final byte HAS_TEMPLATE_MASK = (byte) (1 << 7);
@@ -71,29 +67,6 @@ public class IssueStatementRecord extends Transaction {
         this.signature = signature;
         // not need this.calcFee();
     }
-
-    /*
-    public IssueStatementRecord(PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
-        // set props
-        this.setTypeBytes();
-    }
-
-    public IssueStatementRecord(PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference);
-        // set props
-        this.setTypeBytes();
-    }
-
-
-    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data,
-                                byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, linkTo, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
-        this.signers = signers;
-        this.signatures = signatures;
-        this.setTypeBytes();
-    }
-     */
 
     public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte feePow, long templateKey, byte[] data,
                                 byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures,

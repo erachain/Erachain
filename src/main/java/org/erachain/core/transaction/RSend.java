@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 
-/*
+/**
 
 ## typeBytes
 0 - record type
@@ -61,7 +61,6 @@ public class RSend extends TransactionAmount {
 
     public static final int NO_DATA_MASK = 128; // 0x10000000
     public static final int MAX_DATA_VIEW = 64;
-    //private static int position;
 
     static Logger LOGGER = LoggerFactory.getLogger(RSend.class.getName());
 
@@ -190,8 +189,6 @@ public class RSend extends TransactionAmount {
     }
 
     // GETTERS/SETTERS
-
-    // public static String getName() { return "Send"; }
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 

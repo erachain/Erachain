@@ -76,8 +76,6 @@ public class VoteOnPollTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
-    //public static String getName() { return "Vote on Poll"; }
-
     @Override
     public boolean isWiped() {
         return true;

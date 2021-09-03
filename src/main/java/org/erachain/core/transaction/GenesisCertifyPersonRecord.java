@@ -33,7 +33,6 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return NAME; }
 
     public static Transaction Parse(byte[] data) throws Exception {
 
@@ -43,7 +42,6 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         }
 
         // READ TYPE
-        //byte[] typeBytes = Arrays.copyOfRange(data, 0, SIMPLE_TYPE_LENGTH);
         int position = SIMPLE_TYPE_LENGTH;
 
         //READ RECIPIENT
@@ -128,10 +126,8 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
     @Override
     public void process(Block block, int forDeal) {
 
-        //Block block = new GenesisBlock();
         int transactionIndex = -1;
         int blockIndex = -1;
-        //Block block = this.getBlock(db);// == null (((
         if (block == null) {
             blockIndex = this.dcSet.getBlockMap().last().getHeight();
         } else {
@@ -140,7 +136,6 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
                 // if block not is confirmed - get last block + 1
                 blockIndex = this.dcSet.getBlockMap().last().getHeight() + 1;
             }
-            //transactionIndex = this.getSeqNo(db);
             transactionIndex = block.getTransactionSeq(signature);
         }
 
@@ -172,8 +167,6 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         this.dcSet.getAddressPersonMap().removeItem(this.recipient.getShortAddressBytes());
         this.dcSet.getPersonAddressMap().removeItem(this.key, this.recipient.getAddress());
 
-        //UPDATE REFERENCE OF CREATOR
-        // not needthis.creator.setLastReference(this.reference, db);
         //UPDATE REFERENCE OF RECIPIENT
         this.recipient.removeLastTimestamp(this.dcSet);
     }

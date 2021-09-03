@@ -64,8 +64,6 @@ public class RecordReleasePack extends Transaction {
 
     //GETTERS/SETTERS
 
-    //public static String getName() { return "Multi Send"; }
-
     //PARSE/CONVERT
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {

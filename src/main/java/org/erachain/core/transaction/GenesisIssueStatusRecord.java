@@ -5,7 +5,6 @@ import org.erachain.core.item.statuses.StatusFactory;
 
 import java.util.Arrays;
 
-//import java.math.BigInteger;
 
 public class GenesisIssueStatusRecord extends GenesisIssueItemRecord {
 
@@ -15,12 +14,9 @@ public class GenesisIssueStatusRecord extends GenesisIssueItemRecord {
     public GenesisIssueStatusRecord(StatusCls status) {
         super(TYPE_ID, NAME_ID, status);
 
-        //this.generateSignature();
-
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Genesis Issue Status"; }
 
     @SuppressWarnings("unchecked")
 

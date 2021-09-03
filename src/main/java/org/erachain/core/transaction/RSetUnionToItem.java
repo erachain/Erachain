@@ -113,8 +113,6 @@ public class RSetUnionToItem extends Transaction {
 
     }
 
-    //public static String getName() { return "Send"; }
-
     @Override
     public String getTitle() {
         return "";
@@ -386,11 +384,7 @@ public class RSetUnionToItem extends Transaction {
         super.process(block, forDeal);
 
         // pack additional data
-        byte[] a_data = new byte[0];//this.value1;
-
-        //Block block = db.getBlocksHeadMap().getLastBlock();
-        //int blockIndex = block.getHeight(db);
-        //int transactionIndex = block.getTransactionIndex(signature);
+        byte[] a_data = new byte[0];
 
         Tuple5<Long, Long, byte[], Integer, Integer> itemP = new Tuple5<Long, Long, byte[], Integer, Integer>
                 (

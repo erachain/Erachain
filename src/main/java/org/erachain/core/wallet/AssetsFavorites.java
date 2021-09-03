@@ -26,8 +26,6 @@ public class AssetsFavorites implements Observer {
 
         Controller.getInstance().addWalletObserver(this);
         Controller.getInstance().addObserver(this);
-        ///this.reload();
-        //this.getAssets();
 
     }
 
@@ -68,9 +66,6 @@ public class AssetsFavorites implements Observer {
         }
         this.favorites = favoritesUpadate;
 
-        //Controller.getInstance().replaseAssetsFavorites();
-        //////Controller.getInstance().replaseAssetsFavorites();
-
     }
 
     @Override
@@ -87,8 +82,6 @@ public class AssetsFavorites implements Observer {
                 (
                         message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE
                         || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
-                        //|| message.getType() == ObserverMessage.ADD_BALANCE_TYPE
-                        //|| message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
                 ))) {
             this.reload();
         }

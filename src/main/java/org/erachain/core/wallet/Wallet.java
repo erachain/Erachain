@@ -1,5 +1,4 @@
 package org.erachain.core.wallet;
-// 09/03
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -185,16 +184,6 @@ public class Wallet extends Observable implements Observer {
 		return dwSet != null;
 	}
 
-	// public BigDecimal getUnconfirmedBalance(String address, long key)
-	// {
-	// return this.database.getAccountMap().getUnconfirmedBalance(address, key);
-	// }
-	/*
-	 * public BigDecimal getUnconfirmedBalance(Account account, long key) {
-	 *
-	 * return this.database.getAccountMap().getUnconfirmedBalance(account, key);
-	 * }
-	 */
 	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(Account account, long key) {
 
 		return this.dwSet.getAccountMap().getBalance(account, key);
@@ -231,16 +220,6 @@ public class Wallet extends Observable implements Observer {
 	public void removeWaitingObserver(ObserverWaiter observer) {
 		waitingObservers.remove(observer);
 	}
-
-	/*
-	public PublicKeyAccount getPublicKeyAccount(String address) {
-		if (this.database == null) {
-			return null;
-		}
-
-		return this.database.getAccountMap().getPublicKeyAccount(address);
-	}
-	*/
 
 	public static boolean walletKeysExists() {
 		if (Controller.getInstance().noUseWallet || Settings.SECURE_WALLET_FILE == null) {
@@ -449,15 +428,6 @@ public class Wallet extends Observable implements Observer {
 		this.commit();
 
 		walletUpdater = new WalletUpdater(Controller.getInstance(), this);
-
-		// ADD OBSERVER
-		////////// Controller.getInstance().addObserver(this);
-		////dcSet.getCompletedOrderMap().addObserver(this);
-
-		// SOME
-		// Account initAccount = this.getAccounts().get(0);
-		// initAccount.setConfirmedBalance(Transaction.AssetCls.DILE_KEY,
-		// BigDecimal.valueOf(0.00001));
 
 		return true;
 	}
@@ -756,15 +726,6 @@ public class Wallet extends Observable implements Observer {
 
 	}
 
-	/*
-	// UNLOCK ONCE
-	public boolean unlockOnce(String password) {
-
-		this.secondsToUnlock = -1;
-		return unlock(password);
-	}
-	*/
-
 	public boolean unlock(SecureWalletDatabase secureDatabase) {
 
 		synchronized (secureDatabase) {
@@ -931,7 +892,6 @@ public class Wallet extends Observable implements Observer {
 		return this.secureDatabase.getSeed();
 	}
 
-	// OBSERVER - 4FMukAT6myqaJ8udr28KU1CWXMFhgB3nikquWSdZ9qzu
 	public void linkWaitingObservers(boolean withObserver) {
 		// добавим теперь раз кошелек открылся все ожидающие связи на наблюдения
 		for (ObserverWaiter observer : waitingObservers) {
@@ -940,21 +900,7 @@ public class Wallet extends Observable implements Observer {
 		waitingObservers.clear();
 
 		if (withObserver) {
-			// ADD OBSERVER
-
-
-			// Controller.getInstance().addObserver(this);
-
-			/// вешает при синхронизации ничего нельзя сделать с кошельком - ни открыть ни закрыть
-			// тем более сейчас это событие не используется в кошельке никак
-			/// DCSet..getTransactionTab().addObserver(this);
-
-			/// вешает при синхронизации ничего нельзя сделать с кошельком - ни открыть ни закрыть
-			// тем более сейчас это событие не используется в кошельке никак
-			// DCSet..getBlockMap().addObserver(this);
-
-			// DCSet..getCompletedOrderMap().addObserver(this);
-
+			// ADD OBSERVERs
 
 			// REGISTER ON ORDERS - foe BELLs on incomed TRADES
 			this.dwSet.getOrderMap().addObserver(this);
@@ -1207,9 +1153,6 @@ public class Wallet extends Observable implements Observer {
 				// ADD TO ACCOUNT TRANSACTIONS
 				this.dwSet.getTransactionMap().set(account, transaction);
 
-				// UPDATE BALANCE
-				/// это неподтвержденный баланс - мы его не учитваем теперь?
-				// deal_transaction(account, transaction, false);
 			}
 		}
 	}
@@ -1306,8 +1249,6 @@ public class Wallet extends Observable implements Observer {
 		synchronized (accounts) {
 			for (Account account : accounts) {
 				// CHECK IF INVOLVED
-				// if(atTx.b.getRecipient().equalsIgnoreCase(
-				// account.getAddress() ))
 				if (atTx.b.getRecipient() == account.getAddress()) {
 					this.dwSet.getAccountMap().changeBalance(account.getAddress(), false, atTx.b.getKey(),
 							BigDecimal.valueOf(atTx.b.getAmount()), false, false);
@@ -1331,10 +1272,6 @@ public class Wallet extends Observable implements Observer {
 			// CHECK IF INVOLVED
 			if (transaction.isInvolved(account)) {
 				isInvolved = true;
-
-				// UPDATE UNCONFIRMED BALANCE
-				// НЕподтвержденные балансы не учитываем теперь
-				// deal_transaction(account, transaction, true);
 
 				// 1. DELETE FROM ACCOUNT TRANSACTIONS - с нарощенным мясом
 				this.dwSet.getTransactionMap().delete(account, transaction);
@@ -1382,7 +1319,6 @@ public class Wallet extends Observable implements Observer {
 		byte[] lastBlockSignature = this.dwSet.getLastBlockSignature();
 		if (lastBlockSignature == null
 				|| !Arrays.equals(lastBlockSignature, signatureORreference)) {
-			////walletUpdater.setGoSynchronize(false);
 			return true;
 		}
 
@@ -1392,31 +1328,6 @@ public class Wallet extends Observable implements Observer {
 
 	public void feeProcess(Long blockFee, Account blockGenerator, boolean asOrphan) {
 
-		/*
-        BigDecimal bonusFee; // = block.getBonusFee();
-        BigDecimal blockTotalFee; // = block.getTotalFee(dcSet);
-        BigDecimal emittedFee;
-
-        if (BlockChain.ROBINHOOD_USE) {
-            // find rich account
-            String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
-
-            if (!rich.equals(blockGenerator.getAddress())) {
-                emittedFee = bonusFee.divide(new BigDecimal(2));
-
-                if (this.accountExists(rich)) {
-                    Account richAccount = new Account(rich);
-                    this.database.getAccountMap().changeBalance(richAccount.getAddress(), !asOrphan, FEE_KEY, bonusFee);
-                }
-            } else {
-                emittedFee = BigDecimal.ZERO;
-            }
-
-        } else {
-            emittedFee = bonusFee;
-        }
-
-        */
 		this.dwSet.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY,
 				new BigDecimal(blockFee).movePointLeft(BlockChain.FEE_SCALE), false, false);
 
@@ -1550,7 +1461,6 @@ public class Wallet extends Observable implements Observer {
 			this.dwSet.getBlocksHeadMap().delete(block.blockHead);
 
 			// SET AS LAST BLOCK
-			// this.database.setLastBlockSignature(block.getReference());
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
 			feeProcess(block.blockHead.totalFee, blockGenerator, true);
@@ -1560,11 +1470,6 @@ public class Wallet extends Observable implements Observer {
 		// SET AS LAST BLOCK
 		this.dwSet.setLastBlockSignature(block.blockHead.reference); // .reference
 
-        // long tickets = System.currentTimeMillis() - start;
-		// logger.info("WALLET [" + block.getHeightByParent(DCSet.getInstance())
-		// + "] orphaning time: " + tickets*0.001
-		// + " TXs = " + block.getTransactionCount() + " millsec/record:"
-		// + tickets/(block.getTransactionCount()+1) );
 
     }
 
@@ -1655,8 +1560,6 @@ public class Wallet extends Observable implements Observer {
 			if (person != null) {
 				// FIND issue record
 				Transaction transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
-				///// GET FEE from that record
-				///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 				// ISSUE NEW COMPU in chain
 				BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(transPersonIssue.getBlockHeight());
@@ -1720,8 +1623,6 @@ public class Wallet extends Observable implements Observer {
 
 			// FIND issue record
 			Transaction transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
-			//// GET FEE from that record
-			///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 			// ISSUE NEW COMPU in chain
 			BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(height);

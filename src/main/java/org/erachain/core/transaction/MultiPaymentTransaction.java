@@ -55,8 +55,6 @@ public class MultiPaymentTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
-    //public static String getName() { return "Multi Send"; }
-
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         int test_len = BASE_LENGTH;

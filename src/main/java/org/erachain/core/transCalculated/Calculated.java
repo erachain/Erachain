@@ -15,9 +15,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 
-// import org.slf4j.LoggerFactory;
-
-/*
+/**
  * Вычисленные транзакции (вычисления) - нужны для показа причин изменения остатов и состояний
  * Заносятся в таблицу datachain/TransactionFinalCalculatedMap.java
  * по ключу из номера блока, номера трнзакции внем и порядковому номеру вычисления

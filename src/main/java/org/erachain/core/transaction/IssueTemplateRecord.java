@@ -10,9 +10,6 @@ import org.erachain.core.item.templates.TemplateFactory;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-//import java.util.Map;
-// import org.slf4j.LoggerFactory;
-
 public class IssueTemplateRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
     public static final String TYPE_NAME = "Issue Template";
@@ -161,14 +158,6 @@ public class IssueTemplateRecord extends IssueItemRecord {
 
         int result = super.isValid(forDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
-
-		/*
-		BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERA.compareTo(BlockChain.MAJOR_ERA_BALANCE_BD)<0 )
-		{
-			return Transaction.NOT_ENOUGH_RIGHTS;
-		}
-		*/
 
         return Transaction.VALIDATE_OK;
     }

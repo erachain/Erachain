@@ -29,10 +29,13 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-//import java.math.BigDecimal;
-//import java.math.BigInteger;
-
-
+/**
+ * PROPERTIES:
+ * [0] - type
+ * [1] - version
+ * [2] bits[0] - =1 - has Template (OLD)
+ * [3] - < 0 - has DATA
+ */
 public class RSignNote extends Transaction implements Itemable {
 
     protected static final byte HAS_TEMPLATE_MASK = (byte) (1 << 7);
@@ -41,13 +44,6 @@ public class RSignNote extends Transaction implements Itemable {
 
     public static final byte TYPE_ID = (byte) SIGN_NOTE_TRANSACTION;
     public static final String TYPE_NAME = "Note";
-    /*
-    PROPERTIES:
-    [0] - type
-    [1] - version
-    [2] bits[0] - =1 - has Template (OLD)
-    [3] - < 0 - has DATA
-     */
     protected long key; // key for Template
     protected byte[] data;
     /**

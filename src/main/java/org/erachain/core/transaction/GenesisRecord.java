@@ -9,8 +9,6 @@ import org.json.simple.JSONObject;
 import java.util.Arrays;
 import java.util.HashSet;
 
-//import java.math.BigInteger;
-
 public class GenesisRecord extends Transaction {
 
     protected static final int BASE_LENGTH = SIMPLE_TYPE_LENGTH;
@@ -21,21 +19,12 @@ public class GenesisRecord extends Transaction {
 
     //GETTERS/SETTERS
 
-	/*
-	@Override
-	public byte[] getReference()
-	{
-		return this.signature;
-	}
-	*/
-
     public boolean hasPublicText() {
         return false;
     }
 
     public void generateSignature() {
 
-        //return generateSignature1(this.recipient, this.amount, this.timestamp);
         byte[] data = this.toBytes(FOR_NETWORK, false);
 
         //DIGEST
@@ -69,7 +58,6 @@ public class GenesisRecord extends Transaction {
     }
 
     //PARSE CONVERT
-    //public abstract Transaction Parse(byte[] data);
 
     @Override
     public byte[] toBytes(int forDeal, boolean withSignature) {

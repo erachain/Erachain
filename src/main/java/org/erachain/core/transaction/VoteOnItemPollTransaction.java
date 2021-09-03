@@ -73,7 +73,6 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Vote on Poll"; }
 
     @Override
     public long getKey() {

@@ -20,12 +20,9 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
     public GenesisIssueAssetTransaction(AssetCls asset) {
         super(TYPE_ID, NAME_ID, asset);
 
-        //this.generateSignature();
-
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Genesis Issue Asset"; }
 
     //PARSE CONVERT
     public static Transaction Parse(byte[] data) throws Exception {

@@ -14,7 +14,6 @@ import java.util.Arrays;
 // reference - as item.name
 // TODO - reference NOT NEED - because it is unique record! - make it as new version protocol
 public class IssueImprintRecord extends IssueItemRecord {
-    //protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK;
 
     protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK - REFERENCE_LENGTH;
     protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK - REFERENCE_LENGTH;
@@ -55,7 +54,6 @@ public class IssueImprintRecord extends IssueItemRecord {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Issue Imprint"; }
 
     @Override
     public long calcBaseFee(boolean withFreeProtocol) {
@@ -71,8 +69,6 @@ public class IssueImprintRecord extends IssueItemRecord {
     }
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
-
-        //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
@@ -101,11 +97,6 @@ public class IssueImprintRecord extends IssueItemRecord {
             timestamp = Longs.fromByteArray(timestampBytes);
             position += TIMESTAMP_LENGTH;
         }
-
-        //READ REFERENCE
-        //byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        //Long reference = Longs.fromByteArray(referenceBytes);
-        //position += REFERENCE_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
