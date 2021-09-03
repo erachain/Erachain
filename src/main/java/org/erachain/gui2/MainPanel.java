@@ -64,13 +64,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Enumeration;
 
-/*
+/**
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- */
-
-/**
  * @author ����
  */
 public class MainPanel extends javax.swing.JPanel {
@@ -88,10 +85,7 @@ public class MainPanel extends javax.swing.JPanel {
 
     private MainPanel() {
         initComponents();
-        //       jSplitPane1.M_setDividerSize(40);
     }
-
-    // Variables declaration - do not modify
 
     /**
      * Creates new form split_1

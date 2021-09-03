@@ -42,12 +42,6 @@ public class HWeightMessage extends Message {
         return new HWeightMessage(height, weight);
     }
 
-    /*
-    public int getHeight()
-    {
-        return this.height;
-    }
-    */
     public Tuple2<Integer, Long> getHWeight() {
         return new Tuple2<Integer, Long>(this.height, this.weight);
     }

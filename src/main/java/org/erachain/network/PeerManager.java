@@ -88,7 +88,6 @@ public class PeerManager extends MonitoredThread {
 
         while (this.network.run) {
             try {
-                //processPeers(blockingQueue.take());
                 peer = blockingQueue.poll(10, TimeUnit.SECONDS);
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);

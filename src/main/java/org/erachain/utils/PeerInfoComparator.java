@@ -12,9 +12,6 @@ public class PeerInfoComparator implements Comparator<PeerInfo> {
 
         long now = NTP.getTime();
 
-        //boolean o1WhiteOldDayAgo = (now - o1.getFindTime() > 1*24*60*60*1000);
-        //boolean o2WhiteOldDayAgo = (now - o2.getFindTime() > 1*24*60*60*1000);
-
         boolean o1findMoreWeekAgo = (now - o1.getFindingTime() > 7 * 24 * 60 * 60 * 1000);
         boolean o2findMoreWeekAgo = (now - o2.getFindingTime() > 7 * 24 * 60 * 60 * 1000);
 
