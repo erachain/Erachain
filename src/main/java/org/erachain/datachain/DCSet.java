@@ -155,7 +155,6 @@ public class DCSet extends DBASet implements Closeable {
     private SharedPostsMap sharedPostsMap;
     private PostCommentMap postCommentMap;
     private CommentPostMap commentPostMap;
-    private LocalDataMap localDataMap;
     private BlogPostMap blogPostMap;
     private HashtagPostMap hashtagPostMap;
     private VoteOnItemPollMap voteOnItemPollMap;
@@ -277,7 +276,6 @@ public class DCSet extends DBASet implements Closeable {
             this.sharedPostsMap = new SharedPostsMap(this, database);
             this.postCommentMap = new PostCommentMap(this, database);
             this.commentPostMap = new CommentPostMap(this, database);
-            this.localDataMap = new LocalDataMap(this, database);
             this.blogPostMap = new BlogPostMap(this, database);
             this.hashtagPostMap = new HashtagPostMap(this, database);
             this.voteOnItemPollMap = new VoteOnItemPollMap(this, database);
@@ -418,22 +416,6 @@ public class DCSet extends DBASet implements Closeable {
 
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
         this.blocksHeadsMap = new BlocksHeadsMap(parent.blocksHeadsMap, this);
-        //this.nameMap = new NameMap(parent.nameMap);
-        //this.nameStorageMap = new NameStorageMap(parent.nameStorageMap);
-        //this.orphanNameStorageMap = new OrphanNameStorageMap(parent.orphanNameStorageMap);
-        //this.sharedPostsMap = new SharedPostsMap(parent.sharedPostsMap);
-
-        //this.postCommentMap = new PostCommentMap(parent.postCommentMap);
-        //this.commentPostMap = new CommentPostMap(parent.commentPostMap);
-        //this.orphanNameStorageHelperMap = new OrphanNameStorageHelperMap(parent.orphanNameStorageHelperMap);
-        //this.localDataMap = new LocalDataMap(parent.localDataMap);
-        //this.blogPostMap = new BlogPostMap(parent.blogPostMap);
-        //this.hashtagPostMap = new HashtagPostMap(parent.hashtagPostMap);
-        //this.nameExchangeMap = new NameExchangeMap(parent.nameExchangeMap);
-        //this.updateNameMap = new UpdateNameMap(parent.updateNameMap);
-
-        //this.pollMap = new PollMap(parent.pollMap);
-        //this.voteOnPollMap = new VoteOnPollMap(parent.voteOnPollMap);
 
         this.voteOnItemPollMap = new VoteOnItemPollMap(parent.voteOnItemPollMap, this);
 
@@ -800,7 +782,6 @@ public class DCSet extends DBASet implements Closeable {
         this.commentPostMap.clear();
 
         this.postCommentMap.clear();
-        this.localDataMap.clear();
         this.blogPostMap.clear();
         this.hashtagPostMap.clear();
         this.voteOnItemPollMap.clear();
@@ -1240,14 +1221,6 @@ public class DCSet extends DBASet implements Closeable {
 
     public OrphanNameStorageHelperMap getOrphanNameStorageHelperMap() {
         return this.orphanNameStorageHelperMap;
-    }
-
-    /**
-     * я так понял - это отслеживание версии базы данных - и если она новая то все удаляем и заново закачиваем/
-     * Сейчас не используется вроде ни как
-     */
-    public LocalDataMap getLocalDataMap() {
-        return this.localDataMap;
     }
 
     /**

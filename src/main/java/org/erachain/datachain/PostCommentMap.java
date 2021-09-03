@@ -72,7 +72,6 @@ public class PostCommentMap extends DCUMap<byte[], List<byte[]>> {
             put(signatureOfPost, list);
         }
 
-
     }
 
 }

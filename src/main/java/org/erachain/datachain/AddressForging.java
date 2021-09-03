@@ -10,21 +10,20 @@ import org.mapdb.Fun.Tuple3;
 import java.util.Collection;
 import java.util.HashMap;
 
-//
-// last forged block for ADDRESS -> by height = 0
 /**
  * Хранит данные о сборке блока для данного счета - по номеру блока
  * если номер блока не задан - то это последнее значение.
  * При этом если номер блока не задана то хранится поледнее значение
  *  account.address + current block.Height ->
  *     previous making blockHeight + previous ForgingH balance + this ForgingH balance
-<hr>
+ <hr>
  - not SAME with BLOCK HEADS - use point for not only forged blocks - with incoming ERA Volumes
  <br>
  Так же тут можно искать блоки собранны с данного счета - а вторичный индекс у блоков не нужен.
  <br>
  Если точка первая то предыдущее в ней значение Высоты = 0, то есть указывает что ниже нету но текущий баланс уже есть для Форжинга
 
+ last forged block for ADDRESS -> by height = 0
  * @return
  */
 
@@ -43,7 +42,6 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integ
     @Override
     public void openMap() {
         //OPEN MAP
-        ////return database.createHashMap("address_forging").makeOrGet();
         map = database.getHashMap("address_forging");
     }
 

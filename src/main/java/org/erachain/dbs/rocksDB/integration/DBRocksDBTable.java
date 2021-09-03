@@ -46,7 +46,6 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     protected boolean logON = false;
 
     //  интерфейс доступа к БД
-    ///public RocksDbDataSourceImpl dbSource;
     public RocksDbDataSource dbSource;
 
     // индексы

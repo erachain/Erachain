@@ -48,11 +48,6 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
     @SuppressWarnings("rawtypes")
     private NavigableSet typeKey;
 
-    //@SuppressWarnings("rawtypes")
-    //private NavigableSet block_Key;
-    // private NavigableSet <Tuple2<String,Tuple2<Integer,
-    // Integer>>>signature_key;
-
     public TransactionFinalCalculatedMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
@@ -88,15 +83,6 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
                 return account == null ? "genesis" : account.getAddress();
             }
         });
-
-        //	this.block_Key = database.createTreeSet("Block_txs").comparator(Fun.COMPARATOR).makeOrGet();
-
-        //	Bind.secondaryKey(map, this.block_Key, new Fun.Function2<Integer, Tuple2<Integer, Integer>, Calculated>() {
-        //		@Override
-        //		public Integer run(Tuple2<Integer, Integer> key, Calculated val) {
-        //			return val.getBlockHeightByParentOrLast((DCSet)databaseSet);
-        //		}
-        //	});
 
         this.recipientKey = database.createTreeSet("recipient_calcs").comparator(Fun.COMPARATOR).makeOrGet();
 
@@ -385,8 +371,6 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         }
 
         if (desc) {
-            //iterator = ((TreeSet) iterator).descendingSet();
-            ///iterator = ((TreeSet) iterator).descendingIterator();
             iterator = Lists.reverse(Lists.newArrayList(iterator)).iterator();
         }
 

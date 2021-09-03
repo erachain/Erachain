@@ -4,14 +4,6 @@ import org.rocksdb.*;
 
 public interface RocksDbCom {
 
-    //RocksDB createDB(String file, Options options,
-    //                        List<ColumnFamilyDescriptor> columnFamilyDescriptors,
-    //                        List<ColumnFamilyHandle> columnFamilyHandles) throws RocksDBException;
-
-    //RocksDB openDB(String file, DBOptions dbOptions,
-    //                      List<ColumnFamilyDescriptor> columnFamilyDescriptors,
-    //                      List<ColumnFamilyHandle> columnFamilyHandles) throws RocksDBException;
-
     void put(byte[] key, byte[] value) throws RocksDBException;
 
     void put(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value) throws RocksDBException;

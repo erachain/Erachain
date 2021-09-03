@@ -8,13 +8,6 @@ import org.erachain.dbs.rocksDB.exceptions.WrongParseException;
 
 @Slf4j
 public class ByteableItem implements Byteable<ItemCls> {
-   //ItemCls.ASSET_TYPE:
-   //ItemCls.IMPRINT_TYPE:
-   //ItemCls.TEMPLATE_TYPE:
-   //ItemCls.PERSON_TYPE:
-   //ItemCls.POLL_TYPE:
-   //ItemCls.STATUS_TYPE:
-   //ItemCls.UNION_TYPE:
     private int type;
 
     public ByteableItem(int type) {

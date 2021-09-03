@@ -22,10 +22,6 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
 
     static final String NAME = "blocks_heads";
     static Logger LOGGER = LoggerFactory.getLogger(BlocksHeadsMap.class.getName());
-    // for saving in DB
-    //private Atomic.Long fullWeightVar;
-    //private Long fullWeight = 0L;
-    //private int startedInForkHeight = 0;
 
 
     public BlocksHeadsMap(DCSet databaseSet, DB database) {
@@ -63,10 +59,6 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         return get(size()).totalWinValue;
     }
 
-    //public int getStartedInForkHeight() {
-    //    return this.startedInForkHeight;
-    //}
-
     public void recalcWeightFull(DCSet dcSet) {
 
         long weightFull = 0l;
@@ -77,21 +69,9 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
             weightFull += item.winValue;
         }
 
-        //fullWeight = weightFull;
-        //this.fullWeightVar.set(fullWeight);
-
     }
 
     public void putAndProcess(int height, Block.BlockHead item) {
-
-        // get Win Value of block
-        long weight = item.winValue;
-
-        //fullWeight += weight;
-
-        //if (this.fullWeightVar != null) {
-        //    this.fullWeightVar.set(fullWeight);
-        //}
 
         // INSERT WITH NEW KEY
         put(height, item);
@@ -105,24 +85,9 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
     public void deleteAndProcess(Integer key) {
 
         if (this.contains(key)) {
-            // sub old value from FULL
-            //Block.BlockHead value_old = this.get(key);
-            //fullWeight -= value_old.winValue;
-
-            //if (this.fullWeightVar != null) {
-            //    this.fullWeightVar.set(fullWeight);
-            //}
             delete(key);
         }
 
     }
-
-    /**
-     * Если откатить базу данных то нужно и локальные значения сбросить
-     */
-    //@Override
-    //public void afterRollback() {
-    //    this.fullWeight = fullWeightVar.get();
-    //}
 
 }

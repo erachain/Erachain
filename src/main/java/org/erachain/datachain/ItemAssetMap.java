@@ -8,8 +8,6 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
-//import database.serializer.AssetSerializer;
-
 /**
  * Хранение активов.<br>
  * Ключ: номер (автоинкремент)<br>
@@ -35,7 +33,6 @@ public class ItemAssetMap extends ItemMap {
         }
     }
 
-    // http://seo-mayak.com/sozdanie-bloga/wordpress-dlya-novichkov/simvoly-kotoryx-net-na-klaviature.html
     public AssetCls get(Long key) {
 
         AssetCls item;

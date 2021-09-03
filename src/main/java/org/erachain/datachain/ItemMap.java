@@ -42,7 +42,6 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     private static final int NAME_INDEX = 1;
 
     private NavigableSet nameKey;
-    //private NavigableSet<Fun.Tuple2<String, Long>> nameDescendingIndex;
 
 
     public ItemMap(DCSet databaseSet, DB database, int type) {
