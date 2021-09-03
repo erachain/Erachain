@@ -36,9 +36,6 @@ public class Status extends StatusCls {
         position += MAKER_LENGTH;
 
         //READ NAME
-        //byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
-        //int nameLength = Ints.fromByteArray(nameLengthBytes);
-        //position += NAME_SIZE_LENGTH;
         int nameLength = Byte.toUnsignedInt(data[position]);
         position++;
 

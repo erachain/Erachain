@@ -34,10 +34,8 @@ public class OrderProcess {
 
         DCSet dcSet = orderThis.dcSet;
         long haveAssetKey = orderThis.getHaveAssetKey();
-        BigDecimal amountHave = orderThis.getAmountHave();
         long wantAssetKey = orderThis.getWantAssetKey();
         int haveAssetScale = orderThis.getHaveAssetScale();
-        //BigDecimal amountWant = orderThis.getAmountWant();
         int wantAssetScale = orderThis.getWantAssetScale();
 
         AssetCls assetHave;
@@ -68,15 +66,10 @@ public class OrderProcess {
         boolean debug = false;
 
         if (BlockChain.CHECK_BUGS > 3
-            //&& creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-            //|| height == 255992
             //Transaction.viewDBRef(id).equals("40046-1")
         ) {
             debug = true;
         }
-
-        ////// NEED FOR making secondary keys in TradeMap
-        /// not need now ordersMap.add(this);
 
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
@@ -539,9 +532,8 @@ public class OrderProcess {
         // GET HEIGHT from ID
         int height = (int) (id >> 32);
 
-        if (BlockChain.CHECK_BUGS > 1 &&
-                //Transaction.viewDBRef(id).equals("776446-1")
-                id == 3644468729217028L
+        if (BlockChain.CHECK_BUGS > 3
+            // && Transaction.viewDBRef(id).equals("776446-1")
         ) {
             boolean debug = false;
         }

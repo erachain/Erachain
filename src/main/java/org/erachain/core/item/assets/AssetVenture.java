@@ -126,9 +126,6 @@ public class AssetVenture extends AssetCls {
         position += MAKER_LENGTH;
 
         //READ NAME
-        //byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
-        //int nameLength = Ints.fromByteArray(nameLengthBytes);
-        //position += NAME_SIZE_LENGTH;
         int nameLength = Byte.toUnsignedInt(data[position]);
         position++;
 
@@ -241,7 +238,6 @@ public class AssetVenture extends AssetCls {
         data = Bytes.concat(data, quantityBytes);
 
         //WRITE SCALE_LENGTH
-        //byte[] scaleBytes = new byte[this.scale];
         byte[] scaleBytes = new byte[1];
         scaleBytes[0] = (byte) this.scale;
         data = Bytes.concat(data, scaleBytes);
@@ -249,7 +245,6 @@ public class AssetVenture extends AssetCls {
 
         //WRITE ASSET TYPE
         byte[] assetTypeBytes = new byte[1];
-        //assetTypeBytes[0] = (byte) (this.divisible == true ? 1 : 0);
         assetTypeBytes[0] = (byte) this.assetType;
         data = Bytes.concat(data, assetTypeBytes);
 

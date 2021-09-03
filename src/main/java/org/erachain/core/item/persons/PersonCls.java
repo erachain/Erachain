@@ -498,7 +498,6 @@ public abstract class PersonCls extends ItemCls {
     }
 
     public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
-        //DCSet dcSet = DCSet.getInstance();
 
         JSONObject json = super.jsonForExplorerPage(langObj, args);
         json.put("birthday", birthday);

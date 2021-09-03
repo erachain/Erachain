@@ -717,9 +717,6 @@ public abstract class AssetCls extends ItemCls {
 
     @Override
     public byte[] getImage() {
-        //if (key < getStartKey() && image.length > 0)
-        //    return new byte[0];
-
         return image;
     }
 

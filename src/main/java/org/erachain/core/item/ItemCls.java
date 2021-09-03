@@ -39,9 +39,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-//import java.math.BigDecimal;
-//import com.google.common.primitives.Longs;
-
 public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     static Logger LOGGER = LoggerFactory.getLogger(ItemCls.class.getName());
@@ -670,14 +667,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return imageType;
     }
 
-    //public String getIconTypeName() {
-    //    return viewMediaType(iconType);
-    //}
-
-    //public String getImageTypeName() {
-    //    return viewMediaType(imageType);
-    //}
-
     public boolean hasImageURL() {
         return imageAsURL;
     }
@@ -1203,8 +1192,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         JSONObject itemJSON = new JSONObject();
 
-        //itemJSON.put("iconTypeName", viewMediaType(iconType));
-
         // ADD DATA
         if (hasIconURL()) {
             itemJSON.put("iconURL", getIconURL());
@@ -1228,7 +1215,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      * @return
      */
     public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
-        //DCSet dcSet = DCSet.getInstance();
 
         JSONObject itemJSON = new JSONObject();
         itemJSON.put("key", this.getKey());

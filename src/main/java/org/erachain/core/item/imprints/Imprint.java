@@ -8,8 +8,6 @@ import org.erachain.core.account.PublicKeyAccount;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-//import org.slf4j.LoggerFactory;
-
 public class Imprint extends ImprintCls {
 
     private static final int TYPE_ID = IMPRINT;
