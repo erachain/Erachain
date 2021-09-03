@@ -12,13 +12,13 @@ import java.util.HashMap;
  * <b>Значение:</b> State values
  */
 
-public class SmartContractValues extends DCUMap<Tuple2<Integer, Integer>, Object[]> {
+public class SmartContractState extends DCUMap<Tuple2<Integer, Integer>, Object[]> {
 
-    public SmartContractValues(DCSet databaseSet, DB database) {
+    public SmartContractState(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public SmartContractValues(SmartContractValues parent, DCSet dcSet) {
+    public SmartContractState(SmartContractState parent, DCSet dcSet) {
         super(parent, dcSet);
     }
 
