@@ -140,6 +140,7 @@ public class DCSet extends DBASet implements Closeable {
     private VouchRecordMap vouchRecordMap;
     private ExLinksMap exLinksMap;
     private SmartContractValues smartContractValues;
+    private SmartContractState smartContractState;
 
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
@@ -265,6 +266,7 @@ public class DCSet extends DBASet implements Closeable {
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.exLinksMap = new ExLinksMap(this, database);
             this.smartContractValues = new SmartContractValues(this, database);
+            this.smartContractState = new SmartContractState(this, database);
 
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
@@ -409,6 +411,7 @@ public class DCSet extends DBASet implements Closeable {
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
         this.exLinksMap = new ExLinksMap(parent.exLinksMap, this);
         this.smartContractValues = new SmartContractValues(parent.smartContractValues, this);
+        this.smartContractState = new SmartContractState(parent.smartContractState, this);
 
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
@@ -774,6 +777,7 @@ public class DCSet extends DBASet implements Closeable {
         this.vouchRecordMap.clear();
         this.exLinksMap.clear();
         this.smartContractValues.clear();
+        this.smartContractState.clear();
 
         this.hashesMap.clear();
         this.hashesSignsMap.clear();
@@ -1077,6 +1081,10 @@ public class DCSet extends DBASet implements Closeable {
 
     public SmartContractValues getSmartContractValues() {
         return this.smartContractValues;
+    }
+
+    public SmartContractState getSmartContractState() {
+        return this.smartContractState;
     }
 
     /**

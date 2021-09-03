@@ -7,6 +7,7 @@ import org.mapdb.SerializerBase;
 import java.util.HashMap;
 
 /**
+ * Use sates for save values that self-linked (change itself by previous state)
  * <b>Ключ:</b> smartContract.id + state.No<br>
  *
  * <b>Значение:</b> State values
@@ -25,7 +26,7 @@ public class SmartContractState extends DCUMap<Tuple2<Integer, Integer>, Object[
     @Override
     public void openMap() {
         //OPEN MAP
-        map = database.createHashMap("smart_contract_values")
+        map = database.createHashMap("smart_contract_state")
                 .valueSerializer(SerializerBase.BASIC)
                 .makeOrGet();
     }

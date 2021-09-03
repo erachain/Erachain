@@ -10,6 +10,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.SmartContractState;
 import org.erachain.datachain.SmartContractValues;
 import org.mapdb.Fun;
 
@@ -114,6 +115,8 @@ public class DogePlanet extends SmartContract {
 
         AssetUnique planet;
         int i = count;
+
+        SmartContractState stateMap = dcSet.getSmartContractState(); // not used here
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
         Fun.Tuple2 countValueKey = new Fun.Tuple2(id, "c");
