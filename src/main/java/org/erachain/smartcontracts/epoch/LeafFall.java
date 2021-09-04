@@ -15,6 +15,9 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
+/**
+ * Ctrl+Shift-T (IntellijIDEA) - make test unit
+ */
 public class LeafFall extends EpochSmartContract {
 
     public static final int ID = 1;
