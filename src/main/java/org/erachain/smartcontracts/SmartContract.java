@@ -89,7 +89,8 @@ public abstract class SmartContract {
      */
     static public SmartContract make(Transaction transaction) {
 
-        if (BlockChain.TEST_MODE && transaction.getBlockHeight() > 115744
+        if (BlockChain.TEST_MODE
+                && transaction.getBlockHeight() > 115740
                 && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
             if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
@@ -99,10 +100,13 @@ public abstract class SmartContract {
                 return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
             }
 
-        } else if (false && BlockChain.TEST_MODE && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
+        } else if (BlockChain.TEST_MODE
+                && transaction.getBlockHeight() > 129612
+                && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
             CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
-            if (createOrder.getHaveKey() == AssetCls.ERA_KEY && createOrder.getWantKey() == AssetCls.USD_KEY
-                    || createOrder.getHaveKey() == AssetCls.USD_KEY && createOrder.getWantKey() == AssetCls.ERA_KEY)
+            if (createOrder.getHaveKey() == AssetCls.ERA_KEY //  && createOrder.getWantKey() == AssetCls.USD_KEY
+                    || createOrder.getWantKey() == AssetCls.ERA_KEY // && createOrder.getHaveKey() == AssetCls.USD_KEY
+            )
                 return new LeafFall(1);
 
         }

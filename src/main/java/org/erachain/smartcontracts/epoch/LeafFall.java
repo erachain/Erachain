@@ -5,11 +5,13 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.SmartContractValues;
 import org.mapdb.Fun;
 
@@ -21,7 +23,7 @@ import java.math.BigDecimal;
 public class LeafFall extends EpochSmartContract {
 
     public static final int ID = 1;
-    static public final PublicKeyAccount MAKER = new PublicKeyAccount("" + ID);
+    static public final PublicKeyAccount MAKER = new PublicKeyAccount(Base58.encode(Longs.toByteArray(ID)));
 
     private int count;
     private long keyInit;
@@ -30,7 +32,8 @@ public class LeafFall extends EpochSmartContract {
     /**
      * list of assets for this smart-contract
      */
-    private static long[] leafs = new long[]{123456L, 123L, 234L, 2354L, 345L, 34L, 5L, 345L};
+    private static long[] leafs = new long[]{1048721L, 1048722L, 1048723L, 1048724L,
+            1048724L, 1048724L, 1048724L, 1048724L};
 
     static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(ID, "c");
 
@@ -54,7 +57,23 @@ public class LeafFall extends EpochSmartContract {
         return keyInit;
     }
 
+    public long getLeafKey() {
+        return leafKey;
+    }
+
+    /**
+     * Make random leaf key by block and tx signatures
+     *
+     * @param block
+     * @param transaction
+     * @return
+     */
     private long getLeafKey(Block block, Transaction transaction) {
+        if (block == null) {
+            // not confirmed - not make any!
+            return leafs[0];
+        }
+
         int hash = Byte.toUnsignedInt((byte) (block.getSignature()[5] + transaction.getSignature()[5]));
         int level;
         if (hash < 2)
@@ -84,12 +103,9 @@ public class LeafFall extends EpochSmartContract {
             return null;
         }
 
-        Object[][] itemKeys = new Object[count][];
+        Object[][] itemKeys = new Object[1][];
 
-        int i = 0;
-        do {
-            itemKeys[i] = new Object[]{ItemCls.ASSET_TYPE, keyInit - i};
-        } while (++i < count);
+        itemKeys[0] = new Object[]{ItemCls.ASSET_TYPE, leafKey};
 
         return itemKeys;
 
@@ -166,6 +182,14 @@ public class LeafFall extends EpochSmartContract {
         //INSERT INTO DATABASE
         keyInit = dcSet.getItemAssetMap().incrementPut(leafSum);
 
+        ItemAssetMap map = dcSet.getItemAssetMap();
+        for (long leafKey : leafs) {
+            AssetCls leafAsset = map.get(leafKey);
+            leafAsset.setMaker(MAKER);
+            // update MAKER
+            map.put(leafKey, leafAsset);
+        }
+
     }
 
     @Override
@@ -181,6 +205,10 @@ public class LeafFall extends EpochSmartContract {
          *  and orphans values not linked to previous state
          */
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
+        if (valuesMap == null) {
+            boolean debug = true;
+        }
+
         if (keyInit == 0) {
             init(dcSet, transaction);
         } else {
