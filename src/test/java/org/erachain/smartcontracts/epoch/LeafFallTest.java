@@ -19,13 +19,13 @@ public class LeafFallTest {
         LeafFall contractParse = LeafFall.Parse(data, 0, Transaction.FOR_NETWORK);
         assertEquals(contractParse.getCount(), contract.getCount());
 
-        contract = new LeafFall(3, 1234L, 123L);
+        contract = new LeafFall(3, 1234L, 123);
         data = contract.toBytes(Transaction.FOR_DB_RECORD);
         assertEquals(data.length, contract.length(Transaction.FOR_DB_RECORD));
         contractParse = LeafFall.Parse(data, 0, Transaction.FOR_DB_RECORD);
         assertEquals(contractParse.getCount(), contract.getCount());
         assertEquals(contractParse.getKeyInit(), contract.getKeyInit());
-        assertEquals(contractParse.getLeafKey(), contract.getLeafKey());
+        assertEquals(contractParse.getResultHash(), contract.getResultHash());
     }
 
     @Test
