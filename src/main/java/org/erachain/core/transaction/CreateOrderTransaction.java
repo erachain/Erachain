@@ -43,6 +43,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     public static final byte TYPE_ID = (byte) Transaction.CREATE_ORDER_TRANSACTION;
     public static final String TYPE_NAME = "Create Order";
 
+    // < 32 used fjr acuracy
+    public static final byte HAS_SMART_CONTRACT_MASK = 64;
+
     public static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
     private static final int HAVE_LENGTH = 8;
     private static final int WANT_LENGTH = 8;
