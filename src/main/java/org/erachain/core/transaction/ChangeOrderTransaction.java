@@ -466,8 +466,8 @@ public class ChangeOrderTransaction extends Transaction {
      * @param forDeal
      */
     @Override
-    public void process(Block block, int forDeal) {
-        super.process(block, forDeal);
+    public void processBody(Block block, int forDeal) {
+        super.processBody(block, forDeal);
 
         // PROCESS UPDATE ORDER
 
@@ -518,8 +518,8 @@ public class ChangeOrderTransaction extends Transaction {
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
-        super.orphan(block, forDeal);
+    public void orphanBody(Block block, int forDeal) {
+        super.orphanBody(block, forDeal);
 
         // ORPHAN UPDATE ORDER
 

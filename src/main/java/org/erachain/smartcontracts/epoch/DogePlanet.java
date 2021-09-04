@@ -23,12 +23,12 @@ public class DogePlanet extends EpochSmartContract {
 
     static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(DOGE_PLANET_1, "c");
 
-    DogePlanet(int count) {
+    public DogePlanet(int count) {
         super(DOGE_PLANET_1, MAKER);
         this.count = count;
     }
 
-    DogePlanet(int count, long keyEnd) {
+    public DogePlanet(int count, long keyEnd) {
         super(DOGE_PLANET_1, MAKER);
         this.count = count;
         this.keyEnd = keyEnd;

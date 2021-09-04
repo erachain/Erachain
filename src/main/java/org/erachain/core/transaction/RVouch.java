@@ -292,9 +292,9 @@ public class RVouch extends Transaction {
 
 
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         if (block == null)
             return;
@@ -327,9 +327,9 @@ public class RVouch extends Transaction {
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         // make key for vouching record
         Long recordKey = Transaction.makeDBRef(this.refHeight, this.refSeqNo);

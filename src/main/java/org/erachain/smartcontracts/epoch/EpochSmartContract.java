@@ -2,6 +2,8 @@ package org.erachain.smartcontracts.epoch;
 
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
@@ -40,6 +42,23 @@ public abstract class EpochSmartContract extends SmartContract {
             ) {
                 return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
             }
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Делает смотр-контракт протокольный (на эпоху).
+     *
+     * @param transaction
+     * @return
+     */
+    static public SmartContract make(Order order, Trade trade, Transaction transaction) {
+
+        if (BlockChain.TEST_MODE  //&& transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+        ) {
+            return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
         }
 
         return null;

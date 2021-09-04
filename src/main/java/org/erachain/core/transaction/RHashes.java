@@ -393,10 +393,10 @@ public class RHashes extends Transaction {
 
     //PROCESS/ORPHAN
 
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         int height = this.getBlockHeightByParentOrLast(dcSet);
 
@@ -424,10 +424,10 @@ public class RHashes extends Transaction {
 
     }
 
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         HashesSignsMap map = dcSet.getHashesSignsMap();
         for (byte[] hash : hashes) {

@@ -331,9 +331,9 @@ public class IssuePersonRecord extends IssueItemRecord {
     //PROCESS/ORPHAN
 
     //@Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getMaker();
@@ -358,9 +358,9 @@ public class IssuePersonRecord extends IssueItemRecord {
     }
 
     //@Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getMaker();

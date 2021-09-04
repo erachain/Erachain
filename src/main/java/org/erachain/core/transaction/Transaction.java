@@ -922,6 +922,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return smartContract;
     }
 
+    public void setSmartContract(SmartContract smartContract) {
+        this.smartContract = smartContract;
+    }
+
     public void makeItemsKeys() {
         if (isWiped()) {
             itemsKeys = new Object[][]{};
@@ -2526,8 +2530,12 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     // REST
 
-    // public abstract void process(DLSet db);
-    public void process(Block block, int forDeal) {
+    //////////////////////////////////// PROCESS
+
+    public void processHead(Block block, int forDeal) {
+    }
+
+    public void processBody(Block block, int forDeal) {
 
         if (forDeal > Transaction.FOR_PACK) {
 
@@ -2561,7 +2569,21 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     }
 
-    public void orphan(Block block, int forDeal) {
+    public void processTail(Block block, int forDeal) {
+    }
+
+    public void process(Block block, int forDeal) {
+        processHead(block, forDeal);
+        processBody(block, forDeal);
+        processTail(block, forDeal);
+    }
+
+    //////////////////////////////////// ORPHAN
+
+    public void orphanHead(Block block, int forDeal) {
+    }
+
+    public void orphanBody(Block block, int forDeal) {
 
         if (smartContract != null)
             smartContract.orphan(dcSet, this);
@@ -2599,6 +2621,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         // CLEAR all FOOTPRINTS and empty data
         this.dcSet.getVouchRecordMap().delete(dbRef);
 
+    }
+
+    public void orphanTail(Block block, int forDeal) {
+    }
+
+    public void orphan(Block block, int forDeal) {
+        orphanHead(block, forDeal);
+        orphanBody(block, forDeal);
+        orphanTail(block, forDeal);
     }
 
     public Transaction copy() {

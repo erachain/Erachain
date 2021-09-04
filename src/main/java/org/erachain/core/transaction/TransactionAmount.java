@@ -1307,9 +1307,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         if (this.amount == null)
             return;
@@ -1356,9 +1356,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         if (this.amount == null)
             return;

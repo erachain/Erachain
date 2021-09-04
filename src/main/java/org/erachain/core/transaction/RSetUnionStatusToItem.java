@@ -406,10 +406,10 @@ public class RSetUnionStatusToItem extends Transaction {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         // pack additional data
         byte[] a_data = new byte[0];
@@ -432,10 +432,10 @@ public class RSetUnionStatusToItem extends Transaction {
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         // UNDO ALIVE PERSON for DURATION
         if (this.itemType == ItemCls.PERSON_TYPE)

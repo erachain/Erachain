@@ -124,7 +124,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
         int transactionIndex = -1;
         int blockIndex = -1;
@@ -158,7 +158,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
         // UNDO ALIVE PERSON for DURATION
         //db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);

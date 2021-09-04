@@ -297,9 +297,9 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         if (this.orderID == null) {
             if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
@@ -345,12 +345,12 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
         // FIRST GET DB REF from FINAL
 
         // ORPHAN
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         if (this.orderID == null) {
             if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)

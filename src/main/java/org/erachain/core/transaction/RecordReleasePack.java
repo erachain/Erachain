@@ -278,13 +278,13 @@ public class RecordReleasePack extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         //PROCESS PAYMENTS
         for (Transaction transaction : this.transactions) {
-            transaction.process(block, forDeal); // as Pack in body
+            transaction.processBody(block, forDeal); // as Pack in body
         }
     }
 
