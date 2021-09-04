@@ -1,9 +1,13 @@
 package org.erachain.smartcontracts;
 
 import com.google.common.primitives.Ints;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.transaction.CreateOrderTransaction;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.epoch.DogePlanet;
 
@@ -46,11 +50,12 @@ public abstract class SmartContract {
     }
 
     public byte[] toBytes(int forDeal) {
-        byte[] data = new byte[4 + 32];
+        byte[] pubKey = maker.getPublicKey();
+        byte[] data = new byte[4 + pubKey.length];
         System.arraycopy(Ints.toByteArray(id), 0, data, 0, 4);
-        System.arraycopy(maker.getPublicKey(), 0, data, 4, 36);
+        System.arraycopy(pubKey, 0, data, 4, pubKey.length);
 
-        return new byte[8];
+        return data;
     }
 
     public static SmartContract Parses(byte[] data, int position, int forDeal) throws Exception {
@@ -73,5 +78,30 @@ public abstract class SmartContract {
     abstract public boolean process(DCSet dcSet, Block block, Transaction transaction);
 
     abstract public boolean orphan(DCSet dcSet, Transaction transaction);
+
+    /**
+     * Делает смотр-контракт протокольный (на эпоху).
+     *
+     * @param transaction
+     * @return
+     */
+    static public SmartContract make(Transaction transaction) {
+
+        if (BlockChain.TEST_MODE && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+            RSend txSend = (RSend) transaction;
+            if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
+                    && txSend.hasAmount() && txSend.getAmount().signum() < 0
+                // && txSend.getAbsKey() == 10234L
+            ) {
+                return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
+            }
+        } else if (BlockChain.TEST_MODE && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
+            CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
+
+        }
+
+        return null;
+
+    }
 
 }

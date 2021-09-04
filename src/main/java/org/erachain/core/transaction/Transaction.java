@@ -922,10 +922,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return smartContract;
     }
 
-    public void setSmartContract(SmartContract smartContract) {
-        this.smartContract = smartContract;
-    }
-
     public void makeItemsKeys() {
         if (isWiped()) {
             itemsKeys = new Object[][]{};
@@ -2570,6 +2566,16 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void processTail(Block block, int forDeal) {
+        ///////// SMART CONTRACTS SESSION
+        if (smartContract == null) {
+            // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
+            // потом он будет записан в базу данных и его можно найти загрузив эту трнзакцию
+            smartContract = SmartContract.make(this);
+        }
+
+        if (smartContract != null)
+            smartContract.process(dcSet, block, this);
+
     }
 
     public void process(Block block, int forDeal) {
@@ -2581,12 +2587,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     //////////////////////////////////// ORPHAN
 
     public void orphanHead(Block block, int forDeal) {
+        if (smartContract != null)
+            smartContract.orphan(dcSet, this);
     }
 
     public void orphanBody(Block block, int forDeal) {
-
-        if (smartContract != null)
-            smartContract.orphan(dcSet, this);
 
         if (forDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {

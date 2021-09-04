@@ -14,7 +14,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.SmartContract;
-import org.erachain.smartcontracts.epoch.EpochSmartContract;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
@@ -1342,16 +1341,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         this.assetFee.negate(), "Asset Fee", this.dbRef);
             }
         }
-
-        ///////// SMART CONTRACTS SESSION
-        if (smartContract == null) {
-            // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
-            // потом он будет записан в базу данных и его можно найти загрузив эту трнзакцию
-            smartContract = EpochSmartContract.make(this);
-        }
-
-        if (smartContract != null)
-            smartContract.process(dcSet, block, this);
 
     }
 
