@@ -15,22 +15,22 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
-public class DogePlanet extends EpochSmartContract {
+public class LeafFall extends EpochSmartContract {
 
-    public static final int ID = 10;
-
+    public static final int ID = 1;
     static public final PublicKeyAccount MAKER = new PublicKeyAccount("" + ID);
+
     private int count;
     private long keyEnd;
 
     static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(ID, "c");
 
-    public DogePlanet(int count) {
+    public LeafFall(int count) {
         super(ID, MAKER);
         this.count = count;
     }
 
-    public DogePlanet(int count, long keyEnd) {
+    public LeafFall(int count, long keyEnd) {
         super(ID, MAKER);
         this.count = count;
         this.keyEnd = keyEnd;
@@ -84,7 +84,7 @@ public class DogePlanet extends EpochSmartContract {
 
     }
 
-    public static DogePlanet Parse(byte[] data, int pos, int forDeal) {
+    public static LeafFall Parse(byte[] data, int pos, int forDeal) {
 
         // skip ID
         pos += 4;
@@ -97,10 +97,10 @@ public class DogePlanet extends EpochSmartContract {
             // возьмем в базе готовый ключ актива
             byte[] keyBuffer = new byte[8];
             System.arraycopy(data, pos, keyBuffer, 0, 8);
-            return new DogePlanet(Ints.fromByteArray(countBuffer), Longs.fromByteArray(keyBuffer));
+            return new LeafFall(Ints.fromByteArray(countBuffer), Longs.fromByteArray(keyBuffer));
         }
 
-        return new DogePlanet(Ints.fromByteArray(countBuffer));
+        return new LeafFall(Ints.fromByteArray(countBuffer));
     }
 
     @Override
@@ -109,8 +109,15 @@ public class DogePlanet extends EpochSmartContract {
         AssetUnique planet;
         int i = count;
 
-        //SmartContractState stateMap = dcSet.getSmartContractState(); // not used here
+        /**
+         * use this state storage if many variables used in smart-contract
+         */
+        //SmartContractState stateMap = dcSet.getSmartContractState();
 
+        /**
+         * Use this values storage if several variables used in smart-contract
+         *  and orphans values not linked to previous state
+         */
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
         Integer totalIssuedObj = (Integer) valuesMap.get(COUNT_KEY);
         int totalIssued;

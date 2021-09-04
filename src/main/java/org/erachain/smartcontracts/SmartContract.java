@@ -10,10 +10,9 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.epoch.DogePlanet;
+import org.erachain.smartcontracts.epoch.LeafFall;
 
 public abstract class SmartContract {
-
-    protected static final int DOGE_PLANET_1 = 1;
 
     protected final int id;
     protected final PublicKeyAccount maker;
@@ -64,7 +63,9 @@ public abstract class SmartContract {
         System.arraycopy(data, position, idBuffer, 0, 4);
         int id = Ints.fromByteArray(idBuffer);
         switch (id) {
-            case DOGE_PLANET_1:
+            case LeafFall.ID:
+                return LeafFall.Parse(data, position, forDeal);
+            case DogePlanet.ID:
                 return DogePlanet.Parse(data, position, forDeal);
         }
 
