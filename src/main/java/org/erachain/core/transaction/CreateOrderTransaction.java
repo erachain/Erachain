@@ -43,7 +43,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     public static final byte TYPE_ID = (byte) Transaction.CREATE_ORDER_TRANSACTION;
     public static final String TYPE_NAME = "Create Order";
 
-    // < 32 used fjr acuracy
+    // < 32 used for acuracy
     public static final byte HAS_SMART_CONTRACT_MASK = 64;
 
     public static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
@@ -364,8 +364,11 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         return transaction;
     }
 
-    // @Override
-    //@Override
+    @Override
+    protected byte HAS_SMART_CONTRACT_MASK() {
+        return HAS_SMART_CONTRACT_MASK;
+    }
+
     public byte[] toBytes(int forDeal, boolean withSignature) {
         byte[] data = super.toBytes(forDeal, withSignature);
 

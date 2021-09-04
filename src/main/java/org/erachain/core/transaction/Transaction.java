@@ -407,7 +407,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected long dbRef; // height + SeqNo
 
     // TODO REMOVE REFERENCE - use TIMESTAMP as reference
-    protected Long reference = 0l;
+    protected Long reference = 0L;
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
     /**
      * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
@@ -1805,6 +1805,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.signature = Crypto.getInstance().sign(creator, data);
     }
 
+    /**
+     * У неоторых трнзакций этот флаг занят и он другой - для toByte()
+     *
+     * @return
+     */
+    protected byte HAS_SMART_CONTRACT_MASK() {
+        return HAS_SMART_CONTRACT_MASK;
+    }
+
     // VALIDATE
 
     // releaserReference == null - not as pack
@@ -1840,10 +1849,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if (smartContract != null) {
             if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                typeBytes[2] = (byte) (typeBytes[2] | HAS_SMART_CONTRACT_MASK);
+                typeBytes[2] = (byte) (typeBytes[2] | HAS_SMART_CONTRACT_MASK());
                 data = Bytes.concat(data, smartContract.toBytes(forDeal));
             } else {
-                typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK;
+                typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
             }
         }
 
