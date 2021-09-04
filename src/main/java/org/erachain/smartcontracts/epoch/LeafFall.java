@@ -7,7 +7,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.assets.AssetUnique;
+import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SmartContractValues;
@@ -21,7 +21,13 @@ public class LeafFall extends EpochSmartContract {
     static public final PublicKeyAccount MAKER = new PublicKeyAccount("" + ID);
 
     private int count;
-    private long keyEnd;
+    private long keyInit;
+    private long leafKey;
+
+    /**
+     * list of assets for this smart-contract
+     */
+    private static long[] leafs = new long[]{123456L, 123L, 234L, 2354L, 345L, 34L, 5L, 345L};
 
     static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(ID, "c");
 
@@ -30,23 +36,47 @@ public class LeafFall extends EpochSmartContract {
         this.count = count;
     }
 
-    public LeafFall(int count, long keyEnd) {
+    public LeafFall(int count, long keyInit, long leafKey) {
         super(ID, MAKER);
         this.count = count;
-        this.keyEnd = keyEnd;
+        this.keyInit = keyInit;
+        this.leafKey = leafKey;
     }
 
     public int getCount() {
         return count;
     }
 
-    public long getKeyEnd() {
-        return keyEnd;
+    public long getKeyInit() {
+        return keyInit;
+    }
+
+    private long getLeafKey(Block block, Transaction transaction) {
+        int hash = Byte.toUnsignedInt((byte) (block.getSignature()[5] + transaction.getSignature()[5]));
+        int level;
+        if (hash < 2)
+            level = 7;
+        else if (hash < 4)
+            level = 6;
+        else if (hash < 8)
+            level = 5;
+        else if (hash < 16)
+            level = 4;
+        else if (hash < 32)
+            level = 3;
+        else if (hash < 64)
+            level = 2;
+        else if (hash < 128)
+            level = 1;
+        else
+            level = 0;
+
+        return leafs[level];
     }
 
     @Override
     public Object[][] getItemsKeys() {
-        if (keyEnd == 0) {
+        if (keyInit == 0) {
             // not confirmed yet
             return null;
         }
@@ -55,7 +85,7 @@ public class LeafFall extends EpochSmartContract {
 
         int i = 0;
         do {
-            itemKeys[i] = new Object[]{ItemCls.ASSET_TYPE, keyEnd - i};
+            itemKeys[i] = new Object[]{ItemCls.ASSET_TYPE, keyInit - i};
         } while (++i < count);
 
         return itemKeys;
@@ -65,7 +95,7 @@ public class LeafFall extends EpochSmartContract {
     @Override
     public int length(int forDeal) {
         if (forDeal == Transaction.FOR_DB_RECORD)
-            return 16;
+            return 24;
 
         return 8;
     }
@@ -77,7 +107,8 @@ public class LeafFall extends EpochSmartContract {
         data = Bytes.concat(data, Ints.toByteArray(count));
 
         if (forDeal == Transaction.FOR_DB_RECORD) {
-            return Bytes.concat(data, Longs.toByteArray(keyEnd));
+            return Bytes.concat(Bytes.concat(data, Longs.toByteArray(keyInit)),
+                    Longs.toByteArray(leafKey));
         }
 
         return data;
@@ -97,17 +128,45 @@ public class LeafFall extends EpochSmartContract {
             // возьмем в базе готовый ключ актива
             byte[] keyBuffer = new byte[8];
             System.arraycopy(data, pos, keyBuffer, 0, 8);
-            return new LeafFall(Ints.fromByteArray(countBuffer), Longs.fromByteArray(keyBuffer));
+            pos += 8;
+
+            // GET LEAF KEY
+            byte[] leafBuffer = new byte[8];
+            System.arraycopy(data, pos, leafBuffer, 0, 8);
+
+            return new LeafFall(Ints.fromByteArray(countBuffer), Longs.fromByteArray(keyBuffer),
+                    Longs.fromByteArray(leafBuffer));
         }
 
         return new LeafFall(Ints.fromByteArray(countBuffer));
     }
 
+    private void action(DCSet dcSet, Block block, Transaction transaction, boolean asOrphan) {
+        if (leafKey == 0)
+            leafKey = getLeafKey(block, transaction);
+
+        transaction.getCreator().changeBalance(dcSet, asOrphan, false, leafKey,
+                BigDecimal.ONE, false, false, false);
+        maker.changeBalance(dcSet, !asOrphan, false, leafKey,
+                BigDecimal.ONE, false, false, false);
+    }
+
+    private void init(DCSet dcSet, Transaction transaction) {
+
+        /**
+         * for accounting total leaf for person
+         */
+        AssetVenture leafSum = new AssetVenture(null, maker, "LeafFall_sum", null, null,
+                null, AssetCls.AS_SELF_MANAGED_ACCOUNTING, 0, 0);
+        leafSum.setReference(transaction.getSignature(), transaction.getDBRef());
+
+        //INSERT INTO DATABASE
+        keyInit = dcSet.getItemAssetMap().incrementPut(leafSum);
+
+    }
+
     @Override
     public boolean process(DCSet dcSet, Block block, Transaction transaction) {
-
-        AssetUnique planet;
-        int i = count;
 
         /**
          * use this state storage if many variables used in smart-contract
@@ -119,52 +178,42 @@ public class LeafFall extends EpochSmartContract {
          *  and orphans values not linked to previous state
          */
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
-        Integer totalIssuedObj = (Integer) valuesMap.get(COUNT_KEY);
-        int totalIssued;
-        if (totalIssuedObj == null)
-            totalIssued = 0;
-        else
-            totalIssued = totalIssuedObj;
+        if (keyInit == 0) {
+            init(dcSet, transaction);
+        } else {
+            count = (Integer) valuesMap.get(COUNT_KEY);
+        }
 
-        do {
+        action(dcSet, block, transaction, false);
 
-            totalIssued++;
-
-            planet = new AssetUnique(null, maker, "Doge Planet #" + totalIssued, null, null,
-                    null, AssetCls.AS_NON_FUNGIBLE);
-            planet.setReference(transaction.getSignature(), transaction.getDBRef());
-
-            //INSERT INTO DATABASE
-            keyEnd = dcSet.getItemAssetMap().incrementPut(planet);
-            transaction.getCreator().changeBalance(dcSet, false, false, keyEnd,
-                    BigDecimal.ONE, false, false, false);
-
-        } while (--i > 0);
-
-        valuesMap.put(COUNT_KEY, totalIssued);
-
+        valuesMap.put(COUNT_KEY, ++count);
 
         return false;
     }
 
+    private void wipe(DCSet dcSet) {
+        dcSet.getItemAssetMap().decrementDelete(keyInit);
+        SmartContractValues valuesMap = dcSet.getSmartContractValues();
+        valuesMap.delete(COUNT_KEY);
+    }
 
     @Override
     public boolean orphan(DCSet dcSet, Transaction transaction) {
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
-        Integer totalIssued = (Integer) valuesMap.get(COUNT_KEY);
+        count = (Integer) valuesMap.get(COUNT_KEY);
 
-        int i = 0;
-        do {
+        // leafKey already calculated OR get from DB
+        action(dcSet, null, transaction, true);
 
-            transaction.getCreator().changeBalance(dcSet, true, false, keyEnd,
-                    BigDecimal.ONE, false, false, false);
-
-            //DELETE FROM DATABASE
-            dcSet.getItemAssetMap().decrementDelete(keyEnd - i);
-        } while (++i < count);
-
-        valuesMap.put(COUNT_KEY, totalIssued - count);
+        if (count == 1) {
+            /**
+             * remove all data from db
+             */
+            wipe(dcSet);
+        } else {
+            valuesMap.put(COUNT_KEY, --count);
+        }
 
         return false;
     }

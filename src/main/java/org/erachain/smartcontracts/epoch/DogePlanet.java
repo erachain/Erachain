@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 
 public class DogePlanet extends EpochSmartContract {
 
-    public static final int ID = 10;
+    public static final int ID = 1000;
 
     static public final PublicKeyAccount MAKER = new PublicKeyAccount("" + ID);
     private int count;

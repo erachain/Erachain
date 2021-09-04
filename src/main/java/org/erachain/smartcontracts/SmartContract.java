@@ -4,6 +4,7 @@ import com.google.common.primitives.Ints;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -96,8 +97,12 @@ public abstract class SmartContract {
             ) {
                 return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
             }
+
         } else if (BlockChain.TEST_MODE && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
             CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
+            if (createOrder.getHaveKey() == AssetCls.ERA_KEY && createOrder.getWantKey() == AssetCls.USD_KEY
+                    || createOrder.getHaveKey() == AssetCls.USD_KEY && createOrder.getWantKey() == AssetCls.ERA_KEY)
+                return new LeafFall(1);
 
         }
 
