@@ -172,6 +172,9 @@ public class LeafFall extends EpochSmartContract {
 
     private void init(DCSet dcSet, Transaction transaction) {
 
+        // обязательно так как может из СборкиБлока прти уже иниализированный
+        count = 0;
+
         /**
          * for accounting total leaf for person
          */
@@ -205,14 +208,12 @@ public class LeafFall extends EpochSmartContract {
          *  and orphans values not linked to previous state
          */
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
-        if (valuesMap == null) {
-            boolean debug = true;
-        }
 
-        if (keyInit == 0) {
-            init(dcSet, transaction);
-        } else {
+        // CHECK if INITIALIZED
+        if (valuesMap.contains(COUNT_KEY)) {
             count = (Integer) valuesMap.get(COUNT_KEY);
+        } else {
+            init(dcSet, transaction);
         }
 
         action(dcSet, block, transaction, false);

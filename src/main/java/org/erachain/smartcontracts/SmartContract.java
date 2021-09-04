@@ -107,7 +107,7 @@ public abstract class SmartContract {
             if (createOrder.getHaveKey() == AssetCls.ERA_KEY //  && createOrder.getWantKey() == AssetCls.USD_KEY
                     || createOrder.getWantKey() == AssetCls.ERA_KEY // && createOrder.getHaveKey() == AssetCls.USD_KEY
             )
-                return new LeafFall(1);
+                return new LeafFall(0);
 
         }
 
