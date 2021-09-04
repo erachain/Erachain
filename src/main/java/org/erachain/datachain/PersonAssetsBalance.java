@@ -1,9 +1,7 @@
 package org.erachain.datachain;
 
-import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
-
-//import database.serializer.AssetSerializer;
+import org.mapdb.DB;
 
 /**
  * для хранения балансов по Персоне - на будущее
