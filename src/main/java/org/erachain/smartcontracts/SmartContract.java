@@ -89,7 +89,8 @@ public abstract class SmartContract {
      */
     static public SmartContract make(Transaction transaction) {
 
-        if (BlockChain.TEST_MODE && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+        if (BlockChain.TEST_MODE && transaction.getBlockHeight() > 115744
+                && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
             if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
                     && txSend.hasAmount() && txSend.getAmount().signum() < 0
@@ -98,7 +99,7 @@ public abstract class SmartContract {
                 return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
             }
 
-        } else if (BlockChain.TEST_MODE && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
+        } else if (false && BlockChain.TEST_MODE && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
             CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
             if (createOrder.getHaveKey() == AssetCls.ERA_KEY && createOrder.getWantKey() == AssetCls.USD_KEY
                     || createOrder.getHaveKey() == AssetCls.USD_KEY && createOrder.getWantKey() == AssetCls.ERA_KEY)
