@@ -10,6 +10,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
+import org.erachain.smartcontracts.SmartContract;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -112,6 +113,14 @@ public class IssuePersonRecord extends IssueItemRecord {
             position += linkTo.length();
         } else {
             linkTo = null;
+        }
+
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
         }
 
         byte feePow = 0;

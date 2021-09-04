@@ -13,6 +13,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.HashesSignsMap;
 import org.erachain.datachain.TransactionFinalMapSigns;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -152,6 +153,14 @@ public class RHashes extends Transaction {
             position += exLink.length();
         } else {
             exLink = null;
+        }
+
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
         }
 
         byte feePow = 0;

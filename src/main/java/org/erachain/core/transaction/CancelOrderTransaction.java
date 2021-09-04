@@ -13,6 +13,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
@@ -153,6 +154,14 @@ public class CancelOrderTransaction extends Transaction {
             position += exLink.length();
         } else {
             exLink = null;
+        }
+
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
         }
 
         byte feePow = 0;

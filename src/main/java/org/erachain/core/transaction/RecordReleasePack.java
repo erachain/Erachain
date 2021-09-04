@@ -9,6 +9,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -111,6 +112,14 @@ public class RecordReleasePack extends Transaction {
             position += exLink.length();
         } else {
             exLink = null;
+        }
+
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
         }
 
         byte feePow = 0;

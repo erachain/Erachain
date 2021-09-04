@@ -15,6 +15,7 @@ import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
@@ -61,9 +62,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     private BigDecimal amountHave;
     private BigDecimal amountWant;
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
+    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, exLink, smartContract, feePow, timestamp, reference);
         this.haveKey = haveKey;
         this.wantKey = wantKey;
 
@@ -75,15 +76,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
                                   byte[] signature) {
-        this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
+        this(typeBytes, creator, null, null, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
         this.signature = signature;
 
     }
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
+    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
                                   byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
+        this(typeBytes, creator, exLink, smartContract, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
@@ -99,7 +100,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amountHave, amountWant, feePow, timestamp,
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, null, have, want, amountHave, amountWant, feePow, timestamp,
                 reference);
     }
 
@@ -197,6 +198,14 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             exLink = null;
         }
 
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
+        }
+
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {
             // READ FEE POWER
@@ -263,7 +272,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             amountWant = amountWant.scaleByPowerOfTen(-accuracy);
         }
 
-        return new CreateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp,
+        return new CreateOrderTransaction(typeBytes, creator, exLink, smartContract, have, want, amountHave, amountWant, feePow, timestamp,
                 reference, signatureBytes, seqNo, feeLong);
     }
 

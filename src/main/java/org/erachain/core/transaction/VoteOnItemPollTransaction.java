@@ -11,6 +11,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -161,6 +162,14 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
             position += exLink.length();
         } else {
             exLink = null;
+        }
+
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
         }
 
         byte feePow = 0;

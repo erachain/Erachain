@@ -17,6 +17,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
@@ -217,6 +218,14 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             position += exLink.length();
         } else {
             exLink = null;
+        }
+
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
         }
 
         byte feePow = 0;
