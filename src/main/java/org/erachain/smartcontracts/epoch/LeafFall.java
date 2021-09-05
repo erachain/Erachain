@@ -147,7 +147,7 @@ public class LeafFall extends EpochSmartContract {
     public Object[][] getItemsKeys() {
 
         Object[][] itemKeys = new Object[1][];
-        itemKeys[0] = new Object[]{ItemCls.ASSET_TYPE, getLevelResult()};
+        itemKeys[0] = new Object[]{ItemCls.ASSET_TYPE, leafs[getLevelResult()]};
 
         return itemKeys;
 
