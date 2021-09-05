@@ -149,17 +149,12 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integ
             return null;
         }
 
-        boolean debug;
-        if (BlockChain.CHECK_BUGS > 4 && key.a.equals("785kSn6mehhtaqgc2yqvBxp84WMZnP4j3E")) {
-            debug = true; // *** Block[322065] WIN_VALUE not in BASE RULES 0 Creator: 785kSn6mehhtaqgc2yqvBxp84WMZnP4j3E
-        }
-
         // удалять можно только если последняя точка совпадает с удаляемой
         // иначе нельзя - так как может быть несколько удалений в один блок
         Tuple3<Integer, Integer, Integer> lastPoint = getLast(key.a);
         if (lastPoint == null) {
             // обычно такого не должно случаться!!!
-            if (BlockChain.CHECK_BUGS > 5)
+            if (BlockChain.CHECK_BUGS > 2)
                 LOGGER.error("ERROR LAST forging POINTS = null for KEY: " + key);
             return super.remove(key);
         } else {
@@ -176,7 +171,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integ
                     ;
                 } else {
                     // тут ошибка
-                    if (BlockChain.CHECK_BUGS > 3)
+                    if (BlockChain.CHECK_BUGS > 2)
                         LOGGER.error("WRONG deleted and LAST forging POINTS:" + lastPoint + " > " + key);
                     //Tuple3<Integer, Integer, Integer> previous = super.remove(key);
                     //this.setLast(key.a, previous);

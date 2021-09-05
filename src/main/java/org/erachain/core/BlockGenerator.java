@@ -963,11 +963,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 }
                             }
 
-                            if (BlockChain.CHECK_BUGS > 7) {
-                                Tuple2<List<Transaction>, Integer> unconfirmedTransactions
-                                        = getUnconfirmedTransactions(height, timePointForValidTX,
-                                        bchain, winned_winValue);
-                            }
                         } else if (!BlockChain.STOP_GENERATE_BLOCKS) {
                             /// тестовый аккаунт
                             acc_winner = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
@@ -1121,7 +1116,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         }
                                     } catch (Exception e) {
                                         LOGGER.error(e.getMessage(), e);
-                                        if (BlockChain.CHECK_BUGS > 7) {
+                                        if (BlockChain.CHECK_BUGS > 9) {
                                             ctrl.stopAndExit(106);
                                             return;
                                         }

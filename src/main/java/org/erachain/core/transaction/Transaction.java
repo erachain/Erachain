@@ -2005,7 +2005,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
                     errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
-                    if (BlockChain.CHECK_BUGS > 0) {
+                    if (BlockChain.CHECK_BUGS > 2) {
                         LOGGER.debug(errorValue);
                     }
                     return INVALID_TIMESTAMP;
@@ -2014,7 +2014,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
                     errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
-                    if (BlockChain.CHECK_BUGS > 0) {
+                    if (BlockChain.CHECK_BUGS > 2) {
                         LOGGER.debug(errorValue);
                     }
                     return INVALID_TIMESTAMP;
@@ -2029,7 +2029,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                         errorValue = "INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
                                 + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
                                 + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height);
-                        if (BlockChain.CHECK_BUGS > 1)
+                        if (BlockChain.CHECK_BUGS > 2)
                             LOGGER.debug(errorValue);
                     }
                     return INVALID_TIMESTAMP;

@@ -117,10 +117,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {
 
-        if (BlockChain.CHECK_BUGS > 2 && height == 652627) {
-            int tt = 1;
-        }
-
         // TODO сделать удаление по фильтру разом - как у RocksDB - deleteRange(final byte[] beginKey, final byte[] endKey)
         if (map instanceof TransactionFinalSuit) {
             ((TransactionFinalSuit) map).deleteForBlock(height);

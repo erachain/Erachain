@@ -65,12 +65,6 @@ public class OrderProcess {
 
         boolean debug = false;
 
-        if (BlockChain.CHECK_BUGS > 3
-            //Transaction.viewDBRef(id).equals("40046-1")
-        ) {
-            debug = true;
-        }
-
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
         List<Order> orders = ordersMap.getOrdersForTradeWithFork(wantAssetKey, haveAssetKey, thisPriceReverse);
@@ -303,7 +297,7 @@ public class OrderProcess {
                     tradeAmountForHave, tradeAmountForWant,
                     haveAssetScale, wantAssetScale, index);
 
-            if (BlockChain.CHECK_BUGS > 1) {
+            if (BlockChain.CHECK_BUGS > 7) {
                 boolean testDeviation = orderPrice.subtract(trade.calcPrice()).abs().divide(orderPrice, Order.MAX_PRICE_ACCURACY, BigDecimal.ROUND_HALF_UP)
                         .compareTo(BlockChain.MAX_TRADE_DEVIATION_HI) > 0;
                 if (testDeviation) {
@@ -532,6 +526,7 @@ public class OrderProcess {
         // GET HEIGHT from ID
         int height = (int) (id >> 32);
 
+        // for TEST
         if (BlockChain.CHECK_BUGS > 3
             // && Transaction.viewDBRef(id).equals("776446-1")
         ) {

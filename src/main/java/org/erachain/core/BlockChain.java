@@ -1160,10 +1160,6 @@ public class BlockChain {
 
         int difference = height - previousForgingHeight;
 
-        if (CHECK_BUGS > 1 && difference < REPEAT_WIN) {
-            boolean debug = true;
-        }
-
         int repeatsMin;
 
         if (height <= BlockChain.REPEAT_WIN) {

@@ -1450,9 +1450,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             }
 
         } else {
-            if (false && BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
-                thisKey = this.getKey();
-            }
             map.delete(thisKey);
         }
 

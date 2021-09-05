@@ -182,7 +182,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             logger.error("CHECK TABS: \n getBlockSignsMap().size() != height : "
                     + dcSet.getBlockSignsMap().size() + " != " + height
                     + " : " + block);
-            if (BlockChain.CHECK_BUGS > 10) {
+            if (BlockChain.CHECK_BUGS > 9) {
                 Long error = null;
                 ++error;
             }
@@ -213,8 +213,8 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             Fun.Tuple3<Integer, Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
             if (lastPoint.a > head.heightBlock) {
                 LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + head.heightBlock);
-                Long i = null;
-                i++;
+                Long error = null;
+                error++;
             }
         }
 
@@ -248,8 +248,8 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             if (lastPoint == null) {
                 if (lastPoint.a > height) {
                     LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + height);
-                    Long i = null;
-                    i++;
+                    Long error = null;
+                    error++;
                 }
             }
         }
