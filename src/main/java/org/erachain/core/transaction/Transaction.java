@@ -2596,8 +2596,22 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     //////////////////////////////////// ORPHAN
 
     public void orphanHead(Block block, int forDeal) {
-        if (smartContract != null)
+        ///////// SMART CONTRACTS SESSION
+        if (smartContract == null) {
+            // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
+            // для Отката нужно это сделать тут
+            smartContract = SmartContract.make(this);
+        }
+
+        if (smartContract != null) {
+            // если смарт-контракт найден, то тут он Голый и
+            // его надо загружать из баазы данных чтобы восстановить все значения связанные с этой транзакцией
+            Transaction txInDB = dcSet.getTransactionFinalMap().get(dbRef);
+            smartContract = txInDB.getSmartContract();
+
             smartContract.orphan(dcSet, this);
+        }
+
     }
 
     public void orphanBody(Block block, int forDeal) {

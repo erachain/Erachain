@@ -114,7 +114,7 @@ public abstract class SmartContract {
             ) {
                 Order order = createOrder.getDCSet().getCompletedOrderMap().get(createOrder.getOrderId());
                 if (order != null)
-                    return new LeafFall(0);
+                    return new LeafFall();
             }
 
         }

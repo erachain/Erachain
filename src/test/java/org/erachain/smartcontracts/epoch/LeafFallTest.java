@@ -13,13 +13,13 @@ public class LeafFallTest {
 
     @Test
     public void parse() {
-        LeafFall contract = new LeafFall(3);
+        LeafFall contract = new LeafFall();
         byte[] data = contract.toBytes(Transaction.FOR_NETWORK);
         assertEquals(data.length, contract.length(Transaction.FOR_NETWORK));
         LeafFall contractParse = LeafFall.Parse(data, 0, Transaction.FOR_NETWORK);
         assertEquals(contractParse.getCount(), contract.getCount());
 
-        contract = new LeafFall(3, 1234L, 123);
+        contract = new LeafFall(123);
         data = contract.toBytes(Transaction.FOR_DB_RECORD);
         assertEquals(data.length, contract.length(Transaction.FOR_DB_RECORD));
         contractParse = LeafFall.Parse(data, 0, Transaction.FOR_DB_RECORD);

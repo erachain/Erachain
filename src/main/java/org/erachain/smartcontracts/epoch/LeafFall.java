@@ -25,8 +25,14 @@ public class LeafFall extends EpochSmartContract {
     public static final int ID = 1;
     static public final PublicKeyAccount MAKER = new PublicKeyAccount(Base58.encode(Longs.toByteArray(ID)));
 
+    // global values - save in smart-contracts maps
     private int count;
     private long keyInit;
+
+    // local values for each TX
+    /**
+     * = 0 - not calcutaed yet! 1...256
+     */
     private int resultHash;
 
     /**
@@ -36,17 +42,15 @@ public class LeafFall extends EpochSmartContract {
             1048729L, 1048730L, 1048731L, 1048732L};
 
     // use for check: need to initiate values?
-    static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(ID, "c");
+    static final Fun.Tuple2 INIT_KEY = new Fun.Tuple2(ID, "i");
+    static final Fun.Tuple2 COUN_VAR = new Fun.Tuple2(ID, "c");
 
-    public LeafFall(int count) {
+    public LeafFall() {
         super(ID, MAKER);
-        this.count = count;
     }
 
-    public LeafFall(int count, long keyInit, int resultHash) {
+    public LeafFall(int resultHash) {
         super(ID, MAKER);
-        this.count = count;
-        this.keyInit = keyInit;
         this.resultHash = resultHash;
     }
 
@@ -69,13 +73,13 @@ public class LeafFall extends EpochSmartContract {
      * @param transaction
      * @return
      */
-    private int makeResultHash(Block block, Transaction transaction) {
+    private void makeResultHash(Block block, Transaction transaction) {
         if (block == null) {
             // not confirmed - not make any!
-            return 250;
+            return;
         }
 
-        return Byte.toUnsignedInt((byte) (block.getSignature()[5] + transaction.getSignature()[5]));
+        resultHash = 1 + Byte.toUnsignedInt((byte) (block.getSignature()[5] + transaction.getSignature()[5]));
     }
 
     /**
@@ -85,21 +89,21 @@ public class LeafFall extends EpochSmartContract {
      */
     private long getLeafKey() {
 
-        int reverseResultHash = 255 - this.resultHash;
+        int reverseResultHash = 256 - this.resultHash;
         int level;
-        if (reverseResultHash == 0)
+        if (reverseResultHash == 1)
             level = 7;
-        else if (reverseResultHash < 3)
+        else if (reverseResultHash < 4)
             level = 6;
-        else if (reverseResultHash < 7)
+        else if (reverseResultHash < 8)
             level = 5;
-        else if (reverseResultHash < 15)
+        else if (reverseResultHash < 16)
             level = 4;
-        else if (reverseResultHash < 31)
+        else if (reverseResultHash < 32)
             level = 3;
-        else if (reverseResultHash < 63)
+        else if (reverseResultHash < 64)
             level = 2;
-        else if (reverseResultHash < 127)
+        else if (reverseResultHash < 128)
             level = 1;
         else
             level = 0;
@@ -110,7 +114,7 @@ public class LeafFall extends EpochSmartContract {
     private void action(DCSet dcSet, Block block, Transaction transaction, boolean asOrphan) {
 
         if (resultHash == 0) {
-            resultHash = makeResultHash(block, transaction);
+            makeResultHash(block, transaction);
         }
 
         long leafKey = getLeafKey();
@@ -133,13 +137,8 @@ public class LeafFall extends EpochSmartContract {
 
     @Override
     public Object[][] getItemsKeys() {
-        if (keyInit == 0) {
-            // not confirmed yet
-            return null;
-        }
 
         Object[][] itemKeys = new Object[1][];
-
         itemKeys[0] = new Object[]{ItemCls.ASSET_TYPE, getLeafKey()};
 
         return itemKeys;
@@ -149,20 +148,18 @@ public class LeafFall extends EpochSmartContract {
     @Override
     public int length(int forDeal) {
         if (forDeal == Transaction.FOR_DB_RECORD)
-            return 20;
+            return 8;
 
-        return 8;
+        return 4;
     }
 
     @Override
     public byte[] toBytes(int forDeal) {
 
         byte[] data = Ints.toByteArray(id);
-        data = Bytes.concat(data, Ints.toByteArray(count));
 
         if (forDeal == Transaction.FOR_DB_RECORD) {
-            return Bytes.concat(Bytes.concat(data, Longs.toByteArray(keyInit)),
-                    Ints.toByteArray(resultHash));
+            return Bytes.concat(data, Ints.toByteArray(resultHash));
         }
 
         return data;
@@ -174,25 +171,15 @@ public class LeafFall extends EpochSmartContract {
         // skip ID
         pos += 4;
 
-        byte[] countBuffer = new byte[4];
-        System.arraycopy(data, pos, countBuffer, 0, 4);
-        pos += 4;
-
         if (forDeal == Transaction.FOR_DB_RECORD) {
-            // GET INITIAL KEY
-            byte[] keyBuffer = new byte[8];
-            System.arraycopy(data, pos, keyBuffer, 0, 8);
-            pos += 8;
-
             // GET RESULT HASH
             byte[] resultHashBuffer = new byte[4];
             System.arraycopy(data, pos, resultHashBuffer, 0, 4);
 
-            return new LeafFall(Ints.fromByteArray(countBuffer), Longs.fromByteArray(keyBuffer),
-                    Ints.fromByteArray(resultHashBuffer));
+            return new LeafFall(Ints.fromByteArray(resultHashBuffer));
         }
 
-        return new LeafFall(Ints.fromByteArray(countBuffer));
+        return new LeafFall();
     }
 
     private void init(DCSet dcSet, Transaction transaction) {
@@ -209,6 +196,7 @@ public class LeafFall extends EpochSmartContract {
 
         //INSERT INTO DATABASE
         keyInit = dcSet.getItemAssetMap().incrementPut(leafSum);
+        dcSet.getSmartContractValues().put(INIT_KEY, keyInit);
 
         ItemAssetMap map = dcSet.getItemAssetMap();
         for (long leafKey : leafs) {
@@ -236,30 +224,38 @@ public class LeafFall extends EpochSmartContract {
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
 
         // CHECK if INITIALIZED
-        if (valuesMap.contains(COUNT_KEY)) {
-            count = (Integer) valuesMap.get(COUNT_KEY);
+        if (valuesMap.contains(INIT_KEY)) {
+            keyInit = (Long) valuesMap.get(INIT_KEY);
+            count = (Integer) valuesMap.get(COUN_VAR);
         } else {
             init(dcSet, transaction);
         }
 
         action(dcSet, block, transaction, false);
 
-        valuesMap.put(COUNT_KEY, ++count);
+        valuesMap.put(COUN_VAR, ++count);
 
         return false;
     }
 
     private void wipe(DCSet dcSet) {
-        dcSet.getItemAssetMap().decrementDelete(keyInit);
+        // load values
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
-        valuesMap.delete(COUNT_KEY);
+        keyInit = (Long) valuesMap.get(INIT_KEY);
+
+        // remove ASSET
+        dcSet.getItemAssetMap().decrementDelete(keyInit);
+
+        // TODO - сделать удаление всех разом по Tuple2(id, null)
+        valuesMap.delete(INIT_KEY);
+        valuesMap.delete(COUN_VAR);
     }
 
     @Override
     public boolean orphan(DCSet dcSet, Transaction transaction) {
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
-        count = (Integer) valuesMap.get(COUNT_KEY);
+        count = (Integer) valuesMap.get(COUN_VAR);
 
         // leafKey already calculated OR get from DB
         action(dcSet, null, transaction, true);
@@ -270,7 +266,7 @@ public class LeafFall extends EpochSmartContract {
              */
             wipe(dcSet);
         } else {
-            valuesMap.put(COUNT_KEY, --count);
+            valuesMap.put(COUN_VAR, --count);
         }
 
         return false;
