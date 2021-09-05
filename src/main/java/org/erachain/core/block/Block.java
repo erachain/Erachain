@@ -535,43 +535,6 @@ public class Block implements Closeable, ExplorerJsonLine {
     }
 
     /**
-     * Медленное создание и используется для Тестов (Старая версия)
-     * @param creator
-     * @param transactions
-     * @param atBytes
-     * @return
-     */
-    public static byte[] makeTransactionsHashForTests(byte[] creator, List<Transaction> transactions, byte[] atBytes) {
-
-        int atLength;
-        if (atBytes != null) {
-            atLength = atBytes.length;
-        } else {
-            atLength = 0;
-        }
-
-        byte[] data = new byte[0];
-
-        if (transactions == null || transactions.isEmpty()) {
-            data = Bytes.concat(data, creator);
-
-        } else {
-
-            //MAKE TRANSACTIONS HASH
-            for (Transaction transaction : transactions) {
-                data = Bytes.concat(data, transaction.getSignature());
-            }
-
-        }
-
-        if (atLength > 0)
-            data = Bytes.concat(data, atBytes);
-
-        return Crypto.getInstance().digest(data);
-
-    }
-
-    /**
      * делает Хэш и сырые данные из набора транзакций
      *
      * @return
@@ -639,13 +602,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         transactionsHash = Crypto.getInstance().digest(hashData);
-        if (BlockChain.CHECK_BUGS > 0) {
-            byte[] hashTest = makeTransactionsHashForTests(creator.getPublicKey(), transactions, atBytes);
-            if (!Arrays.equals(transactionsHash, hashTest)) {
-                Long error = null;
-                error++;
-            }
-        }
 
     }
 
@@ -1590,11 +1546,6 @@ public class Block implements Closeable, ExplorerJsonLine {
                                     + ":" + transaction.viewFullTypeName()
                                     + " signature  invalid!"
                                     + " " + Base58.encode(transaction.getSignature()));
-                            if (BlockChain.CHECK_BUGS > 1
-                                //&& transaction.viewHeightSeq().equals("869431-1")
-                            ) {
-                                boolean debug = transaction.isSignatureValid(dcSetPlace);
-                            }
                             return INVALID_BLOCK_VERSION;
                         }
                     }
@@ -1846,7 +1797,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (!isClosed) {
             boolean hasValidatedForkDB = validatedForkDB != null;
             close();
-            if (hasValidatedForkDB && BlockChain.CHECK_BUGS > 5) {
+            if (hasValidatedForkDB && BlockChain.CHECK_BUGS > 9) {
                 LOGGER.debug("validatedForkDB is FINALIZED: " + this.toString());
             }
         }
@@ -2374,10 +2325,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (this.heightBlock < 2) {
             // GENESIS BLOCK cannot be orphaned
             return;
-        }
-
-        if (BlockChain.CHECK_BUGS > 3 && this.heightBlock > 162045 && this.heightBlock < 162050) {
-            LOGGER.error(" [" + this.heightBlock + "] BONUS = 0???");
         }
 
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {

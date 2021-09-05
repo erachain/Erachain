@@ -985,7 +985,7 @@ public class BlockExplorer {
                 tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
             }
 
-        } else if (orderInitiator == null && BlockChain.CHECK_BUGS > -1 || pairHaveKey == orderInitiator.getHaveAssetKey()) {
+        } else if (orderInitiator == null || pairHaveKey == orderInitiator.getHaveAssetKey()) {
             tradeJSON.put("type", "sell");
 
             tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());

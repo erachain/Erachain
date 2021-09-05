@@ -617,8 +617,6 @@ public class GeneratorTests {
 
         Tuple2<List<Transaction>, Integer> transactionsItem = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l);
         transactions = transactionsItem.a;
-        // CALCULATE HASH for that transactions
-        byte[] transactionsHash = Block.makeTransactionsHashForTests(generator.getPublicKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(generator,
@@ -699,9 +697,6 @@ public class GeneratorTests {
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
         assertEquals(true, max_count > transactions.size());
 
-        // CALCULATE HASH for that transactions
-        byte[] transactionsHash = Block.makeTransactionsHashForTests(generator.getPublicKey(), transactions, null);
-
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
@@ -765,9 +760,6 @@ public class GeneratorTests {
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         transactions = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l).a;
-
-        // CALCULATE HASH for that transactions
-        byte[] transactionsHash = Block.makeTransactionsHashForTests(userAccount1.getPublicKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(userAccount1,

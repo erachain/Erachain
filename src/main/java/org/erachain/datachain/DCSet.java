@@ -1657,9 +1657,6 @@ public class DCSet extends DBASet implements Closeable {
     @Override
     protected void finalize() throws Throwable {
         close();
-        if (BlockChain.CHECK_BUGS > 5) {
-            logger.debug("DCSet is FINALIZED: " + this.toString());
-        }
         super.finalize();
     }
 

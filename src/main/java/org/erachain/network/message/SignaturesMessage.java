@@ -17,7 +17,7 @@ public class SignaturesMessage extends Message {
     private static final int DATA_LENGTH = 4;
 
     static Logger LOGGER = LoggerFactory.getLogger(SignaturesMessage.class.getName());
-    private static boolean loggerOn = BlockChain.CHECK_BUGS > 5 && false;
+    private static boolean loggerOn = BlockChain.CHECK_BUGS > 7;
 
     private List<byte[]> signatures;
 

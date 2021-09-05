@@ -160,16 +160,6 @@ public class Synchronizer extends Thread {
 
             int height = lastBlock.getHeight();
 
-            if (BlockChain.CHECK_BUGS > 7) {
-                // TEST CORRUPT base
-                int bbb = fork.getBlockMap().size();
-                int hhh = fork.getBlocksHeadsMap().size();
-                int sss = fork.getBlockSignsMap().size();
-                assert (height == hhh);
-                assert (bbb == hhh);
-                assert (sss == hhh);
-            }
-
             if (++countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
                 // сохраним откаченные транзакции - может их потом включим в очередь
                 for (Transaction transaction : lastBlock.getTransactions()) {
@@ -188,20 +178,8 @@ public class Synchronizer extends Thread {
                 ctrl.stopAndExit(311);
             }
 
-            if (BlockChain.CHECK_BUGS > 5) {
-                // TEST CORRUPT base
-                int height2 = lastBlock.getHeight();
-                int bbb2 = fork.getBlockMap().size();
-                int hhh2 = fork.getBlocksHeadsMap().size();
-                int sss2 = fork.getBlockSignsMap().size();
-                assert (height2 == hhh2);
-                assert (bbb2 == hhh2);
-                assert (sss2 == hhh2);
-            }
-
             LOGGER.debug("*** checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
             lastBlock.close();
-            lastBlock = null;
             ctrl.getDCSet().clearCache();
 
             lastBlock = blockMap.last();
