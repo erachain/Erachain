@@ -608,6 +608,12 @@ public class RSignNote extends Transaction implements Itemable {
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
+
         int add_len = 0;
         if (this.data != null && this.data.length > 0)
             add_len += DATA_SIZE_LENGTH + this.data.length;
