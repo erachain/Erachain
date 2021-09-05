@@ -208,6 +208,10 @@ public class LeafFall extends EpochSmartContract {
 
     }
 
+    private void loadValues(SmartContractValues valuesMap) {
+        keyInit = (Long) valuesMap.get(INIT_KEY);
+        count = (Integer) valuesMap.get(COUN_VAR);
+    }
 
     @Override
     public boolean process(DCSet dcSet, Block block, Transaction transaction) {
@@ -222,11 +226,9 @@ public class LeafFall extends EpochSmartContract {
          *  and orphans values not linked to previous state
          */
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
-
         // CHECK if INITIALIZED
         if (valuesMap.contains(INIT_KEY)) {
-            keyInit = (Long) valuesMap.get(INIT_KEY);
-            count = (Integer) valuesMap.get(COUN_VAR);
+            loadValues(valuesMap);
         } else {
             init(dcSet, transaction);
         }
@@ -238,11 +240,7 @@ public class LeafFall extends EpochSmartContract {
         return false;
     }
 
-    private void wipe(DCSet dcSet) {
-        // load values
-        SmartContractValues valuesMap = dcSet.getSmartContractValues();
-        keyInit = (Long) valuesMap.get(INIT_KEY);
-
+    private void wipe(DCSet dcSet, SmartContractValues valuesMap) {
         // remove ASSET
         dcSet.getItemAssetMap().decrementDelete(keyInit);
 
@@ -255,7 +253,7 @@ public class LeafFall extends EpochSmartContract {
     public boolean orphan(DCSet dcSet, Transaction transaction) {
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
-        count = (Integer) valuesMap.get(COUN_VAR);
+        loadValues(valuesMap);
 
         // leafKey already calculated OR get from DB
         action(dcSet, null, transaction, true);
@@ -264,7 +262,7 @@ public class LeafFall extends EpochSmartContract {
             /**
              * remove all data from db
              */
-            wipe(dcSet);
+            wipe(dcSet, valuesMap);
         } else {
             valuesMap.put(COUN_VAR, --count);
         }
