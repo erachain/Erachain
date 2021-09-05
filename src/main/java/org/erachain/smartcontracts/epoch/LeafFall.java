@@ -32,9 +32,10 @@ public class LeafFall extends EpochSmartContract {
     /**
      * list of assets for this smart-contract
      */
-    private static long[] leafs = new long[]{1048721L, 1048722L, 1048723L, 1048724L,
-            1048724L, 1048724L, 1048724L, 1048724L};
+    private static long[] leafs = new long[]{1048725L, 1048727L, 1048726L, 1048728L,
+            1048729L, 1048730L, 1048731L, 1048732L};
 
+    // use for check: need to initiate values?
     static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(ID, "c");
 
     public LeafFall(int count) {
