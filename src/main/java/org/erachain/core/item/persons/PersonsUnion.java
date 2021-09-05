@@ -1,7 +1,5 @@
 package org.erachain.core.item.persons;
 
-//import java.math.BigDecimal;
-
 import org.erachain.core.account.PublicKeyAccount;
 
 public class PersonsUnion extends PersonCls {

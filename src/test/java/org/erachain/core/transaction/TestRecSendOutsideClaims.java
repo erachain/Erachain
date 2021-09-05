@@ -12,6 +12,7 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
+import org.erachain.smartcontracts.SmartContract;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -38,6 +39,7 @@ public class TestRecSendOutsideClaims {
     byte prop2 = 0;
 
     ExLink exLink = null;
+    SmartContract smartContract = null;
 
     byte prop1_backward = org.erachain.core.transaction.TransactionAmount.BACKWARD_MASK;
 
@@ -120,7 +122,7 @@ public class TestRecSendOutsideClaims {
         RSend r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                maker, exLink, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
+                maker, exLink, smartContract, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -130,7 +132,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK, exLink, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, smartContract, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -140,7 +142,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                recipientPK, exLink, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, smartContract, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -151,7 +153,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                maker, exLink, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
+                maker, exLink, smartContract, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -176,7 +178,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK, exLink, FEE_POWER, recipient2, keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, smartContract, FEE_POWER, recipient2, keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -201,7 +203,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK, exLink, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, smartContract, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -211,7 +213,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 this.prop1_backward,
                 prop2,
-                recipientPK, exLink, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, smartContract, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -221,7 +223,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK2, exLink, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK2, exLink, smartContract, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -231,7 +233,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK, exLink, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, smartContract, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -255,7 +257,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                recipientPK, exLink, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, smartContract, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -282,7 +284,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                maker, exLink, FEE_POWER, recipientPK, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
+                maker, exLink, smartContract, FEE_POWER, recipientPK, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -292,7 +294,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                recipientPK, exLink, FEE_POWER, maker, keyA, new BigDecimal(10), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, smartContract, FEE_POWER, maker, keyA, new BigDecimal(10), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -302,7 +304,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                recipientPK, exLink, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK, exLink, smartContract, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -333,7 +335,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 (byte) 0,
                 prop2,
-                recipientPK2, exLink, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK2, exLink, smartContract, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 
@@ -345,7 +347,7 @@ public class TestRecSendOutsideClaims {
         r_SendV3 = new RSend(version,
                 prop1_backward,
                 prop2,
-                recipientPK2, exLink, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
+                recipientPK2, exLink, smartContract, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
 

@@ -29,7 +29,7 @@ public class MultiPaymentTransaction extends Transaction {
     private List<Payment> payments;
 
     public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
         this.payments = payments;
     }
 
@@ -54,8 +54,6 @@ public class MultiPaymentTransaction extends Transaction {
     }
 
     //GETTERS/SETTERS
-
-    //public static String getName() { return "Multi Send"; }
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 

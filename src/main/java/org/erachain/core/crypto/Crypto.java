@@ -48,6 +48,16 @@ public class Crypto {
         }
     }
 
+    public byte[] digest512(byte[] input) {
+        try {
+            //SHA256
+            MessageDigest sha512 = MessageDigest.getInstance("SHA-512");
+            return sha512.digest(input);
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
+    }
+
     public byte[] doubleDigest(byte[] input) {
         //DOUBLE SHA256
         return this.digest(this.digest(input));

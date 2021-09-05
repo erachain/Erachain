@@ -232,7 +232,6 @@ public abstract class PollCls extends ItemCls {
             Pair<Account, Integer> item = (Pair<Account, Integer>)iterator.next();
 
             int option = item.getB();
-            // voter = Account.makeAccountFromShort(item.getA());
 
             Account voter = item.getA();
             Fun.Tuple4<Long, Integer, Integer, Integer> personInfo = voter.getPersonDuration(dcSet);

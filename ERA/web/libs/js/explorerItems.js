@@ -46,12 +46,11 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
 
     }
 
-    if (item.image) {
-        source = 'data:image/gif;base64,' + item.image;
-    } else if (item.imageURL) {
+    if (item.imageURL) {
         source = item.imageURL;
-    } else if (item.imageMediaType.startsWith('video')) {
-        source = '/api' + item.item_type + '/image/' + item.key;
+        if (item.imageMediaType.startsWith('video')) {
+            source = '/api' + item.item_type + '/image/' + item.key;
+        }
     }
 
     if (source) {
@@ -62,6 +61,9 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
         } else if (!origSource && item.imageMediaType.startsWith('audio')) {
             output += '<a href="#"><audio controls autoplay loop><source src="' + source + '" type="audio/mp3"></audio></a>';
 
+        } else if (!origSource && item.imageMediaType.startsWith('html')) {
+            output += '<a id="image-holder" href="#" style="height:1200px;" onclick="style.display=\'none\'">' + source + '</a>';
+            output += '<a href="#" style="height:350px;" onclick="showWindowHtml()" >' + source + '" /></a>';
         } else {
             if (origSource) {
                 // + 10 % for FRAME

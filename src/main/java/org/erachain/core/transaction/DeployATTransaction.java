@@ -54,7 +54,7 @@ public class DeployATTransaction extends Transaction {
     private byte[] creationBytes;
 
     public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, (byte) 0, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, null, (byte) 0, timestamp, reference);
 
         this.name = name;
         this.description = description;

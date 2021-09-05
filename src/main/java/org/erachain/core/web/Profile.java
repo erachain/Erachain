@@ -11,6 +11,7 @@ import org.json.simple.JSONObject;
 import javax.ws.rs.WebApplicationException;
 import java.util.*;
 
+@Deprecated
 @SuppressWarnings("unchecked")
 public class Profile {
 

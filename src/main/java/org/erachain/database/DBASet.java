@@ -10,14 +10,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.mapdb.Serializer;
-
 @Slf4j
 abstract public class DBASet implements IDB {
 
     private static final String VERSION = "version";
-
-    int DBS_USED;
 
     protected File DATA_FILE;
     public DB database;

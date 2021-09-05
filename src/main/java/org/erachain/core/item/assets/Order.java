@@ -209,7 +209,6 @@ public class Order implements Comparable<Order> {
             return false;
 
         // сколько нам надо будет еще купить если эту сделку обработаем
-        //BigDecimal willWant = getFulfilledWant(willHave, this.price, this.wantAssetScale);
         BigDecimal willWant = willHave.multiply(price).setScale(wantAssetScale, BigDecimal.ROUND_HALF_UP);
         if (willWant.signum() == 0) {
             return true;
@@ -381,28 +380,6 @@ public class Order implements Comparable<Order> {
     public long getWantAssetKey() {
         return this.wantAssetKey;
     }
-
-    /*
-    public AssetCls getHaveAsset() {
-        if (dcSet == null)
-            dcSet = DCSet.getInstance();
-
-        if (haveAsset == null)
-            haveAsset = dcSet.getItemAssetMap().get(this.haveAssetKey);
-
-        return haveAsset;
-    }
-
-    public AssetCls getWantAsset() {
-        if (dcSet == null)
-            dcSet = DCSet.getInstance();
-
-        if (wantAsset == null)
-            wantAsset = dcSet.getItemAssetMap().get(this.wantAssetKey);
-
-        return wantAsset;
-    }
-*/
 
     ///////////////////////// AMOUNTS
     public BigDecimal getAmountHave() {

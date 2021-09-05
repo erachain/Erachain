@@ -35,10 +35,6 @@ public class SecureWalletDatabase {
         this.accountSeedMap = new AccountSeedMap(this, this.database);
     }
 
-   // public static boolean exists() {
-   //     return SECURE_WALLET_FILE.exists();
-   // }
-
     public AccountSeedMap getAccountSeedMap() {
         return this.accountSeedMap;
     }

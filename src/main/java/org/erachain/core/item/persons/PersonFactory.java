@@ -1,7 +1,5 @@
 package org.erachain.core.item.persons;
 
-//import com.google.common.primitives.Longs;
-
 public class PersonFactory {
 
     private static PersonFactory instance;

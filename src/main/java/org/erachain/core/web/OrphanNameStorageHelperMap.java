@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Deprecated
 public class OrphanNameStorageHelperMap extends DCUMap<String, List<byte[]>> {
 
     public OrphanNameStorageHelperMap(DCSet dcSet, DB database) {

@@ -174,9 +174,4 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
         return getIndexIterator(TIMESTAMP_INDEX, descending);
     }
 
-    //@Override
-    //public Iterator<Long> getCeatorIterator() {
-    //    return ((TransactionSuitMapDB)map).senderKey.iterator();
-    //}
-
 }

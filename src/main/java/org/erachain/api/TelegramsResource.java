@@ -367,7 +367,7 @@ public class TelegramsResource {
 
         try {
             transaction = cntr.r_Send(
-                    account, null, feePow, recipient, assetKey, amount,
+                    account, null, null, feePow, recipient, assetKey, amount,
                     title, messageBytes, isTextByte, encrypted, 0);
         } catch (Exception e) {
             Transaction.updateMapByErrorSimple(Transaction.INVALID_RETURN, e.getMessage(), out);
@@ -692,7 +692,7 @@ public class TelegramsResource {
                     } while (recipient.equals(creator));
 
                     // MAKE TELEGRAM
-                    Transaction transaction = new RSend(creator, null, (byte) 0, recipient, 0, null,
+                    Transaction transaction = new RSend(creator, null, null, (byte) 0, recipient, 0, null,
                             "TEST 1", "TEST TEST TEST".getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                             new byte[]{(byte) 1},
                             NTP.getTime(), 0L);

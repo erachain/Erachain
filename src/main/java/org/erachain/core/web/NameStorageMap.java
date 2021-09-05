@@ -8,6 +8,7 @@ import org.mapdb.DB.BTreeMapMaker;
 
 import java.util.*;
 
+@Deprecated
 public class NameStorageMap extends DCUMap<String, Map<String, String>> {
 
     public NameStorageMap(DCSet dcSet, DB database) {

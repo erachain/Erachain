@@ -14,13 +14,6 @@ public class ByteableLongItem implements Byteable<Tuple2<Long, ItemCls>> {
 
     private ByteableItem byteableItem;
 
-    //ItemCls.ASSET_TYPE:
-    //ItemCls.IMPRINT_TYPE:
-    //ItemCls.TEMPLATE_TYPE:
-    //ItemCls.PERSON_TYPE:
-    //ItemCls.POLL_TYPE:
-    //ItemCls.STATUS_TYPE:
-    //ItemCls.UNION_TYPE:
     public ByteableLongItem(int type) {
         byteableItem = new ByteableItem(type);
     }

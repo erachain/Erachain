@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Deprecated
 public class Poll {
     private static final int CREATOR_LENGTH = 25;
     private static final int NAME_SIZE_LENGTH = 4;

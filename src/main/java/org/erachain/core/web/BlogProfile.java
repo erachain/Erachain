@@ -3,6 +3,7 @@ package org.erachain.core.web;
 import java.util.Collections;
 import java.util.List;
 
+@Deprecated
 public class BlogProfile implements Comparable<BlogProfile> {
 
     private final Profile profile;

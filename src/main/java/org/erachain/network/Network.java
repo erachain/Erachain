@@ -50,7 +50,6 @@ public class Network extends Observable {
     public LocalPeerScanner localPeerScanner;
     CopyOnWriteArrayList<Peer> knownPeers;
 
-    //private SortedSet<String> handledTelegramMessages;
     private HandledMap<Long, Set<Peer>> handledTelegramMessages;
     private HandledMap<Long, Set<Peer>> handledTransactionMessages;
     private HandledMap<Integer, Set<Peer>> handledWinBlockMessages;

@@ -199,7 +199,7 @@ public class RecResource {
                     }
                     record = new RSend((byte) version, (byte) property1, (byte) property2,
                             creatorPK,
-                            exLink, (byte) feePow, recipient, key, amount, head,
+                            exLink, null, (byte) feePow, recipient, key, amount, head,
                             data, isText, encryptMessage, timestamp, reference);
 
                     break;

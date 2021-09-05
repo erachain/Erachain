@@ -36,8 +36,6 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
 
     int clearByDeadTimeAndLimit(long keepTime, boolean cutDeadTime);
 
-    //boolean set(byte[] signature, Transaction transaction);
-
     void put(Transaction transaction);
 
     void delete(Transaction transaction);
@@ -73,15 +71,11 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
     int getTotalDeleted();
 
     int size();
-    ///IteratorCloseable<Long> getIterator(int index, boolean descending);
-
-    ///IteratorCloseable<Long> getIterator();
 
     Collection<Transaction> values();
 
     void addObserver(Observer o);
     void deleteObserver(Observer o);
 
-    //void clear();
 
 }

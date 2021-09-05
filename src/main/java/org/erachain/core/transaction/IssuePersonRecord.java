@@ -68,8 +68,6 @@ public class IssuePersonRecord extends IssueItemRecord {
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
-        //boolean asPack = releaserReference != null;
-
         //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;
         if (forDeal == Transaction.FOR_MYPACK) {
@@ -229,8 +227,6 @@ public class IssuePersonRecord extends IssueItemRecord {
             return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
         }
 
-        //int ii = Math.abs(person.getHeight());
-        //if (Math.abs(person.getHeight()) < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
         if (person.getHeight() > 255) {
             return Transaction.ITEM_PERSON_HEIGHT_ERROR;
         }

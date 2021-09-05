@@ -45,7 +45,6 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
     }
 
     protected void getMemoryMap() {
-        //return new TreeMap<long[], Integer>(UnsignedBytes.lexicographicalComparator()); // for byte[] KEYS
         map = new TreeMap<Long, Integer>();
     }
 

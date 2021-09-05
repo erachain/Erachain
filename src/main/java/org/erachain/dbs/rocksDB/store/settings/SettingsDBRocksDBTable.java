@@ -24,7 +24,6 @@ public class SettingsDBRocksDBTable {
     private ByteableString byteableString = new ByteableString();
     public SettingsDBRocksDBTable(List<Tuple2<String, Byteable>> namesByteables, String nameTable) {
         this.namesByteables = namesByteables;
-        ////db = new RocksDbDataSourceImpl(nameTable, null, RocksDbSettings.getSettings());
     }
 
     public Object get(String name) {

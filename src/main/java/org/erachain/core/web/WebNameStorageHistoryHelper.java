@@ -5,13 +5,14 @@ import org.erachain.controller.Controller;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.erachain.utils.GZIP;
 import org.erachain.utils.StorageUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.util.*;
 
+@Deprecated
 public class WebNameStorageHistoryHelper {
 
 

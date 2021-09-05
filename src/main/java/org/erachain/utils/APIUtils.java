@@ -309,7 +309,7 @@ public class APIUtils {
         // TODO RSend insert!
         Integer result;
         // SEND ASSET PAYMENT
-        Transaction transaction = Controller.getInstance().r_Send(account, null, feePow, new Account(recipient),
+        Transaction transaction = Controller.getInstance().r_Send(account, null, null, feePow, new Account(recipient),
                 asset.getKey(), bdAmount, title,
                 message, isText, isEncrypted, 0);
         

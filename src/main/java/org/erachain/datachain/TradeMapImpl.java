@@ -6,7 +6,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -71,12 +70,6 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
     @Override
     public void put(Trade trade) {
-        if (BlockChain.CHECK_BUGS > 4 && (
-                Transaction.viewDBRef(trade.getInitiator()).equals("900-1")
-                        || Transaction.viewDBRef(trade.getTarget()).equals("900-1")
-        )) {
-            boolean debug = true;
-        }
         this.put(new Tuple2<Long, Long>(trade.getInitiator(), trade.getTarget()), trade);
     }
 
@@ -274,8 +267,6 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         }
 
         // тут индекс не по времени а по номерам блоков как лонг
-        //int heightStart = Controller.getInstance().getMyHeight();
-        //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
         int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestampMS(startTimestamp);
         int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestampMS(stopTimestamp);
 
@@ -299,8 +290,6 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         }
 
         // тут индекс не по времени а по номерам блоков как лонг
-        //int heightStart = Controller.getInstance().getMyHeight();
-        //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
         int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestampMS(startTimestamp);
         int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestampMS(stopTimestamp);
 

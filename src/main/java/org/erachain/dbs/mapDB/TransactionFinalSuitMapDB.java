@@ -5,7 +5,6 @@ package org.erachain.dbs.mapDB;
 import com.google.common.primitives.SignedBytes;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
@@ -532,19 +531,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @Override
     public void put(Long key, Transaction transaction) {
-
         super.put(key, transaction);
-
-        // FOR TESTs
-        if (false && BlockChain.CHECK_BUGS > 3) {
-            logger.info(Transaction.viewDBRef(key) + ": " + transaction.toString());
-            Transaction tx = transaction.copy();
-            // !!! нужно отключать КЭШ для этого
-            if (!Arrays.equals(tx.toBytes(Transaction.FOR_DB_RECORD, true),
-                    transaction.toBytes(Transaction.FOR_DB_RECORD, true))) {
-                boolean debug = true;
-            }
-        }
     }
 
 }

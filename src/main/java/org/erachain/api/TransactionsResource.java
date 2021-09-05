@@ -905,7 +905,7 @@ public class TransactionsResource {
         Transaction transaction;
         try {
             transaction = Controller.getInstance().r_Send(
-                    Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, 0, recip, asset1, amount,
+                    Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, null, 0, recip, asset1, amount,
                     title, message.getBytes(StandardCharsets.UTF_8), isTextByte, encrypted, 0);
             // test result = new Pair<Transaction, Integer>(null,
             // Transaction.VALIDATE_OK);

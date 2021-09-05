@@ -7,7 +7,7 @@ import org.json.simple.JSONObject;
 
 import java.util.Arrays;
 
-/*
+/**
 
 счетчик вычисленных трнзакций для источника
 

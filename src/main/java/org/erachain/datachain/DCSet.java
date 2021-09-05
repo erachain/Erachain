@@ -42,7 +42,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 533; // vers 5.4.1 (remove getDBIssueMap)
+    final static int CURRENT_VERSION = 535; // vers 5.5.1 epoch smart-contract
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
@@ -139,6 +139,9 @@ public class DCSet extends DBASet implements Closeable {
 
     private VouchRecordMap vouchRecordMap;
     private ExLinksMap exLinksMap;
+    private SmartContractValues smartContractValues;
+    private SmartContractState smartContractState;
+
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
 
@@ -152,7 +155,6 @@ public class DCSet extends DBASet implements Closeable {
     private SharedPostsMap sharedPostsMap;
     private PostCommentMap postCommentMap;
     private CommentPostMap commentPostMap;
-    private LocalDataMap localDataMap;
     private BlogPostMap blogPostMap;
     private HashtagPostMap hashtagPostMap;
     private VoteOnItemPollMap voteOnItemPollMap;
@@ -262,6 +264,9 @@ public class DCSet extends DBASet implements Closeable {
 
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.exLinksMap = new ExLinksMap(this, database);
+            this.smartContractValues = new SmartContractValues(this, database);
+            this.smartContractState = new SmartContractState(this, database);
+
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
             this.nameStorageMap = new NameStorageMap(this, database);
@@ -271,7 +276,6 @@ public class DCSet extends DBASet implements Closeable {
             this.sharedPostsMap = new SharedPostsMap(this, database);
             this.postCommentMap = new PostCommentMap(this, database);
             this.commentPostMap = new CommentPostMap(this, database);
-            this.localDataMap = new LocalDataMap(this, database);
             this.blogPostMap = new BlogPostMap(this, database);
             this.hashtagPostMap = new HashtagPostMap(this, database);
             this.voteOnItemPollMap = new VoteOnItemPollMap(this, database);
@@ -404,27 +408,14 @@ public class DCSet extends DBASet implements Closeable {
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
         this.exLinksMap = new ExLinksMap(parent.exLinksMap, this);
+        this.smartContractValues = new SmartContractValues(parent.smartContractValues, this);
+        this.smartContractState = new SmartContractState(parent.smartContractState, this);
+
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
 
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
         this.blocksHeadsMap = new BlocksHeadsMap(parent.blocksHeadsMap, this);
-        //this.nameMap = new NameMap(parent.nameMap);
-        //this.nameStorageMap = new NameStorageMap(parent.nameStorageMap);
-        //this.orphanNameStorageMap = new OrphanNameStorageMap(parent.orphanNameStorageMap);
-        //this.sharedPostsMap = new SharedPostsMap(parent.sharedPostsMap);
-
-        //this.postCommentMap = new PostCommentMap(parent.postCommentMap);
-        //this.commentPostMap = new CommentPostMap(parent.commentPostMap);
-        //this.orphanNameStorageHelperMap = new OrphanNameStorageHelperMap(parent.orphanNameStorageHelperMap);
-        //this.localDataMap = new LocalDataMap(parent.localDataMap);
-        //this.blogPostMap = new BlogPostMap(parent.blogPostMap);
-        //this.hashtagPostMap = new HashtagPostMap(parent.hashtagPostMap);
-        //this.nameExchangeMap = new NameExchangeMap(parent.nameExchangeMap);
-        //this.updateNameMap = new UpdateNameMap(parent.updateNameMap);
-
-        //this.pollMap = new PollMap(parent.pollMap);
-        //this.voteOnPollMap = new VoteOnPollMap(parent.voteOnPollMap);
 
         this.voteOnItemPollMap = new VoteOnItemPollMap(parent.voteOnItemPollMap, this);
 
@@ -542,26 +533,31 @@ public class DCSet extends DBASet implements Closeable {
             // !!! - может быстро съесть память ((
             // !!! если записи (блоки или единичные транзакции) большого объема!!!
 
-            if (Controller.CACHE_DC.equals("lru")) {
-                // при норм размере и достаточной памяти скорость не хуже чем у остальных
-                // скорость зависит от памяти и настроек -
-                databaseStruc.cacheLRUEnable();
-                needClearCache = true;
-            } else if (Controller.CACHE_DC.equals("weak")) {
-                // analog new cacheSoftRefE - в случае нехватки памяти кеш сам чистится
-                databaseStruc.cacheWeakRefEnable();
-                needClearCache = false;
-            } else if (Controller.CACHE_DC.equals("soft")) {
-                // analog new WeakReference() - в случае нехватки памяти кеш сам чистится
-                databaseStruc.cacheSoftRefEnable();
-                needClearCache = false;
-            } else {
-                // это чистит сама память если осталось 25% от кучи - так что она безопасная
-                // самый быстрый
-                // но чистится каждые 10 тыс обращений - org.mapdb.Caches.HardRef
-                // - опасный так как может поесть память быстро!
-                databaseStruc.cacheHardRefEnable();
-                needClearCache = true;
+            switch (Controller.CACHE_DC) {
+                case "lru":
+                    // при норм размере и достаточной памяти скорость не хуже чем у остальных
+                    // скорость зависит от памяти и настроек -
+                    databaseStruc.cacheLRUEnable();
+                    needClearCache = true;
+                    break;
+                case "weak":
+                    // analog new cacheSoftRefE - в случае нехватки памяти кеш сам чистится
+                    databaseStruc.cacheWeakRefEnable();
+                    needClearCache = false;
+                    break;
+                case "soft":
+                    // analog new WeakReference() - в случае нехватки памяти кеш сам чистится
+                    databaseStruc.cacheSoftRefEnable();
+                    needClearCache = false;
+                    break;
+                default:
+                    // это чистит сама память если осталось 25% от кучи - так что она безопасная
+                    // самый быстрый
+                    // но чистится каждые 10 тыс обращений - org.mapdb.Caches.HardRef
+                    // - опасный так как может поесть память быстро!
+                    databaseStruc.cacheHardRefEnable();
+                    needClearCache = true;
+                    break;
             }
         }
 
@@ -575,8 +571,6 @@ public class DCSet extends DBASet implements Closeable {
 
     /**
      * Для проверки одного блока в памяти - при добавлении в цепочку или в буфер ожидания
-     *
-     * @return
      */
     public static boolean needResetUTXPoolMap = false;
 
@@ -589,10 +583,10 @@ public class DCSet extends DBASet implements Closeable {
                 .newMemoryDB()
                 .transactionDisable()
                 .deleteFilesAfterClose()
-                .asyncWriteEnable() // улучшает чуток и не падает так как нет транзакционности
+                .asyncWriteEnable() // улучшает чуток и не падает так как нет транзакционно
 
                 // это время добавляется к ожиданию конца - и если больше 100 то тормоз лишний
-                // но 1..10 - увеличивает скорость валидации трнзакций!
+                // но 1..10 - увеличивает скорость валидации транзакций!
                 .asyncWriteFlushDelay(2)
                 // тут не влияет .commitFileSyncDisable()
 
@@ -767,6 +761,9 @@ public class DCSet extends DBASet implements Closeable {
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable.clear();
         this.vouchRecordMap.clear();
         this.exLinksMap.clear();
+        this.smartContractValues.clear();
+        this.smartContractState.clear();
+
         this.hashesMap.clear();
         this.hashesSignsMap.clear();
         this.blockMap.clear();
@@ -785,7 +782,6 @@ public class DCSet extends DBASet implements Closeable {
         this.commentPostMap.clear();
 
         this.postCommentMap.clear();
-        this.localDataMap.clear();
         this.blogPostMap.clear();
         this.hashtagPostMap.clear();
         this.voteOnItemPollMap.clear();
@@ -1067,6 +1063,13 @@ public class DCSet extends DBASet implements Closeable {
         return this.exLinksMap;
     }
 
+    public SmartContractValues getSmartContractValues() {
+        return this.smartContractValues;
+    }
+
+    public SmartContractState getSmartContractState() {
+        return this.smartContractState;
+    }
 
     /**
      * Для поиска по хешу в транзакции множества хешей - саму запись
@@ -1218,14 +1221,6 @@ public class DCSet extends DBASet implements Closeable {
 
     public OrphanNameStorageHelperMap getOrphanNameStorageHelperMap() {
         return this.orphanNameStorageHelperMap;
-    }
-
-    /**
-     * я так понял - это отслеживание версии базы данных - и если она новая то все удаляем и заново закачиваем/
-     * Сейчас не используется вроде ни как
-     */
-    public LocalDataMap getLocalDataMap() {
-        return this.localDataMap;
     }
 
     /**
@@ -1662,9 +1657,6 @@ public class DCSet extends DBASet implements Closeable {
     @Override
     protected void finalize() throws Throwable {
         close();
-        if (BlockChain.CHECK_BUGS > 5) {
-            logger.debug("DCSet is FINALIZED: " + this.toString());
-        }
         super.finalize();
     }
 

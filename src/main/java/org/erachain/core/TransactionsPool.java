@@ -239,8 +239,8 @@ public class TransactionsPool extends MonitoredThread {
             // BROADCAST
             controller.network.broadcast(transactionMessage, false);
 
-            if (controller.doesWalletExists() && Controller.HARD_WORK < 3) {
-                controller.getWallet().processTransaction(transaction);
+            if (controller.doesWalletExists()) {
+                controller.getWallet().insertUnconfirmedTransaction(transaction);
             }
 
         }

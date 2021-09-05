@@ -892,10 +892,6 @@ public class Peer extends MonitoredThread {
                 try {
                     // this close IN and OUT streams
                     // and notyfy receiver with EOFException
-                    //this.socket.shutdownInput(); - закрывает канал так что его нужно потом 2-й раз открывать
-                    //this.socket.shutdownOutput(); - не дает переконнектиться
-                    //this.in.close(); - не дает пототм переконнектиться
-                    //this.out.close(); - не дает пототм переконнектиться
 
                     // тут нельзя закрывать Стримы у Сокета так как при встречном переконнекте
                     // иначе Стримы больше не откроются

@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.*;
 
-//import com.google.common.primitives.Longs;
 
 /**
  * @deprecated
@@ -36,26 +35,17 @@ public abstract class ArbitraryTransaction extends Transaction {
     protected List<Payment> payments;
 
     public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
     }
 
     public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, Long reference, byte[] signature) {
         super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference, signature);
     }
-	/*
-	public ArbitraryTransaction(PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference) {
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, timestamp, reference);
-	}
-	 */
 
     // GETTERS/SETTERS
     //public static String getName() { return "OLD: Arbitrary"; }
 
     public static Transaction Parse(byte[] data) throws Exception {
-        // READ TIMESTAMP
-        //byte[] timestampBytes = Arrays.copyOfRange(data, 0, TIMESTAMP_LENGTH);
-        //long timestamp = Longs.fromByteArray(timestampBytes);
-
         return ArbitraryTransactionV3.Parse(data);
     }
 
@@ -220,12 +210,6 @@ public abstract class ArbitraryTransaction extends Transaction {
     public void orphan(Block block, int forDeal) {
 
         // NAME STORAGE UPDATE ORPHAN
-        // if (service == 10) {
-        // StorageUtils.processOrphan(getData(), signature, db);
-        // // BLOGPOST?
-        // } else {
-        // removeFromBlogMapOnDemand(db);
-        // }
 
         // UPDATE CREATOR
         super.orphan(block, forDeal);

@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
  *
  * @author Skerberus
  */
+
+@Deprecated
 public class BlogEntry {
 
     static Logger LOGGER = LoggerFactory.getLogger(BlogEntry.class.getName());

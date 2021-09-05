@@ -15,6 +15,7 @@ import org.erachain.database.IDB;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.Pair;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
@@ -38,6 +39,7 @@ public class TransactionFinalMapImplTest {
     };
 
     ExLink exLink = null;
+    SmartContract smartContract = null;
 
     byte[] isText = new byte[]{1};
     byte[] enCrypted = new byte[]{0};
@@ -274,19 +276,19 @@ public class TransactionFinalMapImplTest {
 
                 RSend assetTransfer;
                 for (int i = 0; i < 100; i++) {
-                    assetTransfer = new RSend(accountA, exLink, FEE_POWER, recipientAcc, 1L, amount_asset, title + i,
+                    assetTransfer = new RSend(accountA, exLink, smartContract, FEE_POWER, recipientAcc, 1L, amount_asset, title + i,
                             null, isText, enCrypted, timestamp++, 0L);
                     assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
                     assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                     map.put(assetTransfer);
 
-                    assetTransfer = new RSend(accountA, exLink, FEE_POWER, recipientAcc, 1L, amount_asset, "for",
+                    assetTransfer = new RSend(accountA, exLink, smartContract, FEE_POWER, recipientAcc, 1L, amount_asset, "for",
                             null, isText, enCrypted, timestamp++, 0L);
                     assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
                     assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);
                     map.put(assetTransfer);
 
-                    assetTransfer = new RSend(accountA, exLink, FEE_POWER, recipientAcc, 1L, amount_asset, "forgen",
+                    assetTransfer = new RSend(accountA, exLink, smartContract, FEE_POWER, recipientAcc, 1L, amount_asset, "forgen",
                             null, isText, enCrypted, timestamp++, 0L);
                     assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
                     assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++, true);

@@ -30,7 +30,7 @@ public class RCalculated extends TransactionAmount {
 
     public RCalculated(byte[] typeBytes, Account recipient, long key,
                        BigDecimal amount, String message, long txReference, long seqNo) {
-        super(typeBytes, NAME_ID, null, null, (byte) 0, recipient, amount, key, 0L, txReference);
+        super(typeBytes, NAME_ID, null, null, null, (byte) 0, recipient, amount, key, 0L, txReference);
 
         this.message = message;
         if (message == null)
@@ -143,6 +143,7 @@ public class RCalculated extends TransactionAmount {
 
         long key = 0;
         BigDecimal amount = null;
+        
         if (typeBytes[2] >= 0) {
             // IF here is AMOUNT
 

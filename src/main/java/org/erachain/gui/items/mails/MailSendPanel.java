@@ -22,6 +22,7 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
 import org.mapdb.Fun.Tuple2;
@@ -721,8 +722,9 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             exLink = new ExLinkAppendix(linkRef);
         }
 
+        SmartContract smartContract = null;
         // CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send(creator, exLink, feePow, recipient, key,
+        Transaction transaction = Controller.getInstance().r_Send(creator, exLink, smartContract, feePow, recipient, key,
                 amount, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);

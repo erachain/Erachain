@@ -34,9 +34,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-//import org.erachain.core.crypto.Base64;
-
-//04/01 +-
 
 /**
  * обработка ключей и криптографии
@@ -45,11 +42,6 @@ public class Account {
 
     public static final int ADDRESS_SHORT_LENGTH = 20;
     public static final int ADDRESS_LENGTH = 25;
-    // private static final long ERA_KEY = Transaction.RIGHTS_KEY;
-    ///private static final long FEE_KEY = Transaction.FEE_KEY;
-    // public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
-    // public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new
-    // byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
 
     public static final int BALANCE_POS_OWN = 1;
     public static final int BALANCE_POS_DEBT = 2;
@@ -71,7 +63,6 @@ public class Account {
     protected String address;
     protected byte[] bytes;
     protected byte[] shortBytes;
-    // private long generatingBalance; //used for forging balance
     // нельзя тут запминать так как при откате данные не будут очищены Tuple4<Long, Integer, Integer, Integer> personDuration;
     Tuple2<Integer, PersonCls> person;
     int viewBalancePosition = 0;
@@ -262,8 +253,8 @@ public class Account {
                 // give CREDIT or BORROW CREDIT
                 type = BALANCE_POS_DEBT;
             } else {
-                // PRODUCE or SPEND
-                type = BALANCE_POS_SPEND;
+                // SPEND or backward PLEDGE
+                type = !isDirect && isBackward ? BALANCE_POS_6 : BALANCE_POS_SPEND;
             }
         }
 
@@ -377,32 +368,12 @@ public class Account {
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ballance;
 
-        if (true) {
-            // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
-            for (byte[] mapKey : map.keySet()) {
-                if (ItemAssetBalanceMap.getAssetKeyFromKey(mapKey) == key) {
-                    ballance = map.get(mapKey);
-                    values.put(ItemAssetBalanceMap.getShortAccountFromKey(mapKey), ballance.a.b);
-                }
+        // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
+        for (byte[] mapKey : map.keySet()) {
+            if (ItemAssetBalanceMap.getAssetKeyFromKey(mapKey) == key) {
+                ballance = map.get(mapKey);
+                values.put(ItemAssetBalanceMap.getShortAccountFromKey(mapKey), ballance.a.b);
             }
-
-        } else {
-
-            // здесь нужен протокольный итератор! его нету у балансов поэтому через перебор ключей
-            try (IteratorCloseable<byte[]> iterator = map.getIndexIterator(0, true)) {
-
-                byte[] bytesKey;
-                while (iterator.hasNext()) {
-                    bytesKey = iterator.next();
-                    if (ItemAssetBalanceMap.getAssetKeyFromKey(bytesKey) == key) {
-                        ballance = map.get(bytesKey);
-                        values.put(ItemAssetBalanceMap.getShortAccountFromKey(bytesKey), ballance.a.b);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
         }
 
         DCSet dcParent = dcSet.getParent();
@@ -464,42 +435,6 @@ public class Account {
 
     }
 
-    /*
-     * public BigDecimal getBalance(long key) { if (key < 0) key = -key; return
-     * this.getBalance(key, DBSet.getInstance()); } public BigDecimal
-     * getBalance(long key, DBSet db) { int type = 1; // OWN if (key < 0) { type
-     * = 2; // RENT key = -key; } Tuple3<BigDecimal, BigDecimal, BigDecimal>
-     * balance = db.getAssetBalanceMap().get(getAddress(), key);
-     *
-     * if (type == 1) return balance.a; else if (type == 2) return balance.b;
-     * else return balance.c; }
-     *
-     * public Integer setConfirmedPersonStatus(long personKey, long statusKey,
-     * int end_date, DBSet db) { return
-     * db.getPersonStatusMap().addItem(personKey, statusKey, end_date); }
-     */
-
-    // SET
-    /*
-     * public void setConfirmedBalance(BigDecimal amount) {
-     * this.setConfirmedBalance(amount, DBSet.getInstance()); } public void
-     * setConfirmedBalance(BigDecimal amount, DBSet db) { //UPDATE BALANCE IN DB
-     * db.getAssetBalanceMap().set(getAddress(), Transaction.FEE_KEY, amount); }
-     * // public void setBalance(long key, BigDecimal balance) {
-     * this.setBalance(key, balance, DBSet.getInstance()); }
-     *
-     * // TODO in_OWN in_RENT on_HOLD public void setBalance(long key,
-     * BigDecimal balance, DBSet db) {
-     *
-     * int type = 1; if (key < 0) { key = -key; type = 2; }
-     *
-     * Tuple3<BigDecimal, BigDecimal, BigDecimal> value =
-     * db.getAssetBalanceMap().get(getAddress(), key); //UPDATE BALANCE IN DB if
-     * (type == 1) { value = new Tuple3<BigDecimal, BigDecimal,
-     * BigDecimal>(balance, value.b, value.c); } else { // SET RENT balance
-     * value = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(value.a, balance,
-     * value.c); } db.getAssetBalanceMap().set(getAddress(), key, value); }
-     */
 
     public String getAddress() {
         if (address == null) {
@@ -525,12 +460,6 @@ public class Account {
         return Controller.getInstance().getWalletUnconfirmedBalance(this, key);
     }
 
-    /*
-     * public BigDecimal getConfirmedBalance() { return
-     * this.getConfirmedBalance(DBSet.getInstance()); } public BigDecimal
-     * getConfirmedBalance(DBSet db) { return
-     * db.getAssetBalanceMap().get(getAddress(), Transaction.FEE_KEY); }
-     */
     public BigDecimal getBalanceUSE(long key) {
         return this.getBalanceUSE(key, DCSet.getInstance());
     }
@@ -549,32 +478,6 @@ public class Account {
 
         return balance.a.b.add(balance.b.b);
     }
-
-    /*
-     * public void setBalance3(long key, Tuple3<BigDecimal, BigDecimal,
-     * BigDecimal> balance, DBSet db) { if (key < 0) key = -key;
-     *
-     * db.getAssetBalanceMap().set(getAddress(), key, balance); }
-     *
-     * public void addBalanceOWN(long key, BigDecimal value, DBSet db) {
-     * Tuple3<BigDecimal, BigDecimal, BigDecimal> balance =
-     * this.getBalance3(key, db); Tuple3<BigDecimal, BigDecimal, BigDecimal>
-     * balance_new = new Tuple3<BigDecimal, BigDecimal,
-     * BigDecimal>(balance.a.add(value), balance.b, balance.c);
-     *
-     * this.setBalance3(key, balance_new, db); }
-     */
-
-    // STATUS
-    /*
-     * public void setConfirmedPersonStatus(long personKey, long statusKey,
-     * Integer days) { this.setConfirmedPersonStatus(personKey, statusKey, days,
-     * DBSet.getInstance()); }
-     *
-     * public void setConfirmedPersonStatus(long personKey, long statusKey,
-     * Integer days, DBSet db) { //UPDATE PRIMARY TIME IN DB
-     * db.getPersonStatusMap().set(personKey, statusKey, days); }
-     */
 
     /**
      * позиция баланса предустанавливается - нужно для Сравнителей - utils.AccountBalanceComparator#compare
@@ -738,61 +641,6 @@ public class Account {
 
         return ownVol.add(inDebt);
     }
-
-    /*
-     * private void updateGeneratingBalance(DBSet db) { //CHECK IF WE NEED TO
-     * RECALCULATE if(this.lastBlockSignature == null) { this.lastBlockSignature
-     * = db.getBlocksHeadMap().getLastBlockSignature();
-     * calculateGeneratingBalance(db); } else { //CHECK IF WE NEED TO
-     * RECALCULATE if(!Arrays.equals(this.lastBlockSignature,
-     * db.getBlocksHeadMap().getLastBlockSignature())) { this.lastBlockSignature =
-     * db.getBlocksHeadMap().getLastBlockSignature(); calculateGeneratingBalance(db);
-     * } } }
-     *
-     * // take current balance public void calculateGeneratingBalance(DBSet db)
-     * { long balance = this.getConfirmedBalance(ERA_KEY,
-     * db).setScale(0).longValue(); this.generatingBalance = balance; }
-     *
-     * // balance FOR generation public void
-     * calculateGeneratingBalance_old(DBSet db) { //CONFIRMED BALANCE + ALL
-     * NEGATIVE AMOUNTS IN LAST 9 BLOCKS - for ERA_KEY only BigDecimal balance =
-     * this.getConfirmedBalance(ERA_KEY, db);
-     *
-     * Block block = db.getBlocksHeadMap().getLastBlock();
-     *
-     * int penalty_koeff = 1000000; int balance_penalty = penalty_koeff;
-     *
-     * // icreator X 10 // not resolve first 100 blocks for(int i=1;
-     * i<GenesisBlock.GENERATING_RETARGET * 10 && block != null &&
-     * block.getHeight(db) > 100; i++) { for(Transaction transaction:
-     * block.getTransactions()) { if(transaction.isInvolved(this) & transaction
-     * instanceof TransactionAmount) { TransactionAmount ta =
-     * (TransactionAmount)transaction;
-     *
-     * if(ta.getKey() == ERA_KEY &
-     * transaction.getAmount(this).compareTo(BigDecimal.ZERO) == 1) { balance =
-     * balance.subtract(transaction.getAmount(this)); } } }
-     * LinkedHashMap<Tuple2<Integer,Integer>,ATTransaction> atTxs =
-     * db.getATTransactionMap().getATTransactions(block.getHeight(db));
-     * Iterator<ATTransaction> iter = atTxs.values().iterator(); while (
-     * iter.hasNext() ) { ATTransaction key = iter.next(); if (
-     * key.getRecipient().equals( this.getAddress() ) ) { balance =
-     * balance.subtract( BigDecimal.valueOf(key.getAmount()) ); } }
-     *
-     * // icreator X 0.9 for each block generated if (balance_penalty > 0.1 *
-     * penalty_koeff && block.getCreator().getAddress().equals(this.address)) {
-     * balance_penalty *= Settings.GENERATE_CONTINUOUS_PENALTY * 0.001; } else {
-     * // reset balance_penalty = penalty_koeff; } block = block.getParent(db);
-     * }
-     *
-     * //DO NOT GO BELOW 0 if(balance.compareTo(BigDecimal.ZERO) == -1) {
-     * balance = BigDecimal.ZERO; }
-     *
-     * // use penalty this.generatingBalance = balance.multiply(new
-     * BigDecimal(balance_penalty / penalty_koeff));
-     *
-     * }
-     */
 
 
     // Добавляем величины для тестовых режимов
@@ -1373,7 +1221,6 @@ public class Account {
         }
 
         return " {"
-                // + NumberAsString.formatAsString(this.getBalanceUSE(FEE_KEY))
                 + viewFEEbalance()
                 + "}" + " " + addressStr + "" + personStr;
     }
@@ -1399,7 +1246,7 @@ public class Account {
                 + addressStr + "" + personStr;
     }
 
-    //////////
+
     public String viewPerson() {
         Tuple2<Integer, PersonCls> personRes = this.getPerson();
         if (personRes == null) {
@@ -1484,20 +1331,9 @@ public class Account {
         return false;
     }
 
-    //public void resetPersonDuration() {
-    //    this.personDuration = null;
-    //}
 
     public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
-        //    if (this.personDuration == null) {
-        //        нельзя использовать старые значения так как при откатах они не будут чиститься
-        //        this.personDuration = db.getAddressPersonMap().getItem(shortBytes);
-        //    }
-
-        //return this.personDuration;
-
         return db.getAddressPersonMap().getItem(shortBytes);
-
     }
 
     public boolean isPerson(DCSet dcSet, int forHeight, Tuple4<Long, Integer, Integer, Integer> addressDuration) {
@@ -1515,17 +1351,6 @@ public class Account {
             return false;
         if (days * (long) 86400000 < current_time)
             return false;
-
-        // IF PERSON ALIVE
-        Long personKey = addressDuration.a;
-        // TODO by deth day if
-        /*
-         * //Tuple5<Long, Long, byte[], Integer, Integer> personDuration =
-         * db.getPersonStatusMap().getItem(personKey, ALIVE_KEY); // TEST TIME
-         * and EXPIRE TIME for ALIVE person Long end_date = personDuration.b; if
-         * (end_date == null ) return true; // permanent active if (end_date <
-         * current_time + 86400000l ) return false; // - 1 day
-         */
 
         return true;
 
@@ -1572,19 +1397,6 @@ public class Account {
         // TODO x 1000 ?
         if (days < 0 || days * (long) 86400000 < current_time)
             return new Tuple2<Integer, PersonCls>(-1, person);
-
-        // IF PERSON is ALIVE
-        // TODO by DEATH day
-        /*
-         * Tuple5<Long, Long, byte[], Integer, Integer> personDuration =
-         * db.getPersonStatusMap().getItem(personKey, ALIVE_KEY); // TEST TIME
-         * and EXPIRE TIME for ALIVE person if (personDuration == null) return
-         * new Tuple2<Integer, PersonCls>(-2, person); Long end_date =
-         * personDuration.b; if (end_date == null ) // permanent active return
-         * new Tuple2<Integer, PersonCls>(0, person); else if (end_date <
-         * current_time + 86400000l ) // ALIVE expired return new Tuple2<Integer,
-         * PersonCls>(-1, person);
-         */
 
         return new Tuple2<Integer, PersonCls>(1, person);
 

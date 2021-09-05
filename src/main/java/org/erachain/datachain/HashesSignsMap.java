@@ -8,19 +8,18 @@ import org.mapdb.Fun.Tuple3;
 import java.util.Stack;
 import java.util.TreeMap;
 
-//import org.mapdb.Fun.Tuple2;
-//import org.mapdb.Fun.Tuple3;
 
-// hash[byte] -> Stack person + block.height + transaction.seqNo
-// Example - database.AddressPersonMap
-/** Набор хэшей - по хэшу поиск записи в котрой он участвует и
+/**
+ * Набор хэшей - по хэшу поиск записи в котрой он участвует и
  * используется в транзакции org.erachain.core.transaction.RHashes
- hash[byte] -> Stack person + block.height + transaction.seqNo
-
+ * hash[byte] -> Stack person + block.height + transaction.seqNo
+ * <p>
  * Ключ: хэш<br>
  * Значение: список - номер персоны (Если это персона создала запись, ссылка на запись)<br>
- // TODO укротить до 20 байт адрес и ссылку на Long
-
+ * // TODO укротить до 20 байт адрес и ссылку на Long
+ * <p>
+ * hash[byte] -> Stack person + block.height + transaction.seqNo
+ * Example - database.AddressPersonMap
  */
 
 public class HashesSignsMap extends DCUMap<byte[], Stack<Tuple3<

@@ -48,8 +48,6 @@ public class WebTransactionsHTML {
 
     public JSONObject get_HTML_Body(Transaction transaction, String out) {
 
-        //String out = "";
-
         ExLink exLink = transaction.getExLink();
         if (exLink != null) {
             out += "<h4>";
@@ -182,12 +180,6 @@ public class WebTransactionsHTML {
 
         transaction.setDC(dcSet, true);
 
-        //List<Transaction> tt = new ArrayList<Transaction>();
-        //tt.add(transaction);
-        //explorer.transactionsJSON(null, tt, 0, BlockExplorer.pageSize, "tx");
-        //JSONObject tras_json = (JSONObject) ((LinkedHashMap) ((LinkedHashMap) explorer.output.get("Transactions"))
-        //        .get("transactions")).get(0);
-
         JSONObject tras_json = transaction.toJson();
 
         String out = "<font size='+1'> <b>" + Lang.T("Transaction", langObj) + ":</b>";
@@ -195,8 +187,6 @@ public class WebTransactionsHTML {
         out += " (" + Lang.T("Block", langObj) + ": </b><a href=?block=" + tras_json.get("height") + get_Lang() + ">" + tras_json.get("height") + "</a>";
         out += ", " + Lang.T("seqNo", langObj) + ": </b><a href=?tx=" + tras_json.get("seqNo") + get_Lang() + ">" + tras_json.get("seqNo") + "</a> ) </font><br>";
 
-        // она и так в заголовке будет
-        //out += "<br><b>" + Lang.TFromLangObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
         out += "<br><b>" + Lang.T("Confirmations", langObj) + ": </b>" + transaction.getConfirmations(dcSet);
 
         if (!(transaction instanceof RCalculated)) {
@@ -320,21 +310,6 @@ public class WebTransactionsHTML {
         if (person.getGender() == 1)
             out += Lang.T("Female", langObj);
         out += "<br>";
-        //out += "<b>" + Lang.TFromLangObj("Description", langObj) + ":</b> "
-        //        + person.getDescription() + "<br>";
-        if (person.getMaker().getPerson() != null) {
-            // out += "<b>" + Lang.TFromLangObj("Maker",
-            // langObj) + ":</b> <a href=?person="
-            // +person.getMaker().getPerson().b.getKey()+ get_Lang(langObj) +
-            // ">" + person.getMaker().viewPerson() +"</a><br>";
-        } else {
-            // out += "<b>" +Lang.TFromLangObj("Maker",
-            // langObj) + ":</b> <a href=?address=" +
-            // person.getMaker().getAddress() + get_Lang(langObj) + ">" +
-            // person.getMaker().getAddress() +"</a><br>";
-        }
-        // out += "<b>" + Lang.TFromLangObj("Public
-        // Key", langObj) + ":</b> " + person.getMaker().getBase58() +"<br>";
         return out;
     }
 
@@ -609,14 +584,8 @@ public class WebTransactionsHTML {
         RVouch vouchRecord = (RVouch) transaction;
         Transaction record = dcSet.getTransactionFinalMap().get(vouchRecord.getRefHeight(),
                 vouchRecord.getRefSeqNo());
-		/*out += "<b>" + Lang.TFromLangObj("height-seqNo", langObj) + ":</b> <a href=?tx="
-				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
-				+ vouchRecord.getVouchSeqNo() + "</a><br>"; */
-        //out += "<b>" + Lang.TFromLangObj("Description", langObj) + ":</b>";
-        //  out += "<b>" + Lang.TFromLangObj("Vouch Record", langObj) + ":</b> ";
         out += "<b>" + Lang.T("Signed Transaction", langObj) + ": </b> <a href='?tx=" + record.viewSignature() + get_Lang() + "'> ";
         out += record.getBlockHeight() + "-" + record.getSeqNo() + "</a> <br>";
-        // LABEL DESCRIPTION
 
         return out;
     }
@@ -682,21 +651,6 @@ public class WebTransactionsHTML {
         if (person.getGender() == 1)
             out += Lang.T("Female", langObj);
         out += "</b><br>";
-        //out += "<b>" + Lang.TFromLangObj("Description", langObj) + ":</b> "
-        //        + person.getDescription() + "<br>";
-        if (person.getMaker().getPerson() != null) {
-            // out += "<b>" + Lang.TFromLangObj("Maker",
-            // langObj) + ":</b> <a href=?person="
-            // +person.getMaker().getPerson().b.getKey()+ get_Lang(langObj) +
-            // ">" + person.getMaker().viewPerson() +"</a><br>";
-        } else {
-            // out += "<b>" +Lang.TFromLangObj("Maker",
-            // langObj) + ":</b> <a href=?address=" +
-            // person.getMaker().getAddress() + get_Lang(langObj) + ">" +
-            // person.getMaker().getAddress() +"</a><br>";
-        }
-        // out += "<b>" + Lang.TFromLangObj("Public
-        // Key", langObj) + ":</b> " + person.getMaker().getBase58() +"<br>";
         return out;
     }
 

@@ -24,7 +24,6 @@ public abstract class ExAction<R> {
     int type;
     protected long assetKey;
 
-    /////////////////
     protected DCSet dcSet;
     protected int height;
     protected AssetCls asset;

@@ -125,7 +125,6 @@ public class ConnectionAcceptor extends MonitoredThread {
 
             try {
                 //CREATE PEER
-                ////new Peer(callback, connectionSocket);
                 //logger.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress()
                 //		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
                 //		+ " my:" + Network.getMyselfAddress());

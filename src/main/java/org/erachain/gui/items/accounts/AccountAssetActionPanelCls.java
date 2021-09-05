@@ -29,6 +29,7 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
 import org.mapdb.Fun;
@@ -61,6 +62,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     int action;
 
     public ExLink exLink;
+
+    public SmartContract smartContract;
 
     public int feePow;
 
@@ -613,7 +616,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send((byte) 2, backward ? TransactionAmount.BACKWARD_MASK : 0,
-                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress()), exLink, feePow,
+                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress()), exLink, smartContract, feePow,
                 recipient, getAssetKey(), getAmount(), txTitle, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";

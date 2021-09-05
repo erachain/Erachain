@@ -37,7 +37,6 @@ public class DBRocksDBTableTransaction<K, V> extends DBRocksDBTable<K, V> implem
         dbSource = new RocksDbDataSourceTransaction(this.root, NAME_TABLE, indexes,
                 (TransactionDB) dbSoutceImpl.dbSource, dbSoutceImpl.dbSource.getColumnFamilyHandles(), writeOptions, readOptions, this.enableSize);
 
-        //openSource();
         afterOpen();
     }
 

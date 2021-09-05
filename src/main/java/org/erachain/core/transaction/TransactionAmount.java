@@ -13,6 +13,8 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
+import org.erachain.smartcontracts.epoch.EpochSmartContract;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
@@ -28,7 +30,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/*
+/**
 
 ## typeBytes
 0 - record type
@@ -64,12 +66,8 @@ typeBytes[3].4-0 = point accuracy: -16..16 = BYTE - 16
 
  */
 
-/**
- *
- */
 public abstract class TransactionAmount extends Transaction implements Itemable{
     public static final byte[][] VALID_REC = new byte[][]{
-        //Base58.decode("2PLy4qTVeYnwAiESvaeaSUTWuGcERQr14bpGj3qo83c4vTP8RRMjnmRXnd6USsbvbLwWUNtjErcdvs5KtZMpyREC"),
     };
 
     static Logger LOGGER = LoggerFactory.getLogger(TransactionAmount.class.getName());
@@ -79,6 +77,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static final int maxSCALE = TransactionAmount.SCALE_MASK_HALF + BlockChain.AMOUNT_DEDAULT_SCALE - 1;
     public static final int minSCALE = BlockChain.AMOUNT_DEDAULT_SCALE - TransactionAmount.SCALE_MASK_HALF;
 
+    /**
+     * used over typeBytes[2]
+     */
     public static final byte BACKWARD_MASK = 64;
 
     // BALANCES types and ACTION with IT
@@ -101,13 +102,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             // ACTION_RESERVED_6
     };
 
-    /*
-     * public static final String NAME_ACTION_TYPE_BACKWARD_PROPERTY =
-     * "backward PROPERTY"; public static final String
-     * NAME_ACTION_TYPE_BACKWARD_HOLD = "backward HOLD"; public static final
-     * String NAME_ACTION_TYPE_BACKWARD_CREDIT = "backward CREDIT"; public
-     * static final String NAME_ACTION_TYPE_BACKWARD_SPEND = "backward SPEND";
-     */
     public static final String NAME_ACTION_TYPE_PROPERTY = "SEND";
     public static final String NAME_ACTION_TYPE_PROPERTY_WAS = "Send # was";
     public static final String NAME_ACTION_TYPE_HOLD = "HOLD";
@@ -130,13 +124,13 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected PersonCls recipientPerson;
 
     protected BigDecimal amount;
-    protected long key; //  = Transaction.FEE_KEY;
+    protected long key;
     protected AssetCls asset;
 
     // need for calculate fee by feePow into GUI
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, byte feePow, Account recipient,
+    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
                                 BigDecimal amount, long key, long timestamp, Long reference) {
-        super(typeBytes, name, creator, exLink, feePow, timestamp, reference);
+        super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, reference);
         this.recipient = recipient;
 
         if (amount == null || amount.signum() == 0) {
@@ -151,14 +145,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
     }
 
-    // need for calculate fee
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
-                                BigDecimal amount, long key, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, name, creator, null, feePow, recipient, amount, key, timestamp, reference);
-        this.signature = signature;
-    }
-
     // GETTERS/SETTERS
+
     @Override
     public void setDC(DCSet dcSet, boolean andUpdateFromState) {
         super.setDC(dcSet, false);
@@ -182,18 +170,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
-        if (BlockChain.CHECK_BUGS > 3// && viewDBRef(dbRef).equals("18165-1")
-        ) {
-            boolean debug;
-            debug = true;
-        }
-
         if (false && andUpdateFromState && !isWiped())
             updateFromStateDB();
     }
 
-    // public static String getName() { return "unknown subclass Amount"; }
-    
     public Account getRecipient() {
         return this.recipient;
     }
@@ -451,7 +431,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (amount == null || amount.signum() == 0)
             return "Mail";
 
-        //return viewActionType(this.key, this.amount, this.isBackward(), asset.isDirectBalances());
         return asset.viewAssetTypeAction(isBackward(), balancePosition(), creator == null ? false : asset.getMaker().equals(creator));
     }
 
@@ -559,13 +538,18 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (exLink != null)
             base_len += exLink.length();
 
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
+
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 
         return base_len - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
     }
 
-    //@Override // - fee + balance - calculate here
     private static long pointLogg;
 
     public static boolean isValidPersonProtect(DCSet dcSet, int height, Account recipient,
@@ -628,11 +612,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                 if (asset == null) {
                     return new Fun.Tuple2<>(ITEM_ASSET_NOT_EXIST, "key: " + key);
-                }
-
-                // самому себе нельзя пересылать
-                if (height > BlockChain.VERS_4_11 && creator.equals(recipient)) {
-                    return new Fun.Tuple2<>(INVALID_ADDRESS, "Equal recipient");
                 }
 
                 // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
@@ -700,7 +679,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             return new Fun.Tuple2<>(CREATOR_NOT_MAKER, "creator != asset maker");
                         }
                         if (creator.equals(recipient)) {
-                            return new Fun.Tuple2<>(INVALID_ADDRESS, "creator == recipient");
+                            return new Fun.Tuple2<>(INVALID_ADDRESS, "Creator equal recipient");
                         }
 
                         // TRY FEE
@@ -711,6 +690,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         }
 
                     } else {
+
+                        // самому себе нельзя пересылать
+                        if (height > BlockChain.VERS_4_11 && creator.equals(recipient)
+                                && actionType != ACTION_SPEND) {
+                            return new Fun.Tuple2<>(INVALID_ADDRESS, "Creator equal recipient");
+                        }
 
                         // VALIDATE by ASSET TYPE
                         switch (assetType) {
@@ -1138,7 +1123,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 /// вообще не проверяем в тесте
                 if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    if (true || BlockChain.CHECK_BUGS > 1)
+                    if (BlockChain.CHECK_BUGS > 2)
                         LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
                     errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
                     return INVALID_TIMESTAMP;
@@ -1146,7 +1131,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
                 if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    if (BlockChain.CHECK_BUGS > 1)
+                    if (BlockChain.CHECK_BUGS > 2)
                         LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
                     errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
                     return INVALID_TIMESTAMP;
@@ -1165,7 +1150,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             || BlockChain.CHECK_BUGS > 1 && System.currentTimeMillis() - pointLogg > 1000) {
                         if (BlockChain.TEST_DB == 0) {
                             pointLogg = System.currentTimeMillis();
-                            if (BlockChain.CHECK_BUGS > 1)
+                            if (BlockChain.CHECK_BUGS > 2)
                                 LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
                                         + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
                                         + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
@@ -1195,13 +1180,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         if (creatorPerson != null && !creatorPerson.isAlive(this.timestamp)) {
             return ITEM_PERSON_IS_DEAD;
-        }
-
-        if (false // комиссия у так уже = 0 - нельзя модифицировать флаг внутри
-                && height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
-                && getDataLength(FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
-            // не учитываем комиссию если размер блока маленький
-            flags = flags | NOT_VALIDATE_FLAG_FEE;
         }
 
         //////////////////////////////
@@ -1364,6 +1342,17 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         this.assetFee.negate(), "Asset Fee", this.dbRef);
             }
         }
+
+        ///////// SMART CONTRACTS SESSION
+        if (smartContract == null) {
+            // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
+            // потом он будет записан в базу данных и его можно найти загрузив эту трнзакцию
+            smartContract = EpochSmartContract.make(this);
+        }
+
+        if (smartContract != null)
+            smartContract.process(dcSet, block, this);
+
     }
 
     @Override
@@ -1411,7 +1400,5 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         
         return assetAmount;
     }
-    
-    // public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
 
 }

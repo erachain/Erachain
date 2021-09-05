@@ -38,22 +38,14 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 {
     protected String dataBaseName;
 
-    //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
-    // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
-    // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
-    //protected boolean dbSync = true;
-
     protected WriteOptions writeOptions;
     protected boolean enableSize;
 
     @Getter
-    //public RocksDB database;
     // база данных - сама
     public RocksDB dbCore;
     // некий объект работы с базой данных - как сама так и транзакция
     public RocksDbCom table;
-    //public OptimisticTransactionDB database;
-    Options options;
 
     protected boolean alive;
     protected String pathName;

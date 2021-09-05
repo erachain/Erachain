@@ -14,15 +14,6 @@ public class PrivateKeyAccount extends PublicKeyAccount {
         this.keyPair = Crypto.getInstance().createKeyPair(seed);
     }
 
-    /*
-    public PrivateKeyAccount(byte[] privateKey, byte[] publicKey) {
-        super(publicKey);
-        /// null this.seed = privateKey;
-        this.keyPair = new Pair(privateKey, publicKey);
-    }
-
-     */
-
     public byte[] getSeed() {
         return this.seed;
     }

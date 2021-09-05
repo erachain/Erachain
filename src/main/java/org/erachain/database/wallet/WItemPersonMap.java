@@ -6,7 +6,6 @@ import org.mapdb.DB;
 
 public class WItemPersonMap extends WItemMap {
 
-    //static Logger logger = LoggerFactory.getLogger(WItemPersonMap.class.getName());
     static final String NAME = "person";
     static final int TYPE = ItemCls.PERSON_TYPE;
 

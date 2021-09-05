@@ -1,6 +1,5 @@
 package org.erachain.core.item.persons;
 
-//import java.math.BigDecimal;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;

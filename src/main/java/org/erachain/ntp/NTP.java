@@ -15,16 +15,6 @@ public final class NTP {
     private static long lastUpdate = 0;
     private static long offset = 0;
 
-	/*
-	public static long getTime()
-	{
-		getTime_old();
-		java.util.Date date= new java.util.Date();
-		return new Timestamp(date.getTime()).getTime() + offset;
-		
-	}
-	*/
-
     // TODO - if offset is GREAT!
     public static long getTime() {
         //CHECK IF OFFSET NEEDS TO BE UPDATED

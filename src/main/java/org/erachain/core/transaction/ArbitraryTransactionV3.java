@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-//import java.math.BigInteger;
-
 /**
  * @deprecated 
  */
@@ -213,18 +211,6 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
     }
 
     // VALIDATE
-
-	/*
-	@Override
-	public boolean isSignatureValid() {
-
-		byte[] data = this.toBytes( false );
-		if ( data == null ) return false;
-
-		return Crypto.getInstance().verify(this.creator.getPublicKey(),
-				this.signature, data);
-	}
-	 */
 
     //@Override
     @Override

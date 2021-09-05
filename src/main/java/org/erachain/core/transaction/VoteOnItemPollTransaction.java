@@ -34,7 +34,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
     private PollCls poll;
 
     public VoteOnItemPollTransaction(byte[] typeBytes, PublicKeyAccount creator, long pollKey, int option, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
 
         this.key = pollKey;
         this.option = option;
@@ -73,7 +73,6 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Vote on Poll"; }
 
     @Override
     public long getKey() {

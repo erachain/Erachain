@@ -19,20 +19,10 @@ public abstract class AddressItemRefs extends Transaction {
     public static final long START_KEY = 1000L; // << 20;
 
     public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
         this.item = item;
     }
 
-    /*
-    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature)
-    {
-        this(typeBytes, NAME_ID, creator, item, feePow, timestamp, reference);
-        this.signature = signature;
-        if (item.getReference() == null) item.setReference(signature); // set reference
-        //item.resolveKey(DLSet.getInstance());
-        ///// if (timestamp > 1000 ) setDB; // not asPaack
-    }
-     */
     public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature, long dbRef) {
         this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, null);
         this.signature = signature;

@@ -40,7 +40,6 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
 {
     protected String dataBaseName;
 
-    //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
     // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
     protected boolean dbSync = true;
@@ -52,7 +51,6 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     public Transaction dbCore;
     @Getter
     public TransactionDB dbCoreParent;
-    //public OptimisticTransactionDB database;
 
     protected boolean alive;
     protected String parentName;

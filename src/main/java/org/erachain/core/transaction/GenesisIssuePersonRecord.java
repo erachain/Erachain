@@ -5,19 +5,6 @@ import org.erachain.core.item.persons.PersonFactory;
 
 import java.util.Arrays;
 
-//import java.nio.charset.StandardCharsets;
-//import java.util.HashSet;
-//import java.util.List;
-//import java.util.Map;
-// import org.slf4j.LoggerFactory;
-
-//import org.json.simple.JSONObject;
-//import com.google.common.primitives.Bytes;
-//import org.erachain.core.account.Account;
-//import org.erachain.core.account.PublicKeyAccount;
-//import org.erachain.core.crypto.Crypto;
-//import org.erachain.core.item.ItemCls;
-
 public class GenesisIssuePersonRecord extends GenesisIssueItemRecord {
     private static final byte TYPE_ID = (byte) GENESIS_ISSUE_PERSON_TRANSACTION;
     private static final String NAME_ID = "GENESIS Issue Person";

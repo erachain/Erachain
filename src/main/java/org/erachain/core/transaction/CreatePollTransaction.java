@@ -28,7 +28,7 @@ public class CreatePollTransaction extends Transaction {
     private Poll poll;
 
     public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
 
         this.creator = creator;
         this.poll = poll;
@@ -60,7 +60,6 @@ public class CreatePollTransaction extends Transaction {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Create Poll"; }
 
     @Override
     public boolean isWiped() {
@@ -242,16 +241,6 @@ public class CreatePollTransaction extends Transaction {
     }
 
     //VALIDATE
-
-	/*
-	public boolean isSignatureValid()
-	{
-		byte[] data = this.toBytes( false, null );
-		if ( data == null ) return false;
-
-		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
-	}
-	 */
 
     @Override
     public int isValid(int forDeal, long flags) {

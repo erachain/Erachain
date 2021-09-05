@@ -55,8 +55,12 @@ public class WalletUpdater extends MonitoredThread {
         synchronizeMode = value;
     }
 
+    /**
+     * Сюда приходит блок очищенный от всех исчислений - транзакции сброшены до байт-кода...
+     *
+     * @param pair
+     */
     public void offerMessage(Pair<Boolean, Block> pair) {
-        //LOGGER.debug(" offer: " + pair.toString());
         blockingQueue.offer(pair);
     }
 
@@ -65,7 +69,6 @@ public class WalletUpdater extends MonitoredThread {
         if (pair == null)
             return;
 
-        //LOGGER.debug(" process: " + pair.toString());
         if (pair.getA()) {
             // ORPHAN
             if (!wallet.checkNeedSyncWallet(pair.getB().getSignature())) {
@@ -80,7 +83,17 @@ public class WalletUpdater extends MonitoredThread {
             // PROCESS
             if (controller.isStatusOK() // только если нет синхронизации
                     && !wallet.checkNeedSyncWallet(pair.getB().getReference())) {
-                wallet.processBlock(pair.getB());
+
+                try {
+                    wallet.processBlock(pair.getB());
+                } catch (java.lang.OutOfMemoryError e) {
+                    LOGGER.error(e.getMessage(), e);
+                    // внутрення ошибка - выходим для лога
+                    Controller.getInstance().stopAndExit(1644);
+                    return;
+                } finally {
+                    pair.getB().close();
+                }
 
             } else {
                 // set then NEED SYNCH
@@ -210,7 +223,6 @@ public class WalletUpdater extends MonitoredThread {
                     }
                 }
 
-                ///setGoSynchronize(true);
                 // break current synchronization if exists
                 wallet.synchronizeBodyUsed = false;
                 try {

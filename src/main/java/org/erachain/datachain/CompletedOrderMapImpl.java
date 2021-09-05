@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
@@ -110,8 +109,6 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
         }
 
         // тут индекс не по времени а по номерам блоков как лонг
-        //int heightStart = Controller.getInstance().getMyHeight();
-        //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
         int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestampMS(startTimestamp);
         int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestampMS(stopTimestamp);
 
@@ -176,53 +173,21 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
 
     @Override
     public void put(Order order) {
-
-        if (BlockChain.CHECK_BUGS > 3
-                && (Transaction.viewDBRef(order.getId()).equals("-178617-18")
-                || Transaction.viewDBRef(order.getId()).equals("-125300-1"))
-        ) {
-            boolean debug = true;
-        }
-
         this.put(order.getId(), order);
     }
 
     @Override
     public void put(Long id, Order order) {
-
-        if (BlockChain.CHECK_BUGS > 3
-                && (Transaction.viewDBRef(id).equals("178617-18")
-                || Transaction.viewDBRef(id).equals("125300-1"))
-        ) {
-            boolean debug = true;
-        }
-
         super.put(id, order);
     }
 
     @Override
     public void delete(Order order) {
-
-        if (BlockChain.CHECK_BUGS > 3
-                && (Transaction.viewDBRef(order.getId()).equals("176395-2")
-                || Transaction.viewDBRef(order.getId()).equals("125300-1"))
-        ) {
-            boolean debug = true;
-        }
-
         this.delete(order.getId());
     }
 
     @Override
     public void delete(Long id) {
-
-        if (BlockChain.CHECK_BUGS > 3
-                && (Transaction.viewDBRef(id).equals("176395-2")
-                || Transaction.viewDBRef(id).equals("125300-1"))
-        ) {
-            boolean debug = true;
-        }
-
         super.delete(id);
     }
 }

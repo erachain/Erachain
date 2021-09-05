@@ -39,9 +39,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-//import java.math.BigDecimal;
-//import com.google.common.primitives.Longs;
-
 public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     static Logger LOGGER = LoggerFactory.getLogger(ItemCls.class.getName());
@@ -148,7 +145,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         this.appData = appData;
         this.maker = maker;
         this.name = name.trim();
-        this.description = description;
+        this.description = description == null ? "" : description;
         this.icon = icon == null ? new byte[0] : icon;
         this.image = image == null ? new byte[0] : image;
 
@@ -670,14 +667,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return imageType;
     }
 
-    //public String getIconTypeName() {
-    //    return viewMediaType(iconType);
-    //}
-
-    //public String getImageTypeName() {
-    //    return viewMediaType(imageType);
-    //}
-
     public boolean hasImageURL() {
         return imageAsURL;
     }
@@ -913,15 +902,21 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     @Override
     public int hashCode() {
-        return (reference == null ? 0 : Ints.fromByteArray(reference));
+        return (int) key + (reference == null ? 0 : Ints.fromByteArray(reference));
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ItemCls) {
             ItemCls item = (ItemCls) obj;
-            if (this.reference != null && item.reference != null)
-                return Arrays.equals(this.reference, item.reference);
+            if (item.getItemType() == getItemType()) {
+                if (key != 0 && item.key == key
+                        || this.reference != null && item.reference != null
+                        && Arrays.equals(this.reference, item.reference))
+                    /// сущности по смарт-контрактам, в момент когда еще нет Номера, могут совпадать reference
+                    /// но это разные сущности! надо имя сравнивать
+                    return item.name.equals(name);
+            }
         }
         return false;
     }
@@ -1197,8 +1192,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         JSONObject itemJSON = new JSONObject();
 
-        //itemJSON.put("iconTypeName", viewMediaType(iconType));
-
         // ADD DATA
         if (hasIconURL()) {
             itemJSON.put("iconURL", getIconURL());
@@ -1222,7 +1215,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
      * @return
      */
     public JSONObject jsonForExplorerPage(JSONObject langObj, Object[] args) {
-        //DCSet dcSet = DCSet.getInstance();
 
         JSONObject itemJSON = new JSONObject();
         itemJSON.put("key", this.getKey());
@@ -1410,7 +1402,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         ItemMap dbMap = this.getDBMap(db);
 
         long newKey;
+
         long novaKey = this.isNovaItem(db);
+
         if (novaKey > 0) {
 
             // INSERT WITH NOVA KEY
@@ -1456,9 +1450,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             }
 
         } else {
-            if (false && BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
-                thisKey = this.getKey();
-            }
             map.delete(thisKey);
         }
 

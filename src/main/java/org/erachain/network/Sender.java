@@ -285,8 +285,6 @@ public class Sender extends MonitoredThread {
 
     public void run() {
 
-        //Controller cnt = Controller.getInstance();
-
         Message message;
 
         while (this.peer.network.run) {

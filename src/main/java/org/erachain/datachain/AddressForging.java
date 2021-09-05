@@ -10,21 +10,20 @@ import org.mapdb.Fun.Tuple3;
 import java.util.Collection;
 import java.util.HashMap;
 
-//
-// last forged block for ADDRESS -> by height = 0
 /**
  * Хранит данные о сборке блока для данного счета - по номеру блока
  * если номер блока не задан - то это последнее значение.
  * При этом если номер блока не задана то хранится поледнее значение
  *  account.address + current block.Height ->
  *     previous making blockHeight + previous ForgingH balance + this ForgingH balance
-<hr>
+ <hr>
  - not SAME with BLOCK HEADS - use point for not only forged blocks - with incoming ERA Volumes
  <br>
  Так же тут можно искать блоки собранны с данного счета - а вторичный индекс у блоков не нужен.
  <br>
  Если точка первая то предыдущее в ней значение Высоты = 0, то есть указывает что ниже нету но текущий баланс уже есть для Форжинга
 
+ last forged block for ADDRESS -> by height = 0
  * @return
  */
 
@@ -43,7 +42,6 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integ
     @Override
     public void openMap() {
         //OPEN MAP
-        ////return database.createHashMap("address_forging").makeOrGet();
         map = database.getHashMap("address_forging");
     }
 
@@ -151,17 +149,12 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integ
             return null;
         }
 
-        boolean debug;
-        if (BlockChain.CHECK_BUGS > 4 && key.a.equals("785kSn6mehhtaqgc2yqvBxp84WMZnP4j3E")) {
-            debug = true; // *** Block[322065] WIN_VALUE not in BASE RULES 0 Creator: 785kSn6mehhtaqgc2yqvBxp84WMZnP4j3E
-        }
-
         // удалять можно только если последняя точка совпадает с удаляемой
         // иначе нельзя - так как может быть несколько удалений в один блок
         Tuple3<Integer, Integer, Integer> lastPoint = getLast(key.a);
         if (lastPoint == null) {
             // обычно такого не должно случаться!!!
-            if (BlockChain.CHECK_BUGS > 5)
+            if (BlockChain.CHECK_BUGS > 2)
                 LOGGER.error("ERROR LAST forging POINTS = null for KEY: " + key);
             return super.remove(key);
         } else {
@@ -178,7 +171,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integ
                     ;
                 } else {
                     // тут ошибка
-                    if (BlockChain.CHECK_BUGS > 3)
+                    if (BlockChain.CHECK_BUGS > 2)
                         LOGGER.error("WRONG deleted and LAST forging POINTS:" + lastPoint + " > " + key);
                     //Tuple3<Integer, Integer, Integer> previous = super.remove(key);
                     //this.setLast(key.a, previous);

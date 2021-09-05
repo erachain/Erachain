@@ -47,8 +47,6 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
     TransactionsPool pool;
 
-    //public int TIMESTAMP_INDEX = 1;
-
     public int totalDeleted = 0;
 
     public TransactionMapImpl(int dbsUsed, DCSet databaseSet, DB database) {

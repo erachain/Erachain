@@ -35,7 +35,7 @@ public class VoteOnPollTransaction extends Transaction {
     private String poll;
 
     public VoteOnPollTransaction(byte[] typeBytes, PublicKeyAccount creator, String poll, int option, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference);
+        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
 
         this.creator = creator;
         this.poll = poll;
@@ -75,8 +75,6 @@ public class VoteOnPollTransaction extends Transaction {
     }
 
     //GETTERS/SETTERS
-
-    //public static String getName() { return "Vote on Poll"; }
 
     @Override
     public boolean isWiped() {

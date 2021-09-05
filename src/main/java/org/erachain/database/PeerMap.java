@@ -21,7 +21,6 @@ import java.util.*;
 
 public class PeerMap extends DCUMapImpl<byte[], byte[]> {
     private static final byte[] BYTE_WHITELISTED = new byte[]{0, 0};
-    //private static final byte[] BYTE_BLACKLISTED = new byte[]{1, 1};
     private static final byte[] BYTE_NOTFOUND = new byte[]{2, 2};
     static Logger LOGGER = LoggerFactory.getLogger(PeerMap.class.getName());
 

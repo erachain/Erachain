@@ -15,7 +15,7 @@ import org.mapdb.Fun.Tuple3;
 import java.math.BigDecimal;
 import java.util.HashSet;
 
-/*
+/**
 
 вычисляемая трнзакция по изменению объеиов
 

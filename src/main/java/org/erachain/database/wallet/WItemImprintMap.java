@@ -6,7 +6,6 @@ import org.mapdb.DB;
 
 public class WItemImprintMap extends WItemMap {
 
-    //static Logger logger = LoggerFactory.getLogger(WItemImprintMap.class.getName());
     static final String NAME = "imprint";
     static final int TYPE = ItemCls.IMPRINT_TYPE;
 

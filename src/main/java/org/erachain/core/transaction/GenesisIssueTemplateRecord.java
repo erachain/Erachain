@@ -5,8 +5,6 @@ import org.erachain.core.item.templates.TemplateFactory;
 
 import java.util.Arrays;
 
-//import java.math.BigInteger;
-
 public class GenesisIssueTemplateRecord extends GenesisIssueItemRecord {
 
     private static final byte TYPE_ID = (byte) GENESIS_ISSUE_TEMPLATE_TRANSACTION;

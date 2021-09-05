@@ -44,10 +44,6 @@ public interface ItemAssetBalanceMap extends DBTab<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value);
 
-    //Tuple5<
-    //        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-    //        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> get(byte[] key);
-
     Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> get(byte[] address, long key);
@@ -60,15 +56,9 @@ public interface ItemAssetBalanceMap extends DBTab<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> getBalancesList(Account account);
 
-    //Set<byte[]> keySet();
-
-    //Iterator<byte[]> getIterator(int index, boolean descending);
-
     IteratorCloseable<byte[]> getIteratorByAsset(long assetKey);
 
     IteratorCloseable<byte[]> getIteratorByAccount(Account account);
-
-    //void clear();
 
     void addObserver(Observer o);
 

@@ -10,9 +10,6 @@ import org.erachain.core.item.unions.UnionFactory;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-//import java.util.Map;
-// import org.slf4j.LoggerFactory;
-
 public class IssueUnionRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_UNION_TRANSACTION;
     public static final String TYPE_NAME = "Issue Union";
@@ -46,7 +43,6 @@ public class IssueUnionRecord extends IssueItemRecord {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Issue Union"; }
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 

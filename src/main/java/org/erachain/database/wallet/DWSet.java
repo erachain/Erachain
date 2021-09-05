@@ -392,6 +392,29 @@ public class DWSet extends DBASet {
         }
     }
 
+    public FavoriteItemMap getItemFavoritesSet(int itemType) {
+        switch (itemType) {
+            case ItemCls.ASSET_TYPE:
+                return assetFavoritesSet;
+            case ItemCls.IMPRINT_TYPE:
+                return imprintFavoritesSet;
+            case ItemCls.POLL_TYPE:
+                return pollFavoriteSet;
+            case ItemCls.TEMPLATE_TYPE:
+                return templateFavoritesSet;
+            case ItemCls.PERSON_TYPE:
+                return personFavoritesSet;
+            case ItemCls.STATUS_TYPE:
+                return statusFavoritesSet;
+            case ItemCls.UNION_TYPE:
+                return unionFavoritesSet;
+            default:
+                return null;
+        }
+    }
+
+    //////////////// FAVORITES ///////////
+
     public void addItemFavorite(ItemCls item) {
         getItemFavoritesSet(item).add(item.getKey());
     }
@@ -400,7 +423,6 @@ public class DWSet extends DBASet {
         getItemFavoritesSet(item).delete(item.getKey());
     }
 
-    //////////////// FAVORITES ///////////
     public void addDocumentToFavorite(Transaction transaction) {
         getDocumentFavoritesSet().add(transaction.getDBRef());
     }
@@ -439,14 +461,6 @@ public class DWSet extends DBASet {
         json.put("description", description);
 
         getFavoriteAccountsMap().put(address, new Fun.Tuple3<>(pubKey, name, json.toJSONString()));
-    }
-
-    public void addItemToFavorite(ItemCls item) {
-        getItemFavoritesSet(item).add(item.getKey());
-    }
-
-    public void removeItemFromFavorite(ItemCls item) {
-        getItemFavoritesSet(item).delete(item.getKey());
     }
 
     public boolean isItemFavorite(ItemCls item) {

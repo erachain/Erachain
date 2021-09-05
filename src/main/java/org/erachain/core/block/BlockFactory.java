@@ -39,11 +39,4 @@ public class BlockFactory {
         }
     }
 
-    /*
-    // not signed and not getGeneratingBalance
-    public Block create(int version, byte[] reference, PublicKeyAccount generator, int height, byte[] unconfirmedTransactionsHash, byte[] atBytes) {
-        return new Block(version, reference, generator, height, unconfirmedTransactionsHash, atBytes);
-    }
-    */
-	
 }

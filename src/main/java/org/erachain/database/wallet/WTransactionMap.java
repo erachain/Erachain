@@ -38,10 +38,6 @@ import java.util.NavigableSet;
  */
 public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transaction> {
 
-    //public static final int TIMESTAMP_INDEX = 1;
-    //public static final int ADDRESS_INDEX = 2;
-    //public static final int AMOUNT_INDEX = 3;
-
     /**
      * Поиск по типу транзакции
      */
@@ -94,66 +90,6 @@ public class WTransactionMap extends DCUMapImpl<Tuple2<Long, Integer>, Transacti
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
-
-        /*
-
-        //TIMESTAMP INDEX
-        NavigableSet<Long> timestampIndex = database.createTreeSet("transactions_index_timestamp")
-                .makeOrGet();
-
-        NavigableSet<Long> descendingTimestampIndex = database.createTreeSet("transactions_index_timestamp_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
-
-        createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Long, Tuple2<Long, Long>, Transaction>() {
-            @Override
-            public Long run(Tuple2<Long, Long> key, Transaction value) {
-                return value.getTimestamp();
-            }
-        });
-
-
-        //ADDRESS INDEX
-        NavigableSet<Tuple2<String[], Tuple2<Long, Long>>> addressIndex = database.createTreeSet("transactions_index_address")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
-
-        NavigableSet<Tuple2<String[], Tuple2<Long, Long>>> descendingAddressIndex = database.createTreeSet("transactions_index_address_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
-
-        createIndexes(ADDRESS_INDEX, addressIndex, descendingAddressIndex, new Fun.Function2<String[], Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
-            @Override
-            public String[] run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
-                HashSet<Account> involved = value.b.getInvolvedAccounts();
-                String[] keys = new String[involved.size()];
-                Iterator<Account> keysIterator = involved.iterator();
-                for (int i = 0; i < involved.size(); i++) {
-                    keys[i] =keysIterator.next().getAddress();
-                }
-                return keys;
-            }
-        });
-         */
-
-        /* это вообще не информативнй индекс не нужен
-        //AMOUNT INDEX
-        NavigableSet<Tuple2<BigDecimal, Tuple2<Long, Long>>> amountIndex = database.createTreeSet("transactions_index_amount")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
-
-        NavigableSet<Tuple2<BigDecimal, Tuple2<Long, Long>>> descendingAmountIndex = database.createTreeSet("transactions_index_amount_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
-
-        createIndex(AMOUNT_INDEX, amountIndex, descendingAmountIndex, new Fun.Function2<BigDecimal, Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
-            @Override
-            public BigDecimal run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
-                Account account = new Account(key.a);
-                return value.b.getAmount(account);
-            }
-        });
-        */
 
         this.typeKey = database.createTreeSet("type_txs").comparator(Fun.COMPARATOR)
                 .makeOrGet();

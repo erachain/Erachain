@@ -57,6 +57,7 @@ import org.erachain.network.Peer;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.*;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
@@ -100,7 +101,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.5";
+    public static String version = "5.6";
     public static String buildTime = "2021-08-15 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -932,10 +933,6 @@ public class Controller extends Observable {
             Settings.getInstance().setWalletKeysPath(pathOld);
             return 3;
         }
-    }
-
-    public void replaseFavoriteItems(int type) {
-        this.wallet.replaseFavoriteItems(type);
     }
 
     public DCSet reCreateDC(boolean inMemory) throws IOException, Exception {
@@ -2733,61 +2730,58 @@ public class Controller extends Observable {
         if (newBlock == null)
             return false;
 
-        try {
-            // if last block is changed by core.Synchronizer.process(DLSet, Block)
-            // clear this win block
-            if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
-                // see finalliy newBlock.close();
+        // if last block is changed by core.Synchronizer.process(DLSet, Block)
+        // clear this win block
+        if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
+            newBlock.close();
+            return false;
+        }
+
+        LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
+
+        if (!newBlock.isValidated()) {
+            // это может случиться при добавлении в момент синхронизации - тогда до расчета Победы не доходит
+            // или при добавлении моего сгнерированного блока т.к. он не проверился?
+
+            // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+            DCSet forked = dcSet.fork(DCSet.makeDBinMemory(), "flushNewBlockGenerated");
+            // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
+
+            if (newBlock.isValid(forked,
+                    onlyProtocolIndexing // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+            ) > 0) {
+                // очищаем занятые транзакциями ресурсы
+                // - see finalliy newBlock.close();
+
+                // освобождаем память от базы данных - так как мы ее к блоку не привязали
+                forked.close();
                 return false;
             }
 
-            LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
-
-            if (!newBlock.isValidated()) {
-                // это может случиться при добавлении в момент синхронизации - тогда до расчета Победы не доходит
-                // или при добавлении моего сгнерированного блока т.к. он не проверился?
-
-                // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-                DCSet forked = dcSet.fork(DCSet.makeDBinMemory(), "flushNewBlockGenerated");
-                // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
-
-                if (newBlock.isValid(forked,
-                        onlyProtocolIndexing // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
-                ) > 0) {
-                    // очищаем занятые транзакциями ресурсы
-                    // - see finalliy newBlock.close();
-
-                    // освобождаем память от базы данных - так как мы ее к блоку не привязали
-                    forked.close();
-                    return false;
-                }
-
-                // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
-                if (onlyProtocolIndexing) {
-                    // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
-                    newBlock.setValidatedForkDB(forked);
-                } else {
-                    // освобождаем память от базы данных - так как мы ее к блоку не привязали
-                    forked.close();
-                }
+            // если вторичные индексы нужны то нельзя быстрый просчет - иначе вторичные при сиве из форка не создадутся
+            if (onlyProtocolIndexing) {
+                // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
+                newBlock.setValidatedForkDB(forked);
+            } else {
+                // освобождаем память от базы данных - так как мы ее к блоку не привязали
+                forked.close();
             }
+        }
 
-            try {
-                this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
+        try {
+            // тутв нутри будет сделан newBlock.close();
+            this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
 
-            } catch (Exception e) {
-                if (this.isOnStopping()) {
-                    throw new Exception("on stoping");
-                } else {
-                    LOGGER.error(e.getMessage(), e);
-                    return false;
-                }
+        } catch (Exception e) {
+            if (this.isOnStopping()) {
+                throw new Exception("on stoping");
+            } else {
+                LOGGER.error(e.getMessage(), e);
+                return false;
             }
-            if (network != null) {
-                this.network.clearHandledWinBlockMessages();
-            }
-        } finally {
-            newBlock.close();
+        }
+        if (network != null) {
+            this.network.clearHandledWinBlockMessages();
         }
 
         LOGGER.info("+++ flushNewBlockGenerated OK");
@@ -3006,7 +3000,10 @@ public class Controller extends Observable {
 
         // ADD TO WALLET TRANSACTIONS
         if (doesWalletExists() && HARD_WORK < 4) {
-            wallet.processTransaction(transaction);
+            // они и так будут в transactionsPool добавляться, но там может и проскользуть мимо очерди
+            // если она очень занята
+            // поэтому тут добавим наверняка
+            wallet.insertUnconfirmedTransaction(transaction);
         }
 
     }
@@ -3514,7 +3511,7 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, String recipientStr,
+    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, SmartContract smartContract, String recipientStr,
                                                   int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
                                                   String title, String message, int messagecode, boolean encrypt, long timestamp) {
 
@@ -3629,26 +3626,26 @@ public class Controller extends Observable {
         }
 
         // CREATE RSend
-        return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, linkTo, feePow, recipient,
+        return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, linkTo, smartContract, feePow, recipient,
                 assetKey, amount, title, messageBytes, isTextByte, encrypted, timestamp));
 
     }
 
-    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, int feePow,
+    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, SmartContract smartContract, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage, long timestamp) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(sender, linkTo, recipient, key, amount, feePow, title, message, isText,
+            return this.transactionCreator.r_Send(sender, linkTo, smartContract, recipient, key, amount, feePow, title, message, isText,
                     encryptMessage, timestamp);
         }
     }
 
     public Transaction r_Send(byte version, byte property1, byte property2,
-                              PrivateKeyAccount sender, ExLink linkTo, int feePow,
+                              PrivateKeyAccount sender, ExLink linkTo, SmartContract smartContract, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, linkTo, feePow,
+            return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, linkTo, smartContract, feePow,
                     title, message, isText, encryptMessage);
         }
     }

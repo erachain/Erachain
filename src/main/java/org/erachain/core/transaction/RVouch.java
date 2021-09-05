@@ -19,10 +19,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-
-// TODO
-// ver =1 - vouching incommed transfers - assets etc.
-//   ++ FEE = 0, no TIMESTAMP??, max importance for including in block
+/**
+ * TODO
+ * ver =1 - vouching incommed transfers - assets etc.
+ * ++ FEE = 0, no TIMESTAMP??, max importance for including in block
+ */
 public class RVouch extends Transaction {
 
     protected static final int LOAD_LENGTH = HEIGHT_LENGTH + SEQ_LENGTH;
@@ -39,7 +40,7 @@ public class RVouch extends Transaction {
     protected int refSeqNo;
 
     public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int refHeight, int refSeqNo, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
 
         this.refHeight = refHeight;
         this.refSeqNo = refSeqNo;
@@ -81,8 +82,6 @@ public class RVouch extends Transaction {
 
     //GETTERS/SETTERS
 
-    //public static String getName() { return "Send"; }
-
     public int getRefHeight() {
         return this.refHeight;
     }
@@ -100,8 +99,6 @@ public class RVouch extends Transaction {
 
 
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
-
-        //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
         int test_len;

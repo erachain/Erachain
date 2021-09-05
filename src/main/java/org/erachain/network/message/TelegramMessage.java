@@ -18,11 +18,6 @@ public class TelegramMessage extends Message {
     }
 
     @Override
-    public Long getHash() {
-        return Longs.fromByteArray(this.transaction.getSignature());
-    }
-
-    @Override
     public boolean isHandled() {
         return true;
     }

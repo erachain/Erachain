@@ -19,10 +19,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     public static final String TYPE_NAME = "Issue Asset";
 
-    //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
-
-    //private AssetCls asset;
-
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference) {
         super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, reference);
     }
@@ -62,7 +58,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Issue Asset"; }
 
     @Override
     public long calcBaseFee(boolean withFreeProtocol) {
@@ -105,31 +100,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
         return BigDecimal.ZERO.setScale(asset.getScale());
     }
 
-	/*
-	@Override
-	public BigDecimal getAmount(Account account) {
-		String address = account.getAddress();
-		return getAmount(address);
-	}
-	 */
-
-	/*
-    public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, forDeal, blockHeight, seqNo);
-
-        AssetCls asset = (AssetCls) this.item;
-
-        if (false && dcSet.getItemAssetMap().getLastKey() < BlockChain.AMOUNT_SCALE_FROM) {
-            // MAKE OLD STYLE ASSET with DEVISIBLE:
-            // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
-            asset = new AssetVenture((byte) 0, asset.getOwner(), asset.getName(),
-                    asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, asset.getScale(), asset.getQuantity());
-            this.item = asset;
-        }
-
-    }
-    */
-
     //VALIDATE
 
     @Override
@@ -148,7 +118,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     }
 
-    //@Override
     @Override
     public int isValid(int forDeal, long flags) {
 
@@ -297,21 +266,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
             return new IssueAssetTransaction(typeBytes, creator, linkTo, asset, signatureBytes);
         }
     }
-
-	/*
-	//@Override
-	public byte[] toBytes(boolean withSign, byte[] releaserReference)
-	{
-
-		byte[] data = super.toBytes(withSign, releaserReference);
-
-		//WRITE ASSET
-		// without reference
-		data = Bytes.concat(data, this.asset.toBytes(false));
-
-		return data;
-	}
-	 */
 
     //PROCESS/ORPHAN
 

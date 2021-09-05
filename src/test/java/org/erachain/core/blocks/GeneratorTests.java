@@ -617,8 +617,6 @@ public class GeneratorTests {
 
         Tuple2<List<Transaction>, Integer> transactionsItem = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l);
         transactions = transactionsItem.a;
-        // CALCULATE HASH for that transactions
-        byte[] transactionsHash = Block.makeTransactionsHashForTests(generator.getPublicKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(generator,
@@ -677,7 +675,7 @@ public class GeneratorTests {
         for (int i = 0; i < max_count; i++) {
 
             //CREATE VALID PAYMENT
-            Transaction payment = new RSend(generator, exLink, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001),
+            Transaction payment = new RSend(generator, exLink, null, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001),
                     "sss", new byte[3000], new byte[]{1}, new byte[]{0},
                     timestamp++, generator.getLastTimestamp(snapshot)[0]);
 
@@ -698,9 +696,6 @@ public class GeneratorTests {
 
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
         assertEquals(true, max_count > transactions.size());
-
-        // CALCULATE HASH for that transactions
-        byte[] transactionsHash = Block.makeTransactionsHashForTests(generator.getPublicKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(generator,
@@ -765,9 +760,6 @@ public class GeneratorTests {
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         transactions = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l).a;
-
-        // CALCULATE HASH for that transactions
-        byte[] transactionsHash = Block.makeTransactionsHashForTests(userAccount1.getPublicKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(userAccount1,

@@ -8,7 +8,6 @@ public abstract class DBSuitImpl<T, U> implements DBSuit<T, U> {
     protected DBTab cover;
 
     protected boolean sizeEnable;
-    //protected abstract void openMap();
 
     @Override
     public boolean isSizeEnable() {
@@ -19,8 +18,6 @@ public abstract class DBSuitImpl<T, U> implements DBSuit<T, U> {
     public int getDefaultIndex() {
         return 0;
     }
-
-    //protected abstract void getMap();
 
     protected void createIndexes() {
     }

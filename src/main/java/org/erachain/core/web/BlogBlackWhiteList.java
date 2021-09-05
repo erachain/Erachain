@@ -20,6 +20,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author Skerberus
  */
+
+@Deprecated
 public class BlogBlackWhiteList {
 
     /**
@@ -45,39 +47,6 @@ public class BlogBlackWhiteList {
         if (blogname == null) {
             return new BlogBlackWhiteList(false, new ArrayList<String>(), null);
         }
-
-        /*
-        Name blognameName = DCSet.getInstance().getNameMap().get(blogname);
-
-        // Name not registered, --> Default = Whitelist
-        if (blognameName == null) {
-            return new BlogBlackWhiteList(true, new ArrayList<String>(),
-                    blogname);
-        }
-
-        JSONObject jsonForName = ProfileUtils.getBlogBlackWhiteList(blogname);
-
-        if (jsonForName.containsKey(Corekeys.BLOGWHITELIST.toString())) {
-            String whitelist = (String) jsonForName.get(Corekeys.BLOGWHITELIST
-                    .toString());
-
-            String[] whiteListEntries = StringUtils.split(whitelist, ";");
-            List<String> result = new ArrayList<String>(new ArrayList<>(
-                    Arrays.asList(whiteListEntries)));
-            return new BlogBlackWhiteList(true, result, blogname);
-
-        }
-
-        if (jsonForName.containsKey(Corekeys.BLOGBLACKLIST.toString())) {
-            String blackList = (String) jsonForName.get(Corekeys.BLOGBLACKLIST
-                    .toString());
-
-            String[] blackListEntries = StringUtils.split(blackList, ";");
-            return new BlogBlackWhiteList(false, new ArrayList<>(
-                    Arrays.asList(blackListEntries)), blogname);
-        }
-
-         */
 
         return new BlogBlackWhiteList(true, new ArrayList<String>(), blogname);
 

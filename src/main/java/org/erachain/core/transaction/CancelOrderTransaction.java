@@ -30,8 +30,6 @@ public class CancelOrderTransaction extends Transaction {
 
     // TODO убрать в новой цепочке
     public static final byte[][] VALID_REC = new byte[][]{
-            //Base58.decode("2SEfiztfaj9wNE2k8h3Wiko3oVHtdjawosfua5PbjeAwPTFMHhFoJqVxpYvswZUdJFfQZ7i6xXep85UvCkZoxHqi"),
-            //Base58.decode("34BaZfvWJpyEKAL7i3txFcTqRcVJt2GgumJm2ANqNcvBHCxngfoXBUKhm24uhqmZx1qvShj1KwUK6WHwHX2FQpfy"),
     };
     // TODO - reference to ORDER - by recNor INT+INT - not 64xBYTE[] !!!
     public static final byte TYPE_ID = (byte) CANCEL_ORDER_TRANSACTION;
@@ -49,7 +47,7 @@ public class CancelOrderTransaction extends Transaction {
 
 
     public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
         this.orderSignature = orderSignature;
     }
 
@@ -196,9 +194,6 @@ public class CancelOrderTransaction extends Transaction {
         byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE ORDER
-        //byte[] orderBytes = this.orderSignature;
-        //byte[] fill = new byte[ORDER_LENGTH - orderBytes.length];
-        //orderBytes = Bytes.concat(fill, orderBytes);
         data = Bytes.concat(data, this.orderSignature);
 
         return data;
@@ -313,11 +308,6 @@ public class CancelOrderTransaction extends Transaction {
             error++;
         }
 
-        // TODO - CANCEL для транзакции в том же блоке???
-        //Transaction createOrder = this.dcSet.getTransactionFinalMap().get(this.orderSignature);
-        //Tuple2<Integer, Integer> dbRefTuple2 = createOrder.getHeightSeqNo();
-        //this.orderID = Transaction.makeDBRef(dbRefTuple2);
-
         Order order = this.dcSet.getOrderMap().get(this.orderID);
 
         if (order == null) {
@@ -419,22 +409,7 @@ public class CancelOrderTransaction extends Transaction {
         return false;
     }
 
-	/*
-	@Override
-	public BigDecimal Amount(Account account)
-	{
-		String address = account.getAddress();
 
-		if(address.equals(this.creator.getAddress()))
-		{
-			return BigDecimal.ZERO;
-		}
-
-		return BigDecimal.ZERO;
-	}
-	 */
-
-    //@Override
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
         Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 

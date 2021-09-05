@@ -28,8 +28,6 @@ public class PersonsFavorites implements Observer {
 
     public List<PersonCls> getPersons() {
         List<PersonCls> persons = new ArrayList<PersonCls>();
-        //persons.add(Controller.getInstance().getperson(Transaction.FEE_KEY));
-        //persons.add(Controller.getInstance().getperson(Transaction.FEE_KEY + 1l));
         for (Long key : this.favorites) {
             persons.add(Controller.getInstance().getItemPerson(key));
         }
@@ -52,29 +50,7 @@ public class PersonsFavorites implements Observer {
                 (
                         message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE
                                 || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
-                        //|| message.getType() == ObserverMessage.ADD_BALANCE_TYPE
-                        //|| message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
                 ))) {
-            List<Long> favoritesUpadate = new ArrayList<Long>();
-            //favoritesUpadate.add(0L);
-			
-			/* balancec = nil
-			for (Account account : Controller.getInstance().getAccounts()) {
-				SortableList<Tuple2<String, Long>, BigDecimal> balancesList = DLSet.getInstance().getBalanceMap().getBalancesSortableList(account);
-				
-				for (Pair<Tuple2<String, Long>, BigDecimal> balance : balancesList) {
-					if(balance.getB().compareTo(BigDecimal.ZERO) > 0) {
-						if(!favoritesUpadate.contains(balance.getA().b)){
-							favoritesUpadate.add(balance.getA().b);
-						}
-					}
-				}
-			}
-			*/
-
-            ////////this.favorites = favoritesUpadate;
-
-            ///////Controller.getInstance().replasepersonsFavorites();
         }
     }
 }

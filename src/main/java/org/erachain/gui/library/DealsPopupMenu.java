@@ -179,6 +179,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(spendAsset);
 
+
         spendAssetBackward = new JMenuItem(Lang.T("Backward Spend"));
         spendAssetBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

@@ -39,7 +39,7 @@ public class RSetUnionToItem extends Transaction {
 
     public RSetUnionToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
                            Long beg_date, Long end_date, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
 
         this.key = key;
         this.itemType = itemType;
@@ -112,8 +112,6 @@ public class RSetUnionToItem extends Transaction {
             updateFromStateDB();
 
     }
-
-    //public static String getName() { return "Send"; }
 
     @Override
     public String getTitle() {
@@ -386,11 +384,7 @@ public class RSetUnionToItem extends Transaction {
         super.process(block, forDeal);
 
         // pack additional data
-        byte[] a_data = new byte[0];//this.value1;
-
-        //Block block = db.getBlocksHeadMap().getLastBlock();
-        //int blockIndex = block.getHeight(db);
-        //int transactionIndex = block.getTransactionIndex(signature);
+        byte[] a_data = new byte[0];
 
         Tuple5<Long, Long, byte[], Integer, Integer> itemP = new Tuple5<Long, Long, byte[], Integer, Integer>
                 (

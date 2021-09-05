@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Deprecated
 public class SharedPostsMap extends DCUMap<byte[], List<String>> {
 
     public SharedPostsMap(DCSet dcSet, DB database) {

@@ -25,12 +25,13 @@ import org.mapdb.Fun.Tuple4;
 import java.math.BigDecimal;
 import java.util.*;
 
-
-// if person has not ALIVE status - add it
-// end_day = this.add_day + this.timestanp(days)
-// typeBytes[1] - version =0 - not need sign by person;
-// 		 =1 - need sign by person
-// typeBytes[2] - size of personalized accounts
+/**
+ * if person has not ALIVE status - add it
+ * end_day = this.add_day + this.timestanp(days)
+ * typeBytes[1] - version =0 - not need sign by person;
+ * =1 - need sign by person
+ * typeBytes[2] - size of personalized accounts
+ */
 public class RCertifyPubKeys extends Transaction implements Itemable {
 
     public static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
@@ -54,7 +55,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
     public RCertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, byte feePow, long key,
                            List<PublicKeyAccount> certifiedPublicKeys,
                            int add_day, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, exLink, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, exLink, null, feePow, timestamp, reference);
 
         this.key = key;
         this.certifiedPublicKeys = certifiedPublicKeys;
@@ -552,6 +553,10 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         if (!person.isAlive(this.timestamp))
             return Transaction.ITEM_PERSON_IS_DEAD;
 
+        if (certifiedPublicKeys.size() > 3) {
+            return INVALID_PUBLIC_KEY;
+        }
+
         ///////// PUBLIC KEYS
         for (PublicKeyAccount publicAccount : this.certifiedPublicKeys) {
             //CHECK IF PERSON PUBLIC KEY IS VALID
@@ -600,7 +605,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
     @Override
     public void makeItemsKeys() {
-        if (isWiped()) {
+        if (isWiped() || person == null) {
             itemsKeys = new Object[][]{};
         }
 
@@ -627,7 +632,6 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
         int transactionIndex = -1;
         int blockIndex = -1;
-        //Block block = this.getBlock(db);// == null (((
         if (block == null) {
             blockIndex = dcSet.getBlockMap().last().getHeight();
         } else {
@@ -636,7 +640,6 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
                 // if block not is confirmed - get last block + 1
                 blockIndex = dcSet.getBlockMap().last().getHeight() + 1;
             }
-            //transactionIndex = this.getSeqNo(db);
             transactionIndex = block.getTransactionSeq(signature);
         }
 
@@ -721,18 +724,6 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, end_day,
                 blockIndex, transactionIndex);
 
-		/*
-		Tuple5<Long, Long, byte[], Integer, Integer> psItem = dcSet.getPersonStatusMap().getItem(this.key, StatusCls.ALIVE_KEY);
-		if (psItem == null) {
-			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
-			PersonCls person = (PersonCls)dcSet.getItemPersonMap().get(this.key);
-			dcSet.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY,
-					new Tuple5<Long, Long, byte[], Integer, Integer>(
-							person.getBirthday(), Long.MAX_VALUE,
-							new byte[0],
-							blockIndex, transactionIndex));
-		}
-		 */
 
         // SET PERSON ADDRESS
         String address;

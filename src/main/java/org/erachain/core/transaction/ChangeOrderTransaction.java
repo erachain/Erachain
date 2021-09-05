@@ -62,7 +62,7 @@ public class ChangeOrderTransaction extends Transaction {
      */
     public ChangeOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
                                   BigDecimal newAmount, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
 
         this.orderRef = orderRef;
         this.newAmount = newAmount;

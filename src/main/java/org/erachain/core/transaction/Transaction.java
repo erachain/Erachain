@@ -30,6 +30,7 @@ import org.erachain.gui.library.ASMutableTreeNode;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -48,24 +49,14 @@ import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-// import org.slf4j.LoggerFactory;
-
-//import java.math.RoundingMode;
-//import java.math.MathContext;
-//import java.util.Comparator;
-//import javax.swing.JFrame;
-//import javax.swing.JOptionPane;
-//import org.erachain.lang.Lang;
-//import org.erachain.settings.Settings;
+/**
+ * SEE in concrete TRANSACTIONS
+ * public static final byte[][] VALID_RECORDS = new byte[][]{
+ * };
+ */
 
 public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
-
-    /*
-     *  SEE in concrete TRANSACTIONS
-     * public static final byte[][] VALID_RECORDS = new byte[][]{
-     * };
-     */
 
     // toBYTE & PARSE fields for different DEALs
     public static final int FOR_MYPACK = 1; // not use this.timestamp & this.feePow
@@ -84,7 +75,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     //
     public static final int MAX_TITLE_BYTES_LENGTH = (1 << 8) - 2;
     public static final int MAX_DATA_BYTES_LENGTH = BlockChain.MAX_REC_DATA_BYTES;
-
 
     // VALIDATION CODE
     public static final int JSON_ERROR = -1;
@@ -285,6 +275,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int INVALID_EX_LINK_REF = 402;
     public static final int INVALID_RECEIVERS_LIST = 403;
 
+    public static final int INVALID_EPOCH_SMART_CONTRCT = 451;
+
     public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 501;
     public static final int ACCOUNT_ACCSES_DENIED = 520;
 
@@ -356,50 +348,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final long RIGHTS_KEY = AssetCls.ERA_KEY;
     public static final long BTC_KEY = AssetCls.ERA_KEY;
 
-    // public static final int ACCOUNTING_TRANSACTION = 26;
-    // public static final int JSON_TRANSACTION = 27;
     public static final long FEE_KEY = AssetCls.FEE_KEY;
 
-    // FEE PARAMETERS public static final int FEE_PER_BYTE = 1;
-    // protected static final int PROP_LENGTH = 2; // properties
     public static final int TIMESTAMP_LENGTH = 8;
 
-    // RELEASES
-    // private static final long ASSETS_RELEASE = 0l;
-    // private static final long POWFIX_RELEASE = 0L; // Block Version 3 //
-    // 2016-02-25T19:00:00+00:00
-    // public static final int REFERENCE_LENGTH = Crypto.SIGNATURE_LENGTH;
     public static final int REFERENCE_LENGTH = TIMESTAMP_LENGTH;
 
-    /*
-     * / public static long getVOTING_RELEASE() {
-     * if(Settings.getInstance().isTestnet()) { return
-     * Settings.getInstance().getGenesisStamp(); } return VOTING_RELEASE; }
-     *
-     * public static long getARBITRARY_TRANSACTIONS_RELEASE() {
-     * if(Settings.getInstance().isTestnet()) { return
-     * Settings.getInstance().getGenesisStamp(); } return
-     * ARBITRARY_TRANSACTIONS_RELEASE; }
-     *
-     * public static int getAT_BLOCK_HEIGHT_RELEASE() {
-     * if(Settings.getInstance().isTestnet()) { return 1; } return
-     * AT_BLOCK_HEIGHT_RELEASE; }
-     *
-     * public static int getMESSAGE_BLOCK_HEIGHT_RELEASE() {
-     * if(Settings.getInstance().isTestnet()) { return 1; } return
-     * MESSAGE_BLOCK_HEIGHT_RELEASE; }
-     *
-     * public static long getASSETS_RELEASE() {
-     * if(Settings.getInstance().isTestnet()) { return
-     * Settings.getInstance().getGenesisStamp(); } return ASSETS_RELEASE; }
-     *
-     * public static long getPOWFIX_RELEASE() {
-     * if(Settings.getInstance().isTestnet()) { return
-     * Settings.getInstance().getGenesisStamp(); } return POWFIX_RELEASE; }
-     */
     public static final int KEY_LENGTH = 8;
-    // not need now protected static final int FEE_LENGTH = 8;
     public static final int SIGNATURE_LENGTH = Crypto.SIGNATURE_LENGTH;
+
     // PROPERTIES LENGTH
     protected static final int SIMPLE_TYPE_LENGTH = 1;
     public static final int TYPE_LENGTH = 4;
@@ -415,7 +372,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int IS_TEXT_LENGTH = 1;
     protected static final int FEE_POWER_LENGTH = 1;
     public static final int FEE_LENGTH = 8;
-    // protected static final int HKEY_LENGTH = 20;
     public static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int BASE_LENGTH_AS_MYPACK = TYPE_LENGTH;
     protected static final int BASE_LENGTH_AS_PACK = BASE_LENGTH_AS_MYPACK + TIMESTAMP_LENGTH
@@ -430,7 +386,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * % - это указатель на параметр например иак - %1
      * see https://regex101.com/
      */
-    //public static String SPLIT_CHARS = "[!?\\/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
     public static String SPLIT_CHARS = "[!?/_.,\\~+&^№*=;:][\\s$]|[()<>\\\"\\'|\\[\\]{}\\\\]|[\\s]";
 
     // in pack toByte and Parse - reference not included
@@ -438,12 +393,12 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     protected DCSet dcSet;
     protected String TYPE_NAME = "unknown";
-    // protected int type;
 
     /////////   MASKS amd PARS
     public static final byte HAS_EXLINK_MASK = 32;
+    public static final byte HAS_SMART_CONTRACT_MASK = 16;
     /**
-     * typeBytes[2] = HAS_EXLINK_MASK
+     * typeBytes[2] | HAS_EXLINK_MASK | HAS_SMART_CONTRACT_MASK
      */
     protected byte[] typeBytes;
 
@@ -464,7 +419,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public BigDecimal assetFeeBurn = null;
 
     // transactions
-    // protected BigDecimal fee = new BigDecimal.valueOf(999000);
     protected byte feePow = 0;
     protected byte[] signature;
     protected long timestamp;
@@ -478,6 +432,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected Object[][] itemsKeys;
 
     protected ExLink exLink;
+    protected SmartContract smartContract;
 
     /**
      * если да то значит взята из Пула трнзакций и на двойную трату проверялась
@@ -492,7 +447,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.TYPE_NAME = type_name;
     }
 
-    protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, byte feePow, long timestamp,
+    protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, long timestamp,
                           Long reference) {
         this.typeBytes = typeBytes;
         this.TYPE_NAME = type_name;
@@ -501,6 +456,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             typeBytes[2] = (byte) (typeBytes[2] | HAS_EXLINK_MASK);
             this.exLink = exLink;
         }
+
+        this.smartContract = smartContract;
+
         // this.props = props;
         this.timestamp = timestamp;
         this.reference = reference;
@@ -513,7 +471,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, byte feePow, long timestamp,
                           Long reference, byte[] signature) {
-        this(typeBytes, type_name, creator, exLink, feePow, timestamp, reference);
+        this(typeBytes, type_name, creator, exLink, null, feePow, timestamp, reference);
         this.signature = signature;
     }
 
@@ -722,7 +680,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     /**
-     * Нарастить мясо на скелет из базы состояния - нужно для записи в FinalMap b созданим вторичных ключей и Номер Сущности
+     * Нарастить мясо на скелет из базы состояния - нужно для:<br>
+     * - записи в FinalMap b созданим вторичных ключей и Номер Сущности<br>
+     * - для внесения в кошелек когда блок прилетел и из него сырые транзакции берем
      */
     public void updateFromStateDB() {
     }
@@ -889,13 +849,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return this.timestamp + 5 * BlockChain.UNCONFIRMED_DEADTIME_MS(this.timestamp);
     }
 
-    /// tyutuy jhg jhg jg j
-    /*
-     * // TIME public Long viewTime() { return 0L; } public Long getTime() {
-     * return this.viewTime(); } public Long viewTime(Account account) { return
-     * 0L; } public Long getTime(Account account) { return
-     * this.viewTime(account); }
-     */
     public long getKey() {
         return 0L;
     }
@@ -963,6 +916,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public ExLink getExLink() {
         return exLink;
+    }
+
+    public SmartContract getSmartContract() {
+        return smartContract;
     }
 
     public void makeItemsKeys() {
@@ -1848,12 +1805,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.signature = Crypto.getInstance().sign(creator, data);
     }
 
-    /*
-     * public boolean isValidated() { for ( byte[] wiped:
-     * BlockChain.VALID_RECORDS) { byte[] sign = wiped; if
-     * (Arrays.equals(this.signature, sign)) { return true; } } return false; }
-     */
-
     // VALIDATE
 
     // releaserReference == null - not as pack
@@ -1885,6 +1836,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
             data = Bytes.concat(data, exLink.toBytes());
+        }
+
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                typeBytes[2] = (byte) (typeBytes[2] | HAS_SMART_CONTRACT_MASK);
+                data = Bytes.concat(data, smartContract.toBytes(forDeal));
+            } else {
+                typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK;
+            }
         }
 
         if (forDeal > FOR_PACK) {
@@ -1943,6 +1903,12 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if (exLink != null)
             base_len += exLink.length();
+
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
 
         return base_len;
 
@@ -2013,7 +1979,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return true;
     }
 
-    /*
+    /**
      *  flags
      *   = 1 - not check fee
      *   = 2 - not check person
@@ -2039,7 +2005,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
                     errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
-                    if (BlockChain.CHECK_BUGS > 0) {
+                    if (BlockChain.CHECK_BUGS > 2) {
                         LOGGER.debug(errorValue);
                     }
                     return INVALID_TIMESTAMP;
@@ -2048,7 +2014,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
                     errorValue = "diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000;
-                    if (BlockChain.CHECK_BUGS > 0) {
+                    if (BlockChain.CHECK_BUGS > 2) {
                         LOGGER.debug(errorValue);
                     }
                     return INVALID_TIMESTAMP;
@@ -2063,7 +2029,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                         errorValue = "INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
                                 + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
                                 + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height);
-                        if (BlockChain.CHECK_BUGS > 1)
+                        if (BlockChain.CHECK_BUGS > 2)
                             LOGGER.debug(errorValue);
                     }
                     return INVALID_TIMESTAMP;
@@ -2203,19 +2169,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             out.put("value", errorValue);
         }
     }
-
-    /*
-    public void updateMapByError2(int error, String errorMess, HashMap out) {
-        JSONObject json = new JSONObject();
-        json.put("code", error);
-        json.put("message", errorMess);
-        if (errorValue != null) {
-            json.put("value", errorValue);
-        }
-        out.put("error", json);
-    }
-
-     */
 
     @Deprecated
     public void updateMapByError(int error, String errorMess, HashMap out, String lang) {
@@ -2576,14 +2529,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     // public abstract void process(DLSet db);
     public void process(Block block, int forDeal) {
 
-        if (false
-            //this.signature != null && Base58.encode(this.signature)
-            //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
-        ) {
-            int error = 0;
-            error++;
-        }
-
         if (forDeal > Transaction.FOR_PACK) {
 
             // CALC ROYALTY
@@ -2618,14 +2563,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public void orphan(Block block, int forDeal) {
 
-        if (false && BlockChain.CHECK_BUGS > 1
-            ///&& viewHeightSeq().equals("628853-1") // is forging 628853-1
-            //Base58.encode(this.signature)
-            //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
-        ) {
-            int error = 0;
-            error++;
-        }
+        if (smartContract != null)
+            smartContract.orphan(dcSet, this);
 
         if (forDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
@@ -2681,11 +2620,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public abstract HashSet<Account> getInvolvedAccounts();
-
-    /*
-     * public boolean isConfirmed() { return
-     * this.isConfirmed(DLSet.getInstance()); }
-     */
 
     public abstract HashSet<Account> getRecipientAccounts();
 

@@ -546,7 +546,7 @@ public class TelegramSplitPanel extends SplitPanel {
         } else {
             // CREATE TX MESSAGE
             Transaction transaction = Controller.getInstance().r_Send(
-                    creator, null, feePow, recipient, key,
+                    creator, null, null, feePow, recipient, key,
                     amount, head, messageBytes, isTextByte, encrypted, 0);
 
             Controller.getInstance().broadcastTelegram(transaction, true);

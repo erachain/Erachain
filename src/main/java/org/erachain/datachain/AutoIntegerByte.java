@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
-// Block Height -> creator
-
 /**
  * Главный класс для инкриментов - не используется
+ * Block Height -> creator
  */
 public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
     static Logger LOGGER = LoggerFactory.getLogger(AutoIntegerByte.class.getName());

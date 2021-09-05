@@ -243,7 +243,7 @@ public class IssueSendPaymentOrder extends IconPanel {
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
-                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, 0, recipient, key,
+                Controller.getInstance().getWalletPrivateKeyAccountByAddress(sender.getAddress()), exLink, null, 0, recipient, key,
                 null, head, messageBytes, isTextByte, encrypted, 0);
 
         String Status_text = "";

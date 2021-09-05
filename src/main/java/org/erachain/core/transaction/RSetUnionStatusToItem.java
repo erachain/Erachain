@@ -18,7 +18,9 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 
-// this.end_date == null -> MAX
+/**
+ * this.end_date == null -> MAX
+ */
 public class RSetUnionStatusToItem extends Transaction {
 
     public static final byte TYPE_ID = (byte) Transaction.SET_UNION_STATUS_TO_ITEM_TRANSACTION;
@@ -44,7 +46,7 @@ public class RSetUnionStatusToItem extends Transaction {
 
     public RSetUnionStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
                                  Long beg_date, Long end_date, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
 
         this.key = key;
         this.itemType = itemType;
@@ -120,8 +122,6 @@ public class RSetUnionStatusToItem extends Transaction {
             updateFromStateDB();
 
     }
-
-    //public static String getName() { return "Send"; }
 
     public StatusCls getStatus() {
         if (statusKey == null) {
@@ -412,11 +412,7 @@ public class RSetUnionStatusToItem extends Transaction {
         super.process(block, forDeal);
 
         // pack additional data
-        byte[] a_data = new byte[0];//this.value1;
-
-        //Block block = db.getBlocksHeadMap().getLastBlock();
-        //int blockIndex = block.getHeight(db);
-        //int transactionIndex = block.getTransactionIndex(signature);
+        byte[] a_data = new byte[0];
 
         Tuple5<Long, Long, byte[], Integer, Integer> itemP = new Tuple5<Long, Long, byte[], Integer, Integer>
                 (

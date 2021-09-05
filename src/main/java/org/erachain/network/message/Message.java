@@ -2,7 +2,6 @@ package org.erachain.network.message;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.network.Peer;
@@ -187,11 +186,6 @@ public abstract class Message {
 
     public int getLength() {
         return this.length;
-    }
-
-    public Long getHash() {
-        //return Crypto.getInstance().digest(this.toBytes());
-        return Longs.fromByteArray(this.toBytes());
     }
 
     public boolean isHandled() { return false; }

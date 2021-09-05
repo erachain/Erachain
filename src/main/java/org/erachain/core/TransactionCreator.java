@@ -31,6 +31,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
+import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.mapdb.DB;
@@ -57,10 +58,6 @@ public class TransactionCreator {
     private Block lastBlock;
     private int blockHeight;
     private AtomicInteger seqNo = new AtomicInteger();
-
-    //static private final byte[] itemAppData = null;
-    //private byte[] icon = new byte[0]; // default value
-    //private byte[] image = new byte[0]; // default value
 
     // must be a SYNCHRONIZED
     private synchronized void checkUpdate() {
@@ -92,7 +89,6 @@ public class TransactionCreator {
         this.seqNo.set(0); // reset sequence number
 
         //SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
-        ///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValuesAll();
         TransactionMap transactionTab = this.fork.getTransactionTab();
         List<Transaction> accountTransactions = new ArrayList<Transaction>();
         Transaction transaction;
@@ -248,8 +244,6 @@ public class TransactionCreator {
         //TIME
         long time = NTP.getTime();
 
-        //asset.setKey(this.fork.getItemAssetMap().getLastKey() + 1l);
-
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetSeriesTransaction issueAssetSeriesTransaction = new IssueAssetSeriesTransaction(creator, linkTo,
                 origAssetTXSign, prototypeAsset, (byte) feePow, time, 0L);
@@ -278,29 +272,7 @@ public class TransactionCreator {
         //VALIDATE AND PROCESS
         return issueImprintRecord;
     }
-	
-/*
-	public Transaction createIssueImprintTransaction1(PrivateKeyAccount creator, String name, String description,
-			byte[] icon, byte[] image,
-			int feePow)
-	{
-		//CHECK FOR UPDATES
-		this.checkUpdate();
 
-		//TIME
-		long time = NTP.getTime();
-
-		ImprintCls imprint = new Imprint(creator, name, icon, image, description);
-
-		//CREATE ISSUE IMPRINT TRANSACTION
-		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte)feePow, time);
-		issueImprintRecord.sign(creator, false);
-		issueImprintRecord.setDC(this.fork, false);
-
-		//VALIDATE AND PROCESS
-		return issueImprintRecord;
-	}
-*/
 
     public Pair<Transaction, Integer> createIssuePersonHumanTransaction(
             boolean forIssue,
@@ -313,30 +285,6 @@ public class TransactionCreator {
         this.checkUpdate();
 
         //CHECK FOR UPDATES
-        if (false // теперь ниже проверяем в форке тут на ДУБЛЬ
-                && forIssue) {
-            // IF has not DUPLICATE in UNCONFIRMED RECORDS
-            TransactionMap unconfirmedMap = this.fork.getTransactionTab();
-            try {
-                for (Transaction record : unconfirmedMap.values()) {
-                    if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
-                        if (record instanceof IssuePersonRecord) {
-                            IssuePersonRecord issuePerson = (IssuePersonRecord) record;
-                            if (issuePerson.getItem().getName().equals(fullName)) {
-                                record.setErrorValue("equal to " + fullName);
-                                return new Pair<Transaction, Integer>(record, Transaction.ITEM_DUPLICATE);
-                            }
-                        }
-                    }
-                }
-            } catch (java.lang.Throwable e) {
-                if (e instanceof java.lang.IllegalAccessError) {
-                    // налетели на закрытую таблицу
-                } else {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }
 
         //TIME
         long time = NTP.getTime();
@@ -401,7 +349,6 @@ public class TransactionCreator {
         }
 
         //VALIDATE AND PROCESS
-        boolean asPack = false;
         return new Pair<Transaction, Integer>(issuePersonRecord, Transaction.VALIDATE_OK);
 
     }
@@ -517,12 +464,6 @@ public class TransactionCreator {
 
         //CREATE ORDER TRANSACTION
         CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amountHave, amounWant, (byte) feePow, time, 0l);
-
-		/*
-		int res = createOrderTransaction.isValid(this.fork, null);
-		if (res != Transaction.VALIDATE_OK)
-			return null;
-		 */
 
         //VALIDATE AND PROCESS
         createOrderTransaction.sign(creator, Transaction.FOR_NETWORK);
@@ -653,10 +594,8 @@ public class TransactionCreator {
 
     }
 
-    //public Pair<Transaction, Integer> r_Send(PrivateKeyAccount creator,
-
-    public Transaction r_Send(PrivateKeyAccount creator,
-                              ExLink linkTo, Account recipient, long key, BigDecimal amount, int feePow, String title, byte[] message, byte[] isText,
+    public Transaction r_Send(PrivateKeyAccount creator, ExLink linkTo, SmartContract smartContract, Account recipient,
+                              long key, BigDecimal amount, int feePow, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage, long timestamp_in) {
 
         this.checkUpdate();
@@ -666,17 +605,16 @@ public class TransactionCreator {
         long timestamp = timestamp_in > 0 ? timestamp_in : NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
-        //messageTx = new RSend(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
-        messageTx = new RSend(creator, linkTo, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0L);
+        messageTx = new RSend(creator, linkTo, smartContract, (byte) feePow, recipient, key, amount, title, message, isText, encryptMessage, timestamp, 0L);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
-        return messageTx;// new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
+        return messageTx;
     }
 
     public Transaction r_Send(byte version, byte property1, byte property2,
                               PrivateKeyAccount creator,
-                              Account recipient, long key, BigDecimal amount, ExLink linkTo, int feePow, String title,
+                              Account recipient, long key, BigDecimal amount, ExLink linkTo, SmartContract smartContract, int feePow, String title,
                               byte[] message, byte[] isText, byte[] encryptMessage) {
 
         this.checkUpdate();
@@ -686,7 +624,7 @@ public class TransactionCreator {
         long timestamp = NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
-        messageTx = new RSend(version, property1, property2, creator, linkTo, (byte) feePow, recipient, key, amount, title,
+        messageTx = new RSend(version, property1, property2, creator, linkTo, smartContract, (byte) feePow, recipient, key, amount, title,
                 message, isText, encryptMessage, timestamp, 0L);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
@@ -816,33 +754,6 @@ public class TransactionCreator {
                 urlStr, dataStr, hashes58);
     }
 
-
-	/*
-	// version 1
-	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack,
-			PrivateKeyAccount creator, int feePow, long key, ItemCls item,
-			Long beg_date, Long end_date,
-			int value_1, int value_2, byte[] data, long refParent
-			) {
-
-		this.checkUpdate();
-
-		Transaction record;
-
-		long timestamp = NTP.getTime();
-
-		//CREATE SERTIFY PERSON TRANSACTION
-		//int version = 5; // without user sign
-		record = new RSetStatusToItem(creator, (byte)feePow, key, item.getItemType(), item.getKey(),
-				beg_date, end_date, value_1, value_2, data, refParent,
-				timestamp, 0l);
-		record.sign(creator, asPack);
-		record.setDB(this.fork, asPack);
-
-		return afterCreate(record, asPack);
-	}
-	 */
-
     // version 2
     public Transaction r_SetStatusToItem(int version, boolean asPack,
                                          PrivateKeyAccount creator, int feePow, long key, ItemCls item,
@@ -867,58 +778,6 @@ public class TransactionCreator {
         return transaction;
     }
 
-	/*
-	public Pair<Transaction, Integer> createJson(PrivateKeyAccount creator,
-			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
-			byte[] message, byte[] encryptMessage) {
-
-		this.checkUpdate();
-
-		Transaction messageTx;
-
-		long timestamp = NTP.getTime();
-
-		//CREATE MESSAGE TRANSACTION
-		messageTx = new JsonTransaction(creator, recipient, key, amount, (byte)feePow, message, isText, encryptMessage, timestamp, 0l);
-		messageTx.sign(creator);
-		record.setDB(this.fork, asPack);
-
-		return afterCreate(messageTx);
-	}
-
-	public Pair<Transaction, Integer> createAccounting(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
-			byte[] message, byte[] encryptMessage) {
-
-		this.checkUpdate();
-
-		long timestamp = NTP.getTime();
-
-		//CREATE ACCOunting TRANSACTION
-		Transaction messageTx = new AccountingTransaction(sender, (byte)feePow, recipient, key, amount, message, isText, encryptMessage, timestamp, sender.getLastReference(this.fork));
-		messageTx.sign(sender);
-		record.setDB(this.fork, asPack);
-
-		return afterCreate(messageTx);
-	}
-
-	public Pair<Transaction, Integer> createJson1(PrivateKeyAccount creator,
-			Account recipient, long key, BigDecimal amount, int feePow, byte[] isText,
-			byte[] message, byte[] encryptMessage) {
-
-		this.checkUpdate();
-
-		long timestamp = NTP.getTime();
-
-		//CREATE MESSAGE TRANSACTION
-		Transaction messageTx = new JsonTransaction(creator, recipient, key, amount, (byte)feePow, message, isText, encryptMessage, timestamp, 0l);
-		messageTx.sign(creator);
-		record.setDB(this.fork, asPack);
-
-		return afterCreate(messageTx);
-	}
-	 */
-
     public Pair<Transaction, Integer> createTransactionFromRaw(byte[] rawData) {
         //CHECK FOR UPDATES
         this.checkUpdate();
@@ -937,13 +796,6 @@ public class TransactionCreator {
 
     public Integer afterCreate(Transaction transaction, int forDeal, boolean tryFree, boolean notRelease) {
         //CHECK IF PAYMENT VALID
-
-        if (false && // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
-                this.fork.getTransactionTab().contains(transaction.getSignature())) {
-            // если случилась коллизия по подписи усеченной
-            // в базе неподтвержденных транзакций -то выдадим ошибку
-            return Transaction.KEY_COLLISION;
-        }
 
         boolean incremented = false;
         if (!this.fork.equals(transaction.getDCSet())) {

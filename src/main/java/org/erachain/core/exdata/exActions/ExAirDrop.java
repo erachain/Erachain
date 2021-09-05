@@ -51,8 +51,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     final boolean backward;
     private final byte[][] addresses;
 
-    /////////////////
-
     public String errorValue;
 
     public ExAirDrop(int flags, long assetKey, BigDecimal amount, int balancePos, boolean backward, byte[][] addresses) {
@@ -272,9 +270,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         int steep = 0;
         BigDecimal amount;
-
-        //Controller cntr = Controller.getInstance();
-        //BlockChain chain = cntr.getBlockChain();
 
         try {
             amount = amountStr == null || amountStr.isEmpty() ? null : new BigDecimal(amountStr);

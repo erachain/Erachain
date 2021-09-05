@@ -10,6 +10,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
 
@@ -29,7 +30,7 @@ public class DCSetTest {
             new int[]{DCSet.DBS_ROCK_DB};
 
     ExLink exLink = null;
-
+    SmartContract smartContract = null;
 
     String testsPath = Settings.getInstance().getDataTempDir();
     DCSet dcSet;
@@ -95,7 +96,7 @@ public class DCSetTest {
                 BigDecimal amount = new BigDecimal(counter + "." + counter);
 
                 String address = creator.getAddress();
-                Transaction messageTx = new RSend(creator, exLink, (byte) 0, recipient, 1L, amount,
+                Transaction messageTx = new RSend(creator, exLink, smartContract, (byte) 0, recipient, 1L, amount,
                         "title test", null, new byte[]{(byte) 1},
                         new byte[]{(byte) 0}, timestamp + random.nextInt(10000), 0l);
                 messageTx.sign(creator, Transaction.FOR_NETWORK);

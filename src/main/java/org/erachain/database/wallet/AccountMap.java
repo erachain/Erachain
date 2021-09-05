@@ -18,7 +18,9 @@ import org.mapdb.Fun.Tuple3;
 import java.math.BigDecimal;
 import java.util.*;
 
-// UNCONFIRMED balances for accounts in owner wallet only
+/**
+ * UNCONFIRMED balances for accounts in owner wallet only
+ */
 public class AccountMap extends DCUMapImpl<String, Integer> {
 
     private static final String ADDRESS_ASSETS = "address_assets";
