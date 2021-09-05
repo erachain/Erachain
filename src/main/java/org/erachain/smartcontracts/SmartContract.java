@@ -104,7 +104,7 @@ public abstract class SmartContract {
             }
 
         } else if (BlockChain.TEST_MODE
-                && transaction.getBlockHeight() > 129612
+                && transaction.getBlockHeight() > 132464
                 && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
             CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
             if (createOrder.getHaveKey() == AssetCls.ERA_KEY
