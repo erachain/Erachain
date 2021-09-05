@@ -85,20 +85,21 @@ public class LeafFall extends EpochSmartContract {
      */
     private long getLeafKey() {
 
+        int reverseResultHash = 255 - this.resultHash;
         int level;
-        if (resultHash < 2)
+        if (reverseResultHash == 0)
             level = 7;
-        else if (resultHash < 4)
+        else if (reverseResultHash < 3)
             level = 6;
-        else if (resultHash < 8)
+        else if (reverseResultHash < 7)
             level = 5;
-        else if (resultHash < 16)
+        else if (reverseResultHash < 15)
             level = 4;
-        else if (resultHash < 32)
+        else if (reverseResultHash < 31)
             level = 3;
-        else if (resultHash < 64)
+        else if (reverseResultHash < 63)
             level = 2;
-        else if (resultHash < 128)
+        else if (reverseResultHash < 127)
             level = 1;
         else
             level = 0;
@@ -120,6 +121,7 @@ public class LeafFall extends EpochSmartContract {
         maker.changeBalance(dcSet, !asOrphan, false, leafKey,
                 BigDecimal.ONE, false, false, false);
 
+        //
         BigDecimal resultBG = new BigDecimal(resultHash);
         // ACCAUNTING RARITY RESULT from MAKER to RECIPIENT
         transaction.getCreator().changeBalance(dcSet, asOrphan, false, keyInit,
