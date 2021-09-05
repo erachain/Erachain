@@ -87,11 +87,11 @@ public class LeafFall extends EpochSmartContract {
      *
      * @return
      */
-    private long getLeafKey() {
+    private int getLevelResult() {
 
         int reverseResultHash = 256 - this.resultHash;
         int level;
-        if (reverseResultHash == 1)
+        if (reverseResultHash < 2)
             level = 7;
         else if (reverseResultHash < 4)
             level = 6;
@@ -108,7 +108,7 @@ public class LeafFall extends EpochSmartContract {
         else
             level = 0;
 
-        return leafs[level];
+        return level;
     }
 
     private void action(DCSet dcSet, Block block, Transaction transaction, boolean asOrphan) {
@@ -117,10 +117,12 @@ public class LeafFall extends EpochSmartContract {
             makeResultHash(block, transaction);
         }
 
-        long leafKey = getLeafKey();
+        int levelResult = getLevelResult();
+        long leafKey = leafs[levelResult];
 
+        PublicKeyAccount creator = transaction.getCreator();
         // TRANSFER LEAF from MAKER to RECIPIENT
-        transaction.getCreator().changeBalance(dcSet, asOrphan, false, leafKey,
+        creator.changeBalance(dcSet, asOrphan, false, leafKey,
                 BigDecimal.ONE, false, false, false);
         maker.changeBalance(dcSet, !asOrphan, false, leafKey,
                 BigDecimal.ONE, false, false, false);
@@ -128,10 +130,16 @@ public class LeafFall extends EpochSmartContract {
         //
         BigDecimal resultBG = new BigDecimal(resultHash);
         // ACCAUNTING RARITY RESULT from MAKER to RECIPIENT
-        transaction.getCreator().changeBalance(dcSet, asOrphan, false, keyInit,
+        creator.changeBalance(dcSet, asOrphan, false, keyInit,
                 resultBG, false, false, false);
         maker.changeBalance(dcSet, !asOrphan, false, keyInit,
                 resultBG, false, false, false);
+
+        if (block != null) {
+            // add remark for action
+            block.addCalculated(creator, keyInit, resultBG,
+                    "Magic leaf fall win: %1!".replaceFirst("%1", "" + levelResult), transaction.getDBRef());
+        }
 
     }
 
@@ -139,7 +147,7 @@ public class LeafFall extends EpochSmartContract {
     public Object[][] getItemsKeys() {
 
         Object[][] itemKeys = new Object[1][];
-        itemKeys[0] = new Object[]{ItemCls.ASSET_TYPE, getLeafKey()};
+        itemKeys[0] = new Object[]{ItemCls.ASSET_TYPE, getLevelResult()};
 
         return itemKeys;
 
