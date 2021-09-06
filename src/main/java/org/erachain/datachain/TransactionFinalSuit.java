@@ -9,7 +9,7 @@ public interface TransactionFinalSuit {
 
     void deleteForBlock(Integer height);
 
-    IteratorCloseable<Long> getBlockIterator(Integer height);
+    IteratorCloseable<Long> getBlockIterator(Integer height, boolean descending);
 
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, boolean descending);
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, boolean descending);

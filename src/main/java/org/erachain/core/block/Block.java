@@ -2460,7 +2460,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         // DELETE ALL CALCULATED
         if (dcSet.isFork()) {
             /// если форк их тут вообще нету - нужно выцепить из Родительской таблицы
-            try (IteratorCloseable<Long> iterator = dcSet.getParent().getTransactionFinalMap().getIteratorByBlock(height)) {
+            try (IteratorCloseable<Long> iterator = dcSet.getParent().getTransactionFinalMap().getIteratorByBlock(height, true)) {
                 Iterators.advance(iterator, this.transactionCount);
                 while (iterator.hasNext()) {
                     finalMap.delete(iterator.next());
