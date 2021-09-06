@@ -148,6 +148,91 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         }
     }
 
+    public Long getOrderId() {
+        //return this.signature;
+        return Transaction.makeDBRef(this.height, this.seqNo);
+    }
+
+    @Override
+    public BigDecimal getAmount() {
+        return this.amountHave;
+    }
+
+    @Override
+    public long getKey() {
+        return this.haveKey;
+    }
+
+    @Override
+    public long getAssetKey() {
+        return this.haveKey;
+    }
+
+    @Override
+    public ItemCls getItem() {
+        return this.haveAsset;
+    }
+
+    public long getHaveKey() {
+        return this.haveKey;
+    }
+
+    public AssetCls getHaveAsset() {
+        return this.haveAsset;
+    }
+
+    public BigDecimal getAmountHave() {
+        return this.amountHave;
+    }
+
+    public long getWantKey() {
+        return this.wantKey;
+    }
+
+    public AssetCls getWantAsset() {
+        return this.wantAsset;
+    }
+
+    public BigDecimal getAmountWant() {
+        return this.amountWant;
+    }
+
+    public BigDecimal getPriceCalc() {
+        return makeOrder().calcPrice();
+    }
+
+    public BigDecimal getPriceCalcReverse() {
+        return makeOrder().calcPriceReverse();
+    }
+
+    @Override
+    public boolean hasPublicText() {
+        return false;
+    }
+
+    // PARSE CONVERT
+
+    public Order makeOrder() {
+        return new Order(dcSet, Transaction.makeDBRef(this.height, this.seqNo), this.creator,
+                this.haveKey, this.amountHave, this.haveAsset.getScale(),
+                this.wantKey, this.amountWant, this.wantAsset.getScale()
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public JSONObject toJson() {
+        // GET BASE
+        JSONObject transaction = this.getJsonBase();
+
+        transaction.put("haveKey", this.haveKey);
+        transaction.put("wantKey", this.wantKey);
+        transaction.put("amountHave", this.amountHave.toPlainString());
+        transaction.put("amountWant", this.amountWant.toPlainString());
+
+        return transaction;
+    }
+
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
         //boolean asPack = releaserReference != null;
 
@@ -267,91 +352,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 reference, signatureBytes, seqNo, feeLong);
     }
 
-    public Long getOrderId() {
-        //return this.signature;
-        return Transaction.makeDBRef(this.height, this.seqNo);
-    }
-
-    @Override
-    public BigDecimal getAmount() {
-        return this.amountHave;
-    }
-
-    @Override
-    public long getKey() {
-        return this.haveKey;
-    }
-
-    @Override
-    public long getAssetKey() {
-        return this.haveKey;
-    }
-
-    @Override
-    public ItemCls getItem() {
-        return this.haveAsset;
-    }
-
-    public long getHaveKey() {
-        return this.haveKey;
-    }
-
-    public AssetCls getHaveAsset() {
-        return this.haveAsset;
-    }
-
-    public BigDecimal getAmountHave() {
-        return this.amountHave;
-    }
-
-    public long getWantKey() {
-        return this.wantKey;
-    }
-
-    public AssetCls getWantAsset() {
-        return this.wantAsset;
-    }
-
-    public BigDecimal getAmountWant() {
-        return this.amountWant;
-    }
-
-    public BigDecimal getPriceCalc() {
-        return makeOrder().calcPrice();
-    }
-
-    public BigDecimal getPriceCalcReverse() {
-        return makeOrder().calcPriceReverse();
-    }
-
-    @Override
-    public boolean hasPublicText() {
-        return false;
-    }
-
-    // PARSE CONVERT
-
-    public Order makeOrder() {
-        return new Order(dcSet, Transaction.makeDBRef(this.height, this.seqNo), this.creator,
-                this.haveKey, this.amountHave, this.haveAsset.getScale(),
-                this.wantKey, this.amountWant, this.wantAsset.getScale()
-        );
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public JSONObject toJson() {
-        // GET BASE
-        JSONObject transaction = this.getJsonBase();
-
-        transaction.put("haveKey", this.haveKey);
-        transaction.put("wantKey", this.wantKey);
-        transaction.put("amountHave", this.amountHave.toPlainString());
-        transaction.put("amountWant", this.amountWant.toPlainString());
-
-        return transaction;
-    }
-
     // @Override
     //@Override
     public byte[] toBytes(int forDeal, boolean withSignature) {
@@ -407,8 +407,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         return data;
     }
 
-    // VALIDATE
-
     @Override
     public int getDataLength(int forDeal, boolean withSignature)
     {
@@ -431,6 +429,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         return base_len;
     }
 
+
+    // VALIDATE
     @Override
     public int isValid(int forDeal, long flags) {
 
