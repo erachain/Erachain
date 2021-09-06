@@ -2,10 +2,8 @@ package org.erachain.smartcontracts.epoch;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
@@ -23,7 +21,6 @@ import java.math.BigDecimal;
 public class LeafFall extends EpochSmartContract {
 
     public static final int ID = 1;
-    static public final PublicKeyAccount MAKER = new PublicKeyAccount(Base58.encode(Longs.toByteArray(ID)));
 
     // global values - save in smart-contracts maps
     private int count;
@@ -46,11 +43,11 @@ public class LeafFall extends EpochSmartContract {
     static final Fun.Tuple2 COUN_VAR = new Fun.Tuple2(ID, "c");
 
     public LeafFall() {
-        super(ID, MAKER);
+        super(ID);
     }
 
     public LeafFall(int resultHash) {
-        super(ID, MAKER);
+        super(ID);
         this.resultHash = resultHash;
     }
 
@@ -155,16 +152,17 @@ public class LeafFall extends EpochSmartContract {
 
     @Override
     public int length(int forDeal) {
+        int len = super.length(forDeal);
         if (forDeal == Transaction.FOR_DB_RECORD)
-            return 8;
+            return len + 4;
 
-        return 4;
+        return len;
     }
 
     @Override
     public byte[] toBytes(int forDeal) {
 
-        byte[] data = Ints.toByteArray(id);
+        byte[] data = super.toBytes(forDeal);
 
         if (forDeal == Transaction.FOR_DB_RECORD) {
             return Bytes.concat(data, Ints.toByteArray(resultHash));
@@ -209,7 +207,7 @@ public class LeafFall extends EpochSmartContract {
         ItemAssetMap map = dcSet.getItemAssetMap();
         for (long leafKey : leafs) {
             AssetCls leafAsset = map.get(leafKey);
-            leafAsset.setMaker(MAKER);
+            leafAsset.setMaker(maker);
             // update MAKER
             map.put(leafKey, leafAsset);
         }
