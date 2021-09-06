@@ -139,7 +139,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
 
     @Override
     public void deleteForBlock(Integer height) {
-        try (IteratorCloseable<Long> iterator = getBlockIterator(height)) {
+        try (IteratorCloseable<Long> iterator = getBlockIterator(height, true)) {
             while (iterator.hasNext()) {
                 map.remove(iterator.next());
             }
@@ -148,11 +148,17 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public IteratorCloseable<Long> getBlockIterator(Integer height) {
+    public IteratorCloseable<Long> getBlockIterator(Integer height, boolean descending) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
-                .subMap(Transaction.makeDBRef(height, 0),
-                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
+        if (descending) {
+            return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
+                    .subMap(Transaction.makeDBRef(height, 0),
+                            Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().descendingIterator());
+        } else {
+            return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
+                    .subMap(Transaction.makeDBRef(height, 0),
+                            Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
+        }
 
     }
 

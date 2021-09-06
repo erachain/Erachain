@@ -1,6 +1,5 @@
 package org.erachain.core.block;
 
-import com.google.common.collect.Iterators;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -2397,78 +2396,76 @@ public class Block implements Closeable, ExplorerJsonLine {
         orphan(dcSet, false);
     }
 
+    /**
+     * ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
+     *
+     * @param dcSet
+     * @param height
+     * @param notStoreTXs
+     * @throws Exception
+     */
     private void orphanTransactions(DCSet dcSet, int height, boolean notStoreTXs) throws Exception {
 
         Controller cnt = Controller.getInstance();
 
-        TransactionMap unconfirmedMap = dcSet.getTransactionTab();
         TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
         TransactionsPool pool = Controller.getInstance().transactionsPool;
 
-        this.getTransactions();
-
-        //ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
-
         // CLEAR ASSETS FEE
         earnedAllAssets = new HashMap<>();
 
-        int seqNo;
-        if (heightBlock == 97856) {
-            boolean debug = true;
-        }
-        for (int i = this.transactionCount - 1; i >= 0; i--) {
-            seqNo = i + 1;
-            if (cnt.isOnStopping()) {
-                throw new Exception("on stoping");
-            }
-
-            Transaction transaction = transactions.get(i);
-
-            // (!) seqNo = i + 1
-            transaction.setDC(dcSet, Transaction.FOR_NETWORK, height, seqNo,
-                    true); // тут наращиваем мясо - чтобы ключи удалялись правильно
-
-            if (!transaction.isWiped()) {
-                transaction.orphan(this, Transaction.FOR_NETWORK);
-            } else {
-                // IT IS REFERENCED RECORD?
-                transaction.getCreator().removeLastTimestamp(dcSet, transaction.getTimestamp());
-            }
-
-            if (!notStoreTXs) {
-                pool.offerMessage(transaction);
-            }
-
-            Long key = Transaction.makeDBRef(height, seqNo);
-
-            finalMap.delete(key);
-            transFinalMapSinds.delete(transaction.getSignature());
-
-            // Обязательно надо делать иначе некоторые тразакции будут потом невалидны (удостоверение ключей и регистрация подписанной персоны)
-            List<byte[]> signatures = transaction.getOtherSignatures();
-            if (signatures != null) {
-                for (byte[] itemSignature : signatures) {
-                    transFinalMapSinds.delete(itemSignature);
+        // DELETE ALL BY DB ITERATOR
+        // It delete all CALCULATED FIRST correct and all txs too
+        /// если форк их тут вообще нету - нужно выцепить из Родительской таблицы
+        Long dbRef;
+        try (IteratorCloseable<Long> iterator = finalMap.getIteratorByBlock(height, true)) {
+            while (iterator.hasNext()) {
+                if (cnt.isOnStopping()) {
+                    throw new Exception("on stoping");
                 }
-            }
 
-            // сбросим данные блока - для правильного отображения неподтвержденных
-            transaction.resetSeqNo();
-        }
+                dbRef = iterator.next();
 
-        // DELETE ALL CALCULATED
-        if (dcSet.isFork()) {
-            /// если форк их тут вообще нету - нужно выцепить из Родительской таблицы
-            try (IteratorCloseable<Long> iterator = dcSet.getParent().getTransactionFinalMap().getIteratorByBlock(height)) {
-                Iterators.advance(iterator, this.transactionCount);
-                while (iterator.hasNext()) {
-                    finalMap.delete(iterator.next());
+                Transaction transaction = finalMap.get(dbRef);
+                // тут наращиваем мясо - чтобы ключи удалялись правильно
+                transaction.setDC(dcSet, true);
+
+                if (transaction instanceof RCalculated) {
+
+                } else {
+
+                    if (!transaction.isWiped()) {
+                        transaction.orphan(this, Transaction.FOR_NETWORK);
+                    } else {
+                        // IT IS REFERENCED RECORD?
+                        transaction.getCreator().removeLastTimestamp(dcSet, transaction.getTimestamp());
+                    }
+
+                    transFinalMapSinds.delete(transaction.getSignature());
+
+                    // Обязательно надо делать иначе некоторые тразакции будут потом невалидны (удостоверение ключей и регистрация подписанной персоны)
+                    List<byte[]> signatures = transaction.getOtherSignatures();
+                    if (signatures != null) {
+                        for (byte[] itemSignature : signatures) {
+                            transFinalMapSinds.delete(itemSignature);
+                        }
+                    }
+
+                    // сбросим данные блока - для правильного отображения неподтвержденных
+                    transaction.resetSeqNo();
+
+                    if (!notStoreTXs) {
+                        pool.offerMessage(transaction);
+                    }
+
                 }
+
+                // полное удалени включая Посиковые Метки tags
+                finalMap.delete(dbRef);
             }
-        } else {
-            finalMap.delete(height);
         }
+
     }
 
     @Override

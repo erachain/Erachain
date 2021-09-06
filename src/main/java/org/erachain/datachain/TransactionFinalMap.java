@@ -38,7 +38,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     @SuppressWarnings({"unchecked", "rawtypes"})
     List<Transaction> getTransactionsByRecipient(byte[] addressShort, int limit);
 
-    IteratorCloseable<Long> getIteratorByBlock(Integer block);
+    IteratorCloseable<Long> getIteratorByBlock(Integer block, boolean descending);
 
     Collection<Transaction> getTransactionsByBlock(Integer block);
 
