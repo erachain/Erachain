@@ -36,7 +36,7 @@ import java.util.List;
 
 public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>>> {
 
-    public static final byte BASE_LENGTH = 4 + 8 + 1 + 2 + 4;
+    public static final byte BASE_LENGTH = 4 + 8 + 1 + 4;
 
     public static final int MAX_COUNT = 1 << 16;
 
@@ -173,7 +173,7 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
     }
 
     public int length() {
-        int len = BASE_LENGTH + (addresses.length + 3) * Account.ADDRESS_SHORT_LENGTH;
+        int len = BASE_LENGTH + addresses.length * (Account.ADDRESS_SHORT_LENGTH + 3);
         for (Tuple3<byte[], BigDecimal, String> item : addresses) {
             len += item.b.unscaledValue().toByteArray().length;
             len += item.c.getBytes(StandardCharsets.UTF_8).length;
