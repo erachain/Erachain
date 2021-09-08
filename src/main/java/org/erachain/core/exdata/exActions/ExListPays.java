@@ -212,9 +212,6 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static ExListPays parse(byte[] data, int pos) throws Exception {
 
-        int scale;
-        int len;
-
         int flags = Ints.fromByteArray(Arrays.copyOfRange(data, pos, pos + Integer.BYTES));
         pos += Integer.BYTES;
 
@@ -231,11 +228,13 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
             balancePos = -balancePos;
         }
 
-        len = Ints.fromByteArray(Arrays.copyOfRange(data, pos, pos + Integer.BYTES));
+        Tuple3<byte[], BigDecimal, String>[] addresses = new Tuple3[Ints.fromByteArray(
+                Arrays.copyOfRange(data, pos, pos + Integer.BYTES))];
         pos += Integer.BYTES;
 
-        Tuple3<byte[], BigDecimal, String>[] addresses = new Tuple3[len];
-        for (int i = 0; i < len; i++) {
+        int scale;
+        int len;
+        for (int i = 0; i < addresses.length; i++) {
             byte[] addressShort = new byte[Account.ADDRESS_SHORT_LENGTH];
             System.arraycopy(data, pos, addressShort, 0, Account.ADDRESS_SHORT_LENGTH);
             pos += Account.ADDRESS_SHORT_LENGTH;

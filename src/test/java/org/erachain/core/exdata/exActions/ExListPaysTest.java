@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -74,7 +75,8 @@ public class ExListPaysTest {
             System.out.println(e.getMessage());
         }
 
-        assertEquals(exListPays.getAddresses()[2], exPaysParsed.getAddresses()[2]);
+        assertEquals(Arrays.equals(exListPays.getAddresses()[2].a, exPaysParsed.getAddresses()[2].a), true);
+        assertEquals(exListPays.getAddresses()[2].c, exPaysParsed.getAddresses()[2].c);
     }
 
     @Test
