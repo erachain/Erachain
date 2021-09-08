@@ -451,8 +451,8 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
                 return Transaction.INVALID_AMOUNT;
             }
 
-            if (item.c.getBytes(StandardCharsets.UTF_8).length > 255) {
-                errorValue = "ListPays: item[" + index + "] -> Memo string > 255";
+            if (item.c.getBytes(StandardCharsets.UTF_8).length > 256) {
+                errorValue = "ListPays: item[" + index + "] -> Memo string > 256";
                 return Transaction.INVALID_TITLE_LENGTH_MAX;
             }
 
