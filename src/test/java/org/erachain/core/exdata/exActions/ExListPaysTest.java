@@ -2,6 +2,7 @@ package org.erachain.core.exdata.exActions;
 
 import org.erachain.core.account.Account;
 import org.junit.Test;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
@@ -81,6 +82,20 @@ public class ExListPaysTest {
 
     @Test
     public void parseJSON_local() {
+        init();
+
+        ExListPays exListPays = new ExListPays(flags, assetKey, balancePos, backward, addressesList);
+
+        ExListPays exPaysParsed = null;
+        try {
+            Fun.Tuple2<ExAction, String> result = ExListPays.parseJSON_local(exListPays.toJson());
+            exPaysParsed = (ExListPays) result.a;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        assertEquals(Arrays.equals(exListPays.getAddresses()[2].a, exPaysParsed.getAddresses()[2].a), true);
+        assertEquals(exListPays.getAddresses()[2].c, exPaysParsed.getAddresses()[2].c);
     }
 
     @Test

@@ -309,7 +309,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
     public static Fun.Tuple2<ExAction, String> parseJSON_local(JSONObject jsonObject) throws Exception {
         long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0L).toString());
-        int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
+        int position = Integer.valueOf(jsonObject.getOrDefault("balancePosition", 1).toString());
         boolean backward = Boolean.valueOf((boolean) jsonObject.getOrDefault("backward", false));
 
         String value = (String) jsonObject.get("amount");

@@ -310,7 +310,7 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
                 return new Fun.Tuple2<>(null, i + ":" + item + " - " + "Wrong amount - null or ZERO");
 
             // CHECK MEMO
-            String memoStr = (String) item.get(3);
+            String memoStr = (String) item.get(2);
             if (memoStr == null)
                 memoStr = "";
 
@@ -368,7 +368,7 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
 
             array.add(itemArray);
         }
-        toJson.put("addresses", array);
+        toJson.put("list", array);
 
         return toJson;
     }

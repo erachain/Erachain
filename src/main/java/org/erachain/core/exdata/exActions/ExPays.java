@@ -704,7 +704,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     public static Fun.Tuple2<ExAction, String> parseJSON_local(JSONObject jsonObject) throws Exception {
         long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0L).toString());
-        int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
+        int position = Integer.valueOf(jsonObject.getOrDefault("balancePosition", 1).toString());
         boolean backward = Boolean.valueOf((boolean) jsonObject.getOrDefault("backward", false));
 
         int payMethod = Integer.valueOf(jsonObject.getOrDefault("method", 1).toString());
