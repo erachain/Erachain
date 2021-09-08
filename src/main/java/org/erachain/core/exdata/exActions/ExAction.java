@@ -2,6 +2,7 @@ package org.erachain.core.exdata.exActions;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -17,6 +18,8 @@ import java.util.List;
  */
 
 public abstract class ExAction<R> {
+
+    static Crypto crypto = Crypto.getInstance();
 
     public static final int FILTERED_ACCRUALS_TYPE = 0;
     public static final int SIMPLE_PAYOUTS_TYPE = 1;

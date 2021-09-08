@@ -318,8 +318,7 @@ public class RSend extends TransactionAmount {
         }
 
         // HEAD LEN
-        int titleLen = Byte.toUnsignedInt(data[position]);
-        position++;
+        int titleLen = Byte.toUnsignedInt(data[position++]);
         // HEAD
         byte[] titleBytes = Arrays.copyOfRange(data, position, position + titleLen);
         String title = new String(titleBytes, StandardCharsets.UTF_8);

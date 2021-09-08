@@ -7,7 +7,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
@@ -49,6 +48,9 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     private final BigDecimal amount;
     private final int balancePos;
     final boolean backward;
+    /**
+     * Short form of address = [20]
+     */
     private final byte[][] addresses;
 
     public String errorValue;
@@ -84,7 +86,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
     @Override
     public String viewResults(Transaction transactionParent) {
-        Crypto crypto = Crypto.getInstance();
         String amountStr = " " + amount.toPlainString();
         String results = "";
         int i = 0;
@@ -347,7 +348,8 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         JSONArray array = new JSONArray();
         for (byte[] address : addresses) {
-            array.add(Base58.encode(address));
+            array.add(Base58.encode(crypto.getAddressFromShortBytes(address)));
+
         }
         toJson.put("addresses", array);
 
