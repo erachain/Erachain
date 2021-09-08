@@ -19,7 +19,8 @@ import java.util.List;
 public abstract class ExAction<R> {
 
     public static final int FILTERED_ACCRUALS_TYPE = 0;
-    public static final int LIST_PAYOUTS_TYPE = 1;
+    public static final int SIMPLE_PAYOUTS_TYPE = 1;
+    public static final int LIST_PAYOUTS_TYPE = 2;
 
     int type;
     protected long assetKey;
@@ -83,8 +84,10 @@ public abstract class ExAction<R> {
         switch (type) {
             case FILTERED_ACCRUALS_TYPE:
                 return ExPays.parse(data, pos);
-            case LIST_PAYOUTS_TYPE:
+            case SIMPLE_PAYOUTS_TYPE:
                 return ExAirDrop.parse(data, pos);
+            case LIST_PAYOUTS_TYPE:
+                return ExListPays.parse(data, pos);
         }
 
         throw new Exception("Invalid ExAction type: " + type);
@@ -98,8 +101,10 @@ public abstract class ExAction<R> {
             switch (type) {
                 case FILTERED_ACCRUALS_TYPE:
                     return ExPays.parseJSON_local(json);
-                case LIST_PAYOUTS_TYPE:
+                case SIMPLE_PAYOUTS_TYPE:
                     return ExAirDrop.parseJSON_local(json);
+                case LIST_PAYOUTS_TYPE:
+                    return ExListPays.parseJSON_local(json);
             }
             return new Fun.Tuple2<>(null, "Invalid ExAction type: " + type);
         } catch (Exception e) {
