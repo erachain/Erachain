@@ -144,6 +144,7 @@ public class Controller extends Observable {
     public BlocksRequest blockRequester;
     public BlockChain blockChain;
     private BlockGenerator blockGenerator;
+    private FPool fPool;
     public Synchronizer synchronizer;
     private TransactionCreator transactionCreator;
     private Timer connectTimer;
@@ -843,6 +844,9 @@ public class Controller extends Observable {
         this.blockGenerator = new BlockGenerator(this.dcSet, this.blockChain, true);
         // START UPDATES and BLOCK BLOCKGENERATOR
         this.blockGenerator.start();
+
+        // START FORGING POOL
+        this.fPool = new FPool(this, this.blockChain, this.dcSet);
 
         // CREATE NETWORK
         if (BlockChain.TEST_DB == 0) {

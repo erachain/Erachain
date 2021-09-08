@@ -54,6 +54,7 @@ public class Settings {
     public static final String DEFAULT_DATA_CHAIN_DIR = "datachain";
 
     private static final String DEFAULT_DATA_LOCAL_DIR = "datalocal";
+    private static final String DEFAULT_DATA_FPOOR_DIR = "dataFPool";
     private static final String DEFAULT_DATA_TEMP_DIR = "datatemp";
     private static final String DEFAULT_DATA_WALLET_DIR = "dataWallet";
     public static final String DEFAULT_WALLET_KEYS_DIR = "walletKeys";
@@ -443,6 +444,10 @@ public class Settings {
 
     public String getLocalDir() {
         return this.getUserPath() + DEFAULT_DATA_LOCAL_DIR;
+    }
+
+    public String getFPoolDir() {
+        return this.getUserPath() + DEFAULT_DATA_FPOOR_DIR;
     }
 
     public String getDataTempDir() {
