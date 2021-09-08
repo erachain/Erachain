@@ -1105,6 +1105,12 @@ public class Controller extends Observable {
 
         // STOP TRANSACTIONS POOL
         this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping Forging Pool")));
+        LOGGER.info("Stopping Forging Pool");
+        this.fPool.halt();
+
+        // STOP TRANSACTIONS POOL
+        this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping Transactions Pool")));
         LOGGER.info("Stopping Transactions Pool");
         this.transactionsPool.halt();

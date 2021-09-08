@@ -402,6 +402,7 @@ public class TransactionsPool extends MonitoredThread {
 
     public void halt() {
         this.runned = false;
+        interrupt();
     }
 
 }
