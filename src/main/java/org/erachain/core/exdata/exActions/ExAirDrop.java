@@ -342,7 +342,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         toJson.put("flags", flags);
         toJson.put("assetKey", assetKey);
-        toJson.put("amount", amount);
+        toJson.put("amount", amount.toPlainString());
         toJson.put("balancePosition", balancePos);
         toJson.put("backward", backward);
 
