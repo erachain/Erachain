@@ -788,6 +788,7 @@ public class BlockChain {
 
         }
 
+        ERA_ASSET = dcSet.getItemAssetMap().get(AssetCls.ERA_KEY);
         FEE_ASSET = dcSet.getItemAssetMap().get(AssetCls.FEE_KEY);
 
     }
@@ -837,6 +838,7 @@ public class BlockChain {
         return 0;
     }
 
+    public static AssetCls ERA_ASSET;
     public static AssetCls FEE_ASSET;
 
     /**

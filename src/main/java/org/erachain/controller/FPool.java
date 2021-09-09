@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -79,11 +80,25 @@ public class FPool extends MonitoredThread {
         return blockingQueue.offer(block);
     }
 
-    private void addRewards(Long assteKey, BigDecimal total, HashMap credits) {
+
+    HashMap<String, BigDecimal> results = new HashMap();
+
+    private void addRewards(AssetCls asset, BigDecimal totalEarn, BigDecimal totalForginAmount, HashMap<String, BigDecimal> credits) {
+        BigDecimal amount;
+        int scale = asset.getScale() + 6;
+        for (String address : credits.keySet()) {
+            amount = totalEarn.multiply(credits.get(address)).divide(totalForginAmount, scale, RoundingMode.DOWN);
+
+            if (results.containsKey(address)) {
+                results.put(address, results.get(address).add(amount));
+            } else {
+                results.put(address, amount);
+            }
+        }
 
     }
 
-    public boolean processMessage(Block block) {
+    private boolean processMessage(Block block) {
 
         if (block == null
                 || !controller.isMyAccountByAddress(block.getCreator()))
@@ -100,12 +115,16 @@ public class FPool extends MonitoredThread {
         CreditAddressesMap creditMap = dcSet.getCredit_AddressesMap();
         HashMap<String, BigDecimal> credits = new HashMap();
         try (IteratorCloseable<Tuple3<String, Long, String>> iterator = creditMap.getIterator(new Tuple3<String, Long, String>
-                (forger.getAddress(), AssetCls.FEE_KEY, null), false)) {
+                (forger.getAddress(), AssetCls.FEE_KEY, ""), false)) {
 
             Tuple3<String, Long, String> key;
             BigDecimal creditAmount;
             while (iterator.hasNext()) {
                 key = iterator.next();
+
+                if (!forger.equals(key.a) || !key.b.equals(AssetCls.FEE_KEY))
+                    break;
+
                 creditAmount = creditMap.get(key);
                 if (creditAmount.signum() <= 0)
                     continue;
@@ -118,23 +137,27 @@ public class FPool extends MonitoredThread {
         }
 
         // FOR FEE
-        addRewards(AssetCls.FEE_KEY, feeEarn, credits);
+        addRewards(BlockChain.FEE_ASSET, feeEarn, totalForginAmount, credits);
 
         if (false) {
             // FOR ERA
-            addRewards(AssetCls.ERA_KEY, totalEmite, credits);
+            addRewards(BlockChain.ERA_ASSET, totalEmite, totalForginAmount, credits);
         }
+
+        if (credits.size() == 0)
+            return true;
 
         // for all ERNAED assets
         for (AssetCls assetEran : earnedAllAssets.keySet()) {
             Fun.Tuple2<BigDecimal, BigDecimal> item = earnedAllAssets.get(assetEran);
-            addRewards(assetEran.getKey(), item.a, credits);
+            addRewards(assetEran, item.a, totalForginAmount, credits);
         }
 
         return true;
 
     }
 
+    @Override
     public void run() {
 
         runned = true;
@@ -149,12 +172,14 @@ public class FPool extends MonitoredThread {
             } catch (OutOfMemoryError e) {
                 blockingQueue = null;
                 LOGGER.error(e.getMessage(), e);
+                dpSet.close();
                 Controller.getInstance().stopAndExit(2457);
                 return;
             } catch (IllegalMonitorStateException e) {
                 blockingQueue = null;
+                dpSet.close();
                 Controller.getInstance().stopAndExit(2458);
-                break;
+                return;
             } catch (InterruptedException e) {
                 blockingQueue = null;
                 break;
@@ -166,6 +191,7 @@ public class FPool extends MonitoredThread {
 
         }
 
+        dpSet.close();
         LOGGER.info("Forging Pool halted");
 
     }

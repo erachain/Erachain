@@ -1146,20 +1146,6 @@ public class Controller extends Observable {
             }
         }
 
-        if (dcSet.isBusy())
-            this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("DCSet is busy...")));
-        LOGGER.info("DCSet is busy...");
-
-        i = 0;
-        while (i++ < 10 && dcSet.isBusy()) {
-            try {
-                Thread.sleep(500);
-            } catch (Exception e) {
-                break;
-            }
-        }
-
         if (this.wallet != null) {
             // CLOSE WALLET
             this.setChanged();
@@ -1180,6 +1166,20 @@ public class Controller extends Observable {
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing telegram")));
             LOGGER.info("Closing telegram");
             this.telegramStore.close();
+        }
+
+        if (dcSet.isBusy())
+            this.setChanged();
+        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("DCSet is busy...")));
+        LOGGER.info("DCSet is busy...");
+
+        i = 0;
+        while (i++ < 10 && dcSet.isBusy()) {
+            try {
+                Thread.sleep(500);
+            } catch (Exception e) {
+                break;
+            }
         }
 
         // CLOSE DATABABASE
