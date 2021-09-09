@@ -111,8 +111,12 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     private boolean fromTrustedPeer = false;
     // FORGING INFO
-    // при обработке трнзакций используем для запоминания что данные менялись
+    // при обработке транзакций используем для запоминания что данные менялись
     protected List<Account> forgingInfoUpdate;
+
+    /**
+     * 1 - EARN FEE, 2 - BURNED
+     */
     protected HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> earnedAllAssets;
 
 
@@ -860,15 +864,6 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     }
 
-    private BigDecimal getTotalFee(DCSet db) {
-        BigDecimal fee = this.getFeeByProcess(db);
-        return fee.add(this.getBonusFee());
-    }
-
-    private BigDecimal getTotalFee() {
-        return getTotalFee(DCSet.getInstance());
-    }
-
     private BigDecimal getFeeByProcess(DCSet db) {
         int fee = 0;
 
@@ -878,6 +873,15 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         return BigDecimal.valueOf(fee, BlockChain.FEE_SCALE);
 
+    }
+
+    private BigDecimal getTotalFee(DCSet db) {
+        BigDecimal fee = this.getFeeByProcess(db);
+        return fee.add(this.getBonusFee());
+    }
+
+    public HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> getEarnedAllAssets() {
+        return earnedAllAssets;
     }
 
     public void setTransactionData(int transactionCount, byte[] rawTransactions) {
@@ -2015,7 +2019,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
             if (error) {
                 LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] "
-                        + " totalFee: " + this.getTotalFee()
+                        + " totalFee: " + this.getTotalFee(dcSet)
                         + " bonusFee: " + this.getBonusFee());
 
                 error = false;

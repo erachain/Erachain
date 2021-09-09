@@ -144,7 +144,7 @@ public class Controller extends Observable {
     public BlocksRequest blockRequester;
     public BlockChain blockChain;
     private BlockGenerator blockGenerator;
-    private FPool fPool;
+    public FPool fPool;
     public Synchronizer synchronizer;
     private TransactionCreator transactionCreator;
     private Timer connectTimer;
@@ -2779,8 +2779,12 @@ public class Controller extends Observable {
         }
 
         try {
-            // тутв нутри будет сделан newBlock.close();
+            // тут внутри будет сделан newBlock.close();
             this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
+
+            if (fPool != null) {
+                fPool.offerBlock(newBlock);
+            }
 
         } catch (Exception e) {
             if (this.isOnStopping()) {
