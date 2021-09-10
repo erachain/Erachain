@@ -3,7 +3,6 @@ package org.erachain.controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.ExData;
@@ -131,28 +130,29 @@ public class FPool extends MonitoredThread {
     private boolean processMessage(Block block) {
 
         if (block == null
-                || !privateKeyAccount.equals(block.getCreator()))
+            //|| !privateKeyAccount.equals(block.getCreator())
+        )
             return false;
 
-        PublicKeyAccount forger = block.getCreator();
+        //PublicKeyAccount forger = block.getCreator();
         BigDecimal feeEarn = BigDecimal.valueOf(block.blockHead.totalFee + block.blockHead.emittedFee, BlockChain.FEE_SCALE);
         BigDecimal totalEmite = BigDecimal.ZERO;
         HashMap<AssetCls, Fun.Tuple2<BigDecimal, BigDecimal>> earnedAllAssets = block.getEarnedAllAssets();
 
-        BigDecimal totalForginAmount = forger.getBalanceUSE(AssetCls.FEE_KEY);
+        BigDecimal totalForginAmount = privateKeyAccount.getBalanceUSE(AssetCls.FEE_KEY);
 
         // make table of credits
         CreditAddressesMap creditMap = dcSet.getCredit_AddressesMap();
         HashMap<String, BigDecimal> credits = new HashMap();
-        try (IteratorCloseable<Tuple3<String, Long, String>> iterator = creditMap.getIterator(new Tuple3<String, Long, String>
-                (forger.getAddress(), AssetCls.FEE_KEY, ""), false)) {
+        try (IteratorCloseable<Tuple3<String, Long, String>> iterator = creditMap.getCreditorsIterator(
+                privateKeyAccount.getAddress(), AssetCls.ERA_KEY)) {
 
             Tuple3<String, Long, String> key;
             BigDecimal creditAmount;
             while (iterator.hasNext()) {
                 key = iterator.next();
 
-                if (!forger.equals(key.a) || !key.b.equals(AssetCls.FEE_KEY))
+                if (!privateKeyAccount.equals(key.a) || !key.b.equals(AssetCls.ERA_KEY))
                     break;
 
                 creditAmount = creditMap.get(key);

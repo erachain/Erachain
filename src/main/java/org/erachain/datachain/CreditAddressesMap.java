@@ -1,18 +1,15 @@
 package org.erachain.datachain;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
-import org.mapdb.DB;
-import org.mapdb.Fun;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
+import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 /** Общая сумма переданных средств в кредит на другой счет
  * Используется для проверки сумм которые отдаются или забираются у заемщика<br><br>
@@ -25,6 +22,7 @@ import java.util.TreeMap;
 
 public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, BigDecimal> {
 
+    private NavigableMap<Tuple3<String, Long, String>, Tuple3<String, Long, String>> creditors;
 
     public CreditAddressesMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -36,6 +34,7 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
 
     @Override
     public void openMap() {
+        LO = new Tuple3(null, null, null);
         HI = new Tuple3(Fun.HI, Fun.HI, Fun.HI);
 
         //OPEN MAP
@@ -51,6 +50,27 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
     @Override
     protected void getMemoryMap() {
         map = new TreeMap<Tuple3<String, Long, String>, BigDecimal>();
+    }
+
+    @Override
+    protected void createIndexes() {
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return;
+
+        this.creditors = database.createTreeMap("credit_debt_creditors")
+                .comparator(Fun.TUPLE3_COMPARATOR).makeOrGet();
+
+        //BIND CREDITPRS KEY
+        Bind.secondaryKey((BTreeMap) map, this.creditors, new Fun.Function2<Tuple3<String, Long, String>,
+                Tuple3<String, Long, String>, BigDecimal>() {
+            @Override
+            public Tuple3<String, Long, String> run(Tuple3<String, Long, String> key, BigDecimal value) {
+                return new Tuple3<String, Long, String>(key.c, key.b, key.a);
+            }
+        });
+
     }
 
     @Override
@@ -78,8 +98,13 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
         return this.get(new Tuple3<String, Long, String>(creditorAddress, key, debtorAddress));
     }
 
+    public IteratorCloseable<Tuple3<String, Long, String>> getCreditorsIterator(String debtorAddress, long key) {
+        return IteratorCloseableImpl.make(creditors.subMap(new Tuple3(debtorAddress, key, null), HI).values().iterator());
+    }
+
     /**
      * For GUI only
+     *
      * @param creditorAddress
      * @param key
      * @return
