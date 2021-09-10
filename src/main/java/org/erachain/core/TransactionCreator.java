@@ -643,7 +643,7 @@ public class TransactionCreator {
         long timestamp = NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
-        recordNoteTx = new RSignNote(version, property1, property1,
+        recordNoteTx = new RSignNote(version, property1, property2,
                 creator, (byte) feePow, key, message, timestamp, 0L);
         recordNoteTx.sign(creator, Transaction.FOR_NETWORK);
         recordNoteTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet(), false);
