@@ -688,6 +688,10 @@ public class RSignNote extends Transaction implements Itemable {
             return INVALID_DATA_LENGTH;
         }
 
+        // parse with files
+        // need for test PUBLIC by files
+        parseDataFull();
+
         int result;
         if (false // комиссия у так уже = 0 - нельзя модифицировать флаг внутри
                 && height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
@@ -704,10 +708,6 @@ public class RSignNote extends Transaction implements Itemable {
         if (this.key > 0 && !this.dcSet.getItemTemplateMap().contains(this.key))
             return Transaction.ITEM_DOES_NOT_EXIST;
 
-        if (extendedData == null) {
-            parseDataV2WithoutFiles();
-        }
-
         result = extendedData.isValid(this);
         if (result != Transaction.VALIDATE_OK) {
             // errorValue updated in extendedData
@@ -717,7 +717,6 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (height > BlockChain.VERS_5_01_01) {
             // только уникальные - так как иначе каждый новый перезатрет поиск старого
-            parseDataFull(); // need for take HASHES from FILES
             byte[][] allHashes = extendedData.getAllHashesAsBytes(true);
             if (allHashes != null && allHashes.length > 0) {
                 TransactionFinalMapSigns map = dcSet.getTransactionFinalMapSigns();
