@@ -63,7 +63,7 @@ public class FPool extends MonitoredThread {
         this.blockChain = blockChain;
         this.dcSet = dcSet;
         this.privateKeyAccount = privateKeyAccount;
-        this.poolFee = new BigDecimal(poolFee);
+        this.poolFee = new BigDecimal(poolFee).movePointLeft(2);
 
         this.setName("Forging Pool[" + this.getId() + "]");
 
