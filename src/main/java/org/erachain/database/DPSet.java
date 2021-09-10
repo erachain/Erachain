@@ -16,13 +16,17 @@ public class DPSet extends DBASet {
     /**
      * New version will auto-rebase DLSet from empty db file
      */
-    final static int CURRENT_VERSION = 1;
+    final static int CURRENT_VERSION = 2;
 
-    private FPoolMap fPoolMap;
+    final private FPoolMap fPoolMap;
+    final private FPoolBlocksMap blocksMap;
+    final private FPoolBalancesMap balancesMap;
 
     public DPSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
         super(dbFile, database, withObserver, dynamicGUI);
         this.fPoolMap = new FPoolMap(this, this.database);
+        this.blocksMap = new FPoolBlocksMap(this, this.database);
+        this.balancesMap = new FPoolBalancesMap(this, this.database);
     }
 
     static DB makeDB(File dbFile) {
@@ -105,6 +109,14 @@ public class DPSet extends DBASet {
 
     public FPoolMap getFPoolMap() {
         return this.fPoolMap;
+    }
+
+    public FPoolBlocksMap getBlocksMap() {
+        return this.blocksMap;
+    }
+
+    public FPoolBalancesMap geBbalancesMap() {
+        return this.balancesMap;
     }
 
     @Override

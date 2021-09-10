@@ -9,10 +9,12 @@ import org.erachain.database.FPoolMap;
 import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +25,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class FPool extends MonitoredThread {
 
+    final static int PENDING_PERIOD = 5;
     Controller controller;
     BlockChain blockChain;
     DCSet dcSet;
@@ -39,8 +42,6 @@ public class FPool extends MonitoredThread {
     BlockingQueue<Block> blockingQueue = new ArrayBlockingQueue<Block>(3);
 
     private boolean runned;
-
-    TreeMap blocks = new TreeMap<Integer, Object[]>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FPool.class.getSimpleName());
 
@@ -81,18 +82,23 @@ public class FPool extends MonitoredThread {
     }
 
 
-    HashMap<String, BigDecimal> results = new HashMap();
+    //TreeMap<Integer, Object[]> pendingBlocks;
+    HashMap<Tuple2<Long, String>, BigDecimal> results;
+    //TreeMap<Tuple2<Long, String>, BigDecimal> pendingPays;
 
     private void addRewards(AssetCls asset, BigDecimal totalEarn, BigDecimal totalForginAmount, HashMap<String, BigDecimal> credits) {
         BigDecimal amount;
         int scale = asset.getScale() + 6;
+        Tuple2<Long, String> key;
         for (String address : credits.keySet()) {
             amount = totalEarn.multiply(credits.get(address)).divide(totalForginAmount, scale, RoundingMode.DOWN);
 
-            if (results.containsKey(address)) {
-                results.put(address, results.get(address).add(amount));
+            key = new Tuple2<>(asset.getKey(), address);
+
+            if (results.containsKey(key)) {
+                results.put(key, results.get(key).add(amount));
             } else {
-                results.put(address, amount);
+                results.put(key, amount);
             }
         }
 
@@ -136,6 +142,8 @@ public class FPool extends MonitoredThread {
             return false;
         }
 
+        results = new HashMap<>();
+
         // FOR FEE
         addRewards(BlockChain.FEE_ASSET, feeEarn, totalForginAmount, credits);
 
@@ -153,8 +161,44 @@ public class FPool extends MonitoredThread {
             addRewards(assetEran, item.a, totalForginAmount, credits);
         }
 
+        dpSet.getBlocksMap().put(block.heightBlock, new Object[]{block.getSignature(), results});
+
         return true;
 
+    }
+
+    private void checkPending() {
+        try (IteratorCloseable iterator = IteratorCloseableImpl.make(dpSet.getBlocksMap().getIterator())) {
+            for (Integer height : dpSet.getBlocksMap().keySet()) {
+                if (height + PENDING_PERIOD > controller.getMyHeight())
+                    continue;
+
+                HashMap<Tuple2<Long, String>, BigDecimal> blockResults;
+                Object[] item = pendingBlocks.get(height);
+                if (dcSet.getBlockSignsMap().contains((byte[]) item[0])) {
+                    blockResults = (HashMap<Tuple2<Long, String>, BigDecimal>) item[1];
+                    for (Tuple2<Long, String> key : blockResults.keySet()) {
+                        if (pendingPays.containsKey(key)) {
+                            pendingPays.put(key, pendingPays.get(key).add(results.get(key)));
+                        } else {
+                            pendingPays.put(key, results.get(key));
+                        }
+                    }
+                } else {
+                    // block was orphaned
+                    pendingBlocks.remove(height);
+                }
+
+            }
+        }
+
+    }
+
+    private void payout() {
+        IteratorCloseable
+        try (Iterator iterator = pendingPays.entrySet().iterator()) {
+
+        }
     }
 
     @Override
@@ -169,6 +213,11 @@ public class FPool extends MonitoredThread {
             // PROCESS
             try {
                 processMessage(blockingQueue.poll(BlockChain.GENERATING_MIN_BLOCK_TIME(0), TimeUnit.SECONDS));
+
+                checkPending();
+
+                payout();
+
             } catch (OutOfMemoryError e) {
                 blockingQueue = null;
                 LOGGER.error(e.getMessage(), e);

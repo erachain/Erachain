@@ -7,26 +7,25 @@ import org.mapdb.DB;
 import java.util.TreeMap;
 
 /**
+ *
  */
 @Slf4j
-public class FPoolMap extends DCUMapImpl<String, Object[]> {
+public class FPoolBlocksMap extends DCUMapImpl<Integer, Object[]> {
 
-    public FPoolMap(DPSet databaseSet, DB database) {
+    public FPoolBlocksMap(DPSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
     @Override
     public void openMap() {
         //OPEN MAP
-        map = database.createTreeMap("pool")
-                //.keySerializer(BTreeKeySerializer.BASIC)
-                //.comparator(UnsignedBytes.lexicographicalComparator())
+        map = database.createTreeMap("pool_blocks")
                 .makeOrGet();
     }
 
     @Override
     protected void getMemoryMap() {
-        map = new TreeMap<String, Object[]>();
+        map = new TreeMap<Integer, Object[]>();
     }
 
 }
