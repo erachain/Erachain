@@ -50,7 +50,7 @@ public class PeersResource {
         APIUtils.askAPICallAllowed(password, "POST peers " + address, request, true);
 
         // CHECK WALLET UNLOCKED
-        if (Controller.getInstance().doesWalletExists() && !Controller.getInstance().isWalletUnlocked()) {
+        if (Controller.getInstance().doesWalletKeysExists() && !Controller.getInstance().isWalletUnlocked()) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_LOCKED);
         }

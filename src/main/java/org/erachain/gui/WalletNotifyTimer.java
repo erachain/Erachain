@@ -50,7 +50,7 @@ public class WalletNotifyTimer<U> implements Observer {
 
     public void update(Observable o, Object arg) {
 
-        if (!contr.doesWalletExists() || contr.getWallet().synchronizeBodyUsed
+        if (!contr.doesWalletKeysExists() || contr.getWallet().synchronizeBodyUsed
                 || !settings.isTrayEventEnabled())
             return;
 

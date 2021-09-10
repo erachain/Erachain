@@ -24,6 +24,10 @@ if SEED lenght < 30 - It will made new SEED
 example for restore: -seed=3:AXR1wqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1
 example for auto make wallet keys: -seed=3:new:1
 
+-fpool=FORGING_ACCOUNT:FEE_PERCENT
+Start forging pool on account and set tax.
+For ezample: -fpool=77MWxrB6BuykCrZrsTqmfgfC3vGTgwFQYS:3.5
+
 -backup
 
 -nogui

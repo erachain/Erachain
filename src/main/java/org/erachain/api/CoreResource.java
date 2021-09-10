@@ -124,11 +124,11 @@ public class CoreResource {
     @GET
     @Path("/settings")
     public String getSettings() {
-        if (Controller.getInstance().doesWalletExists() && !Controller.getInstance().isWalletUnlocked()) {
+        if (Controller.getInstance().doesWalletKeysExists() && !Controller.getInstance().isWalletUnlocked()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
         }
 
-        if (!Controller.getInstance().doesWalletExists() || Controller.getInstance().isWalletUnlocked()) {
+        if (!Controller.getInstance().doesWalletKeysExists() || Controller.getInstance().isWalletUnlocked()) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("settings.json", Settings.getInstance().Dump());
             jsonObject.put("peers.json", Settings.getInstance().getPeersJson());

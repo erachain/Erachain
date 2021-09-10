@@ -118,7 +118,7 @@ public class TransactionsResource {
         APIUtils.askAPICallAllowed(password, "GET transactions/limit/" + limit, request, true);
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
@@ -161,7 +161,7 @@ public class TransactionsResource {
         APIUtils.askAPICallAllowed(password, "GET transactions/address/" + address + "/limit/" + limit, request, true);
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
@@ -644,7 +644,7 @@ public class TransactionsResource {
     public String incoming(@PathParam("height") int height) {
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
@@ -689,7 +689,7 @@ public class TransactionsResource {
     public String incomingRecipient(@PathParam("height") int height, @PathParam("address") String address) {
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
@@ -738,7 +738,7 @@ public class TransactionsResource {
         boolean needPass = true;
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 

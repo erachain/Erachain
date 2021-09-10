@@ -173,6 +173,7 @@ public class Controller extends Observable {
 
     public boolean backUP = false;
     public String[] seedCommand;
+    public String[] fpoolCommand;
     public boolean noCalculated;
     public boolean noUseWallet;
     public boolean noDataWallet;
@@ -845,9 +846,6 @@ public class Controller extends Observable {
         // START UPDATES and BLOCK BLOCKGENERATOR
         this.blockGenerator.start();
 
-        // START FORGING POOL
-        this.fPool = new FPool(this, this.blockChain, this.dcSet);
-
         // CREATE NETWORK
         if (BlockChain.TEST_DB == 0) {
             this.network = new Network(this);
@@ -1103,11 +1101,13 @@ public class Controller extends Observable {
         } catch (Exception e) {
         }
 
-        // STOP TRANSACTIONS POOL
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping Forging Pool")));
-        LOGGER.info("Stopping Forging Pool");
-        this.fPool.halt();
+        if (fPool != null) {
+            // STOP TRANSACTIONS POOL
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping Forging Pool")));
+            LOGGER.info("Stopping Forging Pool");
+            this.fPool.halt();
+        }
 
         // STOP TRANSACTIONS POOL
         this.setChanged();
@@ -1876,14 +1876,14 @@ public class Controller extends Observable {
     }
 
     public Account[] getInvolvedAccounts(Transaction transaction) {
-        if (!doesWalletExists())
+        if (!doesWalletKeysExists())
             return null;
 
         return wallet.getInvolvedAccounts(transaction);
     }
 
     public Account getInvolvedAccount(Transaction transaction) {
-        if (!doesWalletExists())
+        if (!doesWalletKeysExists())
             return null;
 
         return wallet.getInvolvedAccount(transaction);
@@ -2189,7 +2189,7 @@ public class Controller extends Observable {
 
     // WALLET
 
-    public boolean doesWalletExists() {
+    public boolean doesWalletKeysExists() {
         // CHECK IF WALLET EXISTS
         return !noUseWallet && this.wallet != null && this.wallet.walletKeysExists();
     }
@@ -2227,7 +2227,7 @@ public class Controller extends Observable {
     }
 
     public long getWalletLicense() {
-        if (this.doesWalletExists()) {
+        if (this.doesWalletKeysExists()) {
             return this.wallet.getLicenseKey();
         } else {
             return 2l;
@@ -2235,7 +2235,7 @@ public class Controller extends Observable {
     }
 
     public void setWalletLicense(long key) {
-        if (this.doesWalletExists()) {
+        if (this.doesWalletKeysExists()) {
             this.wallet.setLicenseKey(key);
         }
     }
@@ -2251,7 +2251,7 @@ public class Controller extends Observable {
     }
 
     public boolean isAddressIsMine(String address) {
-        if (!this.doesWalletExists())
+        if (!this.doesWalletKeysExists())
             return false;
 
         List<Account> accounts = this.wallet.getAccounts();
@@ -2275,7 +2275,7 @@ public class Controller extends Observable {
     }
 
     public PrivateKeyAccount getWalletPrivateKeyAccountByAddress(String address) {
-        if (this.doesWalletExists()) {
+        if (this.doesWalletKeysExists()) {
             return this.wallet.getPrivateKeyAccount(address);
         } else {
             return null;
@@ -2283,7 +2283,7 @@ public class Controller extends Observable {
     }
 
     public PrivateKeyAccount getWalletPrivateKeyAccountByAddress(Account account) {
-        if (this.doesWalletExists()) {
+        if (this.doesWalletKeysExists()) {
             return this.wallet.getPrivateKeyAccount(account);
         } else {
             return null;
@@ -2327,7 +2327,7 @@ public class Controller extends Observable {
      * @return object Account
      */
     public Account getWalletAccountByAddress(String address) {
-        if (this.doesWalletExists()) {
+        if (this.doesWalletKeysExists()) {
             return this.wallet.getAccount(address);
         } else {
             return null;
@@ -2335,14 +2335,14 @@ public class Controller extends Observable {
     }
 
     public boolean isMyAccountByAddress(String address) {
-        if (this.doesWalletExists()) {
+        if (this.doesWalletKeysExists()) {
             return this.wallet.accountExists(address);
         }
         return false;
     }
 
     public boolean isMyAccountByAddress(Account address) {
-        if (this.doesWalletExists()) {
+        if (this.doesWalletKeysExists()) {
             return this.wallet.accountExists(address);
         }
         return false;
@@ -3013,7 +3013,7 @@ public class Controller extends Observable {
         this.broadcastTransaction(transaction);
 
         // ADD TO WALLET TRANSACTIONS
-        if (doesWalletExists() && HARD_WORK < 4) {
+        if (doesWalletKeysExists() && HARD_WORK < 4) {
             // они и так будут в transactionsPool добавляться, но там может и проскользуть мимо очерди
             // если она очень занята
             // поэтому тут добавим наверняка
@@ -4127,6 +4127,11 @@ public class Controller extends Observable {
                 Settings.getInstance().updateJson("rpcport", value);
                 continue;
             }
+            if (arg.startsWith("-fpool=") && arg.length() > 7) {
+                fpoolCommand = arg.substring(7).split(":");
+                continue;
+            }
+
 
         }
 
@@ -4205,10 +4210,17 @@ public class Controller extends Observable {
                 Controller.getInstance().start();
 
                 //unlock wallet
+                if (pass != null && doesWalletKeysExists()) {
+                    if (unlockWallet(pass)) {
 
-                if (pass != null && doesWalletDatabaseExists()) {
-                    if (unlockWallet(pass))
+                        // TRY START FORGING POOL
+                        if (fpoolCommand != null) {
+                            PrivateKeyAccount forger = Controller.getInstance().getWalletPrivateKeyAccountByAddress(fpoolCommand[0]);
+                            this.fPool = new FPool(this, this.blockChain, this.dcSet, forger, fpoolCommand[1]);
+                        }
+
                         lockWallet();
+                    }
                 }
 
                 Status.getinstance();
@@ -4238,7 +4250,7 @@ public class Controller extends Observable {
                     }
                 }
 
-                if (Controller.getInstance().doesWalletExists()) {
+                if (Controller.getInstance().doesWalletKeysExists()) {
                     Controller.getInstance().wallet.initiateItemsFavorites();
                 }
 

@@ -133,7 +133,7 @@ public class APIUtils {
             if (noGUI) {
 
                 // если кошелек открыт на постоянно то не спрашиваем пароль
-                if (Controller.getInstance().doesWalletExists() && Controller.getInstance().isWalletUnlockedForRPC())
+                if (Controller.getInstance().doesWalletKeysExists() && Controller.getInstance().isWalletUnlockedForRPC())
                     return;
 
                 if (!ServletUtils.isRemoteRequest(request, ipAddress)) {
@@ -263,7 +263,7 @@ public class APIUtils {
         }
         
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
         
@@ -389,7 +389,7 @@ public class APIUtils {
             // full check is later to prompt user with calculated fee
             
             // CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletExists()) {
+            if (!Controller.getInstance().doesWalletKeysExists()) {
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
             }
             
@@ -435,7 +435,7 @@ public class APIUtils {
         // full check is later to prompt user with calculated fee
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
@@ -498,7 +498,7 @@ public class APIUtils {
         }
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 

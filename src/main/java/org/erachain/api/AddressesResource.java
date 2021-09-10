@@ -64,7 +64,7 @@ public class AddressesResource {
         APIUtils.askAPICallAllowed(password, "GET addresses", request, true);
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
@@ -165,7 +165,7 @@ public class AddressesResource {
         }
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
@@ -201,7 +201,7 @@ public class AddressesResource {
         }
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
@@ -234,7 +234,7 @@ public class AddressesResource {
         APIUtils.askAPICallAllowed(password, "GET addresses/new", request, true);
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
@@ -259,7 +259,7 @@ public class AddressesResource {
             APIUtils.askAPICallAllowed(password, "POST addresses new\nGenerates a new account", request, true);
 
             // CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletExists()) {
+            if (!Controller.getInstance().doesWalletKeysExists()) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
             }
@@ -277,7 +277,7 @@ public class AddressesResource {
             String seed = x;
 
             // CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletExists()) {
+            if (!Controller.getInstance().doesWalletKeysExists()) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
             }
@@ -515,7 +515,7 @@ public class AddressesResource {
         APIUtils.askAPICallAllowed(null, "POST addresses/sign/" + address, request, true);
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
@@ -659,7 +659,7 @@ public class AddressesResource {
         APIUtils.askAPICallAllowed(password, "GET addresses import Account seed", request, true);
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
@@ -695,7 +695,7 @@ public class AddressesResource {
     public String importPrivate(@PathParam("privatekey") String privateKey) {
 
         // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }

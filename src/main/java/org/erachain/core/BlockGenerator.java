@@ -627,7 +627,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             public void run() {
 
                 //WE HAVE TO WAIT FOR THE WALLET TO ADD THAT LISTENER.
-                while (!ctrl.doesWalletExists() || !ctrl.doesWalletDatabaseExists()) {
+                while (!ctrl.doesWalletKeysExists() || !ctrl.doesWalletDatabaseExists()) {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
@@ -857,7 +857,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 // is WALLET
-                if (BlockChain.TEST_DB > 0 || ctrl.doesWalletExists()
+                if (BlockChain.TEST_DB > 0 || ctrl.doesWalletKeysExists()
                         || height < BlockChain.ALL_VALID_BEFORE) {
 
                     if (timePoint > NTP.getTime()) {

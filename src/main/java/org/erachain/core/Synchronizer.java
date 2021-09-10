@@ -369,7 +369,7 @@ public class Synchronizer extends Thread {
 
             // освободим всю память
             dcSet.clearCache();
-            if (ctrl.doesWalletExists()) {
+            if (ctrl.doesWalletKeysExists()) {
                 try {
                     ctrl.getWallet().dwSet.clearCache();
                 } catch (Exception ee) {
@@ -993,7 +993,7 @@ public class Synchronizer extends Thread {
         int txCount = block.getTransactionCount();
 
         dcSet.getBlockMap().setProcessing(true);
-        boolean observOn = ctrl.doesWalletExists() && ctrl.useGui;
+        boolean observOn = ctrl.doesWalletKeysExists() && ctrl.useGui;
         Integer countObserv_ADD = null;
         Integer countObserv_REMOVE = null;
 
@@ -1212,7 +1212,7 @@ public class Synchronizer extends Thread {
             if (!dcSet.isFork()) {
                 // только запись в нашу цепочку
 
-                if (ctrl.doesWalletExists() && !ctrl.noDataWallet && ctrl.getWallet().walletUpdater != null) {
+                if (ctrl.doesWalletKeysExists() && !ctrl.noDataWallet && ctrl.getWallet().walletUpdater != null) {
                     nedToCloseBlock = false; // не надо закрывать - он еще в очереди на обработку в кошельке томится - там закроют
                     ctrl.getWallet().walletUpdater.offerMessage(new Pair(doOrphan, block));
                 }

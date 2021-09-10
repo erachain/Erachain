@@ -239,7 +239,7 @@ public class TransactionsPool extends MonitoredThread {
             // BROADCAST
             controller.network.broadcast(transactionMessage, false);
 
-            if (controller.doesWalletExists()) {
+            if (controller.doesWalletKeysExists()) {
                 controller.getWallet().insertUnconfirmedTransaction(transaction);
             }
 

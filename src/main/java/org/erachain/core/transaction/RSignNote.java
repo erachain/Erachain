@@ -850,7 +850,7 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     public boolean isFavorite() {
-        if (Controller.getInstance().doesWalletExists()) {
+        if (Controller.getInstance().doesWalletKeysExists()) {
             return Controller.getInstance().getWallet().dwSet.getDocumentFavoritesSet().contains(this.dbRef);
         }
         return false;

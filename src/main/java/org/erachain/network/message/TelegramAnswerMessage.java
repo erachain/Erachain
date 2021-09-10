@@ -67,7 +67,7 @@ public class TelegramAnswerMessage extends Message {
                 continue;
             }
             // receivers
-            if (Controller.getInstance().doesWalletExists()) {
+            if (Controller.getInstance().doesWalletKeysExists()) {
                 HashSet<Account> recipients = tran.getRecipientAccounts();
                 for (Account recipient : recipients) {
                     if (Controller.getInstance().getWallet().accountExists(recipient) && !telegransList.contains(tran))

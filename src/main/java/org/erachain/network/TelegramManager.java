@@ -578,7 +578,7 @@ public class TelegramManager extends Thread {
 
         this.handledTelegrams.put(signatureKey, telegram);
 
-        if (Controller.getInstance().doesWalletExists()
+        if (Controller.getInstance().doesWalletKeysExists()
                 && Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
             // IF MY STORE is USED
 

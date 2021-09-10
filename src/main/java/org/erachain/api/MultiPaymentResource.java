@@ -116,7 +116,7 @@ public class MultiPaymentResource {
             }
 
             // CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletExists()) {
+            if (!Controller.getInstance().doesWalletKeysExists()) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
             }

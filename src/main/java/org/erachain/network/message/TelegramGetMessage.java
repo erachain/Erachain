@@ -19,7 +19,7 @@ public class TelegramGetMessage extends Message {
     public TelegramGetMessage() {
         super(TELEGRAM_GET_TYPE);
         address = new JSONObject();
-        if (Controller.getInstance().doesWalletExists()) {
+        if (Controller.getInstance().doesWalletKeysExists()) {
             List<Account> acounts = Controller.getInstance().getWallet().getAccounts();
             for (int i = 0; i < acounts.size(); i++) {
                 this.address.put(i, acounts.get(i).getAddress());
