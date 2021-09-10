@@ -17,12 +17,14 @@ import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,47 +34,38 @@ import java.util.List;
  * Result: recipient + Validate_Result {code, mess}
  */
 
-public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>>> {
+public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>>> {
 
-    public static final byte BASE_LENGTH = 4 + 8 + 1 + 2 + 4;
+    public static final byte BASE_LENGTH = 4 + 8 + 1 + 4;
 
     public static final int MAX_COUNT = 1 << 16;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExAirDrop.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExListPays.class);
 
     /**
      * 0 - version; 1 - flags;
      */
     private final int flags; // byte[2]
 
-    private final BigDecimal amount;
     private final int balancePos;
     final boolean backward;
-    /**
-     * Short form of address = [20]
-     */
-    private final byte[][] addresses;
+    private final Tuple3<byte[], BigDecimal, String>[] addresses;
+
+    /////////////////
 
     public String errorValue;
 
-    public ExAirDrop(int flags, long assetKey, BigDecimal amount, int balancePos, boolean backward, byte[][] addresses) {
+    public ExListPays(int flags, long assetKey, int balancePos, boolean backward, Tuple3<byte[], BigDecimal, String>[] addresses) {
         super(LIST_PAYOUTS_TYPE);
         this.flags = flags;
         this.assetKey = assetKey;
-        this.amount = amount;
         this.balancePos = balancePos;
         this.backward = backward;
         this.addresses = addresses;
 
-        totalPay = amount.multiply(BigDecimal.valueOf(addresses.length));
-
     }
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public byte[][] getAddresses() {
+    public Tuple3<byte[], BigDecimal, String>[] getAddresses() {
         return addresses;
     }
 
@@ -86,11 +79,10 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
     @Override
     public String viewResults(Transaction transactionParent) {
-        String amountStr = " " + amount.toPlainString();
         String results = "";
         int i = 0;
-        for (byte[] address : addresses) {
-            results += ++i + " " + crypto.getAddressFromShort(address) + amountStr + "\n";
+        for (Tuple3<byte[], BigDecimal, String> item : addresses) {
+            results += ++i + " " + crypto.getAddressFromShort(item.a) + " " + item.b.toPlainString() + " " + item.c + "\n";
         }
 
         return results;
@@ -122,9 +114,10 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
             return;
         }
 
-        for (byte[] recipientShort : addresses) {
+        totalPay = BigDecimal.ZERO;
+        for (Tuple3<byte[], BigDecimal, String> item : addresses) {
 
-            Account recipient = new Account(recipientShort);
+            Account recipient = new Account(item.a);
 
             // IF send from PERSON to ANONYMOUS
             if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
@@ -132,16 +125,14 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
                     asset)) {
                 resultCode = Transaction.RECEIVER_NOT_PERSONALIZED;
                 errorValue = null;
-                results.add(new Fun.Tuple2(recipient, new Fun.Tuple2<>(resultCode, null)));
+                results.add(new Fun.Tuple3(recipient, item.b, new Fun.Tuple2<>(resultCode, null)));
             } else {
-                results.add(new Fun.Tuple2(recipient, null));
+                results.add(new Fun.Tuple3(recipient, item.b, null));
             }
 
+            totalPay = totalPay.add(item.b);
+
         }
-
-        totalPay = amount.multiply(new BigDecimal(addresses.length));
-
-        return;
 
     }
 
@@ -151,7 +142,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         outStream.write(Ints.toByteArray(flags));
 
-        byte[] buff;
         outStream.write(Longs.toByteArray(this.assetKey));
 
         if (backward) {
@@ -160,14 +150,22 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
             outStream.write(balancePos);
         }
 
-        outStream.write(this.amount.scale());
-        buff = this.amount.unscaledValue().toByteArray();
-        outStream.write(buff.length);
-        outStream.write(buff);
-
         outStream.write(Ints.toByteArray(addresses.length));
-        for (int i = 0; i < addresses.length; i++) {
-            outStream.write(addresses[i]);
+        byte[] buff;
+        for (Tuple3<byte[], BigDecimal, String> item : addresses) {
+            outStream.write(item.a);
+
+            outStream.write(item.b.scale());
+            buff = item.b.unscaledValue().toByteArray();
+            outStream.write(buff.length);
+            outStream.write(buff);
+
+            buff = item.c.getBytes(StandardCharsets.UTF_8);
+            // HEAD SIZE
+            outStream.write((byte) buff.length);
+            // HEAD
+            outStream.write(buff);
+
         }
 
         return outStream.toByteArray();
@@ -175,9 +173,12 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     }
 
     public int length() {
-        return BASE_LENGTH
-                + this.amount.unscaledValue().toByteArray().length
-                + addresses.length * Account.ADDRESS_SHORT_LENGTH;
+        int len = BASE_LENGTH + addresses.length * (Account.ADDRESS_SHORT_LENGTH + 3);
+        for (Tuple3<byte[], BigDecimal, String> item : addresses) {
+            len += item.b.unscaledValue().toByteArray().length;
+            len += item.c.getBytes(StandardCharsets.UTF_8).length;
+        }
+        return len;
     }
 
     public int getLengthDBData() {
@@ -209,10 +210,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static ExAirDrop parse(byte[] data, int pos) throws Exception {
-
-        int scale;
-        int len;
+    public static ExListPays parse(byte[] data, int pos) throws Exception {
 
         int flags = Ints.fromByteArray(Arrays.copyOfRange(data, pos, pos + Integer.BYTES));
         pos += Integer.BYTES;
@@ -230,23 +228,33 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
             balancePos = -balancePos;
         }
 
-        scale = data[pos++];
-        len = data[pos++];
-        BigDecimal payValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, pos, pos + len)), scale);
-        pos += len;
-
-        len = Ints.fromByteArray(Arrays.copyOfRange(data, pos, pos + Integer.BYTES));
+        Tuple3<byte[], BigDecimal, String>[] addresses = new Tuple3[Ints.fromByteArray(
+                Arrays.copyOfRange(data, pos, pos + Integer.BYTES))];
         pos += Integer.BYTES;
 
-        byte[][] addresses = new byte[len][];
-        for (int i = 0; i < len; i++) {
-            byte[] buff = new byte[Account.ADDRESS_SHORT_LENGTH];
-            System.arraycopy(data, pos, buff, 0, Account.ADDRESS_SHORT_LENGTH);
-            addresses[i] = buff;
+        int scale;
+        int len;
+        for (int i = 0; i < addresses.length; i++) {
+            byte[] addressShort = new byte[Account.ADDRESS_SHORT_LENGTH];
+            System.arraycopy(data, pos, addressShort, 0, Account.ADDRESS_SHORT_LENGTH);
             pos += Account.ADDRESS_SHORT_LENGTH;
+
+            scale = data[pos++];
+            len = data[pos++];
+            BigDecimal payValue = new BigDecimal(new BigInteger(Arrays.copyOfRange(data, pos, pos + len)), scale);
+            pos += len;
+
+            // MEMO STRING LEN
+            int memoLen = Byte.toUnsignedInt(data[pos++]);
+            // MEMO STRING
+            byte[] memoBytes = Arrays.copyOfRange(data, pos, pos + memoLen);
+            String memoStr = new String(memoBytes, StandardCharsets.UTF_8);
+            pos += memoLen;
+
+            addresses[i] = new Tuple3<>(addressShort, payValue, memoStr);
         }
 
-        return new ExAirDrop(flags, assetKey, payValue, balancePos, backward, addresses);
+        return new ExListPays(flags, assetKey, balancePos, backward, addresses);
     }
 
     public int parseDBData(byte[] dbData, int position) {
@@ -265,59 +273,65 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
     }
 
-    public static Fun.Tuple2<ExAction, String> make(Long assetKey, String amountStr,
+    public static Fun.Tuple2<ExAction, String> make(Long assetKey,
                                                     int balancePos, boolean backward,
-                                                    String[] addressesStr) {
+                                                    JSONArray addressesArray) {
 
         int steep = 0;
         BigDecimal amount;
 
-        try {
-            amount = amountStr == null || amountStr.isEmpty() ? null : new BigDecimal(amountStr);
-        } catch (Exception e) {
-            String error;
-            switch (steep) {
-                case 0:
-                    error = "Wrong amount";
-                    break;
-                default:
-                    error = e.getMessage();
-            }
-            return new Fun.Tuple2<>(null, error);
-        }
+        //Controller cntr = Controller.getInstance();
+        //BlockChain chain = cntr.getBlockChain();
 
-        if (assetKey == null || assetKey == 0L) {
+        if (assetKey == null || assetKey <= 0L) {
             return new Fun.Tuple2<>(null, "Wrong assetKey (null or ZERO)");
-        } else if (amount == null || amount.signum() == 0) {
-            return new Fun.Tuple2<>(null, "Wrong payMethodValue (null or ZERO)");
         }
 
         Fun.Tuple2<Account, String> result;
-        byte[][] addresses = new byte[addressesStr.length][];
-        for (int i = 0; i < addressesStr.length; i++) {
-            result = Account.tryMakeAccount(addressesStr[i]);
+        Tuple3<byte[], BigDecimal, String>[] addresses = new Tuple3[addressesArray.size()];
+        for (int i = 0; i < addresses.length; i++) {
+
+            JSONArray item = (JSONArray) addressesArray.get(i);
+
+            // CHECH ADDRESS
+            result = Account.tryMakeAccount((String) item.get(0));
             if (result.a == null) {
-                return new Fun.Tuple2<>(null, i + ":" + addressesStr[i] + " - " + result.b);
+                return new Fun.Tuple2<>(null, i + ":" + item.toJSONString() + " - " + result.b);
             }
-            addresses[i] = result.a.getShortAddressBytes();
+
+            // CHECK AMOUNT
+            try {
+                String amountStr = (String) item.get(1);
+                amount = amountStr == null || amountStr.isEmpty() ? null : new BigDecimal(amountStr);
+            } catch (Exception e) {
+                return new Fun.Tuple2<>(null, i + ":" + item + " - " + "Wrong amount");
+            }
+            if (amount == null || amount.signum() == 0)
+                return new Fun.Tuple2<>(null, i + ":" + item + " - " + "Wrong amount - null or ZERO");
+
+            // CHECK MEMO
+            String memoStr = (String) item.get(2);
+            if (memoStr == null)
+                memoStr = "";
+
+            // MAKE
+            addresses[i] = new Tuple3<>(result.a.getShortAddressBytes(), amount, memoStr);
         }
 
+
         int flags = 0;
-        return new Fun.Tuple2<>(new ExAirDrop(flags, assetKey, amount, balancePos, backward, addresses), null);
+        return new Fun.Tuple2<>(new ExListPays(flags, assetKey, balancePos, backward, addresses), null);
 
     }
 
     public static Fun.Tuple2<ExAction, String> parseJSON_local(JSONObject jsonObject) throws Exception {
         long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0L).toString());
-        int position = Integer.valueOf(jsonObject.getOrDefault("balancePosition", 1).toString());
+        int position = Integer.valueOf(jsonObject.getOrDefault("position", 1).toString());
         boolean backward = Boolean.valueOf((boolean) jsonObject.getOrDefault("backward", false));
 
-        String value = (String) jsonObject.get("amount");
+        JSONArray addressesJson = (JSONArray) jsonObject.get("list");
 
-        JSONArray addressesJson = (JSONArray) jsonObject.get("addresses");
-        String[] addressesStr = (String[]) addressesJson.toArray(new String[addressesJson.size()]);
-
-        return make(assetKey, value, position, backward, addressesStr);
+        return make(assetKey, position, backward, addressesJson);
     }
 
     /**
@@ -342,16 +356,19 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         toJson.put("flags", flags);
         toJson.put("assetKey", assetKey);
-        toJson.put("amount", amount.toPlainString());
         toJson.put("balancePosition", balancePos);
         toJson.put("backward", backward);
 
         JSONArray array = new JSONArray();
-        for (byte[] address : addresses) {
-            array.add(Base58.encode(crypto.getAddressFromShortBytes(address)));
+        for (Tuple3<byte[], BigDecimal, String> item : addresses) {
+            JSONArray itemArray = new JSONArray();
+            itemArray.add(Base58.encode(crypto.getAddressFromShortBytes(item.a)));
+            itemArray.add(item.b.toPlainString());
+            itemArray.add(item.c);
 
+            array.add(itemArray);
         }
-        toJson.put("addresses", array);
+        toJson.put("list", array);
 
         return toJson;
     }
@@ -375,19 +392,16 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     public int isValid(RSignNote rNote) {
 
         if (this.assetKey == 0L) {
-            errorValue = "Airdrop: assetKey == null or ZERO";
+            errorValue = "ListPays: assetKey == null or ZERO";
             return Transaction.INVALID_ITEM_KEY;
         } else if (this.balancePos < TransactionAmount.ACTION_SEND || this.balancePos > TransactionAmount.ACTION_SPEND) {
-            errorValue = "Airdrop: balancePos out off range";
+            errorValue = "ListPays: balancePos out off range";
             return Transaction.INVALID_BALANCE_POS;
-        } else if (amount.signum() < 0) {
-            errorValue = "Airdrop: payMethodValue < 0";
-            return Transaction.INVALID_AMOUNT;
         }
 
         height = rNote.getBlockHeight();
 
-        Account recipient = new Account(addresses[0]);
+        Account recipient = new Account(addresses[0].a);
         PublicKeyAccount creator = rNote.getCreator();
         byte[] signature = rNote.getSignature();
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
@@ -413,22 +427,41 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
                     key, asset, signs.b > 0 ? totalPay : totalPay.negate(), recipient,
                     backward, totalFeeBG, null, creatorIsPerson, actionFlags, rNote.getTimestamp());
             if (result.a != Transaction.VALIDATE_OK) {
-                errorValue = "Airdrop: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
+                errorValue = "ListPays: totalPay + totalFee = " + totalPay.toPlainString() + " / " + totalFeeBG.toPlainString();
                 return result.a;
             }
         }
 
         int index = 0;
-        for (byte[] recipientShort : addresses) {
+        for (Tuple3<byte[], BigDecimal, String> item : addresses) {
 
-            recipient = new Account(recipientShort);
+            if (item.a.length != Account.ADDRESS_SHORT_LENGTH) {
+                errorValue = "ListPays: item[" + index + "] ->  address len != " + Account.ADDRESS_SHORT_LENGTH;
+                return Transaction.INVALID_RECEIVER;
+            }
+
+            recipient = new Account(item.a);
+            if (recipient == null) {
+                errorValue = "ListPays: item[" + index + "]";
+                return Transaction.INVALID_RECEIVER;
+            }
+
+            if (item.b.signum() == 0) {
+                errorValue = "ListPays: item[" + index + "] ->  amount == 0";
+                return Transaction.INVALID_AMOUNT;
+            }
+
+            if (item.c.getBytes(StandardCharsets.UTF_8).length > 256) {
+                errorValue = "ListPays: item[" + index + "] -> Memo string > 256";
+                return Transaction.INVALID_TITLE_LENGTH_MAX;
+            }
 
             result = TransactionAmount.isValidAction(dcSet, height, creator, signature,
-                    key, asset, amount, recipient,
+                    key, asset, item.b, recipient,
                     backward, BigDecimal.ZERO, null, creatorIsPerson, actionFlags, rNote.getTimestamp());
 
             if (result.a != Transaction.VALIDATE_OK) {
-                errorValue = "Airdrop: address[" + index + "] -> " + recipient.getAddress();
+                errorValue = "ListPays: item[" + index + "] -> " + recipient.getAddress();
                 return result.a;
             }
 
@@ -449,28 +482,31 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         boolean incomeReverse = balancePos == Account.BALANCE_POS_HOLD;
         boolean reversedBalancesInPosition = asset.isReverseBalancePos(balancePos);
 
-        // сбросим направление от фильтра
-        BigDecimal actionPayAmount = amount.abs();
-        // зададим направление от Действия нашего
-        actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
-
-        boolean isAmountNegate = amount.signum() < 0;
-        boolean backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
+        boolean isAmountNegate;
+        boolean backwardAction = false;
 
         Account recipient;
-        for (byte[] address : addresses) {
+        for (Tuple3<byte[], BigDecimal, String> item : addresses) {
 
-            recipient = new Account(address);
+            recipient = new Account(item.a);
             if (recipient == null)
                 break;
 
+            // сбросим направление от фильтра
+            BigDecimal actionPayAmount = item.b.abs();
+            // зададим направление от Действия нашего
+            actionPayAmount = signs.b > 0 ? actionPayAmount : actionPayAmount.negate();
+
+            isAmountNegate = item.b.signum() < 0;
+            backwardAction = (reversedBalancesInPosition ^ backward) ^ isAmountNegate;
+
             if (!asOrphan && block != null) {
-                rNote.addCalculated(block, recipient, absKey, amount,
+                rNote.addCalculated(block, recipient, absKey, item.b,
                         asset.viewAssetTypeAction(backwardAction, balancePos, asset.getMaker().equals(creator)));
             }
 
             if (creator.equals(recipient))
-                // пропустим себя в любом случае - хотя КАлькулейтед оставим для виду
+                // пропустим себя в любом случае
                 continue;
 
             TransactionAmount.processAction(dcSet, asOrphan, creator, recipient, balancePos, absKey,
@@ -481,7 +517,8 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         if (!asOrphan && block != null) {
             rNote.addCalculated(block, creator, absKey, totalPay.negate(),
-                    asset.viewAssetTypeAction(backwardAction, balancePos, asset.getMaker().equals(creator)));
+                    asset.viewAssetTypeAction(backwardAction, // by last list action on ITEM
+                            balancePos, asset.getMaker().equals(creator)));
         }
 
     }

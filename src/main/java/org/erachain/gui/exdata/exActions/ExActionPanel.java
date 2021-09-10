@@ -65,7 +65,7 @@ public class ExActionPanel extends IconPanel {
         add(selectBox, fieldGBC);
 
         actionPanels[ExAction.FILTERED_ACCRUALS_TYPE] = new ExFilteredPaysPanel(parent);
-        actionPanels[ExAction.LIST_PAYOUTS_TYPE] = new ExAirDropPanel(parent);
+        actionPanels[ExAction.SIMPLE_PAYOUTS_TYPE] = new ExAirDropPanel(parent);
 
         for (JPanel actionPanel : actionPanels) {
             actionPanel.setVisible(false);
