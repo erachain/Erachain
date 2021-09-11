@@ -1,7 +1,5 @@
 package org.erachain.core;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -20,10 +18,10 @@ import org.erachain.datachain.DCSet;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.utils.FileUtils;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -495,26 +493,7 @@ public class BlockChain {
             if (file.exists()) {
                 LOGGER.info(Settings.CLONE_OR_SIDE.toLowerCase() + "PROTOCOL.json USED");
                 // START SIDE CHAIN
-                String jsonString = "";
-                try {
-                    List<String> lines = Files.readLines(file, Charsets.UTF_8);
-
-                    for (String line : lines) {
-                        if (line.trim().startsWith("//")) {
-                            // пропускаем //
-                            continue;
-                        }
-                        jsonString += line;
-                    }
-
-                } catch (Exception e) {
-                    LOGGER.info("Error while reading " + file.getAbsolutePath());
-                    LOGGER.error(e.getMessage(), e);
-                    System.exit(3);
-                }
-
-                //CREATE JSON OBJECT
-                JSONObject chainParams = (JSONObject) JSONValue.parse(jsonString);
+                JSONObject chainParams = FileUtils.readCommentedJSONObject(file.getPath());
                 if (chainParams == null) {
                     throw new Exception("Wrong JSON or not UTF-8 encode in " + file.getName());
                 }

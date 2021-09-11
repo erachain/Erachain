@@ -1,9 +1,16 @@
 package org.erachain.utils;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 public class FileUtils {
 
@@ -26,6 +33,47 @@ public class FileUtils {
         return bytes;
     }
 
+    public static String readCommentedText(String path) throws IOException {
 
+        File file = new File(path);
+
+        if (!file.exists())
+            return null;
+
+        List<String> lines;
+        try {
+            lines = Files.readLines(file, Charsets.UTF_8);
+        } catch (IOException e) {
+            throw new IOException("Could not completely read file " + file.getName());
+        }
+
+        String jsonString = "";
+        for (String line : lines) {
+            if (line.trim().startsWith("//")) {
+                continue;
+            }
+            jsonString += line;
+        }
+
+        return jsonString;
+    }
+
+    public static JSONObject readCommentedJSONObject(String path) throws IOException {
+        String text = readCommentedText(path);
+        if (text == null)
+            return new JSONObject();
+
+        //CREATE JSON OBJECT
+        return (JSONObject) JSONValue.parse(text);
+    }
+
+    public static JSONArray readCommentedJSONArray(String path) throws IOException {
+        String text = readCommentedText(path);
+        if (text == null)
+            return new JSONArray();
+
+        //CREATE JSON ARRAY
+        return (JSONArray) JSONValue.parse(text);
+    }
 
 }

@@ -20,7 +20,9 @@ import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.settings.Settings;
+import org.erachain.utils.FileUtils;
 import org.erachain.utils.MonitoredThread;
+import org.erachain.utils.SaveStrToFile;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -44,7 +46,9 @@ import java.util.concurrent.TimeUnit;
 
 public class FPool extends MonitoredThread {
 
+    final static String settings_path = "settings_fpool.json";
     final static int PENDING_PERIOD = 5;
+    JSONObject settingsJSON;
     Controller controller;
     BlockChain blockChain;
     DCSet dcSet;
@@ -66,6 +70,13 @@ public class FPool extends MonitoredThread {
         this.dcSet = dcSet;
         this.privateKeyAccount = privateKeyAccount;
         this.poolFee = new BigDecimal(poolFee).movePointLeft(2);
+
+        try {
+            settingsJSON = FileUtils.readCommentedJSONObject(settings_path);
+        } catch (IOException e) {
+            settingsJSON = new JSONObject();
+        }
+
 
         this.setName("Forging Pool[" + this.getId() + "]");
 
@@ -471,6 +482,12 @@ public class FPool extends MonitoredThread {
 
         dpSet.close();
         LOGGER.info("Forging Pool halted");
+
+        try {
+            SaveStrToFile.saveJsonFine(settings_path, settingsJSON);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
 
     }
 
