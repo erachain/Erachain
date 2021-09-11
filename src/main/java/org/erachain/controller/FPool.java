@@ -95,6 +95,18 @@ public class FPool extends MonitoredThread {
         return blockingQueue.offer(block);
     }
 
+    public BigDecimal getTax() {
+        return poolFee;
+    }
+
+    public String getAddress() {
+        return privateKeyAccount.getAddress();
+    }
+
+    public int getPendingPeriod() {
+        return PENDING_PERIOD;
+    }
+
     private boolean balanceReady(Long assteKey, BigDecimal balance) {
         switch ((int) (long) assteKey) {
             case (int) AssetCls.ERA_KEY:
@@ -113,6 +125,10 @@ public class FPool extends MonitoredThread {
         BigDecimal amount;
         int scale = asset.getScale() + 6;
         Tuple2<Long, String> key;
+
+        // USE TAX
+        totalEarn = totalEarn.multiply(BigDecimal.ONE.subtract(poolFee));
+
         for (String address : credits.keySet()) {
             amount = totalEarn.multiply(credits.get(address)).divide(totalForginAmount, scale, RoundingMode.DOWN);
 
@@ -130,7 +146,7 @@ public class FPool extends MonitoredThread {
     private boolean processMessage(Block block) {
 
         if (block == null
-            //|| !privateKeyAccount.equals(block.getCreator())
+                || !privateKeyAccount.equals(block.getCreator())
         )
             return false;
 
@@ -152,9 +168,6 @@ public class FPool extends MonitoredThread {
             while (iterator.hasNext()) {
                 key = iterator.next();
 
-                if (!privateKeyAccount.equals(key.a) || !key.b.equals(AssetCls.ERA_KEY))
-                    break;
-
                 creditAmount = creditMap.get(key);
                 if (creditAmount.signum() <= 0)
                     continue;
@@ -166,29 +179,62 @@ public class FPool extends MonitoredThread {
             return false;
         }
 
+        if (credits.size() == 0)
+            return true;
+
         results = new HashMap<>();
 
         // FOR FEE
-        addRewards(BlockChain.FEE_ASSET, feeEarn, totalForginAmount, credits);
+        if (feeEarn.signum() > 0) {
+            addRewards(BlockChain.FEE_ASSET, feeEarn, totalForginAmount, credits);
+        }
 
-        if (false) {
+        if (totalEmite.signum() > 0) {
             // FOR ERA
             addRewards(BlockChain.ERA_ASSET, totalEmite, totalForginAmount, credits);
         }
 
-        if (credits.size() == 0)
-            return true;
+        if (true) {
+            // TEST MODE
+            earnedAllAssets = new HashMap<>();
+            earnedAllAssets.put(BlockChain.ERA_ASSET, new Tuple2<>(new BigDecimal("10"), new BigDecimal("1")));
+            earnedAllAssets.put(controller.getAsset(16L), new Tuple2<>(new BigDecimal("20"), new BigDecimal("5")));
+        }
 
         // for all ERNAED assets
-        for (AssetCls assetEran : earnedAllAssets.keySet()) {
-            Fun.Tuple2<BigDecimal, BigDecimal> item = earnedAllAssets.get(assetEran);
-            addRewards(assetEran, item.a, totalForginAmount, credits);
+        if (earnedAllAssets != null) {
+            for (AssetCls assetEran : earnedAllAssets.keySet()) {
+                Fun.Tuple2<BigDecimal, BigDecimal> item = earnedAllAssets.get(assetEran);
+                addRewards(assetEran, item.a, totalForginAmount, credits);
+            }
         }
 
         dpSet.getBlocksMap().put(block.heightBlock, new Object[]{block.getSignature(), results});
 
         return true;
 
+    }
+
+    /**
+     * height + signature(STRING)
+     *
+     * @return
+     */
+    public Object[][] getPending() {
+
+        FPoolBlocksMap blocksMap = dpSet.getBlocksMap();
+        Object[][] result = new Object[blocksMap.size()][];
+        try (IteratorCloseable<Integer> iterator = IteratorCloseableImpl.make(blocksMap.getIterator())) {
+            Integer height;
+            int index = 0;
+            while (iterator.hasNext()) {
+                height = iterator.next();
+                result[index++] = new Object[]{height, blocksMap.get(height)[0]};
+            }
+        } catch (IOException e) {
+        }
+
+        return result;
     }
 
     private void checkPending() {
@@ -220,6 +266,7 @@ public class FPool extends MonitoredThread {
 
             }
         } catch (IOException e) {
+            return;
         }
 
     }
@@ -254,6 +301,7 @@ public class FPool extends MonitoredThread {
 
             }
         } catch (IOException e) {
+            return;
         }
 
         if (assetKeyToWithdraw == null) {

@@ -442,6 +442,16 @@ public class ApiClient {
                             "Errors: 102 - Invalid address. 601 - Invalid asset id."
                     },
                     {
+                            "GET addresses/creditors/<address>/<key>",
+                            "Returns list of creditors of the given address for the given asset key.",
+                            "Errors: 102 - Invalid address. 601 - Invalid asset id."
+                    },
+                    {
+                            "GET addresses/debitors/<address>/<key>",
+                            "Returns list of debitors of the given address for the given asset key.",
+                            "Errors: 102 - Invalid address. 601 - Invalid asset id."
+                    },
+                    {
                             "POST addresses/sign/<address> <message>",
                             "Signs the given message using the given address.",
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked."
@@ -817,6 +827,23 @@ public class ApiClient {
                     {
                             "GET trade/updatepairs/[days]",
                             "Update pairs stat by trades deep days. May be need after resynchronization"
+                    },
+                    ///////// FORGING POOL
+                    {
+                            "GET fpool",
+                            "Get FPool info"
+                    },
+                    {
+                            "GET fpool/pending",
+                            "Get pending blocks"
+                    },
+                    {
+                            "GET fpool/rewardblock/<blockNo>",
+                            "Make rewards by block and last forging values - test?"
+                    },
+                    {
+                            "GET fpool/settax/<tax>",
+                            "set tax"
                     }
 
 

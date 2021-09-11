@@ -8,8 +8,10 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.APIUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -23,6 +25,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -475,6 +478,96 @@ public class AddressesResource {
                 = DCSet.getInstance().getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
 
         return balance.a.a.toPlainString();
+    }
+
+    @GET
+    @Path("creditors/{address}/{assetid}")
+    public String getAssetCreditors(@PathParam("address") String address,
+                                    @PathParam("assetid") Long assetKey) {
+        // CHECK IF VALID ADDRESS
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_ADDRESS);
+
+        }
+
+        // DOES ASSETID EXIST
+        if (!DCSet.getInstance().getItemAssetMap().contains(assetKey)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+
+        }
+
+        CreditAddressesMap map = DCSet.getInstance().getCredit_AddressesMap();
+        JSONArray out = new JSONArray();
+        try (IteratorCloseable<Fun.Tuple3<String, Long, String>> iterator = map.getCreditorsIterator(address, assetKey)) {
+            Fun.Tuple3<String, Long, String> key;
+            BigDecimal credit;
+            JSONArray item;
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                credit = map.get(key);
+
+                item = new JSONArray();
+                item.add(key.a);
+                item.add(credit);
+
+                out.add(item);
+
+
+            }
+        } catch (IOException e) {
+        }
+
+        return out.toJSONString();
+    }
+
+    @GET
+    @Path("debitors/{address}/{assetid}")
+    public String getAssetDebitors(@PathParam("address") String address,
+                                   @PathParam("assetid") Long assetKey) {
+        // CHECK IF VALID ADDRESS
+        Tuple2<Account, String> result = Account.tryMakeAccount(address);
+        if (result.a == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_ADDRESS);
+
+        }
+
+        // DOES ASSETID EXIST
+        if (!DCSet.getInstance().getItemAssetMap().contains(assetKey)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+
+        }
+
+        CreditAddressesMap map = DCSet.getInstance().getCredit_AddressesMap();
+        JSONArray out = new JSONArray();
+        try (IteratorCloseable<Fun.Tuple3<String, Long, String>> iterator = map.getDebitorsIterator(address, assetKey)) {
+            Fun.Tuple3<String, Long, String> key;
+            BigDecimal credit;
+            JSONArray item;
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                credit = map.get(key);
+
+                item = new JSONArray();
+                item.add(key.c);
+                item.add(credit);
+
+                out.add(item);
+
+
+            }
+        } catch (IOException e) {
+        }
+
+        return out.toJSONString();
     }
 
     @SuppressWarnings("unchecked")
