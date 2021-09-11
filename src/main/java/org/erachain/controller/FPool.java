@@ -49,7 +49,7 @@ public class FPool extends MonitoredThread {
     final static String settings_path = "settings_fpool.json";
 
     static int PENDING_PERIOD;
-    static JSONObject MIN_WITHDRAWS;
+    static HashMap<Long, BigDecimal> MIN_WITHDRAWS;
     static BigDecimal POOL_TAX;
 
     JSONObject settingsJSON;
@@ -84,17 +84,22 @@ public class FPool extends MonitoredThread {
             settingsJSON.put("pending_period", 30);
 
             JSONObject min_withdraw = new JSONObject();
-            min_withdraw.put(AssetCls.ERA_KEY, 1d);
-            min_withdraw.put(AssetCls.FEE_KEY, 0.001d);
-            min_withdraw.put(AssetCls.BTC_KEY, 0.00001d);
-            min_withdraw.put(0, 0.01d); // OTHER
+            min_withdraw.put("" + AssetCls.ERA_KEY, "1");
+            min_withdraw.put("" + AssetCls.FEE_KEY, "0.001");
+            min_withdraw.put("" + AssetCls.BTC_KEY, "0.00001");
+            min_withdraw.put("0", "0.01"); // OTHER
 
             settingsJSON.put("min_withdraw", min_withdraw);
         }
 
         try {
             PENDING_PERIOD = Integer.parseInt(settingsJSON.getOrDefault("pending_period", 30).toString());
-            MIN_WITHDRAWS = (JSONObject) settingsJSON.get("min_withdraw");
+            MIN_WITHDRAWS = new HashMap();
+            JSONObject minJSON = (JSONObject) settingsJSON.get("min_withdraw");
+            for (Object keyStr : minJSON.keySet()) {
+                MIN_WITHDRAWS.put(Long.parseLong((String) keyStr), new BigDecimal((String) minJSON.get(keyStr)));
+            }
+
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -151,9 +156,10 @@ public class FPool extends MonitoredThread {
     }
 
     private boolean balanceReady(Long assteKey, BigDecimal balance) {
-        BigDecimal min_withdraw = (BigDecimal) MIN_WITHDRAWS.get(assteKey);
-        if (min_withdraw == null)
-            min_withdraw = new BigDecimal((Double) MIN_WITHDRAWS.getOrDefault("0", 0.01d));
+        BigDecimal min_withdraw = MIN_WITHDRAWS.get(assteKey);
+        if (min_withdraw == null) {
+            min_withdraw = MIN_WITHDRAWS.get(0L);
+        }
 
         return balance.compareTo(min_withdraw) > 0;
 
