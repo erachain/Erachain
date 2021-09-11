@@ -1937,11 +1937,22 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
     public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
 
+        if (BlockChain.TEST_MODE) {
+            // EMITTE
+            if (earnedAllAssets == null)
+                earnedAllAssets = new HashMap<>();
+
+            BigDecimal emite = BigDecimal.TEN;
+            addAssetFee(BlockChain.ERA_ASSET, emite, null);
+            BlockChain.ERA_ASSET.getMaker().changeBalance(dcSet, !asOrphan, false,
+                    AssetCls.ERA_KEY, emite, false, false, false);
+
+        }
+
         if (transactionCount == 0)
             return;
 
         // подсчет наград с ПЕРЕВОДОВ
-        Tuple2<BigDecimal, BigDecimal> earnedPair;
         for (Transaction transaction : getTransactions()) {
             if (transaction.assetFee == null)
                 continue;
@@ -1952,6 +1963,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         // FOR ASSETS
+        Tuple2<BigDecimal, BigDecimal> earnedPair;
         for (AssetCls asset : earnedAllAssets.keySet()) {
             earnedPair = earnedAllAssets.get(asset);
 

@@ -122,16 +122,16 @@ public class FPool extends MonitoredThread {
         BigDecimal min;
         switch ((int) (long) assteKey) {
             case (int) AssetCls.ERA_KEY:
-                min = new BigDecimal("0.01");
+                min = new BigDecimal("1");
                 break;
             case (int) AssetCls.FEE_KEY:
-                min = new BigDecimal("0.0001");
+                min = new BigDecimal("0.001");
                 break;
             case (int) AssetCls.BTC_KEY:
-                min = new BigDecimal("0.000001");
+                min = new BigDecimal("0.00001");
                 break;
             default:
-                min = new BigDecimal("0.00001");
+                min = new BigDecimal("0.0001");
         }
         return balance.compareTo(min) > 0;
 
