@@ -191,7 +191,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         if (totalPay == null) {
             dbData = new byte[1];
-            buff = null;
+            return dbData;
         } else {
             buff = this.totalPay.unscaledValue().toByteArray();
             dbData = new byte[2 + buff.length];
@@ -200,6 +200,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         int pos = 0;
 
         dbData[pos++] = (byte) buff.length;
+
 
         dbData[pos++] = (byte) this.totalPay.scale();
         System.arraycopy(buff, 0, dbData, pos, buff.length);
@@ -490,6 +491,10 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         height = rNote.getBlockHeight();
         asset = dcSet.getItemAssetMap().get(assetKey);
+
+        if (results == null) {
+            preProcess(rNote);
+        }
 
         processBody(rNote, false, block);
 
