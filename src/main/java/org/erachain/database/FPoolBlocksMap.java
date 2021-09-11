@@ -18,6 +18,9 @@ public class FPoolBlocksMap extends DCUMapImpl<Integer, Object[]> {
 
     @Override
     public void openMap() {
+
+        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
+
         //OPEN MAP
         map = database.createTreeMap("pool_blocks")
                 .makeOrGet();

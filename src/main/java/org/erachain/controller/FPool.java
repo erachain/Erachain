@@ -4,6 +4,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exActions.ExListPays;
@@ -220,6 +221,7 @@ public class FPool extends MonitoredThread {
         }
 
         dpSet.getBlocksMap().put(block.heightBlock, new Object[]{block.getSignature(), results});
+        results = null;
 
         return true;
 
@@ -239,7 +241,7 @@ public class FPool extends MonitoredThread {
             int index = 0;
             while (iterator.hasNext()) {
                 height = iterator.next();
-                result[index++] = new Object[]{height, blocksMap.get(height)[0]};
+                result[index++] = new Object[]{height, Base58.encode((byte[]) blocksMap.get(height)[0])};
             }
         } catch (IOException e) {
         }
@@ -284,9 +286,9 @@ public class FPool extends MonitoredThread {
                     blockResults = (HashMap<Tuple2<Long, String>, BigDecimal>) item[1];
                     for (Tuple2<Long, String> key : blockResults.keySet()) {
                         if (balsMap.contains(key)) {
-                            balsMap.put(key, balsMap.get(key).add(results.get(key)));
+                            balsMap.put(key, balsMap.get(key).add(blockResults.get(key)));
                         } else {
-                            balsMap.put(key, results.get(key));
+                            balsMap.put(key, blockResults.get(key));
                         }
                     }
                 } else {

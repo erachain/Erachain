@@ -27,7 +27,8 @@ example for auto make wallet keys: -seed=3:new:1
 -fpool=FORGING_ACCOUNT:FEE_PERCENT
 Start forging pool on account and set tax.
 For ezample: -fpool=77MWxrB6BuykCrZrsTqmfgfC3vGTgwFQYS:3.5
-!! Used only with -pass parametr
+!! Used only with -pass parameter
+see RPC fpool commands for control and statistic
 
 -backup
 
