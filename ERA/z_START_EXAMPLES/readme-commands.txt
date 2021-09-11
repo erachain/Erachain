@@ -27,7 +27,7 @@ example for auto make wallet keys: -seed=3:new:1
 -fpool
 Start forging pool
 !! Used only with -pass parameter
-Settings set in settings_fpool.json (see example in settings_fpool-example.json).
+Setup by settings_fpool.json (see example in settings_fpool-example.json).
 See RPC and API fpool commands for control and statistic.
 
 -backup
