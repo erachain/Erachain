@@ -834,12 +834,12 @@ public class ApiClient {
                             "Get FPool info"
                     },
                     {
-                            "GET fpool/pending",
+                            "GET fpool/pending_blocks",
                             "Get pending blocks"
                     },
                     {
-                            "GET fpool/rewardblock/<blockNo>",
-                            "Make rewards by block and last forging values - test?"
+                            "GET fpool/pending_withdraws",
+                            "Get pending withdraws"
                     },
                     {
                             "GET fpool/settax/<tax>",

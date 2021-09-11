@@ -4,6 +4,7 @@ package org.erachain.api;
 import org.erachain.controller.Controller;
 import org.erachain.controller.FPool;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
+import java.util.TreeMap;
 
 @Path("fpool")
 @Produces(MediaType.APPLICATION_JSON)
@@ -46,8 +48,8 @@ public class FPoolResource {
     }
 
     @GET
-    @Path("pending")
-    public String getPending() {
+    @Path("pending_blocks")
+    public String getPendingBlocks() {
 
         JSONObject out = new JSONObject();
 
@@ -57,9 +59,33 @@ public class FPoolResource {
             return out.toJSONString();
         }
 
-        Object[][] pending = fpool.getPending();
+        Object[][] pending = fpool.getPendingBlocks();
         for (Object[] block : pending) {
             out.put(block[0], block[1]);
+        }
+
+        return out.toJSONString();
+    }
+
+    @GET
+    @Path("pending_withdraws")
+    public String getPendingWithdraws() {
+
+        JSONObject out = new JSONObject();
+
+        FPool fpool = contr.fPool;
+        if (fpool == null) {
+            out.put("status", "off");
+            return out.toJSONString();
+        }
+
+        TreeMap<Fun.Tuple2<Long, String>, BigDecimal> pending = fpool.getPendingWithdraws();
+        for (Fun.Tuple2<Long, String> key : pending.keySet()) {
+            if (!out.containsKey(key.a)) {
+                out.put(key.a, new JSONObject());
+            }
+
+            ((JSONObject) out.get(key.a)).put(key.b, pending.get(key));
         }
 
         return out.toJSONString();

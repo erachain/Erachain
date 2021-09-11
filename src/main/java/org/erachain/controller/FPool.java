@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -127,7 +128,7 @@ public class FPool extends MonitoredThread {
 
     private void addRewards(AssetCls asset, BigDecimal totalEarn, BigDecimal totalForginAmount, HashMap<String, BigDecimal> credits) {
         BigDecimal amount;
-        int scale = asset.getScale() + 6;
+        int scale = asset.getScale() + 8;
         Tuple2<Long, String> key;
 
         // USE TAX
@@ -135,6 +136,10 @@ public class FPool extends MonitoredThread {
 
         for (String address : credits.keySet()) {
             amount = totalEarn.multiply(credits.get(address)).divide(totalForginAmount, scale, RoundingMode.DOWN);
+            if (amount.signum() == 0)
+                continue;
+
+            amount = amount.stripTrailingZeros();
 
             key = new Tuple2<>(asset.getKey(), address);
 
@@ -159,7 +164,7 @@ public class FPool extends MonitoredThread {
         BigDecimal totalEmite = BigDecimal.ZERO;
         HashMap<AssetCls, Fun.Tuple2<BigDecimal, BigDecimal>> earnedAllAssets = block.getEarnedAllAssets();
 
-        BigDecimal totalForginAmount = privateKeyAccount.getBalanceUSE(AssetCls.FEE_KEY);
+        BigDecimal totalForginAmount = privateKeyAccount.getBalanceUSE(AssetCls.ERA_KEY);
 
         // make table of credits
         CreditAddressesMap creditMap = dcSet.getCredit_AddressesMap();
@@ -176,7 +181,7 @@ public class FPool extends MonitoredThread {
                 if (creditAmount.signum() <= 0)
                     continue;
 
-                credits.put(key.c, creditAmount);
+                credits.put(key.a, creditAmount);
             }
 
         } catch (IOException e) {
@@ -198,11 +203,12 @@ public class FPool extends MonitoredThread {
             addRewards(BlockChain.ERA_ASSET, totalEmite, totalForginAmount, credits);
         }
 
-        if (true) {
+        if (BlockChain.TEST_MODE) {
             // TEST MODE
             earnedAllAssets = new HashMap<>();
-            earnedAllAssets.put(BlockChain.ERA_ASSET, new Tuple2<>(new BigDecimal("10"), new BigDecimal("1")));
-            earnedAllAssets.put(controller.getAsset(16L), new Tuple2<>(new BigDecimal("20"), new BigDecimal("5")));
+            earnedAllAssets.put(BlockChain.ERA_ASSET, new Tuple2<>(new BigDecimal("10"), BigDecimal.ZERO));
+            earnedAllAssets.put(controller.getAsset(AssetCls.BTC_KEY), new Tuple2<>(new BigDecimal("0.000001"), BigDecimal.ZERO));
+            earnedAllAssets.put(controller.getAsset(18L), new Tuple2<>(new BigDecimal("1"), BigDecimal.ZERO));
         }
 
         // for all ERNAED assets
@@ -220,11 +226,11 @@ public class FPool extends MonitoredThread {
     }
 
     /**
-     * height + signature(STRING)
+     * Pending block - await add to payouts. height + signature(STRING)
      *
      * @return
      */
-    public Object[][] getPending() {
+    public Object[][] getPendingBlocks() {
 
         FPoolBlocksMap blocksMap = dpSet.getBlocksMap();
         Object[][] result = new Object[blocksMap.size()][];
@@ -241,10 +247,30 @@ public class FPool extends MonitoredThread {
         return result;
     }
 
+    public TreeMap<Tuple2<Long, String>, BigDecimal> getPendingWithdraws() {
+
+        FPoolBalancesMap balanceMap = dpSet.getBalancesMap();
+        TreeMap<Tuple2<Long, String>, BigDecimal> result = new TreeMap();
+        try (IteratorCloseable<Tuple2<Long, String>> iterator = IteratorCloseableImpl.make(balanceMap.getIterator())) {
+            BigDecimal balance;
+            Fun.Tuple2<Long, String> key;
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                balance = balanceMap.get(key);
+                if (balance.signum() > 0)
+                    result.put(key, balance);
+
+            }
+        } catch (IOException e) {
+        }
+
+        return result;
+    }
+
     private void checkPending() {
 
         FPoolBlocksMap blocksMap = dpSet.getBlocksMap();
-        FPoolBalancesMap balsMap = dpSet.geBbalancesMap();
+        FPoolBalancesMap balsMap = dpSet.getBalancesMap();
         try (IteratorCloseable<Integer> iterator = IteratorCloseableImpl.make(blocksMap.getIterator())) {
             Integer height;
             while (iterator.hasNext()) {
@@ -276,7 +302,7 @@ public class FPool extends MonitoredThread {
     }
 
     private void payout() {
-        FPoolBalancesMap balsMap = dpSet.geBbalancesMap();
+        FPoolBalancesMap balsMap = dpSet.getBalancesMap();
 
         Long assetKeyToWithdraw = null;
         List<Tuple2<String, BigDecimal>> payouts = new ArrayList();

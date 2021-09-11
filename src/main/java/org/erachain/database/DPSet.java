@@ -115,7 +115,7 @@ public class DPSet extends DBASet {
         return this.blocksMap;
     }
 
-    public FPoolBalancesMap geBbalancesMap() {
+    public FPoolBalancesMap getBalancesMap() {
         return this.balancesMap;
     }
 
