@@ -29,6 +29,7 @@ Start forging pool on account and set tax.
 For ezample: -fpool=77MWxrB6BuykCrZrsTqmfgfC3vGTgwFQYS:3.5
 !! Used only with -pass parameter
 see RPC and API fpool commands for control and statistic
+Settings set in settings_fpool.json (see example in settings_fpool-example.json)
 
 -backup
 

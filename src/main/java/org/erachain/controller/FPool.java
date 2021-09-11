@@ -47,13 +47,16 @@ import java.util.concurrent.TimeUnit;
 public class FPool extends MonitoredThread {
 
     final static String settings_path = "settings_fpool.json";
-    final static int PENDING_PERIOD = 5;
+
+    static int PENDING_PERIOD;
+    static JSONObject MIN_WITHDRAWS;
+    static BigDecimal POOL_TAX;
+
     JSONObject settingsJSON;
     Controller controller;
     BlockChain blockChain;
     DCSet dcSet;
     DPSet dpSet;
-    BigDecimal poolFee;
     String title = "Forging poll Withdraw";
     PrivateKeyAccount privateKeyAccount;
 
@@ -69,7 +72,7 @@ public class FPool extends MonitoredThread {
         this.blockChain = blockChain;
         this.dcSet = dcSet;
         this.privateKeyAccount = privateKeyAccount;
-        this.poolFee = new BigDecimal(poolFee).movePointLeft(2);
+        this.POOL_TAX = new BigDecimal(poolFee).movePointLeft(2);
 
         try {
             settingsJSON = FileUtils.readCommentedJSONObject(settings_path);
@@ -77,6 +80,24 @@ public class FPool extends MonitoredThread {
             settingsJSON = new JSONObject();
         }
 
+        if (settingsJSON.isEmpty()) {
+            settingsJSON.put("pending_period", 30);
+
+            JSONObject min_withdraw = new JSONObject();
+            min_withdraw.put(AssetCls.ERA_KEY, 1d);
+            min_withdraw.put(AssetCls.FEE_KEY, 0.001d);
+            min_withdraw.put(AssetCls.BTC_KEY, 0.00001d);
+            min_withdraw.put(0, 0.01d); // OTHER
+
+            settingsJSON.put("min_withdraw", min_withdraw);
+        }
+
+        try {
+            PENDING_PERIOD = Integer.parseInt(settingsJSON.getOrDefault("pending_period", 30).toString());
+            MIN_WITHDRAWS = (JSONObject) settingsJSON.get("min_withdraw");
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
 
         this.setName("Forging Pool[" + this.getId() + "]");
 
@@ -110,11 +131,11 @@ public class FPool extends MonitoredThread {
     }
 
     public BigDecimal getTax() {
-        return poolFee;
+        return POOL_TAX;
     }
 
     public void setTax(BigDecimal newTax) {
-        poolFee = newTax;
+        POOL_TAX = newTax;
     }
 
     public String getAddress() {
@@ -130,21 +151,11 @@ public class FPool extends MonitoredThread {
     }
 
     private boolean balanceReady(Long assteKey, BigDecimal balance) {
-        BigDecimal min;
-        switch ((int) (long) assteKey) {
-            case (int) AssetCls.ERA_KEY:
-                min = new BigDecimal("1");
-                break;
-            case (int) AssetCls.FEE_KEY:
-                min = new BigDecimal("0.001");
-                break;
-            case (int) AssetCls.BTC_KEY:
-                min = new BigDecimal("0.00001");
-                break;
-            default:
-                min = new BigDecimal("0.0001");
-        }
-        return balance.compareTo(min) > 0;
+        BigDecimal min_withdraw = (BigDecimal) MIN_WITHDRAWS.get(assteKey);
+        if (min_withdraw == null)
+            min_withdraw = new BigDecimal((Double) MIN_WITHDRAWS.getOrDefault("0", 0.01d));
+
+        return balance.compareTo(min_withdraw) > 0;
 
     }
 
@@ -154,7 +165,7 @@ public class FPool extends MonitoredThread {
         Tuple2<Long, String> key;
 
         // USE TAX
-        totalEarn = totalEarn.multiply(BigDecimal.ONE.subtract(poolFee));
+        totalEarn = totalEarn.multiply(BigDecimal.ONE.subtract(POOL_TAX));
 
         for (String address : credits.keySet()) {
             amount = totalEarn.multiply(credits.get(address)).divide(totalForginAmount, scale, RoundingMode.DOWN);
