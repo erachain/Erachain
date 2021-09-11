@@ -1814,6 +1814,13 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     //PROCESS/ORPHAN
 
+    /**
+     * add some earn for forger and set some burn value
+     *
+     * @param asset
+     * @param assetFeeAdd
+     * @param assetFeeBurnAdd
+     */
     public void addAssetFee(AssetCls asset, BigDecimal assetFeeAdd, BigDecimal assetFeeBurnAdd) {
 
         Tuple2<BigDecimal, BigDecimal> earnedPair;
