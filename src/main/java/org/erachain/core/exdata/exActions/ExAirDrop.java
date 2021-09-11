@@ -509,4 +509,14 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
     }
 
+    public boolean isInvolved(Account account) {
+        if (results != null) {
+            for (Fun.Tuple2<Account, Fun.Tuple2<Integer, String>> item : results) {
+                if (item.a.equals(account))
+                    return true;
+            }
+        }
+        return false;
+    }
+
 }

@@ -1348,4 +1348,14 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     }
 
+    public boolean isInvolved(Account account) {
+        if (results != null) {
+            for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
+                if (item.a.equals(account))
+                    return true;
+            }
+        }
+        return false;
+    }
+
 }

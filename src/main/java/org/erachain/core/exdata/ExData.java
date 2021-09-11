@@ -1784,4 +1784,21 @@ public class ExData {
         }
     }
 
+    public boolean isInvolved(Account account) {
+
+        if (hasRecipients()) {
+            for (Account item : recipients) {
+                if (account.equals(item))
+                    return true;
+            }
+        }
+
+        if (hasExAction()) {
+            if (exAction.isInvolved(account))
+                return true;
+        }
+
+        return false;
+    }
+
 }

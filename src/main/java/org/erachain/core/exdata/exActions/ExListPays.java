@@ -545,4 +545,14 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
 
     }
 
+    public boolean isInvolved(Account account) {
+        if (results != null) {
+            for (Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
+                if (item.a.equals(account))
+                    return true;
+            }
+        }
+        return false;
+    }
+
 }

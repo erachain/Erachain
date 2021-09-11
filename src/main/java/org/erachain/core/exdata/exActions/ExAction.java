@@ -156,4 +156,6 @@ public abstract class ExAction<R> {
 
     public abstract void orphan(Transaction rNote);
 
+    public abstract boolean isInvolved(Account account);
+
 }
