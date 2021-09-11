@@ -103,7 +103,7 @@ public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
         //INSERT INTO DATABASE
         this.item.insertToMap(this.dcSet, 0L);
@@ -112,7 +112,7 @@ public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
 
 
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
         //DELETE FROM DATABASE
         this.item.deleteFromMap(this.dcSet, 0L);

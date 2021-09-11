@@ -113,9 +113,9 @@ public abstract class AddressItemRefs extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         this.item.setReference(this.signature, dbRef);
 
@@ -126,9 +126,9 @@ public abstract class AddressItemRefs extends Transaction {
 
     //@Override
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         //DELETE FROM DATABASE
         long key = this.item.deleteFromMap(this.dcSet, START_KEY);

@@ -407,7 +407,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected long dbRef; // height + SeqNo
 
     // TODO REMOVE REFERENCE - use TIMESTAMP as reference
-    protected Long reference = 0l;
+    protected Long reference = 0L;
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
     /**
      * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
@@ -1805,6 +1805,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.signature = Crypto.getInstance().sign(creator, data);
     }
 
+    /**
+     * У неоторых трнзакций этот флаг занят и он другой - для toByte()
+     *
+     * @return
+     */
+    protected byte HAS_SMART_CONTRACT_MASK() {
+        return HAS_SMART_CONTRACT_MASK;
+    }
+
     // VALIDATE
 
     // releaserReference == null - not as pack
@@ -1840,10 +1849,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if (smartContract != null) {
             if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                typeBytes[2] = (byte) (typeBytes[2] | HAS_SMART_CONTRACT_MASK);
+                typeBytes[2] = (byte) (typeBytes[2] | HAS_SMART_CONTRACT_MASK());
                 data = Bytes.concat(data, smartContract.toBytes(forDeal));
             } else {
-                typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK;
+                typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
             }
         }
 
@@ -2526,8 +2535,12 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     // REST
 
-    // public abstract void process(DLSet db);
-    public void process(Block block, int forDeal) {
+    //////////////////////////////////// PROCESS
+
+    public void processHead(Block block, int forDeal) {
+    }
+
+    public void processBody(Block block, int forDeal) {
 
         if (forDeal > Transaction.FOR_PACK) {
 
@@ -2561,10 +2574,47 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     }
 
-    public void orphan(Block block, int forDeal) {
+    public void processTail(Block block, int forDeal) {
+        ///////// SMART CONTRACTS SESSION
+        if (smartContract == null) {
+            // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
+            // потом он будет записан в базу данных и его можно найти загрузив эту трнзакцию
+            smartContract = SmartContract.make(this);
+        }
 
         if (smartContract != null)
+            smartContract.process(dcSet, block, this);
+
+    }
+
+    public void process(Block block, int forDeal) {
+        processHead(block, forDeal);
+        processBody(block, forDeal);
+        processTail(block, forDeal);
+    }
+
+    //////////////////////////////////// ORPHAN
+
+    public void orphanHead(Block block, int forDeal) {
+        ///////// SMART CONTRACTS SESSION
+        if (smartContract == null) {
+            // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
+            // для Отката нужно это сделать тут
+            smartContract = SmartContract.make(this);
+        }
+
+        if (smartContract != null) {
+            // если смарт-контракт найден, то тут он Голый и
+            // его надо загружать из баазы данных чтобы восстановить все значения связанные с этой транзакцией
+            Transaction txInDB = dcSet.getTransactionFinalMap().get(dbRef);
+            smartContract = txInDB.getSmartContract();
+
             smartContract.orphan(dcSet, this);
+        }
+
+    }
+
+    public void orphanBody(Block block, int forDeal) {
 
         if (forDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
@@ -2599,6 +2649,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         // CLEAR all FOOTPRINTS and empty data
         this.dcSet.getVouchRecordMap().delete(dbRef);
 
+    }
+
+    public void orphanTail(Block block, int forDeal) {
+    }
+
+    public void orphan(Block block, int forDeal) {
+        orphanHead(block, forDeal);
+        orphanBody(block, forDeal);
+        orphanTail(block, forDeal);
     }
 
     public Transaction copy() {

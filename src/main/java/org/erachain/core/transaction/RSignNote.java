@@ -608,6 +608,12 @@ public class RSignNote extends Transaction implements Itemable {
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
+
         int add_len = 0;
         if (this.data != null && this.data.length > 0)
             add_len += DATA_SIZE_LENGTH + this.data.length;
@@ -631,9 +637,9 @@ public class RSignNote extends Transaction implements Itemable {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         parseDataFull(); // need for take HASHES from FILES
         extendedData.process(this, block);
@@ -649,7 +655,7 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
         parseDataFull(); // also need for take HASHES from FILES
         extendedData.orphan(this);
@@ -661,7 +667,7 @@ public class RSignNote extends Transaction implements Itemable {
             }
         }
 
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
     }
 

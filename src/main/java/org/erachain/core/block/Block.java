@@ -2438,13 +2438,10 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 dbRef = iterator.next();
 
+                // внутри уже есть setDC
                 Transaction transaction = finalMap.get(dbRef);
-                // тут наращиваем мясо - чтобы ключи удалялись правильно
-                transaction.setDC(dcSet, true);
 
-                if (transaction instanceof RCalculated) {
-
-                } else {
+                if (!(transaction instanceof RCalculated)) {
 
                     if (!transaction.isWiped()) {
                         transaction.orphan(this, Transaction.FOR_NETWORK);

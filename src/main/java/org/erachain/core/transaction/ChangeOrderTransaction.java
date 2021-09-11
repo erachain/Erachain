@@ -13,6 +13,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
@@ -271,6 +272,14 @@ public class ChangeOrderTransaction extends Transaction {
             exLink = null;
         }
 
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
+        }
+
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {
             // READ FEE POWER
@@ -364,6 +373,12 @@ public class ChangeOrderTransaction extends Transaction {
 
         if (exLink != null)
             base_len += exLink.length();
+
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
 
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
@@ -466,8 +481,8 @@ public class ChangeOrderTransaction extends Transaction {
      * @param forDeal
      */
     @Override
-    public void process(Block block, int forDeal) {
-        super.process(block, forDeal);
+    public void processBody(Block block, int forDeal) {
+        super.processBody(block, forDeal);
 
         // PROCESS UPDATE ORDER
 
@@ -518,8 +533,8 @@ public class ChangeOrderTransaction extends Transaction {
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
-        super.orphan(block, forDeal);
+    public void orphanBody(Block block, int forDeal) {
+        super.orphanBody(block, forDeal);
 
         // ORPHAN UPDATE ORDER
 

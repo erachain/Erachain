@@ -267,7 +267,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
         long key = this.key;
 
@@ -322,14 +322,14 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
         // RISE ERROR
         DCSet err = null;
         err.hashCode();
 
-		/* IT CANNOT BE orphanED !!!
-		 *
-		 */
+        /* IT CANNOT BE orphanED !!!
+         *
+         */
 
     }
 

@@ -269,14 +269,14 @@ public class RCalculated extends TransactionAmount {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
         // ввобщето тут вызов ошибки должен быть
         Long error = null;
         error++;
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
         // ввобщето тут вызов ошибки должен быть
         Long error = null;
         error++;

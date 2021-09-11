@@ -66,7 +66,7 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
 
     }
 
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
         AssetCls asset = (AssetCls) item;
         if (this.dcSet.getItemAssetMap().size() > 1
@@ -75,7 +75,7 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
             // SKIP all base TOKENS
             return;
 
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         long quantity = asset.getQuantity();
         if (quantity > 0L) {

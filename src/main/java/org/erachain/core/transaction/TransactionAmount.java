@@ -14,7 +14,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.SmartContract;
-import org.erachain.smartcontracts.epoch.EpochSmartContract;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
@@ -1307,9 +1306,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         if (this.amount == null)
             return;
@@ -1343,22 +1342,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
-        ///////// SMART CONTRACTS SESSION
-        if (smartContract == null) {
-            // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
-            // потом он будет записан в базу данных и его можно найти загрузив эту трнзакцию
-            smartContract = EpochSmartContract.make(this);
-        }
-
-        if (smartContract != null)
-            smartContract.process(dcSet, block, this);
-
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         if (this.amount == null)
             return;
