@@ -119,16 +119,21 @@ public class FPool extends MonitoredThread {
     }
 
     private boolean balanceReady(Long assteKey, BigDecimal balance) {
+        BigDecimal min;
         switch ((int) (long) assteKey) {
             case (int) AssetCls.ERA_KEY:
-                return balance.compareTo(new BigDecimal("1")) > 0;
+                min = new BigDecimal("0.01");
+                break;
             case (int) AssetCls.FEE_KEY:
-                return balance.compareTo(new BigDecimal("0.01")) > 0;
+                min = new BigDecimal("0.0001");
+                break;
             case (int) AssetCls.BTC_KEY:
-                return balance.compareTo(new BigDecimal("0.0001")) > 0;
+                min = new BigDecimal("0.000001");
+                break;
             default:
-                return balance.compareTo(new BigDecimal("0.1")) > 0;
+                min = new BigDecimal("0.00001");
         }
+        return balance.compareTo(min) > 0;
 
     }
 
