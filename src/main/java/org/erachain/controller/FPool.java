@@ -67,12 +67,12 @@ public class FPool extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FPool.class.getSimpleName());
 
-    FPool(Controller controller, BlockChain blockChain, DCSet dcSet, PrivateKeyAccount privateKeyAccount, String poolFee) {
+    FPool(Controller controller, BlockChain blockChain, DCSet dcSet) {
         this.controller = controller;
         this.blockChain = blockChain;
         this.dcSet = dcSet;
-        this.privateKeyAccount = privateKeyAccount;
-        this.POOL_TAX = new BigDecimal(poolFee).movePointLeft(2);
+
+        LOGGER.info("Start Forging Pool, used " + settings_path);
 
         try {
             settingsJSON = FileUtils.readCommentedJSONObject(settings_path);
@@ -81,6 +81,8 @@ public class FPool extends MonitoredThread {
         }
 
         if (settingsJSON.isEmpty()) {
+            settingsJSON.put("address", controller.getWalletAccounts().get(0).getAddress());
+            settingsJSON.put("tax", 3.5);
             settingsJSON.put("pending_period", 30);
 
             JSONObject min_withdraw = new JSONObject();
@@ -90,18 +92,23 @@ public class FPool extends MonitoredThread {
             min_withdraw.put("0", "0.01"); // OTHER
 
             settingsJSON.put("min_withdraw", min_withdraw);
-        }
 
-        try {
-            PENDING_PERIOD = Integer.parseInt(settingsJSON.getOrDefault("pending_period", 30).toString());
-            MIN_WITHDRAWS = new HashMap();
-            JSONObject minJSON = (JSONObject) settingsJSON.get("min_withdraw");
-            for (Object keyStr : minJSON.keySet()) {
-                MIN_WITHDRAWS.put(Long.parseLong((String) keyStr), new BigDecimal((String) minJSON.get(keyStr)));
+            try {
+                SaveStrToFile.saveJsonFine(settings_path, settingsJSON);
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
             }
 
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        }
+
+        privateKeyAccount = controller.getWalletPrivateKeyAccountByAddress((String) settingsJSON.get("address"));
+        POOL_TAX = new BigDecimal(settingsJSON.get("tax").toString()).movePointLeft(2);
+        PENDING_PERIOD = Integer.parseInt(settingsJSON.getOrDefault("pending_period", 30).toString());
+
+        MIN_WITHDRAWS = new HashMap();
+        JSONObject minJSON = (JSONObject) settingsJSON.get("min_withdraw");
+        for (Object keyStr : minJSON.keySet()) {
+            MIN_WITHDRAWS.put(Long.parseLong((String) keyStr), new BigDecimal((String) minJSON.get(keyStr)));
         }
 
         this.setName("Forging Pool[" + this.getId() + "]");
@@ -126,6 +133,8 @@ public class FPool extends MonitoredThread {
 
             this.dpSet = DPSet.reCreateDB();
         }
+
+        LOGGER.info("FPool address: " + privateKeyAccount.getAddress() + ", tax: " + POOL_TAX.movePointRight(2).toPlainString() + "%");
 
         this.start();
 

@@ -1,4 +1,8 @@
 {
+  // Address of forging
+  "address": "7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP",
+  // pool tax
+  "tax": 3.6,
   // period of pending before make rewards from forged block
   "pending_period": 30,
   // minimal withdraw for asset by KEY

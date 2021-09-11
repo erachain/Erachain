@@ -172,8 +172,7 @@ public class Controller extends Observable {
     private long transactionMakeTimingAverage;
 
     public boolean backUP = false;
-    public String[] seedCommand;
-    public String[] fpoolCommand;
+    private String[] seedCommand;
     public boolean noCalculated;
     public boolean noUseWallet;
     public boolean noDataWallet;
@@ -3950,6 +3949,7 @@ public class Controller extends Observable {
 
         // default
         databaseSystem = DCSet.DBS_MAP_DB;
+        boolean fpool = false;
 
         for (String arg : args) {
 
@@ -4127,8 +4127,9 @@ public class Controller extends Observable {
                 Settings.getInstance().updateJson("rpcport", value);
                 continue;
             }
-            if (arg.startsWith("-fpool=") && arg.length() > 7) {
-                fpoolCommand = arg.substring(7).split(":");
+
+            if (arg.equals("-fpool")) {
+                fpool = true;
                 continue;
             }
 
@@ -4214,12 +4215,15 @@ public class Controller extends Observable {
                     if (unlockWallet(pass)) {
 
                         // TRY START FORGING POOL
-                        if (fpoolCommand != null) {
-                            PrivateKeyAccount forger = Controller.getInstance().getWalletPrivateKeyAccountByAddress(fpoolCommand[0]);
-                            this.fPool = new FPool(this, this.blockChain, this.dcSet, forger, fpoolCommand[1]);
+                        if (fpool) {
+                            this.fPool = new FPool(this, this.blockChain, this.dcSet);
                         }
 
                         lockWallet();
+                    }
+                } else {
+                    if (fpool) {
+                        LOGGER.info("Command -fpool ignored. Need set -pass=");
                     }
                 }
 
