@@ -344,14 +344,19 @@ public class FPool extends MonitoredThread {
             return false;
         }
 
-        if (true)
-            return false;
+        //if (true)
+        //    return false;
+
+        AssetCls assetWithdraw = controller.getAsset(assetKeyToWithdraw);
 
         Tuple3<byte[], BigDecimal, String>[] addresses = new Tuple3[payouts.size()];
         int index = 0;
         Crypto crypto = Crypto.getInstance();
+        BigDecimal toPay;
         for (Tuple2<String, BigDecimal> item : payouts) {
-            addresses[index] = new Tuple3<byte[], BigDecimal, String>(crypto.getShortBytesFromAddress(item.a), item.b, "");
+            toPay = item.b.setScale(assetWithdraw.getScale(), RoundingMode.DOWN);
+            addresses[index++] = new Tuple3<byte[], BigDecimal, String>(crypto.getShortBytesFromAddress(item.a),
+                    toPay, "");
         }
 
         /// MAKE WITHDRAW
@@ -379,9 +384,11 @@ public class FPool extends MonitoredThread {
             return false;
         }
 
-        /// RESET BALANCCES for
-        for (Tuple2<String, BigDecimal> item : payouts) {
-            balsMap.put(new Tuple2<>(assetKeyToWithdraw, item.a), BigDecimal.ZERO);
+        /// UPADTE BALANCCES by withdraw amounts
+        Tuple2<Long, String> balsKey;
+        for (Tuple3<byte[], BigDecimal, String> item : addresses) {
+            balsKey = new Tuple2<>(assetKeyToWithdraw, crypto.getAddressFromShort(item.a));
+            balsMap.put(balsKey, balsMap.get(balsKey).subtract(item.b));
         }
 
         return true;

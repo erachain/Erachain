@@ -202,7 +202,7 @@ public class ExData {
 
         this.tags = tags;
 
-        this.json = json;
+        this.json = json == null ? new JSONObject() : json;
         this.files = files;
 
     }
