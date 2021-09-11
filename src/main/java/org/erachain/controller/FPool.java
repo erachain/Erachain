@@ -204,7 +204,7 @@ public class FPool extends MonitoredThread {
             addRewards(BlockChain.ERA_ASSET, totalEmite, totalForginAmount, credits);
         }
 
-        if (BlockChain.TEST_MODE) {
+        if (false && BlockChain.TEST_MODE) {
             // TEST MODE
             earnedAllAssets = new HashMap<>();
             earnedAllAssets.put(BlockChain.ERA_ASSET, new Tuple2<>(new BigDecimal("10"), BigDecimal.ZERO));
@@ -283,6 +283,7 @@ public class FPool extends MonitoredThread {
                 HashMap<Tuple2<Long, String>, BigDecimal> blockResults;
                 Object[] item = blocksMap.get(height);
                 if (dcSet.getBlockSignsMap().contains((byte[]) item[0])) {
+                    // block was confirmed!
                     blockResults = (HashMap<Tuple2<Long, String>, BigDecimal>) item[1];
                     for (Tuple2<Long, String> key : blockResults.keySet()) {
                         if (balsMap.contains(key)) {
@@ -291,10 +292,9 @@ public class FPool extends MonitoredThread {
                             balsMap.put(key, blockResults.get(key));
                         }
                     }
-                } else {
-                    // block was orphaned
-                    blocksMap.remove(height);
                 }
+
+                blocksMap.remove(height);
 
             }
         } catch (IOException e) {
