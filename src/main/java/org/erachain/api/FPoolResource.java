@@ -68,7 +68,16 @@ public class FPoolResource {
     @GET
     @Path("settax/{tax}")
     public String setTax(@PathParam("tax") BigDecimal tax) {
-        return "OK";
+        FPool fpool = contr.fPool;
+        if (fpool == null) {
+            JSONObject out = new JSONObject();
+            out.put("status", "off");
+            return out.toJSONString();
+        }
+
+        fpool.setTax(tax.movePointLeft(2));
+
+        return getInfo();
     }
 
 }

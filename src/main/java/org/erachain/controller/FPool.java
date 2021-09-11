@@ -99,6 +99,10 @@ public class FPool extends MonitoredThread {
         return poolFee;
     }
 
+    public void setTax(BigDecimal newTax) {
+        poolFee = newTax;
+    }
+
     public String getAddress() {
         return privateKeyAccount.getAddress();
     }
@@ -307,6 +311,9 @@ public class FPool extends MonitoredThread {
         if (assetKeyToWithdraw == null) {
             return;
         }
+
+        if (true)
+            return;
 
         Tuple3<byte[], BigDecimal, String>[] addresses = new Tuple3[payouts.size()];
         int index = 0;
