@@ -842,6 +842,10 @@ public class ApiClient {
                             "Get pending withdraws"
                     },
                     {
+                            "GET fpool/withdraw_all",
+                            "Try withdraws all balances"
+                    },
+                    {
                             "GET fpool/settax/<tax>",
                             "set tax"
                     }

@@ -92,6 +92,34 @@ public class FPoolResource {
     }
 
     @GET
+    @Path("withdraw_all")
+    public String getWithdrawALL() {
+
+        JSONObject out = new JSONObject();
+
+        FPool fpool = contr.fPool;
+        if (fpool == null) {
+            out.put("status", "off");
+            return out.toJSONString();
+        }
+
+        TreeMap<Fun.Tuple2<Long, String>, BigDecimal> pending = fpool.getPendingWithdraws();
+        for (Fun.Tuple2<Long, String> key : pending.keySet()) {
+            if (!out.containsKey(key.a)) {
+                out.put(key.a, new JSONObject());
+            }
+
+            ((JSONObject) out.get(key.a)).put(key.b, pending.get(key));
+        }
+
+        do {
+
+        } while (fpool.withdraw(true));
+
+        return out.toJSONString();
+    }
+
+    @GET
     @Path("settax/{tax}")
     public String setTax(@PathParam("tax") BigDecimal tax) {
         FPool fpool = contr.fPool;

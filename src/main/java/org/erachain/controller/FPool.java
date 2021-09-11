@@ -303,7 +303,11 @@ public class FPool extends MonitoredThread {
 
     }
 
-    private void payout() {
+    /**
+     * @param allLeftover
+     * @return True if has some withdraws
+     */
+    public boolean withdraw(boolean allLeftover) {
         FPoolBalancesMap balsMap = dpSet.getBalancesMap();
 
         Long assetKeyToWithdraw = null;
@@ -322,7 +326,7 @@ public class FPool extends MonitoredThread {
                 }
 
                 balance = balsMap.get(key);
-                if (!balanceReady(assetKey, balance)) {
+                if (!allLeftover && !balanceReady(assetKey, balance) || balance.signum() <= 0) {
                     continue;
                 }
 
@@ -333,15 +337,15 @@ public class FPool extends MonitoredThread {
 
             }
         } catch (IOException e) {
-            return;
+            return false;
         }
 
         if (assetKeyToWithdraw == null) {
-            return;
+            return false;
         }
 
         if (true)
-            return;
+            return false;
 
         Tuple3<byte[], BigDecimal, String>[] addresses = new Tuple3[payouts.size()];
         int index = 0;
@@ -366,19 +370,21 @@ public class FPool extends MonitoredThread {
                     privateKeyAccount, feePow, 0, exData.toByte());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            return;
+            return false;
         }
 
         int validate = Controller.getInstance().getTransactionCreator().afterCreate(issueDoc, Transaction.FOR_NETWORK, false, false);
         if (validate != Transaction.VALIDATE_OK) {
             LOGGER.error(issueDoc.makeErrorJSON2(validate).toJSONString());
-            return;
+            return false;
         }
 
         /// RESET BALANCCES for
         for (Tuple2<String, BigDecimal> item : payouts) {
             balsMap.put(new Tuple2<>(assetKeyToWithdraw, item.a), BigDecimal.ZERO);
         }
+
+        return true;
     }
 
     @Override
@@ -396,7 +402,7 @@ public class FPool extends MonitoredThread {
 
                 checkPending();
 
-                payout();
+                withdraw(false);
 
             } catch (OutOfMemoryError e) {
                 blockingQueue = null;
