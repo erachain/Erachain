@@ -75,6 +75,7 @@ public class API {
         help.put("see /api/tx", "Help for transactions API");
         //help.put("see /apirecords", "Help for transactions API"); // @Deprecated
         help.put("see /apidocuments", "Help for documents API");
+        help.put("see /apifpool", "Help for forging pool API");
 
         help.put("*** BALANCE STRUCTURE ***", "");
         help.put("balance Side", "Balance has Sides: - BigDecimal array: [Total_Income (side 1), Remaining_Balance (side 2)]. Side 3 - Total Outcome as difference: Side1 - Side2");

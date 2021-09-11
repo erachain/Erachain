@@ -22,6 +22,7 @@ import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -111,6 +112,10 @@ public class FPool extends MonitoredThread {
 
     public int getPendingPeriod() {
         return PENDING_PERIOD;
+    }
+
+    public JSONObject getAddressBalances(String address) {
+        return dpSet.getBalancesMap().getAddressBalances(address);
     }
 
     private boolean balanceReady(Long assteKey, BigDecimal balance) {
@@ -269,6 +274,26 @@ public class FPool extends MonitoredThread {
         return result;
     }
 
+    public TreeMap<Tuple2<Long, String>, BigDecimal> getPendingWithdraws(String address) {
+
+        FPoolBalancesMap balanceMap = dpSet.getBalancesMap();
+        TreeMap<Tuple2<Long, String>, BigDecimal> result = new TreeMap();
+        try (IteratorCloseable<Tuple2<Long, String>> iterator = IteratorCloseableImpl.make(balanceMap.getIterator())) {
+            BigDecimal balance;
+            Fun.Tuple2<Long, String> key;
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                balance = balanceMap.get(key);
+                if (balance.signum() > 0)
+                    result.put(key, balance);
+
+            }
+        } catch (IOException e) {
+        }
+
+        return result;
+    }
+
     private void checkPending() {
 
         FPoolBlocksMap blocksMap = dpSet.getBlocksMap();
@@ -388,7 +413,13 @@ public class FPool extends MonitoredThread {
         Tuple2<Long, String> balsKey;
         for (Tuple3<byte[], BigDecimal, String> item : addresses) {
             balsKey = new Tuple2<>(assetKeyToWithdraw, crypto.getAddressFromShort(item.a));
-            balsMap.put(balsKey, balsMap.get(balsKey).subtract(item.b));
+            if (allLeftover) {
+                // CLEAR ALL
+                balsMap.delete(balsKey);
+            } else {
+                // SAVE LEFT BALANCES
+                balsMap.put(balsKey, balsMap.get(balsKey).subtract(item.b));
+            }
         }
 
         return true;

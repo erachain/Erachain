@@ -19,8 +19,6 @@ public class FPoolMap extends DCUMapImpl<String, Object[]> {
     public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("pool")
-                //.keySerializer(BTreeKeySerializer.BASIC)
-                //.comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 

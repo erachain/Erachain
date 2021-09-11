@@ -29,9 +29,8 @@ public class FPoolResource {
     HttpServletRequest request;
 
     @GET
-    public String getInfo() {
+    public static String getInfo() {
         JSONObject out = new JSONObject();
-
 
         FPool fpool = contr.fPool;
         if (fpool == null) {
