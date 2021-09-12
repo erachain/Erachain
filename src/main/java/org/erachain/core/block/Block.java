@@ -1949,18 +1949,20 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         }
 
-        if (transactionCount == 0)
-            return;
+        if (transactionCount > 0) {
+            // подсчет наград с ПЕРЕВОДОВ
+            for (Transaction transaction : getTransactions()) {
+                if (transaction.assetFee == null)
+                    continue;
 
-        // подсчет наград с ПЕРЕВОДОВ
-        for (Transaction transaction : getTransactions()) {
-            if (transaction.assetFee == null)
-                continue;
+                AssetCls asset = transaction.getAsset();
+                addAssetFee(asset, transaction.assetFee, transaction.assetFeeBurn);
 
-            AssetCls asset = transaction.getAsset();
-            addAssetFee(asset, transaction.assetFee, transaction.assetFeeBurn);
-
+            }
         }
+
+        if (earnedAllAssets == null || earnedAllAssets.isEmpty())
+            return;
 
         // FOR ASSETS
         Tuple2<BigDecimal, BigDecimal> earnedPair;
