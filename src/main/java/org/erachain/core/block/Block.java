@@ -1937,12 +1937,12 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
     public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
 
-        if (BlockChain.TEST_MODE) {
+        if (BlockChain.TEST_MODE && heightBlock > 10000) {
             // EMITTE
             if (earnedAllAssets == null)
                 earnedAllAssets = new HashMap<>();
 
-            BigDecimal emite = BigDecimal.TEN;
+            BigDecimal emite = BigDecimal.ONE;
             addAssetFee(BlockChain.ERA_ASSET, emite, null);
             BlockChain.ERA_ASSET.getMaker().changeBalance(dcSet, !asOrphan, false,
                     AssetCls.ERA_KEY, emite, false, false, false);
