@@ -12,19 +12,17 @@ import java.util.TreeMap;
  * Height -> block.getSignature(), credits, results
  */
 @Slf4j
-public class FPoolBlocksMap extends DCUMapImpl<Integer, Object[]> {
+public class FPoolBlocksHistoryMap extends DCUMapImpl<Integer, Object[]> {
 
-    public FPoolBlocksMap(DPSet databaseSet, DB database) {
+    public FPoolBlocksHistoryMap(DPSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
     @Override
     public void openMap() {
 
-        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
-
         //OPEN MAP
-        map = database.createTreeMap("pool_blocks")
+        map = database.createTreeMap("pool_blocks_history")
                 .makeOrGet();
     }
 
@@ -36,5 +34,4 @@ public class FPoolBlocksMap extends DCUMapImpl<Integer, Object[]> {
     public Map.Entry<Integer, Object[]> lastEntry() {
         return ((BTreeMap) map).lastEntry();
     }
-
 }

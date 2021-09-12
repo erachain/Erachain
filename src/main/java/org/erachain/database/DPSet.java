@@ -20,12 +20,14 @@ public class DPSet extends DBASet {
 
     final private FPoolMap fPoolMap;
     final private FPoolBlocksMap blocksMap;
+    final private FPoolBlocksHistoryMap blocksHistoryMap;
     final private FPoolBalancesMap balancesMap;
 
     public DPSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI) {
         super(dbFile, database, withObserver, dynamicGUI);
         this.fPoolMap = new FPoolMap(this, this.database);
         this.blocksMap = new FPoolBlocksMap(this, this.database);
+        this.blocksHistoryMap = new FPoolBlocksHistoryMap(this, this.database);
         this.balancesMap = new FPoolBalancesMap(this, this.database);
     }
 
@@ -113,6 +115,10 @@ public class DPSet extends DBASet {
 
     public FPoolBlocksMap getBlocksMap() {
         return this.blocksMap;
+    }
+
+    public FPoolBlocksHistoryMap getBlocksHistoryMap() {
+        return this.blocksHistoryMap;
     }
 
     public FPoolBalancesMap getBalancesMap() {

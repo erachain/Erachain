@@ -40,6 +40,8 @@ public class APIFPool {
 
         help.put("GET apifpool/info", "Get fpoolinfo");
         help.put("GET apifpool/balance/{address}", "Get balances for address");
+        help.put("GET apifpool/pending/blocks", "Get pending blocks");
+
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -78,13 +80,47 @@ public class APIFPool {
                     .build();
         }
 
+        out.put("balances", fpool.getAddressBalances(address).toJSONString());
+
+        JSONObject pendingBlocks = new JSONObject();
+        for (Object[] block : fpool.getPendingBlocks()) {
+            pendingBlocks.put(block[0], block[1]);
+        }
+        out.put("pending", pendingBlocks);
+
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(fpool.getAddressBalances(address).toJSONString())
+                .entity(out.toJSONString())
                 .build();
 
     }
 
+    @GET
+    @Path("pending/blocks")
+    public Response getPendingBlocks() {
+
+        JSONObject out = new JSONObject();
+
+        FPool fpool = cntrl.fPool;
+        if (fpool == null) {
+            out.put("status", "off");
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(out.toJSONString())
+                    .build();
+        }
+
+        for (Object[] block : fpool.getPendingBlocks()) {
+            out.put(block[0], block[1]);
+        }
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
+                .build();
+    }
 
 }

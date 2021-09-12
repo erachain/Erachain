@@ -834,15 +834,15 @@ public class ApiClient {
                             "Get FPool info"
                     },
                     {
-                            "GET fpool/pending_blocks",
+                            "GET fpool/pending/blocks",
                             "Get pending blocks"
                     },
                     {
-                            "GET fpool/pending_withdraws",
+                            "GET fpool/pending/withdraws",
                             "Get pending withdraws"
                     },
                     {
-                            "GET fpool/withdraw_all",
+                            "GET fpool/withdraw/all",
                             "Try withdraws all balances"
                     },
                     {

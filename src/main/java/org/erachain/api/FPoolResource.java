@@ -47,7 +47,7 @@ public class FPoolResource {
     }
 
     @GET
-    @Path("pending_blocks")
+    @Path("pending/blocks")
     public String getPendingBlocks() {
 
         JSONObject out = new JSONObject();
@@ -67,7 +67,7 @@ public class FPoolResource {
     }
 
     @GET
-    @Path("pending_withdraws")
+    @Path("pending/withdraws")
     public String getPendingWithdraws() {
 
         JSONObject out = new JSONObject();
@@ -91,7 +91,7 @@ public class FPoolResource {
     }
 
     @GET
-    @Path("withdraw_all")
+    @Path("withdraw/all")
     public String getWithdrawALL() {
 
         JSONObject out = new JSONObject();

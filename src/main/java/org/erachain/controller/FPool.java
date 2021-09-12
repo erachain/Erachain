@@ -11,10 +11,7 @@ import org.erachain.core.exdata.exActions.ExListPays;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.DPSet;
-import org.erachain.database.FPoolBalancesMap;
-import org.erachain.database.FPoolBlocksMap;
-import org.erachain.database.FPoolMap;
+import org.erachain.database.*;
 import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
@@ -36,10 +33,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -174,7 +168,8 @@ public class FPool extends MonitoredThread {
 
     }
 
-    private void addRewards(AssetCls asset, BigDecimal totalEarn, BigDecimal totalForginAmount, HashMap<String, BigDecimal> credits) {
+    private void addRewards(AssetCls asset, BigDecimal totalEarn, BigDecimal totalForginAmount,
+                            HashMap<String, BigDecimal> previouseCredits, HashMap<String, BigDecimal> credits) {
         BigDecimal amount;
         int scale = asset.getScale() + 8;
         Tuple2<Long, String> key;
@@ -182,8 +177,18 @@ public class FPool extends MonitoredThread {
         // USE TAX
         totalEarn = totalEarn.multiply(BigDecimal.ONE.subtract(POOL_TAX));
 
+        BigDecimal previouseCredit;
+        BigDecimal currentCredit;
         for (String address : credits.keySet()) {
-            amount = totalEarn.multiply(credits.get(address)).divide(totalForginAmount, scale, RoundingMode.DOWN);
+            previouseCredit = previouseCredits.get(address);
+            currentCredit = credits.get(address);
+            if (previouseCredit == null || previouseCredit.signum() <= 0)
+                continue;
+
+            if (previouseCredit.compareTo(currentCredit) > 0)
+                previouseCredit = currentCredit;
+
+            amount = totalEarn.multiply(previouseCredit).divide(totalForginAmount, scale, RoundingMode.DOWN);
             if (amount.signum() == 0)
                 continue;
 
@@ -212,7 +217,7 @@ public class FPool extends MonitoredThread {
         BigDecimal totalEmite = BigDecimal.ZERO;
         HashMap<AssetCls, Fun.Tuple2<BigDecimal, BigDecimal>> earnedAllAssets = block.getEarnedAllAssets();
 
-        BigDecimal totalForginAmount = privateKeyAccount.getBalanceUSE(AssetCls.ERA_KEY);
+        BigDecimal totalForginAmount = new BigDecimal(block.getForgingValue());
 
         // make table of credits
         CreditAddressesMap creditMap = dcSet.getCredit_AddressesMap();
@@ -241,33 +246,42 @@ public class FPool extends MonitoredThread {
 
         results = new HashMap<>();
 
-        // FOR FEE
-        if (feeEarn.signum() > 0) {
-            addRewards(BlockChain.FEE_ASSET, feeEarn, totalForginAmount, credits);
-        }
+        Map.Entry<Integer, Object[]> previoseBlock = dpSet.getBlocksMap().lastEntry();
+        if (previoseBlock == null)
+            previoseBlock = dpSet.getBlocksHistoryMap().lastEntry();
 
-        if (totalEmite.signum() > 0) {
-            // FOR ERA
-            addRewards(BlockChain.ERA_ASSET, totalEmite, totalForginAmount, credits);
-        }
+        if (previoseBlock != null) {
+            // MAKE REWARDS
+            HashMap<String, BigDecimal> previouseCredits = (HashMap<String, BigDecimal>) previoseBlock.getValue()[1];
 
-        if (false && BlockChain.TEST_MODE) {
-            // TEST MODE
-            earnedAllAssets = new HashMap<>();
-            earnedAllAssets.put(BlockChain.ERA_ASSET, new Tuple2<>(new BigDecimal("10"), BigDecimal.ZERO));
-            earnedAllAssets.put(controller.getAsset(AssetCls.BTC_KEY), new Tuple2<>(new BigDecimal("0.000001"), BigDecimal.ZERO));
-            earnedAllAssets.put(controller.getAsset(18L), new Tuple2<>(new BigDecimal("1"), BigDecimal.ZERO));
-        }
+            // FOR FEE
+            if (feeEarn.signum() > 0) {
+                addRewards(BlockChain.FEE_ASSET, feeEarn, totalForginAmount, previouseCredits, credits);
+            }
 
-        // for all ERNAED assets
-        if (earnedAllAssets != null) {
-            for (AssetCls assetEran : earnedAllAssets.keySet()) {
-                Fun.Tuple2<BigDecimal, BigDecimal> item = earnedAllAssets.get(assetEran);
-                addRewards(assetEran, item.a, totalForginAmount, credits);
+            if (totalEmite.signum() > 0) {
+                // FOR ERA
+                addRewards(BlockChain.ERA_ASSET, totalEmite, totalForginAmount, previouseCredits, credits);
+            }
+
+            if (false && BlockChain.TEST_MODE) {
+                // TEST MODE
+                earnedAllAssets = new HashMap<>();
+                earnedAllAssets.put(BlockChain.ERA_ASSET, new Tuple2<>(new BigDecimal("10"), BigDecimal.ZERO));
+                earnedAllAssets.put(controller.getAsset(AssetCls.BTC_KEY), new Tuple2<>(new BigDecimal("0.000001"), BigDecimal.ZERO));
+                earnedAllAssets.put(controller.getAsset(18L), new Tuple2<>(new BigDecimal("1"), BigDecimal.ZERO));
+            }
+
+            // for all ERNAED assets
+            if (earnedAllAssets != null) {
+                for (AssetCls assetEran : earnedAllAssets.keySet()) {
+                    Fun.Tuple2<BigDecimal, BigDecimal> item = earnedAllAssets.get(assetEran);
+                    addRewards(assetEran, item.a, totalForginAmount, previouseCredits, credits);
+                }
             }
         }
 
-        dpSet.getBlocksMap().put(block.heightBlock, new Object[]{block.getSignature(), results});
+        dpSet.getBlocksMap().put(block.heightBlock, new Object[]{block.getSignature(), credits, results});
         results = null;
 
         return true;
@@ -339,6 +353,7 @@ public class FPool extends MonitoredThread {
     private void checkPending() {
 
         FPoolBlocksMap blocksMap = dpSet.getBlocksMap();
+        FPoolBlocksHistoryMap blocksHistoryMap = dpSet.getBlocksHistoryMap();
         FPoolBalancesMap balsMap = dpSet.getBalancesMap();
         try (IteratorCloseable<Integer> iterator = IteratorCloseableImpl.make(blocksMap.getIterator())) {
             Integer height;
@@ -348,10 +363,10 @@ public class FPool extends MonitoredThread {
                     break;
 
                 HashMap<Tuple2<Long, String>, BigDecimal> blockResults;
-                Object[] item = blocksMap.get(height);
-                if (dcSet.getBlockSignsMap().contains((byte[]) item[0])) {
+                Object[] pendingBlock = blocksMap.get(height);
+                if (dcSet.getBlockSignsMap().contains((byte[]) pendingBlock[0])) {
                     // block was confirmed!
-                    blockResults = (HashMap<Tuple2<Long, String>, BigDecimal>) item[1];
+                    blockResults = (HashMap<Tuple2<Long, String>, BigDecimal>) pendingBlock[2];
                     for (Tuple2<Long, String> key : blockResults.keySet()) {
                         if (balsMap.contains(key)) {
                             balsMap.put(key, balsMap.get(key).add(blockResults.get(key)));
@@ -361,7 +376,8 @@ public class FPool extends MonitoredThread {
                     }
                 }
 
-                blocksMap.remove(height);
+                blocksMap.delete(height);
+                blocksHistoryMap.put(height, pendingBlock);
 
             }
         } catch (IOException e) {
