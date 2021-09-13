@@ -6,7 +6,7 @@
   // period of pending before make rewards from forged block
   "pending_period": 30,
   "title": "Staking Rewards",
-  "message": "<h3>Forging Pool</h3>Tax: <b>5.0</b>",
+  "message": "<h3>Forging Pool</h3>",
   // minimal withdraw for asset by KEY
   "min_withdraw": {
     // other assets

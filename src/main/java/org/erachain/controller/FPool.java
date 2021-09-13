@@ -78,7 +78,7 @@ public class FPool extends MonitoredThread {
             settingsJSON.put("title", "Staking Rewards");
             settingsJSON.put("tax", 5.0);
             settingsJSON.put("pending_period", 30);
-            settingsJSON.put("message", "<h3>Forging Pool</h3>Tax: <b>" + settingsJSON.get("tax") + "</b>");
+            settingsJSON.put("message", "<h3>Forging Pool</h3>");
 
             JSONObject min_withdraw = new JSONObject();
             min_withdraw.put("" + AssetCls.ERA_KEY, "5");
@@ -449,7 +449,7 @@ public class FPool extends MonitoredThread {
         byte[] flags = new byte[]{3, 0, 0, 0};
         ExListPays listPays = new ExListPays(0, assetKeyToWithdraw, Account.BALANCE_POS_OWN, false, addresses);
         JSONObject exDataJSON = new JSONObject();
-        exDataJSON.put("MS", settingsJSON.get("message"));
+        exDataJSON.put("MS", settingsJSON.get("message") + "<p>Tax: <b>" + settingsJSON.get("tax") + "</b></p>");
         ExData exData = new ExData(flags, null, listPays, (String) settingsJSON.get("title"),
                 (byte) 0, null, (byte) 0, null,
                 (byte) 0, null, null, exDataJSON, null);
