@@ -80,10 +80,10 @@ public class FPool extends MonitoredThread {
             settingsJSON.put("pending_period", 30);
 
             JSONObject min_withdraw = new JSONObject();
-            min_withdraw.put("" + AssetCls.ERA_KEY, "1");
-            min_withdraw.put("" + AssetCls.FEE_KEY, "0.001");
-            min_withdraw.put("" + AssetCls.BTC_KEY, "0.00001");
-            min_withdraw.put("0", "0.01"); // OTHER
+            min_withdraw.put("" + AssetCls.ERA_KEY, "5");
+            min_withdraw.put("" + AssetCls.FEE_KEY, "0.05");
+            min_withdraw.put("" + AssetCls.BTC_KEY, "0.0005");
+            min_withdraw.put("0", "0.5"); // OTHER
 
             settingsJSON.put("min_withdraw", min_withdraw);
 
