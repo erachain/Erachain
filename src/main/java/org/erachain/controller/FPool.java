@@ -51,7 +51,6 @@ public class FPool extends MonitoredThread {
     BlockChain blockChain;
     DCSet dcSet;
     DPSet dpSet;
-    String title = "Forging poll Withdraw";
     PrivateKeyAccount privateKeyAccount;
 
     BlockingQueue<Block> blockingQueue = new ArrayBlockingQueue<Block>(3);
@@ -76,8 +75,10 @@ public class FPool extends MonitoredThread {
 
         if (settingsJSON.isEmpty()) {
             settingsJSON.put("address", controller.getWalletAccounts().get(0).getAddress());
+            settingsJSON.put("title", "Staking Rewards");
             settingsJSON.put("tax", 5.0);
             settingsJSON.put("pending_period", 30);
+            settingsJSON.put("message", "<h3>Forging Pool</h3>Tax: <b>" + settingsJSON.get("tax") + "</b>");
 
             JSONObject min_withdraw = new JSONObject();
             min_withdraw.put("" + AssetCls.ERA_KEY, "5");
@@ -447,8 +448,11 @@ public class FPool extends MonitoredThread {
         /// MAKE WITHDRAW
         byte[] flags = new byte[]{3, 0, 0, 0};
         ExListPays listPays = new ExListPays(0, assetKeyToWithdraw, Account.BALANCE_POS_OWN, false, addresses);
-        ExData exData = new ExData(flags, null, listPays, title, (byte) 0, null, (byte) 0, null,
-                (byte) 0, null, null, null, null);
+        JSONObject exDataJSON = new JSONObject();
+        exDataJSON.put("MS", settingsJSON.get("message"));
+        ExData exData = new ExData(flags, null, listPays, (String) settingsJSON.get("title"),
+                (byte) 0, null, (byte) 0, null,
+                (byte) 0, null, null, exDataJSON, null);
 
         byte version = (byte) 3;
         byte property1 = (byte) 0;
