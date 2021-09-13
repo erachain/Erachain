@@ -837,7 +837,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             if (noForge && currentRow.getType() == Transaction.CALCULATED_TRANSACTION) {
                 RCalculated tx = (RCalculated) currentRow;
                 String mess = tx.getMessage();
-                if (mess != null && mess.equals("forging")) {
+                if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
                     if (forgedCount < 100) {
                         // skip all but not 100
                         forgedCount++;
@@ -887,7 +887,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
                             RCalculated tx = (RCalculated) item;
                             String mess = tx.getMessage();
-                            if (mess != null && mess.equals("forging")) {
+                            if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
                                 if (forgedCount < 100) {
                                     // skip all but not 100
                                     forgedCount++;
@@ -946,7 +946,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
                             RCalculated tx = (RCalculated) item;
                             String mess = tx.getMessage();
-                            if (mess != null && mess.equals("forging")) {
+                            if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
                                 if (forgedCount < 100) {
                                     // skip all but not 100
                                     forgedCount++;
@@ -1049,7 +1049,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
                     RCalculated tx = (RCalculated) item;
                     String mess = tx.getMessage();
-                    if (mess != null && mess.equals("forging")) {
+                    if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
                         if (forgedCount < 100) {
                             // skip all but not 100
                             forgedCount++;
@@ -1335,7 +1335,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
                         RCalculated tx = (RCalculated) item;
                         String mess = tx.getMessage();
-                        if (mess != null && mess.equals("forging")) {
+                        if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
                             if (forgedCount < 100) {
                                 // skip all but not 100
                                 forgedCount++;
@@ -1398,7 +1398,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
                         RCalculated tx = (RCalculated) item;
                         String mess = tx.getMessage();
-                        if (mess != null && mess.equals("forging")) {
+                        if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
                             if (forgedCount < 100) {
                                 // skip all but not 100
                                 forgedCount++;

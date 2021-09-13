@@ -1,6 +1,7 @@
 package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
@@ -180,7 +181,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
         if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
             RCalculated tx = (RCalculated) transaction;
             String mess = tx.getMessage();
-            if (mess != null && mess.equals("forging")) {
+            if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
                 return false;
             }
         }

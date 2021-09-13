@@ -40,6 +40,8 @@ public class BlockChain {
 
     public static final int TESTS_VERS = 0; // not use TESTs - or a11 (as version)
 
+    public static String MESS_FORGING = "forging";
+
     /**
      * Задает потолок цепочки
      */

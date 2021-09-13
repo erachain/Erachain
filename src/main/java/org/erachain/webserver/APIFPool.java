@@ -80,7 +80,7 @@ public class APIFPool {
                     .build();
         }
 
-        out.put("balances", fpool.getAddressBalances(address).toJSONString());
+        out.put("balances", fpool.getAddressBalances(address));
 
         JSONObject pendingBlocks = new JSONObject();
         for (Object[] block : fpool.getPendingBlocks()) {

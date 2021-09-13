@@ -374,10 +374,12 @@ public class FPool extends MonitoredThread {
                             balsMap.put(key, blockResults.get(key));
                         }
                     }
+
+                    // ADD to processed blocks
+                    blocksHistoryMap.put(height, pendingBlock);
                 }
 
                 blocksMap.delete(height);
-                blocksHistoryMap.put(height, pendingBlock);
 
             }
         } catch (IOException e) {

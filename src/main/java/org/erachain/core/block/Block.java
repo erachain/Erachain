@@ -78,6 +78,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
     public static final int DATA_SIGN_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TRANSACTIONS_HASH_LENGTH;
     static Logger LOGGER = LoggerFactory.getLogger(Block.class.getSimpleName());
+
     /// HEAD of BLOCK ///
     // FACE
     protected int version;
@@ -1916,7 +1917,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && this.txCalculated != null) {
                 this.txCalculated.add(new RCalculated(this.creator, Transaction.FEE_KEY,
-                        forgerEarn, "forging", Transaction.makeDBRef(this.heightBlock, 0), 0L));
+                        forgerEarn, BlockChain.MESS_FORGING, Transaction.makeDBRef(this.heightBlock, 0), 0L));
             }
         }
 
@@ -1975,7 +1976,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                         earnedPair.a, false, false, true);
                 if (!asOrphan && this.txCalculated != null) {
                     this.txCalculated.add(new RCalculated(this.creator, asset.getKey(),
-                            earnedPair.a, "Asset Total Forged", Transaction.makeDBRef(this.heightBlock, 0), 0L));
+                            earnedPair.a, BlockChain.MESS_FORGING, Transaction.makeDBRef(this.heightBlock, 0), 0L));
                 }
             }
 

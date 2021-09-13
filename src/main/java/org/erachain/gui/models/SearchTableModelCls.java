@@ -1,6 +1,7 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RCalculated;
@@ -108,7 +109,7 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
                     if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
                         RCalculated tx = (RCalculated) transaction;
                         String mess = tx.getMessage();
-                        if (mess != null && mess.equals("forging")) {
+                        if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
                             if (++countForge < 100)
                                 continue;
                             else

@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
@@ -271,7 +272,7 @@ public class TransactionFinalMapImplTest {
                 String address = "7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW";
                 Account recipientAcc = new Account(address);
                 BigDecimal amount_asset = new BigDecimal("1");
-                String title = "forging";
+                String title = BlockChain.MESS_FORGING;
                 TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
 
                 RSend assetTransfer;
@@ -298,7 +299,7 @@ public class TransactionFinalMapImplTest {
 
                 Long fromSeqNo = Transaction.makeDBRef(1, 30);
                 // WORDS + asFilter
-                Pair<String, Boolean>[] wordsForging = new Pair[]{new Pair("forging", true)};
+                Pair<String, Boolean>[] wordsForging = new Pair[]{new Pair(BlockChain.MESS_FORGING, true)};
                 Pair<String, Boolean>[] wordsForgenFilter = new Pair[]{new Pair("forgen", true)};
                 Pair<String, Boolean>[] wordsForgen = new Pair[]{new Pair("forgen", false)};
                 Pair<String, Boolean>[] wordsFor = new Pair[]{new Pair("for", false)};
