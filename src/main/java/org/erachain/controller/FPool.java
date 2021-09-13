@@ -76,7 +76,7 @@ public class FPool extends MonitoredThread {
 
         if (settingsJSON.isEmpty()) {
             settingsJSON.put("address", controller.getWalletAccounts().get(0).getAddress());
-            settingsJSON.put("tax", 3.5);
+            settingsJSON.put("tax", 5.0);
             settingsJSON.put("pending_period", 30);
 
             JSONObject min_withdraw = new JSONObject();

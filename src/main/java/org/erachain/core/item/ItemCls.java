@@ -1178,7 +1178,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         if (imageURL != null) {
             itemJSON.put("imageURL", imageURL);
             itemJSON.put("imageType", getImageType());
-            //itemJSON.put("imageTypeName", getImageTypeName());
             itemJSON.put("imageMediaType", getImageMediaType().toString());
             itemJSON.put("imagePreviewMediaType", PreviewMaker.getPreviewType(this).toString());
         }
