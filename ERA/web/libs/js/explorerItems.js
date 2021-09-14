@@ -9,7 +9,7 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
     if (item.original) {
         if (item.original.imageURL) {
             origSource = item.original.imageURL;
-        } else if (item.original.imageMediaType.startsWith('video')) {
+        } else if (item.original.imageMediaType && item.original.imageMediaType.startsWith('video')) {
             origSource = '/api' + item.original.item_type + '/image/' + item.original.key;
         }
 
@@ -50,7 +50,7 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
         source = 'data:image/gif;base64,' + item.image;
     } else if (item.imageURL) {
         source = item.imageURL;
-    } else if (item.imageMediaType.startsWith('video')) {
+    } else if (item.imageMediaType && item.imageMediaType.startsWith('video')) {
         source = '/api' + item.item_type + '/image/' + item.key;
     }
 
