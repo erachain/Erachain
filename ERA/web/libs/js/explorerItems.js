@@ -9,8 +9,9 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
     if (item.original) {
         if (item.original.imageURL) {
             origSource = item.original.imageURL;
-        } else if (item.original.imageMediaType && item.original.imageMediaType.startsWith('video')) {
-            origSource = '/api' + item.original.item_type + '/image/' + item.original.key;
+            if (item.original.imageMediaType.startsWith('video')) {
+                origSource = '/api' + item.original.item_type + '/image/' + item.original.key;
+            }
         }
 
         if (origSource) {
