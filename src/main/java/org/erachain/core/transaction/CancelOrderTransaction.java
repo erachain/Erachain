@@ -75,19 +75,31 @@ public class CancelOrderTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
+    public void setHeightSeq(long seqNo) {
+        super.setHeightSeq(seqNo);
+        orderID = dbRef;
+    }
+
+    public void setHeightSeq(int height, int seqNo) {
+        super.setHeightSeq(height, seqNo);
+        orderID = dbRef;
+    }
+
     public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
-        Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
-        if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID && height > BlockChain.ALL_VALID_BEFORE) {
-            LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderSignature));
-            errorValue = Base58.encode(this.orderSignature);
-            if (BlockChain.CHECK_BUGS > 3) {
-                Long error = null;
-                error++;
+        if (orderID == 0) {
+            Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
+            if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID && height > BlockChain.ALL_VALID_BEFORE) {
+                LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderSignature));
+                errorValue = Base58.encode(this.orderSignature);
+                if (BlockChain.CHECK_BUGS > 3) {
+                    Long error = null;
+                    error++;
+                }
             }
+            this.orderID = createDBRef;
         }
-        this.orderID = createDBRef;
 
         if (false && andUpdateFromState && !isWiped())
             updateFromStateDB();
