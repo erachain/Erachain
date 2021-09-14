@@ -103,6 +103,16 @@ public class ChangeOrderTransaction extends Transaction {
 
     // GETTERS/SETTERS
 
+    public void setHeightSeq(long seqNo) {
+        super.setHeightSeq(seqNo);
+        orderID = dbRef;
+    }
+
+    public void setHeightSeq(int height, int seqNo) {
+        super.setHeightSeq(height, seqNo);
+        orderID = dbRef;
+    }
+
     public boolean isHaveUpdated() {
         return (typeBytes[3] & HAVE_AMOUNT_MASK) != 0;
     }
@@ -111,14 +121,18 @@ public class ChangeOrderTransaction extends Transaction {
 
         super.setDC(dcSet, false);
 
-        // на выходе может быть NULL - он в long не преобразуется - поэтому сначала исследуем
-        Long res = dcSet.getTransactionFinalMapSigns().get(orderRef);
+        if (orderID == 0) {
 
-        if (res == null) {
-            return;
+            // на выходе может быть NULL - он в long не преобразуется - поэтому сначала исследуем
+            Long res = dcSet.getTransactionFinalMapSigns().get(orderRef);
+
+            if (res == null) {
+                return;
+            }
+
+            orderID = res;
         }
 
-        orderID = res;
         order = dcSet.getOrderMap().get(orderID);
         // подтянем в любом случае даже из Completed, а ниже проверку вставим на Активен?
         if (order == null) {
