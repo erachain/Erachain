@@ -351,6 +351,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final long FEE_KEY = AssetCls.FEE_KEY;
 
     public static final int TIMESTAMP_LENGTH = 8;
+    public static final int SEQ_NO_LENGTH = 8;
 
     public static final int REFERENCE_LENGTH = TIMESTAMP_LENGTH;
 

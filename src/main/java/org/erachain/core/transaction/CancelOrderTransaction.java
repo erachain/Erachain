@@ -7,7 +7,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
@@ -36,12 +35,14 @@ public class CancelOrderTransaction extends Transaction {
     public static final byte TYPE_ID = (byte) CANCEL_ORDER_TRANSACTION;
     public static final String TYPE_NAME = "Cancel Order";
 
-    private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
+    private static final int ORDER_SIGN_LENGTH = SIGNATURE_LENGTH;
 
-    private static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + ORDER_LENGTH;
-    private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + ORDER_LENGTH;
-    private static final int BASE_LENGTH = Transaction.BASE_LENGTH + ORDER_LENGTH;
-    private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + ORDER_LENGTH;
+    private static final int LOAD_LENGTH = SIGNATURE_LENGTH;
+    private static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
+    private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
+    private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
+    private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH
+            + SEQ_NO_LENGTH;
 
     private byte[] orderSignature;
     private Long orderID;
@@ -52,14 +53,15 @@ public class CancelOrderTransaction extends Transaction {
         this.orderSignature = orderSignature;
     }
 
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, order, feePow, timestamp, reference);
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference, byte[] signature) {
+        this(typeBytes, creator, orderSignature, feePow, timestamp, reference);
         this.signature = signature;
     }
 
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, order, feePow, timestamp, reference);
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, long orderID, byte feePow, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
+        this(typeBytes, creator, orderSignature, feePow, timestamp, reference);
         this.signature = signature;
+        this.orderID = orderID;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -74,16 +76,6 @@ public class CancelOrderTransaction extends Transaction {
     }
 
     //GETTERS/SETTERS
-
-    public void setHeightSeq(long seqNo) {
-        super.setHeightSeq(seqNo);
-        orderID = dbRef;
-    }
-
-    public void setHeightSeq(int height, int seqNo) {
-        super.setHeightSeq(height, seqNo);
-        orderID = dbRef;
-    }
 
     public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
@@ -124,7 +116,7 @@ public class CancelOrderTransaction extends Transaction {
     public static Transaction Parse(byte[] data, int forDeal) throws Exception {
 
         int test_len;
-        if (forDeal == Transaction.FOR_MYPACK) {
+        if (forDeal == FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
         } else if (forDeal == Transaction.FOR_PACK) {
             test_len = BASE_LENGTH_AS_PACK;
@@ -143,7 +135,7 @@ public class CancelOrderTransaction extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (forDeal > Transaction.FOR_MYPACK) {
+        if (forDeal > FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
@@ -202,11 +194,19 @@ public class CancelOrderTransaction extends Transaction {
             position += FEE_LENGTH;
         }
 
-        //READ ORDER
-        byte[] orderSignature = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-        position += ORDER_LENGTH;
+        //READ ORDER SIGNATURE
+        byte[] orderSignature = Arrays.copyOfRange(data, position, position + ORDER_SIGN_LENGTH);
+        position += ORDER_SIGN_LENGTH;
 
-        return new CancelOrderTransaction(typeBytes, creator, orderSignature, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+        long orderID = 0;
+        if (forDeal == FOR_DB_RECORD) {
+            //READ ORDER ID
+            byte[] orderIDBytes = Arrays.copyOfRange(data, position, position + SEQ_NO_LENGTH);
+            orderID = Longs.fromByteArray(orderIDBytes);
+            position += SEQ_NO_LENGTH;
+        }
+
+        return new CancelOrderTransaction(typeBytes, creator, orderSignature, orderID, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
     }
 
     //@Override
@@ -216,6 +216,12 @@ public class CancelOrderTransaction extends Transaction {
 
         //WRITE ORDER
         data = Bytes.concat(data, this.orderSignature);
+
+        if (forDeal == FOR_DB_RECORD) {
+            // WRITE ORDER ID
+            byte[] orderIDBytes = Longs.toByteArray(this.orderID == null ? 0L : this.orderID);
+            data = Bytes.concat(data, orderIDBytes);
+        }
 
         return data;
     }
