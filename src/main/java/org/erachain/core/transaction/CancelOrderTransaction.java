@@ -45,7 +45,7 @@ public class CancelOrderTransaction extends Transaction {
             + SEQ_NO_LENGTH;
 
     private byte[] orderSignature;
-    private Long orderID;
+    private long orderID;
 
 
     public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference) {
@@ -80,7 +80,7 @@ public class CancelOrderTransaction extends Transaction {
     public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
-        if (orderID == null || orderID == 0) {
+        if (orderID == 0L) {
             Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
             if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID && height > BlockChain.ALL_VALID_BEFORE) {
                 LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderSignature));
@@ -219,7 +219,7 @@ public class CancelOrderTransaction extends Transaction {
 
         if (forDeal == FOR_DB_RECORD) {
             // WRITE ORDER ID
-            byte[] orderIDBytes = Longs.toByteArray(this.orderID == null ? 0L : this.orderID);
+            byte[] orderIDBytes = Longs.toByteArray(this.orderID);
             data = Bytes.concat(data, orderIDBytes);
         }
 
@@ -256,11 +256,11 @@ public class CancelOrderTransaction extends Transaction {
 
         //CHECK IF ORDER EXISTS
         boolean emptyOrder = false;
-        if (this.orderID == null || !this.dcSet.getOrderMap().contains(this.orderID)) {
+        if (this.orderID == 0L || !this.dcSet.getOrderMap().contains(this.orderID)) {
             if (this.height > BlockChain.CANCEL_ORDERS_ALL_VALID && height > BlockChain.ALL_VALID_BEFORE) {
 
                 if (true) {
-                    if (this.orderID == null) {
+                    if (this.orderID == 0L) {
                         errorValue = "orderID == null";
                         LOGGER.debug("INVALID: " + errorValue);
                     } else {
@@ -334,7 +334,7 @@ public class CancelOrderTransaction extends Transaction {
         //UPDATE CREATOR
         super.processBody(block, forDeal);
 
-        if (this.orderID == null) {
+        if (this.orderID == 0L) {
             if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
                 return;
             Long error = null;
@@ -385,7 +385,7 @@ public class CancelOrderTransaction extends Transaction {
         // ORPHAN
         super.orphanBody(block, forDeal);
 
-        if (this.orderID == null) {
+        if (this.orderID == 0L) {
             if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
                 return;
             Long error = null;
