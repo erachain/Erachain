@@ -109,8 +109,17 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
 
     @Override
     public IteratorCloseable<Long> getBlockIterator(Integer height, boolean descending) {
-        // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        return map.getIndexIteratorFilter(Ints.toByteArray(height), descending, false);
+
+        // берем из родителя
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalSuit) parent).getBlockIterator(height, descending);
+
+        // берем свои - форкнутые
+        IteratorCloseable<Long> iteratorForked = map.getIndexIteratorFilter(Ints.toByteArray(height), descending, false);
+
+        // создаем с учетом удаленных
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted), iteratorForked), Fun.COMPARATOR);
+
     }
 
     @Override

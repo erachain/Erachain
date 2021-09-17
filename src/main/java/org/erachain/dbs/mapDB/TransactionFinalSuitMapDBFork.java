@@ -149,16 +149,25 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
 
     @Override
     public IteratorCloseable<Long> getBlockIterator(Integer height, boolean descending) {
-        // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
+        // берем из родителя
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalSuit) parent).getBlockIterator(height, descending);
+
+        // берем свои - форкнутые
+        IteratorCloseable<Long> iteratorForked;
         if (descending) {
-            return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
+            iteratorForked = new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
                     .subMap(Transaction.makeDBRef(height, 0),
                             Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().descendingIterator());
         } else {
-            return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
+            iteratorForked = new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
                     .subMap(Transaction.makeDBRef(height, 0),
                             Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
         }
+
+        // создаем с учетом удаленных
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted), iteratorForked), Fun.COMPARATOR);
+
 
     }
 

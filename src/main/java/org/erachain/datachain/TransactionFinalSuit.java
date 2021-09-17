@@ -9,15 +9,26 @@ public interface TransactionFinalSuit {
 
     void deleteForBlock(Integer height);
 
+    /**
+     * Use in FORK by MergedOR_IteratorsNoDuplicates
+     *
+     * @param height
+     * @param descending
+     * @return
+     */
     IteratorCloseable<Long> getBlockIterator(Integer height, boolean descending);
 
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, boolean descending);
+
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, boolean descending);
+
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending);
 
 
     IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, boolean descending);
+
     IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, Long fromSeqNo, boolean descending);
+
     IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending);
 
     /**
