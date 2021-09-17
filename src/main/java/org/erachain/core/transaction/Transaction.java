@@ -2584,7 +2584,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             smartContract.process(dcSet, block, this);
 
         // UPDATE REFERENCE OF SENDER
-        this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
+        if (this.creator != null)
+            this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
 
     }
 
@@ -2599,8 +2600,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public void orphanHead(Block block, int forDeal) {
 
         // UPDATE REFERENCE OF SENDER
-        // set last transaction signature for this ACCOUNT
-        this.creator.removeLastTimestamp(this.dcSet, timestamp);
+        // reset last transaction signature for this ACCOUNT
+        if (this.creator != null)
+            this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         ///////// SMART CONTRACTS SESSION
         if (smartContract == null) {

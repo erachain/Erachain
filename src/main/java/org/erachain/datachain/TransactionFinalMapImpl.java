@@ -17,7 +17,6 @@ import org.erachain.database.PagedMap;
 import org.erachain.dbs.*;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDBFork;
-import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDB;
 import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
@@ -27,7 +26,10 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 
 import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
@@ -116,24 +118,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {
-
-        // TODO сделать удаление по фильтру разом - как у RocksDB - deleteRange(final byte[] beginKey, final byte[] endKey)
-        if (map instanceof TransactionFinalSuit) {
-            ((TransactionFinalSuit) map).deleteForBlock(height);
-        } else if (map instanceof NativeMapTreeMapFork) {
-            // Descending for correct remove tags see issue #1766
-            Iterator<Long> iterator = map.getDescendingIterator();
-            while (iterator.hasNext()) {
-                Long key = iterator.next();
-                if (Transaction.parseDBRef(key).a.equals(height)) {
-                    map.delete(key);
-                }
-            }
-        } else {
-            Long error = null;
-            ++error;
-        }
-
+        ((TransactionFinalSuit) map).deleteForBlock(height);
     }
 
     @Override

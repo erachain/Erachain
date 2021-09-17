@@ -24,7 +24,11 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     int CUT_NAME_INDEX = 12;
     int ADDRESS_KEY_LEN = 10;
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    /**
+     * delete all transactions for Block
+     *
+     * @param height
+     */
     void delete(Integer height);
 
     void delete(Integer height, Integer seq);
