@@ -188,8 +188,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByBlock(Integer block, boolean descending) {
-        return ((TransactionFinalSuit) map).getBlockIterator(block, descending);
+    public IteratorCloseable<Long> getOneBlockIterator(Integer block, boolean descending) {
+        return ((TransactionFinalSuit) map).getOneBlockIterator(block, descending);
     }
 
     @Override
@@ -205,7 +205,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBlockIterator(block, false)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getOneBlockIterator(block, false)) {
 
             if (offset > 0)
                 Iterators.advance(iterator, offset);

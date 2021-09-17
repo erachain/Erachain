@@ -16,7 +16,7 @@ public interface TransactionFinalSuit {
      * @param descending
      * @return
      */
-    IteratorCloseable<Long> getBlockIterator(Integer height, boolean descending);
+    IteratorCloseable<Long> getOneBlockIterator(Integer height, boolean descending);
 
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, boolean descending);
 

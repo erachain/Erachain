@@ -2445,7 +2445,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         // It delete all CALCULATED FIRST correct and all txs too
         /// если форк их тут вообще нету - нужно выцепить из Родительской таблицы
         Long dbRef;
-        try (IteratorCloseable<Long> iterator = finalMap.getIteratorByBlock(height, true)) {
+        try (IteratorCloseable<Long> iterator = finalMap.getOneBlockIterator(height, true)) {
             while (iterator.hasNext()) {
                 if (cnt.isOnStopping()) {
                     throw new Exception("on stoping");
@@ -2467,7 +2467,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                     transFinalMapSinds.delete(transaction.getSignature());
 
-                    // Обязательно надо делать иначе некоторые тразакции будут потом невалидны (удостоверение ключей и регистрация подписанной персоны)
+                    // Обязательно надо делать иначе некоторые транзакции будут потом невалидны (удостоверение ключей и регистрация подписанной персоны)
                     List<byte[]> signatures = transaction.getOtherSignatures();
                     if (signatures != null) {
                         for (byte[] itemSignature : signatures) {
