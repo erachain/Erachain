@@ -43,7 +43,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     List<Transaction> getTransactionsByRecipient(byte[] addressShort, int limit);
 
     /**
-     * Iterator for ONE block only
+     * Iterator for ONE block only with FORK proccessing
      *
      * @param block
      * @param descending
