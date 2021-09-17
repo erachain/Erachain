@@ -2564,13 +2564,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                             "Referral bonus " + "@" + this.viewHeightSeq(), dbRef, timestamp);
                 }
             }
+        }
 
-            if (exLink != null) {
-                exLink.process(this);
-            }
-
-            // UPDATE REFERENCE OF SENDER
-            this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
+        if (exLink != null) {
+            exLink.process(this);
         }
 
     }
@@ -2586,6 +2583,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         if (smartContract != null)
             smartContract.process(dcSet, block, this);
 
+        // UPDATE REFERENCE OF SENDER
+        this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
+
     }
 
     public void process(Block block, int forDeal) {
@@ -2597,6 +2597,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     //////////////////////////////////// ORPHAN
 
     public void orphanHead(Block block, int forDeal) {
+
+        // UPDATE REFERENCE OF SENDER
+        // set last transaction signature for this ACCOUNT
+        this.creator.removeLastTimestamp(this.dcSet, timestamp);
+
         ///////// SMART CONTRACTS SESSION
         if (smartContract == null) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
@@ -2617,6 +2622,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public void orphanBody(Block block, int forDeal) {
 
+        // CLEAR all FOOTPRINTS and empty data
+        this.dcSet.getVouchRecordMap().delete(dbRef);
+
+        if (exLink != null) {
+            exLink.orphan(this);
+        }
+
         if (forDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
@@ -2634,21 +2646,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                             BlockChain.FEE_ASSET, null, null, dbRef, timestamp);
             }
 
-            // UPDATE REFERENCE OF SENDER
-            // set last transaction signature for this ACCOUNT
-            this.creator.removeLastTimestamp(this.dcSet, timestamp);
-
             // CALC ROYALTY
             processRoyalty(block, true);
 
         }
-
-        if (exLink != null) {
-            exLink.orphan(this);
-        }
-
-        // CLEAR all FOOTPRINTS and empty data
-        this.dcSet.getVouchRecordMap().delete(dbRef);
 
     }
 
