@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
@@ -17,19 +18,21 @@ import java.math.BigDecimal;
 
 public class DogePlanet extends EpochSmartContract {
 
-    static public final PublicKeyAccount MAKER = new PublicKeyAccount("1");
+    static public final int ID = 1000;
+
+    static public final PublicKeyAccount MAKER = new PublicKeyAccount(Base58.encode(Longs.toByteArray(ID)));
     private int count;
     private long keyEnd;
 
-    static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(DOGE_PLANET_1, "c");
+    static final Fun.Tuple2 COUNT_KEY = new Fun.Tuple2(ID, "c");
 
-    DogePlanet(int count) {
-        super(DOGE_PLANET_1, MAKER);
+    public DogePlanet(int count) {
+        super(ID);
         this.count = count;
     }
 
-    DogePlanet(int count, long keyEnd) {
-        super(DOGE_PLANET_1, MAKER);
+    public DogePlanet(int count, long keyEnd) {
+        super(ID);
         this.count = count;
         this.keyEnd = keyEnd;
     }

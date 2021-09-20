@@ -14,6 +14,7 @@ import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
@@ -236,6 +237,15 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         } else {
             linkTo = null;
         }
+
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
+        }
+
 
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {

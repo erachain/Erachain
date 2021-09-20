@@ -6,7 +6,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exActions.ExAction;
-import org.erachain.core.exdata.exActions.ExAirDrop;
 import org.erachain.core.exdata.exLink.*;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
@@ -247,8 +246,6 @@ public class RSignNoteResource {
             }
 
         }
-
-        ExAirDrop exAirdrop = null;
 
         if (!test && !BlockChain.TEST_MODE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {

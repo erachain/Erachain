@@ -1,15 +1,22 @@
 package org.erachain.smartcontracts;
 
 import com.google.common.primitives.Ints;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.Order;
+import org.erachain.core.transaction.CreateOrderTransaction;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.epoch.DogePlanet;
+import org.erachain.smartcontracts.epoch.LeafFall;
+
+import java.math.BigDecimal;
 
 public abstract class SmartContract {
-
-    protected static final int DOGE_PLANET_1 = 1;
 
     protected final int id;
     protected final PublicKeyAccount maker;
@@ -46,11 +53,12 @@ public abstract class SmartContract {
     }
 
     public byte[] toBytes(int forDeal) {
-        byte[] data = new byte[4 + 32];
+        byte[] pubKey = maker.getPublicKey();
+        byte[] data = new byte[4 + pubKey.length];
         System.arraycopy(Ints.toByteArray(id), 0, data, 0, 4);
-        System.arraycopy(maker.getPublicKey(), 0, data, 4, 36);
+        System.arraycopy(pubKey, 0, data, 4, pubKey.length);
 
-        return new byte[8];
+        return data;
     }
 
     public static SmartContract Parses(byte[] data, int position, int forDeal) throws Exception {
@@ -59,7 +67,9 @@ public abstract class SmartContract {
         System.arraycopy(data, position, idBuffer, 0, 4);
         int id = Ints.fromByteArray(idBuffer);
         switch (id) {
-            case DOGE_PLANET_1:
+            case LeafFall.ID:
+                return LeafFall.Parse(data, position, forDeal);
+            case DogePlanet.ID:
                 return DogePlanet.Parse(data, position, forDeal);
         }
 
@@ -73,5 +83,44 @@ public abstract class SmartContract {
     abstract public boolean process(DCSet dcSet, Block block, Transaction transaction);
 
     abstract public boolean orphan(DCSet dcSet, Transaction transaction);
+
+    /**
+     * Делает смотр-контракт протокольный (на эпоху).
+     *
+     * @param transaction
+     * @return
+     */
+    static public SmartContract make(Transaction transaction) {
+
+        if (BlockChain.TEST_MODE
+                && transaction.getBlockHeight() > 115740
+                && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+            RSend txSend = (RSend) transaction;
+            if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
+                    && txSend.hasAmount() && txSend.getAmount().signum() < 0
+                // && txSend.getAbsKey() == 10234L
+            ) {
+                return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
+            }
+
+        } else if (BlockChain.TEST_MODE
+                && transaction.getBlockHeight() > 132464
+                && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
+            CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
+            if (createOrder.getHaveKey() == AssetCls.ERA_KEY
+                    && createOrder.getAmountHave().compareTo(new BigDecimal(100)) >= 0 //  && createOrder.getWantKey() == AssetCls.USD_KEY
+                    || createOrder.getWantKey() == AssetCls.ERA_KEY
+                    && createOrder.getAmountWant().compareTo(new BigDecimal(100)) >= 0 // && createOrder.getHaveKey() == AssetCls.USD_KEY
+            ) {
+                Order order = createOrder.getDCSet().getCompletedOrderMap().get(createOrder.getOrderId());
+                if (order != null)
+                    return new LeafFall();
+            }
+
+        }
+
+        return null;
+
+    }
 
 }

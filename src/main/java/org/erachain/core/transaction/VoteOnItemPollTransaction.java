@@ -11,6 +11,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -163,6 +164,14 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
             exLink = null;
         }
 
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
+        }
+
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
@@ -253,6 +262,12 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         if (exLink != null)
             base_len += exLink.length();
 
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
+
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 
@@ -308,9 +323,9 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     //PROCESS/ORPHAN
 
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         //ADD VOTE TO POLL
         this.dcSet.getVoteOnItemPollMap().addItem(this.key, this.option, new BigInteger(this.creator.getShortAddressBytes()),
@@ -321,9 +336,9 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     //@Override
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         //DELETE VOTE FROM POLL
         this.dcSet.getVoteOnItemPollMap().removeItem(this.key, this.option, new BigInteger(this.creator.getShortAddressBytes()));

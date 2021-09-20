@@ -15,6 +15,7 @@ import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.item.assets.TradePair;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
@@ -42,6 +43,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     public static final byte TYPE_ID = (byte) Transaction.CREATE_ORDER_TRANSACTION;
     public static final String TYPE_NAME = "Create Order";
 
+    // < 32 used for acuracy
+    public static final byte HAS_SMART_CONTRACT_MASK = 64;
+
     public static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
     private static final int HAVE_LENGTH = 8;
     private static final int WANT_LENGTH = 8;
@@ -61,9 +65,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     private BigDecimal amountHave;
     private BigDecimal amountWant;
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
+    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, exLink, smartContract, feePow, timestamp, reference);
         this.haveKey = haveKey;
         this.wantKey = wantKey;
 
@@ -75,15 +79,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
                                   byte[] signature) {
-        this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
+        this(typeBytes, creator, null, null, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
         this.signature = signature;
 
     }
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
+    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
                                   byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
+        this(typeBytes, creator, exLink, smartContract, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
@@ -99,7 +103,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, have, want, amountHave, amountWant, feePow, timestamp,
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, null, have, want, amountHave, amountWant, feePow, timestamp,
                 reference);
     }
 
@@ -146,125 +150,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         } else {
             return long_fee;
         }
-    }
-
-    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
-        //boolean asPack = releaserReference != null;
-
-        // CHECK IF WE MATCH BLOCK LENGTH
-        int test_len;
-        if (forDeal == Transaction.FOR_MYPACK) {
-            test_len = BASE_LENGTH_AS_MYPACK;
-        } else if (forDeal == Transaction.FOR_PACK) {
-            test_len = BASE_LENGTH_AS_PACK;
-        } else if (forDeal == Transaction.FOR_DB_RECORD) {
-            test_len = BASE_LENGTH_AS_DBRECORD;
-        } else {
-            test_len = BASE_LENGTH;
-        }
-
-        if (data.length < test_len) {
-            throw new Exception("Data does not match RAW length " + data.length + " < " + test_len);
-        }
-
-        // READ TYPE
-        byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
-        int position = TYPE_LENGTH;
-
-        long timestamp = 0;
-        if (forDeal > Transaction.FOR_MYPACK) {
-            //READ TIMESTAMP
-            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-            timestamp = Longs.fromByteArray(timestampBytes);
-            position += TIMESTAMP_LENGTH;
-        }
-
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
-
-        //READ CREATOR
-        byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-        PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
-        position += CREATOR_LENGTH;
-
-        ExLink exLink;
-        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
-            exLink = ExLink.parse(data, position);
-            position += exLink.length();
-        } else {
-            exLink = null;
-        }
-
-        byte feePow = 0;
-        if (forDeal > Transaction.FOR_PACK) {
-            // READ FEE POWER
-            byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-            feePow = feePowBytes[0];
-            position += 1;
-        }
-
-        // READ SIGNATURE
-        byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-        position += SIGNATURE_LENGTH;
-
-        long feeLong = 0;
-        long seqNo = 0;
-        if (forDeal == FOR_DB_RECORD) {
-            //READ SEQ_NO
-            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-            seqNo = Longs.fromByteArray(seqNoBytes);
-            position += TIMESTAMP_LENGTH;
-
-            // READ FEE
-            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
-            feeLong = Longs.fromByteArray(feeBytes);
-            position += FEE_LENGTH;
-        }
-
-        // READ HAVE
-        byte[] haveBytes = Arrays.copyOfRange(data, position, position + HAVE_LENGTH);
-        long have = Longs.fromByteArray(haveBytes);
-        position += HAVE_LENGTH;
-
-        // READ WANT
-        byte[] wantBytes = Arrays.copyOfRange(data, position, position + WANT_LENGTH);
-        long want = Longs.fromByteArray(wantBytes);
-        position += WANT_LENGTH;
-
-        // READ AMOUNT HAVE
-        byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-        BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
-        position += AMOUNT_LENGTH;
-        // CHECK ACCURACY of AMOUNT
-        int accuracy = typeBytes[2] & TransactionAmount.SCALE_MASK;
-        if (accuracy > 0) {
-            if (accuracy >= TransactionAmount.SCALE_MASK_HALF) {
-                accuracy -= TransactionAmount.SCALE_MASK + 1;
-            }
-
-            // RESCALE AMOUNT
-            amountHave = amountHave.scaleByPowerOfTen(-accuracy);
-        }
-
-        // READ AMOUNT WANT
-        byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-        BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
-        position += AMOUNT_LENGTH;
-        // CHECK ACCURACY of AMOUNT
-        accuracy = typeBytes[3] & TransactionAmount.SCALE_MASK;
-        if (accuracy > 0) {
-            if (accuracy >= TransactionAmount.SCALE_MASK_HALF) {
-                accuracy -= TransactionAmount.SCALE_MASK + 1;
-            }
-
-            // RESCALE AMOUNT
-            amountWant = amountWant.scaleByPowerOfTen(-accuracy);
-        }
-
-        return new CreateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp,
-                reference, signatureBytes, seqNo, feeLong);
     }
 
     public Long getOrderId() {
@@ -352,6 +237,133 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         return transaction;
     }
 
+    public static Transaction Parse(byte[] data, int forDeal) throws Exception {
+        //boolean asPack = releaserReference != null;
+
+        // CHECK IF WE MATCH BLOCK LENGTH
+        int test_len;
+        if (forDeal == Transaction.FOR_MYPACK) {
+            test_len = BASE_LENGTH_AS_MYPACK;
+        } else if (forDeal == Transaction.FOR_PACK) {
+            test_len = BASE_LENGTH_AS_PACK;
+        } else if (forDeal == Transaction.FOR_DB_RECORD) {
+            test_len = BASE_LENGTH_AS_DBRECORD;
+        } else {
+            test_len = BASE_LENGTH;
+        }
+
+        if (data.length < test_len) {
+            throw new Exception("Data does not match RAW length " + data.length + " < " + test_len);
+        }
+
+        // READ TYPE
+        byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+        int position = TYPE_LENGTH;
+
+        long timestamp = 0;
+        if (forDeal > Transaction.FOR_MYPACK) {
+            //READ TIMESTAMP
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            timestamp = Longs.fromByteArray(timestampBytes);
+            position += TIMESTAMP_LENGTH;
+        }
+
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
+
+        //READ CREATOR
+        byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+        PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+        position += CREATOR_LENGTH;
+
+        ExLink exLink;
+        if ((typeBytes[2] & HAS_EXLINK_MASK) > 0) {
+            exLink = ExLink.parse(data, position);
+            position += exLink.length();
+        } else {
+            exLink = null;
+        }
+
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
+        }
+
+        byte feePow = 0;
+        if (forDeal > Transaction.FOR_PACK) {
+            // READ FEE POWER
+            byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+            feePow = feePowBytes[0];
+            position += 1;
+        }
+
+        // READ SIGNATURE
+        byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+        position += SIGNATURE_LENGTH;
+
+        long feeLong = 0;
+        long seqNo = 0;
+        if (forDeal == FOR_DB_RECORD) {
+            //READ SEQ_NO
+            byte[] seqNoBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            seqNo = Longs.fromByteArray(seqNoBytes);
+            position += TIMESTAMP_LENGTH;
+
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
+        // READ HAVE
+        byte[] haveBytes = Arrays.copyOfRange(data, position, position + HAVE_LENGTH);
+        long have = Longs.fromByteArray(haveBytes);
+        position += HAVE_LENGTH;
+
+        // READ WANT
+        byte[] wantBytes = Arrays.copyOfRange(data, position, position + WANT_LENGTH);
+        long want = Longs.fromByteArray(wantBytes);
+        position += WANT_LENGTH;
+
+        // READ AMOUNT HAVE
+        byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
+        position += AMOUNT_LENGTH;
+        // CHECK ACCURACY of AMOUNT
+        int accuracy = typeBytes[2] & TransactionAmount.SCALE_MASK;
+        if (accuracy > 0) {
+            if (accuracy >= TransactionAmount.SCALE_MASK_HALF) {
+                accuracy -= TransactionAmount.SCALE_MASK + 1;
+            }
+
+            // RESCALE AMOUNT
+            amountHave = amountHave.scaleByPowerOfTen(-accuracy);
+        }
+
+        // READ AMOUNT WANT
+        byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
+        position += AMOUNT_LENGTH;
+        // CHECK ACCURACY of AMOUNT
+        accuracy = typeBytes[3] & TransactionAmount.SCALE_MASK;
+        if (accuracy > 0) {
+            if (accuracy >= TransactionAmount.SCALE_MASK_HALF) {
+                accuracy -= TransactionAmount.SCALE_MASK + 1;
+            }
+
+            // RESCALE AMOUNT
+            amountWant = amountWant.scaleByPowerOfTen(-accuracy);
+        }
+
+        return new CreateOrderTransaction(typeBytes, creator, exLink, smartContract, have, want, amountHave, amountWant, feePow, timestamp,
+                reference, signatureBytes, seqNo, feeLong);
+    }
+
     // @Override
     //@Override
     public byte[] toBytes(int forDeal, boolean withSignature) {
@@ -407,8 +419,6 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         return data;
     }
 
-    // VALIDATE
-
     @Override
     public int getDataLength(int forDeal, boolean withSignature)
     {
@@ -425,12 +435,20 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (exLink != null)
             base_len += exLink.length();
 
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
+
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 
         return base_len;
     }
 
+
+    // VALIDATE
     @Override
     public int isValid(int forDeal, long flags) {
 
@@ -639,9 +657,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     // @Override
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
         // UPDATE CREATOR
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         // PROCESS ORDER
         Order order = makeOrder();
@@ -672,9 +690,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     // @Override
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
         // UPDATE CREATOR
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         // ORPHAN ORDER
 

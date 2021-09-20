@@ -13,6 +13,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
@@ -102,6 +103,16 @@ public class ChangeOrderTransaction extends Transaction {
 
     // GETTERS/SETTERS
 
+    public void setHeightSeq(long seqNo) {
+        super.setHeightSeq(seqNo);
+        orderID = dbRef;
+    }
+
+    public void setHeightSeq(int height, int seqNo) {
+        super.setHeightSeq(height, seqNo);
+        orderID = dbRef;
+    }
+
     public boolean isHaveUpdated() {
         return (typeBytes[3] & HAVE_AMOUNT_MASK) != 0;
     }
@@ -110,14 +121,18 @@ public class ChangeOrderTransaction extends Transaction {
 
         super.setDC(dcSet, false);
 
-        // на выходе может быть NULL - он в long не преобразуется - поэтому сначала исследуем
-        Long res = dcSet.getTransactionFinalMapSigns().get(orderRef);
+        if (orderID == 0) {
 
-        if (res == null) {
-            return;
+            // на выходе может быть NULL - он в long не преобразуется - поэтому сначала исследуем
+            Long res = dcSet.getTransactionFinalMapSigns().get(orderRef);
+
+            if (res == null) {
+                return;
+            }
+
+            orderID = res;
         }
 
-        orderID = res;
         order = dcSet.getOrderMap().get(orderID);
         // подтянем в любом случае даже из Completed, а ниже проверку вставим на Активен?
         if (order == null) {
@@ -271,6 +286,14 @@ public class ChangeOrderTransaction extends Transaction {
             exLink = null;
         }
 
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
+        }
+
         byte feePow = 0;
         if (forDeal > Transaction.FOR_PACK) {
             // READ FEE POWER
@@ -364,6 +387,12 @@ public class ChangeOrderTransaction extends Transaction {
 
         if (exLink != null)
             base_len += exLink.length();
+
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
 
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
@@ -466,8 +495,8 @@ public class ChangeOrderTransaction extends Transaction {
      * @param forDeal
      */
     @Override
-    public void process(Block block, int forDeal) {
-        super.process(block, forDeal);
+    public void processBody(Block block, int forDeal) {
+        super.processBody(block, forDeal);
 
         // PROCESS UPDATE ORDER
 
@@ -518,8 +547,8 @@ public class ChangeOrderTransaction extends Transaction {
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
-        super.orphan(block, forDeal);
+    public void orphanBody(Block block, int forDeal) {
+        super.orphanBody(block, forDeal);
 
         // ORPHAN UPDATE ORDER
 

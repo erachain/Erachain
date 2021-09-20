@@ -510,6 +510,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return this.maker;
     }
 
+    public void setMaker(PublicKeyAccount newOwner) {
+        this.maker = newOwner;
+    }
+
     public String getName() {
         return this.name;
     }

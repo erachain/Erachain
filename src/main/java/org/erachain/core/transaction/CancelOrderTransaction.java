@@ -13,6 +13,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.DCSet;
+import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
@@ -74,19 +75,31 @@ public class CancelOrderTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
+    public void setHeightSeq(long seqNo) {
+        super.setHeightSeq(seqNo);
+        orderID = dbRef;
+    }
+
+    public void setHeightSeq(int height, int seqNo) {
+        super.setHeightSeq(height, seqNo);
+        orderID = dbRef;
+    }
+
     public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
-        Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
-        if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID && height > BlockChain.ALL_VALID_BEFORE) {
-            LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderSignature));
-            errorValue = Base58.encode(this.orderSignature);
-            if (BlockChain.CHECK_BUGS > 3) {
-                Long error = null;
-                error++;
+        if (orderID == 0) {
+            Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
+            if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID && height > BlockChain.ALL_VALID_BEFORE) {
+                LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderSignature));
+                errorValue = Base58.encode(this.orderSignature);
+                if (BlockChain.CHECK_BUGS > 3) {
+                    Long error = null;
+                    error++;
+                }
             }
+            this.orderID = createDBRef;
         }
-        this.orderID = createDBRef;
 
         if (false && andUpdateFromState && !isWiped())
             updateFromStateDB();
@@ -153,6 +166,14 @@ public class CancelOrderTransaction extends Transaction {
             position += exLink.length();
         } else {
             exLink = null;
+        }
+
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
         }
 
         byte feePow = 0;
@@ -288,6 +309,12 @@ public class CancelOrderTransaction extends Transaction {
         if (exLink != null)
             base_len += exLink.length();
 
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
+
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 
@@ -297,9 +324,9 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
         //UPDATE CREATOR
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         if (this.orderID == null) {
             if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
@@ -345,12 +372,12 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
         // FIRST GET DB REF from FINAL
 
         // ORPHAN
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         if (this.orderID == null) {
             if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)

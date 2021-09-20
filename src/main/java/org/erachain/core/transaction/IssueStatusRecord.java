@@ -6,6 +6,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.statuses.StatusFactory;
+import org.erachain.smartcontracts.SmartContract;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -90,6 +91,14 @@ public class IssueStatusRecord extends IssueItemRecord {
             position += linkTo.length();
         } else {
             linkTo = null;
+        }
+
+        SmartContract smartContract;
+        if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
+            smartContract = SmartContract.Parses(data, position, forDeal);
+            position += smartContract.length(forDeal);
+        } else {
+            smartContract = null;
         }
 
         byte feePow = 0;

@@ -311,6 +311,12 @@ public class RSetUnionToItem extends Transaction {
         if (exLink != null)
             base_len += exLink.length();
 
+        if (smartContract != null) {
+            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+                base_len += smartContract.length(forDeal);
+            }
+        }
+
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 
@@ -378,10 +384,10 @@ public class RSetUnionToItem extends Transaction {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.process(block, forDeal);
+        super.processBody(block, forDeal);
 
         // pack additional data
         byte[] a_data = new byte[0];
@@ -404,10 +410,10 @@ public class RSetUnionToItem extends Transaction {
     }
 
     @Override
-    public void orphan(Block block, int forDeal) {
+    public void orphanBody(Block block, int forDeal) {
 
         //UPDATE SENDER
-        super.orphan(block, forDeal);
+        super.orphanBody(block, forDeal);
 
         // UNDO ALIVE PERSON for DURATION
         if (this.itemType == ItemCls.PERSON_TYPE)
