@@ -45,6 +45,7 @@ public class WebService {
         s.add(APIExchange.class);
         s.add(APITelegramsResource.class);
         s.add(APIDocuments.class);
+        s.add(APIFPool.class);
 
         ResourceConfig config = new ResourceConfig(s);
         config.register(MultiPartFeature.class);

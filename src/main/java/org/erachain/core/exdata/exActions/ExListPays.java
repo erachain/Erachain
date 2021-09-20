@@ -192,7 +192,7 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
 
         if (totalPay == null) {
             dbData = new byte[1];
-            buff = null;
+            return dbData;
         } else {
             buff = this.totalPay.unscaledValue().toByteArray();
             dbData = new byte[2 + buff.length];
@@ -528,6 +528,10 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
         height = rNote.getBlockHeight();
         asset = dcSet.getItemAssetMap().get(assetKey);
 
+        if (results == null) {
+            preProcess(rNote);
+        }
+
         processBody(rNote, false, block);
 
     }
@@ -539,6 +543,16 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
 
         processBody(rNote, true, null);
 
+    }
+
+    public boolean isInvolved(Account account) {
+        if (results != null) {
+            for (Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
+                if (item.a.equals(account))
+                    return true;
+            }
+        }
+        return false;
     }
 
 }

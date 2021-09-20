@@ -1,0 +1,21 @@
+{
+  // Address of forging
+  "address": "7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP",
+  // pool tax
+  "tax": 3.6,
+  // period of pending before make rewards from forged block
+  "pending_period": 30,
+  "title": "Staking Rewards",
+  "message": "<h3>Forging Pool</h3>",
+  // minimal withdraw for asset by KEY
+  "min_withdraw": {
+    // other assets
+    "0": "0.01",
+    // ERA
+    "1": "1",
+    // COMPU
+    "2": "0.001",
+    // BTC
+    "12": "0.00001"
+  }
+}

@@ -229,7 +229,7 @@ public class ItemPollsResource {
 
             Controller controller = Controller.getInstance();
             //CHECK IF WALLET EXISTS
-            if (!controller.doesWalletExists()) {
+            if (!controller.doesWalletKeysExists()) {
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
             }
 
@@ -326,7 +326,7 @@ public class ItemPollsResource {
                 throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 
             //CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletExists())
+            if (!Controller.getInstance().doesWalletKeysExists())
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 
             //GET ACCOUNT
@@ -418,7 +418,7 @@ public class ItemPollsResource {
             }
 
             //CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletExists()) {
+            if (!Controller.getInstance().doesWalletKeysExists()) {
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
             }
 
@@ -487,7 +487,7 @@ public class ItemPollsResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 
         //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists())
+        if (!Controller.getInstance().doesWalletKeysExists())
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 
         //GET ACCOUNT
@@ -525,7 +525,7 @@ public class ItemPollsResource {
     public String getPolls(@PathParam("address") String address) {
 
         //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 

@@ -95,7 +95,7 @@ public class BlogPostResource {
                     + signatureOfComment, request, true);
 
             // CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletExists()) {
+            if (!Controller.getInstance().doesWalletKeysExists()) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
             }
@@ -204,7 +204,7 @@ public class BlogPostResource {
                     "POST blogpost/comment" + "\n" + x, request, true);
 
             // CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletExists()) {
+            if (!Controller.getInstance().doesWalletKeysExists()) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
             }
@@ -318,7 +318,7 @@ public class BlogPostResource {
                     "POST blogpost/" + blogname + "\n" + x, request, true);
 
             // CHECK IF WALLET EXISTS
-            if (!Controller.getInstance().doesWalletExists()) {
+            if (!Controller.getInstance().doesWalletKeysExists()) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
             }

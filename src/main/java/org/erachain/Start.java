@@ -5,8 +5,8 @@ import com.google.common.io.Files;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.settings.Settings;
+import org.erachain.utils.FileUtils;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,27 +124,11 @@ public class Start {
         ///////////////////  CLONECHAINS ///////////
         file = new File(Settings.CLONE_OR_SIDE.toLowerCase() + "GENESIS.json");
         if (Settings.NET_MODE == Settings.NET_MODE_MAIN && Settings.TEST_DB_MODE == 0 && file.exists()) {
+
             // START SIDE CHAIN
             LOGGER.info(Settings.CLONE_OR_SIDE.toLowerCase() + "GENESIS.json USED");
-            String jsonString = "";
-            try {
-                List<String> lines = Files.readLines(file, Charsets.UTF_8);
+            Settings.genesisJSON = FileUtils.readCommentedJSONArray(file.getPath());
 
-                for (String line : lines) {
-                    if (line.trim().startsWith("//")) {
-                        // пропускаем //
-                        continue;
-                    }
-                    jsonString += line;
-                }
-            } catch (Exception e) {
-                LOGGER.info("Error while reading " + file.getAbsolutePath());
-                LOGGER.error(e.getMessage(), e);
-                System.exit(3);
-            }
-
-            //CREATE JSON OBJECT
-            Settings.genesisJSON = (JSONArray) JSONValue.parse(jsonString);
             if (Settings.genesisJSON == null) {
                 LOGGER.error("Wrong JSON or not UTF-8 encode in " + file.getName());
                 throw new Exception("Wrong JSON or not UTF-8 encode in " + file.getName());

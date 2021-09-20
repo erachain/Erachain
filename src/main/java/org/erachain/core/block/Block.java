@@ -78,6 +78,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
     public static final int DATA_SIGN_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TRANSACTIONS_HASH_LENGTH;
     static Logger LOGGER = LoggerFactory.getLogger(Block.class.getSimpleName());
+
     /// HEAD of BLOCK ///
     // FACE
     protected int version;
@@ -111,8 +112,12 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     private boolean fromTrustedPeer = false;
     // FORGING INFO
-    // при обработке трнзакций используем для запоминания что данные менялись
+    // при обработке транзакций используем для запоминания что данные менялись
     protected List<Account> forgingInfoUpdate;
+
+    /**
+     * 1 - EARN FEE, 2 - BURNED
+     */
     protected HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> earnedAllAssets;
 
 
@@ -860,15 +865,6 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     }
 
-    private BigDecimal getTotalFee(DCSet db) {
-        BigDecimal fee = this.getFeeByProcess(db);
-        return fee.add(this.getBonusFee());
-    }
-
-    private BigDecimal getTotalFee() {
-        return getTotalFee(DCSet.getInstance());
-    }
-
     private BigDecimal getFeeByProcess(DCSet db) {
         int fee = 0;
 
@@ -878,6 +874,15 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         return BigDecimal.valueOf(fee, BlockChain.FEE_SCALE);
 
+    }
+
+    private BigDecimal getTotalFee(DCSet db) {
+        BigDecimal fee = this.getFeeByProcess(db);
+        return fee.add(this.getBonusFee());
+    }
+
+    public HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> getEarnedAllAssets() {
+        return earnedAllAssets;
     }
 
     public void setTransactionData(int transactionCount, byte[] rawTransactions) {
@@ -1810,6 +1815,13 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     //PROCESS/ORPHAN
 
+    /**
+     * add some earn for forger and set some burn value
+     *
+     * @param asset
+     * @param assetFeeAdd
+     * @param assetFeeBurnAdd
+     */
     public void addAssetFee(AssetCls asset, BigDecimal assetFeeAdd, BigDecimal assetFeeBurnAdd) {
 
         Tuple2<BigDecimal, BigDecimal> earnedPair;
@@ -1905,7 +1917,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && this.txCalculated != null) {
                 this.txCalculated.add(new RCalculated(this.creator, Transaction.FEE_KEY,
-                        forgerEarn, "forging", Transaction.makeDBRef(this.heightBlock, 0), 0L));
+                        forgerEarn, BlockChain.MESS_FORGING, Transaction.makeDBRef(this.heightBlock, 0), 0L));
             }
         }
 
@@ -1926,21 +1938,35 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
     public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
 
-        if (transactionCount == 0)
-            return;
+        if (BlockChain.TEST_MODE && heightBlock > 150000) {
+            // EMITTE
+            if (earnedAllAssets == null)
+                earnedAllAssets = new HashMap<>();
 
-        // подсчет наград с ПЕРЕВОДОВ
-        Tuple2<BigDecimal, BigDecimal> earnedPair;
-        for (Transaction transaction : getTransactions()) {
-            if (transaction.assetFee == null)
-                continue;
-
-            AssetCls asset = transaction.getAsset();
-            addAssetFee(asset, transaction.assetFee, transaction.assetFeeBurn);
+            BigDecimal emite = BigDecimal.ONE;
+            addAssetFee(BlockChain.ERA_ASSET, emite, null);
+            BlockChain.ERA_ASSET.getMaker().changeBalance(dcSet, !asOrphan, false,
+                    AssetCls.ERA_KEY, emite, false, false, false);
 
         }
 
+        if (transactionCount > 0) {
+            // подсчет наград с ПЕРЕВОДОВ
+            for (Transaction transaction : getTransactions()) {
+                if (transaction.assetFee == null)
+                    continue;
+
+                AssetCls asset = transaction.getAsset();
+                addAssetFee(asset, transaction.assetFee, transaction.assetFeeBurn);
+
+            }
+        }
+
+        if (earnedAllAssets == null || earnedAllAssets.isEmpty())
+            return;
+
         // FOR ASSETS
+        Tuple2<BigDecimal, BigDecimal> earnedPair;
         for (AssetCls asset : earnedAllAssets.keySet()) {
             earnedPair = earnedAllAssets.get(asset);
 
@@ -1950,7 +1976,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                         earnedPair.a, false, false, true);
                 if (!asOrphan && this.txCalculated != null) {
                     this.txCalculated.add(new RCalculated(this.creator, asset.getKey(),
-                            earnedPair.a, "Asset Total Forged", Transaction.makeDBRef(this.heightBlock, 0), 0L));
+                            earnedPair.a, BlockChain.MESS_FORGING, Transaction.makeDBRef(this.heightBlock, 0), 0L));
                 }
             }
 
@@ -2015,7 +2041,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
             if (error) {
                 LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] "
-                        + " totalFee: " + this.getTotalFee()
+                        + " totalFee: " + this.getTotalFee(dcSet)
                         + " bonusFee: " + this.getBonusFee());
 
                 error = false;

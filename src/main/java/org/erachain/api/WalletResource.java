@@ -31,7 +31,7 @@ public class WalletResource {
 
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("exists", Controller.getInstance().doesWalletExists());
+        jsonObject.put("exists", Controller.getInstance().doesWalletKeysExists());
         jsonObject.put("isunlocked", Controller.getInstance().isWalletUnlocked());
 
         return jsonObject.toJSONString();
@@ -45,7 +45,7 @@ public class WalletResource {
         APIUtils.askAPICallAllowed(password, "GET wallet/seed", request, true);
 
         //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
@@ -65,7 +65,7 @@ public class WalletResource {
         APIUtils.askAPICallAllowed(password, "GET wallet/synchronize", request, true);
 
         //CHECK IF WALLET EXISTSашч
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
@@ -88,7 +88,7 @@ public class WalletResource {
         //APIUtils.askAPICallAllowed(password, "GET wallet/lock", request);
 
         //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 
@@ -112,7 +112,7 @@ public class WalletResource {
             String path = (String) jsonObject.get("dir");
 
             //CHECK IF WALLET EXISTS
-            if (Controller.getInstance().doesWalletExists()) {
+            if (Controller.getInstance().doesWalletKeysExists()) {
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ALREADY_EXISTS);
             }
 
@@ -154,7 +154,7 @@ public class WalletResource {
         APIUtils.askAPICallAllowed(x, "POST wallet/unlock " + x, request, false);
 
         //CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
+        if (!Controller.getInstance().doesWalletKeysExists()) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
         }
 

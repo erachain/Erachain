@@ -88,7 +88,7 @@ public class CancelOrderTransaction extends Transaction {
     public void setDC(DCSet dcSet, int forDeal, int blockHeight, int seqNo, boolean andUpdateFromState) {
         super.setDC(dcSet, forDeal, blockHeight, seqNo, false);
 
-        if (orderID == 0) {
+        if (orderID == null || orderID == 0) {
             Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
             if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID && height > BlockChain.ALL_VALID_BEFORE) {
                 LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderSignature));
