@@ -56,7 +56,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     public String errorValue;
 
     public ExAirDrop(int flags, long assetKey, BigDecimal amount, int balancePos, boolean backward, byte[][] addresses) {
-        super(LIST_PAYOUTS_TYPE);
+        super(SIMPLE_PAYOUTS_TYPE);
         this.flags = flags;
         this.assetKey = assetKey;
         this.amount = amount;
