@@ -9,6 +9,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorParent;
@@ -99,7 +100,7 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
 
     @Override
     public void deleteForBlock(Integer height) {
-        try (IteratorCloseable<Long> iterator = getBlockIterator(height, true)) {
+        try (IteratorCloseable<Long> iterator = getOneBlockIterator(height, true)) {
             while (iterator.hasNext()) {
                 map.remove(iterator.next());
             }
@@ -108,9 +109,18 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     }
 
     @Override
-    public IteratorCloseable<Long> getBlockIterator(Integer height, boolean descending) {
-        // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        return map.getIndexIteratorFilter(Ints.toByteArray(height), descending, false);
+    public IteratorCloseable<Long> getOneBlockIterator(Integer height, boolean descending) {
+
+        // берем из родителя
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMapImpl) parent).getOneBlockIterator(height, descending);
+
+        // берем свои - форкнутые
+        IteratorCloseable<Long> iteratorForked = map.getIndexIteratorFilter(Ints.toByteArray(height), descending, false);
+
+        // создаем с учетом удаленных
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted), iteratorForked), Fun.COMPARATOR);
+
     }
 
     @Override

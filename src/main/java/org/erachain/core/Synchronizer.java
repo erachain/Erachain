@@ -163,7 +163,7 @@ public class Synchronizer extends Thread {
             if (++countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
                 // сохраним откаченные транзакции - может их потом включим в очередь
                 for (Transaction transaction : lastBlock.getTransactions()) {
-                    orphanedTransactions.put(transaction.getDBRef(), transaction);
+                    orphanedTransactions.put(Longs.fromByteArray(transaction.getSignature()), transaction);
                 }
                 countOrphanedTransactions += lastBlock.getTransactionCount();
             }
@@ -475,7 +475,7 @@ public class Synchronizer extends Thread {
                         if (ctrl.isOnStopping())
                             throw new Exception("on stopping");
 
-                        Long key = transaction.getDBRef();
+                        Long key = Longs.fromByteArray(transaction.getSignature());
                         if (orphanedTransactions.containsKey(key))
                             orphanedTransactions.remove(key);
                     }

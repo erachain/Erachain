@@ -38,7 +38,8 @@ public class ChangeOrderTransaction extends Transaction {
     private static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
     private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
-    private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
+    private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH
+            + SEQ_NO_LENGTH;
 
     /**
      * typeBytes[3] used as TransactionAmount.SCALE_MASK = 31
@@ -80,9 +81,10 @@ public class ChangeOrderTransaction extends Transaction {
 
     public ChangeOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderRef,
                                   BigDecimal newAmount, byte feePow, long timestamp, Long reference,
-                                  byte[] signature, long seqNo, long feeLong) {
+                                  byte[] signature, long orderID, long seqNo, long feeLong) {
         this(typeBytes, creator, orderRef, newAmount, feePow, timestamp, reference);
         this.signature = signature;
+        this.orderID = orderID;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -103,16 +105,6 @@ public class ChangeOrderTransaction extends Transaction {
 
     // GETTERS/SETTERS
 
-    public void setHeightSeq(long seqNo) {
-        super.setHeightSeq(seqNo);
-        orderID = dbRef;
-    }
-
-    public void setHeightSeq(int height, int seqNo) {
-        super.setHeightSeq(height, seqNo);
-        orderID = dbRef;
-    }
-
     public boolean isHaveUpdated() {
         return (typeBytes[3] & HAVE_AMOUNT_MASK) != 0;
     }
@@ -127,6 +119,12 @@ public class ChangeOrderTransaction extends Transaction {
             Long res = dcSet.getTransactionFinalMapSigns().get(orderRef);
 
             if (res == null) {
+                LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderRef));
+                errorValue = Base58.encode(this.orderRef);
+                if (BlockChain.CHECK_BUGS > 3) {
+                    Long error = null;
+                    error++;
+                }
                 return;
             }
 
@@ -324,6 +322,14 @@ public class ChangeOrderTransaction extends Transaction {
         byte[] orderRef = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long orderID = 0;
+        if (forDeal == FOR_DB_RECORD) {
+            //READ ORDER ID
+            byte[] orderIDBytes = Arrays.copyOfRange(data, position, position + SEQ_NO_LENGTH);
+            orderID = Longs.fromByteArray(orderIDBytes);
+            position += SEQ_NO_LENGTH;
+        }
+
         // READ AMOUNT WANT
         byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
         BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
@@ -340,7 +346,7 @@ public class ChangeOrderTransaction extends Transaction {
         }
 
         return new ChangeOrderTransaction(typeBytes, creator, orderRef, amountWant, feePow, timestamp,
-                reference, signatureBytes, seqNo, feeLong);
+                reference, signatureBytes, orderID, seqNo, feeLong);
     }
 
     public byte[] toBytes(int forDeal, boolean withSignature) {
@@ -348,6 +354,12 @@ public class ChangeOrderTransaction extends Transaction {
 
         // WRITE ORDER REF
         data = Bytes.concat(data, this.orderRef);
+
+        if (forDeal == FOR_DB_RECORD) {
+            // WRITE ORDER ID
+            byte[] orderIDBytes = Longs.toByteArray(this.orderID);
+            data = Bytes.concat(data, orderIDBytes);
+        }
 
         BigDecimal amountBase;
         // WRITE ACCURACY of AMOUNT WANT
