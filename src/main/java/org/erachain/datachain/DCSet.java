@@ -42,7 +42,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 535; // vers 5.5.1 epoch smart-contract
+    final static int CURRENT_VERSION = 536; // vers 5.6.1 orderID
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.

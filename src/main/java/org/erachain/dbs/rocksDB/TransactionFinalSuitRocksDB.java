@@ -191,7 +191,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     // TODO  dbCore.deleteRange(beg, end);
     @Override
     public void deleteForBlock(Integer height) {
-        try (IteratorCloseable<Long> iterator = getBlockIterator(height, true)) {
+        try (IteratorCloseable<Long> iterator = getOneBlockIterator(height, true)) {
             while (iterator.hasNext()) {
                 map.remove(iterator.next());
             }
@@ -201,7 +201,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getBlockIterator(Integer height, boolean descending) {
+    public IteratorCloseable<Long> getOneBlockIterator(Integer height, boolean descending) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
         //map.getIterator();
         return map.getIndexIteratorFilter(Ints.toByteArray(height), descending, false);

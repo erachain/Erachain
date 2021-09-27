@@ -9,10 +9,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IndexIterator;
-import org.erachain.datachain.TransactionFinalMap;
-import org.erachain.datachain.TransactionFinalSuit;
+import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.IteratorParent;
@@ -139,7 +136,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
 
     @Override
     public void deleteForBlock(Integer height) {
-        try (IteratorCloseable<Long> iterator = getBlockIterator(height, true)) {
+        try (IteratorCloseable<Long> iterator = getOneBlockIterator(height, true)) {
             while (iterator.hasNext()) {
                 map.remove(iterator.next());
             }
@@ -148,17 +145,26 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public IteratorCloseable<Long> getBlockIterator(Integer height, boolean descending) {
-        // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
+    public IteratorCloseable<Long> getOneBlockIterator(Integer height, boolean descending) {
+        // берем из родителя
+        IteratorCloseable<Long> parentIterator = ((TransactionFinalMapImpl) parent).getOneBlockIterator(height, descending);
+
+        // берем свои - форкнутые
+        IteratorCloseable<Long> iteratorForked;
         if (descending) {
-            return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
+            iteratorForked = new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
                     .subMap(Transaction.makeDBRef(height, 0),
                             Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().descendingIterator());
         } else {
-            return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
+            iteratorForked = new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
                     .subMap(Transaction.makeDBRef(height, 0),
                             Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
         }
+
+        // создаем с учетом удаленных
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted), iteratorForked), Fun.COMPARATOR);
+
 
     }
 
