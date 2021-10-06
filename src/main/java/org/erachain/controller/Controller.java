@@ -1068,11 +1068,15 @@ public class Controller extends Observable {
         if (this.connectTimer != null)
             this.connectTimer.cancel();
 
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing")));
-        // STOP MESSAGE PROCESSOR
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping message processor")));
+        try {
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Closing")));
+            // STOP MESSAGE PROCESSOR
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Stopping message processor")));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
 
         if (this.network != null) {
             LOGGER.info("Stopping message processor");
