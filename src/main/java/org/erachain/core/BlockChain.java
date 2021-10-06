@@ -258,6 +258,9 @@ public class BlockChain {
 
     public static final int VERS_5_3 = TEST_DB > 0 || !MAIN_MODE ? 0 : 1870000;
 
+    public static final int CLEAR_OLD_ORDERS_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? 0 : 1870000;
+    public static final int CLEAR_OLD_ORDERS_PERIOD = 30 * 24 * 60 * 2;
+
     /**
      * Новый уровень начальных номеров для всех сущностей
      */

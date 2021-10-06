@@ -328,23 +328,13 @@ public class CancelOrderTransaction extends Transaction {
 
     }
 
-    //@Override
-    @Override
-    public void processBody(Block block, int forDeal) {
-        //UPDATE CREATOR
-        super.processBody(block, forDeal);
+    public static void processBody(DCSet dcSet, long dbRef, long orderID, Block block,
+                                   boolean ignoreNull) {
 
-        if (this.orderID == 0L) {
-            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
-                return;
-            Long error = null;
-            error++;
-        }
-
-        Order order = this.dcSet.getOrderMap().get(this.orderID);
+        Order order = dcSet.getOrderMap().get(orderID);
 
         if (order == null) {
-            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
+            if (ignoreNull)
                 return;
             Long error = null;
             error++;
@@ -372,37 +362,42 @@ public class CancelOrderTransaction extends Transaction {
                 false, false,
                 // accounting on PLEDGE position
                 true, Account.BALANCE_POS_PLEDGE);
-        this.addCalculated(block, this.creator, order.getHaveAssetKey(), left,
-                "Cancel Order @" + Transaction.viewDBRef(order.getId()));
+
+        if (block != null) {
+            block.addCalculated(order.getCreator(), order.getHaveAssetKey(), left,
+                    "Cancel Order @" + Transaction.viewDBRef(order.getId()), dbRef);
+        }
     }
 
-    //@Override
     @Override
-    public void orphanBody(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
+        //UPDATE CREATOR
+        super.processBody(block, forDeal);
 
-        // FIRST GET DB REF from FINAL
-
-        // ORPHAN
-        super.orphanBody(block, forDeal);
-
+        boolean ignoreNull = height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE;
         if (this.orderID == 0L) {
-            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
+            if (ignoreNull)
                 return;
             Long error = null;
             error++;
         }
+
+        processBody(dcSet, dbRef, orderID, block, ignoreNull);
+    }
+
+    public static void orphanBody(DCSet dcSet, long dbRef, long orderID, boolean ignoreNull) {
 
         //REMOVE ORDER DATABASE
-        Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);
+        Order order = dcSet.getCompletedOrderMap().get(orderID);
 
         if (order == null) {
-            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE)
+            if (ignoreNull)
                 return;
             Long error = null;
             error++;
         }
 
-        if (Transaction.viewDBRef(this.orderID).equals("776446-1")) {
+        if (Transaction.viewDBRef(orderID).equals("776446-1")) {
             boolean debug = true;
         }
 
@@ -422,15 +417,33 @@ public class CancelOrderTransaction extends Transaction {
     }
 
     @Override
+    public void orphanBody(Block block, int forDeal) {
+
+        // ORPHAN
+        super.orphanBody(block, forDeal);
+
+        boolean ignoreNull = height < BlockChain.CANCEL_ORDERS_ALL_VALID || height < BlockChain.ALL_VALID_BEFORE;
+        if (this.orderID == 0L) {
+            if (ignoreNull)
+                return;
+            Long error = null;
+            error++;
+        }
+
+        orphanBody(dcSet, dbRef, orderID, ignoreNull);
+
+    }
+
+    @Override
     public HashSet<Account> getInvolvedAccounts() {
-        HashSet<Account> accounts = new HashSet<>(2,1);
+        HashSet<Account> accounts = new HashSet<>(2, 1);
         accounts.add(this.creator);
         return accounts;
     }
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        return new HashSet<>(1,1);
+        return new HashSet<>(1, 1);
     }
 
     @Override
