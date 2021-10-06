@@ -661,6 +661,13 @@ public class OrderProcess {
 
         if (asOrphan) {
             Trade trade;
+            try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(blockTx_id)) {
+                while (iterator.hasNext()) {
+                    trade = tradesMap.remove(iterator.next());
+                    CancelOrderTransaction.orphanBody(dcSet, blockTx_id, trade.getTarget(), false);
+                }
+            } catch (IOException e) {
+            }
 
         } else {
             try (IteratorCloseable<Long> iterator = ordersMap.getIterator()) {
