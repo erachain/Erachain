@@ -674,8 +674,15 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             //////////// FIND Issuer (registrar) this PERSON
             // FIND person
             ItemCls person = dcSet.getItemPersonMap().get(key);
+
             // FIND issue record
-            Transaction transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
+            Transaction transPersonIssue;
+            if (transaction instanceof IssuePersonRecord) {
+                transPersonIssue = transaction;
+            } else {
+                transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
+            }
+
             // GIVE GIFT for ISSUER
             Account issuer = transPersonIssue.getCreator();
 
@@ -801,7 +808,13 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             // FIND person
             ItemCls person = dcSet.getItemPersonMap().get(key);
             // FIND issue record
-            Transaction transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
+            Transaction transPersonIssue;
+            if (transaction instanceof IssuePersonRecord) {
+                transPersonIssue = transaction;
+            } else {
+                transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
+            }
+
             Account issuer = transPersonIssue.getCreator();
 
             // EMITTE LIA

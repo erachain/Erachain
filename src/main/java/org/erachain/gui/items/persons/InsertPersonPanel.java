@@ -154,7 +154,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
             insert(false);
         });
 
-        insertAndCertifyButton = new MButton(Lang.T("Check person, insert and certify pubkey"), 3);
+        insertAndCertifyButton = new MButton(Lang.T("Check person, insert and certify pubkey"), 2);
         insertAndCertifyButton.addActionListener(arg0 -> {
             insert(true);
         });

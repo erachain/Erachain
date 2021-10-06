@@ -641,6 +641,10 @@ public class WebTransactionsHTML {
         PersonCls person = (PersonCls) personIssue.getItem();
 
         String out = "";
+        if (personIssue.isAndCertifyPubKey()) {
+            out += "<BR>" + Lang.T("Certify # Удостоверение", langObj) + ": <b>" + person.getMaker().getBase58() + "</b><br>";
+        }
+
         out += "<BR>" + Lang.T("Name", langObj) + ": <b>" + itemNameHTML(person) + "</b><br>";
 
         out += Lang.T("Birthday", langObj) + ": <b>"

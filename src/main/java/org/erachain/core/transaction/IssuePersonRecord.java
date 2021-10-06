@@ -11,6 +11,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.smartcontracts.SmartContract;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -204,6 +205,15 @@ public class IssuePersonRecord extends IssueItemRecord {
             return items;
         }
         return null;
+    }
+
+    @Override
+    public JSONObject toJson() {
+
+        JSONObject transaction = super.toJson();
+        transaction.put("certify", isAndCertifyPubKey());
+
+        return transaction;
     }
 
     //VALIDATE
