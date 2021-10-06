@@ -43,7 +43,9 @@ public class InsertPersonPanel extends IssuePersonPanel {
     private JTextField txtSign = new JTextField();
     private JTextField txtPublicKey = new JTextField();
 
-    private MButton transformButton;
+    private MButton insertButton;
+    private MButton insertAndCertifyButton;
+
     private JLabel labelSign = new JLabel();
     private JLabel labelPublicKey = new JLabel();
     protected MButton pasteButton;
@@ -144,98 +146,103 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
         });
 
-        GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
-        gridBagConstraints1.gridx = labelGBC.gridx;
-        gridBagConstraints1.gridy = gridy;
-        gridBagConstraints1.anchor = GridBagConstraints.FIRST_LINE_END;
-        gridBagConstraints1.insets = new Insets(20, 0, 0, 0);
-        jPanelAdd.add(pasteButton, gridBagConstraints1);
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(pasteButton, fieldGBC);
 
-        transformButton = new MButton(Lang.T("Check person and insert"), 2);
-
-        transformButton.addActionListener(arg0 -> {
-            if (person == null) {
-                return;
-            }
-            if (checkWalletUnlock()) {
-                return;
-            }
-
-            // READ CREATOR
-            Account creatorAccount = (Account) fromJComboBox.getSelectedItem();
-
-            int feePow;
-            try {
-                // READ FEE POW
-                feePow = Integer.parseInt((String) textFeePow.getSelectedItem());
-            } catch (Exception e) {
-                String mess = "Invalid fee power 0..6";
-                JOptionPane.showMessageDialog(new JFrame(), Lang.T(mess),
-                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            PrivateKeyAccount creator = Controller.getInstance()
-                    .getWalletPrivateKeyAccountByAddress(creatorAccount.getAddress());
-
-            if (creator == null) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
-                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            Long linkRef = Transaction.parseDBRef(exLinkText.getText());
-            if (linkRef != null) {
-                exLink = new ExLinkAppendix(linkRef);
-            }
-
-            Pair<Transaction, Integer> result = Controller.getInstance().issuePersonHuman(creator, exLink, feePow, person);
-
-            // CHECK VALIDATE MESSAGE
-            if (result.getB() == Transaction.VALIDATE_OK) {
-                String statusText = "";
-
-                IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, result.getA(),
-                        " ",
-                        (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
-                        Lang.T("Confirmation transaction issue person"));
-
-                IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame((IssuePersonRecord) result.getA());
-                confirmDialog.jScrollPane1.setViewportView(ww);
-                confirmDialog.setLocationRelativeTo(this);
-                confirmDialog.setVisible(true);
-                if (confirmDialog.isConfirm > 0) {
-                    // VALIDATE AND PROCESS
-                    Integer result1 = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(),
-                            Transaction.FOR_NETWORK, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, false);
-                    if (result1 != Transaction.VALIDATE_OK) {
-                        JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.T(OnDealClick.resultMess(result1)),
-                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(new JFrame(),
-                                Lang.T("Person issue has been sent!"),
-                                Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
-                        person = null;
-                        eraseFields();
-
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.T(OnDealClick.resultMess(result.getB())),
-                        Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
-            }
+        insertButton = new MButton(Lang.T("Check person and insert"), 2);
+        insertButton.addActionListener(arg0 -> {
+            insert(false);
         });
 
-        gridBagConstraints1.gridx = fieldGBC.gridx;
-        gridBagConstraints1.gridy = gridy++;
-        gridBagConstraints1.anchor = GridBagConstraints.FIRST_LINE_END;
-        gridBagConstraints1.insets = new Insets(20, 0, 0, 16);
-        jPanelAdd.add(transformButton, gridBagConstraints1);
+        insertAndCertifyButton = new MButton(Lang.T("Check person, insert and certify pubkey"), 3);
+        insertAndCertifyButton.addActionListener(arg0 -> {
+            insert(true);
+        });
+
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(insertButton, fieldGBC);
+
+        fieldGBC.gridy = gridy++;
+        jPanelAdd.add(insertAndCertifyButton, fieldGBC);
 
         super.initBottom(gridy);
+
+    }
+
+    private void insert(boolean andCertify) {
+        if (person == null) {
+            return;
+        }
+        if (checkWalletUnlock()) {
+            return;
+        }
+
+        // READ CREATOR
+        Account creatorAccount = (Account) fromJComboBox.getSelectedItem();
+
+        int feePow;
+        try {
+            // READ FEE POW
+            feePow = Integer.parseInt((String) textFeePow.getSelectedItem());
+        } catch (Exception e) {
+            String mess = "Invalid fee power 0..6";
+            JOptionPane.showMessageDialog(new JFrame(), Lang.T(mess),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        PrivateKeyAccount creator = Controller.getInstance()
+                .getWalletPrivateKeyAccountByAddress(creatorAccount.getAddress());
+
+        if (creator == null) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T(OnDealClick.resultMess(Transaction.PRIVATE_KEY_NOT_FOUND)),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Long linkRef = Transaction.parseDBRef(exLinkText.getText());
+        if (linkRef != null) {
+            exLink = new ExLinkAppendix(linkRef);
+        }
+
+        Pair<Transaction, Integer> result = Controller.getInstance().issuePersonHuman(creator, exLink, feePow, person, andCertify);
+
+        // CHECK VALIDATE MESSAGE
+        if (result.getB() == Transaction.VALIDATE_OK) {
+            String statusText = "";
+
+            IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, result.getA(),
+                    " ",
+                    (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), statusText,
+                    Lang.T("Confirmation transaction issue person"));
+
+            IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame((IssuePersonRecord) result.getA());
+            confirmDialog.jScrollPane1.setViewportView(ww);
+            confirmDialog.setLocationRelativeTo(this);
+            confirmDialog.setVisible(true);
+            if (confirmDialog.isConfirm > 0) {
+                // VALIDATE AND PROCESS
+                Integer result1 = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(),
+                        Transaction.FOR_NETWORK, confirmDialog.isConfirm == IssueConfirmDialog.TRY_FREE, false);
+                if (result1 != Transaction.VALIDATE_OK) {
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.T(OnDealClick.resultMess(result1)),
+                            Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.T("Person issue has been sent!"),
+                            Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+                    person = null;
+                    eraseFields();
+
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    Lang.T(OnDealClick.resultMess(result.getB())),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+        }
 
     }
 

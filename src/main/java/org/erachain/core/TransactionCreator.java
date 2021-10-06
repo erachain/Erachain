@@ -301,7 +301,7 @@ public class TransactionCreator {
         }
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, person, (byte) feePow, time, lastReference);
+        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, false, person, (byte) feePow, time, lastReference);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
@@ -327,7 +327,7 @@ public class TransactionCreator {
     }
 
     public Pair<Transaction, Integer> createIssuePersonHumanTransaction(
-            PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
+            PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person, boolean andCertify) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 
@@ -338,7 +338,7 @@ public class TransactionCreator {
         lastReference = 0L;
 
         //CREATE ISSUE PLATE TRANSACTION
-        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, person, (byte) feePow, time, lastReference);
+        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, andCertify, person, (byte) feePow, time, lastReference);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
@@ -353,7 +353,7 @@ public class TransactionCreator {
 
     }
 
-    public Transaction createIssuePersonTransaction(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person) {
+    public Transaction createIssuePersonTransaction(PrivateKeyAccount creator, ExLink linkTo, int feePow, PersonCls person, boolean andCertify) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 
@@ -361,7 +361,7 @@ public class TransactionCreator {
         long time = NTP.getTime();
 
         //CREATE ISSUE TRANSACTION
-        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, person, (byte) feePow, time, 0L);
+        IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, linkTo, andCertify, person, (byte) feePow, time, 0L);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
         issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 

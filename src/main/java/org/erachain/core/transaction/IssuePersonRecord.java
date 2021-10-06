@@ -26,6 +26,8 @@ import java.util.Set;
 public class IssuePersonRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_PERSON_TRANSACTION;
     public static final String TYPE_NAME = "Issue Person";
+
+    static int AND_CERTIFY_MASK = 1;
     /**
      * Нельзя делать большой, так как вся комиссия будет эммитироваться - а значит слишком большой размер будет эммитрировать больше
      */
@@ -56,8 +58,8 @@ public class IssuePersonRecord extends IssueItemRecord {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, person, feePow, timestamp, reference, signature);
     }
 
-    public IssuePersonRecord(PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, person, feePow, timestamp, reference);
+    public IssuePersonRecord(PublicKeyAccount creator, ExLink linkTo, boolean andCertify, PersonCls person, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, andCertify ? (byte) AND_CERTIFY_MASK : (byte) 0}, creator, linkTo, person, feePow, timestamp, reference);
     }
 
     //GETTERS/SETTERS
@@ -68,7 +70,7 @@ public class IssuePersonRecord extends IssueItemRecord {
     }
 
     public boolean isAndCertifyPubKey() {
-        return (typeBytes[3] & 1) != 0;
+        return (typeBytes[3] & AND_CERTIFY_MASK) != 0;
     }
 
     //PARSE CONVERT

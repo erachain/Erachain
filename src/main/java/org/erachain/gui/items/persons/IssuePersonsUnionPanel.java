@@ -266,7 +266,7 @@ public class IssuePersonsUnionPanel extends IssueItemPanel {
                 addIconLabel.getMediaBytes(), addImageLabel.getMediaBytes(), textAreaDescription.getText(), (byte) 0);
 
         transaction = Controller.getInstance().issuePerson(creator, exLink, feePow,
-                union);
+                union, false);
     }
 
 }
