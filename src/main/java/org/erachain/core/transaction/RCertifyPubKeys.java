@@ -639,27 +639,24 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
     //PROCESS/ORPHAN
 
-    @Override
-    public void processBody(Block block, int forDeal) {
-
-        //UPDATE SENDER
-        super.processBody(block, forDeal);
+    public static void processBody(DCSet dcSet, Block block, Transaction transaction, long key,
+                                   List<PublicKeyAccount> certifiedPublicKeys, int add_day) {
 
         int transactionIndex = -1;
-        int blockIndex = -1;
+        int height = -1;
         if (block == null) {
-            blockIndex = dcSet.getBlockMap().last().getHeight();
+            height = dcSet.getBlockMap().last().getHeight();
         } else {
-            blockIndex = block.getHeight();
-            if (blockIndex < 1) {
+            height = block.getHeight();
+            if (height < 1) {
                 // if block not is confirmed - get last block + 1
-                blockIndex = dcSet.getBlockMap().last().getHeight() + 1;
+                height = dcSet.getBlockMap().last().getHeight() + 1;
             }
-            transactionIndex = block.getTransactionSeq(signature);
+            transactionIndex = block.getTransactionSeq(transaction.signature);
         }
 
         boolean personalized = false;
-        TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = this.dcSet.getPersonAddressMap().getItems(this.key);
+        TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = dcSet.getPersonAddressMap().getItems(key);
         if (personalisedData != null && !personalisedData.isEmpty()) {
             for (Stack<Tuple3<Integer, Integer, Integer>> personalisedDataStack: personalisedData.values()) {
                 if (!personalisedDataStack.isEmpty()) {
@@ -672,25 +669,25 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         if (!personalized) {
             // IT IS NOT VOUCHED PERSON
 
-            PublicKeyAccount pkAccount = this.certifiedPublicKeys.get(0);
+            PublicKeyAccount pkAccount = certifiedPublicKeys.get(0);
 
             //////////// FIND Issuer (registrar) this PERSON
             // FIND person
-            ItemCls person = dcSet.getItemPersonMap().get(this.key);
+            ItemCls person = dcSet.getItemPersonMap().get(key);
             // FIND issue record
             Transaction transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
             // GIVE GIFT for ISSUER
             Account issuer = transPersonIssue.getCreator();
 
             // EMITTE LIA
-            issuer.changeBalance(this.dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE,
+            issuer.changeBalance(dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE,
                     false, false, false);
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, true, false, AssetCls.LIA_KEY, BigDecimal.ONE,
                     false, false, true);
 
             // EMITTE LIA
-            this.creator.changeBalance(this.dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE,
+            transaction.creator.changeBalance(dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE,
                     false, false, false);
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE,
@@ -706,7 +703,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
                 pkAccount.changeCOMPUStatsBalances(dcSet, false, personBonus, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
                 if (block != null) {
                     block.addCalculated(pkAccount, FEE_KEY, personBonus,
-                            "enter bonus", this.dbRef);
+                            "enter bonus", transaction.dbRef);
                 }
                 issued_FEE_BD_total = personBonus;
             } else {
@@ -719,7 +716,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             issuer.changeCOMPUStatsBalances(dcSet, false, issued_FEE_BD, Account.FEE_BALANCE_SIDE_TOTAL_EARNED);
             if (block != null)
                 block.addCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
-                        "register reward @P:" + this.key, this.dbRef);
+                        "register reward @P:" + key, transaction.dbRef);
 
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
@@ -729,30 +726,29 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
         }
 
-        int add_day = this.add_day < 0? this.add_day : BlockChain.DEFAULT_DURATION;
+        add_day = add_day < 0 ? add_day : BlockChain.DEFAULT_DURATION;
         // set to time stamp of record
-        int end_day = (int) (this.timestamp / 86400000L) + add_day;
+        int end_day = (int) (transaction.timestamp / 86400000L) + add_day;
 
         Tuple3<Integer, Integer, Integer> itemP = new Tuple3<Integer, Integer, Integer>(end_day,
                 //Controller.getInstance().getHeight(), this.signature);
-                blockIndex, transactionIndex);
-        Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, end_day,
-                blockIndex, transactionIndex);
+                height, transactionIndex);
+        Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(key, end_day,
+                height, transactionIndex);
 
 
         // SET PERSON ADDRESS
         String address;
-        for (PublicKeyAccount publicAccount : this.certifiedPublicKeys) {
+        for (PublicKeyAccount publicAccount : certifiedPublicKeys) {
             address = publicAccount.getAddress();
             dcSet.getAddressPersonMap().addItem(publicAccount.getShortAddressBytes(), itemA);
-            dcSet.getPersonAddressMap().addItem(this.key, address, itemP);
+            dcSet.getPersonAddressMap().addItem(key, address, itemP);
 
-
-            // TODO удалить это если публичный ключ будет созраняться в таблице Счетов
+            // TODO удалить это если публичный ключ будет сохраняться в таблице Счетов
             if (publicAccount.getLastTimestamp(dcSet) == null) {
                 // for quick search public keys by address - use PUB_KEY from Person DATA owner
                 // used in - controller.Controller.getPublicKeyByAddress
-                publicAccount.setLastTimestamp(new long[]{timestamp, dbRef}, dcSet);
+                publicAccount.setLastTimestamp(new long[]{transaction.timestamp, transaction.dbRef}, dcSet);
             }
 
         }
@@ -760,29 +756,33 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
     }
 
     @Override
-    public void orphanBody(Block block, int forDeal) {
+    public void processBody(Block block, int forDeal) {
 
-        //UPDATE SENDER
-        super.orphanBody(block, forDeal);
+        super.processBody(block, forDeal);
+        processBody(dcSet, block, this, key, certifiedPublicKeys, add_day);
 
-        //UPDATE RECIPIENT
+    }
+
+    public static void orphanBody(DCSet dcSet, Transaction transaction, long key,
+                                  List<PublicKeyAccount> certifiedPublicKeys) {
+
         String address;
-        for (PublicKeyAccount publicAccount : this.certifiedPublicKeys) {
+        for (PublicKeyAccount publicAccount : certifiedPublicKeys) {
             address = publicAccount.getAddress();
             dcSet.getAddressPersonMap().removeItem(publicAccount.getShortAddressBytes());
-            dcSet.getPersonAddressMap().removeItem(this.key, address);
+            dcSet.getPersonAddressMap().removeItem(key, address);
 
             // TODO удалить это если публичный ключ будет созраняться в таблице Счетов
             // при откате нужно след в истории удалить а сам публичный ключ отсавить на всякий случай?
             long[] lastPoint = publicAccount.getLastTimestamp(dcSet);
-            if (lastPoint != null && lastPoint[0] == timestamp) {
-                publicAccount.removeLastTimestamp(dcSet, timestamp);
+            if (lastPoint != null && lastPoint[0] == transaction.timestamp) {
+                publicAccount.removeLastTimestamp(dcSet, transaction.timestamp);
             }
 
         }
 
         boolean personalized = false;
-        TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = this.dcSet.getPersonAddressMap().getItems(this.key);
+        TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = dcSet.getPersonAddressMap().getItems(key);
         if (personalisedData != null && !personalisedData.isEmpty()) {
             for (Stack<Tuple3<Integer, Integer, Integer>> personalisedDataStack: personalisedData.values()) {
                 if (!personalisedDataStack.isEmpty()) {
@@ -795,23 +795,23 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         if (!personalized) {
             // IT WAS NOT VOUCHED PERSON BEFORE
 
-            PublicKeyAccount pkAccount = this.certifiedPublicKeys.get(0);
+            PublicKeyAccount pkAccount = certifiedPublicKeys.get(0);
 
             //////////// FIND Issuer (registrar) this PERSON
             // FIND person
-            ItemCls person = dcSet.getItemPersonMap().get(this.key);
+            ItemCls person = dcSet.getItemPersonMap().get(key);
             // FIND issue record
             Transaction transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
             Account issuer = transPersonIssue.getCreator();
 
             // EMITTE LIA
-            issuer.changeBalance(this.dcSet, true, false, AssetCls.LIA_KEY, BigDecimal.ONE,
+            issuer.changeBalance(dcSet, true, false, AssetCls.LIA_KEY, BigDecimal.ONE,
                     false, false, false);
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, false, false, AssetCls.LIA_KEY, BigDecimal.ONE, false, false, true);
 
             // EMITTE LIA
-            this.creator.changeBalance(this.dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false, false);
+            transaction.creator.changeBalance(dcSet, true, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false, false);
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, false, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false, false, true);
 
@@ -819,7 +819,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
             // GIVE GIFT for this PUB_KEY - to PERSON
             BigDecimal issued_FEE_BD_total;
-            BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
+            BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(transaction.height);
             if (personBonus.signum() != 0) {
 
                 pkAccount.changeBalance(dcSet, true, false, FEE_KEY, personBonus, false, false, false);
@@ -840,6 +840,13 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
         }
 
+    }
+
+    @Override
+    public void orphanBody(Block block, int forDeal) {
+
+        super.orphanBody(block, forDeal);
+        orphanBody(dcSet, this, key, certifiedPublicKeys);
     }
 
     @Override

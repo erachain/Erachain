@@ -136,10 +136,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         return item.toString();
     }
 
-    public String getItemDescription() {
-        return item.getDescription();
-    }
-
     @Override
     public boolean hasPublicText() {
         return true;
@@ -162,7 +158,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         //GET BASE
         JSONObject transaction = this.getJsonBase();
 
-        //ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
         transaction.put("item", this.item.toJson());
 
         return transaction;

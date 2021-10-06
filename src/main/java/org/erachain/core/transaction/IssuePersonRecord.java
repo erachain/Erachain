@@ -20,7 +20,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-
+/**
+ * typeBytes[3] = 1 - certyfy public of person key too
+ */
 public class IssuePersonRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_PERSON_TRANSACTION;
     public static final String TYPE_NAME = "Issue Person";
@@ -63,6 +65,10 @@ public class IssuePersonRecord extends IssueItemRecord {
     @Override
     public long getInvitedFee() {
         return 0L;
+    }
+
+    public boolean isAndCertifyPubKey() {
+        return (typeBytes[3] & 1) != 0;
     }
 
     //PARSE CONVERT
@@ -272,6 +278,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         } else {
             // person is DIE - any PHOTO
         }
+
         if (person instanceof PersonHuman) {
             PersonHuman human = (PersonHuman) person;
             if (human.isMustBeSigned()) {
@@ -334,6 +341,12 @@ public class IssuePersonRecord extends IssueItemRecord {
             }
         }
 
+        if (isAndCertifyPubKey()) {
+            if (!isPersonAlive) {
+                return ITEM_PERSON_IS_DEAD;
+            }
+        }
+
         return res;
     }
 
@@ -364,6 +377,12 @@ public class IssuePersonRecord extends IssueItemRecord {
             dcSet.getTransactionFinalMapSigns().put(person.getMakerSignature(), dbRef);
         }
 
+        if (isAndCertifyPubKey()) {
+            List<PublicKeyAccount> pubKeys = new ArrayList<>();
+            pubKeys.add(maker);
+            RCertifyPubKeys.processBody(dcSet, block, this, person.getKey(), pubKeys, 1);
+        }
+
     }
 
     //@Override
@@ -373,6 +392,13 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getMaker();
+
+        if (isAndCertifyPubKey()) {
+            List<PublicKeyAccount> pubKeys = new ArrayList<>();
+            pubKeys.add(maker);
+            RCertifyPubKeys.orphanBody(dcSet, this, person.getKey(), pubKeys);
+        }
+
         byte[] makerBytes = maker.getPublicKey();
         this.dcSet.getTransactionFinalMapSigns().delete(makerBytes);
 
