@@ -16,6 +16,7 @@ import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
@@ -2098,6 +2099,8 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
         }
 
+        processTail(dcSet);
+
         if (heightBlock % BlockChain.MAX_ORPHAN == 0) {
             cnt.blockchainSyncStatusUpdate(heightBlock);
         }
@@ -2197,6 +2200,16 @@ public class Block implements Closeable, ExplorerJsonLine {
             //e.printStackTrace();
         }
 
+    }
+
+    /**
+     * обработка всего что в конце блока прилипло
+     *
+     * @param dcSet
+     */
+    private void processTail(DCSet dcSet) {
+        // clear old orders
+        OrderProcess.clearOldOrders(dcSet, this, false);
     }
 
     // TODO - make it trownable
@@ -2341,6 +2354,16 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     }
 
+    /**
+     * обработка всего что в конце блока прилипло
+     *
+     * @param dcSet
+     */
+    private void orphanHead(DCSet dcSet) {
+        // clear old orders
+        OrderProcess.clearOldOrders(dcSet, this, true);
+    }
+
     public void orphan(DCSet dcSet, boolean notStoreTXs) throws Exception {
 
         Controller cnt = Controller.getInstance();
@@ -2358,6 +2381,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         long start = System.currentTimeMillis();
+
+        //REMOVE FEE
+        orphanHead(dcSet);
 
         //REMOVE FEE
         feeProcess(dcSet, true);

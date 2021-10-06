@@ -645,4 +645,8 @@ public class OrderProcess {
         return orderThis;
     }
 
+    public static void clearOldOrders(DCSet dcSet, Block block, boolean asOrphan) {
+        if (block.getHeight() % 100 != 0)
+            return;
+    }
 }
