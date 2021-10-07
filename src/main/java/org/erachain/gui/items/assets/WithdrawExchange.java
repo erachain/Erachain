@@ -62,7 +62,7 @@ public class WithdrawExchange extends IconPanel {
         cbxInAssets = new JComboBox<>(new FundTokensComboBoxModel(false));
 
         cbxOutAssets = new JComboBox<>(new String[]{"BTC",
-                //, "DOGE", "LTC", "DASH"
+                "DOGE", "LTC" //, "DASH"
         });
 
         initComponents(assetIn, account);
@@ -91,6 +91,7 @@ public class WithdrawExchange extends IconPanel {
 
             urlGetDetails += DepositExchange.getOutExtName(assetInName) + "/" + assetOut + "/" + address + "/";
 
+            message = assetOut;
             switch (assetInName) {
                 case AssetCls.ERA_NAME:
                     urlGetDetails += "1000";
@@ -107,7 +108,7 @@ public class WithdrawExchange extends IconPanel {
                 case DepositExchange.TEST_ASSET:
                     urlGetDetails = "http://185.195.26.197/7pay_in/apipay/get_uri_in.json/2/";
                     urlGetDetails += "fZEN/ZEN/" + address + "/30"; // eZEN -> ZEN
-                    message += "ZEN";
+                    message = "ZEN";
                     break;
                 default:
                     urlGetDetails += "100";
