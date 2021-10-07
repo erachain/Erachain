@@ -677,7 +677,8 @@ public class OrderProcess {
                     if (orderID > blockTx_id_end)
                         break;
 
-                    CancelOrderTransaction.processBody(dcSet, blockTx_id, orderID, block, false);
+                    CancelOrderTransaction.processBody(dcSet, blockTx_id, orderID, block,
+                            "Expire Order @" + Transaction.viewDBRef(orderID), false);
                 }
             } catch (IOException e) {
             }

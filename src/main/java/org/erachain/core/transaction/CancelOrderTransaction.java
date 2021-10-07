@@ -329,7 +329,7 @@ public class CancelOrderTransaction extends Transaction {
     }
 
     public static void processBody(DCSet dcSet, long dbRef, long orderID, Block block,
-                                   boolean ignoreNull) {
+                                   String calcMess, boolean ignoreNull) {
 
         Order order = dcSet.getOrderMap().get(orderID);
 
@@ -341,16 +341,16 @@ public class CancelOrderTransaction extends Transaction {
         }
 
         //DELETE FROM DATABASE FIRST - иначе сработает проверка внутри
-        dcSet.getOrderMap().delete(order.getId());
+        dcSet.getOrderMap().delete(orderID);
 
         //SET ORPHAN DATA
-        dcSet.getCompletedOrderMap().put(order.getId(), order);
+        dcSet.getCompletedOrderMap().put(orderID, order);
 
         AssetCls assetHave = dcSet.getItemAssetMap().get(order.getHaveAssetKey());
         AssetCls assetWant = dcSet.getItemAssetMap().get(order.getWantAssetKey());
 
         // ADD CANCEL as TRADE
-        Trade trade = new Trade(Trade.TYPE_CANCEL, dbRef, order.getId(), order.getHaveAssetKey(), order.getWantAssetKey(),
+        Trade trade = new Trade(Trade.TYPE_CANCEL, dbRef, orderID, order.getHaveAssetKey(), order.getWantAssetKey(),
                 order.getAmountWantLeft(), order.getAmountHaveLeft(),
                 assetWant.getScale(), assetHave.getScale(), -1);
         //ADD TRADE TO DATABASE
@@ -364,8 +364,7 @@ public class CancelOrderTransaction extends Transaction {
                 true, Account.BALANCE_POS_PLEDGE);
 
         if (block != null) {
-            block.addCalculated(order.getCreator(), order.getHaveAssetKey(), left,
-                    "Cancel Order @" + Transaction.viewDBRef(order.getId()), dbRef);
+            block.addCalculated(order.getCreator(), order.getHaveAssetKey(), left, calcMess, dbRef);
         }
     }
 
@@ -382,7 +381,7 @@ public class CancelOrderTransaction extends Transaction {
             error++;
         }
 
-        processBody(dcSet, dbRef, orderID, block, ignoreNull);
+        processBody(dcSet, dbRef, orderID, block, "Cancel Order @" + Transaction.viewDBRef(orderID), ignoreNull);
     }
 
     public static void orphanBody(DCSet dcSet, long dbRef, long orderID, boolean ignoreNull) {
