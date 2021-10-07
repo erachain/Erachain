@@ -356,6 +356,8 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (isAndCertifyPubKey()) {
             if (!isPersonAlive) {
                 return ITEM_PERSON_IS_DEAD;
+            } else if (person.getMaker().getPersonDuration(dcSet) != null) {
+                return INVALID_PERSONALIZY_ANOTHER_PERSON;
             }
         }
 
