@@ -11,6 +11,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.smartcontracts.SmartContract;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -20,10 +21,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-
+/**
+ * typeBytes[3] = 1 - certyfy public of person key too
+ */
 public class IssuePersonRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_PERSON_TRANSACTION;
     public static final String TYPE_NAME = "Issue Person";
+
+    static int AND_CERTIFY_MASK = 1;
     /**
      * Нельзя делать большой, так как вся комиссия будет эммитироваться - а значит слишком большой размер будет эммитрировать больше
      */
@@ -54,8 +59,8 @@ public class IssuePersonRecord extends IssueItemRecord {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, person, feePow, timestamp, reference, signature);
     }
 
-    public IssuePersonRecord(PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, person, feePow, timestamp, reference);
+    public IssuePersonRecord(PublicKeyAccount creator, ExLink linkTo, boolean andCertify, PersonCls person, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, andCertify ? (byte) AND_CERTIFY_MASK : (byte) 0}, creator, linkTo, person, feePow, timestamp, reference);
     }
 
     //GETTERS/SETTERS
@@ -63,6 +68,10 @@ public class IssuePersonRecord extends IssueItemRecord {
     @Override
     public long getInvitedFee() {
         return 0L;
+    }
+
+    public boolean isAndCertifyPubKey() {
+        return (typeBytes[3] & AND_CERTIFY_MASK) != 0;
     }
 
     //PARSE CONVERT
@@ -198,6 +207,15 @@ public class IssuePersonRecord extends IssueItemRecord {
         return null;
     }
 
+    @Override
+    public JSONObject toJson() {
+
+        JSONObject transaction = super.toJson();
+        transaction.put("certify", isAndCertifyPubKey());
+
+        return transaction;
+    }
+
     //VALIDATE
 
     @Override
@@ -272,6 +290,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         } else {
             // person is DIE - any PHOTO
         }
+
         if (person instanceof PersonHuman) {
             PersonHuman human = (PersonHuman) person;
             if (human.isMustBeSigned()) {
@@ -334,6 +353,14 @@ public class IssuePersonRecord extends IssueItemRecord {
             }
         }
 
+        if (isAndCertifyPubKey()) {
+            if (!isPersonAlive) {
+                return ITEM_PERSON_IS_DEAD;
+            } else if (person.getMaker().getPersonDuration(dcSet) != null) {
+                return INVALID_PERSONALIZY_ANOTHER_PERSON;
+            }
+        }
+
         return res;
     }
 
@@ -364,6 +391,12 @@ public class IssuePersonRecord extends IssueItemRecord {
             dcSet.getTransactionFinalMapSigns().put(person.getMakerSignature(), dbRef);
         }
 
+        if (isAndCertifyPubKey()) {
+            List<PublicKeyAccount> pubKeys = new ArrayList<>();
+            pubKeys.add(maker);
+            RCertifyPubKeys.processBody(dcSet, block, this, person.getKey(), pubKeys, 1);
+        }
+
     }
 
     //@Override
@@ -373,6 +406,13 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getMaker();
+
+        if (isAndCertifyPubKey()) {
+            List<PublicKeyAccount> pubKeys = new ArrayList<>();
+            pubKeys.add(maker);
+            RCertifyPubKeys.orphanBody(dcSet, this, person.getKey(), pubKeys);
+        }
+
         byte[] makerBytes = maker.getPublicKey();
         this.dcSet.getTransactionFinalMapSigns().delete(makerBytes);
 

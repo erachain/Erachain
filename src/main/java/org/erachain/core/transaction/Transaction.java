@@ -237,6 +237,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int ITEM_PERSON_HAIR_COLOR_ERROR = 256;
     public static final int ITEM_PERSON_HEIGHT_ERROR = 257;
     public static final int ITEM_PERSON_OWNER_SIGNATURE_INVALID = 258;
+    public static final int ITEM_PERSON_MUST_BE_SIGNED = 259;
 
     // NAMES
     public static final int NAME_DOES_NOT_EXIST = 5060;

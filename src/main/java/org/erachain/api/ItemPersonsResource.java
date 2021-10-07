@@ -199,7 +199,11 @@ public class ItemPersonsResource {
                     e.getMessage());
         }
 
-        Pair<Transaction, Integer> transactionResult = cntr.issuePersonHuman(resultRaw.a, linkTo, feePow, item);
+        Boolean andCertify = (Boolean) jsonObject.get("certify");
+        if (andCertify == null)
+            andCertify = false;
+
+        Pair<Transaction, Integer> transactionResult = cntr.issuePersonHuman(resultRaw.a, linkTo, feePow, item, andCertify);
         if (transactionResult.getB() != Transaction.VALIDATE_OK) {
             throw ApiErrorFactory.getInstance().createError(
                     transactionResult.getB());

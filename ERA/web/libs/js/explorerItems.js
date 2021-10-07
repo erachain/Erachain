@@ -21,7 +21,7 @@ function itemHead(item, forPrint, imageFaceURL, imageFaceType) {
                     + origSource + '\')" style="position: absolute;"><source src="' + origSource + '"></video></a>';
                 origFullShow = 'onclick="document.getElementById(\'video-orig\').pause();showWindowVideo(\'' + origSource + '\')"';
 
-            } else if (item.imageMediaType.startsWith('audio')) {
+            } else if (item.original.imageMediaType.startsWith('audio')) {
                 output += '<a href="#"><audio controls autoplay loop><source src="' + origSource + '" type="audio/mp3"></audio></a>';
 
             } else {
