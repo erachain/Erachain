@@ -1738,6 +1738,20 @@ public class DCSet extends DBASet implements Closeable {
 
         this.commitSize += size;
 
+        /**
+         * if by Commit Size: 91 MB - chain.dat.t = 2 GB !!
+         * по размеру файла смотрим - если уже большой то сольем
+         */
+        if (commitSize > 20123123) {
+            File dbFileT = new File(Settings.getInstance().getDataChainPath(), "chain.dat.t");
+            if (dbFileT.exists()) {
+                long sizeT = dbFileT.length();
+                if (sizeT > 750000123) {
+                    commitSize = sizeT;
+                }
+            }
+        }
+
         if (hardFlush
                 || actions > ACTIONS_BEFORE_COMMIT
                 || commitSize > MAX_ENGINE_BEFORE_COMMIT
