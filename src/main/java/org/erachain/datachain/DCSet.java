@@ -53,7 +53,7 @@ public class DCSet extends DBASet implements Closeable {
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN
             << (Controller.getInstance().databaseSystem == DBS_MAP_DB ? 1 : 3);
     // если все на Рокс перевели то меньше надо ставить
-    private static final long MAX_ENGINE_BEFORE_COMMIT_KB = 999999999999999L; ///BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 5;
+    private static final long MAX_ENGINE_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN << 2;
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
     public static final long DELETIONS_BEFORE_COMPACT = (long) ACTIONS_BEFORE_COMMIT;
 
@@ -194,11 +194,10 @@ public class DCSet extends DBASet implements Closeable {
     public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory, int defaultDBS) {
         super(dbFile, database, withObserver, dynamicGUI);
 
-        logger.info("UP SIZE BEFORE COMMIT [KB]: " + MAX_ENGINE_BEFORE_COMMIT_KB
+        logger.info("UP SIZE BEFORE COMMIT [KB]: " + MAX_ENGINE_BEFORE_COMMIT
                 + ", ACTIONS BEFORE COMMIT: " + ACTIONS_BEFORE_COMMIT
                 + ", DELETIONS BEFORE COMPACT: " + DELETIONS_BEFORE_COMPACT);
 
-        this.engineSize = getEngineSize();
         this.inMemory = inMemory;
 
         try {
@@ -520,10 +519,9 @@ public class DCSet extends DBASet implements Closeable {
             needClearCache = false;
         } else {
             // USE CACHE
-            if (BLOCKS_MAP != DBS_MAP_DB) {
+            if (true || BLOCKS_MAP != DBS_MAP_DB) {
                 // если блоки не сохраняются в общей базе данных, а трнзакции мелкие по размеру
-                databaseStruc
-                        .cacheSize(1024 << (5 + Controller.HARD_WORK));
+                databaseStruc.cacheSize(32 + 32 << Controller.HARD_WORK);
             } else {
                 // если блоки в этой MapDB то уменьшим - так как размер блока может быть большой
                 databaseStruc.cacheSize(32 + 32 << Controller.HARD_WORK);
@@ -674,12 +672,12 @@ public class DCSet extends DBASet implements Closeable {
 
     }
 
-        /**
-         * make data set in memory. For tests
-         *
-         * @return
-         * @param defaultDBS
-         */
+    /**
+     * make data set in memory. For tests
+     *
+     * @param defaultDBS
+     * @return
+     */
     public static DCSet createEmptyDatabaseSet(int defaultDBS) {
         DB database = DCSet.makeDBinMemory();
 
@@ -1592,7 +1590,7 @@ public class DCSet extends DBASet implements Closeable {
             if (!this.database.isClosed()) {
                 this.addUses();
 
-                // если основная база то с откатом
+                // если основная база и шла обработка блока, то с откатом
                 if (parent == null) {
                     if (this.getBlockMap().isProcessing()) {
                         logger.debug("TRY ROLLBACK");
@@ -1679,7 +1677,7 @@ public class DCSet extends DBASet implements Closeable {
             tab.afterRollback();
         }
 
-        this.actions = 0l;
+        this.actions = 0L;
         this.outUses();
     }
 
@@ -1690,11 +1688,24 @@ public class DCSet extends DBASet implements Closeable {
         super.clearCache();
     }
 
-    private long poinFlush = System.currentTimeMillis();
-    private long poinCompact = poinFlush;
-    private long engineSize;
-    private long poinClear;
+    private long pointFlush = System.currentTimeMillis();
+    private long pointCompact = pointFlush;
+    private long pointClear;
+    private long commitSize;
     private boolean clearGC = false;
+
+    /**
+     * Освобождает память которая вне кучи приложения но у системы память забирается.
+     * Причем размер занимаемой памяти примерно равен файлу data.t - в котором транзакция СУБД хранится.
+     * При коммитре этот файл очищается. Размер файла получается больше чем размер блока,
+     * так как данные дублиуются в таблице трнзакций и еще активы (сущности - для картинок и описний).
+     * <p>
+     * TODO нужно сделать по размеру этого файла - если большой - то коммит закрыть
+     *
+     * @param size
+     * @param hardFlush
+     * @param doOrphan
+     */
     public void flush(int size, boolean hardFlush, boolean doOrphan) {
 
         if (parent != null)
@@ -1703,45 +1714,57 @@ public class DCSet extends DBASet implements Closeable {
         this.addUses();
 
         boolean needRepopulateUTX = hardFlush
-                || System.currentTimeMillis() - poinClear - 1000 >
+                || System.currentTimeMillis() - pointClear - 1000 >
                 BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 3;
-        // try repopulate UTX table
+        // try to repopulate UTX table
         if (needRepopulateUTX && Controller.getInstance().transactionsPool != null) {
             Controller.getInstance().transactionsPool.needClear(doOrphan);
 
-            poinClear = System.currentTimeMillis();
+            pointClear = System.currentTimeMillis();
 
         }
 
-        this.actions += size;
-        long diffSizeEngine = getEngineSize() - engineSize;
-        if (diffSizeEngine < 0)
-            diffSizeEngine = -diffSizeEngine;
+        if (false && // базы данных используют память котрую приложение не видит
+                // и не может понять что там на самом деле творится - вне зависимости от вида КЭША у MapDB
+                Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()
+                && Runtime.getRuntime().totalMemory() / Runtime.getRuntime().freeMemory() > 10) {
+            hardFlush = true;
+            logger.debug("%%%%%%%%%%%%%%%");
+            logger.debug("%%%%%%%%%%%%%%%   totalMemory: " + (Runtime.getRuntime().totalMemory() >> 20)
+                    + "MB   %%%%% freeMemory: " + (Runtime.getRuntime().freeMemory() >> 20) + "MB");
+            logger.debug("%%%%%%%%%%%%%%% = hardFlush");
+        }
 
-        if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
-                || diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB
-                || System.currentTimeMillis() - poinFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 8
+        this.commitSize += size;
+
+        if (hardFlush
+                || actions > ACTIONS_BEFORE_COMMIT
+                || commitSize > MAX_ENGINE_BEFORE_COMMIT
+                || System.currentTimeMillis() - pointFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 8
         ) {
 
             long start = System.currentTimeMillis();
 
-            logger.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions
+            logger.debug("%%%%%%%%%%%%%%%%%%%% FLUSH HARD %%%%%%%%%%%%%%%%%%%%");
+            logger.debug("%%%%%%%%%%%%%%%%%%%% "
                     + (this.actions > ACTIONS_BEFORE_COMMIT ? "by Actions: " + this.actions :
-                    (diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB ? "by diff Size Engine: " + diffSizeEngine : "by time"))
+                    (commitSize > MAX_ENGINE_BEFORE_COMMIT ? "by Commit Size: " + (commitSize >> 20) + " MB" : "by time"))
             );
+            logger.debug("%%%%%%%%%%%%%%%%%%%% memory RATIO: " + Runtime.getRuntime().totalMemory() / Runtime.getRuntime().freeMemory());
 
             for (DBTab tab : tables) {
                 tab.commit();
             }
 
             this.database.commit();
+            //database.
 
-            if (false && Controller.getInstance().compactDConStart && System.currentTimeMillis() - poinCompact > 9999999) {
-                // очень долго делает - лучше ключем при старте
-                poinCompact = System.currentTimeMillis();
+            if (false && Controller.getInstance().compactDConStart && System.currentTimeMillis() - pointCompact > 9999999) {
+                // очень долго делает - лучше ключом при старте
+                pointCompact = System.currentTimeMillis();
 
                 logger.debug("try COMPACT");
-                // очень долго делает - лучше ключем при старте
+                // очень долго делает - лучше ключом при старте
                 try {
                     this.database.compact();
                     transactionTab.setTotalDeleted(0);
@@ -1753,10 +1776,10 @@ public class DCSet extends DBASet implements Closeable {
             }
 
             if (true) {
-                // нельзя папку с базами форков чистить между записями блоков
-                // так как еще другие процессы с форками есть - например создание своих трнзакций или своего блока
-                // они же тоже тут создаются
-                // а хотя тогда они и не удалятся - так как они не закрытые и сотанутся в папке... значит можно тут удалять - нужные не удлятся
+                // Нельзя папку с базами форков чистить между записями блоков
+                // так как еще другие процессы с форками есть - например создание своих транзакций или своего блока
+                // они же тоже тут создаются,
+                // а хотя тогда они и не удалятся - так как они не закрытые и останутся в папке... значит можно тут удалять - нужные не удаляться
                 try {
 
                     // там же лежит и он
@@ -1783,22 +1806,18 @@ public class DCSet extends DBASet implements Closeable {
                 System.gc();
             }
 
-            logger.debug("%%%%%%%%%%%%%%%%%% TOTAL: " + getEngineSize() + "   %%%%%%  commit time: "
+            logger.debug("%%%%%%%%%%%%%%%%%%%%%%%%  commit time: "
                     + (System.currentTimeMillis() - start) + " ms");
 
-            poinFlush = System.currentTimeMillis();
-            this.actions = 0l;
-            this.engineSize = getEngineSize();
+            pointFlush = System.currentTimeMillis();
+            this.actions = 0L;
+            this.commitSize = 0L;
 
         }
 
         this.outUses();
     }
 
-    public long getEngineSize() {
-        return this.database.getEngine().preallocate();
-    }
-    
     public String toString() {
         return (this.isFork() ? "forked in " + makedIn : "") + super.toString();
     }

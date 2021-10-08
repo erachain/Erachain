@@ -339,7 +339,7 @@ public class OrderUnresolveTest {
                 assertEquals(orders.size(), len);
 
                 //////////////////////////////////////////////////////////////////////////
-                dcSet.flush(99999, true, false);
+                dcSet.flush(0, true, false);
                 //////////////////////////////////////////////////////////////////////////
                 iterator = ordersMap.getIterator();
                 count = 0;
