@@ -1660,7 +1660,7 @@ public class DCSet extends DBASet implements Closeable {
 
     @Override
     public void commit() {
-        this.actions += 5000;
+        this.commitSize += 5000;
     }
 
     public void rollback() {
