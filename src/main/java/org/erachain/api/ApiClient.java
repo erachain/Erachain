@@ -1,5 +1,4 @@
 package org.erachain.api;
-// 30/03
 
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.settings.Settings;
