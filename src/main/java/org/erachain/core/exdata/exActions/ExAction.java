@@ -1,5 +1,6 @@
 package org.erachain.core.exdata.exActions;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
@@ -7,6 +8,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
@@ -26,6 +28,7 @@ public abstract class ExAction<R> {
     public static final int LIST_PAYOUTS_TYPE = 2;
 
     int type;
+    protected int flags;
     protected long assetKey;
 
     protected DCSet dcSet;
@@ -40,6 +43,11 @@ public abstract class ExAction<R> {
 
     ExAction(int type) {
         this.type = type;
+    }
+
+    ExAction(int type, int flags) {
+        this.type = type;
+        this.flags = flags;
     }
 
     public int getType() {
@@ -62,7 +70,11 @@ public abstract class ExAction<R> {
         return totalPay;
     }
 
+    public abstract int getCount();
+
     public abstract String viewResults(Transaction transactionParent);
+
+    public abstract String viewType();
 
     public abstract long getTotalFeeBytes();
 
@@ -119,11 +131,44 @@ public abstract class ExAction<R> {
     /**
      * Version 2 maker for BlockExplorer
      */
-    public abstract JSONObject makeJSONforHTML(JSONObject langObj);
+    public JSONObject makeJSONforHTML(JSONObject langObj) {
+        JSONObject json = toJson();
 
-    public abstract JSONObject toJson();
+        json.put("asset", asset.getName());
+        json.put("results", getInfoHTML(true));
 
-    public abstract String getInfoHTML();
+        json.put("Label_Counter", Lang.T("Counter", langObj));
+        json.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
+        json.put("Label_Additional_Fee", Lang.T("Additional Fee", langObj));
+
+
+        return json;
+
+    }
+
+    public JSONObject toJson() {
+        JSONObject toJson = new JSONObject();
+
+        toJson.put("type", type);
+        toJson.put("typeName", viewType());
+        toJson.put("flags", flags);
+        toJson.put("assetKey", assetKey);
+
+        if (totalPay != null)
+            toJson.put("totalPay", totalPay);
+
+        return toJson;
+    }
+
+    public String getInfoHTML(boolean onlyTotal) {
+        String out = "<h3>" + Lang.T(viewType()) + "</h3>";
+        out += Lang.T("Asset") + ": <b>" + asset.getName() + "<br>";
+        out += Lang.T("Count # кол-во") + ": <b>" + getCount()
+                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(getTotalFeeBytes())
+                + "</b>, " + Lang.T("Total") + ": <b>" + totalPay;
+        return out;
+
+    }
 
     /**
      * make calculations of lists and pre-validate it if need
