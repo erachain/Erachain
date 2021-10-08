@@ -108,6 +108,11 @@ public class FPool extends MonitoredThread {
 
         this.setName("Forging Pool[" + this.getId() + "]");
 
+        if (privateKeyAccount == null) {
+            LOGGER.error("FPool address is NULL!! Pool stoped...");
+            return;
+        }
+
         try {
             this.dpSet = DPSet.reCreateDB();
         } catch (Throwable e) {
