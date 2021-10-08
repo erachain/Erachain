@@ -84,14 +84,13 @@ public class DepositExchange extends IconPanel {
 
         cbxAssetsInput = new JComboBox<>(new String[]{
                 "BTC",
-                //"DOGE", "LTC",
-                //"DASH"
+                "DOGE", "LTC" //, "DASH"
         });
 
         cbxAssetsBuy = new JComboBox<>(new String[]{
-                //AssetCls.ERA_ABBREV, AssetCls.FEE_NAME,
+                AssetCls.ERA_ABBREV, AssetCls.FEE_NAME,
                 "BTC",
-                //"USD" //, "DOGE", "LTC", "DASH"
+                "USD", "DOGE", "LTC" //, "DASH"
         });
 
         this.amount = amount;
@@ -450,7 +449,6 @@ public class DepositExchange extends IconPanel {
         jLabel_AreaDetails.setVisible(false);
         payToAddressDetails.setVisible(false);
         jButton_copyDetails.setVisible(false);
-
 
         jLabel_DetailsCheck.setText(Lang.T("Status") + ":");
         labelGBC.gridy = ++gridy;
