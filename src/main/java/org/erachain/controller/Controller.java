@@ -2050,6 +2050,7 @@ public class Controller extends Observable {
 
                     // сохранимся - хотя может и заря - раньше то работало и так
                     // по размеру файла смотрим - если уже большой то сольем
+                    // хотя все равно при каждом ново поиске 300 блоков приостанавливается синхра
                     File dbFileT = new File(Settings.getInstance().getDataChainPath(), "chain.dat.t");
                     if (dbFileT.exists()) {
                         long size = dbFileT.length();
