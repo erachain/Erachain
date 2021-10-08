@@ -1738,10 +1738,6 @@ public class DCSet extends DBASet implements Closeable {
 
         this.commitSize += size;
 
-        if (hardFlush) {
-            boolean debug = true;
-        }
-
         if (hardFlush
                 || actions > ACTIONS_BEFORE_COMMIT
                 || commitSize > MAX_ENGINE_BEFORE_COMMIT
