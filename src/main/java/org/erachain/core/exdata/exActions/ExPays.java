@@ -287,14 +287,10 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             preProcess(transactionParent);
         }
 
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
-            calcAccrualsForMethodTotal();
-        }
-
         String out = "";
         int i = 0;
         for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
-            out += ++i + " " + item.a.getAddress() + " " + item.c.toPlainString() + "\n";
+            out += ++i + " " + item.a.getAddress() + " " + item.b.toPlainString() + " " + item.c.toPlainString() + "\n";
         }
 
         return out;
@@ -964,7 +960,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         BigDecimal accrual;
         BigDecimal totalBalances = BigDecimal.ZERO;
 
-        resultsCount = 0;
+        //resultsCount = 0;
 
         Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
         Long myPersonKey = null;
@@ -1307,13 +1303,14 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void process(Transaction rNote, Block block) {
 
         if (results == null) {
-            resultsCount = preProcess(rNote);
+            preProcess(rNote);
         }
 
         if (resultsCount == 0)
             return;
 
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
+        if (false && // already in PREPROCESS
+                payMethod == PAYMENT_METHOD_TOTAL) {
             if (!calcAccrualsForMethodTotal())
                 // не удалось просчитать значения
                 return;
@@ -1329,13 +1326,14 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void orphan(Transaction rNote) {
 
         if (results == null) {
-            resultsCount = preProcess(rNote);
+            preProcess(rNote);
         }
 
         if (resultsCount == 0)
             return;
 
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
+        if (false &&
+                payMethod == PAYMENT_METHOD_TOTAL) {
             if (!calcAccrualsForMethodTotal())
                 // не удалось просчитать значения
                 return;
