@@ -2049,10 +2049,14 @@ public class Controller extends Observable {
                     }
 
                     // сохранимся - хотя может и заря - раньше то работало и так
-                    if (true) {
-                        dcSet.flush(0, true, false);
+                    // по размеру файла смотрим - если уже большой то сольем
+                    File dbFileT = new File(Settings.getInstance().getDataChainPath(), "chain.dat.t");
+                    if (dbFileT.exists()) {
+                        long size = dbFileT.length();
+                        if (size > DCSet.MAX_ENGINE_BEFORE_COMMIT >> 2) {
+                            dcSet.flush(0, true, false);
+                        }
                     }
-
                 }
 
                 blockchainSyncStatusUpdate(getMyHeight());
