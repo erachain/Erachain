@@ -76,10 +76,8 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
      * 0 - version; 1..3 - flags;
      */
 
-    private int balancePos; // 13
-    private boolean backward; // 14
-    private int payMethod; // 15 0 - by Total, 1 - by Percent
-    private BigDecimal payMethodValue; // 17
+    private final int payMethod; // 15 0 - by Total, 1 - by Percent
+    private final BigDecimal payMethodValue; // 17
     private BigDecimal amountMin; // 19
     private BigDecimal amountMax; //21
 
@@ -89,7 +87,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     private BigDecimal filterBalanceMIN; // 33
     private BigDecimal filterBalanceMAX; // 34
 
-    private int filterTXType; // 36
+    private final int filterTXType; // 36
     private Long filterTimeStart; // 44 - in msec
     public Long filterTimeEnd; // 52 - in msec
 
@@ -136,7 +134,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
                   int filterTXType, Long filterTimeStart, Long filterTimeEnd,
                   int filterByGender, boolean useSelfBalance) {
 
-        super(FILTERED_ACCRUALS_TYPE);
+        super(FILTERED_ACCRUALS_TYPE, balancePos, backward);
 
         this.flags = flags;
 
@@ -144,8 +142,6 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
                 assetKey != null && assetKey != 0L) {
             this.flags |= AMOUNT_FLAG_MASK;
             this.assetKey = assetKey;
-            this.balancePos = balancePos;
-            this.backward = backward;
             this.payMethod = payMethod;
             this.payMethodValue = payMethodValue;
 
@@ -788,10 +784,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     public JSONObject toJson() {
 
-        JSONObject toJson = new JSONObject();
-
-        toJson.put("balancePos", balancePos);
-        toJson.put("backward", backward);
+        JSONObject toJson = super.toJson();
 
         toJson.put("payMethod", payMethod);
         toJson.put("payMethodValue", payMethodValue.toPlainString());
@@ -826,10 +819,17 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         return toJson;
     }
 
-    public String getInfoHTML(boolean onlyTotal) {
+    /**
+     * without resuls not show it
+     *
+     * @param onlyTotal
+     * @param langObj
+     * @return
+     */
+    public String getInfoHTML(boolean onlyTotal, JSONObject langObj) {
 
-        String out = super.getInfoHTML(onlyTotal);
-        if (onlyTotal)
+        String out = super.getInfoHTML(onlyTotal, langObj);
+        if (onlyTotal || results == null)
             return out;
 
         for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {

@@ -46,8 +46,6 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
      * 0 - version; 1 - flags;
      */
 
-    private final int balancePos;
-    final boolean backward;
     private final Tuple3<byte[], BigDecimal, String>[] addresses;
 
     /////////////////
@@ -55,10 +53,8 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
     public String errorValue;
 
     public ExListPays(int flags, long assetKey, int balancePos, boolean backward, Tuple3<byte[], BigDecimal, String>[] addresses) {
-        super(LIST_PAYOUTS_TYPE, flags);
+        super(LIST_PAYOUTS_TYPE, flags, balancePos, backward);
         this.assetKey = assetKey;
-        this.balancePos = balancePos;
-        this.backward = backward;
         this.addresses = addresses;
 
     }
@@ -342,22 +338,9 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
         return make(assetKey, position, backward, addressesJson);
     }
 
-    /**
-     * Version 2 maker for BlockExplorer
-     */
-    public JSONObject makeJSONforHTML(JSONObject langObj) {
-        JSONObject json = super.makeJSONforHTML(langObj);
-
-        return json;
-
-    }
-
     public JSONObject toJson() {
 
-        JSONObject toJson = new JSONObject();
-
-        toJson.put("balancePosition", balancePos);
-        toJson.put("backward", backward);
+        JSONObject toJson = super.toJson();
 
         JSONArray array = new JSONArray();
         for (Tuple3<byte[], BigDecimal, String> item : addresses) {
@@ -377,15 +360,16 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
     }
 
     @Override
-    public String getInfoHTML(boolean onlyTotal) {
+    public String getInfoHTML(boolean onlyTotal, JSONObject langObj) {
 
-        String out = super.getInfoHTML(onlyTotal);
+        String out = super.getInfoHTML(onlyTotal, langObj);
+
         if (onlyTotal)
             return out;
 
         for (Tuple3<byte[], BigDecimal, String> item : addresses) {
-            out += "<br>" + crypto.getAddressFromShort(item.a) + " " + item.b.toPlainString()
-                    + (item.c == null ? "" : " " + item.c);
+            out += "<br>" + item.b.toPlainString() + " " + crypto.getAddressFromShort(item.a)
+                    + (item.c == null || item.c.isEmpty() ? "" : " - " + item.c);
         }
 
         return out;

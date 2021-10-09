@@ -110,7 +110,6 @@ public class FPool extends MonitoredThread {
 
         if (privateKeyAccount == null) {
             LOGGER.error("FPool address is NULL!! Pool stoped...");
-            return;
         }
 
         try {

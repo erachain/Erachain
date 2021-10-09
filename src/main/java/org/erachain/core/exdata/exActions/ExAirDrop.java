@@ -13,6 +13,7 @@ import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -45,8 +46,6 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
      */
 
     private final BigDecimal amount;
-    private final int balancePos;
-    final boolean backward;
     /**
      * Short form of address = [20]
      */
@@ -55,11 +54,9 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     public String errorValue;
 
     public ExAirDrop(int flags, long assetKey, BigDecimal amount, int balancePos, boolean backward, byte[][] addresses) {
-        super(SIMPLE_PAYOUTS_TYPE, flags);
+        super(SIMPLE_PAYOUTS_TYPE, flags, balancePos, backward);
         this.assetKey = assetKey;
         this.amount = amount;
-        this.balancePos = balancePos;
-        this.backward = backward;
         this.addresses = addresses;
 
         totalPay = amount.multiply(BigDecimal.valueOf(addresses.length));
@@ -84,7 +81,7 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
     @Override
     public String viewType() {
-        return "Simple";
+        return "Simple Pay";
     }
 
     @Override
@@ -329,23 +326,11 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         return make(assetKey, value, position, backward, addressesStr);
     }
 
-    /**
-     * Version 2 maker for BlockExplorer
-     */
-    public JSONObject makeJSONforHTML(JSONObject langObj) {
-        JSONObject json = super.makeJSONforHTML(langObj);
-
-        return json;
-
-    }
-
     public JSONObject toJson() {
 
         JSONObject toJson = super.toJson();
 
         toJson.put("amount", amount.toPlainString());
-        toJson.put("balancePosition", balancePos);
-        toJson.put("backward", backward);
 
         JSONArray array = new JSONArray();
         for (byte[] address : addresses) {
@@ -361,13 +346,18 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     }
 
     @Override
-    public String getInfoHTML(boolean onlyTotal) {
-        String out = super.getInfoHTML(onlyTotal);
+    public String getInfoHTML(boolean onlyTotal, JSONObject langObj) {
+
+        String out = super.getInfoHTML(onlyTotal, langObj);
+
+        out += Lang.T("Accrual") + ": <b>" + amount.toPlainString() + "</b><br>";
+
         if (onlyTotal)
             return out;
 
+        out += "<b>" + Lang.T("Recipients") + ":</b><br>";
         for (byte[] recipientShort : addresses) {
-            out += "<br>" + crypto.getAddressFromShort(recipientShort);
+            out += crypto.getAddressFromShort(recipientShort) + "<br>";
         }
 
         return out;

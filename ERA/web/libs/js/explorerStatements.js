@@ -125,52 +125,58 @@ function statement(data) {
             + data.Label_Parent + ' <a href=?tx=' + data.exLink.ref + get_lang() + '><b>' + data.exLink.ref + '</b></a></h3>';
     }
 
-    if (data.hasOwnProperty('exPays')) {
-        exPays = data.exPays;
+    if (data.hasOwnProperty('exAction')) {
+        var exAction = data.exAction;
         output += '<h3>'
             //+ '<img src="img/parentTx.png" style="height:1.5em"> '
-            + data.Label_Accruals + '</h3>';
+            + data.Label_Action + '</h3>';
 
-        if (exPays.hasOwnProperty('filteredAccrualsCount')) {
-            output += exPays.Label_Counter + ': <b>' + exPays.filteredAccrualsCount + '</b><br>';
-            output += exPays.Label_Total_Amount + ': <b>' + exPays.totalPay + '</b><br>';
-            output += exPays.Label_Additional_Fee + ': <b>' + exPays.totalFee + '</b><br>';
+        if (exAction.typeName == 'Accruals') {
+            if (exAction.hasOwnProperty('filteredAccrualsCount')) {
+                output += exAction.Label_Counter + ': <b>' + exAction.filteredAccrualsCount + '</b><br>';
+                output += exAction.Label_Total_Amount + ': <b>' + exAction.totalPay + '</b><br>';
+                output += exAction.Label_Additional_Fee + ': <b>' + exAction.totalFee + '</b><br>';
 
+            }
+
+            output += '<h4>' + exAction.Label_Action_for_Asset + '</h4>';
+            output += exAction.Label_assetKey + ': <b>' + exAction.assetKey + '</b><br>';
+            output += exAction.Label_balancePos + ': <b>[' + exAction.balancePos + "]" + exAction.balancePosName + '</b><br>';
+            output += exAction.Label_backward + ': <b>' + exAction.backward + '</b><br>';
+            output += exAction.Label_payMethod + ': <b>[' + exAction.payMethod + "]" + exAction.payMethodName + '</b><br>';
+            output += exAction.Label_payMethodValue + ': <b>' + exAction.payMethodValue + '</b><br>';
+            if (exAction.hasOwnProperty('amountMin'))
+                output += exAction.Label_amountMin + ': <b>' + exAction.amountMin + '</b><br>';
+            if (exAction.hasOwnProperty('amountMax'))
+                output += exAction.Label_amountMax + ': <b>' + exAction.amountMax + '</b><br>';
+
+            output += '<h4>' + exAction.Label_Filter_By_Asset_and_Balance + '</h4>';
+            output += exAction.Label_assetKey + ': <b>' + exAction.filterAssetKey + '</b><br>';
+            output += exAction.Label_balancePos + ': <b>[' + exAction.filterBalancePos + "]" + exAction.filterBalancePosName + '</b><br>';
+            output += exAction.Label_balanceSide + ': <b>[' + exAction.filterBalanceSide + "]" + exAction.filterBalanceSideName + '</b><br>';
+
+            if (exAction.hasOwnProperty('filterBalanceMIN'))
+                output += exAction.Label_filterBalanceMIN + ': <b>' + exAction.filterBalanceMIN + '</b><br>';
+            if (exAction.hasOwnProperty('filterBalanceMAX'))
+                output += exAction.Label_filterBalanceMAX + ': <b>' + exAction.filterBalanceMAX + '</b><br>';
+
+            output += '<h4>' + exAction.Label_Filter_by_Actions_and_Period + '</h4>';
+            if (exAction.filterTXType)
+                output += exAction.Label_filterTXType + ': <b>[' + exAction.filterTXType + "]" + exAction.filterTXTypeName + '</b><br>';
+            if (exAction.hasOwnProperty('filterTimeStart'))
+                output += exAction.Label_filterTimeStart + ': <b>' + convertTimestamp(exAction.filterTimeStart, true) + '</b><br>';
+            if (exAction.hasOwnProperty('filterTimeEnd'))
+                output += exAction.Label_filterTimeEnd + ': <b>' + convertTimestamp(exAction.filterTimeEnd, true) + '</b><br>';
+
+            output += '<h4>' + exAction.Label_Filter_by_Persons + '</h4>';
+            if (exAction.filterByGender)
+            output += exAction.Label_filterByGender + ': <b>' + exAction.filterByGenderName + '</b><br>';
+            output += exAction.Label_selfUse + ': <b>' + exAction.useSelfBalance + '</b><br>';
         }
 
-        output += '<h4>' + exPays.Label_Action_for_Asset + '</h4>';
-        output += exPays.Label_assetKey + ': <b>' + exPays.assetKey + '</b><br>';
-        output += exPays.Label_balancePos + ': <b>[' + exPays.balancePos + "]" + exPays.balancePosName + '</b><br>';
-        output += exPays.Label_backward + ': <b>' + exPays.backward + '</b><br>';
-        output += exPays.Label_payMethod + ': <b>[' + exPays.payMethod + "]" + exPays.payMethodName + '</b><br>';
-        output += exPays.Label_payMethodValue + ': <b>' + exPays.payMethodValue + '</b><br>';
-        if (exPays.hasOwnProperty('amountMin'))
-            output += exPays.Label_amountMin + ': <b>' + exPays.amountMin + '</b><br>';
-        if (exPays.hasOwnProperty('amountMax'))
-            output += exPays.Label_amountMax + ': <b>' + exPays.amountMax + '</b><br>';
-
-        output += '<h4>' + exPays.Label_Filter_By_Asset_and_Balance + '</h4>';
-        output += exPays.Label_assetKey + ': <b>' + exPays.filterAssetKey + '</b><br>';
-        output += exPays.Label_balancePos + ': <b>[' + exPays.filterBalancePos + "]" + exPays.filterBalancePosName + '</b><br>';
-        output += exPays.Label_balanceSide + ': <b>[' + exPays.filterBalanceSide + "]" + exPays.filterBalanceSideName + '</b><br>';
-
-        if (exPays.hasOwnProperty('filterBalanceMIN'))
-            output += exPays.Label_filterBalanceMIN + ': <b>' + exPays.filterBalanceMIN + '</b><br>';
-        if (exPays.hasOwnProperty('filterBalanceMAX'))
-            output += exPays.Label_filterBalanceMAX + ': <b>' + exPays.filterBalanceMAX + '</b><br>';
-
-        output += '<h4>' + exPays.Label_Filter_by_Actions_and_Period + '</h4>';
-        if (exPays.filterTXType)
-            output += exPays.Label_filterTXType + ': <b>[' + exPays.filterTXType + "]" + exPays.filterTXTypeName + '</b><br>';
-        if (exPays.hasOwnProperty('filterTimeStart'))
-            output += exPays.Label_filterTimeStart + ': <b>' + convertTimestamp(exPays.filterTimeStart, true) + '</b><br>';
-        if (exPays.hasOwnProperty('filterTimeEnd'))
-            output += exPays.Label_filterTimeEnd + ': <b>' + convertTimestamp(exPays.filterTimeEnd, true) + '</b><br>';
-
-        output += '<h4>' + exPays.Label_Filter_by_Persons + '</h4>';
-        if (exPays.filterByGender)
-        output += exPays.Label_filterByGender + ': <b>' + exPays.filterByGenderName + '</b><br>';
-        output += exPays.Label_selfUse + ': <b>' + exPays.useSelfBalance + '</b><br>';
+        if (exAction.hasOwnProperty('results')) {
+            output += exAction.results;
+        }
 
     }
 
