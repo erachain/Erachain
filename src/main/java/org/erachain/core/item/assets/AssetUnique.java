@@ -48,8 +48,9 @@ public class AssetUnique extends AssetCls {
                 },
                 new String[][]{
                         new String[]{"1050864", WebResource.TYPE_IMAGE.toString()},
-                        new String[]{"1050863", WebResource.TYPE_IMAGE.toString()},
                         new String[]{"1050862", WebResource.TYPE_IMAGE.toString()},
+                        null,
+                        new String[]{"1050863", WebResource.TYPE_IMAGE.toString()},
                 },
                 new String[][]{
                         new String[]{"1050860", WebResource.TYPE_IMAGE.toString()},
@@ -59,17 +60,19 @@ public class AssetUnique extends AssetCls {
                         new String[]{"1050866", WebResource.TYPE_IMAGE.toString()},
                 },
                 new String[][]{
+                        new String[]{"1050857", WebResource.TYPE_IMAGE.toString()},
                         new String[]{"1050859", WebResource.TYPE_IMAGE.toString()},
                         new String[]{"1050858", WebResource.TYPE_IMAGE.toString()},
-                        new String[]{"1050857", WebResource.TYPE_IMAGE.toString()},
                 },
                 new String[][]{
                         new String[]{"1050856", WebResource.TYPE_IMAGE.toString()},
                         new String[]{"1050855", WebResource.TYPE_IMAGE.toString()},
+                        null,
                         new String[]{"1050854", WebResource.TYPE_IMAGE.toString()},
                 },
                 null,
                 new String[][]{
+                        null,
                         null,
                         new String[]{"1050852", WebResource.TYPE_IMAGE.toString()},
                         null,
