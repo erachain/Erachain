@@ -124,7 +124,7 @@ public class DogePlanet extends EpochSmartContract {
 
             totalIssued++;
 
-            planet = new AssetUnique(null, maker, "Doge Planet #" + totalIssued, null, null,
+            planet = new AssetUnique(null, maker, "Shiba Planet #" + totalIssued, null, null,
                     null, AssetCls.AS_NON_FUNGIBLE);
             planet.setReference(transaction.getSignature(), transaction.getDBRef());
 
