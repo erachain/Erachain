@@ -37,6 +37,46 @@ public class AssetUnique extends AssetCls {
         this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, assetType);
     }
 
+    private static String[][][] imgsStr;
+
+    {
+        imgsStr = new String[][][]{
+                new String[][]{
+                        new String[]{"1050868", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050867", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050864", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050863", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050862", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050860", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050866", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050859", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050858", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050857", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050856", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050855", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050854", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050866", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050860", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050852", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050851", WebResource.TYPE_IMAGE.toString()},
+                },
+        };
+    }
+
     //GETTERS/SETTERS
     @Override
     public String getImageURL() {
