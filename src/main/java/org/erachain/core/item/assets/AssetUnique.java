@@ -99,6 +99,7 @@ public class AssetUnique extends AssetCls {
         byte[] hash = blockHead.signature;
         byte[] hash2 = Ints.toByteArray((int) key);
         System.arraycopy(hash2, 0, hash, 0, hash2.length);
+        //hash = Crypto.getInstance().digest(hash);
         hash = Crypto.getInstance().digest(Longs.toByteArray(System.currentTimeMillis()));
         int slot = 0;
         int slotRare;
