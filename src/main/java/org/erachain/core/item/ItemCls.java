@@ -839,6 +839,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return key;
     }
 
+    public long getDBref() {
+        return dbRef;
+    }
+
     public void resetKey() {
         this.key = 0;
     }

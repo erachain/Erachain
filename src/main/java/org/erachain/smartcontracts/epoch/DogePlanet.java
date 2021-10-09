@@ -6,12 +6,16 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SmartContractValues;
+import org.erachain.webserver.WebResource;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -161,6 +165,126 @@ public class DogePlanet extends EpochSmartContract {
         valuesMap.put(COUNT_KEY, totalIssued - count);
 
         return false;
+    }
+
+    private static String[][][] imgsStr;
+
+    {
+        imgsStr = new String[][][]{
+                new String[][]{
+                        new String[]{"1050868", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050867", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050864", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050862", WebResource.TYPE_IMAGE.toString()},
+                        null,
+                        new String[]{"1050863", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050860", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        null,
+                        new String[]{"1050866", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050857", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050859", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050858", WebResource.TYPE_IMAGE.toString()},
+                },
+                new String[][]{
+                        new String[]{"1050856", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050855", WebResource.TYPE_IMAGE.toString()},
+                        null,
+                        new String[]{"1050854", WebResource.TYPE_IMAGE.toString()},
+                },
+                null,
+                new String[][]{
+                        null,
+                        null,
+                        new String[]{"1050852", WebResource.TYPE_IMAGE.toString()},
+                        null,
+                        new String[]{"1050851", WebResource.TYPE_IMAGE.toString()},
+                },
+        };
+    }
+
+    public static String getImageURL(AssetCls asset) {
+
+        JSONArray arrayJson = new JSONArray();
+        JSONObject item;
+
+        int height = Transaction.parseHeightDBRef(asset.getDBref());
+        Block.BlockHead blockHead = DCSet.getInstance().getBlocksHeadsMap().get(height + 10);
+        if (blockHead == null) {
+            item = new JSONObject();
+            item.put("url", "/apiasset/image/1050869");
+            item.put("type", WebResource.TYPE_IMAGE.toString());
+            arrayJson.add(item);
+            return arrayJson.toJSONString();
+        }
+
+        byte[] hash = blockHead.signature;
+        byte[] hash2 = Ints.toByteArray((int) asset.getKey());
+        System.arraycopy(hash2, 0, hash, 0, hash2.length);
+        //hash = Crypto.getInstance().digest(hash);
+        hash = Crypto.getInstance().digest(Longs.toByteArray(System.currentTimeMillis()));
+        int slot = 0;
+        int slotRare;
+        int slotRareLvl;
+
+        String[][] slotArray;
+        do {
+            slotRare = Ints.fromBytes((byte) 0, (byte) 0, hash[slot << 1], hash[(slot << 1) + 1]);
+            if ((slotRare >> 11) == 0) {
+                slotRareLvl = 5;
+            } else if ((slotRare >> 12) == 0) {
+                slotRareLvl = 4;
+            } else if ((slotRare >> 13) == 0) {
+                slotRareLvl = 3;
+            } else if ((slotRare >> 14) == 0) {
+                slotRareLvl = 2;
+            } else if ((slotRare >> 15) == 0) {
+                slotRareLvl = 1;
+            } else {
+                slotRareLvl = 0;
+            }
+
+            slotArray = imgsStr[slot];
+            if (slotArray == null)
+                continue;
+
+            if (slotArray.length <= slotRareLvl) {
+                slotRareLvl = slotArray.length - 1;
+            }
+
+            String[] itemArray;
+            do {
+                itemArray = slotArray[slotRareLvl];
+            } while (itemArray == null && slotRareLvl-- > 0);
+
+            if (itemArray == null)
+                continue;
+
+            item = new JSONObject();
+            item.put("url", "/apiasset/image/" + itemArray[0]);
+            item.put("type", itemArray[1]);
+            arrayJson.add(item);
+
+        } while (slot++ < 7);
+
+        item = new JSONObject();
+        item.put("url", "/apiasset/image/1050853");
+        item.put("type", WebResource.TYPE_IMAGE.toString());
+        arrayJson.add(item);
+        item = new JSONObject();
+        item.put("url", "/apiasset/image/1050865");
+        item.put("type", WebResource.TYPE_IMAGE.toString());
+        arrayJson.add(item);
+
+        return arrayJson.toJSONString();
+
     }
 
 }
