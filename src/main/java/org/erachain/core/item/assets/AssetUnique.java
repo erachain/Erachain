@@ -37,6 +37,8 @@ public class AssetUnique extends AssetCls {
         this(new byte[]{(byte) TYPE_ID, (byte) 0}, appData, maker, name, icon, image, description, assetType);
     }
 
+    //GETTERS/SETTERS
+
     private static String[][][] imgsStr;
 
     {
@@ -67,8 +69,8 @@ public class AssetUnique extends AssetCls {
                         new String[]{"1050854", WebResource.TYPE_IMAGE.toString()},
                 },
                 new String[][]{
-                        new String[]{"1050866", WebResource.TYPE_IMAGE.toString()},
-                        new String[]{"1050860", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050865", WebResource.TYPE_IMAGE.toString()},
+                        new String[]{"1050853", WebResource.TYPE_IMAGE.toString()},
                 },
                 new String[][]{
                         new String[]{"1050852", WebResource.TYPE_IMAGE.toString()},
@@ -77,35 +79,33 @@ public class AssetUnique extends AssetCls {
         };
     }
 
-    //GETTERS/SETTERS
     @Override
     public String getImageURL() {
         if (!maker.equals(DogePlanet.MAKER))
             return super.getImageURL();
 
         JSONArray arrayJson = new JSONArray();
+        JSONObject item;
 
         int height = Transaction.parseHeightDBRef(dbRef);
         Block.BlockHead blockHead = DCSet.getInstance().getBlocksHeadsMap().get(height + 10);
         if (blockHead == null) {
-            JSONObject item = new JSONObject();
+            item = new JSONObject();
             item.put("url", "/apiasset/image/1050869");
-            item.put("type", WebResource.TYPE_IMAGE);
+            item.put("type", WebResource.TYPE_IMAGE.toString());
             arrayJson.add(item);
             return arrayJson.toJSONString();
-            //return "<img width=350 style='position:absolute;'src=/smartcontract/epoch/000001/01/000.png>";
         }
 
         byte[] hash = blockHead.signature;
         byte[] hash2 = Ints.toByteArray((int) key);
         System.arraycopy(hash2, 0, hash, 0, hash2.length);
-        //hash = Crypto.getInstance().digest(hash);
         hash = Crypto.getInstance().digest(Longs.toByteArray(System.currentTimeMillis()));
         int slot = 0;
         int slotRare;
         int slotRareLvl;
-        String html = "";
 
+        String[][] slotArray;
         do {
             slotRare = Ints.fromBytes((byte) 0, (byte) 0, hash[slot << 1], hash[(slot << 1) + 1]);
             if ((slotRare >> 11) == 0) {
@@ -122,14 +122,14 @@ public class AssetUnique extends AssetCls {
                 slotRareLvl = 0;
             }
 
-            String[][] slotArray = imgsStr[slot];
+            slotArray = imgsStr[slot];
             if (slotArray.length <= slotRareLvl) {
                 slotRareLvl = slotArray.length - 1;
             }
 
             String[] itemArray = slotArray[slotRareLvl];
 
-            JSONObject item = new JSONObject();
+            item = new JSONObject();
             item.put("url", "/apiasset/image/" + itemArray[0]);
             item.put("type", itemArray[1]);
             arrayJson.add(item);
