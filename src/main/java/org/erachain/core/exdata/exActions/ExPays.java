@@ -832,8 +832,9 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         if (onlyTotal || results == null)
             return out;
 
+        out += "<b>" + Lang.T("Recipients") + ":</b><br>";
         for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
-            out += "<br>" + item.a.getAddress() + " " + item.b.toPlainString() + " " + item.c.toPlainString();
+            out += item.c.toPlainString() + " " + item.a.getAddress() + " x " + item.b.toPlainString() + "<br>";
         }
 
         return out;

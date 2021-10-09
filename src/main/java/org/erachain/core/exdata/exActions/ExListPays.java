@@ -13,6 +13,7 @@ import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -367,9 +368,10 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
         if (onlyTotal)
             return out;
 
+        out += "<b>" + Lang.T("Recipients") + ":</b><br>";
         for (Tuple3<byte[], BigDecimal, String> item : addresses) {
-            out += "<br>" + item.b.toPlainString() + " " + crypto.getAddressFromShort(item.a)
-                    + (item.c == null || item.c.isEmpty() ? "" : " - " + item.c);
+            out += item.b.toPlainString() + " " + crypto.getAddressFromShort(item.a)
+                    + (item.c == null || item.c.isEmpty() ? "" : " - " + item.c) + "<br>";
         }
 
         return out;
