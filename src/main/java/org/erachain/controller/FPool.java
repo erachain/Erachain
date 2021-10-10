@@ -11,7 +11,10 @@ import org.erachain.core.exdata.exActions.ExListPays;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.*;
+import org.erachain.database.DPSet;
+import org.erachain.database.FPoolBalancesMap;
+import org.erachain.database.FPoolBlocksHistoryMap;
+import org.erachain.database.FPoolBlocksMap;
 import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
@@ -42,7 +45,7 @@ public class FPool extends MonitoredThread {
 
     final static String settings_path = "settings_fpool.json";
 
-    static int PENDING_PERIOD;
+    static int PENDING_PERIOD = 30;
     static HashMap<Long, BigDecimal> MIN_WITHDRAWS;
     static BigDecimal POOL_TAX;
 
@@ -514,13 +517,15 @@ public class FPool extends MonitoredThread {
 
         runned = true;
 
-        FPoolMap map = dpSet.getFPoolMap();
-
+        int count = 0;
         while (runned) {
 
             // PROCESS
             try {
-                processMessage(blockingQueue.poll(BlockChain.GENERATING_MIN_BLOCK_TIME(0), TimeUnit.SECONDS));
+
+                boolean forged = processMessage(blockingQueue.poll(BlockChain.GENERATING_MIN_BLOCK_TIME(0), TimeUnit.SECONDS));
+                if (!forged && count++ % (PENDING_PERIOD >> 1) != 0)
+                    continue;
 
                 checkPending();
 
