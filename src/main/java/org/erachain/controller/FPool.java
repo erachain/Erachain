@@ -402,6 +402,8 @@ public class FPool extends MonitoredThread {
 
         Long assetKeyToWithdraw = null;
         List<Tuple2<String, BigDecimal>> payouts = new ArrayList();
+        BigDecimal total = BigDecimal.ZERO;
+
         try (IteratorCloseable<Tuple2<Long, String>> iterator = IteratorCloseableImpl.make(balsMap.getIterator())) {
             Tuple2<Long, String> key;
             Long assetKey;
@@ -422,6 +424,8 @@ public class FPool extends MonitoredThread {
 
                 // BALANCE is GOOD for WITHDRAW
                 payouts.add(new Tuple2(key.b, balance));
+                total = total.add(balance);
+
                 if (assetKeyToWithdraw == null)
                     assetKeyToWithdraw = assetKey;
 
@@ -432,6 +436,18 @@ public class FPool extends MonitoredThread {
 
         if (assetKeyToWithdraw == null) {
             return false;
+        }
+
+        // if Total too small
+        if (!allLeftover) {
+            BigDecimal min_withdraw = MIN_WITHDRAWS.get(assetKeyToWithdraw);
+            if (min_withdraw == null) {
+                min_withdraw = MIN_WITHDRAWS.get(0L);
+            }
+
+            if (total.movePointLeft(1).compareTo(min_withdraw) < 0) {
+                return false;
+            }
         }
 
         //if (true)
