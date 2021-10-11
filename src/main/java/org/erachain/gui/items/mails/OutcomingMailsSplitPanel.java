@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 
+// TODO нужно переделать графику всю
 public class OutcomingMailsSplitPanel extends SplitPanel {
 
     public static String NAME = "OutcomingMailsSplitPanel";
@@ -34,7 +35,6 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     private TableModelMails incoming_Mails_Model;
-    //private MTable jTableJScrollPanelLeftPanel;
     private TableRowSorter my_Sorter;
 
 
@@ -62,21 +62,6 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         columnModel.getColumn(TableModelMails.COLUMN_SEQNO).setMaxWidth(200);
 
         jTableJScrollPanelLeftPanel.setAutoCreateRowSorter(true);
-
-
-        //	my_Sorter = new TableRowSorter(incoming_Mails_Model);
-        //	jTableJScrollPanelLeftPanel.setRowSorter(my_Sorter);
-        //	jTableJScrollPanelLeftPanel.getRowSorter();
-        //	if (incoming_Mails_Model.getRowCount() > 0) incoming_Mails_Model.fireTableDataChanged();
-	/*		
-			//CHECKBOX FOR CONFIRMED
-			TableColumn confirmedColumn = jTableJScrollPanelLeftPanel.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);
-			// confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-			confirmedColumn.setCellRenderer(new RendererBoolean());
-			confirmedColumn.setMinWidth(50);
-			confirmedColumn.setMaxWidth(50);
-			confirmedColumn.setPreferredWidth(50);//.setWidth(30);
-			*/
 
         //MENU
         JPopupMenu menu = new JPopupMenu();
@@ -140,32 +125,18 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         menu.add(setSeeInBlockexplorer);
 
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
-			
-		/*	
-			
-			//CHECKBOX FOR FAVORITE
-			TableColumn favoriteColumn = jTableJScrollPanelLeftPanel.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_FAVORITE);
-			//favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-			favoriteColumn.setCellRenderer(new RendererBoolean());
-			favoriteColumn.setMinWidth(50);
-			favoriteColumn.setMaxWidth(50);
-			favoriteColumn.setPreferredWidth(50);//.setWidth(30);
-		*/
+
         // UPDATE FILTER ON TEXT CHANGE
         this.searchTextField2.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
         this.jTableJScrollPanelLeftPanel.setModel(incoming_Mails_Model);
         this.jTableJScrollPanelLeftPanel = jTableJScrollPanelLeftPanel;
         this.jScrollPanelLeftPanel.setViewportView(this.jTableJScrollPanelLeftPanel);
-        //		this.setRowHeightFormat(true);
 
         // EVENTS on CURSOR
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 
 
-        //		 Dimension size = MainFrame.getInstance().desktopPane.getSize();
-        //		 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-        //	 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
     }
 
     @Override

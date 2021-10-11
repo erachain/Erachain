@@ -29,7 +29,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-//import java.math.BigDecimal;
 
 @SuppressWarnings("serial")
 public class PollsDialog extends JDialog {
@@ -41,8 +40,6 @@ public class PollsDialog extends JDialog {
     private JComboBox<ItemCls> cbxAssets;
 
     public PollsDialog(PollCls poll, int option, AssetCls asset) {
-        // super(Controller.getInstance().getApplicationName(false) + " - " +
-        // Lang.T("Vote"));
 
         if (poll == null)
             return;
@@ -106,9 +103,7 @@ public class PollsDialog extends JDialog {
         descrGBC.insets = new Insets(0, 5, 5, 0);
         descrGBC.fill = GridBagConstraints.BOTH;
         MTextPane txtAreaDescription = new MTextPane(poll.getDescription());
-        //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
-        //txtAreaDescription.setEditable(false);
         JScrollPane ss = new JScrollPane();
         ss.setViewportView(txtAreaDescription);
 
@@ -176,19 +171,6 @@ public class PollsDialog extends JDialog {
         this.cbxOptions = new JComboBox<String>(new OptionsComboBoxModel(poll.viewOptions()));
         if (this.cbxOptions.getItemCount() > option)
             this.cbxOptions.setSelectedIndex(option);
-		/*		
-		this.cbxOptions.setRenderer(new DefaultListCellRenderer() {
-			@SuppressWarnings("rawtypes")
-			@Override
-			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-					boolean cellHasFocus) {
-
-				//AssetCls asset = ((AssetCls) cbxAssets.getSelectedItem());
-
-				return super.getListCellRendererComponent(list, (String)value, index, isSelected, cellHasFocus);
-			}
-		});
-	*/
         this.add(this.cbxOptions, detailGBC);
 
         // LABEL FEE

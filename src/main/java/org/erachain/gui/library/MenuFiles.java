@@ -68,17 +68,10 @@ public class MenuFiles extends JMenu {
                     lockItem.setText(Lang.T("Unlock Wallet"));
                     lockItem.setIcon(unlockedIcon);
                 }
-                //		Dimension d = fileMenu.getPreferredSize();
-                //		d.width = Math.max(d.width, 300);
-                //		fileMenu.setPreferredSize(d);
-                //		fileMenu.show(this_component, 0, this_component.getHeight());
             }
         });
 
-
         //LOAD IMAGES
-
-
         BufferedImage lockedImage;
         try {
             lockedImage = ImageIO.read(new File("images/wallet/locked.png"));
@@ -189,8 +182,6 @@ public class MenuFiles extends JMenu {
 
         // ERACHAIN LICENSE
         JMenuItem licenseItem = new JMenuItem(Lang.T("License"));
-        //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.T("Information about the application"));
-        //    licenseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         licenseItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new LicenseJFrame();
@@ -201,8 +192,6 @@ public class MenuFiles extends JMenu {
         // CLONECHAIN LICENSE
         //ABOUT
         JMenuItem dataLicenseItem = new JMenuItem(Lang.T("Data License of Clonechain"));
-        //    licenseItem.getAccessibleContext().setAccessibleDescription(Lang.T("Information about the application"));
-        //    licenseItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         dataLicenseItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new LicenseDataJFrame();
@@ -227,33 +216,6 @@ public class MenuFiles extends JMenu {
         });
 
         add(quitItem);
-/*        
-        fileMenu.addMenuListener(new MenuListener()
-        {
-			@Override
-			public void menuSelected(MenuEvent arg0) {
-        		if(Controller.getInstance().isWalletUnlocked()) {
-        			lockItem.setText(Lang.T("Lock Wallet"));
-        			lockItem.setIcon(lockedIcon);
-        		} else {
-        			lockItem.setText(Lang.T("Unlock Wallet"));
-        			lockItem.setIcon(unlockedIcon);
-        		}
-			}
-
-			@Override
-			public void menuCanceled(MenuEvent e) {
-				
-			}
-
-			@Override
-			public void menuDeselected(MenuEvent e) {
-				
-			}
-        });
-        	*/
-
-
     }
 
 }

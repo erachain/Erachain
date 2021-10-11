@@ -47,7 +47,6 @@ public class PersonSignedPanel extends JPanel {
 
 
         TableColumn Date_Column = jTable_Vouches.getColumnModel().getColumn(StatementsVouchTableModel.COLUMN_TIMESTAMP);
-        //favoriteColumn.setCellRenderer(new RendererBoolean()); //personsTable.getDefaultRenderer(Boolean.class));
         int rr = (int) (getFontMetrics(UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));
         Date_Column.setMinWidth(rr + 1);
         Date_Column.setMaxWidth(rr * 10);
@@ -56,16 +55,6 @@ public class PersonSignedPanel extends JPanel {
         jTable_Vouches.setAutoCreateRowSorter(true);
 
         TableRowSorter sorter = new TableRowSorter(model); //Создаем сортировщик
-        //sorter.setSortable(0, true); //Указываем, что сортировать будем в первой колонке
-        //sorter.setSortable(1, true); // а в других нет
-        //sorter.setSortable(2, true);
-        //ArrayList<SortKey> keys=new ArrayList<SortKey>(); // создаем коллецию ключей сортировки
-        //keys.add(new SortKey(0, SortOrder.DESCENDING));  //Записываем два ключа !!! (если задать
-        //keys.add(new SortKey(0, SortOrder.DESCENDING));  //один раз, то сортировщик по-умолчанию
-        //DefaultRowSorter от которого происходит
-        //TableRowSorter автоматически добавит
-        //SortOrder.ASCENDING
-        //sorter.setSortKeys(keys);                                   //Добавляем ключи к сортировщику
         if (model.getRowCount() > 0 && sorter.isSortable(StatementsVouchTableModel.COLUMN_TIMESTAMP)) {
             sorter.toggleSortOrder(StatementsVouchTableModel.COLUMN_TIMESTAMP); //Сортируем первую колонку
         }
@@ -73,8 +62,6 @@ public class PersonSignedPanel extends JPanel {
         //при изменении модели данных
         jTable_Vouches.setRowSorter(sorter);
 
-
-        // jPanel_Tab_Vouch = new javax.swing.JPanel();
         jScrollPane_Tab_Vouches = new javax.swing.JScrollPane();
 
         this.setLayout(new java.awt.GridBagLayout());
@@ -121,26 +108,6 @@ public class PersonSignedPanel extends JPanel {
             }
         });
 
-		/*
-		JMenuItem menu_copyName = new JMenuItem(Lang.T("Copy Creator Name"));
-		menu_copyName.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				// StringSelection value = new
-				// StringSelection(person.getCreator().getAddress().toString());
-				int row = jTable_Vouches.getSelectedRow();
-				row = jTable_Vouches.convertRowIndexToModel(row);
-
-
-				@SuppressWarnings("static-access")
-				StringSelection value = new StringSelection((String) model.getValueAt(row, model.COLUMN_CREATOR_NAME));
-				clipboard.setContents(value, null);
-				
-			}
-		});
-		menu.add(menu_copyName);
-		*/
-
 
         JMenuItem copy_Creator_Address = new JMenuItem(Lang.T("Copy Account"));
         copy_Creator_Address.addActionListener(new ActionListener() {
@@ -181,9 +148,6 @@ public class PersonSignedPanel extends JPanel {
                 Account accountTo = (Account) model.getPublicKey(row);
                 MainPanel.getInstance().insertNewTab(Lang.T("Send Asset to Person"), new AccountAssetSendPanel(null,
                         null, accountTo, person, null, false));
-
-                ;
-
             }
         });
         menu.add(Send_Coins_item_Menu);
@@ -199,19 +163,13 @@ public class PersonSignedPanel extends JPanel {
         });
         menu.add(Send_Mail_item_Menu);
 
-
         ////////////////////
         TableMenuPopupUtil.installContextMenu(jTable_Vouches, menu); // SELECT
-
 
     }
 
     public void delay_on_close() {
-
         model.removeObservers();
-
-
     }
-
 
 }

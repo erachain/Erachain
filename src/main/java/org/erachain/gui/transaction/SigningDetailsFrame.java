@@ -55,22 +55,12 @@ public class SigningDetailsFrame extends RecDetailsFrame {
         ++fieldGBC.gridy;
         JTextPane txtAreaDescription = new JTextPane();
         txtAreaDescription.setContentType("text/html");
-        //	txtAreaDescription.setBackground(MainFrame.getFrames()[0].getBackground());
 
         txtAreaDescription.setText(message);
-		/*
-		txtAreaDescription.setRows(4);
-		txtAreaDescription.setColumns(4);
-		*/
         txtAreaDescription.setBorder(name.getBorder());
         txtAreaDescription.setEditable(false);
-        //MenuPopupUtil.installContextMenu(txtAreaDescription);
         this.add(txtAreaDescription, fieldGBC);
 
-        //PACK
-//		this.pack();
-//        this.setResizable(false);
-//        this.setLocationRelativeTo(null);
         this.setVisible(true);
 
     }

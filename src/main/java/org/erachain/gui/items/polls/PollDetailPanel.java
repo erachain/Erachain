@@ -85,18 +85,6 @@ public class PollDetailPanel extends JPanel {
         gbc_creator.gridy = 0;
         this.add(creator, gbc_creator);
 
-        // LABEL DATE
-        labelGBC.gridy = 3;
-
-        // DATE
-        detailGBC.gridy = 3;
-
-        // LABEL DESCRIPTION
-        labelGBC.gridy = 4;
-
-        // DESCRIPTION
-        detailGBC.gridy = 4;
-
         // LABEL OPTIONS
         labelGBC.gridy = 5;
 

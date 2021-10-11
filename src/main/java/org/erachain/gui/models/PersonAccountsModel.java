@@ -13,8 +13,6 @@ import java.util.HashSet;
 import java.util.Stack;
 import java.util.TreeMap;
 
-////////
-
 @SuppressWarnings("serial")
 /**
  * Address-Time, Height SeqNo Transaction
@@ -47,9 +45,6 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
         return value.c + "-" + value.d;
 
     }
-
-
-// set class
 
 
     @Override
@@ -108,31 +103,6 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
 
         return null;
     }
-
-    /*
-    @SuppressWarnings("unchecked")
-    public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_ALL_ACCOUNT_TYPE)
-		{
-
-            setRows();
-			this.fireTableDataChanged();
-
-		} else if (message.getType() == ObserverMessage.ADD_ALL_ACCOUNT_TYPE
-                || message.getType() == ObserverMessage.REMOVE_ALL_ACCOUNT_TYPE
-                ) {
-            needUpdate = true;
-        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
-
-		    needUpdate = false;
-            setRows();
-            this.fireTableDataChanged();
-        }
-    }
-    */
-
 
     public Account getAccount(int row) {
 

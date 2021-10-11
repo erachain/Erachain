@@ -1,7 +1,6 @@
 package org.erachain.gui.telegrams;
 
 import org.erachain.core.account.Account;
-import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.lang.Lang;
 
@@ -31,10 +30,6 @@ public class LeftTelegram extends javax.swing.JPanel {
        this.jCxbRecipientmessages.setText(Lang.T("Filter by Recipients List"));
        this.jButtonGetTelegrams.setText(Lang.T("Get Telegrams from Network"));
 
-
-       //  this.jComboBox_Account.setRenderer(new AccountRenderer(0));
-       //  ((AccountRenderer) jComboBox_Account.getRenderer()).setAsset(((AssetCls) jComboBox_Account.getSelectedItem()).getKey());
-       //   if (account != null) jComboAccount.setSelectedItem(account);
    }
 
    /**
@@ -193,7 +188,6 @@ public class LeftTelegram extends javax.swing.JPanel {
    private javax.swing.JPanel jPanelBottom;
    private javax.swing.JPanel jPanelTop;
    public javax.swing.JScrollPane jScrollPaneCenter;
-   public MTable jTableFavoriteAccounts;
    public javax.swing.JTextField jTextField_AddAccount;
    // End of variables declaration                   
 }

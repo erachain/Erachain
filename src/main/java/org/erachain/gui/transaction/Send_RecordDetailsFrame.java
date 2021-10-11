@@ -38,18 +38,8 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
         //RECIPIENT
         ++fieldGBC.gridy;
         MAccoutnTextField recipient = new MAccoutnTextField(r_Send.getRecipient());
-        //	JTextField recipient = new JTextField(r_Send.getRecipient().getAddress());
         recipient.setEditable(false);
-        //	MenuPopupUtil.installContextMenu(recipient);
         this.add(recipient, fieldGBC);
-		
-	/*	String personStr = r_Send.getRecipient().viewPerson();
-		if (personStr.length()>0) {
-			++labelGBC.gridy;
-			++detailGBC.gridy;
-			this.add(new JLabel(personStr), detailGBC);
-		}
-		*/
 
         if (r_Send.getTitle() != null) {
             //LABEL MESSAGE
@@ -59,7 +49,6 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
 
             // ISTEXT
             ++fieldGBC.gridy;
-            //detailGBC.gridwidth = 2;
             JTextField head_Text = new JTextField(r_Send.getTitle());
             head_Text.setEditable(false);
             MenuPopupUtil.installContextMenu(head_Text);
@@ -91,7 +80,6 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             this.add(amount, fieldGBC);
 
             //ASSET
-            //detailGBC.gridy;
             fieldGBC.gridx = 3;
             fieldGBC.gridwidth = 1;
             JTextField assetFld = new JTextField();
@@ -115,7 +103,6 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             this.add(serviceLabel, labelGBC);
 
             jScrollPane1 = new javax.swing.JScrollPane();
-            //jTextArea_Messge = new javax.swing.JTextArea();
             jTextArea_Messge = new MTextPane();
 
 
@@ -125,10 +112,8 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             jTextArea_Messge.setText(r_Send.viewData());
 
             MenuPopupUtil.installContextMenu(jTextArea_Messge.text_pane);
-            //jTextArea_Messge.setText();
 
             jTextArea_Messge.setPreferredSize(new Dimension(300, 200));
-            //   scrollPaneDescription.setMaximumSize(new Dimension(600,800));
 
             jScrollPane1.setViewportView(jTextArea_Messge);
 
@@ -176,7 +161,6 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                             }
                         }
 
-                        //	encrypted.setEnabled(false);
                         if (!encrypted.isSelected()) {
 
                             byte[] decryptedData = Controller.getInstance().decrypt(r_Send.getCreator(),
@@ -200,10 +184,6 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             }
         }
 
-        //PACK
-        //	this.pack();
-        //    this.setResizable(false);
-        //    this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 }

@@ -30,7 +30,6 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
         JMenuItem setVote_Menu = new JMenuItem(Lang.T("To Vote"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-//			new UnionSetStatusDialog(th, (UnionCls) itemMenu);
 
                 PollCls poll = (PollCls) (itemTableSelected);
                 AssetCls AssetCls = DCSet.getInstance().getItemAssetMap().get((long) (1));
@@ -44,35 +43,11 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
         JMenuItem setStatus_Menu = new JMenuItem(Lang.T("Set status"));
         setStatus_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //			new UnionSetStatusDialog(th, (UnionCls) itemMenu);
             }
         });
         this.menuTable.add(setStatus_Menu);
 
     }
-	
-	
-	
-
-	/*
-	// show details
-	public void onVoteClick() {
-		// GET SELECTED OPTION
-		int option = votingDetailsPanel.pollTabPane.pollDetailPanel.optionsTable.getSelectedRow();
-		if (option >= 0) {
-			option = votingDetailsPanel.pollTabPane.pollDetailPanel.optionsTable.convertRowIndexToModel(option);
-		}
-		
-		//this.pollOptionsTableModel;
-
-		PollCls poll = null;
-		if (allVotingsPanel.pollsTable.getSelectedRow() >= 0)
-			poll = allVotingsPanel.pollsTableModel.getPoll(
-					allVotingsPanel.pollsTable.convertRowIndexToModel(allVotingsPanel.pollsTable.getSelectedRow()));
-		
-		new PollsDialog(poll, option, (AssetCls) allVotingsPanel.cbxAssets.getSelectedItem());
-	}
-	*/
 
     @Override
     public Component getShow(ItemCls item) {

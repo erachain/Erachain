@@ -4,25 +4,16 @@ package org.erachain.gui.transaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.RCalculated;
 import org.erachain.gui.library.MAccoutnTextField;
-import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class RCalculatedDetailsFrame extends RecDetailsFrame {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RCalculatedDetailsFrame.class);
-    private JTextField messageText;
-    private JScrollPane jScrollPane1;
-    private MTextPane jTextArea_Messge;
-    private RCalculatedDetailsFrame th;
 
     public RCalculatedDetailsFrame(final RCalculated r_Calc) {
         super(r_Calc, true);
-        th = this;
         //LABEL RECIPIENT
         ++labelGBC.gridy;
         JLabel recipientLabel = new JLabel(Lang.T("Recipient") + ":");
@@ -31,18 +22,8 @@ public class RCalculatedDetailsFrame extends RecDetailsFrame {
         //RECIPIENT
         ++fieldGBC.gridy;
         MAccoutnTextField recipient = new MAccoutnTextField(r_Calc.getRecipient());
-        //	JTextField recipient = new JTextField(r_Send.getRecipient().getAddress());
         recipient.setEditable(false);
-        //	MenuPopupUtil.installContextMenu(recipient);
         this.add(recipient, fieldGBC);
-
-	/*	String personStr = r_Send.getRecipient().viewPerson();
-		if (personStr.length()>0) {
-			++labelGBC.gridy;
-			++detailGBC.gridy;
-			this.add(new JLabel(personStr), detailGBC);
-		}
-		*/
 
         if (r_Calc.getMessage() != null) {
             //LABEL MESSAGE
@@ -89,10 +70,6 @@ public class RCalculatedDetailsFrame extends RecDetailsFrame {
             }
         }
 
-        //PACK
-        //	this.pack();
-        //    this.setResizable(false);
-        //    this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 }

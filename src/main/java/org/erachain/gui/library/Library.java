@@ -27,16 +27,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Base64;
 
-//import net.sf.tinylaf.Theme;
-
 // почемуто иногда она не может найти эту библиотеку при запуске JAR - надо закоментить ее и опять вставить здесь
 // по Alt-Enter на Класса с вызовом Theme. ниже в коде
-
-/*
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.org.erachain.api.skin.*;
-import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
- */
 
 public class Library {
 
@@ -168,32 +160,6 @@ public class Library {
             }
 
         }
-        /*
-         * //USE SYSTEM STYLE try { int a = 1; //
-         * UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-         * // UIManager.setLookAndFeel(
-         * UIManager.getCrossPlatformLookAndFeelClassName()); // С‚РѕР¶Рµ С‡С‚Рѕ
-         * UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-         * // work //
-         * UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel")
-         * ;; // РЅРµ СѓРІРµР»РёС‡РёРІР°РµС‚ С€СЂРёС„С‚С‹ //
-         * UIManager.setLookAndFeel(
-         * "com.sun.java.swing.plaf.motif.MotifLookAndFeel");; // work //
-         * UIManager.setLookAndFeel(
-         * "com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); // works //
-         * UIManager.setLookAndFeel(
-         * "com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel"); //
-         * works // UIManager.setLookAndFeel(
-         * UIManager.getCrossPlatformLookAndFeelClassName());
-         * //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel")
-         * ;// // com.sun.java.swing.plaf.gtk.GTKLookAndFeel //
-         * com.sun.java.swing.plaf.motif.MotifLookAndFeel //
-         * com.sun.java.swing.plaf.windows.WindowsLookAndFeel
-         *
-         *
-         *
-         *
-         */
 
         Toolkit.getDefaultToolkit().setDynamicLayout(true);
         System.setProperty("sun.awt.noerasebackground", "true");
@@ -296,18 +262,6 @@ public class Library {
         if (size_font > 16)
             UIManager.put("ScrollBar.width", size_font);
 
-        // .setUIFont(new
-        // javax.swing.plaf.FontUIResource("Tahoma",Font.PLAIN,12));
-
-        // ArrayList<Tuple2<String,Object>> ss = new ArrayList<Tuple2<String,
-        // Object>>();
-
-        // UIManager.put("RadioButton.focus", new Color(0, 0, 0, 0));
-        // UIManager.put("Button.focus", new Color(0, 0, 0, 0));
-        // UIManager.put("TabbedPane.focus", new Color(0, 0, 0, 0));
-        // UIManager.put("ComboBox.focus", new Color(0, 0, 0, 0));
-        // UIManager.put("TextArea.font", UIManager.get("TextField.font"));
-
         int scrolH = (int) (size_font * 1.2);
         if (scrolH < 17)
             scrolH = 17;
@@ -332,31 +286,7 @@ public class Library {
             }
         }
 
-        // font = font;
-
     }
-
-    /*
-     * public static void setupSubstance() { try { final String fileName =
-     * System.getProperty("user.home") + System.getProperty("file.separator") +
-     * "insubstantial.txt"; final Properties properties = new Properties();
-     * LookAndFeel laf = new SubstanceGeminiLookAndFeel();
-     * UIManager.setLookAndFeel(laf);
-     * UIManager.put(SubstanceGeminiLookAndFeel.SHOW_EXTRA_WIDGETS,
-     * Boolean.TRUE); JFrame.setDefaultLookAndFeelDecorated(true);
-     * JDialog.setDefaultLookAndFeelDecorated(true);
-     * Runtime.getRuntime().addShutdownHook(new Thread() {
-     *
-     * @Override public void run() { try { String skinClassName =
-     * SubstanceLookAndFeel.getCurrentSkin().getClass().getCanonicalName();
-     * properties.setProperty("skinClassName", skinClassName);
-     * properties.store(new FileOutputStream(fileName), fileName); } catch
-     * (Throwable t) { t.printStackTrace(); } } }); properties.load(new
-     * FileInputStream(fileName)); String skinClassName =
-     * properties.getProperty("skinClassName"); ((SubstanceLookAndFeel)
-     * laf).setSkin(skinClassName); } catch (Throwable t) { t.printStackTrace();
-     * } }
-     */
 
     public static String to_HTML(String str) {
         return viewDescriptionHTML(str);
@@ -500,16 +430,13 @@ public class Library {
         item = new JMenuItem(new DefaultEditorKit.CopyAction());
         item.setText(Lang.T("Copy"));
         item.setEnabled(true);
-        //       item.setEnabled(component.getSelectionStart() != component
-        //               .getSelectionEnd());
         menu.add(item);
+
         item = new JMenuItem(new DefaultEditorKit.CutAction());
         item.setText(Lang.T("Cut"));
         item.setEnabled(true);
-   //     item.setEnabled(component.isEditable()
-   //             && component.getSelectionStart() != component
-   //             .getSelectionEnd());
         menu.add(item);
+
         item = new JMenuItem(new DefaultEditorKit.PasteAction());
         item.setText(Lang.T("Paste"));
         item.setEnabled(component.isEditable());
