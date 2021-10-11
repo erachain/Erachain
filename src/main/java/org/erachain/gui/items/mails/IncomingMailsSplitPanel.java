@@ -38,7 +38,6 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     private TableModelMails incoming_Mails_Model;
-    //private MTable jTableJScrollPanelLeftPanel;
     private TableRowSorter my_Sorter;
 
     public IncomingMailsSplitPanel() {
@@ -171,36 +170,6 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         menu.add(setSeeInBlockexplorer);
 
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu); // SELECT
-        // ROW
-        // ON
-        // WHICH
-        // CLICKED
-        // RIGHT
-        // BUTTON
-
-        /*
-         *
-         *
-         *
-         *
-         *
-         *
-         *
-         *
-         *
-         *
-         *
-         *
-         *
-         *
-         * //CHECKBOX FOR FAVORITE TableColumn favoriteColumn =
-         * jTableJScrollPanelLeftPanel.getColumnModel().getColumn(
-         * WalletItemPersonsTableModel.COLUMN_FAVORITE);
-         * //favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.
-         * class)); favoriteColumn.setCellRenderer(new RendererBoolean());
-         * favoriteColumn.setMinWidth(50); favoriteColumn.setMaxWidth(50);
-         * favoriteColumn.setPreferredWidth(50);//.setWidth(30);
-         */
         // UPDATE FILTER ON TEXT CHANGE
         this.searchTextField2.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO

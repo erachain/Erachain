@@ -10,8 +10,8 @@ import org.erachain.dbs.rocksDB.RockStoreIteratorStart;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
-import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.Fun;
 import org.rocksdb.*;
 
@@ -994,7 +994,12 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     @Override
     public boolean deleteDbBakPath(String dir) {
-        return FileUtil.deleteDir(new File(dir + getDBName()));
+        try {
+            Files.walkFileTree(new File(dir + getDBName()).toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 
     // опции для быстрого чтения

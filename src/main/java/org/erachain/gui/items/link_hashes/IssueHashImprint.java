@@ -1,9 +1,4 @@
 package org.erachain.gui.items.link_hashes;
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 import org.erachain.gui.Gui;
 import org.erachain.gui.library.AuxiliaryToolTip;
@@ -14,11 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  * @author Саша
@@ -75,14 +65,6 @@ public class IssueHashImprint extends javax.swing.JPanel {
         this.jLabel_Description.setText(Lang.T("Description") + ":");
         this.jButton.setText(Lang.T("Write & Sign"));
 
-  /*   this.jButton.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		        onIssueClick();
-		    }
-		});
- */
     }
 
     /**

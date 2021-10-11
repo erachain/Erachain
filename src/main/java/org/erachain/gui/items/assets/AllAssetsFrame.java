@@ -87,7 +87,6 @@ public class AllAssetsFrame extends JFrame {
 
         //CHECKBOX FOR FAVORITE
         TableColumn favoriteColumn = assetsTable.getColumnModel().getColumn(ItemAssetsTableModel.COLUMN_FAVORITE);
-        //favoriteColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
         favoriteColumn.setCellRenderer(new WalletTableRenderer());
 
         TableRowSorter search_Sorter = new TableRowSorter(tableModelItemAssets);
@@ -150,7 +149,6 @@ public class AllAssetsFrame extends JFrame {
         });
         nameSalesMenu.add(details);
 
-       // assetsTable.setComponentPopupMenu(nameSalesMenu);
         TableMenuPopupUtil.installContextMenu(assetsTable, nameSalesMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
         assetsTable.addMouseListener(new MouseAdapter() {
@@ -174,7 +172,6 @@ public class AllAssetsFrame extends JFrame {
 
         //PACK
         this.pack();
-        //this.setSize(500, this.getHeight());
         this.setResizable(true);
         this.setLocationRelativeTo(null);
         this.setVisible(true);

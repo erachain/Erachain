@@ -40,17 +40,13 @@ public class MainFrame extends JFrame implements Observer {
     private static MainFrame instance;
     private JSONObject settingsJSONbuf;
     private JSONObject main_Frame_settingsJSON;
-    // Variables declaration - do not modify
     public MenuFiles jMenu_Files;
     private MenuDeals jMenu2;
     private JMenu jMenuTX;
     private MenuExchange jMenuExchange;
     private javax.swing.JMenuBar jMenuBar1;
     public MainPanel mainPanel;
-    private StatusPanel statusPanel;
     private javax.swing.JTabbedPane jTabbedPane1;
-    // End of variables declaration
-    //private MainFrame th;
     protected Logger logger = LoggerFactory.getLogger(MainFrame.class.getName());
 
     private MainFrame() {
@@ -59,8 +55,6 @@ public class MainFrame extends JFrame implements Observer {
         super(Controller.getInstance().getApplicationName(true) + "   " + Lang.T("KEYS") + ": " + Settings.getInstance().getWalletKeysPath());
         this.setVisible(false);
 
-        //th = this;
-        //    this.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         Controller.getInstance().addObserver(this);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         settingsJSONbuf = new JSONObject();
@@ -84,7 +78,6 @@ public class MainFrame extends JFrame implements Observer {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
         mainPanel = MainPanel.getInstance();
-        // statusPanel = new StatusPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu_Files = new MenuFiles();
         jMenu2 = new MenuDeals();
@@ -94,21 +87,17 @@ public class MainFrame extends JFrame implements Observer {
 
         JMenuItem readTransItemJSON = new JMenuItem(Lang.T("Read Transaction from JSON"));
         readTransItemJSON.getAccessibleContext().setAccessibleDescription(Lang.T("Read Transaction as JSON"));
-        //readTransItemJSON.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
         readTransItemJSON.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-//        		String raw = Base58.encode(transaction.toBytes(false, null));
                 FileChooser chooser = new FileChooser();
                 chooser.setDialogTitle(Lang.T("Open File"));
-                //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
                 chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Erachain TX", "json");
                 chooser.setFileFilter(filter);
 
-                //chooser.setAcceptAllFileFilterUsed(false);
                 String res = "";
                 if (chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
 
@@ -116,7 +105,6 @@ public class MainFrame extends JFrame implements Observer {
 
                     File ff = new File(pp);
 
-                    // new ArrayList<String>();
                     try {
                         BufferedReader in = new BufferedReader(new FileReader(ff));
                         String str;
@@ -128,26 +116,10 @@ public class MainFrame extends JFrame implements Observer {
                         logger.error(e1.getMessage(), e1);
                         return;
                     }
-
-  			/*	 try(FileOutputStream fos=new FileOutputStream(pp))
-  		        {
-  		            // перевод строки в байты
-  				//	String ssst = model.getValueAt(row, 2).toString();
-  		            byte[] buffer =transaction.toBytes(false, null);
-  		            // if ZIP
-
-  		            fos.wri.write(buffer, 0, buffer.length);
-
-  		        }
-  		        catch(IOException ex){
-
-  		            System.out.println(ex.getMessage());
-  		        }
-  	          */
                 }
 
                 try {
-                    JSONObject js = new JSONObject();
+                    JSONObject js;
                     js = (JSONObject) JSONValue.parse(res);
                     String creator = "";
                     if (!js.containsKey("type")) return;
@@ -193,17 +165,14 @@ public class MainFrame extends JFrame implements Observer {
         readTransItemRAW.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-//        		String raw = Base58.encode(transaction.toBytes(false, null));
                 FileChooser chooser = new FileChooser();
                 chooser.setDialogTitle(Lang.T("Open File"));
-                //chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
                 chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Erachain TX in RAW", "raw58", "raw64");
                 chooser.setFileFilter(filter);
 
-                //chooser.setAcceptAllFileFilterUsed(false);
                 String res = "";
                 String fileExt = "";
 
@@ -218,7 +187,6 @@ public class MainFrame extends JFrame implements Observer {
 
                     File ff = new File(fileName);
 
-                    // new ArrayList<String>();
                     try {
                         BufferedReader in = new BufferedReader(new FileReader(ff));
                         String str;
@@ -241,11 +209,8 @@ public class MainFrame extends JFrame implements Observer {
                             WebTransactionsHTML webHTML = new WebTransactionsHTML(DCSet.getInstance(), Lang.getInstance().getLangForNode());
                             JSONObject outJson = webHTML.get_HTML_Body(transaction, "");
                             String htmlDescr = (String) outJson.get("head");
-                            htmlDescr += (String) outJson.get("body");
                             htmlDescr = transaction.toJson().toJSONString();
                             htmlDescr = htmlDescr.replace(",", ",<br>");
-                            //IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
-                            //        (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), "");
                             IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(), true, transaction,
                                     htmlDescr, (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), "",
                                     Lang.T("CHECK") + " " + transaction.viewFullTypeName());
@@ -269,39 +234,13 @@ public class MainFrame extends JFrame implements Observer {
 
         jMenuTX.addSeparator();
 
-        // getContentPane().setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
-        // getContentPane().add(jTabbedPane1, gridBagConstraints);
 
         add(jTabbedPane1, BorderLayout.NORTH);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.2;
-        // getContentPane().add(jPanelHead, gridBagConstraints);
-
         add(mainPanel, BorderLayout.CENTER);
-
-        // javax.swing.GroupLayout jPanel2Layout = new
-        // javax.swing.GroupLayout(statusPanel);
-        // statusPanel.setLayout(jPanel2Layout);
-        // jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        // .addGap(0, 0, Short.MAX_VALUE));
-        // jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        // .addGap(0, 0, Short.MAX_VALUE));
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.2;
-        // getContentPane().add(jPanelCopyButton, gridBagConstraints);
-        // this.add(new StatusPanel(), BorderLayout.SOUTH);
 
         jMenu_Files.setText(Lang.T("File"));
         jMenuBar1.add(jMenu_Files);
@@ -435,18 +374,15 @@ public class MainFrame extends JFrame implements Observer {
 
         } else {
             this.setExtendedState(MAXIMIZED_BOTH);
-
-            // setExtendedState(MAXIMIZED_BOTH);
-            // mainPanel.jSplitPane1.setDividerLocation(250);
-            // mainPanel.jSplitPane1.setLastDividerLocation(300);
-
         }
+
         setLocation(x, y);
         setSize(w, h);
         mainPanel.jSplitPane1.setOrientation(orientation);
         mainPanel.jSplitPane1.setLastDividerLocation(devLastLoc);
         mainPanel.jSplitPane1.setDividerLocation(devLoc);
         mainPanel.jSplitPane1.set_button_title(); // set title diveders
+
         // buttons
 
         // reat Main tree

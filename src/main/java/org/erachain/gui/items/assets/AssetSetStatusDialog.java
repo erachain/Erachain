@@ -130,15 +130,6 @@ public class AssetSetStatusDialog extends JDialog {
 
     private Transaction refreshRecordDetails() {
 
-		/*
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
-		{
-			infoPanel.show_mess(Lang.T("Status must be OK to show public key details."));
-	        jLabel_RecordInfo.setViewportView(infoPanel);
-			return null;
-		}
-		*/
-
         Transaction record = null;
         if (jParentRecTxt.getText().length() == 0) {
             infoPanel.show_mess(Lang.T(""));

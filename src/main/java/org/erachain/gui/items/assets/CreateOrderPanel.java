@@ -76,10 +76,7 @@ public class CreateOrderPanel extends JPanel {
         // DETAIL GBC
         GridBagConstraints detailGBC = new GridBagConstraints();
         detailGBC.insets = new Insets(0, 5, 5, 0);
-        detailGBC.fill = GridBagConstraints.HORIZONTAL;
-        detailGBC.anchor = GridBagConstraints.NORTHWEST;
         detailGBC.gridx = 1;
-
         detailGBC.fill = java.awt.GridBagConstraints.HORIZONTAL;
         detailGBC.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         detailGBC.weightx = 1.0;
@@ -87,7 +84,6 @@ public class CreateOrderPanel extends JPanel {
         // DETAIL GBC
         GridBagConstraints assetHintGBC = new GridBagConstraints();
         assetHintGBC.insets = new Insets(0, 5, 5, 0);
-        assetHintGBC.fill = GridBagConstraints.HORIZONTAL;
         assetHintGBC.anchor = GridBagConstraints.FIRST_LINE_START;
         assetHintGBC.fill = java.awt.GridBagConstraints.HORIZONTAL;
         assetHintGBC.weightx = 1.0;
@@ -101,11 +97,8 @@ public class CreateOrderPanel extends JPanel {
         // DETAIL GBC
         GridBagConstraints Label_sell_buy = new GridBagConstraints();
         Label_sell_buy.insets = new Insets(0, 5, 5, 0);
-        Label_sell_buy.fill = GridBagConstraints.HORIZONTAL;
-        Label_sell_buy.anchor = GridBagConstraints.NORTHWEST;
         Label_sell_buy.gridx = 0;
         Label_sell_buy.gridwidth = 3;
-
         Label_sell_buy.fill = java.awt.GridBagConstraints.HORIZONTAL;
         Label_sell_buy.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         Label_sell_buy.weightx = 1.0;
@@ -129,9 +122,6 @@ public class CreateOrderPanel extends JPanel {
 
         // LABEL FROM
         labelGBC.gridy = ++labelGBC.gridy;
-        // JLabel fromLabel = new JLabel(Lang.T("Account")
-        // + ":");
-        // this.add(fromLabel, labelGBC);
 
         // COMBOBOX FROM
         detailGBC.gridx = 0;
@@ -233,8 +223,6 @@ public class CreateOrderPanel extends JPanel {
         // LABEL AMOUNT
         labelGBC.gridy++;
 
-        // mes = buying ? Lang.T("Result") :
-        // Lang.T("Total Buy (want)");
         mes = Lang.T("Total");
 
         JLabel buyingAmountLabel = new JLabel(mes + ":");
@@ -338,7 +326,6 @@ public class CreateOrderPanel extends JPanel {
         }
 
         sellButton.setEnabled(false);
-        // this.sellButton.setPreferredSize(new Dimension(125, 25));
         this.sellButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -348,16 +335,6 @@ public class CreateOrderPanel extends JPanel {
         labelGBC.insets = new java.awt.Insets(10, 20, 0, 20);
         this.add(this.sellButton, labelGBC);
     }
-
-    /*
-     * public void calculateBuyingPrice(JTextField target, boolean buying) { try
-     * { BigDecimal price = new BigDecimal(txtPrice.getText());
-     * target.setText(BigDecimal.ONE.
-     * divide(price, RoundingMode.DOWN).toPlainString()); } catch(Exception e) {
-     * target.setText("0"); }
-     *
-     * calculateAmounts(txtAmountWant, buying); }
-     */
 
     //нужно отдельно цену считаь для подстановок извне
     public synchronized void calculateAmounts(MDecimalFormatedTextField editedField, boolean buying, boolean recurse) {
