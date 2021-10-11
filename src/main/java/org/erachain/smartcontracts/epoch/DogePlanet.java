@@ -124,6 +124,7 @@ public class DogePlanet extends EpochSmartContract {
         else
             totalIssued = totalIssuedObj;
 
+        PublicKeyAccount creator = transaction.getCreator();
         do {
 
             totalIssued++;
@@ -134,8 +135,15 @@ public class DogePlanet extends EpochSmartContract {
 
             //INSERT INTO DATABASE
             keyEnd = dcSet.getItemAssetMap().incrementPut(planet);
-            transaction.getCreator().changeBalance(dcSet, false, false, keyEnd,
+            creator.changeBalance(dcSet, false, false, keyEnd,
                     BigDecimal.ONE, false, false, false);
+
+            if (block != null) {
+                // add remark for action
+                block.addCalculated(creator, keyEnd, BigDecimal.ONE,
+                        "Produce: " + planet.getName(), transaction.getDBRef());
+            }
+
 
         } while (--i > 0);
 
