@@ -122,17 +122,13 @@ public class TransactionFactory {
                 //PARSE ISSUE PLATE TRANSACTION
                 return RCalculated.Parse(data);
 
-            /*
             case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
                 //PARSE TRANSFER ASSET TRANSACTION
-                return GenesisCertifyPersonRecord.Parse(data);
-                */
+                // not readyreturn GenesisCertifyPersonRecord.Parse(data);
 
-            /*
             case Transaction.GENESIS_ASSIGN_STATUS_TRANSACTION:
                 //PARSE TRANSFER ASSET TRANSACTION
-                return GenesisTransferStatusTransaction.Parse(data);
-                */
+                // not ready return GenesisTransferStatusTransaction.Parse(data);
 
             case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
                 //PARSE TRANSFER ASSET TRANSACTION

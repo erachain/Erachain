@@ -35,11 +35,10 @@ import static org.erachain.utils.ByteArrayUtils.areEqualMask;
  */
 @Slf4j
 public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
-        // DB<byte[], byte[]>, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
 
-    //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
+    // эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
     // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
     //protected boolean dbSync = true;

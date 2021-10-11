@@ -258,16 +258,8 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     public void delete(PublicKeyAccount accountPublicKey) {
 
         Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> keys = ((BTreeMap) this.assetsBalanceMap).subMap(
-                //BTreeMap keys = ((BTreeMap) this.assetsBalanceMap).subMap(
                 Fun.t2(accountPublicKey.getAddress(), null),
                 Fun.t2(accountPublicKey.getAddress(), Long.MAX_VALUE));
-
-        /*
-		if(this.publickKeys == null)
-		{
-			this.loadPublickKeys();
-		}
-		*/
 
         synchronized (this.publicKeys) {
             //DELETE NAMES

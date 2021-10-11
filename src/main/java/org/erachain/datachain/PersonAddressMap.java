@@ -9,9 +9,6 @@ import org.mapdb.Fun.Tuple3;
 import java.util.Stack;
 import java.util.TreeMap;
 
-//import java.util.HashMap;
-//import org.erachain.database.DLSet;
-
 /**
  * Хранит Удостоверенные публичные ключи для персон.
  * Тут block.getHeight + transaction index  - это ссылка на транзакцию создавшую данную заметку<br>
