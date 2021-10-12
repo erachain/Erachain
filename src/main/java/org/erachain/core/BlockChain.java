@@ -448,6 +448,7 @@ public class BlockChain {
     public static HashSet<String> ANONYMASERS = new HashSet<String>();
     public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
     public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
+    public static HashSet<String> FREEZED_FORGING = new HashSet<String>();
 
     public static HashMap<String, Tuple3<Long, Long, byte[]>> NOVA_ASSETS = new HashMap<String, Tuple3<Long, Long, byte[]>>();
     public static HashMap<String, Tuple3<Long, Long, byte[]>> NOVA_PERSONS = new HashMap<String, Tuple3<Long, Long, byte[]>>();
@@ -722,6 +723,16 @@ public class BlockChain {
             FOUNDATION_ADDRESSES.add("73QYndpFQeFvyMvwBcMUwJRDTp7XaxkSmZ"); // STOLEN
             FOUNDATION_ADDRESSES.add("7FJUV5GLMuVdopUHSwTLsjmKF4wkPwFEcG"); // LOSED
             FOUNDATION_ADDRESSES.add("75LK84g7JHoLG2jRUmbJA6srLrFkaXEU5A"); // FREEZED
+
+            FREEZED_FORGING.add("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G"); // Б
+            FOUNDATION_ADDRESSES.add("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G");
+            FREEZED_FORGING.add("7FQ5SGFhewFsdAyTmG1uRjdikWa4sS2EBo"); // Б
+            FOUNDATION_ADDRESSES.add("7FQ5SGFhewFsdAyTmG1uRjdikWa4sS2EBo");
+
+            FREEZED_FORGING.add("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs"); // В
+            FOUNDATION_ADDRESSES.add("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs");
+            FREEZED_FORGING.add("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP"); // Н
+            FOUNDATION_ADDRESSES.add("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP");
 
 
             validBlocks.add(214085);
