@@ -29,13 +29,10 @@ public class ItemDetailsFactopy extends JPanel {
 
         switch (in) {
             case ItemCls.ASSET_TYPE:
-                return null;
             case ItemCls.IMPRINT_TYPE:
-                return null;
             case ItemCls.TEMPLATE_TYPE:
-                return null;
             case ItemCls.PERSON_TYPE:
-                return null;
+            case ItemCls.AUTHOR_TYPE:
             case ItemCls.POLL_TYPE:
                 return null;
             case ItemCls.UNION_TYPE:

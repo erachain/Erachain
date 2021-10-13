@@ -320,6 +320,7 @@ public class DWSet extends DBASet {
             case ItemCls.TEMPLATE_TYPE:
                 return this.TemplateMap;
             case ItemCls.PERSON_TYPE:
+            case ItemCls.AUTHOR_TYPE:
                 return this.personMap;
             case ItemCls.POLL_TYPE:
                 return this.pollMap;
@@ -403,6 +404,7 @@ public class DWSet extends DBASet {
             case ItemCls.TEMPLATE_TYPE:
                 return templateFavoritesSet;
             case ItemCls.PERSON_TYPE:
+            case ItemCls.AUTHOR_TYPE:
                 return personFavoritesSet;
             case ItemCls.STATUS_TYPE:
                 return statusFavoritesSet;
