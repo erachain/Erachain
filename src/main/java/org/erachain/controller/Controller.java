@@ -2566,9 +2566,14 @@ public class Controller extends Observable {
             case ItemCls.TEMPLATE_TYPE:
                 return this.dcSet.getItemTemplateMap();
             case ItemCls.PERSON_TYPE:
+            case ItemCls.AUTHOR_TYPE:
                 return this.dcSet.getItemPersonMap();
             case ItemCls.POLL_TYPE:
                 return this.dcSet.getItemPollMap();
+            case ItemCls.STATUS_TYPE:
+                return this.dcSet.getItemStatusMap();
+            case ItemCls.UNION_TYPE:
+                return this.dcSet.getItemUnionMap();
         }
         return null;
     }
@@ -2986,6 +2991,7 @@ public class Controller extends Observable {
             case ItemCls.TEMPLATE_TYPE:
                 return db.getItemTemplateMap().get(key);
             case ItemCls.PERSON_TYPE:
+            case ItemCls.AUTHOR_TYPE:
                 return db.getItemPersonMap().get(key);
             case ItemCls.POLL_TYPE:
                 return db.getItemPollMap().get(key);

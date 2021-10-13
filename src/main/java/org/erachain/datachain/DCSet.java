@@ -1364,9 +1364,9 @@ public class DCSet extends DBASet implements Closeable {
             case ItemCls.TEMPLATE_TYPE: {
                 return this.getItemTemplateMap();
             }
-            case ItemCls.PERSON_TYPE: {
+            case ItemCls.PERSON_TYPE:
+            case ItemCls.AUTHOR_TYPE:
                 return this.getItemPersonMap();
-            }
             case ItemCls.POLL_TYPE: {
                 return this.getItemPollMap();
             }
