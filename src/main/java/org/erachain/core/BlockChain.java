@@ -720,19 +720,21 @@ public class BlockChain {
             FOUNDATION_ADDRESSES.add("75Mb8cGchcG4DF31wavhNrnoycWsoLQqP4");
             FOUNDATION_ADDRESSES.add("75LzKAoxx4TgAAkpMRStve26YEY625TCRE");
 
-            FOUNDATION_ADDRESSES.add("73QYndpFQeFvyMvwBcMUwJRDTp7XaxkSmZ"); // STOLEN
-            FOUNDATION_ADDRESSES.add("7FJUV5GLMuVdopUHSwTLsjmKF4wkPwFEcG"); // LOSED
-            FOUNDATION_ADDRESSES.add("75LK84g7JHoLG2jRUmbJA6srLrFkaXEU5A"); // FREEZED
+            FOUNDATION_ADDRESSES.add("73QYndpFQeFvyMvwBcMUwJRDTp7XaxkSmZ"); // Пирожков
+            // emty FOUNDATION_ADDRESSES.add("7FJUV5GLMuVdopUHSwTLsjmKF4wkPwFEcG"); // возвращены
+            FOUNDATION_ADDRESSES.add("75LK84g7JHoLG2jRUmbJA6srLrFkaXEU5A"); // Довлетбаев
 
-            FREEZED_FORGING.add("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G"); // Б
-            FOUNDATION_ADDRESSES.add("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G");
-            FREEZED_FORGING.add("7FQ5SGFhewFsdAyTmG1uRjdikWa4sS2EBo"); // Б
-            FOUNDATION_ADDRESSES.add("7FQ5SGFhewFsdAyTmG1uRjdikWa4sS2EBo");
+            if (false) {
+                FREEZED_FORGING.add("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G"); // Борисов
+                FOUNDATION_ADDRESSES.add("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G");
+                FREEZED_FORGING.add("7FQ5SGFhewFsdAyTmG1uRjdikWa4sS2EBo"); // Б
+                FOUNDATION_ADDRESSES.add("7FQ5SGFhewFsdAyTmG1uRjdikWa4sS2EBo");
 
-            FREEZED_FORGING.add("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs"); // В
-            FOUNDATION_ADDRESSES.add("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs");
-            FREEZED_FORGING.add("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP"); // Н
-            FOUNDATION_ADDRESSES.add("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP");
+                FREEZED_FORGING.add("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs"); // Выборнов
+                FOUNDATION_ADDRESSES.add("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs");
+                FREEZED_FORGING.add("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP"); // Никишкин
+                FOUNDATION_ADDRESSES.add("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP");
+            }
 
 
             validBlocks.add(214085);
