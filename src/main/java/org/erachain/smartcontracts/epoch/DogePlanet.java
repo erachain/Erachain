@@ -3,6 +3,7 @@ package org.erachain.smartcontracts.epoch;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
@@ -23,6 +24,8 @@ import java.math.BigDecimal;
 public class DogePlanet extends EpochSmartContract {
 
     static public final int ID = 1000;
+    static Controller contr = Controller.getInstance();
+    static Crypto crypto = Crypto.getInstance();
 
     static public final PublicKeyAccount MAKER = new PublicKeyAccount(Base58.encode(Longs.toByteArray(ID)));
     private int count;
@@ -218,14 +221,18 @@ public class DogePlanet extends EpochSmartContract {
         };
     }
 
+    static int confirms = 10;
+    static int deploy_period = 3;
+
     public static String getImageURL(AssetCls asset) {
 
         JSONArray arrayJson = new JSONArray();
         JSONObject item;
 
+
         int height = Transaction.parseHeightDBRef(asset.getDBref());
-        Block.BlockHead blockHead = DCSet.getInstance().getBlocksHeadsMap().get(height + 10);
-        if (blockHead == null) {
+
+        if (contr.getMyHeight() < height + deploy_period + confirms) {
             item = new JSONObject();
             item.put("url", "/apiasset/image/1050869");
             item.put("type", WebResource.TYPE_IMAGE.toString());
@@ -233,11 +240,14 @@ public class DogePlanet extends EpochSmartContract {
             return arrayJson.toJSONString();
         }
 
+        Block.BlockHead blockHead = DCSet.getInstance().getBlocksHeadsMap().get(height + deploy_period);
+
         byte[] hash = blockHead.signature;
         byte[] hash2 = Ints.toByteArray((int) asset.getKey());
         System.arraycopy(hash2, 0, hash, 0, hash2.length);
-        //hash = Crypto.getInstance().digest(hash);
-        hash = Crypto.getInstance().digest(Longs.toByteArray(System.currentTimeMillis()));
+
+        //hash = crypto.digest(hash);
+        hash = crypto.digest(Longs.toByteArray(System.currentTimeMillis()));
         int slot = 0;
         int slotRare;
         int slotRareLvl;
