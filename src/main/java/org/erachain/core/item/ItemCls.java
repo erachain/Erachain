@@ -1148,8 +1148,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
         itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
         itemJSON.put("description", viewDescription());
-        itemJSON.put("maker", this.maker.getAddress());
-        itemJSON.put("creator", this.maker.getAddress()); // @Deprecated
+        maker.toJsonPersonInfo(itemJSON, "maker");
+        maker.toJsonPersonInfo(itemJSON, "creator"); // @Deprecated
         itemJSON.put("maker_public_key", this.maker.getBase58());
         itemJSON.put("maker_publickey", this.maker.getBase58());
         //itemJSON.put("makerPubkey", this.maker.getBase58());
@@ -1166,14 +1166,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
                 referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
 
             if (referenceTx != null) {
-                PublicKeyAccount creator = referenceTx.getCreator();
-                if (creator == null) {
-                    itemJSON.put("tx_creator", "GENESIS");
-                    itemJSON.put("tx_creator_pubkey", "GENESIS");
-                } else {
-                    itemJSON.put("tx_creator", creator.getAddress());
-                    itemJSON.put("tx_creator_pubkey", creator.getBase58());
-                }
+                PublicKeyAccount creatorTX = referenceTx.getCreator();
+                creatorTX.toJsonPersonInfo(itemJSON, "tx_creator");
+                itemJSON.put("tx_creator_pubkey", creatorTX.getBase58());
                 itemJSON.put("tx_timestamp", referenceTx.getTimestamp());
                 itemJSON.put("block_timestamp", Controller.getInstance().blockChain.getTimestamp(referenceTx.getBlockHeight()));
             }
