@@ -194,9 +194,9 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         //ADD CREATOR/RECIPIENT/AMOUNT/ASSET
         if (this.sender != null)
-            transaction.put("sender", this.sender.getAddress());
+            sender.toJsonPersonInfo(transaction, "sender");
 
-        transaction.put("recipient", this.recipient.getAddress());
+        recipient.toJsonPersonInfo(transaction, "recipient");
         transaction.put("asset", this.key);
         transaction.put("amount", this.amount.toPlainString());
 

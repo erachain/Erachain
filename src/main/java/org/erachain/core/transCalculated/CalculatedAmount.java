@@ -210,8 +210,8 @@ public abstract class CalculatedAmount extends Calculated {
     @SuppressWarnings("unchecked")
     protected JSONObject getJsonBase() {
         JSONObject transaction = super.getJsonBase();
-        
-        transaction.put("recipient", this.recipient.getAddress());
+
+        recipient.toJsonPersonInfo(transaction, "recipient");
         if (this.amount != null) {
             transaction.put("asset", this.getAbsKey());
             transaction.put("amount", this.viewAmount());
@@ -220,7 +220,7 @@ public abstract class CalculatedAmount extends Calculated {
             transaction.put("action_name", TransactionAmount.viewSubTypeName(this.assetKey, this.amount, this.isBackward(), isDirect));
             transaction.put("backward", this.isBackward());
         }
-        
+
         return transaction;
     }
     

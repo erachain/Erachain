@@ -429,10 +429,7 @@ public class APIItemPerson {
                 tx = Transaction.findByHeightSeqNo(dcSet, block, seqNo);
                 Account creator = tx.getCreator();
                 if (creator != null) {
-                    statusJSON.put("creator", creator.getAddress());
-                    if (creator.isPerson()) {
-                        statusJSON.put("creator_name", creator.getPerson().b.viewName());
-                    }
+                    creator.toJsonPersonInfo(statusJSON, "creator");
                 } else {
                     statusJSON.put("creator", GenesisBlock.CREATOR.getAddress());
                     statusJSON.put("creator_name", "GENESIS");
@@ -509,10 +506,7 @@ public class APIItemPerson {
 
                 accountJSON.put("verified_to_date", item.a * 86400000L);
                 accountJSON.put("verifier", transactionIssue.getCreator().getAddress());
-                if (transactionIssue.getCreator().getPerson() != null) {
-                    accountJSON.put("verifier_key", transactionIssue.getCreator().getPerson().b.getKey());
-                    accountJSON.put("verifier_name", transactionIssue.getCreator().getPerson().b.viewName());
-                }
+                transactionIssue.getCreator().toJsonPersonInfo(accountJSON, "verifier");
             }
 
             accountsArray.add(accountJSON);

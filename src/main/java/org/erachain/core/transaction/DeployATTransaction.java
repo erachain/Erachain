@@ -199,7 +199,6 @@ public class DeployATTransaction extends Transaction {
     public JSONObject toJson() {
         JSONObject transaction = this.getJsonBase();
 
-        transaction.put("creator", this.creator.getAddress());
         transaction.put("name", this.name);
         transaction.put("description", this.description);
         transaction.put("atType", this.type);

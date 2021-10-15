@@ -1623,7 +1623,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             transaction.put("title", getTitle());
             transaction.put("deadLine", getDeadline());
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
-            transaction.put("creator", this.creator.getAddress());
+            creator.toJsonPersonInfo(transaction, "creator");
             transaction.put("fee", this.fee.toPlainString());
             transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
         }

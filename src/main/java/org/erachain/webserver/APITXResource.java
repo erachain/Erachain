@@ -113,6 +113,8 @@ public class APITXResource {
     @Path("{signature}")
     public Response getBySign(@PathParam("signature") String signature) {
 
+        //boolean desc = API.checkBoolean(info, "desc");
+
         Map out = new JSONObject();
 
         int step = 1;

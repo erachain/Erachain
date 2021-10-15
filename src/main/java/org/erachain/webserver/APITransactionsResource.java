@@ -40,6 +40,9 @@ public class APITransactionsResource {
 
         Map<String, String> help = new LinkedHashMap<String, String>();
 
+        help.put("apirecords - deprecated",
+                Lang.T("see api/tx"));
+
         help.put("apirecords/get/{signature}",
                 Lang.T("Get Record by sigmature."));
         help.put("apirecords/getbynumber/{height-sequence}",
