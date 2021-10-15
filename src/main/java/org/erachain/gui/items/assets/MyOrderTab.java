@@ -68,13 +68,9 @@ public class MyOrderTab extends SplitPanel {
         ordersModel = new WalletOrdersTableModel();
         // set interval
         setInterval();
-        // table = new MTable(ordersModel);
 
-        // add listener
-        // jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(table);
         // show
         this.jTableJScrollPanelLeftPanel = new MTable(ordersModel);
-        // this.jTableJScrollPanelLeftPanel = table;
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
         jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
@@ -238,24 +234,6 @@ public class MyOrderTab extends SplitPanel {
                 else
                     orderMenu.getComponent(2).setEnabled(false);
 
-                /*
-                 * if(e.getClickCount() == 2) { row =
-                 * table.convertRowIndexToModel(row); AssetCls asset =
-                 * assetsModel.getAsset(row); new AssetFrame(asset); }
-                 * if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
-                 * 
-                 * if (table.getSelectedColumn() ==
-                 * WalletItemAssetsTableModel.COLUMN_FAVORITE){ row =
-                 * table.convertRowIndexToModel(row); AssetCls asset =
-                 * orderModel.getAsset(row); favoriteSet( table);
-                 * 
-                 * 
-                 * 
-                 * }
-                 * 
-                 * 
-                 * }
-                 */
             }
         });
 
@@ -307,6 +285,7 @@ public class MyOrderTab extends SplitPanel {
     
     @Override
     public void onClose() {
+        // TODO сделать добавку и убирание Обсерверов
         // не надо так как потом не встанет Обсервер по новой и ордера перестанут обновляться ordersModel.deleteObservers();
         // setIntervalPanel.deleteObservers();
 

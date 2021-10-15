@@ -21,13 +21,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-//public class PersonConfirm extends JDialog { // JInternalFrame  {
+// TODO удалить или обновить
 public class RIPPersonFrame extends JInternalFrame {
 
     /**
      *
      */
-    //private static final long serialVersionUID = 1L;
     private static final long serialVersionUID = 2717571093561259483L;
     static PersonCls person;
     private JComboBox<Account> accountLBox;

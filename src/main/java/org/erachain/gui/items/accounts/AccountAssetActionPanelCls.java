@@ -142,7 +142,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.accountsModel = new AccountsComboBoxModel(action);
         jComboBoxCreator.setModel(accountsModel);
 
-        if (creator != null) {
+        if (creator == null) {
+            creator = (Account) jComboBoxCreator.getSelectedItem();
+        } else {
             jComboBoxCreator.setSelectedItem(creator);
         }
 
@@ -276,14 +278,22 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             jLabel_Amount.setVisible(false);
         }
 
-        if (recipient == null) {
-            jButton_ok.setEnabled(false);
-        } else {
+        if (recipient != null) {
             recipientAddress.setSelectedAccount(recipient);
-            jButton_ok.setEnabled(true);
         }
 
         refreshLabels();
+    }
+
+    protected void checkReadyToOK() {
+
+        if (creator == null || recipient == null || asset == null) {
+            jButton_ok.setEnabled(false);
+            return;
+        }
+
+        jButton_ok.setEnabled(true);
+
     }
 
     private void refreshLabels() {
@@ -392,17 +402,6 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                     + " / " + (action == TransactionAmount.ACTION_SPEND ? ("<b>" + balance.d.b.toPlainString() + "</b>") : balance.d.b.toPlainString());
         }
         this.jLabel_Balances.setText("<html>" + details);
-
-    }
-
-    protected void checkReadyToOK() {
-
-        if (creator == null || recipient == null || asset == null) {
-            jButton_ok.setEnabled(false);
-            return;
-        }
-
-        jButton_ok.setEnabled(true);
 
     }
 
@@ -616,7 +615,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send((byte) 2, backward ? TransactionAmount.BACKWARD_MASK : 0,
-                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator.getAddress()), exLink, smartContract, feePow,
+                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator), exLink, smartContract, feePow,
                 recipient, getAssetKey(), getAmount(), txTitle, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";

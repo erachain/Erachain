@@ -19,15 +19,7 @@ public class MTextPane extends JScrollPane {
         super();
 
         install();
-        //setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
-        //setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
-
-        //text_pane = new JTextPane();
-        //text_pane.setEditable(false);
-
-        //text_pane.setContentType("text/html");
         setText(str);
-        //setViewportView(text_pane);
 
     }
 

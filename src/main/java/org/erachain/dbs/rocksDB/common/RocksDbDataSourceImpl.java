@@ -10,8 +10,8 @@ import org.erachain.dbs.rocksDB.RockStoreIteratorStart;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
-import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.Fun;
 import org.rocksdb.*;
 
@@ -34,7 +34,6 @@ import static org.erachain.utils.ByteArrayUtils.areEqualMask;
  */
 @Slf4j
 public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
-        // DB<byte[], byte[]>, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
 
@@ -59,21 +58,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     protected ColumnFamilyHandle columnFamilyFieldSize;
 
     protected ReadWriteLock resetDbLock = new ReentrantReadWriteLock();
-
-    /*
-    static {
-        try {
-            logger.info("load libraries");
-            loadLibrary(new ArrayList<String>() {{
-                add(".");
-            }});
-            logger.info("loaded success");
-        } catch (Throwable throwable) {
-            logger.error(throwable.getMessage(), throwable);
-        }
-    }
-
-     */
 
     public RocksDbDataSourceImpl(TransactionDB dbCore, RocksDbCom table,
                                  String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
@@ -1010,7 +994,12 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     @Override
     public boolean deleteDbBakPath(String dir) {
-        return FileUtil.deleteDir(new File(dir + getDBName()));
+        try {
+            Files.walkFileTree(new File(dir + getDBName()).toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 
     // опции для быстрого чтения

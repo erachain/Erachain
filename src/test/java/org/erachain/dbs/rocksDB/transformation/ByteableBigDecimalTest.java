@@ -1,12 +1,9 @@
 package org.erachain.dbs.rocksDB.transformation;
 
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.controller.Controller;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-
-import static org.junit.Assert.*;
 
 @Slf4j
 public class ByteableBigDecimalTest {
@@ -16,11 +13,14 @@ public class ByteableBigDecimalTest {
     public void receiveObjectFromBytes() {
     }
 
+    /**
+     * это неэффективный пример создания ключей
+     */
     @Test
     public void toBytesObject() {
 
         /**
-         * А вот пример как у Глеба сериалзитор был сделан:
+         * А вот пример как у Глеба сериалзитор был сделан - не эффективно:
          *     public BigDecimal receiveObjectFromBytes(byte[] bytes) {
          *         byte[] sizeArray = Arrays.copyOfRange(bytes, 0, Integer.BYTES);
          *         Integer size = byteableInteger.receiveObjectFromBytes(sizeArray);
@@ -41,7 +41,10 @@ public class ByteableBigDecimalTest {
          *                 bytes);
          *     }
          *
-         *  - лишние обхекты, пустые байты...
+         *  - лишние объекты, пустые байты...
+         *
+         *  и вот результат п тестам в 3-4 раза скорость ипамять хуже:
+         *
          */
         long totalMemory = Runtime.getRuntime().totalMemory();
         logger.info(" used MEMORY[kB]: " + totalMemory / 1000);
@@ -60,13 +63,15 @@ public class ByteableBigDecimalTest {
 
     }
 
+    /**
+     * Это правильный пример создания ключей
+     */
     @Test
     public void toBytesObjectMapDB() {
         // То же самое но как работает Мар DB
 
         long totalMemory = Runtime.getRuntime().totalMemory();
         logger.info(" used MEMORY[kB]: " + totalMemory / 1000);
-        ByteableBigDecimal serializer = new ByteableBigDecimal();
 
         long time = System.nanoTime();
         for (int i = 0; i < 1000000L; i++) {

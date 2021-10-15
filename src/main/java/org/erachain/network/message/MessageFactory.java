@@ -111,9 +111,7 @@ public class MessageFactory {
         }
 
         //READ LENGTH
-        //byte[] lengthBytes = new byte[Message.MESSAGE_LENGTH];
-        //inputStream.readFully(lengthBytes);
-        int length = inputStream.readInt();//Ints.fromByteArray(lengthBytes);
+        int length = inputStream.readInt();
 
         //IF MESSAGE CONTAINS DATA READ DATA AND VALIDATE CHECKSUM
         byte[] data = new byte[length];
@@ -125,24 +123,6 @@ public class MessageFactory {
 
             //READ DATA
             inputStream.readFully(data);
-			
-			/*int position = 0;
-			while(position < length)
-			{
-				//READ MULTIPLE TIMES BECAUSE OF MAX READ OF 65536 BYTES
-				
-				//TODO CHECK THIS FIXES PROBLEM
-				//position += inputStream.read(data, position, length - position);
-				int temp = inputStream.read(data, position, length - position);
-				position += temp;
-				
-				if(temp == -1)
-				{
-					boolean tempa = true;
-					tempa = false;
-					if(tempa);
-				}
-			}*/
 
             //VALIDATE CHECKSUM
             byte[] digest = Crypto.getInstance().digest(data);
@@ -193,9 +173,7 @@ public class MessageFactory {
             case Message.WIN_BLOCK_TYPE:
 
                 // может быть это повтор?
-                if (//!Controller.getInstance().isStatusOK() ||
-                        !sender.network.checkHandledWinBlockMessages(data, sender, false)
-                ) {
+                if (!sender.network.checkHandledWinBlockMessages(data, sender, false)) {
                     //logger.debug(sender + " <-- Win Block REPEATED...");
                     return null;
                 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
+import org.erachain.core.transaction.CancelOrderTransaction;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.CompletedOrderMap;
@@ -645,4 +646,44 @@ public class OrderProcess {
         return orderThis;
     }
 
+    public static void clearOldOrders(DCSet dcSet, Block block, boolean asOrphan) {
+
+        int height = block.getHeight();
+        if (height < BlockChain.CLEAR_OLD_ORDERS_HEIGHT || height % 100 != 0)
+            return;
+
+        long blockTx_id = Transaction.makeDBRef(height, 0);
+        CompletedOrderMap completedMap = dcSet.getCompletedOrderMap();
+        OrderMap ordersMap = dcSet.getOrderMap();
+        TradeMap tradesMap = dcSet.getTradeMap();
+
+        long blockTx_id_end = Transaction.makeDBRef(height - BlockChain.CLEAR_OLD_ORDERS_PERIOD, 0);
+
+        if (asOrphan) {
+            Trade trade;
+            try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(blockTx_id)) {
+                while (iterator.hasNext()) {
+                    trade = tradesMap.remove(iterator.next());
+                    CancelOrderTransaction.orphanBody(dcSet, blockTx_id, trade.getTarget(), false);
+                }
+            } catch (IOException e) {
+            }
+
+        } else {
+            try (IteratorCloseable<Long> iterator = ordersMap.getIterator()) {
+                Long orderID;
+                while (iterator.hasNext()) {
+                    orderID = iterator.next();
+                    if (orderID > blockTx_id_end)
+                        break;
+
+                    CancelOrderTransaction.processBody(dcSet, blockTx_id, orderID, block,
+                            "Expire Order @" + Transaction.viewDBRef(orderID), false);
+                }
+            } catch (IOException e) {
+            }
+
+        }
+
+    }
 }

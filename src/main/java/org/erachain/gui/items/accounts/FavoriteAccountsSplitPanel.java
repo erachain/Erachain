@@ -69,11 +69,6 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
             accountsMap = Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap();
 
         searthLabel2.setVisible(true);
-        // this.searchTextFieldSearchToolBarLeftPanelDocument.setVisible(true);
-        // this.searchToolBar_LeftPanel.setVisible(true);
-        // not show buttons
-        // button1ToolBarLeftPanel.setVisible(false);
-        // button2ToolBarLeftPanel.setVisible(false);
         button1ToolBarLeftPanel.setText(Lang.T("Load"));
         button2ToolBarLeftPanel.setText(Lang.T("Save"));
         button3_ToolBar_LeftPanel = new JButton();
@@ -86,17 +81,9 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         this.accountsTableModel = new FavoriteAccountsTableModel();
         final MTable imprintsTable = new MTable(this.accountsTableModel);
 
-        // CHECKBOX FOR FAVORITE
-        // TableColumn favoriteColumn =
-        // imprintsTable.getColumnModel().getColumn(TableModelUnionsItemsTableModel.COLUMN_FAVORITE);
-        // favoriteColumn.setCellRenderer(new RendererBoolean());
-        // //unionsTable.getDefaultRenderer(Boolean.class));
-        // favoriteColumn.setMinWidth(50);
-        // favoriteColumn.setMaxWidth(50);
-        // favoriteColumn.setPreferredWidth(50);//.setWidth(30);
         // column #1
         TableColumnModel columnModel = imprintsTable.getColumnModel();
-        TableColumn column1 = columnModel.getColumn(WalletItemImprintsTableModel.COLUMN_KEY);// .COLUMN_CONFIRMED);
+        TableColumn column1 = columnModel.getColumn(WalletItemImprintsTableModel.COLUMN_KEY);
         column1.setMaxWidth(100);
         column1.setPreferredWidth(50);
 
@@ -129,24 +116,6 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent arg0) {
-                /*
-                 * ImprintCls imprint = null; if (jTableJScrollPanelLeftPanel.getSelectedRow()
-                 * >= 0 ) imprint = tableModelImprints.getImprint(jTableJScrollPanelLeftPanel.
-                 * convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-                 *
-                 *
-                 *
-                 * // info.show_001(person);
-                 *
-                 * // search_Person_SplitPanel.jSplitPanel.setDividerLocation(
-                 * search_Person_SplitPanel.jSplitPanel.getDividerLocation()); //
-                 * search_Person_SplitPanel.searchTextFieldSearchToolBarLeftPanelDocument.setEnabled(
-                 * true); ImprintsInfoPanel info_panel = new ImprintsInfoPanel(imprint);
-                 * info_panel.setPreferredSize(new
-                 * Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,
-                 * jScrollPaneJPanelRightPanel.getSize().height-50));
-                 * jScrollPaneJPanelRightPanel.setViewportView(info_panel);
-                 */
             }
 
         });
@@ -301,7 +270,6 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         });
         menu.add(menuItemDelete);
 
-      //  imprintsTable.setComponentPopupMenu(menu);
         TableMenuPopupUtil.installContextMenu(imprintsTable, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
         btnSaveButton.addActionListener(new ActionListener() {
@@ -313,11 +281,9 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                 chooser = new FileChooser();
 
                 chooser.setDialogTitle(Lang.T("Save File"));
-                // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
-                // chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                // chooser.setAcceptAllFileFilterUsed(false);
+
                 // add filters
                 FileNameExtensionFilter xmlFilter = new FileNameExtensionFilter("Era Name Accounts files (*.enaf)",
                         "enaf");
@@ -361,9 +327,6 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                             output.put(key, account);
 
                         }
-                        // byte[] buffer =(byte[]) ;
-                        // copy buffer in file
-                        /// fos.write(buffer, 0, buffer.length);
                         try {
                             SaveStrToFile.saveJsonFine(pp, output);
                         } catch (IOException e) {
@@ -392,11 +355,9 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                 chooser = new FileChooser();
 
                 chooser.setDialogTitle(Lang.T("Open File"));
-                // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
-                // chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                // chooser.setAcceptAllFileFilterUsed(false);
+
                 // add filters
                 FileNameExtensionFilter xmlFilter = new FileNameExtensionFilter("Era Name Accounts files (*.enaf)",
                         "enaf");
@@ -454,11 +415,6 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
     public void onClose() {
         // delete observer left panel
         accountsTableModel.deleteObservers();
-        // get component from right panel
-        Component c1 = jScrollPaneJPanelRightPanel.getViewport().getView();
-        // if PersonInfo 002 delay on close
-        // if (c1 instanceof ImprintsInfoPanel) (
-        // (ImprintsInfoPanel)c1).delay_on_Close();
 
     }
 

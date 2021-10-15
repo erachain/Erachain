@@ -154,12 +154,11 @@ public class RecoverWalletFrame extends JFrame {
         panGBC.weightx = 0.2;
         panGBC.gridx = 0;
         panGBC.gridy = 0;
+
         //path text
-        //  labelGBC.gridy = labelGBC.gridy+1;
         jTextFieldDataDir = new JTextField(Settings.getInstance().getWalletKeysPath());
         jTextFieldDataDir.setEditable(false);
         pan.add(jTextFieldDataDir, panGBC);
-        // this.add(jTextFieldDataDir, labelGBC);
 
         // button path  
         JButton btnBrowseWallet = new JButton(Lang.T("Browse..."));
@@ -181,11 +180,9 @@ public class RecoverWalletFrame extends JFrame {
 
         panGBC = new java.awt.GridBagConstraints();
         panGBC.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        // panGBC.gridx = 1;
         pan.add(btnBrowseWallet, panGBC);
 
         this.add(pan, labelGBC);
-
 
         //BUTTON confirm
         buttonGBC.gridy = labelGBC.gridy + 1;
@@ -196,7 +193,6 @@ public class RecoverWalletFrame extends JFrame {
                 onConfirmClick();
             }
         });
-        //     confirmButton.setPreferredSize(new Dimension(110, 25));
         this.add(confirmButton, buttonGBC);
 
         //BUTTON BACK
@@ -207,20 +203,17 @@ public class RecoverWalletFrame extends JFrame {
                 onBackClick();
             }
         });
-        //     backButton.setPreferredSize(new Dimension(110, 25));
         this.add(backButton, buttonGBC);
 
         //CLOSE NICELY
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 Controller.getInstance().stopAndExit(0);
-                //	System.exit(0);
             }
         });
 
         //CALCULATE HEIGHT WIDTH
         this.pack();
-        //  	this.setSize(500, this.getHeight());
 
         this.setResizable(false);
         this.setLocationRelativeTo(null);

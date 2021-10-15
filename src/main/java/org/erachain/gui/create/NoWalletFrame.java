@@ -15,8 +15,6 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class NoWalletFrame extends JFrame {
 
-    private JRadioButton createButton;
-    private JRadioButton recoverButton;
     private Gui parent;
     private NoWalletFrame th;
 
@@ -79,9 +77,6 @@ public class NoWalletFrame extends JFrame {
         this.add(label2, labelGBC);
 
         //ADD OPTIONS
-        //	this.createButton = new JRadioButton(Lang.T("Create a new wallet."));
-        //	this.createButton.setSelected(true);
-        //	this.add(this.createButton, optionsGBC);
         // CREATE WALLET LABEL
         JLabel create_Label = new JLabel("<HTML><a href =''>" + Lang.T("Create a new wallet.") + " </a>");
         create_Label.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -125,14 +120,7 @@ public class NoWalletFrame extends JFrame {
 
         });
 
-
         optionsGBC.gridy = 3;
-        //	this.recoverButton = new JRadioButton(Lang.T("Recover a wallet using an existing seed"));
-        // 	this.add(this.recoverButton, optionsGBC);
-        //
-        // 	ButtonGroup group = new ButtonGroup();
-        // 	group.add(this.createButton);
-        // 	group.add(this.recoverButton);
 
         // CREATE WALLET LABEL
         JLabel recover_Label = new JLabel("<HTML><a href =''>" + Lang.T("Recover a wallet using an existing seed") + " </a>");
@@ -172,20 +160,12 @@ public class NoWalletFrame extends JFrame {
                 th.setVisible(false);
                 new LicenseJFrame(true, th, 2);
 
-
             }
-
 
         });
 
 
         optionsGBC.gridy = 4;
-        //	this.recoverButton = new JRadioButton(Lang.T("Recover a wallet using an existing seed"));
-        // 	this.add(this.recoverButton, optionsGBC);
-        //
-        // 	ButtonGroup group = new ButtonGroup();
-        // 	group.add(this.createButton);
-        // 	group.add(this.recoverButton);
 
         // CREATE WALLET LABEL
         JLabel dir_Label = new JLabel("<HTML><a href =''>" + Lang.T("Open Wallet") + " </a>");
@@ -227,9 +207,7 @@ public class NoWalletFrame extends JFrame {
 
             }
 
-
         });
-
 
         //BUTTON NEXT
         buttonGBC.gridy = 5;
@@ -240,8 +218,6 @@ public class NoWalletFrame extends JFrame {
                 onNextClick();
             }
         });
-        //       nextButton.setPreferredSize(new Dimension(80, 25));
-        //   	this.add(nextButton, buttonGBC);
 
         //BUTTON CANCEL
         buttonGBC.gridx = 0;
@@ -252,20 +228,16 @@ public class NoWalletFrame extends JFrame {
                 onCancelClick();
             }
         });
-        //       cancelButton.setPreferredSize(new Dimension(80, 25));
-        //   	this.add(cancelButton, buttonGBC);
 
         //CLOSE NICELY
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 Controller.getInstance().stopAndExit(0);
-                //  	System.exit(0);
             }
         });
 
         //CALCULATE HEIGHT WIDTH
         this.pack();
-        //    	this.setSize(500, this.getHeight());
 
         this.setResizable(false);
         this.setLocationRelativeTo(null);
@@ -302,26 +274,6 @@ public class NoWalletFrame extends JFrame {
     }
 
     public void onNextClick() {
-
-	/*
-        TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_VERS);
-        if (template == null) {
-            // USE default LICENSE
-            template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
-        }
-        */
-
-        if (createButton.isSelected()) {
-            //OPEN CREATE WALLET FRAME
-            this.setVisible(false);
-            // new LicenseJFrame(template, true, this, true);
-        }
-
-        if (recoverButton.isSelected()) {
-            //OPEN RECOVER WALLET FRAME
-            this.setVisible(false);
-            //  new LicenseJFrame(template, true, this, false);
-        }
     }
 
     public void onCancelClick() {

@@ -49,7 +49,6 @@ public class AccountsRightPanel extends JPanel {
     public AccountsTransactionsTableModel tableModel;
     @SuppressWarnings("rawtypes")
     public MTable jTable1;
-    // Variables declaration - do not modify
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -152,19 +151,6 @@ public class AccountsRightPanel extends JPanel {
         jToggleButton2.setText("jToggleButton2");
 
         setLayout(new java.awt.GridBagLayout());
-/*
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        */
         jScrollPane1.setViewportView(jTable1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -196,7 +182,6 @@ public class AccountsRightPanel extends JPanel {
                 if (row1 < 0) return;
 
                 row = jTable1.convertRowIndexToModel(row1);
-
 
             }
         });
@@ -368,7 +353,6 @@ public class AccountsRightPanel extends JPanel {
         });
         mainMenu.add(setSeeInBlockexplorer);
 
-        //   jTable1.setComponentPopupMenu(mainMenu);
         TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
         // SELECT
@@ -377,17 +361,11 @@ public class AccountsRightPanel extends JPanel {
                 if (e.getClickCount() > 0) {
                     Point p = e.getPoint();
                     th.row = jTable1.rowAtPoint(p);
-                    //jTable1.setRowSelectionInterval(th.row, th.row);
-                    //if (((WTransactionMap) table_Model.getMap()).isUnViewed(table_Model.getItem(th.row).walletKey)) {
-                    //    jTable1.setSelectionForeground(Color.white);
-                    //    jTable1.setSelectionBackground(Color.red);
-                    //}
 
                     AccountsTransactionsTableModel.Trans rowItem = tableModel.getItem(th.row);
                     Transaction transaction = rowItem.transaction;
                     rowItem.isUnViewed = false;
                     ((WTransactionMap) tableModel.getMap()).clearUnViewed(transaction);
-                    //table_Model.fireTableCellUpdated(th.row);
 
                     if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
                         if (jTable1.getSelectedColumn() == AccountsTransactionsTableModel.COLUMN_FAVORITE) {

@@ -10,8 +10,6 @@ import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class ItemInfo extends JPanel {
 
@@ -101,24 +99,6 @@ public class ItemInfo extends JPanel {
             }
         }
 
-        if (false) {
-            GridBagLayout gbl_jPanel_Image = new GridBagLayout();
-            gbl_jPanel_Image.columnWidths = new int[]{81};
-            gbl_jPanel_Image.rowHeights = new int[]{152};
-            gbl_jPanel_Image.rowWeights = new double[]{1.0};
-            gbl_jPanel_Image.columnWeights = new double[]{0.0};
-            jPanel_Image.setLayout(gbl_jPanel_Image);
-            GridBagConstraints gridBagConstraints_1 = new GridBagConstraints();
-            gridBagConstraints_1.gridheight = 2;
-            gridBagConstraints_1.gridx = 0;
-            gridBagConstraints_1.gridy = ++labelGBC.gridy;
-            gridBagConstraints_1.anchor = GridBagConstraints.FIRST_LINE_START;
-            gridBagConstraints_1.weighty = 0.6;
-            gridBagConstraints_1.insets = new Insets(0, 8, 8, 5);
-            add(jPanel_Image, gridBagConstraints_1);
-        }
-
-
     }
 
     public void initFoot() {
@@ -172,35 +152,4 @@ public class ItemInfo extends JPanel {
 
     }
 
-    // End of variables declaration
-    // End of variables declaration
-    class Image_mouse_Clikl extends MouseAdapter {
-        @Override
-        public void mousePressed(MouseEvent e) {
-            // Point p = e.getPoint();
-            // int row = search_Table.rowAtPoint(p);
-            if (e.getClickCount() == 2) {
-            }
-
-            // if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
-            if (e.getButton() == MouseEvent.BUTTON1) {
-
-                /*
-                 * row = search_Table.convertRowIndexToModel(row); PersonCls person =
-                 * search_Table_Model.getPerson(row); //выводим меню
-                 * всплывающее if(Controller.getInstance().isItemFavorite(person)) {
-                 * Search_run_menu.jButton3.setText(Lang.getInstance().
-                 * translate("Remove Favorite")); } else {
-                 * Search_run_menu.jButton3.setText(Lang.T("Add Favorite")
-                 * ); } // alpha = 255; alpha_int = 5; Search_run_menu.setBackground(new
-                 * Color(1,204,102,255)); Search_run_menu.setLocation(e.getXOnScreen(),
-                 * e.getYOnScreen()); Search_run_menu.repaint();
-                 * Search_run_menu.setVisible(true);
-                 *
-                 */
-
-            }
-
-        }
-    }
 }

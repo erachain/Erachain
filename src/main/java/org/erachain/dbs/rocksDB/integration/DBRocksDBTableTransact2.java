@@ -16,12 +16,13 @@ import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
-import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -432,7 +433,10 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
     @Override
     public void clear() {
         dbSource.close();
-        FileUtil.recursiveDelete(dbSource.getDbPathAndFile().toString());
+        try {
+            Files.walkFileTree(dbSource.getDbPathAndFile(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (IOException e) {
+        }
         dbSource = new RocksDbTransactSourceImpl2(root, NAME_TABLE, indexes, settings);
         columnFamilyHandles = dbSource.getColumnFamilyHandles();
         if (columnFamilyHandles.size() > 1) {

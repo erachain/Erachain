@@ -50,8 +50,7 @@ public class BlExpUnit implements Comparable<BlExpUnit> {
         return this.height2;
     }
 	
-	/*
-	@Override 
+	@Override
  	public boolean equals(Object other) {
 		if (!(other instanceof BlExpUnit)) {
 			return false;
@@ -64,8 +63,6 @@ public class BlExpUnit implements Comparable<BlExpUnit> {
 	public int hashCode() {
 		return Integer.MIN_VALUE + height * 5*700 + seq + getOrder(this.unit)*700;
 	}
-
-	*/
 
     private int getOrder(Object unit) {
         if (unit instanceof Block) {

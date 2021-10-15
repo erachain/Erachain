@@ -38,10 +38,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-//import org.erachain.settings.Settings;
-
 @SuppressWarnings("serial")
 
+// TODO нужно переделать графику всю
 public class MailSendPanel extends IconPanel implements RecipientAddress.RecipientAddressInterface {
 
     public static String NAME = "MailSendPanel";
@@ -49,7 +48,6 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
 
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
-    // private final MessagesTableModel messagesTableModel;
     private final MailsHTMLTableModel messagesHistoryTable;
     public JTextArea txtMessage;
     public JTextField txt_Title;
@@ -87,8 +85,6 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         fieldGBC.gridx = 1;
 
         GridBagLayout gridBagLayout = new GridBagLayout();
-        // gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
-        // gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
         this.setLayout(gridBagLayout);
 
         // PADDING
@@ -118,8 +114,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         labelFromGBC.gridy = ++y;
         JLabel fromLabel = new JLabel(Lang.T("Select account") + ":");
         this.add(fromLabel, labelFromGBC);
-        // fontHeight =
-        // fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
+        // fontHeight = fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
 
         // COMBOBOX FROM
         GridBagConstraints cbxFromGBC = new GridBagConstraints();
@@ -207,7 +202,6 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         this.add(txt_Title, txtMessageGBC);
 
         // LABEL MESSAGE
-        // GridBagConstraints labelMessageGBC = new GridBagConstraints();
         labelMessageGBC.insets = new Insets(5, 10, 5, 5);
         labelMessageGBC.fill = GridBagConstraints.HORIZONTAL;
         labelMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
@@ -217,10 +211,8 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         messageLabel = new JLabel(Lang.T("Message") + ":");
 
         // TXT MESSAGE
-        // GridBagConstraints txtMessageGBC = new GridBagConstraints();
         txtMessageGBC.gridwidth = 6;
         txtMessageGBC.insets = new Insets(5, 5, 5, 10);
-        // txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;
         txtMessageGBC.fill = java.awt.GridBagConstraints.BOTH;
         txtMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
         txtMessageGBC.gridx = 1;
@@ -230,7 +222,6 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         this.txtMessage = new JTextArea();
         this.txtMessage.setRows(4);
         this.txtMessage.setColumns(25);
-        // this.txtMessage.setMinimumSize(new Dimension(200,150));
 
         this.txtMessage.setBorder(this.recipientBox.getBorder());
 
@@ -471,13 +462,6 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             this.add(recipientBox, txtToGBC);
         }
 
-        /*
-         * this.pack(); this.setLocationRelativeTo(null);
-         * this.setMaximizable(true);
-         * this.setTitle(Lang.T("Persons"));
-         * this.setClosable(true); this.setResizable(true);
-         */
-
         // Container parent = this.getParent();
         // this.setSize(new Dimension(
         // (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
@@ -524,17 +508,6 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         this.sendButton.setEnabled(false);
 
         // TODO TEST
-        // CHECK IF NETWORK OK
-        /*
-         * if(Controller.getInstance().getStatus() != Controller.STATUS_OKE) {
-         * //NETWORK NOT OK JOptionPane.showMessageDialog(null,
-         * "You are unable to send a transaction while synchronizing or while having no connections!"
-         * , "Error", JOptionPane.ERROR_MESSAGE);
-         *
-         * //ENABLE this.sendButton.setEnabled(true);
-         *
-         * return; }
-         */
 
         // CHECK IF WALLET UNLOCKED
         if (!Controller.getInstance().isWalletUnlocked()) {

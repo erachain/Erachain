@@ -20,8 +20,7 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
 
     protected ReadOptions transactReadOptions = new ReadOptions();
 
-    TransactionDBOptions transactionDbOptions = new TransactionDBOptions()
-            ;
+    TransactionDBOptions transactionDbOptions = new TransactionDBOptions();
 
     public RocksDbTransactSourceImpl(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
         super(parentName, name, indexes, settings, enableSize);

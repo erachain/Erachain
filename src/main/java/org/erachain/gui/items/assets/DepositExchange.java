@@ -36,7 +36,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-//public class PersonConfirm extends JDialog { // InternalFrame  {
 public class DepositExchange extends IconPanel {
 
     public static String NAME = "DepositExchange";
@@ -84,14 +83,13 @@ public class DepositExchange extends IconPanel {
 
         cbxAssetsInput = new JComboBox<>(new String[]{
                 "BTC",
-                //"DOGE", "LTC",
-                //"DASH"
+                "DOGE", "LTC" //, "DASH"
         });
 
         cbxAssetsBuy = new JComboBox<>(new String[]{
-                //AssetCls.ERA_ABBREV, AssetCls.FEE_NAME,
+                AssetCls.ERA_ABBREV, AssetCls.FEE_NAME,
                 "BTC",
-                //"USD" //, "DOGE", "LTC", "DASH"
+                "USD", "DOGE", "LTC" //, "DASH"
         });
 
         this.amount = amount;
@@ -169,7 +167,6 @@ public class DepositExchange extends IconPanel {
             }
 
             InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
-            //String result = new BufferedReader(isReader).readLine();
 
             BufferedReader bufferedReader = new BufferedReader(isReader);
             String inputLine;
@@ -292,7 +289,6 @@ public class DepositExchange extends IconPanel {
         fieldGBC.fill = java.awt.GridBagConstraints.HORIZONTAL;
         fieldGBC.insets = new java.awt.Insets(0, 5, 5, 8);
 
-        //paneAssetInfo = new JScrollPane();
         jLabel_YourAddress = new JLabel();
         jComboBox_YourAddress = new JComboBox<>();
         jLabel_Address = new JLabel();
@@ -451,7 +447,6 @@ public class DepositExchange extends IconPanel {
         payToAddressDetails.setVisible(false);
         jButton_copyDetails.setVisible(false);
 
-
         jLabel_DetailsCheck.setText(Lang.T("Status") + ":");
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabel_DetailsCheck, labelGBC);
@@ -461,7 +456,6 @@ public class DepositExchange extends IconPanel {
 
         //////////////////////////
         JTextPane jText_History = new JTextPane();
-        //jText_History.setStyledDocument(styleDocument);
 
         jButtonHistory = new MButton(Lang.T("See Deposit History"), 2);
         jButtonHistory.addActionListener(new ActionListener() {
@@ -500,7 +494,6 @@ public class DepositExchange extends IconPanel {
         });
 
         titleGBC.gridy = 1;
-        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         jPanelHistory.add(jText_History, titleGBC);
 
         cbxAssetsBuy.addItemListener(new ItemListener() {

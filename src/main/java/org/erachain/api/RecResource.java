@@ -53,9 +53,6 @@ public class RecResource {
             jsonObject = new JSONObject(queryParameters);
         } catch (NullPointerException | ClassCastException e) {
             // JSON EXCEPTION
-            //logger.error(e.getMessage());
-            //return Response.status(500).entity(ApiErrorFactory.getInstance().createError(
-            //		ApiErrorFactory.ERROR_JSON)).build();
             return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
                     ApiErrorFactory.ERROR_JSON).toString());
         }

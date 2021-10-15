@@ -68,14 +68,6 @@ public abstract class BalanceMap extends DCUMap<Tuple2<Long, Long>,
             // NOT USE SECONDARY INDEXES
             return;
 
-        //BIND ASSET KEY
-		/*
-		Bind.secondaryKey(map, this.assetKeyMap, new Fun.Function2<Tuple3<Long, BigDecimal, byte[]>, Tuple2<Long, Long>, BigDecimal>() {
-			@Override
-			public Tuple3<Long, BigDecimal, byte[]> run(Tuple2<Long, Long> key, BigDecimal value) {
-				return new Tuple3<Long, BigDecimal, String>(key.b, value.negate(), key.a);
-			}
-		});*/
         Bind.secondaryKey((BTreeMap)map, this.assetKeyMap, new Fun.Function2<Tuple3<Long, Tuple4<Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>, Long>,
                 Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>,

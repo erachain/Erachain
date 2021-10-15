@@ -31,7 +31,6 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
 
         Controller.getInstance().addObserver(this);
         this.balances = Controller.getInstance().getBalances(account);
-        ///this.balances.registerObserver();
 
         this.update();
     }
@@ -57,13 +56,9 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
     }
 
     private void update() {
-        //GET SELECTED ITEM
-        //Account selected = (Account) this.getSelectedItem();
 
         //EMPTY LIST
         this.removeAllElements();
-
-        //ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
 
         //INSERT ALL ACCOUNTS
         for (int i = 0; i < this.balances.size(); i++) {
@@ -83,15 +78,9 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
             this.addElement(new Pair(new Tuple2(account, assetKey), balance));
         }
 
-        //RESET SELECTED ITEM
-		/*if(this.getIndexOf(selected) != -1)
-		{
-			this.setSelectedItem(selected);
-		}*/
     }
 
     public void removeObservers() {
         Controller.getInstance().deleteObserver(this);
-        //this.balances.removeObserver();
     }
 }

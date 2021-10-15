@@ -12,8 +12,8 @@ import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
-import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.Fun;
 import org.rocksdb.*;
 
@@ -35,9 +35,7 @@ import static org.erachain.utils.ByteArrayUtils.areEqualMask;
  * Самый низкий уровень доступа к функциям RocksDB
  */
 @Slf4j
-public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted // implements DB<byte[], byte[]>
-        //, Flusher, DbSourceInter<byte[]>
-{
+public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted {
     protected String dataBaseName;
 
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
@@ -67,21 +65,6 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
 
 
     protected ReadWriteLock resetDbLock = new ReentrantReadWriteLock();
-
-    /*
-    static {
-        try {
-            logger.info("load libraries");
-            loadLibrary(new ArrayList<String>() {{
-                add(".");
-            }});
-            logger.info("loaded success");
-        } catch (Throwable throwable) {
-            logger.error(throwable.getMessage(), throwable);
-        }
-    }
-
-     */
 
     public RocksDbTransactSourceImpl2(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this.dataBaseName = name;
@@ -213,10 +196,6 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     public String getDBName() {
         return dataBaseName;
     }
-
-    //public void initDB() {
-    //    initDB(RocksDbSettings.getSettings());
-    //}
 
     protected void initDB() {
         resetDbLock.writeLock().lock();
@@ -962,7 +941,12 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
 
     @Override
     public boolean deleteDbBakPath(String dir) {
-        return FileUtil.deleteDir(new File(dir + getDBName()));
+        try {
+            Files.walkFileTree(new File(dir + getDBName()).toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 
     byte[] sizeBytes = new byte[4];

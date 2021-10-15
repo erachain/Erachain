@@ -50,24 +50,13 @@ public class ReferenceMapImpl extends DBTabImpl<byte[], long[]>
                     map = new ReferenceSuitMapDBFork((ReferenceMap) parent, databaseSet);
                     break;
                 case DBS_ROCK_DB:
-                    //map = new ReferenceSuitRocksDBFork((ReferenceMap) parent, databaseSet);
+                    // not ready? map = new ReferenceSuitRocksDBFork((ReferenceMap) parent, databaseSet);
                     //break;
                 default:
-                    //map = new ReferenceSuitMapDBFork((ReferenceMap) parent, databaseSet);
+                    //not ready? map = new ReferenceSuitMapDBFork((ReferenceMap) parent, databaseSet);
                     map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
             }
         }
     }
-
-    /*
-    @Override
-    protected void getMemoryMap() {
-        if (database == null) {
-            map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
-        } else {
-            getMap();
-        }
-    }
-     */
 
 }

@@ -11,8 +11,8 @@ import org.erachain.dbs.rocksDB.common.RocksDbDataSource;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
-import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.Fun;
 import org.rocksdb.*;
 
@@ -35,11 +35,10 @@ import static org.erachain.utils.ByteArrayUtils.areEqualMask;
  */
 @Slf4j
 public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
-        // DB<byte[], byte[]>, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
 
-    //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
+    // эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
     // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
     //protected boolean dbSync = true;
@@ -1007,7 +1006,12 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     @Override
     public boolean deleteDbBakPath(String dir) {
-        return FileUtil.deleteDir(new File(dir + getDBName()));
+        try {
+            Files.walkFileTree(new File(dir + getDBName()).toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 
     byte[] sizeBytes = new byte[4];

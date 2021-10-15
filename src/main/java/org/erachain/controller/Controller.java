@@ -606,13 +606,8 @@ public class Controller extends Observable {
 
         this.transactionCreator = new TransactionCreator();
 
-        // Setting_Json = new JSONObject();
-        // Setting_Json = Settings.getInstance().read_setting_JSON();
-
         int error = 0;
         // OPEN DATABASE
-
-        /////////openDataBaseFile("DataLocale", "/datalocal", DCSet);
 
         try {
             this.setChanged();

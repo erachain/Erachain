@@ -14,7 +14,6 @@ import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -26,8 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("serial")
 public class RecDetailsFrame extends JPanel //JFrame
@@ -45,27 +42,12 @@ public class RecDetailsFrame extends JPanel //JFrame
         DCSet dcSet = DCSet.getInstance();
         this.transaction.setDC(dcSet, andSetup);
 
-        //ICON
-        List<Image> icons = new ArrayList<Image>();
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-        //this.setIconImages(icons);
-
-        //CLOSE
-//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
         //LAYOUT
         this.setLayout(new GridBagLayout());
-
-        //PADDING
-//		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
 
         //LABEL GBC
         labelGBC = new GridBagConstraints();
         labelGBC.insets = new Insets(10, 5, 5, 5);
-        //labelGBC.fill = GridBagConstraints.;
         labelGBC.anchor = GridBagConstraints.FIRST_LINE_START;//..NORTHWEST;
         labelGBC.weightx = 0.1;
         labelGBC.weighty = 0;
@@ -96,7 +78,6 @@ public class RecDetailsFrame extends JPanel //JFrame
                 + "=" + transaction.getFee() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
                 + ">>" + transaction.getConfirmations(dcSet));
         shortInfo.setEditable(false);
-//		MenuPopupUtil.installContextMenu(shortInfo);
         this.add(shortInfo, fieldGBC);
 
         if (transaction.getCreator() != null) {
@@ -110,80 +91,10 @@ public class RecDetailsFrame extends JPanel //JFrame
             //CREATOR
             fieldGBC.gridy = componentLevel;
             MAccoutnTextField creator = new MAccoutnTextField(transaction.getCreator());
-
             creator.setEditable(false);
-
             this.add(creator, fieldGBC);
 
-            String personStr = transaction.getCreator().viewPerson();
-            if (personStr.length() > 0) {
-                //LABEL PERSON
-                componentLevel++;
-                fieldGBC.gridy = componentLevel;
-                //		this.add(new JLabel(personStr), detailGBC);
-            }
-
-            //LABEL CREATOR PUBLIC KEY
-            componentLevel++;
-            labelGBC.gridy = componentLevel;
-            JLabel creator_Pub_keyLabel = new JLabel(Lang.T("Creator Public Key") + ":");
-            //	this.add(creator_Pub_keyLabel, labelGBC);
-
-            //CREATOR
-            fieldGBC.gridy = componentLevel;
-
-            JTextField creator_Pub_key = new JTextField(transaction.getCreator().getBase58());
-            creator_Pub_key.setEditable(false);
-            MenuPopupUtil.installContextMenu(creator_Pub_key);
-            //	this.add(creator_Pub_key, detailGBC);
-
         }
-
-        if (transaction.getSignature() != null) {
-            componentLevel++;
-            //LABEL SIGNATURE
-            labelGBC.gridy = componentLevel;
-            JLabel signatureLabel = new JLabel(Lang.T("Signature") + ":");
-            //			this.add(signatureLabel, labelGBC);
-
-            //SIGNATURE
-            fieldGBC.gridy = componentLevel;
-            //JTextField signature = new JTextField(Base58.encode(record.getSignature()).substring(0, 12) + "..");
-            signature = new JTextField(Base58.encode(transaction.getSignature()));
-            signature.setEditable(false);
-            MenuPopupUtil.installContextMenu(signature);
-            //			this.add(signature, detailGBC);
-
-        }
-		
-		/*
-		//LABEL FEE POWER
-		componentLevel ++;
-		labelGBC.gridy = componentLevel;
-		JLabel feePowLabel = new JLabel(Lang.T("Size")+" & "+ Lang.T("Fee") + ":");
-		this.add(feePowLabel, labelGBC);
-						
-		//FEE POWER
-		detailGBC.gridy = componentLevel;
-		JTextField feePow = new JTextField(
-				String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow())
-				+ "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
-				+ ">>" + record.getConfirmations(db));
-		feePow.setEditable(false);
-		MenuPopupUtil.installContextMenu(feePow);
-		this.add(feePow, detailGBC);	
-						
-		//LABEL CONFIRMATIONS
-		componentLevel ++;
-		labelGBC.gridy = componentLevel;
-		JLabel confirmationsLabel = new JLabel(Lang.T("Confirmations") + ":");
-		this.add(confirmationsLabel, labelGBC);
-								
-		//CONFIRMATIONS
-		detailGBC.gridy = componentLevel;
-		JLabel confirmations = new JLabel(String.valueOf(record.getConfirmations(db)));
-		this.add(confirmations, detailGBC);
-		*/
 
         linksTree(shortInfo);
 
@@ -352,13 +263,5 @@ public class RecDetailsFrame extends JPanel //JFrame
             return null;
         }
 
-        //@Override
-        //public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-        //    final Component ret = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-
-        ///final DefaultMutableTreeNode node = ((DefaultMutableTreeNode) (value));
-        //this.setText(value.toString());
-        //return ret;
-        //}
     }
 }

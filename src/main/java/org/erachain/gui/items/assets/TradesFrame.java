@@ -17,7 +17,6 @@ public class TradesFrame extends JDialog {
 
     public TradesFrame(Order order, boolean isSell) {
 
-        //super(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Trades"));
         setTitle(Controller.getInstance().getApplicationName(false) + " - " + Lang.T("Trades"));
         setModal(true);
         //ICON
@@ -79,6 +78,7 @@ public class TradesFrame extends JDialog {
         //tradesTableModel.setRowSorter(sorter);
 
 
+        // TODO всатвить менгю по сделке - кто что трнзакция и т.д.
         // MENU
 		/*JPopupMenu ordersMenu = new JPopupMenu();
 		JMenuItem trades = new JMenuItem("Trades");

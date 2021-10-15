@@ -52,9 +52,6 @@ public class IssueLinkedHashPanel extends SplitPanel {
         GridBagLayout gridBagLayout = (GridBagLayout) rightPanel1.getLayout();
         gridBagLayout.rowWeights = new double[]{0.0, 0.0};
         gridBagLayout.columnWeights = new double[]{0.0};
-        // GridBagLayout gridBagLayout = (GridBagLayout) rightPanel1.getLayout();
-        // gridBagLayout.rowWeights = new double[]{1.0, 0.0};
-        // gridBagLayout.columnWeights = new double[]{1.0};
         // left panel
 
         this.toolBarLeftPanel.setVisible(false);

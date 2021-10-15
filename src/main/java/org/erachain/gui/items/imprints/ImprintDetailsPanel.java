@@ -7,16 +7,12 @@ import org.erachain.lang.Lang;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class ImprintDetailsPanel extends JPanel {
 
     private static final long serialVersionUID = 4763074704570450206L;
 
     private ImprintCls imprint;
-
-    private JButton favoritesButton;
 
     public ImprintDetailsPanel(ImprintCls imprint) {
         this.imprint = imprint;
@@ -74,9 +70,7 @@ public class ImprintDetailsPanel extends JPanel {
         //DESCRIPTION
         detailGBC.gridy = 3;
         MTextPane txtAreaDescription = new MTextPane(imprint.getDescription());
-        //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(txtName.getBorder());
-        //txtAreaDescription.setEditable(false);
         this.add(txtAreaDescription, detailGBC);
 
         //LABEL OWNER
@@ -90,79 +84,8 @@ public class ImprintDetailsPanel extends JPanel {
         maker.setEditable(false);
         this.add(maker, detailGBC);
 
-        //IF IMPRINT CONFIRMED
-        if (this.imprint.getKey() >= 0) {
-            //ADD ERM PAIR BUTTON
-            labelGBC.gridy++;
-            labelGBC.gridwidth = 2;
-            JButton openPairButton = new JButton(Lang.T("Open pair"));
-            openPairButton.setPreferredSize(new Dimension(200, 25));
-            openPairButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    onOpenPairClick();
-                }
-            });
-            this.add(openPairButton, labelGBC);
-        }
-		
-		/*
-		//IF IMPRINT CONFIRMED AND NOT ERM
-		if(this.imprint.getKey() > 2l)
-		{
-			//FAVORITES
-			labelGBC.gridy++;
-			labelGBC.gridwidth = 2;
-			this.favoritesButton = new JButton();
-			
-			//CHECK IF FAVORITES
-			if(Controller.getInstance().isItemFavorite(imprint))
-			{
-				this.favoritesButton.setText(Lang.T("Remove Favorite"));
-			}
-			else
-			{
-				this.favoritesButton.setText(Lang.T("Add Favorite"));
-			}
-				
-			this.favoritesButton.setPreferredSize(new Dimension(200, 25));
-			this.favoritesButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					onFavoriteClick();
-				}
-			});	
-			this.add(this.favoritesButton, labelGBC);
-			
-		}
-		*/
-
         //PACK
         this.setVisible(true);
     }
-
-    public void onOpenPairClick() {
-
-        //new ImprintPairSelect(this.imprint.getKey());
-
-    }
-	
-	/*
-	public void onFavoriteClick()
-	{
-		//CHECK IF FAVORITES
-		if(Controller.getInstance().isItemFavorite(imprint))
-		{
-			this.favoritesButton.setText(Lang.T("Add Favorite"));
-			Controller.getInstance().removeItemFavorite(this.imprint);
-		}
-		else
-		{
-			this.favoritesButton.setText(Lang.T("Remove Favorite"));
-			Controller.getInstance().addItemFavorite(this.imprint);
-		}
-			
-	}
-	*/
 
 }
