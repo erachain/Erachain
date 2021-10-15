@@ -72,14 +72,12 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public static final String FILTER_PERS_WOMAN = "Only for Women";
 
     /**
+     * flags:
      * 0 - version; 1..3 - flags;
      */
-    private int flags; // 4
 
-    private int balancePos; // 13
-    private boolean backward; // 14
-    private int payMethod; // 15 0 - by Total, 1 - by Percent
-    private BigDecimal payMethodValue; // 17
+    private final int payMethod; // 15 0 - by Total, 1 - by Percent
+    private final BigDecimal payMethodValue; // 17
     private BigDecimal amountMin; // 19
     private BigDecimal amountMax; //21
 
@@ -89,7 +87,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     private BigDecimal filterBalanceMIN; // 33
     private BigDecimal filterBalanceMAX; // 34
 
-    private int filterTXType; // 36
+    private final int filterTXType; // 36
     private Long filterTimeStart; // 44 - in msec
     public Long filterTimeEnd; // 52 - in msec
 
@@ -136,7 +134,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
                   int filterTXType, Long filterTimeStart, Long filterTimeEnd,
                   int filterByGender, boolean useSelfBalance) {
 
-        super(FILTERED_ACCRUALS_TYPE);
+        super(FILTERED_ACCRUALS_TYPE, balancePos, backward);
 
         this.flags = flags;
 
@@ -144,8 +142,6 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
                 assetKey != null && assetKey != 0L) {
             this.flags |= AMOUNT_FLAG_MASK;
             this.assetKey = assetKey;
-            this.balancePos = balancePos;
-            this.backward = backward;
             this.payMethod = payMethod;
             this.payMethodValue = payMethodValue;
 
@@ -216,6 +212,11 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         return totalFeeBytes;
     }
 
+    @Override
+    public String viewType() {
+        return "Accruals";
+    }
+
     public static String viewPayMethod(int mode) {
         return "PAY_METHOD_" + mode;
     }
@@ -281,20 +282,21 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     }
 
     @Override
+    public int getCount() {
+        return resultsCount;
+    }
+
+    @Override
     public String viewResults(Transaction transactionParent) {
 
         if (results == null) {
             preProcess(transactionParent);
         }
 
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
-            calcAccrualsForMethodTotal();
-        }
-
         String out = "";
         int i = 0;
         for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
-            out += ++i + " " + item.a.getAddress() + " " + item.c.toPlainString() + "\n";
+            out += ++i + " " + item.a.getAddress() + " " + item.b.toPlainString() + " " + item.c.toPlainString() + "\n";
         }
 
         return out;
@@ -736,20 +738,12 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
      * Version 2 maker for BlockExplorer
      */
     public JSONObject makeJSONforHTML(JSONObject langObj) {
-        JSONObject json = toJson();
+        JSONObject json = super.makeJSONforHTML(langObj);
 
-        json.put("asset", asset.getName());
         if (filterAssetKey != null && filterAssetKey > 0L) {
             if (filterAsset == null)
                 filterAsset = dcSet.getItemAssetMap().get(filterAssetKey);
             json.put("filterAsset", filterAsset.getName());
-        }
-
-        if (resultsCount > 0) {
-            json.put("Label_Counter", Lang.T("Counter", langObj));
-            json.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
-            json.put("Label_Additional_Fee", Lang.T("Additional Fee", langObj));
-
         }
 
         json.put("payMethodName", Lang.T(ExPays.viewPayMethod(payMethod), langObj));
@@ -783,18 +777,14 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         json.put("Label_selfUse", Lang.T("Accrual by creator account too", langObj));
 
         json.put("Label_", Lang.T("", langObj));
+
         return json;
 
     }
 
     public JSONObject toJson() {
 
-        JSONObject toJson = new JSONObject();
-
-        toJson.put("flags", flags);
-        toJson.put("assetKey", assetKey);
-        toJson.put("balancePos", balancePos);
-        toJson.put("backward", backward);
+        JSONObject toJson = super.toJson();
 
         toJson.put("payMethod", payMethod);
         toJson.put("payMethodValue", payMethodValue.toPlainString());
@@ -822,7 +812,6 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
         if (resultsCount > 0) {
             toJson.put("resultsCount", resultsCount);
-            toJson.put("totalPay", totalPay.toPlainString());
             toJson.put("totalFeeBytes", totalFeeBytes);
             toJson.put("totalFee", BlockChain.feeBG(totalFeeBytes).toPlainString());
         }
@@ -830,13 +819,23 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         return toJson;
     }
 
-    public String getInfoHTML() {
+    /**
+     * without resuls not show it
+     *
+     * @param onlyTotal
+     * @param langObj
+     * @return
+     */
+    public String getInfoHTML(boolean onlyTotal, JSONObject langObj) {
 
-        String out = "<h3>" + Lang.T("Accruals") + "</h3>";
-        out += Lang.T("Asset") + ": <b>" + asset.getName() + "<br>";
-        out += Lang.T("Count # кол-во") + ": <b>" + resultsCount
-                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(totalFeeBytes)
-                + "</b>, " + Lang.T("Total") + ": <b>" + totalPay;
+        String out = super.getInfoHTML(onlyTotal, langObj);
+        if (onlyTotal || results == null)
+            return out;
+
+        out += "<b>" + Lang.T("Recipients") + ":</b><br>";
+        for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
+            out += item.c.toPlainString() + " " + item.a.getAddress() + " x " + item.b.toPlainString() + "<br>";
+        }
 
         return out;
     }
@@ -964,7 +963,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         BigDecimal accrual;
         BigDecimal totalBalances = BigDecimal.ZERO;
 
-        resultsCount = 0;
+        //resultsCount = 0;
 
         Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
         Long myPersonKey = null;
@@ -1307,13 +1306,14 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void process(Transaction rNote, Block block) {
 
         if (results == null) {
-            resultsCount = preProcess(rNote);
+            preProcess(rNote);
         }
 
         if (resultsCount == 0)
             return;
 
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
+        if (false && // already in PREPROCESS
+                payMethod == PAYMENT_METHOD_TOTAL) {
             if (!calcAccrualsForMethodTotal())
                 // не удалось просчитать значения
                 return;
@@ -1329,13 +1329,14 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     public void orphan(Transaction rNote) {
 
         if (results == null) {
-            resultsCount = preProcess(rNote);
+            preProcess(rNote);
         }
 
         if (resultsCount == 0)
             return;
 
-        if (payMethod == PAYMENT_METHOD_TOTAL) {
+        if (false &&
+                payMethod == PAYMENT_METHOD_TOTAL) {
             if (!calcAccrualsForMethodTotal())
                 // не удалось просчитать значения
                 return;

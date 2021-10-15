@@ -50,6 +50,8 @@ public class MemoryViewer extends Thread {
                     LOGGER.debug("########################### Max=Total Memory [MB]:" + (Runtime.getRuntime().totalMemory() >> 20));
                     LOGGER.debug("########################### Free Memory [MB]:" + (Runtime.getRuntime().freeMemory() >> 20));
 
+                    Runtime.getRuntime().runFinalization();
+
                     System.gc();
 
                     if (controller.isAllThreadsGood()) {

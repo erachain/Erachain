@@ -11,7 +11,10 @@ import org.erachain.core.exdata.exActions.ExListPays;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.*;
+import org.erachain.database.DPSet;
+import org.erachain.database.FPoolBalancesMap;
+import org.erachain.database.FPoolBlocksHistoryMap;
+import org.erachain.database.FPoolBlocksMap;
 import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
@@ -42,7 +45,7 @@ public class FPool extends MonitoredThread {
 
     final static String settings_path = "settings_fpool.json";
 
-    static int PENDING_PERIOD;
+    static int PENDING_PERIOD = 30;
     static HashMap<Long, BigDecimal> MIN_WITHDRAWS;
     static BigDecimal POOL_TAX;
 
@@ -107,6 +110,10 @@ public class FPool extends MonitoredThread {
         }
 
         this.setName("Forging Pool[" + this.getId() + "]");
+
+        if (privateKeyAccount == null) {
+            LOGGER.error("FPool address is NULL!! Pool stoped...");
+        }
 
         try {
             this.dpSet = DPSet.reCreateDB();
@@ -398,6 +405,8 @@ public class FPool extends MonitoredThread {
 
         Long assetKeyToWithdraw = null;
         List<Tuple2<String, BigDecimal>> payouts = new ArrayList();
+        BigDecimal total = BigDecimal.ZERO;
+
         try (IteratorCloseable<Tuple2<Long, String>> iterator = IteratorCloseableImpl.make(balsMap.getIterator())) {
             Tuple2<Long, String> key;
             Long assetKey;
@@ -418,6 +427,8 @@ public class FPool extends MonitoredThread {
 
                 // BALANCE is GOOD for WITHDRAW
                 payouts.add(new Tuple2(key.b, balance));
+                total = total.add(balance);
+
                 if (assetKeyToWithdraw == null)
                     assetKeyToWithdraw = assetKey;
 
@@ -428,6 +439,18 @@ public class FPool extends MonitoredThread {
 
         if (assetKeyToWithdraw == null) {
             return false;
+        }
+
+        // if Total too small
+        if (!allLeftover) {
+            BigDecimal min_withdraw = MIN_WITHDRAWS.get(assetKeyToWithdraw);
+            if (min_withdraw == null) {
+                min_withdraw = MIN_WITHDRAWS.get(0L);
+            }
+
+            if (total.movePointLeft(1).compareTo(min_withdraw) < 0) {
+                return false;
+            }
         }
 
         //if (true)
@@ -494,13 +517,15 @@ public class FPool extends MonitoredThread {
 
         runned = true;
 
-        FPoolMap map = dpSet.getFPoolMap();
-
+        int count = 0;
         while (runned) {
 
             // PROCESS
             try {
-                processMessage(blockingQueue.poll(BlockChain.GENERATING_MIN_BLOCK_TIME(0), TimeUnit.SECONDS));
+
+                boolean forged = processMessage(blockingQueue.poll(BlockChain.GENERATING_MIN_BLOCK_TIME(0), TimeUnit.SECONDS));
+                if (!forged && count++ % (PENDING_PERIOD >> 1) != 0)
+                    continue;
 
                 checkPending();
 

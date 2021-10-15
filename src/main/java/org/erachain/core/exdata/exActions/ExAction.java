@@ -1,5 +1,6 @@
 package org.erachain.core.exdata.exActions;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
@@ -7,6 +8,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
@@ -26,7 +28,10 @@ public abstract class ExAction<R> {
     public static final int LIST_PAYOUTS_TYPE = 2;
 
     int type;
+    protected int flags;
     protected long assetKey;
+    protected final int balancePos;
+    protected final boolean backward;
 
     protected DCSet dcSet;
     protected int height;
@@ -38,8 +43,17 @@ public abstract class ExAction<R> {
     public int resultCode;
     public String errorValue;
 
-    ExAction(int type) {
+    ExAction(int type, int balancePos, boolean backward) {
         this.type = type;
+        this.balancePos = balancePos;
+        this.backward = backward;
+    }
+
+    ExAction(int type, int flags, int balancePos, boolean backward) {
+        this.type = type;
+        this.flags = flags;
+        this.balancePos = balancePos;
+        this.backward = backward;
     }
 
     public int getType() {
@@ -62,7 +76,11 @@ public abstract class ExAction<R> {
         return totalPay;
     }
 
+    public abstract int getCount();
+
     public abstract String viewResults(Transaction transactionParent);
+
+    public abstract String viewType();
 
     public abstract long getTotalFeeBytes();
 
@@ -119,11 +137,51 @@ public abstract class ExAction<R> {
     /**
      * Version 2 maker for BlockExplorer
      */
-    public abstract JSONObject makeJSONforHTML(JSONObject langObj);
+    public JSONObject makeJSONforHTML(JSONObject langObj) {
+        JSONObject json = toJson();
 
-    public abstract JSONObject toJson();
+        json.put("assetName", asset.getName());
+        json.put("results", getInfoHTML(false, langObj));
 
-    public abstract String getInfoHTML();
+        json.put("Label_Counter", Lang.T("Counter", langObj));
+        json.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
+        json.put("Label_Additional_Fee", Lang.T("Additional Fee", langObj));
+
+
+        return json;
+
+    }
+
+    public JSONObject toJson() {
+        JSONObject toJson = new JSONObject();
+
+        toJson.put("type", type);
+        toJson.put("typeName", viewType());
+        toJson.put("flags", flags);
+        toJson.put("assetKey", assetKey);
+
+        toJson.put("balancePos", balancePos);
+        toJson.put("backward", backward);
+
+        if (getTotalPay() != null)
+            toJson.put("totalPay", getTotalPay());
+
+        return toJson;
+    }
+
+    public String getInfoHTML(boolean onlyTotal, JSONObject langObj) {
+        String out = "<h4>" + Lang.T(viewType()) + "</h4>";
+        out += Lang.T("Count # кол-во") + ": <b>" + getCount()
+                + "</b> " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(getTotalFeeBytes()) + "</b><br>";
+
+        out += Lang.T("Asset") + ": <b>" + asset.getName() + "</b><br>";
+        out += Lang.T("Total") + ": <b>" + getTotalPay()
+                + " (" + Lang.T(Account.balancePositionName(balancePos), langObj)
+                + (backward ? " " + Lang.T("backward", langObj) : "") + ")</b><br>";
+
+        return out;
+
+    }
 
     /**
      * make calculations of lists and pre-validate it if need

@@ -6,9 +6,6 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Crypto;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.epoch.DogePlanet;
 import org.erachain.webserver.WebResource;
@@ -36,51 +33,21 @@ public class AssetUnique extends AssetCls {
     }
 
     //GETTERS/SETTERS
+
+
     @Override
     public String getImageURL() {
-        if (!maker.equals(DogePlanet.MAKER))
-            return super.getImageURL();
+        if (maker.equals(DogePlanet.MAKER))
+            return DogePlanet.getImageURL(this);
 
-        int height = Transaction.parseHeightDBRef(dbRef);
-        Block.BlockHead blockHead = DCSet.getInstance().getBlocksHeadsMap().get(height + 10);
-        if (blockHead == null)
-            return "<img width=350 style='position:absolute;'src=/smartcontract/epoch/000001/01/000.png>";
-
-        byte[] hash = blockHead.signature;
-        byte[] hash2 = Ints.toByteArray((int) key);
-        System.arraycopy(hash2, 0, hash, 0, hash2.length);
-        //hash = Crypto.getInstance().digest(hash);
-        hash = Crypto.getInstance().digest(Longs.toByteArray(System.currentTimeMillis()));
-        int slot = 0;
-        int slotRare;
-        String html = "";
-        do {
-            html += String.format("<img style='position:absolute; height:inherit' src=/smartcontract/epoch/000001/%02d/", slot);
-            slotRare = Ints.fromBytes((byte) 0, (byte) 0, hash[slot << 1], hash[(slot << 1) + 1]);
-            if ((slotRare >> 11) == 0) {
-                html += "5.png>";
-            } else if ((slotRare >> 12) == 0) {
-                html += "4.png>";
-            } else if ((slotRare >> 13) == 0) {
-                html += "3.png>";
-            } else if ((slotRare >> 14) == 0) {
-                html += "2.png>";
-            } else if ((slotRare >> 15) == 0) {
-                html += "1.png>";
-            } else {
-                html += "0.png>";
-            }
-
-        } while (slot++ < 7);
-
-        return html;
+        return super.getImageURL();
 
     }
 
     @Override
     public MediaType getImageMediaType() {
         if (maker.equals(DogePlanet.MAKER))
-            return WebResource.TYPE_HTML;
+            return WebResource.TYPE_ARRAY;
 
         return super.getImageMediaType();
     }

@@ -790,6 +790,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             case ItemCls.IMPRINT_TYPE:
                 return "IMPRINT";
             case ItemCls.PERSON_TYPE:
+            case ItemCls.AUTHOR_TYPE:
                 return "PERSON";
             case ItemCls.POLL_TYPE:
                 return "POLL"; // Opinion
@@ -814,7 +815,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
             return ItemCls.ASSET_TYPE;
         } else if (type.startsWith("imprint")) {
             return ItemCls.IMPRINT_TYPE;
-        } else if (type.startsWith("person")) {
+        } else if (type.startsWith("person") || type.startsWith("author")) {
             return ItemCls.PERSON_TYPE;
         } else if (type.startsWith("poll")) {
             return ItemCls.POLL_TYPE;
@@ -837,6 +838,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         ItemMap dbMap = this.getDBMap(db);
         long key = dbMap.getLastKey();
         return key;
+    }
+
+    public long getDBref() {
+        return dbRef;
     }
 
     public void resetKey() {

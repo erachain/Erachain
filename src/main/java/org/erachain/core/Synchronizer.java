@@ -1011,7 +1011,7 @@ public class Synchronizer extends Thread {
                     block.orphan(dcSet, notStoreTXs);
                     dcSet.getBlockMap().setProcessing(false);
                     // FARDFLUSH not use in each case - only after accumulate size
-                    dcSet.flush(txCount + 3, false, doOrphan);
+                    dcSet.flush(512 + block.blockHead.transactionsCount * 512 + block.blockHead.size << 1, false, doOrphan);
 
                     if (ctrl.isOnStopping())
                         return;
@@ -1112,7 +1112,7 @@ public class Synchronizer extends Thread {
                     dcSet.getBlockMap().setProcessing(false);
 
                     // FLUSH not use in each case - only after accumulate size
-                    dcSet.flush(txCount + 3, false, doOrphan);
+                    dcSet.flush(512 + block.blockHead.transactionsCount * 512 + block.blockHead.size << 1, false, doOrphan);
 
                     if (ctrl.isOnStopping())
                         return;

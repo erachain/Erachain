@@ -88,22 +88,22 @@ public class UpdateUtil {
 
         dcSet.getTransactionFinalMap().clear();
 
-        Block b = new GenesisBlock();
+        Block block = new GenesisBlock();
         do {
-            List<Transaction> txs = b.getTransactions();
+            List<Transaction> txs = block.getTransactions();
             int counter = 1;
             for (Transaction tx : txs) {
-                dcSet.getTransactionFinalMap().add(b.getHeight(), counter, tx);
+                dcSet.getTransactionFinalMap().add(block.getHeight(), counter, tx);
                 counter++;
             }
-            if (b.getHeight() % 1000 == 0) {
-                LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight());
+            if (block.getHeight() % 1000 == 0) {
+                LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + block.getHeight());
             }
-            dcSet.flush(3 + b.getTransactionCount(), false, false);
+            dcSet.flush(512 + block.blockHead.transactionsCount * 512 + block.blockHead.size << 1, false, false);
 
-            b = b.getChild(dcSet);
+            block = block.getChild(dcSet);
 
-        } while (b != null);
+        } while (block != null);
 
         dcSet.flush(0, true, true);
 
@@ -112,10 +112,10 @@ public class UpdateUtil {
     public static void repopulateCommentPostMap() {
         DCSet.getInstance().getPostCommentMap().clear();
 
-        Block b = new GenesisBlock();
-        int height = b.getHeight();
+        Block block = new GenesisBlock();
+        int height = block.getHeight();
         do {
-            List<Transaction> txs = b.getTransactions();
+            List<Transaction> txs = block.getTransactions();
             int seqNo = 0;
             for (Transaction tx : txs) {
                 tx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK, height, ++seqNo, false);
@@ -127,12 +127,12 @@ public class UpdateUtil {
                     }
                 }
             }
-            if (b.getHeight() % 1000 == 0) {
-                LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight());
-                DCSet.getInstance().flush(3 + b.getTransactionCount(), false, false);
+            if (block.getHeight() % 1000 == 0) {
+                LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + block.getHeight());
+                DCSet.getInstance().flush(512 + block.blockHead.transactionsCount * 512 + block.blockHead.size << 1, false, false);
             }
-            b = b.getChild(DCSet.getInstance());
-        } while (b != null);
+            block = block.getChild(DCSet.getInstance());
+        } while (block != null);
 
     }
 }

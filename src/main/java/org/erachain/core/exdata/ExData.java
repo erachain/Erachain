@@ -1369,7 +1369,7 @@ public class ExData {
         }
 
         if (exAction != null) {
-            output.put("Label_Accruals", Lang.T("Accruals", langObj));
+            output.put("Label_Action", Lang.T("Action", langObj));
             output.put("exAction", exAction.makeJSONforHTML(langObj));
 
         }

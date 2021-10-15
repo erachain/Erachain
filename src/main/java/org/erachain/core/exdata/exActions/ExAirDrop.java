@@ -41,13 +41,11 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     private static final Logger LOGGER = LoggerFactory.getLogger(ExAirDrop.class);
 
     /**
+     * flags:
      * 0 - version; 1 - flags;
      */
-    private final int flags; // byte[2]
 
     private final BigDecimal amount;
-    private final int balancePos;
-    final boolean backward;
     /**
      * Short form of address = [20]
      */
@@ -56,12 +54,9 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     public String errorValue;
 
     public ExAirDrop(int flags, long assetKey, BigDecimal amount, int balancePos, boolean backward, byte[][] addresses) {
-        super(SIMPLE_PAYOUTS_TYPE);
-        this.flags = flags;
+        super(SIMPLE_PAYOUTS_TYPE, flags, balancePos, backward);
         this.assetKey = assetKey;
         this.amount = amount;
-        this.balancePos = balancePos;
-        this.backward = backward;
         this.addresses = addresses;
 
         totalPay = amount.multiply(BigDecimal.valueOf(addresses.length));
@@ -82,6 +77,16 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
     public long getTotalFeeBytes() {
         return addresses.length * 25;
+    }
+
+    @Override
+    public String viewType() {
+        return "Simple Pay";
+    }
+
+    @Override
+    public int getCount() {
+        return addresses.length;
     }
 
     @Override
@@ -321,31 +326,11 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         return make(assetKey, value, position, backward, addressesStr);
     }
 
-    /**
-     * Version 2 maker for BlockExplorer
-     */
-    public JSONObject makeJSONforHTML(JSONObject langObj) {
-        JSONObject json = toJson();
-
-        json.put("asset", asset.getName());
-
-        json.put("Label_Counter", Lang.T("Counter", langObj));
-        json.put("Label_Total_Amount", Lang.T("Total Amount", langObj));
-        json.put("Label_Additional_Fee", Lang.T("Additional Fee", langObj));
-
-        return json;
-
-    }
-
     public JSONObject toJson() {
 
-        JSONObject toJson = new JSONObject();
+        JSONObject toJson = super.toJson();
 
-        toJson.put("flags", flags);
-        toJson.put("assetKey", assetKey);
         toJson.put("amount", amount.toPlainString());
-        toJson.put("balancePosition", balancePos);
-        toJson.put("backward", backward);
 
         JSONArray array = new JSONArray();
         for (byte[] address : addresses) {
@@ -354,16 +339,27 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
         }
         toJson.put("addresses", array);
 
+        toJson.put("totalFeeBytes", getTotalFeeBytes());
+        toJson.put("totalFee", BlockChain.feeBG(getTotalFeeBytes()).toPlainString());
+
         return toJson;
     }
 
     @Override
-    public String getInfoHTML() {
-        String out = "<h3>" + Lang.T("Accruals") + "</h3>";
-        out += Lang.T("Asset") + ": <b>" + asset.getName() + "<br>";
-        out += Lang.T("Count # кол-во") + ": <b>" + addresses.length
-                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(getTotalFeeBytes())
-                + "</b>, " + Lang.T("Total") + ": <b>" + totalPay;
+    public String getInfoHTML(boolean onlyTotal, JSONObject langObj) {
+
+        String out = super.getInfoHTML(onlyTotal, langObj);
+
+        out += Lang.T("Accrual") + ": <b>" + amount.toPlainString() + "</b><br>";
+
+        if (onlyTotal)
+            return out;
+
+        out += "<b>" + Lang.T("Recipients") + ":</b><br>";
+        for (byte[] recipientShort : addresses) {
+            out += crypto.getAddressFromShort(recipientShort) + "<br>";
+        }
+
         return out;
     }
 

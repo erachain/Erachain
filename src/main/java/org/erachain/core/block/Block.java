@@ -1336,6 +1336,10 @@ public class Block implements Closeable, ExplorerJsonLine {
             return INVALID_BLOCK_VERSION;
         }
 
+        if (BlockChain.FREEZED_FORGING.contains(creator.getAddress())) {
+            return INVALID_BLOCK_WIN;
+        }
+
         // TEST STRONG of win Value
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 

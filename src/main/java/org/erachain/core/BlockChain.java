@@ -258,7 +258,7 @@ public class BlockChain {
 
     public static final int VERS_5_3 = TEST_DB > 0 || !MAIN_MODE ? 0 : 1870000;
 
-    public static final int CLEAR_OLD_ORDERS_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? DEMO_MODE ? 224733 : 0 : 1870000;
+    public static final int CLEAR_OLD_ORDERS_HEIGHT = TEST_DB > 0 || !MAIN_MODE ? DEMO_MODE ? 9224733 : 0 : 9870000;
     public static final int CLEAR_OLD_ORDERS_PERIOD = DEMO_MODE ? 10 : 30 * 24 * 60 * 2;
 
     /**
@@ -448,6 +448,7 @@ public class BlockChain {
     public static HashSet<String> ANONYMASERS = new HashSet<String>();
     public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
     public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
+    public static HashSet<String> FREEZED_FORGING = new HashSet<String>();
 
     public static HashMap<String, Tuple3<Long, Long, byte[]>> NOVA_ASSETS = new HashMap<String, Tuple3<Long, Long, byte[]>>();
     public static HashMap<String, Tuple3<Long, Long, byte[]>> NOVA_PERSONS = new HashMap<String, Tuple3<Long, Long, byte[]>>();
@@ -719,9 +720,21 @@ public class BlockChain {
             FOUNDATION_ADDRESSES.add("75Mb8cGchcG4DF31wavhNrnoycWsoLQqP4");
             FOUNDATION_ADDRESSES.add("75LzKAoxx4TgAAkpMRStve26YEY625TCRE");
 
-            FOUNDATION_ADDRESSES.add("73QYndpFQeFvyMvwBcMUwJRDTp7XaxkSmZ"); // STOLEN
-            FOUNDATION_ADDRESSES.add("7FJUV5GLMuVdopUHSwTLsjmKF4wkPwFEcG"); // LOSED
-            FOUNDATION_ADDRESSES.add("75LK84g7JHoLG2jRUmbJA6srLrFkaXEU5A"); // FREEZED
+            FOUNDATION_ADDRESSES.add("73QYndpFQeFvyMvwBcMUwJRDTp7XaxkSmZ"); // Пирожков
+            // emty FOUNDATION_ADDRESSES.add("7FJUV5GLMuVdopUHSwTLsjmKF4wkPwFEcG"); // возвращены
+            FOUNDATION_ADDRESSES.add("75LK84g7JHoLG2jRUmbJA6srLrFkaXEU5A"); // Довлетбаев
+
+            if (false) {
+                FREEZED_FORGING.add("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G"); // Борисов
+                FOUNDATION_ADDRESSES.add("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G");
+                FREEZED_FORGING.add("7FQ5SGFhewFsdAyTmG1uRjdikWa4sS2EBo"); // Б
+                FOUNDATION_ADDRESSES.add("7FQ5SGFhewFsdAyTmG1uRjdikWa4sS2EBo");
+
+                FREEZED_FORGING.add("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs"); // Выборнов
+                FOUNDATION_ADDRESSES.add("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs");
+                FREEZED_FORGING.add("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP"); // Никишкин
+                FOUNDATION_ADDRESSES.add("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP");
+            }
 
 
             validBlocks.add(214085);

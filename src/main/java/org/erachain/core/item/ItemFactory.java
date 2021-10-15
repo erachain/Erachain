@@ -34,6 +34,7 @@ public class ItemFactory {
             case ItemCls.TEMPLATE_TYPE:
                 return TemplateFactory.getInstance().parse(forDeal, data, includeReference);
             case ItemCls.PERSON_TYPE:
+            case ItemCls.AUTHOR_TYPE:
                 return PersonFactory.getInstance().parse(forDeal, data, includeReference);
             case ItemCls.POLL_TYPE:
                 return PollFactory.getInstance().parse(forDeal, data, includeReference);

@@ -101,7 +101,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.6.1 dev";
+    public static String version = "5.6.1 dev 02";
     public static String buildTime = "2021-10-05 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -2044,10 +2044,15 @@ public class Controller extends Observable {
                     }
 
                     // сохранимся - хотя может и заря - раньше то работало и так
-                    if (true) {
-                        dcSet.flush(0, true, false);
+                    // по размеру файла смотрим - если уже большой то сольем
+                    // хотя все равно при каждом ново поиске 300 блоков приостанавливается синхра
+                    File dbFileT = new File(Settings.getInstance().getDataChainPath(), "chain.dat.t");
+                    if (dbFileT.exists()) {
+                        long size = dbFileT.length();
+                        if (size > DCSet.MAX_ENGINE_BEFORE_COMMIT >> 2) {
+                            dcSet.flush(0, true, false);
+                        }
                     }
-
                 }
 
                 blockchainSyncStatusUpdate(getMyHeight());
@@ -2556,9 +2561,14 @@ public class Controller extends Observable {
             case ItemCls.TEMPLATE_TYPE:
                 return this.dcSet.getItemTemplateMap();
             case ItemCls.PERSON_TYPE:
+            case ItemCls.AUTHOR_TYPE:
                 return this.dcSet.getItemPersonMap();
             case ItemCls.POLL_TYPE:
                 return this.dcSet.getItemPollMap();
+            case ItemCls.STATUS_TYPE:
+                return this.dcSet.getItemStatusMap();
+            case ItemCls.UNION_TYPE:
+                return this.dcSet.getItemUnionMap();
         }
         return null;
     }
@@ -2976,6 +2986,7 @@ public class Controller extends Observable {
             case ItemCls.TEMPLATE_TYPE:
                 return db.getItemTemplateMap().get(key);
             case ItemCls.PERSON_TYPE:
+            case ItemCls.AUTHOR_TYPE:
                 return db.getItemPersonMap().get(key);
             case ItemCls.POLL_TYPE:
                 return db.getItemPollMap().get(key);

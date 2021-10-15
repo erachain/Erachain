@@ -374,7 +374,7 @@ public class RNoteInfo extends RecDetailsFrame {
         ExAction exAction = exData.getExAction();
         if (exAction != null) {
             exAction.preProcess(statement);
-            resultStr += exAction.getInfoHTML();
+            resultStr += exAction.getInfoHTML(false, Lang.getInstance().getLangForNode());
         }
 
         if (exData.isCanSignOnlyRecipients()) {
