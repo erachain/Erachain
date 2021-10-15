@@ -1447,11 +1447,10 @@ public class Account {
         if (personRes == null)
             return;
 
-        JSONObject personJson = new JSONObject();
-        personJson.put(keyName + "_key", personRes.b.getKey());
-        personJson.put(keyName + "_name", personRes.b.viewName());
-        personJson.put(keyName + "_birthday", personRes.b.getBirthdayStr());
-        personJson.put(keyName + "_image", personRes.b.getImageURL());
+        json.put(keyName + "_key", personRes.b.getKey());
+        json.put(keyName + "_name", personRes.b.viewName());
+        json.put(keyName + "_birthday", personRes.b.getBirthdayStr());
+        json.put(keyName + "_image", personRes.b.getImageURL());
 
     }
 
