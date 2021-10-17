@@ -1,21 +1,23 @@
 package org.erachain.dbs;
 
+import org.mapdb.Fun.Tuple2;
+
 import java.util.Iterator;
 import java.util.Map;
 
-public class IteratorParent<T> implements IteratorCloseable<T> {
-    protected PeekingIteratorCloseable<? extends T> iterator;
+public class IteratoкOfSetParent<T extends Tuple2<K, V>, K, V> implements IteratorCloseable<Tuple2<K, V>> {
+    protected PeekingIteratorCloseable<Tuple2<K, V>> iterator;
     private Map deleted;
     private boolean hasNextUsedBefore = false;
 
 
     /**
-     * С учетом удаленных в форке - для вторичных ключей на основе Map
+     * С учетом удаленных в форке - для вторичных ключей на основе Set
      *
      * @param iterator
      * @param deleted
      */
-    public IteratorParent(Iterator<? extends T> iterator, Map deleted) {
+    public IteratoкOfSetParent(Iterator<Tuple2<K, V>> iterator, Map deleted) {
         this.iterator = new PeekingIteratorCloseable(iterator);
         this.deleted = deleted;
     }
@@ -32,7 +34,11 @@ public class IteratorParent<T> implements IteratorCloseable<T> {
         if (!iterator.hasNext())
             return false;
 
-        while (iterator.hasNext() && deleted.containsKey(iterator.peek())) {
+        while (iterator.hasNext()) {
+            V key = iterator.peek().b;
+            if (!deleted.containsKey(key))
+                break;
+
             iterator.next();
         }
 
@@ -41,7 +47,7 @@ public class IteratorParent<T> implements IteratorCloseable<T> {
     }
 
     @Override
-    public T next() {
+    public Tuple2<K, V> next() {
         if (!hasNextUsedBefore) {
             // если проверки не было то надо промотать по Делетед иначе
             // возьмет даже удаленный
