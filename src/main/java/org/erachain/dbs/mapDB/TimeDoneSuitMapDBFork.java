@@ -7,7 +7,7 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.TimeTXDoneMap;
 import org.erachain.datachain.TimeTXintf;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.dbs.IteratoкOfSetParent;
+import org.erachain.dbs.IteratorParentSecondaryKey;
 import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.mapdb.Bind;
 import org.mapdb.Fun;
@@ -59,6 +59,6 @@ public class TimeDoneSuitMapDBFork extends DBMapSuitFork<Long, Integer> implemen
     @Override
     public IteratorCloseable<Fun.Tuple2<Integer, Long>> getTXIterator() {
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratoкOfSetParent(((TimeTXintf) parent).getTXIterator(), deleted), keySet.iterator()), Fun.COMPARATOR);
+                new IteratorParentSecondaryKey(((TimeTXintf) parent).getTXIterator(), deleted), keySet.iterator()), Fun.COMPARATOR);
     }
 }

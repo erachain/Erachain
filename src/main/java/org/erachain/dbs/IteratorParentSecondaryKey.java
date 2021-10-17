@@ -5,19 +5,19 @@ import org.mapdb.Fun.Tuple2;
 import java.util.Iterator;
 import java.util.Map;
 
-public class IteratoкOfSetParent<T extends Tuple2<K, V>, K, V> implements IteratorCloseable<Tuple2<K, V>> {
+public class IteratorParentSecondaryKey<T extends Tuple2<K, V>, K, V> implements IteratorCloseable<Tuple2<K, V>> {
     protected PeekingIteratorCloseable<Tuple2<K, V>> iterator;
     private Map deleted;
     private boolean hasNextUsedBefore = false;
 
 
     /**
-     * С учетом удаленных в форке - для вторичных ключей на основе Set
+     * С учетом удаленных в форке - для вторичных ключей на основе Set, см.
      *
      * @param iterator
      * @param deleted
      */
-    public IteratoкOfSetParent(Iterator<Tuple2<K, V>> iterator, Map deleted) {
+    public IteratorParentSecondaryKey(Iterator<Tuple2<K, V>> iterator, Map deleted) {
         this.iterator = new PeekingIteratorCloseable(iterator);
         this.deleted = deleted;
     }

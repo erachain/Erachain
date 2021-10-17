@@ -10,7 +10,7 @@ public class IteratorParent<T> implements IteratorCloseable<T> {
 
 
     /**
-     * С учетом удаленных в форке - для вторичных ключей на основе Map
+     * С учетом удаленных в форке - для первичны ключей и для getIndexIterator, то есть преобразованных вторичных
      *
      * @param iterator
      * @param deleted
