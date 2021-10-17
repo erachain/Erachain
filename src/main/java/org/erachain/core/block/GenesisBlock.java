@@ -513,7 +513,8 @@ public class GenesisBlock extends Block {
             case (int) AssetCls.ERA_KEY:
                 return new AssetVenture(itemAppData, CREATOR, AssetCls.ERA_NAME, icon, image, AssetCls.ERA_DESCR, 0, 8, 0L);
             case (int) AssetCls.FEE_KEY:
-                return new AssetVenture(itemAppData, BlockChain.FEE_ASSET_EMITTER, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 0, 8, 0L);
+                return new AssetVenture(itemAppData, BlockChain.FEE_ASSET_EMITTER == null ? (BlockChain.FEE_ASSET_EMITTER = CREATOR) : CREATOR,
+                        AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 0, 8, 0L);
             case (int) AssetCls.TRUST_KEY:
                 return new AssetVenture(itemAppData, CREATOR, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, 0, 8, 0L);
             case (int) AssetCls.REAL_KEY:

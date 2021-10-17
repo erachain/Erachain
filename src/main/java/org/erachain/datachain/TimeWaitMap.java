@@ -49,6 +49,6 @@ public class TimeWaitMap extends DBTabImpl<Integer, Long> implements TimeTXintf<
 
     @Override
     public IteratorCloseable<Fun.Tuple2<Integer, Long>> getTXIterator() {
-        return null;
+        return ((TimeTXintf) map).getTXIterator();
     }
 }
