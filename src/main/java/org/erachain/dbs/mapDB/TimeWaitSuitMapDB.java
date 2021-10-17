@@ -21,7 +21,7 @@ import java.util.NavigableSet;
  */
 
 @Slf4j
-public class TimeWaitSuitMapDB extends DBMapSuit<Integer, Long> implements TimeTXintf<Integer, Long> {
+public class TimeWaitSuitMapDB extends DBMapSuit<Long, Integer> implements TimeTXintf<Integer, Long> {
 
     private NavigableSet keySet;
 
@@ -43,11 +43,11 @@ public class TimeWaitSuitMapDB extends DBMapSuit<Integer, Long> implements TimeT
                 .makeOrGet();
 
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.keySet,
-                new Fun.Function2<Fun.Tuple2<Integer, Long>, Integer, Long>() {
+                new Fun.Function2<Integer, Long, Integer>() {
                     @Override
-                    public Fun.Tuple2<Integer, Long> run(
-                            Integer height, Long dbRef) {
-                        return new Fun.Tuple2<Integer, Long>(height, dbRef);
+                    public Integer run(
+                            Long dbRef, Integer height) {
+                        return height;
                     }
                 });
 

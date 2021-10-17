@@ -15,7 +15,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * Ключ: ссылка на запись создания заказа<br>
  * Значение: заказ<br>
  */
-public class TimeWaitMap extends DBTabImpl<Integer, Long> implements TimeTXintf<Integer, Long> {
+public class TimeWaitMap extends DBTabImpl<Long, Integer> implements TimeTXintf<Integer, Long> {
 
     public TimeWaitMap(int dbs, DCSet databaseSet, DB database) {
         super(dbs, databaseSet, database);

@@ -1,6 +1,7 @@
 package org.erachain.dbs.mapDB;
 
 import org.erachain.core.block.GenesisBlock;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TimeWaitMap;
@@ -33,14 +34,14 @@ public class TimeWaitSuitMapDBTest {
 
         init();
 
-        timeWaitMap.put(1, 1L);
-        timeWaitMap.put(1, 2L);
-        timeWaitMap.put(1, 3L);
+        timeWaitMap.put(Transaction.parseDBRef("123-1"), 1234);
+        timeWaitMap.put(Transaction.parseDBRef("125-2"), 2234);
+        timeWaitMap.put(Transaction.parseDBRef("333-5"), 234);
 
         IteratorCloseable<Fun.Tuple2<Integer, Long>> iterator = timeWaitMap.getTXIterator();
         while (iterator.hasNext()) {
             key = iterator.next();
-            System.out.println(key.toString());
+            System.out.println(key.a + " - " + Transaction.viewDBRef(key.b));
         }
 
     }
