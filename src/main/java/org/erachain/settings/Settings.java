@@ -1250,6 +1250,8 @@ public class Settings {
                 //OPEN FILE
 
                 settingsJSON = FileUtils.readCommentedJSONObject(file.getPath());
+                if (settingsJSON == null)
+                    settingsJSON = new JSONObject();
 
                 alreadyPassed++;
 

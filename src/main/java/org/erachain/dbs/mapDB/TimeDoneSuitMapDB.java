@@ -3,6 +3,9 @@ package org.erachain.dbs.mapDB;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.TimeTXintf;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -10,14 +13,15 @@ import org.mapdb.Fun;
 import java.util.NavigableSet;
 
 /**
- * Хранит исполненные трнзакции, или отмененные - все что уже не активно<br>
+ * Хранит исполненные транзакции, или отмененные - все что уже не активно для запуска по времени<br>
  * <br>
- * Ключ: ссылка на ID транзакции<br>
+ * Ключ: блок, значение - ссылка на ID транзакции, поэтому в основной мапке только последняя трнзакция на этот ожидаемый блок<br>
+ * Для прохода по всем транзакциям использовать только getTXIterator!!!
  * Значение: заказ<br>
  */
 
 @Slf4j
-public class TimeDoneSuitMapDB extends DBMapSuit<Integer, Long> {
+public class TimeDoneSuitMapDB extends DBMapSuit<Integer, Long> implements TimeTXintf<Integer, Long> {
 
     private NavigableSet keySet;
 
@@ -55,4 +59,8 @@ public class TimeDoneSuitMapDB extends DBMapSuit<Integer, Long> {
 
     }
 
+    @Override
+    public IteratorCloseable<Fun.Tuple2<Integer, Long>> getTXIterator() {
+        return IteratorCloseableImpl.make(keySet.iterator());
+    }
 }
