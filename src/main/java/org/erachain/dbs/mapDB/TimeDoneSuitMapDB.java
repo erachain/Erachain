@@ -62,7 +62,10 @@ public class TimeDoneSuitMapDB extends DBMapSuit<Long, Integer> implements TimeT
     }
 
     @Override
-    public IteratorCloseable<Fun.Tuple2<Integer, Long>> getTXIterator() {
+    public IteratorCloseable<Fun.Tuple2<Integer, Long>> getTXIterator(boolean descending) {
+        if (descending)
+            return IteratorCloseableImpl.make(keySet.descendingIterator());
+
         return IteratorCloseableImpl.make(keySet.iterator());
     }
 }

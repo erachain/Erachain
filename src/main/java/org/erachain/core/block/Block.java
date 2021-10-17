@@ -2214,6 +2214,30 @@ public class Block implements Closeable, ExplorerJsonLine {
     private void processTail(DCSet dcSet) {
         // clear old orders
         OrderProcess.clearOldOrders(dcSet, this, false);
+
+        // time wait process
+        TimeTXWaitMap timeWaitMap = dcSet.getTimeTXWaitMap();
+        TimeTXDoneMap timewDoneMap = dcSet.getTimeTXDoneMap();
+        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
+        Transaction tx;
+        Tuple2<Integer, Long> key;
+        try (IteratorCloseable<Tuple2<Integer, Long>> iteraator = timeWaitMap.getTXIterator(false)) {
+            while (iteraator.hasNext()) {
+                key = iteraator.next();
+                // reversed pair - key = <Block, dbRef>
+                if (key.a > heightBlock)
+                    break;
+
+                timeWaitMap.remove(key.b);
+                timewDoneMap.put(key.b, key.a);
+
+                tx = txMap.get(key.b);
+                tx.processByTime(this);
+
+            }
+        } catch (IOException e) {
+            Controller.getInstance().stopAndExit(99999);
+        }
     }
 
     // TODO - make it trownable
@@ -2366,6 +2390,31 @@ public class Block implements Closeable, ExplorerJsonLine {
     private void orphanHead(DCSet dcSet) {
         // clear old orders
         OrderProcess.clearOldOrders(dcSet, this, true);
+
+        // time wait process
+        TimeTXWaitMap timeWaitMap = dcSet.getTimeTXWaitMap();
+        TimeTXDoneMap timewDoneMap = dcSet.getTimeTXDoneMap();
+        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
+        Transaction tx;
+        Tuple2<Integer, Long> key;
+        try (IteratorCloseable<Tuple2<Integer, Long>> iteraator = timewDoneMap.getTXIterator(true)) {
+            while (iteraator.hasNext()) {
+                key = iteraator.next();
+                // reversed pair - key = <Block, dbRef>
+                if (key.a < heightBlock)
+                    break;
+
+                timewDoneMap.remove(key.b);
+                timeWaitMap.put(key.b, key.a);
+
+                tx = txMap.get(key.b);
+                tx.orphanByTime(this);
+
+            }
+        } catch (IOException e) {
+            Controller.getInstance().stopAndExit(99999);
+        }
+
     }
 
     public void orphan(DCSet dcSet, boolean notStoreTXs) throws Exception {

@@ -17,6 +17,8 @@ public class TimeWaitSuitMapDBTest {
     TimeTXWaitMap timeTXWaitMap;
     Fun.Tuple2<Integer, Long> key;
 
+    boolean descending = false;
+
     private void init() {
 
         dcSet = DCSet.createEmptyDatabaseSet(IDB.DBS_MAP_DB);
@@ -43,7 +45,7 @@ public class TimeWaitSuitMapDBTest {
         timeTXWaitMap.put(Transaction.parseDBRef(values[1].a), values[1].b);
         timeTXWaitMap.put(Transaction.parseDBRef(values[2].a), values[2].b);
 
-        IteratorCloseable<Fun.Tuple2<Integer, Long>> iterator = timeTXWaitMap.getTXIterator();
+        IteratorCloseable<Fun.Tuple2<Integer, Long>> iterator = timeTXWaitMap.getTXIterator(descending);
         int i = 0;
         while (iterator.hasNext()) {
             key = iterator.next();
@@ -68,7 +70,7 @@ public class TimeWaitSuitMapDBTest {
 
         System.out.println(" DELETE: " + values[0].a);
         timeTXWaitMap.delete(Transaction.parseDBRef(values[0].a));
-        iterator = timeTXWaitMap.getTXIterator();
+        iterator = timeTXWaitMap.getTXIterator(descending);
         i = 0;
         while (iterator.hasNext()) {
             key = iterator.next();
@@ -103,7 +105,7 @@ public class TimeWaitSuitMapDBTest {
         timeTXWaitMap.put(Transaction.parseDBRef(values[1].a), values[1].b);
         timeTXWaitMap.put(Transaction.parseDBRef(values[2].a), values[2].b);
 
-        IteratorCloseable<Fun.Tuple2<Integer, Long>> iterator = timeTXWaitMap.getTXIterator();
+        IteratorCloseable<Fun.Tuple2<Integer, Long>> iterator = timeTXWaitMap.getTXIterator(descending);
         int i = 0;
         while (iterator.hasNext()) {
             key = iterator.next();
@@ -131,7 +133,7 @@ public class TimeWaitSuitMapDBTest {
         timeTXWaitMap = forkDCSet.getTimeTXWaitMap();
         timeTXWaitMap.put(Transaction.parseDBRef(values[3].a), values[3].b);
 
-        iterator = timeTXWaitMap.getTXIterator();
+        iterator = timeTXWaitMap.getTXIterator(descending);
         i = 0;
         while (iterator.hasNext()) {
             key = iterator.next();
@@ -158,7 +160,7 @@ public class TimeWaitSuitMapDBTest {
 
         System.out.println(" DELETE: " + values[0].a);
         timeTXWaitMap.delete(Transaction.parseDBRef(values[0].a));
-        iterator = timeTXWaitMap.getTXIterator();
+        iterator = timeTXWaitMap.getTXIterator(descending);
         i = 0;
         while (iterator.hasNext()) {
             key = iterator.next();

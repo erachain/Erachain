@@ -1,9 +1,11 @@
 package org.erachain.datachain;
 
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.mapDB.TimeDoneSuitMapDB;
 import org.erachain.dbs.mapDB.TimeDoneSuitMapDBFork;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
@@ -13,7 +15,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * Ключ: ссылка на ID транзакции, значение - ожидаемый блок<br>
  * Значение: заказ<br>
  */
-public class TimeTXDoneMap extends DBTabImpl<Long, Integer> {
+public class TimeTXDoneMap extends DBTabImpl<Long, Integer> implements TimeTXintf<Integer, Long> {
 
     public TimeTXDoneMap(int dbs, DCSet databaseSet, DB database) {
         super(dbs, databaseSet, database);
@@ -43,5 +45,10 @@ public class TimeTXDoneMap extends DBTabImpl<Long, Integer> {
                     map = new TimeDoneSuitMapDBFork((TimeTXDoneMap) parent, databaseSet);
             }
         }
+    }
+
+    @Override
+    public IteratorCloseable<Fun.Tuple2<Integer, Long>> getTXIterator(boolean descending) {
+        return ((TimeTXintf) map).getTXIterator(descending);
     }
 }
