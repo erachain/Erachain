@@ -63,7 +63,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
                 TransactionAmount.ACTION_DEBT,
                 TransactionAmount.ACTION_HOLD,
                 TransactionAmount.ACTION_SPEND,
-                //TransactionAmount.ACTION_PLEDGE,
+                TransactionAmount.ACTION_PLEDGE,
         }));
         jComboBoxFilterBalancePosition.setRenderer(new RenderComboBoxViewBalance());
         jComboBoxFilterSideBalance.setModel(new DefaultComboBoxModel(new String[]{
@@ -290,7 +290,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         jComboBoxAccrualAsset = new JComboBox<>();
         jComboBoxAccrualAction = new JComboBox<>();
         jComboBoxFilterAsset = new JComboBox<>();
-        jLabelBalancePosition = new JLabel();
+        jLabelFilterBalancePosition = new JLabel();
         jComboBoxFilterBalancePosition = new JComboBox<>();
         jLabel8 = new JLabel();
         jTextFieldBQ = new JTextField();
@@ -517,11 +517,11 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
         jPanelFilterBalance.setLayout(jPanelLayout);
 
-        jLabelBalancePosition.setText(Lang.T("Balance Position"));
+        jLabelFilterBalancePosition.setText(Lang.T("Balance Position"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
         gridBagConstraints.insets = labelGBC.insets;
-        jPanelFilterBalance.add(jLabelBalancePosition, gridBagConstraints);
+        jPanelFilterBalance.add(jLabelFilterBalancePosition, gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -800,7 +800,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
     private JLabel jLabelPaymentMin;
     private JLabel jLabelTitlemetod;
     private JLabel jLabel_FeesResult;
-    private JLabel jLabelBalancePosition;
+    private JLabel jLabelFilterBalancePosition;
     private JPanel jPanelMinMaxAmounts;
     private JPanel jPanelFilterBalance;
     private JPanel jPanelStartEndActions;
