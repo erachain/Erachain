@@ -1655,7 +1655,7 @@ public class ExData {
         if (hashes != null) {
             for (Object hashObject : hashes.keySet()) {
                 if (Base58.isExtraSymbols(hashObject.toString())) {
-                    rNote.errorValue = hashObject.toString();
+                    errorValue = hashObject.toString();
                     return Transaction.INVALID_DATA_FORMAT;
                 }
             }
@@ -1667,7 +1667,7 @@ public class ExData {
             for (ExLinkAuthor author : getAuthors()) {
                 result = author.isValid(dcSet);
                 if (result != Transaction.VALIDATE_OK) {
-                    rNote.errorValue = "" + author.getRef();
+                    errorValue = "" + author.getRef();
                     return result;
                 }
             }
@@ -1677,7 +1677,7 @@ public class ExData {
             for (ExLinkSource source : getSources()) {
                 result = source.isValid(dcSet);
                 if (result != Transaction.VALIDATE_OK) {
-                    rNote.errorValue = Transaction.viewDBRef(source.getRef());
+                    errorValue = Transaction.viewDBRef(source.getRef());
                     return result;
                 }
             }
@@ -1707,7 +1707,7 @@ public class ExData {
         if (exAction != null) {
             result = exAction.isValid(rNote);
             if (result != Transaction.VALIDATE_OK)
-                rNote.errorValue = exAction.errorValue;
+                errorValue = exAction.errorValue;
             return result;
         }
 
