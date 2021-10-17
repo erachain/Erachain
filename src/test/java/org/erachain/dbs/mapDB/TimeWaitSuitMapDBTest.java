@@ -9,6 +9,8 @@ import org.erachain.dbs.IteratorCloseable;
 import org.junit.Test;
 import org.mapdb.Fun;
 
+import static org.junit.Assert.assertEquals;
+
 public class TimeWaitSuitMapDBTest {
 
     DCSet dcSet;
@@ -34,22 +36,54 @@ public class TimeWaitSuitMapDBTest {
 
         init();
 
-        timeTXWaitMap.put(Transaction.parseDBRef("123-1"), 1234);
-        timeTXWaitMap.put(Transaction.parseDBRef("125-2"), 2234);
-        timeTXWaitMap.put(Transaction.parseDBRef("333-5"), 234);
+        Fun.Tuple2<String, Integer>[] values = new Fun.Tuple2[]{
+                new Fun.Tuple2("123-1", 1234), new Fun.Tuple2("523-1", 2234), new Fun.Tuple2("333-5", 234),
+        };
+        timeTXWaitMap.put(Transaction.parseDBRef(values[0].a), values[0].b);
+        timeTXWaitMap.put(Transaction.parseDBRef(values[1].a), values[1].b);
+        timeTXWaitMap.put(Transaction.parseDBRef(values[2].a), values[2].b);
 
         IteratorCloseable<Fun.Tuple2<Integer, Long>> iterator = timeTXWaitMap.getTXIterator();
+        int i = 0;
         while (iterator.hasNext()) {
             key = iterator.next();
             System.out.println(key.a + " - " + Transaction.viewDBRef(key.b));
+
+            switch (++i) {
+                case 1:
+                    assertEquals(values[2].b, key.a);
+                    break;
+                case 2:
+                    assertEquals(values[0].b, key.a);
+                    break;
+                case 3:
+                    assertEquals(values[1].b, key.a);
+                    break;
+                default:
+                    assertEquals("wrong index", "");
+
+            }
+
         }
 
         System.out.println(" DELETE: ");
-        timeTXWaitMap.delete(Transaction.parseDBRef("123-1"));
+        timeTXWaitMap.delete(Transaction.parseDBRef(values[0].a));
         iterator = timeTXWaitMap.getTXIterator();
+        i = 0;
         while (iterator.hasNext()) {
             key = iterator.next();
             System.out.println(key.a + " - " + Transaction.viewDBRef(key.b));
+
+            switch (++i) {
+                case 1:
+                    assertEquals(values[2].b, key.a);
+                    break;
+                case 2:
+                    assertEquals(values[1].b, key.a);
+                    break;
+                default:
+                    assertEquals("wrong index", "");
+            }
         }
 
     }
@@ -59,28 +93,92 @@ public class TimeWaitSuitMapDBTest {
 
         init();
 
-        /*
-        long[] pointStart = new long[]{2345L, 123L};
+        Fun.Tuple2<String, Integer>[] values = new Fun.Tuple2[]{
+                new Fun.Tuple2("123-1", 1234), new Fun.Tuple2("523-1", 2234), new Fun.Tuple2("333-5", 234),
+                // in FORK:
+                new Fun.Tuple2("220-4", 1534),
 
-        assertEquals(account.getLastTimestamp(dcSet), null);
-        account.setLastTimestamp(pointStart, dcSet);
-        assertEquals(pointStart, account.getLastTimestamp(dcSet));
+        };
+        timeTXWaitMap.put(Transaction.parseDBRef(values[0].a), values[0].b);
+        timeTXWaitMap.put(Transaction.parseDBRef(values[1].a), values[1].b);
+        timeTXWaitMap.put(Transaction.parseDBRef(values[2].a), values[2].b);
 
-        long[] point2 = new long[]{pointStart[0] + 9767, pointStart[1] + 123};
-        account.setLastTimestamp(point2, dcSet);
-        assertEquals(point2, account.getLastTimestamp(dcSet));
+        IteratorCloseable<Fun.Tuple2<Integer, Long>> iterator = timeTXWaitMap.getTXIterator();
+        int i = 0;
+        while (iterator.hasNext()) {
+            key = iterator.next();
+            System.out.println(key.a + " - " + Transaction.viewDBRef(key.b));
+
+            switch (++i) {
+                case 1:
+                    assertEquals(values[2].b, key.a);
+                    break;
+                case 2:
+                    assertEquals(values[0].b, key.a);
+                    break;
+                case 3:
+                    assertEquals(values[1].b, key.a);
+                    break;
+                default:
+                    assertEquals("wrong index", "");
+
+            }
+        }
+
+        System.out.println(" *** ADD in FORK *** ");
 
         DCSet forkDCSet = dcSet.fork(this.toString());
-        account.removeLastTimestamp(forkDCSet, point2[0]);
-        long[] pointStartCopy = new long[]{2345L, 123L};
-        assertEquals(2345L, account.getLastTimestamp(forkDCSet)[0]);
-        assertEquals(123L, account.getLastTimestamp(forkDCSet)[1]);
+        timeTXWaitMap = forkDCSet.getTimeTXWaitMap();
+        timeTXWaitMap.put(Transaction.parseDBRef(values[3].a), values[3].b);
 
-        account.removeLastTimestamp(forkDCSet);
-        assertEquals(null, account.getLastTimestamp(forkDCSet));
+        iterator = timeTXWaitMap.getTXIterator();
+        i = 0;
+        while (iterator.hasNext()) {
+            key = iterator.next();
+            System.out.println(key.a + " - " + Transaction.viewDBRef(key.b));
 
+            switch (++i) {
+                case 1:
+                    assertEquals(values[2].b, key.a);
+                    break;
+                case 2:
+                    assertEquals(values[0].b, key.a);
+                    break;
+                case 3:
+                    assertEquals(values[3].b, key.a);
+                    break;
+                case 4:
+                    assertEquals(values[1].b, key.a);
+                    break;
+                default:
+                    assertEquals("wrong index", "");
 
-         */
+            }
+        }
+
+        System.out.println(" DELETE: ");
+        timeTXWaitMap.delete(Transaction.parseDBRef(values[0].a));
+        iterator = timeTXWaitMap.getTXIterator();
+        i = 0;
+        while (iterator.hasNext()) {
+            key = iterator.next();
+            System.out.println(key.a + " - " + Transaction.viewDBRef(key.b));
+
+            switch (++i) {
+                case 1:
+                    assertEquals(values[2].b, key.a);
+                    break;
+                case 2:
+                    assertEquals(values[3].b, key.a);
+                    break;
+                case 3:
+                    assertEquals(values[1].b, key.a);
+                    break;
+                default:
+                    assertEquals("wrong index", "");
+            }
+        }
+
     }
 
 }

@@ -59,6 +59,6 @@ public class TimeDoneSuitMapDBFork extends DBMapSuitFork<Long, Integer> implemen
     @Override
     public IteratorCloseable<Fun.Tuple2<Integer, Long>> getTXIterator() {
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratorParent(parent.getIterator(), deleted), keySet.iterator()), Fun.COMPARATOR);
+                new IteratorParent(((TimeTXintf) parent).getTXIterator(), deleted), keySet.iterator()), Fun.COMPARATOR);
     }
 }
