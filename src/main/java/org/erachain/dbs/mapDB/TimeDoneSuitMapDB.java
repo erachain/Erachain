@@ -13,17 +13,20 @@ import org.mapdb.Fun;
 import java.util.NavigableSet;
 
 /**
- * Хранит исполненные транзакции, или отмененные - все что уже не активно для запуска по времени<br>
+ * Хранит исполненные транзакции, или отмененные - все что уже не активно для запуска по времени. Нужно для откатов<br>
  * <br>
- * Ключ: блок, значение - ссылка на ID транзакции, поэтому в основной мапке только последняя трнзакция на этот ожидаемый блок<br>
- * Для прохода по всем транзакциям использовать только getTXIterator!!!
+ * Ключ: ссылка на ID транзакции, значение - ожидаемый блок<br>
+ * TODO заменить на один SET - без основной MAP, так как она по сути дублируется во вторичном ключе на SET - но тогда нужно другой класс SuitSet делать и у РоксДБ
  * Значение: заказ<br>
  */
 
 @Slf4j
-public class TimeDoneSuitMapDB extends DBMapSuit<Integer, Long> implements TimeTXintf<Integer, Long> {
+public class TimeDoneSuitMapDB extends DBMapSuit<Long, Integer> implements TimeTXintf<Integer, Long> {
 
-    private NavigableSet keySet;
+    /**
+     * тут как раз хранится весь список - как Set - блок который ждем + SeqNo транзакции которая ждет
+     */
+    private NavigableSet<Fun.Tuple2<Integer, Long>> keySet;
 
     public TimeDoneSuitMapDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger, false);
@@ -43,11 +46,10 @@ public class TimeDoneSuitMapDB extends DBMapSuit<Integer, Long> implements TimeT
                 .makeOrGet();
 
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.keySet,
-                new Fun.Function2<Fun.Tuple2<Integer, Long>, Integer, Long>() {
+                new Fun.Function2<Integer, Long, Integer>() {
                     @Override
-                    public Fun.Tuple2<Integer, Long> run(
-                            Integer height, Long dbRef) {
-                        return new Fun.Tuple2<Integer, Long>(height, dbRef);
+                    public Integer run(Long dbRef, Integer height) {
+                        return height;
                     }
                 });
 

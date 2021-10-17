@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
-import org.erachain.datachain.TimeDoneMap;
+import org.erachain.datachain.TimeTXDoneMap;
 import org.erachain.datachain.TimeTXintf;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorParent;
@@ -14,20 +14,12 @@ import org.mapdb.Fun;
 
 import java.util.NavigableSet;
 
-/**
- * Хранит исполненные транзакции, или отмененные - все что уже не активно для запуска по времени<br>
- * <br>
- * Ключ: блок, значение - ссылка на ID транзакции, поэтому в основной мапке только последняя трнзакция на этот ожидаемый блок<br>
- * Для прохода по всем транзакциям использовать только getTXIterator!!!
- * Значение: заказ<br>
- */
-
 @Slf4j
-public class TimeDoneSuitMapDBFork extends DBMapSuitFork<Integer, Long> implements TimeTXintf<Integer, Long> {
+public class TimeDoneSuitMapDBFork extends DBMapSuitFork<Long, Integer> implements TimeTXintf<Integer, Long> {
 
-    private NavigableSet keySet;
+    private NavigableSet<Fun.Tuple2<Integer, Long>> keySet;
 
-    public TimeDoneSuitMapDBFork(TimeDoneMap parent, DBASet databaseSet) {
+    public TimeDoneSuitMapDBFork(TimeTXDoneMap parent, DBASet databaseSet) {
         super(parent, databaseSet, logger, false, null);
     }
 
@@ -44,11 +36,10 @@ public class TimeDoneSuitMapDBFork extends DBMapSuitFork<Integer, Long> implemen
                 .makeOrGet();
 
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.keySet,
-                new Fun.Function2<Fun.Tuple2<Integer, Long>, Integer, Long>() {
+                new Fun.Function2<Integer, Long, Integer>() {
                     @Override
-                    public Fun.Tuple2<Integer, Long> run(
-                            Integer height, Long dbRef) {
-                        return new Fun.Tuple2<Integer, Long>(height, dbRef);
+                    public Integer run(Long dbRef, Integer height) {
+                        return height;
                     }
                 });
 

@@ -181,8 +181,8 @@ public class DCSet extends DBASet implements Closeable {
     private TransactionFinalMapSigns transactionFinalMapSigns;
     private TransactionMapImpl transactionTab;
 
-    private TimeDoneMap timeDoneMap;
-    private TimeWaitMap timeWaitMap;
+    private TimeTXDoneMap timeTXDoneMap;
+    private TimeTXWaitMap timeTXWaitMap;
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
@@ -245,10 +245,10 @@ public class DCSet extends DBASet implements Closeable {
 
             this.addressPersonMap = new AddressPersonMapImpl(defaultDBS != DBS_FAST ? defaultDBS : DBS_MAP_DB, this, database);
 
-            this.timeDoneMap = new TimeDoneMap(defaultDBS != DBS_FAST ? defaultDBS :
+            this.timeTXDoneMap = new TimeTXDoneMap(defaultDBS != DBS_FAST ? defaultDBS :
                     TIME_DONE_MAP
                     , this, database);
-            this.timeWaitMap = new TimeWaitMap(defaultDBS != DBS_FAST ? defaultDBS :
+            this.timeTXWaitMap = new TimeTXWaitMap(defaultDBS != DBS_FAST ? defaultDBS :
                     TIME_WAIT_MAP
                     , this, database);
 
@@ -402,16 +402,16 @@ public class DCSet extends DBASet implements Closeable {
 
         this.addressPersonMap = new AddressPersonMapImpl(DBS_MAP_DB, parent.addressPersonMap, this);
 
-        this.timeDoneMap = new TimeDoneMap(
+        this.timeTXDoneMap = new TimeTXDoneMap(
                 DBS_MAP_DB
                 //DBS_ROCK_DB
                 //DBS_NATIVE_MAP
-                , parent.timeDoneMap, this);
-        this.timeWaitMap = new TimeWaitMap(
+                , parent.timeTXDoneMap, this);
+        this.timeTXWaitMap = new TimeTXWaitMap(
                 DBS_MAP_DB
                 //DBS_ROCK_DB
                 //DBS_NATIVE_MAP
-                , parent.timeWaitMap, this);
+                , parent.timeTXWaitMap, this);
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.timeRoyaltyMap = new TimeRoyaltyMap(parent.timeRoyaltyMap, this);
@@ -825,8 +825,8 @@ public class DCSet extends DBASet implements Closeable {
         this.atStateMap.clear();
         this.atTransactionMap.clear();
 
-        this.timeDoneMap.clear();
-        this.timeWaitMap.clear();
+        this.timeTXDoneMap.clear();
+        this.timeTXWaitMap.clear();
 
         this.outUses();
     }
@@ -1374,12 +1374,12 @@ public class DCSet extends DBASet implements Closeable {
         return this.itemUnionMap;
     }
 
-    public TimeDoneMap getTimeDoneMap() {
-        return this.timeDoneMap;
+    public TimeTXDoneMap getTimeTXDoneMap() {
+        return this.timeTXDoneMap;
     }
 
-    public TimeWaitMap getTimeWaitMap() {
-        return this.timeWaitMap;
+    public TimeTXWaitMap getTimeTXWaitMap() {
+        return this.timeTXWaitMap;
     }
 
     /**

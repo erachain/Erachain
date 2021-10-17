@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.TimeTXWaitMap;
 import org.erachain.datachain.TimeTXintf;
-import org.erachain.datachain.TimeWaitMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorParent;
 import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
@@ -14,23 +14,12 @@ import org.mapdb.Fun;
 
 import java.util.NavigableSet;
 
-/**
- * Хранит исполненные транзакции, или отмененные - все что уже не активно для запуска по времени<br>
- * <br>
- * Ключ: блок, значение - ссылка на ID транзакции, поэтому в основной мапке только последняя трнзакция на этот ожидаемый блок<br>
- * Для прохода по всем транзакциям использовать только getTXIterator!!!
- * Значение: заказ<br>
- */
-
 @Slf4j
 public class TimeWaitSuitMapDBFork extends DBMapSuitFork<Long, Integer> implements TimeTXintf<Integer, Long> {
 
-    /**
-     * тут как раз хранится весь список - как Set - блок который ждем + SeqNo транзакциикоторая ждет
-     */
     private NavigableSet<Fun.Tuple2<Integer, Long>> keySet;
 
-    public TimeWaitSuitMapDBFork(TimeWaitMap parent, DBASet databaseSet) {
+    public TimeWaitSuitMapDBFork(TimeTXWaitMap parent, DBASet databaseSet) {
         super(parent, databaseSet, logger, false, null);
     }
 

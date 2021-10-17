@@ -9,19 +9,13 @@ import org.mapdb.Fun;
 
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
-/**
- * Хранит исполненные трнзакции, или отмененные - все что уже не активно<br>
- * <br>
- * Ключ: ссылка на запись создания заказа<br>
- * Значение: заказ<br>
- */
-public class TimeWaitMap extends DBTabImpl<Long, Integer> implements TimeTXintf<Integer, Long> {
+public class TimeTXWaitMap extends DBTabImpl<Long, Integer> implements TimeTXintf<Integer, Long> {
 
-    public TimeWaitMap(int dbs, DCSet databaseSet, DB database) {
+    public TimeTXWaitMap(int dbs, DCSet databaseSet, DB database) {
         super(dbs, databaseSet, database);
     }
 
-    public TimeWaitMap(int dbs, TimeWaitMap parent, DCSet dcSet) {
+    public TimeTXWaitMap(int dbs, TimeTXWaitMap parent, DCSet dcSet) {
         super(dbs, parent, dcSet);
     }
 
@@ -39,10 +33,10 @@ public class TimeWaitMap extends DBTabImpl<Long, Integer> implements TimeTXintf<
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new TimeWaitSuitMapDBFork((TimeWaitMap) parent, databaseSet);
+                    map = new TimeWaitSuitMapDBFork((TimeTXWaitMap) parent, databaseSet);
                     break;
                 default:
-                    map = new TimeWaitSuitMapDBFork((TimeWaitMap) parent, databaseSet);
+                    map = new TimeWaitSuitMapDBFork((TimeTXWaitMap) parent, databaseSet);
             }
         }
     }

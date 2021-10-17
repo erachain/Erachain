@@ -4,7 +4,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TimeWaitMap;
+import org.erachain.datachain.TimeTXWaitMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.junit.Test;
 import org.mapdb.Fun;
@@ -12,7 +12,7 @@ import org.mapdb.Fun;
 public class TimeWaitSuitMapDBTest {
 
     DCSet dcSet;
-    TimeWaitMap timeWaitMap;
+    TimeTXWaitMap timeTXWaitMap;
     Fun.Tuple2<Integer, Long> key;
 
     private void init() {
@@ -25,7 +25,7 @@ public class TimeWaitSuitMapDBTest {
 
         }
 
-        timeWaitMap = dcSet.getTimeWaitMap();
+        timeTXWaitMap = dcSet.getTimeTXWaitMap();
 
     }
 
@@ -34,11 +34,19 @@ public class TimeWaitSuitMapDBTest {
 
         init();
 
-        timeWaitMap.put(Transaction.parseDBRef("123-1"), 1234);
-        timeWaitMap.put(Transaction.parseDBRef("125-2"), 2234);
-        timeWaitMap.put(Transaction.parseDBRef("333-5"), 234);
+        timeTXWaitMap.put(Transaction.parseDBRef("123-1"), 1234);
+        timeTXWaitMap.put(Transaction.parseDBRef("125-2"), 2234);
+        timeTXWaitMap.put(Transaction.parseDBRef("333-5"), 234);
 
-        IteratorCloseable<Fun.Tuple2<Integer, Long>> iterator = timeWaitMap.getTXIterator();
+        IteratorCloseable<Fun.Tuple2<Integer, Long>> iterator = timeTXWaitMap.getTXIterator();
+        while (iterator.hasNext()) {
+            key = iterator.next();
+            System.out.println(key.a + " - " + Transaction.viewDBRef(key.b));
+        }
+
+        System.out.println(" DELETE: ");
+        timeTXWaitMap.delete(Transaction.parseDBRef("123-1"));
+        iterator = timeTXWaitMap.getTXIterator();
         while (iterator.hasNext()) {
             key = iterator.next();
             System.out.println(key.a + " - " + Transaction.viewDBRef(key.b));

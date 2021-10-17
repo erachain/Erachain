@@ -8,18 +8,18 @@ import org.mapdb.DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 /**
- * Хранит исполненные трнзакции, или отмененные - все что уже не активно<br>
+ * Хранит исполненные транзакции, или отмененные - все что уже не активно для запуска по времени<br>
  * <br>
- * Ключ: ссылка на запись создания заказа<br>
+ * Ключ: ссылка на ID транзакции, значение - ожидаемый блок<br>
  * Значение: заказ<br>
  */
-public class TimeDoneMap extends DBTabImpl<Integer, Long> {
+public class TimeTXDoneMap extends DBTabImpl<Long, Integer> {
 
-    public TimeDoneMap(int dbs, DCSet databaseSet, DB database) {
+    public TimeTXDoneMap(int dbs, DCSet databaseSet, DB database) {
         super(dbs, databaseSet, database);
     }
 
-    public TimeDoneMap(int dbs, TimeDoneMap parent, DCSet dcSet) {
+    public TimeTXDoneMap(int dbs, TimeTXDoneMap parent, DCSet dcSet) {
         super(dbs, parent, dcSet);
     }
 
@@ -40,7 +40,7 @@ public class TimeDoneMap extends DBTabImpl<Integer, Long> {
                     //map = new BlocksSuitMapDBFotk((TransactionMap) parent, databaseSet);
                     //break;
                 default:
-                    map = new TimeDoneSuitMapDBFork((TimeDoneMap) parent, databaseSet);
+                    map = new TimeDoneSuitMapDBFork((TimeTXDoneMap) parent, databaseSet);
             }
         }
     }
