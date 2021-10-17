@@ -66,7 +66,7 @@ public class TimeWaitSuitMapDBTest {
 
         }
 
-        System.out.println(" DELETE: ");
+        System.out.println(" DELETE: " + values[0].a);
         timeTXWaitMap.delete(Transaction.parseDBRef(values[0].a));
         iterator = timeTXWaitMap.getTXIterator();
         i = 0;
@@ -125,7 +125,7 @@ public class TimeWaitSuitMapDBTest {
             }
         }
 
-        System.out.println(" *** ADD in FORK *** ");
+        System.out.println(" *** ADD in FORK *** " + values[3].a);
 
         DCSet forkDCSet = dcSet.fork(this.toString());
         timeTXWaitMap = forkDCSet.getTimeTXWaitMap();
@@ -156,7 +156,7 @@ public class TimeWaitSuitMapDBTest {
             }
         }
 
-        System.out.println(" DELETE: ");
+        System.out.println(" DELETE: " + values[0].a);
         timeTXWaitMap.delete(Transaction.parseDBRef(values[0].a));
         iterator = timeTXWaitMap.getTXIterator();
         i = 0;

@@ -5,6 +5,6 @@ import org.mapdb.Fun;
 
 public interface TimeTXintf<T, U> {
 
-    abstract IteratorCloseable<Fun.Tuple2<T, U>> getTXIterator();
+    IteratorCloseable<Fun.Tuple2<T, U>> getTXIterator();
 
 }
