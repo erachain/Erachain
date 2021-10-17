@@ -156,6 +156,11 @@ public class DogePlanet extends EpochSmartContract {
         return false;
     }
 
+    @Override
+    public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
+        return false;
+    }
+
 
     @Override
     public boolean orphan(DCSet dcSet, Transaction transaction) {
@@ -175,6 +180,11 @@ public class DogePlanet extends EpochSmartContract {
 
         valuesMap.put(COUNT_KEY, totalIssued - count);
 
+        return false;
+    }
+
+    @Override
+    public boolean orphanByTime(DCSet dcSet, Transaction transaction) {
         return false;
     }
 

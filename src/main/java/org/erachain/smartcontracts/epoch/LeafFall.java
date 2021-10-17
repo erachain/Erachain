@@ -246,13 +246,9 @@ public class LeafFall extends EpochSmartContract {
         return false;
     }
 
-    private void wipe(DCSet dcSet, SmartContractValues valuesMap) {
-        // remove ASSET
-        dcSet.getItemAssetMap().decrementDelete(keyInit);
-
-        // TODO - сделать удаление всех разом по Tuple2(id, null)
-        valuesMap.delete(INIT_KEY);
-        valuesMap.delete(COUN_VAR);
+    @Override
+    public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
+        return false;
     }
 
     @Override
@@ -276,5 +272,18 @@ public class LeafFall extends EpochSmartContract {
         return false;
     }
 
+    @Override
+    public boolean orphanByTime(DCSet dcSet, Transaction transaction) {
+        return false;
+    }
+
+    private void wipe(DCSet dcSet, SmartContractValues valuesMap) {
+        // remove ASSET
+        dcSet.getItemAssetMap().decrementDelete(keyInit);
+
+        // TODO - сделать удаление всех разом по Tuple2(id, null)
+        valuesMap.delete(INIT_KEY);
+        valuesMap.delete(COUN_VAR);
+    }
 
 }

@@ -2602,6 +2602,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * @param block
      */
     public void processByTime(Block block) {
+        if (smartContract != null)
+            smartContract.processByTime(dcSet, block, this);
     }
 
     //////////////////////////////////// ORPHAN
@@ -2674,6 +2676,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void orphanByTime(Block block) {
+        if (smartContract != null)
+            smartContract.orphanByTime(dcSet, this);
     }
 
     public Transaction copy() {
