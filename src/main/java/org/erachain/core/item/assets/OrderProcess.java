@@ -541,7 +541,7 @@ public class OrderProcess {
         AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
 
         //ORPHAN TRADES
-        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(id)) {
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(id, false)) {
 
             Order target;
             while (iterator.hasNext()) {
@@ -661,7 +661,7 @@ public class OrderProcess {
 
         if (asOrphan) {
             Trade trade;
-            try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(blockTx_id)) {
+            try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(blockTx_id, asOrphan)) {
                 while (iterator.hasNext()) {
                     trade = tradesMap.remove(iterator.next());
                     CancelOrderTransaction.orphanBody(dcSet, blockTx_id, trade.getTarget(), false);

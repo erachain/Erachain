@@ -350,7 +350,8 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
         if (address != null) {
             //iterator = Iterators.concat(senderKeys, recipientKeys);
-            iterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of((Iterable) senderKeys, recipientKeys), Fun.COMPARATOR);
+            iterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of((Iterable) senderKeys, recipientKeys),
+                    desc ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
 
         } else if (sender != null && recipient != null) {
             iterator = senderKeys;

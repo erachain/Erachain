@@ -35,6 +35,8 @@ public class TradeMapImplTest {
             IDB.DBS_MAP_DB,
             IDB.DBS_ROCK_DB};
 
+    boolean descending = false;
+
     Long releaserReference = null;
     long ERM_KEY = Transaction.RIGHTS_KEY;
     long FEE_KEY = Transaction.FEE_KEY;
@@ -170,7 +172,7 @@ public class TradeMapImplTest {
                 DCSet forked = dcSet.fork(this.toString());
                 TradeMapImpl forkedTradesMap = forked.getTradeMap();
 
-                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID);
+                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID, descending);
                 assertEquals(1, Iterators.size(iterator));
 
                 // ADD to FORK
@@ -179,13 +181,13 @@ public class TradeMapImplTest {
                         3, 5, index++);
                 forkedTradesMap.put(trade);
 
-                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID);
+                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID, descending);
                 assertEquals(2, Iterators.size(iterator));
 
                 // DELETE in FORK
                 Trade removed = forkedTradesMap.remove(new Fun.Tuple2<Long, Long>(initiatorID, targetID));
                 assertNotEquals(null, removed);
-                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID);
+                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID, descending);
                 assertEquals(1, Iterators.size(iterator));
 
 

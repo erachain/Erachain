@@ -12,6 +12,7 @@ import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.mapdb.Bind;
 import org.mapdb.Fun;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
 
@@ -62,14 +63,19 @@ public class TimeWaitSuitMapDBFork extends DBMapSuitFork<Long, Integer> implemen
     public IteratorCloseable<Fun.Tuple2<Integer, Long>> getTXIterator(boolean descending) {
         IteratorCloseable parentIterator = ((TimeTXintf) parent).getTXIterator(descending);
 
+        Comparator comparatorDuplicates;
         Iterator iterator;
-        if (descending)
+
+        if (descending) {
             iterator = keySet.descendingIterator();
-        else
+            comparatorDuplicates = Fun.REVERSE_COMPARATOR;
+        } else {
             iterator = keySet.iterator();
+            comparatorDuplicates = Fun.COMPARATOR;
+        }
 
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratorParentSecondaryKey(parentIterator, deleted), iterator), Fun.COMPARATOR);
+                new IteratorParentSecondaryKey(parentIterator, deleted), iterator), comparatorDuplicates);
     }
 
 }
