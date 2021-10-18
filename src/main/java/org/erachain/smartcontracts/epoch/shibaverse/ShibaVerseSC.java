@@ -386,9 +386,9 @@ public class ShibaVerseSC extends EpochSmartContract {
     }
 
     @Override
-    public boolean orphanByTime(DCSet dcSet, Transaction transaction) {
+    public boolean orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
         if (COMMAND_CATH_COMET.equals(command)) {
-            catchComets(dcSet, null, (RSend) transaction, true);
+            catchComets(dcSet, block, (RSend) transaction, true);
         }
 
         return false;

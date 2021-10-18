@@ -179,7 +179,7 @@ public class DogePlanet extends EpochSmartContract {
     }
 
     @Override
-    public boolean orphanByTime(DCSet dcSet, Transaction transaction) {
+    public boolean orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
         return false;
     }
 

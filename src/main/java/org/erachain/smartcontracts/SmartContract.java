@@ -101,7 +101,7 @@ public abstract class SmartContract {
 
     abstract public boolean orphan(DCSet dcSet, Transaction transaction);
 
-    abstract public boolean orphanByTime(DCSet dcSet, Transaction transaction);
+    abstract public boolean orphanByTime(DCSet dcSet, Block block, Transaction transaction);
 
     /**
      * Делает смотр-контракт протокольный (на эпоху).
