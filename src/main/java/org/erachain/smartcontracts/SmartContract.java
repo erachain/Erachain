@@ -48,7 +48,7 @@ public abstract class SmartContract {
     }
 
     public Object[][] getItemsKeys() {
-        return null;
+        return new Object[0][0];
     }
 
     /**
@@ -84,6 +84,8 @@ public abstract class SmartContract {
                 return LeafFall.Parse(data, position, forDeal);
             case DogePlanet.ID:
                 return DogePlanet.Parse(data, position, forDeal);
+            case ShibaVerseSC.ID:
+                return ShibaVerseSC.Parse(data, position, forDeal);
         }
 
         throw new Exception("wrong smart-contract id:" + id);
@@ -109,11 +111,13 @@ public abstract class SmartContract {
      */
     static public SmartContract make(Transaction transaction) {
 
+        String addr = ShibaVerseSC.MAKER.getAddress();
+
         if (BlockChain.TEST_MODE
                 && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
 
-            if (txSend.getRecipient() == ShibaVerseSC.MAKER && txSend.isText() && !txSend.isEncrypted()) {
+            if (txSend.getRecipient().equals(ShibaVerseSC.MAKER) && txSend.isText() && !txSend.isEncrypted()) {
                 return new ShibaVerseSC(new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase(), "");
             }
 
