@@ -3,6 +3,8 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Bytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.json.simple.JSONObject;
 
@@ -33,6 +35,11 @@ public class GenesisRecord extends Transaction {
 
         this.signature = digest;
 
+    }
+
+    @Override
+    public PublicKeyAccount getCreator() {
+        return GenesisBlock.CREATOR;
     }
 
     @Override
