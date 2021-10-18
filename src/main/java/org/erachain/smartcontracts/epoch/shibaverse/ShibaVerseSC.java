@@ -85,11 +85,12 @@ public class ShibaVerseSC extends EpochSmartContract {
                     return true;
                 }
             }
-            status = "error: wrong data";
+            status = "error: " + COMMAND_CATH_COMET + " - wrong data";
             return false;
         }
 
-        return true;
+        status = "error: unknown command";
+        return false;
 
     }
 
