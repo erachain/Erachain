@@ -13,6 +13,7 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.epoch.DogePlanet;
 import org.erachain.smartcontracts.epoch.LeafFall;
+import org.erachain.smartcontracts.epoch.shibaverse.ShibaVerseSC;
 
 import java.math.BigDecimal;
 
@@ -117,6 +118,13 @@ public abstract class SmartContract {
                 Order order = createOrder.getDCSet().getCompletedOrderMap().get(createOrder.getOrderId());
                 if (order != null)
                     return new LeafFall();
+            }
+
+        } else if (BlockChain.TEST_MODE
+                && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+            RSend txSend = (RSend) transaction;
+            if (txSend.getRecipient() == ShibaVerseSC.MAKER) {
+                return new ShibaVerseSC();
             }
 
         }
