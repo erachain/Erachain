@@ -111,8 +111,6 @@ public abstract class SmartContract {
      */
     static public SmartContract make(Transaction transaction) {
 
-        String addr = ShibaVerseSC.MAKER.getAddress();
-
         if (BlockChain.TEST_MODE
                 && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;

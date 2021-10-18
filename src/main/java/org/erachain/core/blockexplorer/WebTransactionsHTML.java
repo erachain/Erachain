@@ -75,6 +75,12 @@ public class WebTransactionsHTML {
         outTX.put("timestamp", transaction.getTimestamp());
         outTX.put("signature", transaction.viewSignature());
 
+        if (transaction instanceof RCalculated) {
+
+        } else {
+            outTX.put("Label_RAW", Lang.T("RAW"));
+        }
+
         if (transaction.isWiped())
             return outTX;
 
@@ -799,7 +805,7 @@ public class WebTransactionsHTML {
 
         Fun.Tuple2<Integer, PersonCls> itemPerson = transaction.getCreator().getPerson();
         if (itemPerson == null) {
-            return htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature(), langObj);
+            return htmlSignifier(transaction.getTimestamp(), null, null, transaction.getCreator(), transaction.getSignature(), langObj);
         }
 
         return htmlSignifier(transaction.getTimestamp(), itemPerson.b.getKey(), itemPerson.b.viewName(),
@@ -849,7 +855,7 @@ public class WebTransactionsHTML {
             personSign = htmlSignifier(transaction.getTimestamp(), creatorPersonItem.b.getKey(),
                     creatorPersonItem.b.viewName(), transaction.getCreator(), transaction.getSignature(), langObj);
         } else {
-            personSign = htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature(), langObj);
+            personSign = htmlSignifier(transaction.getTimestamp(), null, null, transaction.getCreator(), transaction.getSignature(), langObj);
         }
 
         Fun.Tuple2<BigDecimal, List<Long>> signsItem = dcSet.getVouchRecordMap().get(transaction.getDBRef());

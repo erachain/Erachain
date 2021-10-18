@@ -43,7 +43,9 @@ function tx(data) {
         output += tx.links + '<br>';
     }
 
-    output += '<br><a href ="/api/tx/raw/' + tx.signature + '">{ RAW }</a>';
+    if (tx.hasOwnProperty('Label_RAW')) {
+        output += '<a href ="/api/tx/raw/' + tx.signature + '">{ ' + tx.Label_RAW + ' }</a>';
+    }
 
     return output;
 }

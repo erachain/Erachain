@@ -2564,6 +2564,7 @@ public class BlockExplorer {
         output.put("Label_pubKey", Lang.T("Public Key", langObj));
         output.put("Label_signature", Lang.T("Signature", langObj));
         output.put("Label_Link", Lang.T("Link", langObj));
+        output.put("Label_RAW", Lang.T("RAW"));
 
         int block = rNote.getBlockHeight();
         int seqNo = rNote.getSeqNo();

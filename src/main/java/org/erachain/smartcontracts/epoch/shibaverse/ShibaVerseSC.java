@@ -142,7 +142,8 @@ public class ShibaVerseSC extends EpochSmartContract {
     }
 
 
-    // PROCESSES
+    //////// PROCESSES
+
     private void init(DCSet dcSet, RSend commandTX, Account admin, boolean asOrphan) {
 
         /**
@@ -181,6 +182,8 @@ public class ShibaVerseSC extends EpochSmartContract {
     public boolean processAdminCommands(DCSet dcSet, Block block, RSend commandTX, Account admin) {
         if ("init".equals(command)) {
             init(dcSet, commandTX, admin, false);
+        } else if (command.startsWith("emite")) {
+
         }
 
         return false;
