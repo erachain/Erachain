@@ -2575,7 +2575,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public void processTail(Block block, int forDeal) {
         ///////// SMART CONTRACTS SESSION
-        if (smartContract == null) {
+        if (smartContract == null && (block == null || block.heightBlock > 1)) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
             // потом он будет записан в базу данных и его можно найти загрузив эту трнзакцию
             smartContract = SmartContract.make(this);
@@ -2616,7 +2616,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         ///////// SMART CONTRACTS SESSION
-        if (smartContract == null) {
+        if (smartContract == null && block.heightBlock > 1) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
             // для Отката нужно это сделать тут
             smartContract = SmartContract.make(this);

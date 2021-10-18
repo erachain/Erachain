@@ -1,9 +1,12 @@
 package org.erachain.smartcontracts;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.CreateOrderTransaction;
@@ -20,12 +23,20 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class SmartContract {
 
+    static protected Controller contr = Controller.getInstance();
+    static protected Crypto crypto = Crypto.getInstance();
+
     protected final int id;
     protected final PublicKeyAccount maker;
 
     protected SmartContract(int id, PublicKeyAccount maker) {
         this.id = id;
         this.maker = maker;
+    }
+
+    protected SmartContract(int id) {
+        this.id = id;
+        this.maker = new PublicKeyAccount(crypto.digest(Longs.toByteArray(id)));
     }
 
     public int getID() {

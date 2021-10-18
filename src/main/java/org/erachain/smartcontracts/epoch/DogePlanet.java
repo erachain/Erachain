@@ -3,11 +3,8 @@ package org.erachain.smartcontracts.epoch;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
@@ -24,10 +21,8 @@ import java.math.BigDecimal;
 public class DogePlanet extends EpochSmartContract {
 
     static public final int ID = 1000;
-    static Controller contr = Controller.getInstance();
-    static Crypto crypto = Crypto.getInstance();
 
-    static public final PublicKeyAccount MAKER = new PublicKeyAccount(Base58.encode(Longs.toByteArray(ID)));
+    static public final PublicKeyAccount MAKER = new PublicKeyAccount(crypto.digest(Longs.toByteArray(ID)));
     private int count;
     private long keyEnd;
 
