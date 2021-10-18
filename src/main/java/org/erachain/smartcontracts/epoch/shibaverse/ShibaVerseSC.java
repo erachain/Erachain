@@ -196,7 +196,9 @@ public class ShibaVerseSC extends EpochSmartContract {
         if (transaction instanceof RSend) {
             RSend rsend = (RSend) transaction;
             if (isAdminCommand(transaction)) {
-                return processAdminCommands(dcSet, block, rsend, adminAddress);
+                return processAdminCommands(dcSet, block, rsend,
+                        rsend.getCreator() // need for TEST - not adminAddress
+                );
             } else {
                 if (rsend.hasAmount()) {
                     Long gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
@@ -266,7 +268,9 @@ public class ShibaVerseSC extends EpochSmartContract {
         }
 
         if (isAdminCommand(transaction)) {
-            return orphanAdminCommands(dcSet, (RSend) transaction, adminAddress);
+            return orphanAdminCommands(dcSet, (RSend) transaction,
+                    transaction.getCreator() // need for TEST - not adminAddress
+            );
         }
 
         return false;

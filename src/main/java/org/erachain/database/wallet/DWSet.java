@@ -3,6 +3,7 @@ package org.erachain.database.wallet;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.imprints.ImprintCls;
@@ -456,7 +457,7 @@ public class DWSet extends DBASet {
     }
 
     public void addAddressFavorite(String address, String pubKey, String name, String description) {
-        if (getFavoriteAccountsMap().contains(address))
+        if (getFavoriteAccountsMap().contains(address) || GenesisBlock.CREATOR.equals(address))
             return;
 
         JSONObject json = new JSONObject();
