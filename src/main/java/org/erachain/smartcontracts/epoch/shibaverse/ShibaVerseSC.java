@@ -57,7 +57,6 @@ public class ShibaVerseSC extends EpochSmartContract {
     public boolean isValid(DCSet dcSet, Transaction transaction) {
         if (isAdminCommand(transaction)) {
             if (command.equals("init") && dcSet.getSmartContractValues().contains(INIT_KEY)) {
-                ;
                 status = "error: already initated";
                 return false;
             }
@@ -204,11 +203,6 @@ public class ShibaVerseSC extends EpochSmartContract {
                     Long gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
                     if (rsend.getAssetKey() == gravitaKey) {
                         byte[] data = rsend.getData();
-                        if (data == null || data.length == 0) {
-                            // рождение комет
-                            dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
-                            return false;
-                        }
                         String command = new String(data, StandardCharsets.UTF_8).toLowerCase();
                         if ("catch comets".equals(command)) {
                             // рождение комет
