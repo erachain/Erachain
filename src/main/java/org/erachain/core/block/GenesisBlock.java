@@ -56,7 +56,9 @@ public class GenesisBlock extends Block {
         // ISSUE ITEMS
         this.initItems();
 
-        if (BlockChain.TEST_MODE && !BlockChain.DEMO_MODE) {
+        if (BlockChain.DEMO_MODE) {
+            ;
+        } else if (BlockChain.TEST_MODE) {
             this.testnetInfo = "";
 
             //ADD TESTNET GENESIS TRANSACTIONS
@@ -144,6 +146,8 @@ public class GenesisBlock extends Block {
             }
 
         } else {
+
+            /// MAIN MODE
 
             List<Tuple2<Account, BigDecimal>> sends_toUsers = new ArrayList<Tuple2<Account, BigDecimal>>();
 
