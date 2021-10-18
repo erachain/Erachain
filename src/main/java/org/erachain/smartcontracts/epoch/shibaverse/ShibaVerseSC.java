@@ -3,7 +3,7 @@ package org.erachain.smartcontracts.epoch.shibaverse;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.core.BlockChain;
+import org.apache.commons.net.util.Base64;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -17,7 +17,7 @@ import org.erachain.smartcontracts.epoch.EpochSmartContract;
 import org.erachain.webserver.WebResource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -25,22 +25,27 @@ import java.util.Arrays;
 
 public class ShibaVerseSC extends EpochSmartContract {
 
-    int WAIT_RAND = 5;
+    int WAIT_RAND = 3;
 
     static public final int ID = 1001;
 
     // 7G6sJRb7vf8ABEr3ENvV1fo1hwt197r35e
     final public static PublicKeyAccount MAKER = new PublicKeyAccount(crypto.digest(Longs.toByteArray(ID)));
 
-    final static public Account adminAddress = new Account("7G6sJRb7vf8ABEr3ENvV1fo1hwt197r35e");
+    /**
+     * admin account
+     */
+    final static public Account adminAddress = new Account("7C6cEeHw739uQm8PhdnS9yENdLhT8LUERP");
 
+    final static public String COMMAND_CATH_COMET = "catch comets";
     /**
      * GRAVUTA KEY
      */
-    static final Fun.Tuple2 INIT_KEY = new Fun.Tuple2(ID, "i");
+    static final private Tuple2 INIT_KEY = new Tuple2(ID, "i");
 
     private String command;
     private String status;
+    private Long gravitaKey;
 
     public ShibaVerseSC(String command, String status) {
         super(ID, MAKER);
@@ -50,7 +55,7 @@ public class ShibaVerseSC extends EpochSmartContract {
     }
 
     private boolean isAdminCommand(Transaction transaction) {
-        return BlockChain.TEST_MODE || transaction.getCreator().equals(adminAddress);
+        return transaction.getCreator().equals(adminAddress);
     }
 
     @Override
@@ -60,6 +65,28 @@ public class ShibaVerseSC extends EpochSmartContract {
                 status = "error: already initated";
                 return false;
             }
+            return true;
+        }
+
+        if (gravitaKey == null)
+            gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
+
+        if (gravitaKey == null) {
+            status = "error: not initated yet";
+            return false;
+        }
+
+        if (COMMAND_CATH_COMET.equals(command)) {
+            if (transaction instanceof RSend) {
+                RSend rsend = (RSend) transaction;
+                if (rsend.getAssetKey() == gravitaKey
+                        && rsend.hasAmount() && rsend.getAmount().signum() > 0
+                        && !rsend.isBackward() && rsend.balancePosition() == Account.BALANCE_POS_OWN) {
+                    return true;
+                }
+            }
+            status = "error: wrong data";
+            return false;
         }
 
         return true;
@@ -141,6 +168,114 @@ public class ShibaVerseSC extends EpochSmartContract {
         return new ShibaVerseSC(command, status);
     }
 
+    ///////// COMMANDS
+
+    public static byte[] getRandHash(Block block, Transaction transaction, int nonce) {
+
+        byte[] hash = block.getSignature();
+        System.arraycopy(transaction.getSignature(), 0, hash, 0, 14);
+        System.arraycopy(Ints.toByteArray(nonce),
+                0, hash, 14, 4);
+
+        hash = crypto.digest(hash);
+        int slot = 0;
+        int slotRare;
+        int slotRareLvl;
+
+        byte[] randomArray = new byte[8];
+
+        // GET 4 rabdom levels of Rarity
+        int index = 0;
+        do {
+            slotRare = Ints.fromBytes((byte) 0, (byte) 0, hash[index++], hash[index++]);
+            if ((slotRare >> 11) == 0) {
+                slotRareLvl = 5;
+            } else if ((slotRare >> 12) == 0) {
+                slotRareLvl = 4;
+            } else if ((slotRare >> 13) == 0) {
+                slotRareLvl = 3;
+            } else if ((slotRare >> 14) == 0) {
+                slotRareLvl = 2;
+            } else if ((slotRare >> 15) == 0) {
+                slotRareLvl = 1;
+            } else {
+                slotRareLvl = 0;
+            }
+            randomArray[slot] = (byte) slotRareLvl;
+
+        } while (slot++ < 3);
+
+        // GET 4 rabdom values
+        do {
+            randomArray[slot] = hash[index++];
+        } while (slot++ < 7);
+
+        return randomArray;
+
+    }
+
+    /**
+     * @param dcSet
+     * @param commandTX
+     * @param asOrphan
+     */
+    private void catchComets(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        // рождение комет
+        SmartContractValues valuesMap = dcSet.getSmartContractValues();
+        PublicKeyAccount creator = commandTX.getCreator();
+        int count = 5 * commandTX.getAmount().intValue();
+        AssetVenture comet;
+        Long assetKey;
+        do {
+            byte[] randomArray = getRandHash(block, commandTX, count);
+
+            // make object name: "c" - comet, "0" - era, Rarity1,2, Value1,2,
+            int value1 = Byte.toUnsignedInt(randomArray[7]) >>> 5;
+            int value2 = Byte.toUnsignedInt(randomArray[6]) >>> 5;
+            String name = "c0" + randomArray[0] + randomArray[1] + value1 + value2;
+            Tuple2 keyID = new Tuple2(ID, name);
+
+            if (asOrphan) {
+                assetKey = (Long) valuesMap.get(keyID);
+
+                // DELETE FROM BLOCKCHAIN DATABASE
+                dcSet.getItemAssetMap().decrementRemove(assetKey);
+
+            } else {
+                // seek if already exist
+                if (valuesMap.contains(keyID)) {
+                    assetKey = (Long) valuesMap.get(keyID);
+                } else {
+                    // make new COMET
+                    JSONObject json = new JSONObject();
+                    json.put("value1", value1);
+                    json.put("value2", value2);
+                    json.put("rare1", randomArray[6]);
+                    json.put("rare2", randomArray[7]);
+                    json.put("type", "comet");
+                    json.put("random", Base64.encodeBase64String(randomArray));
+                    String description = json.toJSONString();
+
+                    comet = new AssetVenture(null, maker, name, null, null,
+                            description, AssetCls.AS_INSIDE_ASSETS, 0, 0);
+                    comet.setReference(commandTX.getSignature(), commandTX.getDBRef());
+
+                    //INSERT INTO BLOCKCHAIN DATABASE
+                    assetKey = dcSet.getItemAssetMap().incrementPut(comet);
+                    //INSERT INTO CONTRACT DATABASE
+                    dcSet.getSmartContractValues().put(keyID, assetKey);
+                }
+            }
+
+            // TRANSFER ASSET
+            creator.changeBalance(dcSet, asOrphan, false, assetKey,
+                    BigDecimal.ONE, false, false, false);
+            maker.changeBalance(dcSet, !asOrphan, false, assetKey,
+                    BigDecimal.ONE, false, false, false);
+
+        } while (--count > 0);
+    }
+
 
     //////// PROCESSES
 
@@ -149,7 +284,6 @@ public class ShibaVerseSC extends EpochSmartContract {
         /**
          * issue main currency
          */
-        long gravitaKey;
         if (asOrphan) {
             gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
         } else {
@@ -202,17 +336,12 @@ public class ShibaVerseSC extends EpochSmartContract {
                         rsend.getCreator() // need for TEST - not adminAddress
                 );
             } else {
-                if (rsend.hasAmount()) {
-                    Long gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
-                    if (rsend.getAssetKey() == gravitaKey) {
-                        byte[] data = rsend.getData();
-                        String command = new String(data, StandardCharsets.UTF_8).toLowerCase();
-                        if ("catch comets".equals(command)) {
-                            // рождение комет
-                            dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
-                            return false;
-                        }
-                    }
+                if (COMMAND_CATH_COMET.equals(command)
+                        // это не проверка вне блока - в ней блока нет
+                        && block != null) {
+                    // рождение комет
+                    dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
+                    return false;
                 }
             }
         }
@@ -222,29 +351,11 @@ public class ShibaVerseSC extends EpochSmartContract {
 
     @Override
     public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
-        if (transaction instanceof RSend) {
-            RSend rsend = (RSend) transaction;
-            if (rsend.getCreator().equals(adminAddress)) {
-                return processAdminCommands(dcSet, block, rsend, adminAddress);
-            } else {
-                if (rsend.hasAmount()) {
-                    Long gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
-                    if (rsend.getAssetKey() == gravitaKey) {
-                        String command = new String(rsend.getData(), StandardCharsets.UTF_8);
-                        if (command.isEmpty() || "use".equals(command)) {
-                            // рождение комет
-                            SmartContractValues valuesMap = dcSet.getSmartContractValues();
-                            PublicKeyAccount creator = transaction.getCreator();
-                            int count = 4;
-                            AssetVenture comet;
-                            do {
 
-                            } while (count-- > 0);
-                        }
-                    }
-                }
-            }
+        if (COMMAND_CATH_COMET.equals(command)) {
+            catchComets(dcSet, block, (RSend) transaction, false);
         }
+
         return false;
     }
 
@@ -275,6 +386,10 @@ public class ShibaVerseSC extends EpochSmartContract {
 
     @Override
     public boolean orphanByTime(DCSet dcSet, Transaction transaction) {
+        if (COMMAND_CATH_COMET.equals(command)) {
+            catchComets(dcSet, null, (RSend) transaction, true);
+        }
+
         return false;
     }
 

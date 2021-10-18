@@ -41,6 +41,8 @@ public abstract class AssetCls extends ItemCls {
     protected static final long APP_DATA_DEX_AWARDS_MASK = 1L;
     // untransferable
     protected static final long APP_DATA_UNTRANSFERABLE_MASK = 2L;
+    // anonimouse protection
+    protected static final long APP_DATA_ANONIM_PROTECT_MASK = 4L;
 
     //
     protected int assetType;
