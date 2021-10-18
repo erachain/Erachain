@@ -13,6 +13,10 @@ public abstract class EpochSmartContract extends SmartContract {
         super(id, new PublicKeyAccount(Base58.encode(Longs.toByteArray(id))));
     }
 
+    EpochSmartContract(int id, PublicKeyAccount maker) {
+        super(id, maker);
+    }
+
     /**
      * Эпохальный смарт-контракт
      *

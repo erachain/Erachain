@@ -97,7 +97,6 @@ public abstract class SmartContract {
     static public SmartContract make(Transaction transaction) {
 
         if (BlockChain.TEST_MODE
-                && transaction.getBlockHeight() > 115740
                 && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
             if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
@@ -108,7 +107,6 @@ public abstract class SmartContract {
             }
 
         } else if (BlockChain.TEST_MODE
-                && transaction.getBlockHeight() > 132464
                 && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
             CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
             if (createOrder.getHaveKey() == AssetCls.ERA_KEY
