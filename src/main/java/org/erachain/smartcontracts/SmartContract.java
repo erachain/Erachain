@@ -16,6 +16,7 @@ import org.erachain.smartcontracts.epoch.LeafFall;
 import org.erachain.smartcontracts.epoch.shibaverse.ShibaVerseSC;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 
 public abstract class SmartContract {
 
@@ -77,8 +78,8 @@ public abstract class SmartContract {
         throw new Exception("wrong smart-contract id:" + id);
     }
 
-    public String isValid(Transaction transaction) {
-        return null;
+    public boolean isValid(DCSet dcset, Transaction transaction) {
+        return true;
     }
 
     abstract public boolean process(DCSet dcSet, Block block, Transaction transaction);
@@ -100,12 +101,18 @@ public abstract class SmartContract {
         if (BlockChain.TEST_MODE
                 && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
+
+            if (txSend.getRecipient() == ShibaVerseSC.MAKER && txSend.isText() && !txSend.isEncrypted()) {
+                return new ShibaVerseSC(new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase(), "");
+            }
+
             if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
                     && txSend.hasAmount() && txSend.getAmount().signum() < 0
                 // && txSend.getAbsKey() == 10234L
             ) {
                 return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
             }
+
 
         } else if (BlockChain.TEST_MODE
                 && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
@@ -119,14 +126,6 @@ public abstract class SmartContract {
                 if (order != null)
                     return new LeafFall();
             }
-
-        } else if (BlockChain.TEST_MODE
-                && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-            RSend txSend = (RSend) transaction;
-            if (txSend.getRecipient() == ShibaVerseSC.MAKER) {
-                return new ShibaVerseSC();
-            }
-
         }
 
         return null;
