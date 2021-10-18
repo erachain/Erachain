@@ -2388,8 +2388,6 @@ public class Block implements Closeable, ExplorerJsonLine {
      * @param dcSet
      */
     private void orphanHead(DCSet dcSet) {
-        // clear old orders
-        OrderProcess.clearOldOrders(dcSet, this, true);
 
         // time wait process
         TimeTXWaitMap timeWaitMap = dcSet.getTimeTXWaitMap();
@@ -2414,6 +2412,9 @@ public class Block implements Closeable, ExplorerJsonLine {
         } catch (IOException e) {
             Controller.getInstance().stopAndExit(99999);
         }
+
+        // clear old orders
+        OrderProcess.clearOldOrders(dcSet, this, true);
 
     }
 
