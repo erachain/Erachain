@@ -239,8 +239,11 @@ public class ShibaVerseSC extends EpochSmartContract {
             if (asOrphan) {
                 assetKey = (Long) valuesMap.get(keyID);
 
-                // DELETE FROM BLOCKCHAIN DATABASE
-                dcSet.getItemAssetMap().decrementRemove(assetKey);
+                AssetCls asset = dcSet.getItemAssetMap().get(assetKey);
+                if (asset.getReleased(dcSet).equals(BigDecimal.ONE)) {
+                    // DELETE FROM BLOCKCHAIN DATABASE
+                    dcSet.getItemAssetMap().decrementRemove(assetKey);
+                }
 
             } else {
                 // seek if already exist
@@ -286,7 +289,9 @@ public class ShibaVerseSC extends EpochSmartContract {
          * issue main currency
          */
         if (asOrphan) {
-            gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
+            // need to remove - for reinit after orphans
+            gravitaKey = (Long) dcSet.getSmartContractValues().remove(INIT_KEY);
+            dcSet.getItemAssetMap().decrementRemove(gravitaKey);
         } else {
             AssetVenture gravita = new AssetVenture(null, maker, "GR", null, null,
                     null, AssetCls.AS_INSIDE_ASSETS, 6, 0);

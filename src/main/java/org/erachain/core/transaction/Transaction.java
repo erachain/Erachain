@@ -2574,6 +2574,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void processTail(Block block, int forDeal) {
+
         ///////// SMART CONTRACTS SESSION
         if (smartContract == null && (block == null || block.heightBlock > 1)) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
