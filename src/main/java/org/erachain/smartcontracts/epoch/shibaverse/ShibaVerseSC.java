@@ -275,7 +275,7 @@ public class ShibaVerseSC extends EpochSmartContract {
                     json.put("value2", value2);
                     json.put("rare1", Byte.toUnsignedInt(randomArray[6]));
                     json.put("rare2", Byte.toUnsignedInt(randomArray[7]));
-                    json.put("type", "comet");
+                    json.put("type", "Comet");
                     json.put("random", Base64.encodeBase64StringUnChunked(randomArray));
                     String description = json.toJSONString();
 
