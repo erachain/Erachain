@@ -21,6 +21,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 public class ShibaVerseSC extends EpochSmartContract {
@@ -272,10 +273,10 @@ public class ShibaVerseSC extends EpochSmartContract {
                     JSONObject json = new JSONObject();
                     json.put("value1", value1);
                     json.put("value2", value2);
-                    json.put("rare1", randomArray[6]);
-                    json.put("rare2", randomArray[7]);
+                    json.put("rare1", Byte.toUnsignedInt(randomArray[6]));
+                    json.put("rare2", Byte.toUnsignedInt(randomArray[7]));
                     json.put("type", "comet");
-                    json.put("random", Base64.encodeBase64String(randomArray));
+                    json.put("random", Base64.encodeBase64StringUnChunked(randomArray));
                     String description = json.toJSONString();
 
                     comet = new AssetVenture(null, maker, name, null, null,
@@ -550,6 +551,14 @@ public class ShibaVerseSC extends EpochSmartContract {
 
         return arrayJson.toJSONString();
 
+    }
+
+    static DecimalFormat format2 = new DecimalFormat("#.##");
+
+    public static String viewDescription(AssetCls asset, String description) {
+        int released = asset.getReleased(DCSet.getInstance()).intValue();
+        double rary = Math.sqrt(1.0d / released);
+        return "<html>RARY: <b>" + format2.format(rary) + "</b><br>" + description + "</html>";
     }
 
 }
