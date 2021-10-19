@@ -1500,12 +1500,22 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     public void put(Long key, Transaction transaction) {
-        super.put(key, transaction);
+        try {
+            super.put(key, transaction);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage() + " - " + transaction.toString(), e);
+            Controller.getInstance().stopAndExit(1351);
+        }
     }
 
     @Override
     public void put(Transaction transaction) {
-        put(transaction.getDBRef(), transaction);
+        try {
+            put(transaction.getDBRef(), transaction);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage() + " - " + transaction.toString(), e);
+            Controller.getInstance().stopAndExit(1351);
+        }
     }
 
 }
