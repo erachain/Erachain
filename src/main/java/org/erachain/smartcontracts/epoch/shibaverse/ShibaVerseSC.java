@@ -3,6 +3,7 @@ package org.erachain.smartcontracts.epoch.shibaverse;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.apache.commons.net.util.Base64;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -275,7 +276,7 @@ public class ShibaVerseSC extends EpochSmartContract {
                     json.put("rare1", Byte.toUnsignedInt(randomArray[6]));
                     json.put("rare2", Byte.toUnsignedInt(randomArray[7]));
                     json.put("type", "comet");
-                    //json.put("random", Base64.encodeBase64String(randomArray));
+                    json.put("random", Base64.encodeBase64StringUnChunked(randomArray));
                     String description = json.toJSONString();
 
                     comet = new AssetVenture(null, maker, name, null, null,
