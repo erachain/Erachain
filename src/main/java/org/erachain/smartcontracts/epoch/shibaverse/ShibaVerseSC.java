@@ -58,8 +58,8 @@ public class ShibaVerseSC extends EpochSmartContract {
 
     public String getHTML(JSONObject langObj) {
         String out = super.getHTML(langObj) + "<br>";
-        return out + Lang.T("Command", langObj) + ":" + (command == null ? "" : command) + "<br>"
-                + Lang.T("Status", langObj) + ":" + (status == null ? "" : status);
+        return out + Lang.T("Command", langObj) + ": <b>" + (command == null ? "" : command) + "</b><br>"
+                + Lang.T("Status", langObj) + ": <b>" + (status == null ? "" : status) + "</b>";
     }
 
     private boolean isAdminCommand(Transaction transaction) {
