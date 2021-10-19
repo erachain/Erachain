@@ -13,6 +13,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SmartContractValues;
+import org.erachain.lang.Lang;
 import org.erachain.smartcontracts.epoch.EpochSmartContract;
 import org.erachain.webserver.WebResource;
 import org.json.simple.JSONArray;
@@ -21,6 +22,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 public class ShibaVerseSC extends EpochSmartContract {
@@ -52,6 +54,12 @@ public class ShibaVerseSC extends EpochSmartContract {
 
         this.command = command;
         this.status = status;
+    }
+
+    public String getHTML(JSONObject langObj) {
+        String out = super.getHTML(langObj) + "<br>";
+        return out + Lang.T("Command", langObj) + ": <b>" + (command == null ? "" : command) + "</b><br>"
+                + Lang.T("Status", langObj) + ": <b>" + (status == null ? "" : status) + "</b>";
     }
 
     private boolean isAdminCommand(Transaction transaction) {
@@ -157,6 +165,7 @@ public class ShibaVerseSC extends EpochSmartContract {
 
             byte[] statusSizeBytes = Arrays.copyOfRange(data, pos, pos + 4);
             int statusLen = Ints.fromByteArray(statusSizeBytes);
+            pos += 4;
             byte[] statusBytes = Arrays.copyOfRange(data, pos, pos + statusLen);
             pos += statusLen;
             status = new String(statusBytes, StandardCharsets.UTF_8);
@@ -272,10 +281,10 @@ public class ShibaVerseSC extends EpochSmartContract {
                     JSONObject json = new JSONObject();
                     json.put("value1", value1);
                     json.put("value2", value2);
-                    json.put("rare1", randomArray[6]);
-                    json.put("rare2", randomArray[7]);
-                    json.put("type", "comet");
-                    json.put("random", Base64.encodeBase64String(randomArray));
+                    json.put("rare1", Byte.toUnsignedInt(randomArray[6]));
+                    json.put("rare2", Byte.toUnsignedInt(randomArray[7]));
+                    json.put("type", "Comet");
+                    json.put("random", Base64.encodeBase64StringUnChunked(randomArray));
                     String description = json.toJSONString();
 
                     comet = new AssetVenture(null, maker, name, null, null,
@@ -296,6 +305,12 @@ public class ShibaVerseSC extends EpochSmartContract {
                     BigDecimal.ONE, false, false, false);
 
         } while (--count > 0);
+
+        if (asOrphan)
+            status = "wait";
+        else
+            status = "done";
+
     }
 
 
@@ -321,6 +336,7 @@ public class ShibaVerseSC extends EpochSmartContract {
             //INSERT INTO DATABASE
             gravitaKey = dcSet.getItemAssetMap().incrementPut(gravita);
             dcSet.getSmartContractValues().put(INIT_KEY, gravitaKey);
+
         }
 
         // TRANSFER GRAVITA to ADMIN
@@ -368,6 +384,7 @@ public class ShibaVerseSC extends EpochSmartContract {
                         && block != null) {
                     // рождение комет
                     dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
+                    status = "wait";
                     return false;
                 }
             }
@@ -550,6 +567,14 @@ public class ShibaVerseSC extends EpochSmartContract {
 
         return arrayJson.toJSONString();
 
+    }
+
+    static DecimalFormat format2 = new DecimalFormat("#.##");
+
+    public static String viewDescription(AssetCls asset, String description) {
+        int released = asset.getReleased(DCSet.getInstance()).intValue();
+        double rary = Math.sqrt(1.0d / released);
+        return "<html>RARY: <b>" + format2.format(rary) + "</b><br>" + description + "</html>";
     }
 
 }
