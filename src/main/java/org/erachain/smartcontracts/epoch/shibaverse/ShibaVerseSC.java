@@ -305,6 +305,12 @@ public class ShibaVerseSC extends EpochSmartContract {
                     BigDecimal.ONE, false, false, false);
 
         } while (--count > 0);
+
+        if (asOrphan)
+            status = "wait";
+        else
+            status = "done";
+
     }
 
 
@@ -330,6 +336,7 @@ public class ShibaVerseSC extends EpochSmartContract {
             //INSERT INTO DATABASE
             gravitaKey = dcSet.getItemAssetMap().incrementPut(gravita);
             dcSet.getSmartContractValues().put(INIT_KEY, gravitaKey);
+
         }
 
         // TRANSFER GRAVITA to ADMIN
@@ -377,6 +384,7 @@ public class ShibaVerseSC extends EpochSmartContract {
                         && block != null) {
                     // рождение комет
                     dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
+                    status = "wait";
                     return false;
                 }
             }
