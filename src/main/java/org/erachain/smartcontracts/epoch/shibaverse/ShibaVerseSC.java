@@ -173,10 +173,10 @@ public class ShibaVerseSC extends EpochSmartContract {
 
     public static byte[] getRandHash(Block block, Transaction transaction, int nonce) {
 
-        byte[] hash = block.getSignature();
-        System.arraycopy(transaction.getSignature(), 0, hash, 0, 14);
-        System.arraycopy(Ints.toByteArray(nonce),
-                0, hash, 14, 4);
+        byte[] hash = new byte[32];
+        System.arraycopy(block.getSignature(), 0, hash, 0, 14);
+        System.arraycopy(Ints.toByteArray(nonce), 0, hash, 14, 4);
+        System.arraycopy(transaction.getSignature(), 0, hash, 18, 14);
 
         hash = crypto.digest(hash);
         int slot = 0;
