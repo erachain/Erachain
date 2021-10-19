@@ -238,6 +238,18 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     }
 
     @Override
+    public IteratorCloseable<T> getIterator() {
+        Iterator<T> parentIterator = parent.getIterator();
+        IteratorCloseable<T> iterator = map.getIterator(false, false);
+
+        IteratorCloseable iteratorMerged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                new IteratorParent(parentIterator, deleted), iterator), Fun.COMPARATOR);
+
+        return iteratorMerged;
+
+    }
+
+    @Override
     public IteratorCloseable<T> getIndexIterator(int index, boolean descending) {
 
         Iterator<T> parentIterator = parent.getIndexIterator(index, descending);
@@ -252,19 +264,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
 
         IteratorCloseable iteratorMerged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratorParent(parentIterator, deleted), iterator), Fun.COMPARATOR);
-
-        return iteratorMerged;
-
-    }
-
-    @Override
-    public IteratorCloseable<T> getIterator() {
-        Iterator<T> parentIterator = parent.getIterator();
-        IteratorCloseable<T> iterator = map.getIterator(false, false);
-
-        IteratorCloseable iteratorMerged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratorParent(parentIterator, deleted), iterator), Fun.COMPARATOR);
+                new IteratorParent(parentIterator, deleted), iterator),
+                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
 
         return iteratorMerged;
 

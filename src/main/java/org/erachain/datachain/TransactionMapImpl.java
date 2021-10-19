@@ -441,7 +441,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         IteratorCloseable iteratorMerged;
         if (address != null || sender != null && recipient != null) {
             // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
-            iteratorMerged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(iteratorSender, iteratorRecipient), Fun.COMPARATOR);
+            iteratorMerged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(iteratorSender, iteratorRecipient),
+                    desc ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
         } else if (sender != null) {
             iteratorMerged = iteratorSender;
         } else if (recipient != null) {
@@ -505,7 +506,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
         // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
         /// берем свой итератор
-        try (IteratorCloseable<Long> iterator = new MergedOR_IteratorsNoDuplicates(ImmutableList.of(iteratorSender, iteratorRecipient), Fun.COMPARATOR)) {
+        try (IteratorCloseable<Long> iterator = new MergedOR_IteratorsNoDuplicates(ImmutableList.of(iteratorSender, iteratorRecipient),
+                Fun.COMPARATOR)) {
             return getUnconfirmedTransaction(IteratorCloseableImpl.limit(iterator, 200));
         } catch (IOException e) {
             return new ArrayList<>();

@@ -149,7 +149,6 @@ public class MultiPaymentTransaction extends Transaction {
         JSONObject transaction = this.getJsonBase();
 
         //ADD CREATOR/PAYMENTS
-        transaction.put("creator", this.creator.getAddress());
 
         JSONArray payments = new JSONArray();
         for (Payment payment : this.payments) {

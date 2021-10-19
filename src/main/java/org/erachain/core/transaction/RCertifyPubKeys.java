@@ -555,8 +555,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
                     break;
                 }
             }
-            if (!creator_admin
-                    && !BlockChain.MAIN_MODE && this.height != 176085) // TODO: wrong transaction
+            if (!creator_admin)
                 return CREATOR_NOT_PERSONALIZED;
         }
 

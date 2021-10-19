@@ -943,11 +943,11 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         if (useAll) {
             //WRITE MAKER
-            try {
+            //try {
                 data = Bytes.concat(data, this.maker.getPublicKey());
-            } catch (Exception e) {
-                //DECODE EXCEPTION
-            }
+            //} catch (Exception e) {
+            //DECODE EXCEPTION
+            //}
         }
 
         byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
@@ -1100,7 +1100,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return getShort(DCSet.getInstance());
     }
 
-    public JSONObject toJsonLite(boolean withIcon, boolean showPerson) {
+    public void toJsonInfo(Map json, String keyName) {
+        json.put(keyName + "_key", getKey());
+        json.put(keyName + "_name", viewName());
+        json.put(keyName + "_icon", getImageURL());
+        json.put(keyName + "_iconMediaType", getIconMediaType().toString());
+
+    }
+
+    public JSONObject toJsonLite() {
 
         JSONObject itemJSON = new JSONObject();
 
@@ -1117,18 +1125,10 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         if (iconURL != null) {
             itemJSON.put("iconURL", getIconURL());
             itemJSON.put("iconType", getIconType());
-            //itemJSON.put("iconTypeName", getIconTypeName());
             itemJSON.put("iconMediaType", getIconMediaType().toString());
         }
 
-        itemJSON.put("maker", this.maker.getAddress());
-        if (showPerson) {
-            Fun.Tuple2<Integer, PersonCls> person = this.maker.getPerson();
-            if (person != null) {
-                itemJSON.put("makerPersonKey", person.b.getKey());
-                itemJSON.put("makerPersonName", person.b.getName());
-            }
-        }
+        maker.toJsonPersonInfo(itemJSON, "maker");
 
         return itemJSON;
     }
@@ -1136,7 +1136,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     @SuppressWarnings("unchecked")
     public JSONObject toJson() {
 
-        JSONObject itemJSON = toJsonLite(false, false);
+        JSONObject itemJSON = toJsonLite();
 
         itemJSON.put("charKey", getItemTypeAndKey());
 
@@ -1148,8 +1148,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
         itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
         itemJSON.put("description", viewDescription());
-        itemJSON.put("maker", this.maker.getAddress());
-        itemJSON.put("creator", this.maker.getAddress()); // @Deprecated
         itemJSON.put("maker_public_key", this.maker.getBase58());
         itemJSON.put("maker_publickey", this.maker.getBase58());
         //itemJSON.put("makerPubkey", this.maker.getBase58());
@@ -1166,14 +1164,9 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
                 referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
 
             if (referenceTx != null) {
-                PublicKeyAccount creator = referenceTx.getCreator();
-                if (creator == null) {
-                    itemJSON.put("tx_creator", "GENESIS");
-                    itemJSON.put("tx_creator_pubkey", "GENESIS");
-                } else {
-                    itemJSON.put("tx_creator", creator.getAddress());
-                    itemJSON.put("tx_creator_pubkey", creator.getBase58());
-                }
+                PublicKeyAccount creatorTX = referenceTx.getCreator();
+                creatorTX.toJsonPersonInfo(itemJSON, "tx_creator");
+                itemJSON.put("tx_creator_pubkey", creatorTX.getBase58());
                 itemJSON.put("tx_timestamp", referenceTx.getTimestamp());
                 itemJSON.put("block_timestamp", Controller.getInstance().blockChain.getTimestamp(referenceTx.getBlockHeight()));
             }
@@ -1286,7 +1279,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
                 key = iterator.next();
                 element = map.get(key);
                 if (element != null) {
-                    array.add(element.toJsonLite(true, showPerson));
+                    array.add(element.toJsonLite());
                 }
             }
         } catch (IOException e) {

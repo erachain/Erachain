@@ -1,9 +1,12 @@
 package org.erachain.smartcontracts;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.CreateOrderTransaction;
@@ -13,10 +16,15 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.epoch.DogePlanet;
 import org.erachain.smartcontracts.epoch.LeafFall;
+import org.erachain.smartcontracts.epoch.shibaverse.ShibaVerseSC;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 
 public abstract class SmartContract {
+
+    static protected Controller contr = Controller.getInstance();
+    static protected Crypto crypto = Crypto.getInstance();
 
     protected final int id;
     protected final PublicKeyAccount maker;
@@ -24,6 +32,11 @@ public abstract class SmartContract {
     protected SmartContract(int id, PublicKeyAccount maker) {
         this.id = id;
         this.maker = maker;
+    }
+
+    protected SmartContract(int id) {
+        this.id = id;
+        this.maker = new PublicKeyAccount(crypto.digest(Longs.toByteArray(id)));
     }
 
     public int getID() {
@@ -35,7 +48,7 @@ public abstract class SmartContract {
     }
 
     public Object[][] getItemsKeys() {
-        return null;
+        return new Object[0][0];
     }
 
     /**
@@ -71,18 +84,24 @@ public abstract class SmartContract {
                 return LeafFall.Parse(data, position, forDeal);
             case DogePlanet.ID:
                 return DogePlanet.Parse(data, position, forDeal);
+            case ShibaVerseSC.ID:
+                return ShibaVerseSC.Parse(data, position, forDeal);
         }
 
         throw new Exception("wrong smart-contract id:" + id);
     }
 
-    public String isValid(Transaction transaction) {
-        return null;
+    public boolean isValid(DCSet dcset, Transaction transaction) {
+        return true;
     }
 
     abstract public boolean process(DCSet dcSet, Block block, Transaction transaction);
 
+    abstract public boolean processByTime(DCSet dcSet, Block block, Transaction transaction);
+
     abstract public boolean orphan(DCSet dcSet, Transaction transaction);
+
+    abstract public boolean orphanByTime(DCSet dcSet, Block block, Transaction transaction);
 
     /**
      * Делает смотр-контракт протокольный (на эпоху).
@@ -93,9 +112,13 @@ public abstract class SmartContract {
     static public SmartContract make(Transaction transaction) {
 
         if (BlockChain.TEST_MODE
-                && transaction.getBlockHeight() > 115740
                 && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
+
+            if (txSend.getRecipient().equals(ShibaVerseSC.MAKER) && txSend.isText() && !txSend.isEncrypted()) {
+                return new ShibaVerseSC(new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase(), "");
+            }
+
             if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
                     && txSend.hasAmount() && txSend.getAmount().signum() < 0
                 // && txSend.getAbsKey() == 10234L
@@ -103,8 +126,8 @@ public abstract class SmartContract {
                 return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
             }
 
+
         } else if (BlockChain.TEST_MODE
-                && transaction.getBlockHeight() > 132464
                 && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
             CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
             if (createOrder.getHaveKey() == AssetCls.ERA_KEY
@@ -116,7 +139,6 @@ public abstract class SmartContract {
                 if (order != null)
                     return new LeafFall();
             }
-
         }
 
         return null;

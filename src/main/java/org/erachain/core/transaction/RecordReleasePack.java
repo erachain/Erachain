@@ -192,7 +192,6 @@ public class RecordReleasePack extends Transaction {
         JSONObject json = this.getJsonBase();
 
         //ADD CREATOR/PAYMENTS
-        json.put("creator", this.creator.getAddress());
 
         JSONArray transactions = new JSONArray();
         for (Transaction transaction : this.transactions) {

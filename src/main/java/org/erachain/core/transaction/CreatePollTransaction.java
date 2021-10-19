@@ -158,7 +158,6 @@ public class CreatePollTransaction extends Transaction {
         JSONObject transaction = this.getJsonBase();
 
         //ADD CREATOR/NAME/DESCRIPTION/OPTIONS
-        transaction.put("creator", this.creator.getAddress());
         transaction.put("name", this.poll.getName());
         transaction.put("description", this.poll.getDescription());
 

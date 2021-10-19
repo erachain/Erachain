@@ -5,6 +5,7 @@ import org.erachain.api.FPoolResource;
 import org.erachain.controller.Controller;
 import org.erachain.controller.FPool;
 import org.erachain.core.account.Account;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.StrJSonFine;
@@ -79,6 +80,8 @@ public class APIFPool {
                     .entity(out.toJSONString())
                     .build();
         }
+
+        out.put("stake", dcSet.getCredit_AddressesMap().get(address, AssetCls.ERA_KEY, fpool.getAddress()));
 
         out.put("balances", fpool.getAddressBalances(address));
 

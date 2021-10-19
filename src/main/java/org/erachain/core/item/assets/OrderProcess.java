@@ -541,7 +541,7 @@ public class OrderProcess {
         AssetCls assetWant = dcSet.getItemAssetMap().get(wantAssetKey);
 
         //ORPHAN TRADES
-        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(id)) {
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(id, false)) {
 
             Order target;
             while (iterator.hasNext()) {
@@ -649,7 +649,7 @@ public class OrderProcess {
     public static void clearOldOrders(DCSet dcSet, Block block, boolean asOrphan) {
 
         int height = block.getHeight();
-        if (height < BlockChain.CLEAR_OLD_ORDERS_HEIGHT || height % 100 != 0)
+        if (BlockChain.CLEAR_OLD_ORDERS_HEIGHT < 0 || height < BlockChain.CLEAR_OLD_ORDERS_HEIGHT || height % 100 != 0)
             return;
 
         long blockTx_id = Transaction.makeDBRef(height, 0);
@@ -661,7 +661,7 @@ public class OrderProcess {
 
         if (asOrphan) {
             Trade trade;
-            try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(blockTx_id)) {
+            try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(blockTx_id, asOrphan)) {
                 while (iterator.hasNext()) {
                     trade = tradesMap.remove(iterator.next());
                     CancelOrderTransaction.orphanBody(dcSet, blockTx_id, trade.getTarget(), false);

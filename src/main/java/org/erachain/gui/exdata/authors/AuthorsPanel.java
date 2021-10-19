@@ -49,7 +49,7 @@ public class AuthorsPanel extends JPanel {
                 }
 
                 if (authorsAuthorsModel.getRowCount() < 1) {
-                    authorsAuthorsModel.addRow(new Object[]{(int) 0, "", "", ""});
+                    authorsAuthorsModel.addEmpty();
                     interval = 0;
                 }
 

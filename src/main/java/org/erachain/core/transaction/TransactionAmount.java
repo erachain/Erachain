@@ -478,11 +478,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     @SuppressWarnings("unchecked")
     protected JSONObject getJsonBase() {
         JSONObject transaction = super.getJsonBase();
-        
-        transaction.put("recipient", this.recipient.getAddress());
+
+        recipient.toJsonPersonInfo(transaction, "recipient");
         if (amount != null && amount.signum() != 0) {
-            transaction.put("asset", this.getAbsKey());
+            transaction.put("asset", this.getAbsKey()); // deprecated
             transaction.put("assetKey", this.getAbsKey());
+            if (asset == null) {
+                setDC(DCSet.getInstance(), false);
+            }
+            asset.toJsonInfo(transaction, "asset");
+
             transaction.put("amount", this.amount.toPlainString());
             transaction.put("balancePos", this.balancePosition());
             transaction.put("actionName", viewActionType());

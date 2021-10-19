@@ -6,7 +6,7 @@ import org.erachain.utils.ByteArrayUtils;
 import java.util.*;
 
 /**
- * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
+ * пробегает по итератором сортируя значения и при этом пропуская дублирующие значения на входе
  * Правда в теста вылетает ошибка доступа при закрытии - org.erachain.datachain.TradeMapImplTest#getTradesByTimestamp()
  *
  * @param <T>
@@ -20,7 +20,7 @@ public class MergedOR_IteratorsNoDuplicates<T> extends IteratorCloseableImpl<T> 
     protected boolean hasNextUsedBefore = false;
 
     /**
-     * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
+     * пробегает по итератором сортируя значения и при этом пропуская дублирующие значения на входе
      * Правда в тестах вылетает ошибка доступа при закрытии - org.erachain.datachain.TradeMapImplTest#getTradesByTimestamp()
      *
      * @param iterators

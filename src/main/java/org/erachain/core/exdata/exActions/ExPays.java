@@ -1144,7 +1144,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             if (this.filterAssetKey == null || this.filterAssetKey == 0L) {
                 errorValue = "Accruals: filterAssetKey == null or ZERO";
                 return Transaction.INVALID_ITEM_KEY;
-            } else if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_SPEND) {
+            } else if (this.filterBalancePos < TransactionAmount.ACTION_SEND || this.filterBalancePos > TransactionAmount.ACTION_PLEDGE) {
                 errorValue = "Accruals: filterBalancePos";
                 return Transaction.INVALID_BALANCE_POS;
             } else if (this.filterBalanceSide < Account.BALANCE_SIDE_DEBIT || this.filterBalanceSide > Account.BALANCE_SIDE_CREDIT) {

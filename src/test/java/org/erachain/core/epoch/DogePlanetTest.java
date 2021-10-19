@@ -14,7 +14,7 @@ public class DogePlanetTest {
 
     @Test
     public void toBytes() {
-        DogePlanet contract = new DogePlanet(3);
+        DogePlanet contract = new DogePlanet(4);
         byte[] data = contract.toBytes(Transaction.FOR_NETWORK);
         assertEquals(data.length, contract.length(Transaction.FOR_NETWORK));
         DogePlanet contractParse = DogePlanet.Parse(data, 0, Transaction.FOR_NETWORK);

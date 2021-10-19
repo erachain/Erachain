@@ -74,7 +74,6 @@ public abstract class ArbitraryTransaction extends Transaction {
         JSONObject transaction = this.getJsonBase();
 
         // ADD CREATOR/SERVICE/DATA
-        transaction.put("creator", this.creator.getAddress());
         transaction.put("service", this.service);
         transaction.put("data", Base58.encode(this.data));
 

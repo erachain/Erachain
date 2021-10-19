@@ -1438,6 +1438,22 @@ public class Account {
         return json;
     }
 
+    public void toJsonPersonInfo(Map json, String keyName) {
+
+        json.put(keyName, getAddress());
+
+        Tuple2<Integer, PersonCls> personRes = this.getPerson();
+
+        if (personRes == null)
+            return;
+
+        json.put(keyName + "_key", personRes.b.getKey());
+        json.put(keyName + "_name", personRes.b.viewName());
+        json.put(keyName + "_birthday", personRes.b.getBirthdayStr());
+        json.put(keyName + "_image", personRes.b.getImageURL());
+
+    }
+
     // previous forging block or changed ERA volume
     public Tuple3<Integer, Integer, Integer> getForgingData(DCSet db, int height) {
         return db.getAddressForging().get(getAddress(), height);

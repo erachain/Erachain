@@ -46,7 +46,7 @@ public class AuthorsModel extends DefaultTableModel {
         return true;
     }
 
-    private void addEmpty() {
+    public void addEmpty() {
         this.addRow(new Object[]{0L, 1, "", ""});
     }
 

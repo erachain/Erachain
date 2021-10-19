@@ -1623,7 +1623,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             transaction.put("title", getTitle());
             transaction.put("deadLine", getDeadline());
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
-            transaction.put("creator", this.creator.getAddress());
+            creator.toJsonPersonInfo(transaction, "creator");
             transaction.put("fee", this.fee.toPlainString());
             transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
         }
@@ -2574,8 +2574,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void processTail(Block block, int forDeal) {
+
         ///////// SMART CONTRACTS SESSION
-        if (smartContract == null) {
+        if (smartContract == null && (block == null || block.heightBlock > 1)) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
             // потом он будет записан в базу данных и его можно найти загрузив эту трнзакцию
             smartContract = SmartContract.make(this);
@@ -2596,6 +2597,16 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         processTail(block, forDeal);
     }
 
+    /**
+     * delayed
+     *
+     * @param block
+     */
+    public void processByTime(Block block) {
+        if (smartContract != null)
+            smartContract.processByTime(dcSet, block, this);
+    }
+
     //////////////////////////////////// ORPHAN
 
     public void orphanHead(Block block, int forDeal) {
@@ -2606,7 +2617,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         ///////// SMART CONTRACTS SESSION
-        if (smartContract == null) {
+        if (smartContract == null && block.heightBlock > 1) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
             // для Отката нужно это сделать тут
             smartContract = SmartContract.make(this);
@@ -2663,6 +2674,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         orphanHead(block, forDeal);
         orphanBody(block, forDeal);
         orphanTail(block, forDeal);
+    }
+
+    public void orphanByTime(Block block) {
+        if (smartContract != null)
+            smartContract.orphanByTime(dcSet, block, this);
     }
 
     public Transaction copy() {

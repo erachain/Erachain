@@ -75,7 +75,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         JSONObject transaction = super.toJson();
 
         //ADD CREATOR/RECIPIENT/AMOUNT/ASSET
-        transaction.put("recipient", this.recipient.getAddress());
+        recipient.toJsonPersonInfo(transaction, "recipient");
         transaction.put("person", this.key);
 
         return transaction;

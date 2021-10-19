@@ -1,16 +1,17 @@
 package org.erachain.smartcontracts.epoch;
 
 import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.crypto.Base58;
 import org.erachain.smartcontracts.SmartContract;
 
 public abstract class EpochSmartContract extends SmartContract {
 
+    public EpochSmartContract(int id) {
+        super(id);
+    }
 
-    EpochSmartContract(int id) {
-        super(id, new PublicKeyAccount(Base58.encode(Longs.toByteArray(id))));
+    public EpochSmartContract(int id, PublicKeyAccount maker) {
+        super(id, maker);
     }
 
     /**

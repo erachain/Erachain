@@ -193,9 +193,6 @@ public class RCalculated extends TransactionAmount {
         // GET BASE
         JSONObject transaction = this.getJsonBase();
 
-        transaction.put("asset", this.getAbsKey());
-        transaction.put("amount", this.amount.toPlainString());
-
         transaction.put("timestamp", Controller.getInstance().blockChain.getTimestamp(this.height));
 
         if (message.length() > 0) {
