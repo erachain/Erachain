@@ -50,7 +50,7 @@ public abstract class SmartContract {
     }
 
     public String getHTML(JSONObject langObj) {
-        return "id: " + id + "<br>" + Lang.T("maker", langObj) + ":" + maker.getAddress();
+        return "ID: " + id + "<br>" + Lang.T("Maker", langObj) + ":" + maker.getAddress();
     }
 
     public Object[][] getItemsKeys() {
