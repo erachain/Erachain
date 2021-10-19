@@ -14,9 +14,11 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.erachain.smartcontracts.epoch.DogePlanet;
 import org.erachain.smartcontracts.epoch.LeafFall;
 import org.erachain.smartcontracts.epoch.shibaverse.ShibaVerseSC;
+import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -45,6 +47,10 @@ public abstract class SmartContract {
 
     public PublicKeyAccount getMaker() {
         return this.maker;
+    }
+
+    public String getHTML(JSONObject langObj) {
+        return "id: " + id + "<br>" + Lang.T("maker", langObj) + ":" + maker.getAddress();
     }
 
     public Object[][] getItemsKeys() {

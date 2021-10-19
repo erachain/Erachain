@@ -20,6 +20,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
+import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -894,6 +895,20 @@ public class WebTransactionsHTML {
 
     }
 
+    public static void getContract(HashMap output, Transaction transaction, JSONObject langObj) {
+
+        SmartContract contract = transaction.getSmartContract();
+        if (contract == null) {
+            return;
+        }
+
+        String out = "<b><center>" + Lang.T("Smart Contract", langObj) + "</center></b> ";
+        out += contract.getHTML(langObj);
+
+        output.put("contract", out);
+
+    }
+
     public static void getSigns(HashMap output, Transaction transaction, JSONObject langObj) {
 
         DCSet dcSet = DCSet.getInstance();
@@ -1078,6 +1093,7 @@ public class WebTransactionsHTML {
     }
 
     public static void getApps(HashMap output, Transaction transaction, JSONObject langObj) {
+        getContract(output, transaction, langObj);
         getSigns(output, transaction, langObj);
         getLinks(output, transaction, langObj);
     }

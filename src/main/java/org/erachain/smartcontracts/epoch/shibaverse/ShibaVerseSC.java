@@ -13,6 +13,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SmartContractValues;
+import org.erachain.lang.Lang;
 import org.erachain.smartcontracts.epoch.EpochSmartContract;
 import org.erachain.webserver.WebResource;
 import org.json.simple.JSONArray;
@@ -53,6 +54,12 @@ public class ShibaVerseSC extends EpochSmartContract {
 
         this.command = command;
         this.status = status;
+    }
+
+    public String getHTML(JSONObject langObj) {
+        String out = super.getHTML(langObj) + "<br>";
+        return out + Lang.T("Command", langObj) + ":" + (command == null ? "" : command) + "<br>"
+                + Lang.T("Status", langObj) + ":" + (status == null ? "" : status);
     }
 
     private boolean isAdminCommand(Transaction transaction) {
@@ -158,6 +165,7 @@ public class ShibaVerseSC extends EpochSmartContract {
 
             byte[] statusSizeBytes = Arrays.copyOfRange(data, pos, pos + 4);
             int statusLen = Ints.fromByteArray(statusSizeBytes);
+            pos += 4;
             byte[] statusBytes = Arrays.copyOfRange(data, pos, pos + statusLen);
             pos += statusLen;
             status = new String(statusBytes, StandardCharsets.UTF_8);
