@@ -200,7 +200,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                 && !BlockChain.isNovaAsset(key)
         ) {
 
-            LOGGER.error("delete KEY: " + key + " != map.value.key: " + this.key);
+            LOGGER.error("remove KEY: " + key + " != map.value.key: " + this.key);
 
             if (key > this.key) {
                 Long error = null;

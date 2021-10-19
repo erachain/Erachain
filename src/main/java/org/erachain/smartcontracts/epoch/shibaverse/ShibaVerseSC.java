@@ -225,10 +225,24 @@ public class ShibaVerseSC extends EpochSmartContract {
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
         PublicKeyAccount creator = commandTX.getCreator();
         int count = 5 * commandTX.getAmount().intValue();
+
+        // need select direction by asOrphan, else decrementDelete will not work!
+        int nonce;
+        if (asOrphan)
+            nonce = 1;
+        else
+            nonce = count;
+
         AssetVenture comet;
         Long assetKey;
         do {
-            byte[] randomArray = getRandHash(block, commandTX, count);
+
+            // GET RANDOM
+            byte[] randomArray = getRandHash(block, commandTX, nonce);
+            if (asOrphan)
+                nonce++;
+            else
+                nonce--;
 
             // make object name: "c" - comet, "0" - era, Rarity1,2, Value1,2,
             int value1 = Byte.toUnsignedInt(randomArray[7]) >>> 5;
@@ -242,7 +256,11 @@ public class ShibaVerseSC extends EpochSmartContract {
                 AssetCls asset = dcSet.getItemAssetMap().get(assetKey);
                 if (asset.getReleased(dcSet).equals(BigDecimal.ONE)) {
                     // DELETE FROM BLOCKCHAIN DATABASE
-                    dcSet.getItemAssetMap().decrementRemove(assetKey);
+                    dcSet.getItemAssetMap().decrementDelete(assetKey);
+
+                    // DELETE FROM CONTRACT DATABASE
+                    valuesMap.delete(keyID);
+
                 }
 
             } else {
@@ -289,9 +307,12 @@ public class ShibaVerseSC extends EpochSmartContract {
          * issue main currency
          */
         if (asOrphan) {
-            // need to remove - for reinit after orphans
+            // need to remove INIT_KEY - for reinit after orphans
             gravitaKey = (Long) dcSet.getSmartContractValues().remove(INIT_KEY);
-            dcSet.getItemAssetMap().decrementRemove(gravitaKey);
+
+            // orphan GRAVITA ASSET
+            dcSet.getItemAssetMap().decrementDelete(gravitaKey);
+
         } else {
             AssetVenture gravita = new AssetVenture(null, maker, "GR", null, null,
                     null, AssetCls.AS_INSIDE_ASSETS, 6, 0);
@@ -385,6 +406,12 @@ public class ShibaVerseSC extends EpochSmartContract {
             return orphanAdminCommands(dcSet, (RSend) transaction,
                     transaction.getCreator() // need for TEST - not adminAddress
             );
+        }
+
+        if (COMMAND_CATH_COMET.equals(command)) {
+            // отмена рождения комет
+            dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
+            return false;
         }
 
         return false;
