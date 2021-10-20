@@ -36,6 +36,9 @@ function tx(data) {
     if (tx.hasOwnProperty('foot')) {
         output += fformat(tx.foot) + '<br>';
     }
+    if (tx.hasOwnProperty('contract')) {
+        output += tx.contract + '<br>';
+    }
     if (tx.hasOwnProperty('signs')) {
         output += tx.signs + '<br>';
     }
