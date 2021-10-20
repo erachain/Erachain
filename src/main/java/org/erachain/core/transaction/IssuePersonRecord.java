@@ -382,9 +382,13 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (person.isMustBeSigned()) {
             // for quick search public keys by address - use PUB_KEY from Person DATA owner
             // used in - controller.Controller.getPublicKeyByAddress
-            long[] makerLastTimestamp = maker.getLastTimestamp(this.dcSet);
-            if (makerLastTimestamp == null) {
-                maker.setLastTimestamp(new long[]{timestamp, dbRef}, this.dcSet);
+            if (!maker.equals(creator)) {
+                // если создатель персоны и выпускающий - один счет то игнорируем
+                long[] makerLastTimestamp = maker.getLastTimestamp(this.dcSet);
+                if (makerLastTimestamp == null) {
+                    // добавим первую точку счете персоны по времени
+                    maker.setLastTimestamp(new long[]{timestamp, dbRef}, this.dcSet);
+                }
             }
 
             // запомним подпись для поиска потом
@@ -413,12 +417,23 @@ public class IssuePersonRecord extends IssueItemRecord {
             RCertifyPubKeys.orphanBody(dcSet, this, person.getKey(), pubKeys);
         }
 
-        byte[] makerBytes = maker.getPublicKey();
-        this.dcSet.getTransactionFinalMapSigns().delete(makerBytes);
-
         if (person.isMustBeSigned()) {
+            // for quick search public keys by address - use PUB_KEY from Person DATA owner
+            // used in - controller.Controller.getPublicKeyByAddress
+            if (!maker.equals(creator)) {
+                // если создатель персоны и и выпускающий - один счет то игнорируем
+                long[] makerLastTimestamp = maker.getLastTimestamp(this.dcSet);
+                if (makerLastTimestamp == null) {
+                    maker.removeLastTimestamp(this.dcSet, timestamp);
+                }
+            }
+
+            // удалим подпись для поиска
             dcSet.getTransactionFinalMapSigns().delete(person.getMakerSignature());
         }
+
+        byte[] makerBytes = maker.getPublicKey();
+        this.dcSet.getTransactionFinalMapSigns().delete(makerBytes);
 
     }
 
