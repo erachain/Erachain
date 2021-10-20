@@ -40,6 +40,7 @@ public class ShibaVerseSC extends EpochSmartContract {
     final static public Account adminAddress = new Account("7C6cEeHw739uQm8PhdnS9yENdLhT8LUERP");
 
     final static public String COMMAND_CATH_COMET = "catch comets";
+    final static public String COMMAND_STAKE = "stake";
     /**
      * GRAVUTA KEY
      */
@@ -94,6 +95,18 @@ public class ShibaVerseSC extends EpochSmartContract {
                 }
             }
             status = "error: " + COMMAND_CATH_COMET + " - wrong data";
+            return false;
+
+        } else if (COMMAND_STAKE.equals(command)) {
+            if (transaction instanceof RSend) {
+                RSend rsend = (RSend) transaction;
+                if (rsend.getAssetKey() == AssetCls.ERA_KEY
+                        && rsend.hasAmount() && rsend.getAmount().signum() > 0
+                        && !rsend.isBackward() && rsend.balancePosition() == Account.BALANCE_POS_OWN) {
+                    return true;
+                }
+            }
+            status = "error: " + COMMAND_STAKE + " - wrong data";
             return false;
         }
 
@@ -313,6 +326,8 @@ public class ShibaVerseSC extends EpochSmartContract {
 
     }
 
+    private void stakeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+    }
 
     //////// PROCESSES
 
@@ -386,6 +401,8 @@ public class ShibaVerseSC extends EpochSmartContract {
                     dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
                     status = "wait";
                     return false;
+                } else if (COMMAND_STAKE.equals(command)) {
+                    stakeAction(dcSet, block, (RSend) transaction, false);
                 }
             }
         }
@@ -429,6 +446,8 @@ public class ShibaVerseSC extends EpochSmartContract {
             // отмена рождения комет
             dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
             return false;
+        } else if (COMMAND_STAKE.equals(command)) {
+            stakeAction(dcSet, null, (RSend) transaction, false);
         }
 
         return false;
