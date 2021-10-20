@@ -751,7 +751,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             dcSet.getPersonAddressMap().addItem(key, address, itemP);
 
             // TODO удалить это если публичный ключ будет сохраняться в таблице Счетов
-            if (publicAccount.getLastTimestamp(dcSet) == null) {
+            if (publicAccount.getLastTimestamp(dcSet) == null && !publicAccount.equals(transaction.getCreator())) {
                 // for quick search public keys by address - use PUB_KEY from Person DATA owner
                 // used in - controller.Controller.getPublicKeyByAddress
                 publicAccount.setLastTimestamp(new long[]{transaction.timestamp, transaction.dbRef}, dcSet);
@@ -781,7 +781,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             // TODO удалить это если публичный ключ будет созраняться в таблице Счетов
             // при откате нужно след в истории удалить а сам публичный ключ отсавить на всякий случай?
             long[] lastPoint = publicAccount.getLastTimestamp(dcSet);
-            if (lastPoint != null && lastPoint[0] == transaction.timestamp) {
+            if (lastPoint != null && lastPoint[0] == transaction.timestamp && !publicAccount.equals(transaction.getCreator())) {
                 publicAccount.removeLastTimestamp(dcSet, transaction.timestamp);
             }
 
