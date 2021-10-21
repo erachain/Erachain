@@ -2592,6 +2592,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void process(Block block, int forDeal) {
+        if (BlockChain.CHECK_BUGS > 2 && (height == 6460 || height == 6469)) {
+            boolean debug = true;
+        }
+
         processHead(block, forDeal);
         processBody(block, forDeal);
         processTail(block, forDeal);
@@ -2603,8 +2607,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * @param block
      */
     public void processByTime(Block block) {
-        if (smartContract != null)
+        if (smartContract != null) {
             smartContract.processByTime(dcSet, block, this);
+            // update status in DB
+
+        }
     }
 
     //////////////////////////////////// ORPHAN
@@ -2671,6 +2678,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void orphan(Block block, int forDeal) {
+        if (BlockChain.CHECK_BUGS > 2 && (height == 6460 || height == 6469)) {
+            boolean debug = true;
+        }
+
         orphanHead(block, forDeal);
         orphanBody(block, forDeal);
         orphanTail(block, forDeal);
