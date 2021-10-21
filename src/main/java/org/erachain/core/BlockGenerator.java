@@ -944,25 +944,28 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             local_status = 5;
                             this.setMonitorStatus("local_status " + viewStatus());
 
-                            for (PrivateKeyAccount account : knownAccounts) {
+                            // protect from - java.util.ConcurrentModificationException
+                            synchronized (knownAccounts) {
+                                for (PrivateKeyAccount account : knownAccounts) {
 
-                                if (BlockChain.FREEZED_FORGING.contains(account.getAddress()))
-                                    continue;
+                                    if (BlockChain.FREEZED_FORGING.contains(account.getAddress()))
+                                        continue;
 
-                                forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-                                winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
-                                if (winValue < 1)
-                                    continue;
+                                    forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
+                                    if (winValue < 1)
+                                        continue;
 
-                                targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
-                                if (targetedWinValue < 1)
-                                    continue;
+                                    targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
+                                    if (targetedWinValue < 1)
+                                        continue;
 
-                                if (winValue > winned_winValue) {
-                                    acc_winner = account;
-                                    winned_winValue = winValue;
-                                    winned_forgingValue = forgingValue;
+                                    if (winValue > winned_winValue) {
+                                        acc_winner = account;
+                                        winned_winValue = winValue;
+                                        winned_forgingValue = forgingValue;
 
+                                    }
                                 }
                             }
 

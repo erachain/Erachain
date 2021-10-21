@@ -2217,10 +2217,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         // clear old orders
         OrderProcess.clearOldOrders(dcSet, this, false);
 
-        if (BlockChain.CHECK_BUGS > 0 && heightBlock == 2745 + 3) {
-            boolean debug = true;
-        }
-
         // time wait process
         TimeTXWaitMap timeWaitMap = dcSet.getTimeTXWaitMap();
         TimeTXDoneMap timewDoneMap = dcSet.getTimeTXDoneMap();
@@ -2395,10 +2391,6 @@ public class Block implements Closeable, ExplorerJsonLine {
      * @param dcSet
      */
     private void orphanHead(DCSet dcSet) {
-
-        if (BlockChain.CHECK_BUGS > 0 && heightBlock == 2745 + 3) {
-            boolean debug = true;
-        }
 
         // time wait process
         TimeTXWaitMap timeWaitMap = dcSet.getTimeTXWaitMap();
