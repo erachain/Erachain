@@ -21,7 +21,6 @@ import org.erachain.smartcontracts.epoch.shibaverse.ShibaVerseSC;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 
 public abstract class SmartContract {
 
@@ -67,6 +66,20 @@ public abstract class SmartContract {
         return false;
     }
 
+    /**
+     * make public key from Base with Nonce
+     *
+     * @param base
+     * @param nonce
+     * @return
+     */
+    public static PublicKeyAccount noncePubKey(byte[] base, byte nonce) {
+        byte[] hash = new byte[base.length];
+        System.arraycopy(base, 0, hash, 0, base.length);
+        hash[base.length - 1] += nonce;
+        return new PublicKeyAccount(hash);
+    }
+
     public int length(int forDeal) {
         return 4 + 32;
     }
@@ -101,6 +114,15 @@ public abstract class SmartContract {
         return true;
     }
 
+    /**
+     * @param dcSet
+     * @param block
+     * @param asOrphan
+     */
+    public static void processByBlock(DCSet dcSet, Block block, boolean asOrphan) {
+        ShibaVerseSC.blockAction(dcSet, block, asOrphan);
+    }
+
     abstract public boolean process(DCSet dcSet, Block block, Transaction transaction);
 
     abstract public boolean processByTime(DCSet dcSet, Block block, Transaction transaction);
@@ -117,13 +139,13 @@ public abstract class SmartContract {
      */
     static public SmartContract make(Transaction transaction) {
 
+        SmartContract contract = ShibaVerseSC.make(transaction);
+        if (contract != null)
+            return contract;
+
         if (BlockChain.TEST_MODE
                 && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
-
-            if (txSend.getRecipient().equals(ShibaVerseSC.MAKER) && txSend.isText() && !txSend.isEncrypted()) {
-                return new ShibaVerseSC(new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase(), "");
-            }
 
             if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
                     && txSend.hasAmount() && txSend.getAmount().signum() < 0
@@ -149,15 +171,6 @@ public abstract class SmartContract {
 
         return null;
 
-    }
-
-    /**
-     * @param dcSet
-     * @param block
-     * @param asOrphan
-     */
-    public static void processByBlock(DCSet dcSet, Block block, boolean asOrphan) {
-        ShibaVerseSC.blockAction(dcSet, block, asOrphan);
     }
 
 }
