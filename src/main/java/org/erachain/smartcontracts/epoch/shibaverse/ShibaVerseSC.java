@@ -12,15 +12,19 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SmartContractValues;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.smartcontracts.epoch.EpochSmartContract;
 import org.erachain.webserver.WebResource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
@@ -423,10 +427,37 @@ public class ShibaVerseSC extends EpochSmartContract {
     private void stakeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
     }
 
+    private void farmChargeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+    }
+
     private void farmAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        if (commandTX.isBackward()) {
+            // WITHDRAW
+            farmChargeAction(dcSet, block, commandTX, asOrphan);
+        } else {
+            // DEPOSITE
+
+        }
     }
 
     private static void farm(DCSet dcSet, Block block, boolean asOrphan) {
+        CreditAddressesMap map = dcSet.getCredit_AddressesMap();
+        try (IteratorCloseable<Fun.Tuple3<String, Long, String>> iterator = map.getDebitorsIterator(FARM_01.getAddress())) {
+            Fun.Tuple3<String, Long, String> key;
+            BigDecimal credit;
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                credit = map.get(key);
+                if (credit.signum() < 1)
+                    continue;
+
+                if (key.b == 1048579L || key.b == 1048587) {
+                    dcSet.getSmartContractState()
+                }
+            }
+        } catch (IOException e) {
+
+        }
     }
 
     //////// PROCESSES
@@ -508,7 +539,7 @@ public class ShibaVerseSC extends EpochSmartContract {
                     return false;
                 } else if (COMMAND_STAKE.equals(command)) {
                     stakeAction(dcSet, block, (RSend) transaction, false);
-                } else if (COMMAND_FARM.equals(command)) {
+                } else if (COMMAND_FARM.equals(command) || COMMAND_PICK_UP.equals(command)) {
                     farmAction(dcSet, block, (RSend) transaction, false);
                 }
             }

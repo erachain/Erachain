@@ -108,6 +108,11 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
                 new Tuple3(creditorAddress, key, Fun.HI)).keySet().iterator());
     }
 
+    public IteratorCloseable<Tuple3<String, Long, String>> getDebitorsIterator(String creditorAddress) {
+        return IteratorCloseableImpl.make(((BTreeMap) map).subMap(new Tuple3(creditorAddress, null, null),
+                new Tuple3(creditorAddress, Long.MAX_VALUE, Fun.HI)).keySet().iterator());
+    }
+
     /**
      * For GUI only
      *
