@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class ShibaVerseSC extends EpochSmartContract {
@@ -427,7 +428,20 @@ public class ShibaVerseSC extends EpochSmartContract {
     private void stakeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
     }
 
+    // CHARGE all from FARM 01
     private void farmChargeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        SmartContractValues mapValues = dcSet.getSmartContractValues();
+        Tuple2<Integer, String> farmKeyValue;
+        BigDecimal farmedValue;
+        try (IteratorCloseable iterator = mapValues.getIterator()) {
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                farmKeyValue = new Tuple2<>(ID, "farm1" +);
+                farmedValue = (BigDecimal) mapValues.get(farmKeyValue);
+            }
+        } catch (IOException e) {
+        }
+
     }
 
     private void farmAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
@@ -442,22 +456,45 @@ public class ShibaVerseSC extends EpochSmartContract {
 
     private static void farm(DCSet dcSet, Block block, boolean asOrphan) {
         CreditAddressesMap map = dcSet.getCredit_AddressesMap();
+        SmartContractValues mapValues = dcSet.getSmartContractValues();
+        Fun.Tuple3<String, Long, String> key;
+        BigDecimal credit;
+        Tuple2<Integer, String> farmKeyValue;
+        BigDecimal farmedValue;
+        HashMap<String, BigDecimal> results = new HashMap<>();
         try (IteratorCloseable<Fun.Tuple3<String, Long, String>> iterator = map.getDebitorsIterator(FARM_01.getAddress())) {
-            Fun.Tuple3<String, Long, String> key;
-            BigDecimal credit;
             while (iterator.hasNext()) {
                 key = iterator.next();
                 credit = map.get(key);
                 if (credit.signum() < 1)
                     continue;
 
+                farmKeyValue = new Tuple2<>(ID, "farm1" + key.a);
+                farmedValue = (BigDecimal) mapValues.get(farmKeyValue);
+                if (farmedValue.signum() > 0) {
+                    // not charged yet
+                    continue;
+                }
+
                 if (key.b == 1048579L || key.b == 1048587) {
-                    dcSet.getSmartContractState()
+                    farmedValue = results.get(key.a);
+                    if (farmedValue == null)
+                        farmedValue = BigDecimal.ZERO;
+
+                    farmedValue = farmedValue.add(BigDecimal.ONE);
+                    results.put(key.a, farmedValue);
                 }
             }
         } catch (IOException e) {
-
         }
+
+        // SAVE RESULTS
+        for (String address : results.keySet()) {
+            farmKeyValue = new Tuple2<>(ID, "farm1" + address);
+            mapValues.put(farmKeyValue, results.get(address));
+        }
+
+
     }
 
     //////// PROCESSES
