@@ -330,6 +330,11 @@ public class ShibaVerseSC extends EpochSmartContract {
     }
 
     //////// PROCESSES
+    public static void blockAction(DCSet dcSet, Block block, boolean asOrphan) {
+        if (block.heightBlock % 1000 == 0) {
+
+        }
+    }
 
     private void init(DCSet dcSet, RSend commandTX, Account admin, boolean asOrphan) {
 

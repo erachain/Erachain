@@ -151,4 +151,13 @@ public abstract class SmartContract {
 
     }
 
+    /**
+     * @param dcSet
+     * @param block
+     * @param asOrphan
+     */
+    public static void processByBlock(DCSet dcSet, Block block, boolean asOrphan) {
+        ShibaVerseSC.blockAction(dcSet, block, asOrphan);
+    }
+
 }
