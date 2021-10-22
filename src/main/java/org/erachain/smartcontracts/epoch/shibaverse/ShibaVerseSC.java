@@ -18,6 +18,7 @@ import org.erachain.datachain.SmartContractValues;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.smartcontracts.epoch.EpochSmartContract;
+import org.erachain.smartcontracts.epoch.shibaverse.server.Farm_01;
 import org.erachain.webserver.WebResource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -43,6 +44,7 @@ public class ShibaVerseSC extends EpochSmartContract {
     final public static PublicKeyAccount MAKER = new PublicKeyAccount(crypto.digest(Longs.toByteArray(ID)));
 
     final public static PublicKeyAccount FARM_01 = noncePubKey(HASH, (byte) 1);
+    public static Farm_01 FARM_01_SERVER = new Farm_01(null);
 
     final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
 
