@@ -50,7 +50,7 @@ public class ShibaVerseSC extends EpochSmartContract {
         farm_01_settings.put("account", FARM_01_PUBKEY.getAddress());
     }
 
-    public static Farm_01 FARM_01_SERVER = new Farm_01(farm_01_settings);
+    public static Farm_01 FARM_01_SERVER = null; //new Farm_01(farm_01_settings);
 
     final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
 
@@ -443,8 +443,8 @@ public class ShibaVerseSC extends EpochSmartContract {
         BigDecimal farmedValue;
         try (IteratorCloseable iterator = mapValues.getIterator()) {
             while (iterator.hasNext()) {
-                key = iterator.next();
-                farmKeyValue = new Tuple2<>(ID, "farm1" +);
+                Object key = iterator.next();
+                farmKeyValue = new Tuple2<>(ID, "farm1" + key.toString());
                 farmedValue = (BigDecimal) mapValues.get(farmKeyValue);
             }
         } catch (IOException e) {

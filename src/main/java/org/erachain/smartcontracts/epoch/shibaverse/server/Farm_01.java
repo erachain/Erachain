@@ -9,8 +9,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exActions.ExListPays;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.RSignNote;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DPSet;
 import org.erachain.database.FPoolBalancesMap;
 import org.erachain.database.FPoolBlocksHistoryMap;
@@ -408,24 +406,6 @@ public class Farm_01 extends Thread {
                 (byte) 0, null, (byte) 0, null,
                 (byte) 0, null, null, exDataJSON, null);
 
-        byte version = (byte) 3;
-        byte property1 = (byte) 0;
-        byte property2 = (byte) 0;
-        byte feePow = 0;
-        RSignNote issueDoc = null;
-        try {
-            issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2,
-                    account, feePow, 0, exData.toByte());
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            return false;
-        }
-
-        int validate = Controller.getInstance().getTransactionCreator().afterCreate(issueDoc, Transaction.FOR_NETWORK, false, false);
-        if (validate != Transaction.VALIDATE_OK) {
-            LOGGER.error(issueDoc.makeErrorJSON2(validate).toJSONString());
-            return false;
-        }
 
         /// UPADTE BALANCCES by withdraw amounts
         Tuple2<Long, String> balsKey;
