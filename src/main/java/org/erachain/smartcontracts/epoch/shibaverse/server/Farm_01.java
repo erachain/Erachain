@@ -30,8 +30,11 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
+/**
+ * централизованный сервре для расчета фарминга - по аналогии с FPool
+ * нужен для обработки сложной логики, которую не эффективно делать в сморт-контракте из-за больших расчетов
+ */
 public class Farm_01 extends Thread {
 
     static int PENDING_PERIOD = 30;
@@ -62,8 +65,8 @@ public class Farm_01 extends Thread {
         LOGGER.info("Start\n" + settingsJSON.toJSONString());
 
         account = new Account((String) settingsJSON.get("account"));
-        POOL_TAX = new BigDecimal(settingsJSON.get("tax").toString()).movePointLeft(2);
-        PENDING_PERIOD = Integer.parseInt(settingsJSON.getOrDefault("pending_period", 30).toString());
+        //POOL_TAX = new BigDecimal(settingsJSON.get("tax").toString()).movePointLeft(2);
+        //PENDING_PERIOD = Integer.parseInt(settingsJSON.getOrDefault("pending_period", 30).toString());
 
         this.setName("Shiba FARM 01 [" + this.getId() + "]");
 
@@ -428,15 +431,13 @@ public class Farm_01 extends Thread {
 
         runned = true;
 
-        int count = 0;
+        boolean forged;
         while (runned) {
 
             // PROCESS
             try {
 
-                boolean forged = processMessage(blockingQueue.poll(BlockChain.GENERATING_MIN_BLOCK_TIME(0), TimeUnit.SECONDS));
-                if (!forged && count++ % (PENDING_PERIOD >> 1) != 0)
-                    continue;
+                forged = processMessage(blockingQueue.take());
 
                 checkPending();
 

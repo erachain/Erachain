@@ -46,24 +46,23 @@ public class ShibaVerseSC extends EpochSmartContract {
 
     final public static PublicKeyAccount FARM_01_PUBKEY = noncePubKey(HASH, (byte) 1);
     private static JSONObject farm_01_settings = new JSONObject();
-
-    {
+    static {
         farm_01_settings.put("account", FARM_01_PUBKEY.getAddress());
     }
 
     public static Farm_01 FARM_01_SERVER = null;
 
-    {
+    static {
         if (SmartContract.settingsJSON.containsKey("shiba")) {
             boolean farm_01 = (boolean) ((JSONObject) SmartContract.settingsJSON.get("shiba")).getOrDefault("farm_01", false);
-            if (farm_01)
+            if (false && farm_01)
                 FARM_01_SERVER = new Farm_01(farm_01_settings);
         }
     }
 
     final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
 
-    {
+    static {
         accounts.add(MAKER);
         accounts.add(FARM_01_PUBKEY);
     }
@@ -102,6 +101,11 @@ public class ShibaVerseSC extends EpochSmartContract {
     }
 
     public static ShibaVerseSC make(Transaction transaction) {
+
+        if (transaction.getBlockHeight() == 1609) {
+            boolean debug = true;
+        }
+
         if (!BlockChain.TEST_MODE || transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
             return null;
 

@@ -31,7 +31,7 @@ public abstract class SmartContract {
 
     public static JSONObject settingsJSON;
 
-    {
+    static {
         try {
             settingsJSON = FileUtils.readCommentedJSONObject("settings_servers.json");
         } catch (IOException e) {
@@ -151,13 +151,13 @@ public abstract class SmartContract {
      */
     static public SmartContract make(Transaction transaction) {
 
-        SmartContract contract = ShibaVerseSC.make(transaction);
-        if (contract != null)
-            return contract;
-
         if (BlockChain.TEST_MODE
                 && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
+
+            SmartContract contract = ShibaVerseSC.make(transaction);
+            if (contract != null)
+                return contract;
 
             if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
                     && txSend.hasAmount() && txSend.getAmount().signum() < 0

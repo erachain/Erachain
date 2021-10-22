@@ -1092,7 +1092,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return VALIDATE_OK;
         }
 
-        if ((!BlockChain.MAIN_MODE || height > 1000) && getVersion() < 2) {
+        if (false && (!BlockChain.MAIN_MODE || height > 1000) && getVersion() < 2) {
             return INVALID_BACKWARD_ACTION;
         }
 
