@@ -45,10 +45,9 @@ public class ShibaVerseSC extends EpochSmartContract {
     final public static PublicKeyAccount MAKER = new PublicKeyAccount(crypto.digest(Longs.toByteArray(ID)));
 
     final public static PublicKeyAccount FARM_01_PUBKEY = noncePubKey(HASH, (byte) 1);
-    private static JSONObject farm_01_settings = new JSONObject();
-    static {
-        farm_01_settings.put("account", FARM_01_PUBKEY.getAddress());
-    }
+    private static JSONObject farm_01_settings = new JSONObject() {{
+        put("account", FARM_01_PUBKEY.getAddress());
+    }};
 
     public static Farm_01 FARM_01_SERVER = null;
 
@@ -60,12 +59,10 @@ public class ShibaVerseSC extends EpochSmartContract {
         }
     }
 
-    final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
-
-    static {
+    final public static HashSet<PublicKeyAccount> accounts = new HashSet<PublicKeyAccount>() {{
         accounts.add(MAKER);
         accounts.add(FARM_01_PUBKEY);
-    }
+    }};
 
     /**
      * admin account
