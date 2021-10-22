@@ -29,31 +29,31 @@ import java.util.Base64;
 
 ## version 0
 typeBytes[2] = -128 if NO AMOUNT
-typeBytes[3] = -128 if NO DATA
+ typeBytes[3] = -128 if NO DATA
 
-## version 1
-typeBytes[1] (version) = 1 - if backward - CONFISCATE CREDIT
+ ## version 1
+ typeBytes[1] (version) = 1 - if backward - CONFISCATE CREDIT
 
-## version 2
-typeBytes[1] - version
+ ## version 2
+ typeBytes[1] - version
 
-#### PROPERTY 1
-typeBytes[2].0 = -128 if NO AMOUNT
-typeBytes[2].1 = 64 if backward - CONFISCATE CREDIT
+ #### PROPERTY 1
+ typeBytes[2] = -128 if NO AMOUNT
+ typeBytes[2] = 64 if backward - CONFISCATE CREDIT
 
-#### PROPERTY 2
-typeBytes[3].0 = -128 if NO DATA
+ #### PROPERTY 2
+ typeBytes[3] = -128 if NO DATA
 
-## version 3
+ ## version 3
 
-#### PROPERTY 1
-typeBytes[2].0 = -128 if NO AMOUNT - check sign
-typeBytes[2].1 = 64 if backward (CONFISCATE CREDIT, ...)
-typeBytes[2].3 = 32 - HAS_EXLINK_MASK
+ #### PROPERTY 1
+ typeBytes[2] = -128 if NO AMOUNT - check sign
+ typeBytes[2] = 64 if backward (CONFISCATE CREDIT, ...)
+ typeBytes[2] = 32 - HAS_EXLINK_MASK
 
-#### PROPERTY 2
-typeBytes[3].0 = -128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128) - assertEquals((byte)128, (byte)-128);
-typeBytes[3].3-7 = point accuracy: -16..16 = BYTE - 16
+ #### PROPERTY 2
+ typeBytes[3].7 = -128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128) - assertEquals((byte)128, (byte)-128);
+ typeBytes[3].4-0 = point accuracy: -16..16 = BYTE - 16
 
  */
 

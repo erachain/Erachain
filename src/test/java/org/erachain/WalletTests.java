@@ -97,18 +97,4 @@ public class WalletTests {
         assertEquals(10, wallet.getprivateKeyAccounts().size());
     }
 
-    @Test
-    public void test01() {
-        String S = "qweytqwey";
-        String J = "qwerwrertrtyrty";
-        int result = 0;
-        for (int i = 0; i < S.length(); ++i) {
-            char ch = S.charAt(i);
-            if (J.indexOf(ch) >= 0) {
-                ++result;
-            }
-        }
-        System.out.println(result);
-    }
-
 }
