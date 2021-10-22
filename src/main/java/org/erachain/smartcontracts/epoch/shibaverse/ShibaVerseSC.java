@@ -17,6 +17,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SmartContractValues;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
+import org.erachain.smartcontracts.SmartContract;
 import org.erachain.smartcontracts.epoch.EpochSmartContract;
 import org.erachain.smartcontracts.epoch.shibaverse.server.Farm_01;
 import org.erachain.webserver.WebResource;
@@ -50,7 +51,15 @@ public class ShibaVerseSC extends EpochSmartContract {
         farm_01_settings.put("account", FARM_01_PUBKEY.getAddress());
     }
 
-    public static Farm_01 FARM_01_SERVER = null; //new Farm_01(farm_01_settings);
+    public static Farm_01 FARM_01_SERVER = null;
+
+    {
+        if (SmartContract.settingsJSON.containsKey("shiba")) {
+            boolean farm_01 = (boolean) ((JSONObject) SmartContract.settingsJSON.get("shiba")).getOrDefault("farm_01", false);
+            if (farm_01)
+                FARM_01_SERVER = new Farm_01(farm_01_settings);
+        }
+    }
 
     final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
 

@@ -18,14 +18,26 @@ import org.erachain.lang.Lang;
 import org.erachain.smartcontracts.epoch.DogePlanet;
 import org.erachain.smartcontracts.epoch.LeafFall;
 import org.erachain.smartcontracts.epoch.shibaverse.ShibaVerseSC;
+import org.erachain.utils.FileUtils;
 import org.json.simple.JSONObject;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 public abstract class SmartContract {
 
     static protected Controller contr = Controller.getInstance();
     static protected Crypto crypto = Crypto.getInstance();
+
+    public static JSONObject settingsJSON;
+
+    {
+        try {
+            settingsJSON = FileUtils.readCommentedJSONObject("settings_servers.json");
+        } catch (IOException e) {
+            settingsJSON = new JSONObject();
+        }
+    }
 
     protected final int id;
     protected final PublicKeyAccount maker;
