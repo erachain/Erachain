@@ -43,14 +43,20 @@ public class ShibaVerseSC extends EpochSmartContract {
     // 7G6sJRb7vf8ABEr3ENvV1fo1hwt197r35e
     final public static PublicKeyAccount MAKER = new PublicKeyAccount(crypto.digest(Longs.toByteArray(ID)));
 
-    final public static PublicKeyAccount FARM_01 = noncePubKey(HASH, (byte) 1);
-    public static Farm_01 FARM_01_SERVER = new Farm_01(null);
+    final public static PublicKeyAccount FARM_01_PUBKEY = noncePubKey(HASH, (byte) 1);
+    private static JSONObject farm_01_settings = new JSONObject();
+
+    {
+        farm_01_settings.put("account", FARM_01_PUBKEY.getAddress());
+    }
+
+    public static Farm_01 FARM_01_SERVER = new Farm_01(farm_01_settings);
 
     final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
 
     {
         accounts.add(MAKER);
-        accounts.add(FARM_01);
+        accounts.add(FARM_01_PUBKEY);
     }
 
     /**
@@ -96,7 +102,7 @@ public class ShibaVerseSC extends EpochSmartContract {
             return null;
         }
 
-        if (recipent.equals(FARM_01)) {
+        if (recipent.equals(FARM_01_PUBKEY)) {
             if (txSend.balancePosition() == Account.BALANCE_POS_DEBT && txSend.hasAmount()) {
                 return new ShibaVerseSC(txSend.isBackward() ? COMMAND_PICK_UP : COMMAND_FARM, "");
             } else if (txSend.balancePosition() == Account.BALANCE_POS_OWN) {
@@ -464,7 +470,7 @@ public class ShibaVerseSC extends EpochSmartContract {
         Tuple2<Integer, String> farmKeyValue;
         BigDecimal farmedValue;
         HashMap<String, BigDecimal> results = new HashMap<>();
-        try (IteratorCloseable<Fun.Tuple3<String, Long, String>> iterator = map.getDebitorsIterator(FARM_01.getAddress())) {
+        try (IteratorCloseable<Fun.Tuple3<String, Long, String>> iterator = map.getDebitorsIterator(FARM_01_PUBKEY.getAddress())) {
             while (iterator.hasNext()) {
                 key = iterator.next();
                 credit = map.get(key);
