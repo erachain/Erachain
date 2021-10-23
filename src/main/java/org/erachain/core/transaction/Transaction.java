@@ -239,14 +239,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int ITEM_PERSON_OWNER_SIGNATURE_INVALID = 258;
     public static final int ITEM_PERSON_MUST_BE_SIGNED = 259;
 
-    // NAMES
-    public static final int NAME_DOES_NOT_EXIST = 5060;
-    public static final int NAME_ALREADY_REGISTRED = 5061;
-    public static final int NAME_ALREADY_ON_SALE = 5062;
-    public static final int NAME_NOT_FOR_SALE = 5063;
-    public static final int BUYER_ALREADY_OWNER = 5064;
-    public static final int NAME_NOT_LOWER_CASE = 5065;
-    public static final int NAME_WITH_SPACE = 5066;
+    public static final int INVALID_PACKET_SIZE = 310;
 
     public static final int CREATOR_NOT_MAKER = 366;
     public static final int CREATOR_NOT_OWNER = 367;
@@ -288,6 +281,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int TELEGRAM_DOES_NOT_EXIST = 541;
     public static final int NOT_YET_RELEASED = 599;
     public static final int AT_ERROR = 600; // END error for org.erachain.api.ApiErrorFactory.ERROR
+
+    // NAMES
+    public static final int NAME_DOES_NOT_EXIST = 5060;
+    public static final int NAME_ALREADY_REGISTRED = 5061;
+    public static final int NAME_ALREADY_ON_SALE = 5062;
+    public static final int NAME_NOT_FOR_SALE = 5063;
+    public static final int BUYER_ALREADY_OWNER = 5064;
+    public static final int NAME_NOT_LOWER_CASE = 5065;
+    public static final int NAME_WITH_SPACE = 5066;
 
     // 
     // TYPES *******

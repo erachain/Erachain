@@ -545,6 +545,10 @@ public class OnDealClick {
                 mess = "Amount point scale wrong";
                 break;
 
+            case Transaction.INVALID_PACKET_SIZE:
+                mess = "Invalid packet size";
+                break;
+
             case Transaction.INVALID_BLOCK_HEIGHT:
                 mess = "Invalid block height";
                 break;

@@ -725,7 +725,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             base_len -= SIGNATURE_LENGTH;
 
         if (packet == null) {
-            return base_len - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
+            if (this.typeBytes[2] < 0)
+                base_len -= KEY_LENGTH + AMOUNT_LENGTH;
+
+            return base_len;
 
         } else {
             int additionalLen = 0;
@@ -768,6 +771,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public static Fun.Tuple2<Integer, String> isValidAction(DCSet dcSet, int height, Account creator, byte[] signature,
+                                                            int actionType,
                                                             long key, AssetCls asset, BigDecimal amount, Account recipient,
                                                             boolean backward, BigDecimal fee, BigDecimal assetFee,
                                                             boolean creatorIsPerson, long flags, long timestamp) {
@@ -822,10 +826,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                 if (height > BlockChain.ALL_BALANCES_OK_TO) {
 
-                    // BACKWARD - CONFISCATE
-                    boolean isDirect = asset.isDirectBalances();
-
-                    int actionType = Account.balancePosition(key, amount, backward, isDirect);
                     int assetType = asset.getAssetType();
                     BigDecimal balance;
 
@@ -1273,6 +1273,22 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return new Fun.Tuple2<>(VALIDATE_OK, null);
     }
 
+    public static Fun.Tuple2<Integer, String> isValidAction(DCSet dcSet, int height, Account creator, byte[] signature,
+                                                            long key, AssetCls asset, BigDecimal amount, Account recipient,
+                                                            boolean backward, BigDecimal fee, BigDecimal assetFee,
+                                                            boolean creatorIsPerson, long flags, long timestamp) {
+
+        boolean isDirect = asset.isDirectBalances();
+        int actionType = Account.balancePosition(key, amount, backward, isDirect);
+
+        return isValidAction(dcSet, height, creator, signature, actionType,
+                key, asset, amount, recipient,
+                backward, fee, assetFee,
+                creatorIsPerson, flags, timestamp);
+
+    }
+
+
     public int isValid(int forDeal, long flags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
@@ -1375,19 +1391,55 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         //////////////////////////////
         // CHECK IF AMOUNT AND ASSET
-        if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0L
-                && this.amount != null) {
+        if (this.amount != null) {
             Fun.Tuple2<Integer, String> result = isValidAction(dcSet, height, creator, signature, key, asset, amount, recipient,
                     isBackward(), fee, assetFee, isPerson, flags, timestamp);
-            if (result.a != VALIDATE_OK)
+            if (result.a != VALIDATE_OK) {
                 errorValue = result.b;
-            return result.a;
+                return result.a;
+            }
+        } else if (packet != null) {
+            if (packet.length > Integer.MAX_VALUE) {
+                errorValue = " > " + Integer.MAX_VALUE;
+                return INVALID_PACKET_SIZE;
+            } else if (action < ACTION_SEND || action > Account.BALANCE_POS_PLEDGE) {
+                return INVALID_BALANCE_POS;
+            } else if (asset == null) {
+                errorValue = " =" + key;
+                return ITEM_ASSET_NOT_EXIST;
+            }
+
+            int count = 0;
+            for (Object[] row : packet) {
+                if (row[7] == null) {
+                    errorValue = "[" + count + "] = " + row[0];
+                    return ITEM_ASSET_NOT_EXIST;
+                } else if (((BigDecimal) row[1]).signum() <= 0) {
+                    errorValue = "Amount[" + count + "] = " + row[1];
+                    return INVALID_AMOUNT;
+                } else if (((BigDecimal) row[2]).signum() < 0) {
+                    errorValue = "Price[" + count + "] = " + row[2];
+                    return INVALID_AMOUNT;
+                } else if (((BigDecimal) row[3]).signum() < 0) {
+                    errorValue = "DiscontedPrice[" + count + "] = " + row[3];
+                    return INVALID_AMOUNT;
+                }
+                Fun.Tuple2<Integer, String> result = isValidAction(dcSet, height, creator, signature, (Long) row[0],
+                        (AssetCls) row[7], (BigDecimal) row[1], recipient,
+                        isBackward(), fee, assetFee, isPerson, flags, timestamp);
+                if (result.a != VALIDATE_OK) {
+                    errorValue = result.b;
+                    return result.a;
+                }
+
+                count++;
+            }
 
         } else {
             // TODO first org.erachain.records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
             if (height > BlockChain.ALL_BALANCES_OK_TO
-                    && (flags & NOT_VALIDATE_FLAG_FEE) == 0
+                    && (flags & NOT_VALIDATE_FLAG_FEE) == 0L
                     && !BlockChain.isFeeEnough(height, creator)
                     && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                 return NOT_ENOUGH_FEE;
