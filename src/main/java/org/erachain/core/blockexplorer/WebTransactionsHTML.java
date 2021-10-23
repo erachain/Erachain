@@ -101,7 +101,7 @@ public class WebTransactionsHTML {
                 break;
             case Transaction.ISSUE_IMPRINT_TRANSACTION:
                 outTX.put("body", issue_Imprint_HTML(transaction));
-                outTX.put("message", ((Itemable) transaction));
+                outTX.put("message", getItemDescription((Itemable) transaction));
                 break;
             case Transaction.ISSUE_TEMPLATE_TRANSACTION:
                 outTX.put("body", issue_Template_HTML(transaction));
