@@ -35,32 +35,32 @@ public class IssuePersonRecord extends IssueItemRecord {
     public static final int MAX_DESCRIPTION_LENGTH = 1 << 15;
 
 
-    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, reference);
+    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, flags);
     }
 
-    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, reference, signature);
+    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, long flags, byte[] signature) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, flags, signature);
     }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp,
-                             Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, reference, signature);
+                             long flags, byte[] signature, long seqNo, long feeLong) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, flags, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
     }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, person, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, person, feePow, timestamp, reference, signature);
+    public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, person, feePow, timestamp, flags, signature);
     }
 
-    public IssuePersonRecord(PublicKeyAccount creator, ExLink linkTo, boolean andCertify, PersonCls person, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, andCertify ? (byte) AND_CERTIFY_MASK : (byte) 0}, creator, linkTo, person, feePow, timestamp, reference);
+    public IssuePersonRecord(PublicKeyAccount creator, ExLink linkTo, boolean andCertify, PersonCls person, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, andCertify ? (byte) AND_CERTIFY_MASK : (byte) 0}, creator, linkTo, person, feePow, timestamp, flags);
     }
 
     //GETTERS/SETTERS
@@ -106,7 +106,7 @@ public class IssuePersonRecord extends IssueItemRecord {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
+        //READ FLAGS
         byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
         long flagsTX = Longs.fromByteArray(flagsBytes);
         position += FLAGS_LENGTH;

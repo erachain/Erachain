@@ -15,40 +15,40 @@ public class IssueTemplateRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
     public static final String TYPE_NAME = "Issue Template";
 
-    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, reference);
+    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, flags);
     }
 
-    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, reference, signature);
+    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, long flags, byte[] signature) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, flags, signature);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow,
-                               long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, reference, signature);
+                               long timestamp, long flags, byte[] signature, long seqNo, long feeLong) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, flags, signature);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, template, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, feePow, timestamp, reference, signature);
+    public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, feePow, timestamp, flags, signature);
     }
 
     public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, (byte) 0, 0L, null, signature);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssueTemplateRecord(PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, template, feePow, timestamp, reference);
+    public IssueTemplateRecord(PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, template, feePow, timestamp, flags);
     }
 
     public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, (byte) 0, 0L, null);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, (byte) 0, 0L, 0L);
     }
 
     //GETTERS/SETTERS

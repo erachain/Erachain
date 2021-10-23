@@ -466,6 +466,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         this.timestamp = timestamp;
         this.flags = flags;
+        if (flags < 0) {
+            boolean debug = true;
+        }
 
         if (feePow < 0)
             feePow = 0;

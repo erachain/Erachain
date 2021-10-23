@@ -15,32 +15,32 @@ public class IssueUnionRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_UNION_TRANSACTION;
     public static final String TYPE_NAME = "Issue Union";
 
-    public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, union, feePow, timestamp, reference);
+    public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, flags);
     }
 
-    public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, reference, signature);
+    public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, long flags, byte[] signature) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, flags, signature);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp,
-                            Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, reference, signature);
+                            long flags, byte[] signature, long seqNo, long feeLong) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, flags, signature);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, union, (byte) 0, 0l, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, union, feePow, timestamp, reference, signature);
+    public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, union, feePow, timestamp, flags, signature);
     }
 
-    public IssueUnionRecord(PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, union, feePow, timestamp, reference);
+    public IssueUnionRecord(PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, union, feePow, timestamp, flags);
     }
 
     //GETTERS/SETTERS
@@ -74,7 +74,7 @@ public class IssueUnionRecord extends IssueItemRecord {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
+        //READ FLAGS
         byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
         long flagsTX = Longs.fromByteArray(flagsBytes);
         position += FLAGS_LENGTH;

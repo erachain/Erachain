@@ -26,16 +26,16 @@ public class IssueImprintRecord extends IssueItemRecord {
 
 
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp) {
-        super(typeBytes, TYPE_NAME, creator, null, imprint, feePow, timestamp, null);
+        super(typeBytes, TYPE_NAME, creator, null, imprint, feePow, timestamp, 0L);
     }
 
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, feePow, timestamp, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, feePow, timestamp, 0L, signature);
     }
 
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte feePow,
                               long timestamp, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, feePow, timestamp, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, feePow, timestamp, 0L, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -43,7 +43,7 @@ public class IssueImprintRecord extends IssueItemRecord {
 
     // asPack
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, (byte) 0, 0L, 0L, signature);
     }
 
     public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {
