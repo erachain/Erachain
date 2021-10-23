@@ -470,9 +470,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.timestamp = timestamp;
         this.flags = flags;
         if (flags < 0L) {
-            if ((flags & FLAGS_USED_MASK) != 0) {
-                boolean debug = true;
-            }
+            Controller.getInstance().stopAndExit(-111);
         }
 
         if (feePow < 0)

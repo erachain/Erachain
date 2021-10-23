@@ -18,6 +18,7 @@ import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.BigDecimalUtil;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
@@ -141,6 +142,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected Object[][] packet;
     // + 1 to len for memo
     protected static final int PACKET_ROW_LENGTH = KEY_LENGTH + 5 * AMOUNT_LENGTH + 1;
+    protected static final int PACKET_ROW_MEMO_NO = 6;
+
     /**
      * see Account.BALANCE_POS_OWN etc. BACKWARD < 0
      */
@@ -206,7 +209,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
         if (packet != null) {
             for (Object[] row : packet) {
-                row[6] = this.dcSet.getItemAssetMap().get((Long) row[0]);
+                row[7] = this.dcSet.getItemAssetMap().get((Long) row[0]);
             }
         }
 
@@ -563,10 +566,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             int count = 0;
             int additionalLen = 0;
             for (Object[] row : packet) {
-                if (row[6] == null) {
+                if (row[PACKET_ROW_MEMO_NO] == null) {
                     memoBytes[count++] = new byte[0];
                 } else {
-                    additionalLen += (memoBytes[count++] = ((String) row[6]).getBytes(StandardCharsets.UTF_8)).length;
+                    additionalLen += (memoBytes[count++] = ((String) row[PACKET_ROW_MEMO_NO]).getBytes(StandardCharsets.UTF_8)).length;
                 }
             }
 
@@ -635,8 +638,36 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             transaction.put("actionName", viewActionType());
             if (this.isBackward())
                 transaction.put("backward", this.isBackward());
+
         }
-        
+        if (packet != null) {
+            transaction.put("priceAssetKey", this.getAbsKey());
+            if (asset == null) {
+                setDC(DCSet.getInstance(), false);
+            }
+            asset.toJsonInfo(transaction, "priceAsset");
+
+            transaction.put("balancePos", Math.abs(action));
+            transaction.put("actionName", viewActionType());
+            if (this.isBackward())
+                transaction.put("backward", this.isBackward());
+
+            JSONArray packetArray = new JSONArray();
+            for (Object[] row : packet) {
+                JSONArray rowArray = new JSONArray();
+                rowArray.add(row[0]);
+                rowArray.add(row[1]);
+                rowArray.add(row[2]);
+                rowArray.add(row[3]);
+                rowArray.add(row[4]);
+                rowArray.add(row[5]);
+                rowArray.add(row[6]);
+                packetArray.add(rowArray);
+            }
+            transaction.put("packet", packetArray);
+
+        }
+
         return transaction;
     }
     
@@ -693,7 +724,21 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (!withSignature)
             base_len -= SIGNATURE_LENGTH;
 
-        return base_len - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
+        if (packet == null) {
+            return base_len - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
+
+        } else {
+            int additionalLen = 0;
+            for (Object[] row : packet) {
+                if (row[PACKET_ROW_MEMO_NO] == null)
+                    continue;
+
+                additionalLen += ((String) row[PACKET_ROW_MEMO_NO]).getBytes(StandardCharsets.UTF_8).length;
+            }
+
+            return base_len - AMOUNT_LENGTH + Integer.BYTES + packet.length * PACKET_ROW_LENGTH + additionalLen;
+
+        }
     }
 
     private static long pointLogg;
