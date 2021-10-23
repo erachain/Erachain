@@ -22,21 +22,21 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     protected ItemCls item;
     protected Long key = 0L;
 
-    public IssueItemRecord(byte[] typeBytes, String TYPE_NAME, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, null, feePow, timestamp, reference);
+    public IssueItemRecord(byte[] typeBytes, String TYPE_NAME, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, null, feePow, timestamp, flags);
         this.item = item;
         if (item.getKey() != 0)
             key = item.getKey();
     }
 
-    public IssueItemRecord(byte[] typeBytes, String TYPE_NAME, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, TYPE_NAME, creator, linkTo, item, feePow, timestamp, reference);
+    public IssueItemRecord(byte[] typeBytes, String TYPE_NAME, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(typeBytes, TYPE_NAME, creator, linkTo, item, feePow, timestamp, flags);
         this.signature = signature;
         this.item.setReference(signature, dbRef);
     }
 
     public IssueItemRecord(byte[] typeBytes, String TYPE_NAME, PublicKeyAccount creator, ExLink linkTo, ItemCls item, byte[] signature) {
-        this(typeBytes, TYPE_NAME, creator, linkTo, item, (byte) 0, 0L, null);
+        this(typeBytes, TYPE_NAME, creator, linkTo, item, (byte) 0, 0L, 0L);
         this.signature = signature;
         this.item.setReference(signature, dbRef);
     }

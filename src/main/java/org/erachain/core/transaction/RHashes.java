@@ -138,9 +138,9 @@ public class RHashes extends Transaction {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -228,10 +228,10 @@ public class RHashes extends Transaction {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RHashes(typeBytes, creator, exLink, feePow, url, arbitraryData, hashes, timestamp, reference,
+            return new RHashes(typeBytes, creator, exLink, feePow, url, arbitraryData, hashes, timestamp, flagsTX,
                     signatureBytes, seqNo, feeLong);
         } else {
-            return new RHashes(typeBytes, creator, url, arbitraryData, hashes, reference, signatureBytes);
+            return new RHashes(typeBytes, creator, url, arbitraryData, hashes, flagsTX, signatureBytes);
         }
 
     }

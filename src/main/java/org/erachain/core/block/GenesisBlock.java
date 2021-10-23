@@ -709,8 +709,8 @@ public class GenesisBlock extends Block {
         data = Bytes.concat(data, versionBytes);
 
         //WRITE REFERENCE
-        byte[] referenceBytes = Bytes.ensureCapacity(genesisReference, Crypto.SIGNATURE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        byte[] flagsBytes = Bytes.ensureCapacity(genesisReference, Crypto.SIGNATURE_LENGTH, 0);
+        data = Bytes.concat(data, flagsBytes);
 
         //WRITE TIMESTAMP
         byte[] genesisTimestampBytes = Longs.toByteArray(this.genesisTimestamp);

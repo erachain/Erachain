@@ -130,10 +130,10 @@ public class IssueStatementRecord extends Transaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -238,16 +238,16 @@ public class IssueStatementRecord extends Transaction {
         if (signersLen == 0) {
             if (forDeal > Transaction.FOR_MYPACK) {
                 return new IssueStatementRecord(typeBytes, creator, linkTo, feePow, key, arbitraryData, isTextByte, encryptedByte,
-                        timestamp, reference, signatureBytes, seqNo, feeLong);
+                        timestamp, flagsTX, signatureBytes, seqNo, feeLong);
             } else {
-                return new IssueStatementRecord(typeBytes, creator, linkTo, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
+                return new IssueStatementRecord(typeBytes, creator, linkTo, key, arbitraryData, isTextByte, encryptedByte, flagsTX, signatureBytes);
             }
         } else {
             if (forDeal > Transaction.FOR_MYPACK) {
                 return new IssueStatementRecord(typeBytes, creator, linkTo, feePow, key, arbitraryData, isTextByte, encryptedByte,
-                        signers, signatures, timestamp, reference, signatureBytes, seqNo, feeLong);
+                        signers, signatures, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
             } else {
-                return new IssueStatementRecord(typeBytes, creator, linkTo, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
+                return new IssueStatementRecord(typeBytes, creator, linkTo, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, flagsTX, signatureBytes);
             }
 
         }

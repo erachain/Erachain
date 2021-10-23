@@ -534,7 +534,7 @@ public class TestRecAsset {
                     assertEquals(assetTransfer.getTimestamp(), parsedAssetTransfer.getTimestamp());
 
                     //CHECK REFERENCE
-                    assertEquals(assetTransfer.getReference(), parsedAssetTransfer.getReference());
+                    assertEquals(assetTransfer.getFlags(), parsedAssetTransfer.getFlags());
 
                     //CHECK CREATOR
                     assertEquals(assetTransfer.getCreator().getAddress(), parsedAssetTransfer.getCreator().getAddress());

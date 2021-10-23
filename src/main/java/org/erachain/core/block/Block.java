@@ -248,8 +248,8 @@ public class Block implements Closeable, ExplorerJsonLine {
             pos += VERSION_LENGTH;
 
             //WRITE REFERENCE
-            byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-            System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+            byte[] flagsBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
+            System.arraycopy(flagsBytes, 0, data, pos, REFERENCE_LENGTH);
             pos += REFERENCE_LENGTH;
 
             //WRITE GENERATOR
@@ -1095,8 +1095,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         pos += VERSION_LENGTH;
 
         //WRITE REFERENCE
-        byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-        System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+        byte[] flagsBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
+        System.arraycopy(flagsBytes, 0, data, pos, REFERENCE_LENGTH);
         pos += REFERENCE_LENGTH;
 
         //WRITE GENERATOR
@@ -1172,8 +1172,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         pos += VERSION_LENGTH;
 
         //WRITE REFERENCE
-        byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-        System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+        byte[] flagsBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
+        System.arraycopy(flagsBytes, 0, data, pos, REFERENCE_LENGTH);
         pos += REFERENCE_LENGTH;
 
         System.arraycopy(transactionsHash, 0, data, pos, TRANSACTIONS_HASH_LENGTH);

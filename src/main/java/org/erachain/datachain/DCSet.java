@@ -1164,9 +1164,8 @@ public class DCSet extends DBASet implements Closeable {
 
     /**
      * TODO: Надо подумать может она лишняя??
-     * seek reference to tx_Parent by address+timestamp
+     * seek time reference to tx_Parent by address+timestamp
      * account.address -> <tx2.parentTimestamp>
-     *
      */
     public ReferenceMapImpl getReferenceMap() {
         return this.referenceMap;

@@ -82,10 +82,10 @@ public class MultiPaymentTransaction extends Transaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -124,9 +124,9 @@ public class MultiPaymentTransaction extends Transaction {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new MultiPaymentTransaction(typeBytes, creator, payments, feePow, timestamp, reference, signatureBytes);
+            return new MultiPaymentTransaction(typeBytes, creator, payments, feePow, timestamp, flagsTX, signatureBytes);
         } else {
-            return new MultiPaymentTransaction(typeBytes, creator, payments, reference, signatureBytes);
+            return new MultiPaymentTransaction(typeBytes, creator, payments, flagsTX, signatureBytes);
         }
 
     }
@@ -256,11 +256,6 @@ public class MultiPaymentTransaction extends Transaction {
         //PROCESS PAYMENTS
         for (Payment payment : this.payments) {
             payment.process(this.creator, this.dcSet);
-
-            //UPDATE REFERENCE OF RECIPIENT
-            if (false && payment.getRecipient().getLastTimestamp(this.dcSet) == null) {
-                payment.getRecipient().setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
-            }
         }
     }
 
@@ -273,11 +268,6 @@ public class MultiPaymentTransaction extends Transaction {
         //ORPHAN PAYMENTS
         for (Payment payment : this.payments) {
             payment.orphan(this.creator, this.dcSet);
-
-            //UPDATE REFERENCE OF RECIPIENT
-            if (false && payment.getRecipient().getLastTimestamp(this.dcSet).equals(this.timestamp)) {
-                payment.getRecipient().setLastTimestamp(new long[]{this.reference, dbRef}, this.dcSet);
-            }
         }
     }
 

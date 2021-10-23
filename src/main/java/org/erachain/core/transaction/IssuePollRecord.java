@@ -15,36 +15,36 @@ public class IssuePollRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_POLL_TRANSACTION;
     public static final String TYPE_NAME = "Issue Poll";
 
-    public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, poll, feePow, timestamp, reference);
+    public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, poll, feePow, timestamp, flags);
     }
 
-    public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, poll, feePow, timestamp, reference, signature);
+    public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp, long flags, byte[] signature) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, poll, feePow, timestamp, flags, signature);
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp,
-                           Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, poll, feePow, timestamp, reference, signature);
+                           long flags, byte[] signature, long seqNo, long feeLong) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, poll, feePow, timestamp, flags, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, poll, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, poll, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssuePollRecord(PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, poll, feePow, timestamp, reference, signature);
+    public IssuePollRecord(PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, poll, feePow, timestamp, flags, signature);
     }
 
-    public IssuePollRecord(PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, poll, feePow, timestamp, reference);
+    public IssuePollRecord(PublicKeyAccount creator, ExLink linkTo, PollCls poll, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, poll, feePow, timestamp, flags);
     }
 
     public IssuePollRecord(PublicKeyAccount creator, PollCls poll) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, poll, (byte) 0, 0L, null);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, poll, (byte) 0, 0L, 0L);
     }
 
     //GETTERS/SETTERS
@@ -80,10 +80,10 @@ public class IssuePollRecord extends IssueItemRecord {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -148,7 +148,7 @@ public class IssuePollRecord extends IssueItemRecord {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssuePollRecord(typeBytes, creator, linkTo, poll, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+            return new IssuePollRecord(typeBytes, creator, linkTo, poll, feePow, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new IssuePollRecord(typeBytes, creator, linkTo, poll, signatureBytes);
         }

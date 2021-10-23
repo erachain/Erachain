@@ -354,7 +354,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int TIMESTAMP_LENGTH = 8;
     public static final int SEQ_NO_LENGTH = 8;
 
-    public static final int REFERENCE_LENGTH = TIMESTAMP_LENGTH;
+    public static final int FLAGS_LENGTH = TIMESTAMP_LENGTH;
 
     public static final int KEY_LENGTH = 8;
     public static final int SIGNATURE_LENGTH = Crypto.SIGNATURE_LENGTH;
@@ -378,7 +378,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected static final int BASE_LENGTH_AS_MYPACK = TYPE_LENGTH;
     protected static final int BASE_LENGTH_AS_PACK = BASE_LENGTH_AS_MYPACK + TIMESTAMP_LENGTH
             + CREATOR_LENGTH + SIGNATURE_LENGTH;
-    protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH;
+    protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + FLAGS_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + TIMESTAMP_LENGTH + FEE_LENGTH;
 
     /**
@@ -416,6 +416,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
 
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
+
     /**
      * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
      */
@@ -455,7 +456,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, long timestamp,
-                          Long reference) {
+                          long flags) {
         this.typeBytes = typeBytes;
         this.TYPE_NAME = type_name;
         this.creator = creator;
@@ -466,7 +467,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         this.smartContract = smartContract;
 
-        // this.props = props;
         this.timestamp = timestamp;
         this.flags = flags;
         if (flags < 0L) {
@@ -482,11 +482,14 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.feePow = feePow;
     }
 
+    /*
     protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, byte feePow, long timestamp,
-                          Long reference, byte[] signature) {
-        this(typeBytes, type_name, creator, exLink, null, feePow, timestamp, reference);
+                          long flags, byte[] signature) {
+        this(typeBytes, type_name, creator, exLink, null, feePow, timestamp, flags);
         this.signature = signature;
     }
+
+     */
 
     public static int getVersion(byte[] typeBytes) {
         return Byte.toUnsignedInt(typeBytes[1]);
@@ -1040,8 +1043,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return this.signature;
     }
 
-    public long getReference() {
-        return this.reference;
+    public long getFlags() {
+        return this.flags;
     }
 
     public List<byte[]> getOtherSignatures() {
@@ -1846,11 +1849,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             data = Bytes.concat(data, timestampBytes);
         }
 
-        // WRITE REFERENCE - in any case as Pack or not - NOW it reserved FLAGS
-        if (this.reference != null) {
-            // NULL in imprints
-            byte[] referenceBytes = Longs.toByteArray(this.reference);
-            data = Bytes.concat(data, referenceBytes);
+        if (typeBytes[0] != ISSUE_IMPRINT_TRANSACTION) {
+            byte[] flagsBytes = Longs.toByteArray(this.flags);
+            data = Bytes.concat(data, flagsBytes);
         }
 
         // WRITE CREATOR
@@ -2019,7 +2020,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             return INVALID_FLAGS;
         }
 
-        // CHECK IF REFERENCE IS OK
+        // CHECK IF REFERENCE TIMESTAMP IS OK
         //Long reference = forDeal == null ? this.creator.getLastTimestamp(dcSet) : forDeal;
         if (forDeal > Transaction.FOR_MYPACK && height > BlockChain.ALL_BALANCES_OK_TO) {
             if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
@@ -2048,7 +2049,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                         && height > BlockChain.VERS_4_11
                 ) {
                     if (BlockChain.TEST_DB == 0) {
-                        errorValue = "INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
+                        errorValue = "INVALID TIME!!! REF TIMESTAMP: " + DateTimeFormat.timestamptoString(reference[0])
                                 + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
                                 + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height);
                         if (BlockChain.CHECK_BUGS > 2)
@@ -2734,8 +2735,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             return true;
 
         if (this.getType() == Transaction.CALCULATED_TRANSACTION) {
-            // USE referenced transaction
-            return db.getTransactionFinalMap().contains(this.reference);
+            return true;
         }
 
         return db.getTransactionFinalMapSigns().contains(this.getSignature());
