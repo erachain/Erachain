@@ -130,9 +130,9 @@ public class RVouch extends Transaction {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -192,10 +192,10 @@ public class RVouch extends Transaction {
         position += SEQ_LENGTH;
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RVouch(typeBytes, creator, feePow, vouchHeight, vouchSeqNo, timestamp, reference,
+            return new RVouch(typeBytes, creator, feePow, vouchHeight, vouchSeqNo, timestamp, flagsTX,
                     signatureBytes, seqNo, feeLong);
         } else {
-            return new RVouch(typeBytes, creator, vouchHeight, vouchSeqNo, reference, signatureBytes);
+            return new RVouch(typeBytes, creator, vouchHeight, vouchSeqNo, flagsTX, signatureBytes);
         }
 
     }

@@ -1121,7 +1121,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
-        // CHECK IF REFERENCE IS OK
+        // CHECK IF REFERENCE TIMESTAMP IS OK
         if (forDeal > FOR_PACK) {
             if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
                 /// вообще не проверяем в тесте
@@ -1155,12 +1155,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         if (BlockChain.TEST_DB == 0) {
                             pointLogg = System.currentTimeMillis();
                             if (BlockChain.CHECK_BUGS > 2)
-                                LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
+                                LOGGER.debug("INVALID TIME!!! REF TIMESTAMP: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
                                         + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
                                         + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
                         }
                     }
-                    errorValue = "INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
+                    errorValue = "INVALID TIME!!! REF TIMESTAMP: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
                             + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
                             + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp);
                     return INVALID_TIMESTAMP;

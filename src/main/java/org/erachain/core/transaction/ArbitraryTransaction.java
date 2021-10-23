@@ -34,13 +34,16 @@ public abstract class ArbitraryTransaction extends Transaction {
     protected byte[] data;
     protected List<Payment> payments;
 
-    public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, Long reference) {
+    public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, long reference) {
         super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
     }
 
-    public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, Long reference, byte[] signature) {
+    /*
+    public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, long reference, byte[] signature) {
         super(typeBytes, NAME_ID, creator, null, feePow, timestamp, reference, signature);
     }
+
+     */
 
     // GETTERS/SETTERS
     //public static String getName() { return "OLD: Arbitrary"; }
@@ -197,7 +200,7 @@ public abstract class ArbitraryTransaction extends Transaction {
         for (Payment payment : this.getPayments()) {
             payment.process(this.getCreator(), this.dcSet);
 
-            // UPDATE REFERENCE OF RECIPIENT
+            // UPDATE FLAGS OF RECIPIENT
             if (false && payment.getRecipient().getLastTimestamp(this.dcSet) == null) {
                 payment.getRecipient().setLastTimestamp(null, this.dcSet);
             }
@@ -216,11 +219,6 @@ public abstract class ArbitraryTransaction extends Transaction {
         // ORPHAN PAYMENTS
         for (Payment payment : this.getPayments()) {
             payment.orphan(this.getCreator(), this.dcSet);
-
-            // UPDATE REFERENCE OF RECIPIENT
-            if (payment.getRecipient().getLastTimestamp(this.dcSet).equals(this.timestamp)) {
-                payment.getRecipient().removeLastTimestamp(this.dcSet, timestamp);
-            }
         }
     }
 

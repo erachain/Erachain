@@ -269,9 +269,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -361,7 +361,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         }
 
         return new CreateOrderTransaction(typeBytes, creator, exLink, smartContract, have, want, amountHave, amountWant, feePow, timestamp,
-                reference, signatureBytes, seqNo, feeLong);
+                flagsTX, signatureBytes, seqNo, feeLong);
     }
 
     // @Override

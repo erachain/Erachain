@@ -18,13 +18,13 @@ public abstract class AddressItemRefs extends Transaction {
 
     public static final long START_KEY = 1000L; // << 20;
 
-    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
+    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, long reference) {
         super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
         this.item = item;
     }
 
     public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature, long dbRef) {
-        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, null);
+        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, 0L);
         this.signature = signature;
         this.item.setReference(signature, dbRef);
     }

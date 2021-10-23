@@ -95,10 +95,10 @@ public class CreatePollTransaction extends Transaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+         long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -136,7 +136,7 @@ public class CreatePollTransaction extends Transaction {
             position += FEE_LENGTH;
         }
 
-        return new CreatePollTransaction(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+        return new CreatePollTransaction(typeBytes, creator, poll, feePow, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
 
     }
 
@@ -185,10 +185,9 @@ public class CreatePollTransaction extends Transaction {
             data = Bytes.concat(data, timestampBytes);
         }
 
-        //WRITE REFERENCE
-        byte[] referenceBytes = Longs.toByteArray(this.reference);
-        referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        //WRITE FLAGS
+        byte[] flagsBytes = Longs.toByteArray(this.flags);
+        data = Bytes.concat(data, flagsBytes);
 
         //WRITE CREATOR
         data = Bytes.concat(data, this.creator.getPublicKey());

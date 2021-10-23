@@ -202,10 +202,10 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -281,7 +281,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         if (forDeal > Transaction.FOR_MYPACK) {
             return new RCertifyPubKeys(typeBytes, creator, exLink, feePow, key,
                     certifiedPublicKeys,
-                    add_day, timestamp, reference, signature, feeLong,
+                    add_day, timestamp, flagsTX, signature, feeLong,
                     seqNo, certifiedSignatures);
         } else {
             return new RCertifyPubKeys(typeBytes, creator, exLink, key,

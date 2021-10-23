@@ -489,10 +489,10 @@ public class RSignNote extends Transaction implements Itemable {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -586,9 +586,9 @@ public class RSignNote extends Transaction implements Itemable {
 
         if (forDeal > Transaction.FOR_MYPACK) {
             return new RSignNote(typeBytes, creator, feePow, key, externalData,
-                    dbData, timestamp, reference, signatureBytes, seqNo, feeLong);
+                    dbData, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
-            return new RSignNote(typeBytes, creator, key, externalData, dbData, reference, signatureBytes);
+            return new RSignNote(typeBytes, creator, key, externalData, dbData, flagsTX, signatureBytes);
         }
     }
 
@@ -875,7 +875,7 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         RSignNote decryptedNote = new RSignNote(typeBytes, creator, feePow, key, exData,
-                dataForDB, timestamp, reference, signature,
+                dataForDB, timestamp, flags, signature,
                 seqNo, fee.longValue());
         return new Fun.Tuple3<>(decryptedExData.a, decryptedExData.b, decryptedNote);
 
@@ -896,7 +896,7 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         RSignNote decryptedNote = new RSignNote(typeBytes, creator, feePow, key, exData,
-                dataForDB, timestamp, reference, signature,
+                dataForDB, timestamp, flags, signature,
                 seqNo, fee.longValue());
         return new Fun.Tuple2<>(null, decryptedNote);
 

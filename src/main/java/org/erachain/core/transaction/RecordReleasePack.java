@@ -97,9 +97,9 @@ public class RecordReleasePack extends Transaction {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -169,10 +169,10 @@ public class RecordReleasePack extends Transaction {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, reference,
+            return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, flagsTX,
                     signatureBytes, seqNo, feeLong);
         } else {
-            return new RecordReleasePack(typeBytes, creator, transactions, reference, signatureBytes);
+            return new RecordReleasePack(typeBytes, creator, transactions, flagsTX, signatureBytes);
         }
     }
 

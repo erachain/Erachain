@@ -217,7 +217,7 @@ public class RSend extends TransactionAmount {
 
             if (data.length < test_len) {
             throw new Exception("Data does not match RAW length " + data.length + " < " + test_len);
-        }
+            }
 
         long timestamp = 0;
         if (forDeal > Transaction.FOR_MYPACK) {
@@ -227,10 +227,10 @@ public class RSend extends TransactionAmount {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -349,10 +349,10 @@ public class RSend extends TransactionAmount {
 
         if (forDeal > Transaction.FOR_MYPACK) {
             return new RSend(typeBytes, creator, exLink, smartContract, feePow, recipient, key, amount, title, arbitraryData, isTextByte,
-                    encryptedByte, timestamp, reference, signatureBytes, seqNo, feeLong);
+                    encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new RSend(typeBytes, creator, exLink, smartContract, recipient, key, amount, title, arbitraryData, isTextByte,
-                    encryptedByte, reference, signatureBytes);
+                    encryptedByte, flagsTX, signatureBytes);
         }
 
     }

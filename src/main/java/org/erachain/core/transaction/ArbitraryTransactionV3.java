@@ -23,7 +23,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
     protected static final int SERVICE_LENGTH = 4;
     private static final int PAYMENTS_SIZE_LENGTH = 4;
     protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + TIMESTAMP_LENGTH
-            + REFERENCE_LENGTH + CREATOR_LENGTH + SERVICE_LENGTH
+            + FLAGS_LENGTH + CREATOR_LENGTH + SERVICE_LENGTH
             + DATA_SIZE_LENGTH + SIGNATURE_LENGTH
             + PAYMENTS_SIZE_LENGTH;
 
@@ -78,11 +78,11 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         long timestamp = Longs.fromByteArray(timestampBytes);
         position += TIMESTAMP_LENGTH;
 
-        // READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position
-                + REFERENCE_LENGTH);
-        long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        // READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position
+                + FLAGS_LENGTH);
+         long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         // READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position
@@ -137,7 +137,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
                 + SIGNATURE_LENGTH);
 
         return new ArbitraryTransactionV3(typeBytes, creator, payments,
-                service, arbitraryData, feePow, timestamp, reference, signatureBytes);
+                service, arbitraryData, feePow, timestamp, flagsTX, signatureBytes);
     }
 
     // PARSE CONVERT
@@ -156,13 +156,10 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
         // WRITE TIMESTAMP
         byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-        timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
         data = Bytes.concat(data, timestampBytes);
 
-        // WRITE REFERENCE
-        byte[] referenceBytes = Longs.toByteArray(this.reference);
-        referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        // WRITE FLAGS
+        data = Bytes.concat(data, Longs.toByteArray(this.flags));
 
         // WRITE CREATOR
         data = Bytes.concat(data, this.creator.getPublicKey());

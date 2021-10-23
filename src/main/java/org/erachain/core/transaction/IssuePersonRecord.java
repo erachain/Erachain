@@ -107,9 +107,9 @@ public class IssuePersonRecord extends IssueItemRecord {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -174,7 +174,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssuePersonRecord(typeBytes, creator, linkTo, person, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+            return new IssuePersonRecord(typeBytes, creator, linkTo, person, feePow, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new IssuePersonRecord(typeBytes, creator, linkTo, person, signatureBytes);
         }

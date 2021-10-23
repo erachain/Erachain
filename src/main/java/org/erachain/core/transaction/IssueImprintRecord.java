@@ -16,10 +16,10 @@ import java.util.Arrays;
 // TODO - reference NOT NEED - because it is unique record! - make it as new version protocol
 public class IssueImprintRecord extends IssueItemRecord {
 
-    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK - REFERENCE_LENGTH;
-    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK - REFERENCE_LENGTH;
-    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH - REFERENCE_LENGTH;
-    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD - REFERENCE_LENGTH;
+    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK - FLAGS_LENGTH;
+    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK - FLAGS_LENGTH;
+    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH - FLAGS_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD - FLAGS_LENGTH;
 
     public static final byte TYPE_ID = (byte) ISSUE_IMPRINT_TRANSACTION;
     public static final String TYPE_NAME = "Issue Imprint";
