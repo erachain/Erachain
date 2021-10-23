@@ -24,7 +24,8 @@ public class TransactionAmountTest {
     long ERA_KEY = AssetCls.ERA_KEY;
     long FEE_KEY = AssetCls.FEE_KEY;
 
-    long flags = 0l;
+    long flags = 0L;
+    byte feePow = 0;
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -80,6 +81,30 @@ public class TransactionAmountTest {
 
     @Test
     public void isValid() {
+    }
+
+    @Test
+    public void noAmount() {
+
+        System.out.println("(byte) 128 : " + Integer.toBinaryString((byte) 128));
+        System.out.println("(byte)-128 : " + Integer.toBinaryString((byte) -128));
+
+        RSend rSend = new RSend(maker, null, null, feePow, recipient, 1L, amount, "",
+                null, isText, encrypted, 1L, flags);
+
+        System.out.println("prop1: " + Integer.toBinaryString(rSend.getTypeBytes()[2])
+                + "\nprop2: " + Integer.toBinaryString(rSend.getTypeBytes()[3]));
+
+        System.out.println("propView: " + rSend.viewProperies());
+
+        rSend = new RSend(maker, null, null, feePow, recipient, 0L, null, "",
+                null, isText, encrypted, 1L, flags);
+
+        System.out.println("prop1: " + Integer.toBinaryString(rSend.getTypeBytes()[2])
+                + "\nprop2: " + Integer.toBinaryString(rSend.getTypeBytes()[3]));
+
+        System.out.println("propView: " + rSend.viewProperies());
 
     }
+
 }

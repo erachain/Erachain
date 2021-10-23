@@ -38,26 +38,26 @@ import java.util.Map;
 3 = property 2
 
 ## version 0
-// typeBytes[2] = -128 if NO AMOUNT
-// typeBytes[3] = -128 if NO DATA
+ // typeBytes[2] = -128 if NO AMOUNT (NO_AMOUNT_MASK)
+ // typeBytes[3] = -128 if NO DATA
 
 ## version 1
 if backward - CONFISCATE CREDIT
 
 ## version 2
 
-#### PROPERTY 1
-typeBytes[2].7 = -128 if NO AMOUNT - check sign
-typeBytes[2].6 = 64 if backward (CONFISCATE CREDIT, ...)
+ #### PROPERTY 1
+ typeBytes[2].7 = -128 if NO AMOUNT - check sign (NO_AMOUNT_MASK)
+ typeBytes[2].6 = 64 if backward (CONFISCATE CREDIT, ...)
 
 #### PROPERTY 2
 typeBytes[3].7 = -128 if NO DATA - check sign
 
 ## version 3
 
-#### PROPERTY 1
-typeBytes[2].7 = -128 if NO AMOUNT - check sign
-typeBytes[2].6 = 64 if backward (CONFISCATE CREDIT, ...)
+ #### PROPERTY 1
+ typeBytes[2].7 = -128 if NO AMOUNT - check sign (NO_AMOUNT_MASK)
+ typeBytes[2].6 = 64 if backward (CONFISCATE CREDIT, ...)
 
 #### PROPERTY 2
 typeBytes[3].7 = 128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128)
@@ -79,7 +79,13 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     /**
      * used over typeBytes[2]
      */
+    public static final byte NO_AMOUNT_MASK = -128; // == (byte) 128
     public static final byte BACKWARD_MASK = 64;
+
+    /**
+     * used in tx FLATS - set
+     */
+    public static final long USE_PACKET_MASK = FLAGS_USED_MASK + 1; //
 
     // BALANCES types and ACTION with IT
     // 0 - not used
@@ -124,24 +130,58 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     protected BigDecimal amount;
     protected long key;
-    protected AssetCls asset;
+    protected AssetCls asset; // or price Asset for packet
+
+    /**
+     * 0: (long) AssetKey, 1: Price, 2: Discounted Price, 3: Tax1, 4: Tax2, 5: Amount, 6: Asset (after setDC())
+     */
+    protected Object[][] packet;
+    /**
+     * see Account.BALANCE_POS_OWN etc. BACKWARD < 0
+     */
+    protected int action;
 
     // need for calculate fee by feePow into GUI
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
-                                BigDecimal amount, long key, long timestamp, Long reference) {
-        super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, reference);
+                                BigDecimal amount, long key, long timestamp, long flags) {
+        super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, flags);
         this.recipient = recipient;
 
         if (amount == null || amount.signum() == 0) {
             // set version to 1
-            typeBytes[2] = (byte) (typeBytes[2] | (byte) -128);
+            typeBytes[2] = (byte) (typeBytes[2] | NO_AMOUNT_MASK);
         } else {
             // RESET 0 bit
-            typeBytes[2] = (byte) (typeBytes[2] & (byte) 127);
+            typeBytes[2] = (byte) (typeBytes[2] & NO_AMOUNT_MASK);
 
             this.amount = amount;
             this.key = key;
         }
+    }
+
+    /**
+     * packet
+     *
+     * @param typeBytes
+     * @param name
+     * @param creator
+     * @param exLink
+     * @param smartContract
+     * @param feePow
+     * @param recipient
+     * @param packet
+     * @param timestamp
+     * @param flags
+     */
+    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
+                                int action, Long priceAssetKey, Object[][] packet, long timestamp, long flags) {
+        super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, flags);
+        this.recipient = recipient;
+
+        this.flags = flags | USE_PACKET_MASK;
+        this.packet = packet;
+        this.action = action;
+        this.key = priceAssetKey;
     }
 
     // GETTERS/SETTERS
@@ -156,8 +196,13 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
-        if (this.amount != null && dcSet != null) {
+        if (this.key != 0L) {
             this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
+        }
+        if (packet != null) {
+            for (Object[] row : packet) {
+                row[6] = this.dcSet.getItemAssetMap().get((Long) row[0]);
+            }
         }
 
         if (false && andUpdateFromState && !isWiped())
@@ -190,6 +235,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     @Override
     public ItemCls getItem() {
         return this.asset;
+    }
+
+    public boolean hasPacket() {
+        return packet != null;
+    }
+
+    public Object[][] getPacket() {
+        return packet;
     }
 
     @Override
@@ -244,6 +297,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     };
                 }
             }
+        }
+
+        // TODO добавить список в накладной
+        if (packet != null) {
+
         }
     }
 
@@ -305,9 +363,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public long calcBaseFee(boolean withFreeProtocol) {
 
         long long_fee = super.calcBaseFee(withFreeProtocol);
-        if (long_fee == 0)
+        if (packet == null && long_fee == 0)
             // если бесплатно то и процентную комиссию (ниже) не считаем!
             return 0L;
+
+        // TODO packet
 
         // ПРОЦЕНТЫ в любом случае посчитаем - даже если халявная транзакция
         if (hasAmount() && balancePosition() == ACTION_SEND // только для передачи в собственность!
@@ -330,18 +390,20 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public boolean hasAmount() {
-        return amount != null && amount.signum() != 0;
+        return amount != null && amount.signum() != 0 || packet != null;
     }
 
     public int balancePosition() {
         if (!hasAmount())
             return 0;
-        return Account.balancePosition(this.key, this.amount, this.isBackward(), asset.isSelfManaged());
+        return packet == null ? Account.balancePosition(this.key, this.amount, this.isBackward(), asset.isSelfManaged())
+                : action;
     }
 
     // BACKWARD AMOUNT
     public boolean isBackward() {
-        return typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+        return packet == null ? typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0
+                : action < 0;
     }
 
     /*
@@ -350,7 +412,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public String viewTypeName() {
-        return viewTypeName(this.amount, isBackward());
+        return viewTypeName(packet == null ? this.amount : BigDecimal.ONE, isBackward());
     }
 
     public static String viewTypeName(BigDecimal amount, boolean isBackward) {
@@ -388,7 +450,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public String viewSubTypeName() {
-        if (amount == null || amount.signum() == 0)
+        if (packet == null && (amount == null || amount.signum() == 0))
             return "";
 
         return viewSubTypeName(key, amount, isBackward(), asset.isDirectBalances());

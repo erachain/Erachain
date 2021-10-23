@@ -396,7 +396,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected DCSet dcSet;
     protected String TYPE_NAME = "unknown";
 
-    /////////   MASKS amd PARS
+    /////////   MASKS and PARS
     public static final byte HAS_EXLINK_MASK = 32;
     public static final byte HAS_SMART_CONTRACT_MASK = 16;
     /**
@@ -408,8 +408,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected int seqNo;
     protected long dbRef; // height + SeqNo
 
-    // TODO REMOVE REFERENCE - use TIMESTAMP as reference
-    protected Long reference = 0L;
+    /**
+     * external flags of transaction. If FLAGS is USED need to set SINB BIT - use
+     */
+    protected long flags = 0L;
+    public static final long FLAGS_USED_MASK = Long.MIN_VALUE;
+
+
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
     /**
      * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
@@ -463,7 +468,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         // this.props = props;
         this.timestamp = timestamp;
-        this.reference = reference;
+        this.flags = flags;
+        if (flags < 0L) {
+            if ((flags & FLAGS_USED_MASK) != 0) {
+                boolean debug = true;
+            }
+        }
+
         if (feePow < 0)
             feePow = 0;
         else if (feePow > BlockChain.FEE_POW_MAX)
