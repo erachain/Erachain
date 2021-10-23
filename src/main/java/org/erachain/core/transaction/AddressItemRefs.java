@@ -18,8 +18,8 @@ public abstract class AddressItemRefs extends Transaction {
 
     public static final long START_KEY = 1000L; // << 20;
 
-    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, long reference) {
-        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
+    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, long flags) {
+        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, flags);
         this.item = item;
     }
 

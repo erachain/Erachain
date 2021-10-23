@@ -40,21 +40,21 @@ public class RVouch extends Transaction {
     protected int refHeight;
     protected int refSeqNo;
 
-    public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int refHeight, int refSeqNo, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
+    public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int refHeight, int refSeqNo, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, flags);
 
         this.refHeight = refHeight;
         this.refSeqNo = refSeqNo;
     }
 
-    public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, height, seq, timestamp, reference);
+    public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, long flags, byte[] signature) {
+        this(typeBytes, creator, feePow, height, seq, timestamp, flags);
         this.signature = signature;
     }
 
     public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp,
-                  Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, feePow, height, seq, timestamp, reference);
+                  long flags, byte[] signature, long seqNo, long feeLong) {
+        this(typeBytes, creator, feePow, height, seq, timestamp, flags);
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -62,22 +62,22 @@ public class RVouch extends Transaction {
     }
 
     // as pack
-    public RVouch(byte[] typeBytes, PublicKeyAccount creator, int height, int seq, Long reference, byte[] signature) {
-        this(typeBytes, creator, (byte) 0, height, seq, 0l, reference);
+    public RVouch(byte[] typeBytes, PublicKeyAccount creator, int height, int seq, long flags, byte[] signature) {
+        this(typeBytes, creator, (byte) 0, height, seq, 0L, flags);
         this.signature = signature;
     }
 
-    public RVouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, height, seq, timestamp, reference);
+    public RVouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, height, seq, timestamp, flags);
     }
 
-    public RVouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, height, seq, timestamp, reference, signature);
+    public RVouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, height, seq, timestamp, flags, signature);
     }
 
     // as pack
-    public RVouch(PublicKeyAccount creator, int height, int seq, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte) 0, height, seq, 0l, reference);
+    public RVouch(PublicKeyAccount creator, int height, int seq, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte) 0, height, seq, 0L, flags);
     }
 
 
@@ -129,7 +129,7 @@ public class RVouch extends Transaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
+        //READ FLAGS
         byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
         long flagsTX = Longs.fromByteArray(flagsBytes);
         position += FLAGS_LENGTH;

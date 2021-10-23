@@ -52,23 +52,23 @@ public class RSignNote extends Transaction implements Itemable {
     protected byte[] dataForDB;
     ExData extendedData;
 
-    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, Long reference) {
+    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, long flags) {
 
-        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, flags);
 
         this.key = templateKey;
         this.data = data;
         this.dataForDB = dataForDB;
     }
 
-    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, templateKey, data, dataForDB, timestamp, reference);
+    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, long flags, byte[] signature) {
+        this(typeBytes, creator, feePow, templateKey, data, dataForDB, timestamp, flags);
         this.signature = signature;
     }
 
     public RSignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
-                     byte[] dataForDB, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, feePow, templateKey, data, dataForDB, timestamp, reference);
+                     byte[] dataForDB, long timestamp, long flags, byte[] signature, long seqNo, long feeLong) {
+        this(typeBytes, creator, feePow, templateKey, data, dataForDB, timestamp, flags);
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -76,26 +76,26 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     // asPack
-    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data, byte[] dataForDB, Long reference, byte[] signature) {
-        this(typeBytes, creator, (byte) 0, templateKey, data, dataForDB, 0L, reference);
+    public RSignNote(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data, byte[] dataForDB, long flags, byte[] signature) {
+        this(typeBytes, creator, (byte) 0, templateKey, data, dataForDB, 0L, flags);
         this.signature = signature;
         // not need this.calcFee();
     }
 
-    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, dataForDB, timestamp, reference, signature);
+    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, dataForDB, timestamp, flags, signature);
         // set props
         this.setTypeBytes();
     }
 
-    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, dataForDB, timestamp, reference);
+    public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, dataForDB, timestamp, flags);
         // set props
         this.setTypeBytes();
     }
 
-    public RSignNote(byte version, byte ptoperty1, byte ptoperty2, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, version, ptoperty1, ptoperty2}, creator, feePow, templateKey, data, null, timestamp, reference);
+    public RSignNote(byte version, byte ptoperty1, byte ptoperty2, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, version, ptoperty1, ptoperty2}, creator, feePow, templateKey, data, null, timestamp, flags);
         // set props
         this.setTypeBytes();
     }
