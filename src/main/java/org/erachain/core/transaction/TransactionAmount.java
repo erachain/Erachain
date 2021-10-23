@@ -1,6 +1,7 @@
 package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -14,6 +15,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.SmartContract;
+import org.erachain.utils.BigDecimalUtil;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -133,9 +136,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected AssetCls asset; // or price Asset for packet
 
     /**
-     * 0: (long) AssetKey, 1: Price, 2: Discounted Price, 3: Tax1, 4: Tax2, 5: Amount, 6: Asset (after setDC())
+     * 0: (long) AssetKey, 1: Price, 2: Discounted Price, 3: Tax1, 4: Tax2, 5: Amount, 6: memo, 7: Asset (after setDC())
      */
     protected Object[][] packet;
+    // + 1 to len for memo
+    protected static final int PACKET_ROW_LENGTH = KEY_LENGTH + 5 * AMOUNT_LENGTH + 1;
     /**
      * see Account.BALANCE_POS_OWN etc. BACKWARD < 0
      */
@@ -426,12 +431,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
     }
 
-    public static String viewSubTypeName(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
-
-        if (amount == null || amount.signum() == 0)
-            return "";
-
-        int actionType = Account.balancePosition(assetKey, amount, isBackward, isDirect);
+    public static String viewSubTypeName(int actionType) {
 
         switch (actionType) {
             case ACTION_SEND:
@@ -448,12 +448,27 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     }
 
+    public static String viewSubTypeName(long assetKey, BigDecimal amount, boolean isBackward, boolean isDirect) {
+
+        if (amount == null || amount.signum() == 0)
+            return "";
+
+        int actionType = Account.balancePosition(assetKey, amount, isBackward, isDirect);
+
+        return viewSubTypeName(actionType);
+
+    }
+
     @Override
     public String viewSubTypeName() {
         if (packet == null && (amount == null || amount.signum() == 0))
             return "";
 
-        return viewSubTypeName(key, amount, isBackward(), asset.isDirectBalances());
+        if (packet == null) {
+            return viewSubTypeName(key, amount, isBackward(), asset.isDirectBalances());
+        } else {
+            return viewSubTypeName(action);
+        }
     }
 
     @Override
@@ -496,7 +511,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     // PARSE/CONVERT
-    // @Override
+
     @Override
     public byte[] toBytes(int forDeal, boolean withSignature) {
 
@@ -504,14 +519,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         // WRITE RECIPIENT
         data = Bytes.concat(data, this.recipient.getAddressBytes());
-        
+
         if (this.amount != null) {
-            
+
             // WRITE KEY
             byte[] keyBytes = Longs.toByteArray(this.key);
             keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
             data = Bytes.concat(data, keyBytes);
-            
+
             // CALCULATE ACCURACY of AMMOUNT
             int different_scale = this.amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
             BigDecimal amountBase;
@@ -520,17 +535,82 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 amountBase = this.amount.scaleByPowerOfTen(different_scale);
                 if (different_scale < 0)
                     different_scale += TransactionAmount.SCALE_MASK + 1;
-                
+
                 // WRITE ACCURACY of AMMOUNT
                 data[3] = (byte) (data[3] | different_scale);
             } else {
                 amountBase = this.amount;
             }
-            
+
             // WRITE AMOUNT
             byte[] amountBytes = Longs.toByteArray(amountBase.unscaledValue().longValue());
-            amountBytes = Bytes.ensureCapacity(amountBytes, AMOUNT_LENGTH, 0);
+            //amountBytes = Bytes.ensureCapacity(amountBytes, AMOUNT_LENGTH, 0);
             data = Bytes.concat(data, amountBytes);
+
+        } else if (packet != null) {
+            // WRITE PRICE ASSET KEY
+            byte[] keyBytes = Longs.toByteArray(this.key);
+            keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
+            data = Bytes.concat(data, keyBytes);
+
+            byte[] packetLenBytes = Ints.toByteArray(packet.length);
+            // 0 byte - ?
+            // 1 byte - action
+            packetLenBytes[1] = (byte) action;
+            data = Bytes.concat(data, packetLenBytes);
+
+            byte[][] memoBytes = new byte[packet.length][];
+            int count = 0;
+            int additionalLen = 0;
+            for (Object[] row : packet) {
+                if (row[6] == null) {
+                    memoBytes[count++] = new byte[0];
+                } else {
+                    additionalLen += (memoBytes[count++] = ((String) row[6]).getBytes(StandardCharsets.UTF_8)).length;
+                }
+            }
+
+            byte[] buff = new byte[packet.length * PACKET_ROW_LENGTH + additionalLen];
+            int pos = 0;
+            count = 0;
+            for (Object[] row : packet) {
+                /**
+                 * 0: (long) AssetKey, 1: Price, 2: Discounted Price, 3: Tax1, 4: Tax2, 5: Amount, 6: memo, 7: Asset (after setDC())
+                 */
+
+                // WRITE ASSET KEY
+                System.arraycopy(Longs.toByteArray((Long) row[0]), 0, buff, pos, Long.BYTES);
+                pos += 8;
+
+                // WRITE PRICE
+                BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[1]);
+                pos += 8;
+
+                // WRITE DISCOUNT PRICE
+                BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[2]);
+                pos += 8;
+
+                // WRITE TAX 1
+                BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[3]);
+                pos += 8;
+
+                // WRITE TAX 2
+                BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[4]);
+                pos += 8;
+
+                // WRITE AMOUNT
+                BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[5]);
+                pos += 8;
+
+                // WRITE MEMO LEN
+                buff[pos++] = (byte) memoBytes[count].length;
+                // WRITE MEMO
+                System.arraycopy(memoBytes[count], 0, buff, pos, memoBytes[count].length);
+                pos += memoBytes[count++].length;
+            }
+
+            data = Bytes.concat(data, buff);
+
         }
         
         return data;
