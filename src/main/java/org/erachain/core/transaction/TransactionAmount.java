@@ -137,7 +137,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected AssetCls asset; // or price Asset for packet
 
     /**
-     * 0: (long) AssetKey, 1: Price, 2: Discounted Price, 3: Tax1, 4: Tax2, 5: Amount, 6: memo, 7: Asset (after setDC())
+     * 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax, 5: Unit or Fee (reserved - ед.изм или налог), 6: memo, 7: Asset (after setDC())
      */
     protected Object[][] packet;
     // + 1 to len for memo
@@ -578,30 +578,30 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             count = 0;
             for (Object[] row : packet) {
                 /**
-                 * 0: (long) AssetKey, 1: Price, 2: Discounted Price, 3: Tax1, 4: Tax2, 5: Amount, 6: memo, 7: Asset (after setDC())
+                 * 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax, 5: Unit or Fee (reserved - ед.изм или налог), 6: memo, 7: Asset (after setDC())
                  */
 
                 // WRITE ASSET KEY
                 System.arraycopy(Longs.toByteArray((Long) row[0]), 0, buff, pos, Long.BYTES);
                 pos += 8;
 
-                // WRITE PRICE
+                // WRITE AMOUNT
                 BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[1]);
                 pos += 8;
 
-                // WRITE DISCOUNT PRICE
+                // WRITE PRICE
                 BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[2]);
                 pos += 8;
 
-                // WRITE TAX 1
+                // WRITE DISCOUNT PRICE
                 BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[3]);
                 pos += 8;
 
-                // WRITE TAX 2
+                // WRITE TAX 1
                 BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[4]);
                 pos += 8;
 
-                // WRITE AMOUNT
+                // WRITE FEE or TAX 2
                 BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[5]);
                 pos += 8;
 
