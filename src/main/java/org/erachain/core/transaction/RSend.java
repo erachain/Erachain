@@ -9,6 +9,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.smartcontracts.SmartContract;
+import org.erachain.utils.BigDecimalUtil;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -316,6 +317,61 @@ public class RSend extends TransactionAmount {
                 }
             }
 
+        } else if ((flagsTX & USE_PACKET_MASK) != 0L) {
+            // IF here is PACKET of AMOUNTs
+
+            // READ KEY
+            byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+            position += KEY_LENGTH;
+            key = Longs.fromByteArray(keyBytes);
+
+            // READ AMOUNT
+            byte[] packetSizeBytes = Arrays.copyOfRange(data, position, position + Integer.BYTES);
+            position += Integer.BYTES;
+            int action = packetSizeBytes[1];
+            packetSizeBytes[1] = 0; // clear ACTION
+            int packetSize = Ints.fromByteArray(packetSizeBytes);
+
+            Object[][] packet = new Object[packetSize][];
+            Object[] row;
+            byte[] memoBytes;
+            for (int count = 0; count < packetSize; count++) {
+                row = new Object[7];
+                packet[count] = row;
+
+                // READ KEY
+                keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+                position += KEY_LENGTH;
+                row[0] = Longs.fromByteArray(keyBytes);
+
+                //READ AMOUNT
+                row[1] = BigDecimalUtil.fromBytes9(data, position);
+                position += 9;
+
+                //READ PRICE
+                row[2] = BigDecimalUtil.fromBytes9(data, position);
+                position += 9;
+
+                //READ DISCONTED PRICE
+                row[3] = BigDecimalUtil.fromBytes9(data, position);
+                position += 9;
+
+                //READ TAX
+                row[4] = BigDecimalUtil.fromBytes9(data, position);
+                position += 9;
+
+                //READ FEE
+                row[5] = BigDecimalUtil.fromBytes9(data, position);
+                position += 9;
+
+                int lenMemo = data[position++];
+                if (lenMemo > 0) {
+                    memoBytes = Arrays.copyOfRange(data, position, position + lenMemo);
+                    row[PACKET_ROW_MEMO_NO] = new String(memoBytes, StandardCharsets.UTF_8);
+                    position += lenMemo;
+                }
+
+            }
         }
 
         // HEAD LEN

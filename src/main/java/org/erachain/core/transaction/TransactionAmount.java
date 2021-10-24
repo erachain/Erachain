@@ -606,27 +606,27 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 pos += 8;
 
                 // WRITE AMOUNT
-                BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[1]);
+                BigDecimalUtil.toBytes9(buff, pos, (BigDecimal) row[1]);
                 pos += 8;
 
                 // WRITE PRICE
                 if (row[2] != null && ((BigDecimal) row[2]).signum() != 0)
-                    BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[2]);
+                    BigDecimalUtil.toBytes9(buff, pos, (BigDecimal) row[2]);
                 pos += 8;
 
                 // WRITE DISCOUNT PRICE
                 if (row[3] != null && ((BigDecimal) row[3]).signum() != 0)
-                    BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[3]);
+                    BigDecimalUtil.toBytes9(buff, pos, (BigDecimal) row[3]);
                 pos += 8;
 
                 // WRITE TAX
                 if (row[4] != null && ((BigDecimal) row[4]).signum() != 0)
-                    BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[4]);
+                    BigDecimalUtil.toBytes9(buff, pos, (BigDecimal) row[4]);
                 pos += 8;
 
                 // WRITE FEE
                 if (row[5] != null && ((BigDecimal) row[5]).signum() != 0)
-                    BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[5]);
+                    BigDecimalUtil.toBytes9(buff, pos, (BigDecimal) row[5]);
                 pos += 8;
 
                 // WRITE MEMO LEN
