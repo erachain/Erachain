@@ -943,11 +943,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         if (useAll) {
             //WRITE MAKER
-            //try {
-                data = Bytes.concat(data, this.maker.getPublicKey());
-            //} catch (Exception e) {
-            //DECODE EXCEPTION
-            //}
+            data = Bytes.concat(data, this.maker.getPublicKey());
         }
 
         byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);

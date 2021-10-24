@@ -1319,6 +1319,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return VALIDATE_OK;
         }
 
+        if (false && (!BlockChain.MAIN_MODE || height > 1000) && getVersion() < 2) {
+            return INVALID_BACKWARD_ACTION;
+        }
+
         if (false) {
             for (byte[] valid_item : VALID_REC) {
                 if (Arrays.equals(this.signature, valid_item)) {

@@ -97,5 +97,4 @@ public class WalletTests {
         assertEquals(10, wallet.getprivateKeyAccounts().size());
     }
 
-
 }
