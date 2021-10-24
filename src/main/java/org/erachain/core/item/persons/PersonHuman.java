@@ -321,7 +321,7 @@ public class PersonHuman extends PersonCls {
                 || Arrays.equals(this.makerSignature, new byte[Crypto.SIGNATURE_LENGTH]))
             return false;
 
-        if (dcSet.getBlocksHeadsMap().size() < BlockChain.SKIP_VALID_SIGN_BEFORE) {
+        if (dcSet.getBlocksHeadsMap().size() < BlockChain.SKIP_INVALID_SIGN_BEFORE) {
             return true;
         }
 

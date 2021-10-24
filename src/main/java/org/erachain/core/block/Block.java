@@ -1525,7 +1525,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                         // ALL GENESIS transaction
                         LOGGER.debug("*** Block[" + this.heightBlock
                                 + "].Tx[" + seqNo + " : " ///this.getTransactionSeq(transaction.getSignature()) + " : "
-                                + transaction.viewFullTypeName() + "]"
+                                + transaction + "]"
                                 + "creator is Null!"
                         );
                         return INVALID_BLOCK_VERSION;
@@ -1551,10 +1551,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                         if (!transaction.isSignatureValid(dcSetPlace)
                                 && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                             //
-                            LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                    + ":" + transaction.viewFullTypeName()
-                                    + " signature  invalid!"
-                                    + " " + Base58.encode(transaction.getSignature()));
+                            LOGGER.debug("*** signature invalid!!! " + this.heightBlock + "-" + seqNo
+                                    + ": " + transaction);
                             return INVALID_BLOCK_VERSION;
                         }
                     }
@@ -1563,11 +1561,9 @@ public class Block implements Closeable, ExplorerJsonLine {
                     if ((BlockChain.TEST_MODE || BlockChain.CLONE_MODE || heightBlock > 278989) &&
                             transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                     ) {
-                        LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                + ":" + transaction.viewFullTypeName()
-                                + " timestamp Overhead"
+                        LOGGER.debug("*** timestamp Overhead!!! " + this.heightBlock + "-" + seqNo
+                                + ":" + transaction
                                 + " for diff: " + (transaction.getTimestamp() - timestampEnd)
-                                + " " + Base58.encode(transaction.getSignature())
                         );
                         return INVALID_BLOCK_VERSION;
                     }
@@ -1582,10 +1578,9 @@ public class Block implements Closeable, ExplorerJsonLine {
                             && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                         int error = transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION);
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                + ":" + transaction.viewFullTypeName()
                                 + " invalid code: " + OnDealClick.resultMess(error) + "[" + error + "]"
                                 + (transaction.errorValue == null ? "" : " {" + transaction.errorValue + "}")
-                                + " " + Base58.encode(transaction.getSignature()));
+                                + ": " + transaction);
                         return INVALID_BLOCK_VERSION;
                     }
 
@@ -1596,8 +1591,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                         if (cnt.isOnStopping())
                             return INVALID_BRANCH;
 
-                        LOGGER.error("*** " + this.heightBlock + "-" + seqNo
-                                + ": " + transaction.viewFullTypeName() + " - " + e.getMessage(), e);
+                        LOGGER.error("*** " + e.getMessage() + "!!! " + this.heightBlock + "-" + seqNo
+                                + ": " + transaction, e);
                         throw e;
                     }
 

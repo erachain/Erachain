@@ -1939,15 +1939,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 || Arrays.equals(this.signature, new byte[Crypto.SIGNATURE_LENGTH]))
             return false;
 
+        int height = getBlockHeightByParentOrLast(dcSet);
+        if (height < BlockChain.SKIP_INVALID_SIGN_BEFORE) {
+            return true;
+        }
+
         // validation with reference - not as a pack in toBytes - in any case!
         byte[] data = this.toBytes(FOR_NETWORK, false);
         if (data == null)
             return false;
-
-        int height = getBlockHeightByParentOrLast(dcSet);
-        if (height < BlockChain.SKIP_VALID_SIGN_BEFORE) {
-            return true;
-        }
 
         // for skip NOT VALID SIGNs
         for (byte[] valid_item : BlockChain.VALID_SIGN) {
