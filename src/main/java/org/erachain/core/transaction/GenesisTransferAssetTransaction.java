@@ -145,14 +145,6 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
             updateFromStateDB();
     }
 
-    @Override
-    public BigDecimal getAmount(String address) {
-        if (recipient.equals(address)) {
-            return amount;
-        }
-
-        return BigDecimal.ZERO;
-    }
 
     @Override
     public BigDecimal getAmount(Account account) {

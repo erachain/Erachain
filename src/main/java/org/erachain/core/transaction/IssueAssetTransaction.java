@@ -2,6 +2,7 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
@@ -93,8 +94,8 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     @Override
-    public BigDecimal getAmount(String address) {
-        if (address.equals(creator.getAddress())) {
+    public BigDecimal getAmount(Account account) {
+        if (creator.equals(account)) {
             return getAmount();
         }
         AssetCls asset = (AssetCls) item;
@@ -102,11 +103,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     //VALIDATE
-
-    @Override
-    public String viewAmount(String address) {
-        return this.getAmount().toString();
-    }
 
     @Override
     public boolean hasPublicText() {

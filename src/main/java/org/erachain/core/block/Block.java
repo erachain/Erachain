@@ -1958,11 +1958,12 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (transactionCount > 0) {
             // подсчет наград с ПЕРЕВОДОВ
             for (Transaction transaction : getTransactions()) {
-                if (transaction.assetFee == null)
+                if (transaction.assetsFee == null)
                     continue;
 
-                AssetCls asset = transaction.getAsset();
-                addAssetFee(asset, transaction.assetFee, transaction.assetFeeBurn);
+                for (Tuple3<AssetCls, BigDecimal, BigDecimal> row : transaction.assetsFee) {
+                    addAssetFee(row.a, row.b, row.c);
+                }
 
             }
         }

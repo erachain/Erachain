@@ -27,10 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
 
@@ -66,6 +63,7 @@ typeBytes[3].7 = -128 if NO DATA - check sign
 typeBytes[3].7 = 128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128)
 typeBytes[3].4-0 = point accuracy: -16..16 = BYTE - 16
 
+ Transaction.FLAGS = 1 (USE_PACKET_MASK) - use PACET instead single Amount+AssetKey
  */
 
 public abstract class TransactionAmount extends Transaction implements Itemable{
@@ -144,7 +142,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected static final int PACKET_ROW_MEMO_NO = 6;
 
     /**
-     * see Account.BALANCE_POS_OWN etc. BACKWARD < 0
+     * see Account.BALANCE_POS_OWN etc. BACKWARD < 0. Used in case PACKET
      */
     protected int action;
 
@@ -305,22 +303,20 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
                         };
                     } else {
-                        //itemsKeys = new Object[0][0];
+                        // need initalize in all cases
+                        itemsKeys = new Object[0][0];
                     }
                 }
             }
 
-            int len1 = itemsKeys.length;
-
             // TODO добавить список в накладной
             if (packet != null) {
-                int len = itemsKeys.length;
                 Object[][] itemsKeysFull;
-                if (len > 0) {
-                    itemsKeysFull = new Object[len + packet.length][];
-                    System.arraycopy(itemsKeys, 0, itemsKeysFull, 0, len);
+                if (itemsKeys.length > 0) {
+                    itemsKeysFull = new Object[itemsKeys.length + packet.length][];
+                    System.arraycopy(itemsKeys, 0, itemsKeysFull, 0, itemsKeys.length);
                     for (int count = 0; count < packet.length; count++) {
-                        itemsKeysFull[len + count] = new Object[]{ItemCls.ASSET_TYPE, packet[count][0], ((AssetCls) packet[count][7]).getTags()};
+                        itemsKeysFull[itemsKeys.length + count] = new Object[]{ItemCls.ASSET_TYPE, packet[count][0], ((AssetCls) packet[count][7]).getTags()};
                     }
                 } else {
                     itemsKeysFull = new Object[packet.length][];
@@ -346,28 +342,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return this.amount;
     }
 
-    // VIEW
-    @Override
-    public String viewRecipient() {
-        return recipient.getPersonAsString();
-    }
-    
-    @Override
-    public BigDecimal getAmount(String address) {
-        if (this.amount == null)
-            return BigDecimal.ZERO;
-
-        if (this.creator.equals(address)) {
-            // IF SENDER
-            return amount.negate();
-        } else if (this.recipient.equals(address)) {
-            // IF RECIPIENT
-            return amount;
-        }
-
-        return BigDecimal.ZERO;
-    }
-
     @Override
     public BigDecimal getAmount(Account account) {
         if (this.amount == null)
@@ -384,33 +358,73 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return BigDecimal.ZERO;
     }
 
+    /**
+     * // только для передачи в собственность!
+     * call only if (balancePosition() == ACTION_SEND && !creator.equals(asset.getMaker()) && !recipient.equals(asset.getMaker())
+     * && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
+     */
+    public static Tuple3<AssetCls, BigDecimal, BigDecimal> calcSendTAX(Long key, AssetCls asset, BigDecimal amount) {
+
+        if (!BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key))
+            return null;
+
+        BigDecimal assetFee;
+        BigDecimal assetFeeBurn;
+
+        Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
+        assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
+        if (assetFee.compareTo(percItem.b) < 0) {
+            // USE MINIMAL VALUE
+            assetFee = percItem.b.setScale(asset.getScale(), RoundingMode.DOWN);
+        }
+        if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
+                && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
+            assetFeeBurn = assetFee.multiply(BlockChain.ASSET_BURN_PERCENTAGE.get(key)).setScale(asset.getScale(), RoundingMode.UP);
+        } else
+            assetFeeBurn = BigDecimal.ZERO;
+
+        return new Tuple3<>(asset, assetFee, assetFeeBurn);
+
+    }
+
     @Override
     public long calcBaseFee(boolean withFreeProtocol) {
 
         long long_fee = super.calcBaseFee(withFreeProtocol);
-        if (packet == null && long_fee == 0)
-            // если бесплатно то и процентную комиссию (ниже) не считаем!
-            return 0L;
 
         // TODO packet
+        if (packet != null) {
+            long_fee += 25 * packet.length * BlockChain.FEE_PER_BYTE;
+        }
 
         // ПРОЦЕНТЫ в любом случае посчитаем - даже если халявная транзакция
-        if (hasAmount() && balancePosition() == ACTION_SEND // только для передачи в собственность!
-                && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
-                && BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key)
-                && !isInvolved(asset.getMaker())) {
-            Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
-            assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
-            if (assetFee.compareTo(percItem.b) < 0) {
-                // USE MINIMAL VALUE
-                assetFee = percItem.b.setScale(asset.getScale(), RoundingMode.DOWN);
+        // только для передачи в собственность!
+        if (balancePosition() == ACTION_SEND && !creator.equals(asset.getMaker()) && !recipient.equals(asset.getMaker())
+                && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()) {
+            assetsFee = new ArrayList<>();
+            Tuple3<AssetCls, BigDecimal, BigDecimal> assetFee;
+            if (packet != null) {
+                for (Object[] row : packet) {
+                    assetFee = calcSendTAX((Long) row[0], (AssetCls) row[7], (BigDecimal) row[1]);
+                    if (assetFee != null)
+                        assetsFee.add(assetFee);
+                }
+
+            } else if (hasAmount()) {
+                assetFee = calcSendTAX(key, asset, amount);
+                if (assetFee != null)
+                    assetsFee.add(assetFee);
             }
-            if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
-                    && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
-                assetFeeBurn = assetFee.multiply(BlockChain.ASSET_BURN_PERCENTAGE.get(key)).setScale(asset.getScale(), RoundingMode.UP);
-            }
-            return long_fee >> 1;
         }
+
+        if (assetsFee != null && !assetsFee.isEmpty()) {
+            long_fee >>= 1;
+            1
+            if (long_fee < (BlockChain.FREE_FEE_LENGTH >> 2)) ;
+            long_fee = 0;
+        }
+
+
         return long_fee;
     }
 
@@ -434,6 +448,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     /*
      * ************** VIEW
      */
+
+    @Override
+    public String viewRecipient() {
+        return recipient.getPersonAsString();
+    }
 
     @Override
     public String viewTypeName() {
@@ -1399,7 +1418,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // CHECK IF AMOUNT AND ASSET
         if (this.amount != null) {
             Fun.Tuple2<Integer, String> result = isValidAction(dcSet, height, creator, signature, key, asset, amount, recipient,
-                    isBackward(), fee, assetFee, isPerson, flags, timestamp);
+                    isBackward(), fee, assetsFee, isPerson, flags, timestamp);
             if (result.a != VALIDATE_OK) {
                 errorValue = result.b;
                 return result.a;
@@ -1420,9 +1439,13 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
             int count = 0;
             byte[] temp;
+            Long rowAssetKey;
+            HashSet<Long> keys = new HashSet<>();
             for (Object[] row : packet) {
+                rowAssetKey = (Long) row[0];
+
                 if (row[7] == null) {
-                    errorValue = "[" + count + "] = " + row[0];
+                    errorValue = "[" + count + "] = " + rowAssetKey;
                     return ITEM_ASSET_NOT_EXIST;
                 } else if (((BigDecimal) row[1]).signum() <= 0) {
                     errorValue = "Amount[" + count + "] = " + row[1];
@@ -1441,9 +1464,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     }
                 }
 
-                Fun.Tuple2<Integer, String> result = isValidAction(dcSet, height, creator, signature, (Long) row[0],
+                if (keys.contains(rowAssetKey)) {
+                    errorValue = "[" + count + "] = " + rowAssetKey;
+                    return ITEM_DUPLICATE_KEY;
+                } else {
+                    keys.add(rowAssetKey);
+                }
+
+                Fun.Tuple2<Integer, String> result = isValidAction(dcSet, height, creator, signature, rowAssetKey,
                         (AssetCls) row[7], (BigDecimal) row[1], recipient,
-                        isBackward(), fee, assetFee, isPerson, flags, timestamp);
+                        isBackward(), fee, assetsFee, isPerson, flags, timestamp);
                 if (result.a != VALIDATE_OK) {
                     errorValue = result.b;
                     return result.a;
@@ -1594,12 +1624,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             block.addForgingInfoUpdate(this.recipient);
         }
 
-        if (assetFee != null && assetFee.signum() != 0) {
+        if (assetsFee != null && assetsFee.signum() != 0) {
             // учтем что он еще заплатил коэффициент с суммы
-            this.creator.changeBalance(db, !backward, backward, absKey, this.assetFee, false, false, !incomeReverse);
+            this.creator.changeBalance(db, !backward, backward, absKey, this.assetsFee, false, false, !incomeReverse);
             if (block != null) {
                 block.addCalculated(this.creator, absKey,
-                        this.assetFee.negate(), "Asset Fee", this.dbRef);
+                        this.assetsFee.negate(), "Asset Fee", this.dbRef);
             }
         }
 
@@ -1631,12 +1661,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             block.addForgingInfoUpdate(this.recipient);
         }
 
-        if (assetFee != null && assetFee.signum() != 0) {
-            this.creator.changeBalance(dcSet, backward, backward, absKey, this.assetFee, false, false, !incomeReverse);
+        if (assetsFee != null && assetsFee.signum() != 0) {
+            this.creator.changeBalance(dcSet, backward, backward, absKey, this.assetsFee, false, false, !incomeReverse);
         }
 
     }
-    
+
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
         Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
         

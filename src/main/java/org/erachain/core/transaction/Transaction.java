@@ -420,13 +420,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
 
     /**
-     * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
+     * Если еще и комиссия + сжигание с перечисляемого актива - то не НУЛЬ
      */
-    public BigDecimal assetFee = null;
-    /**
-     * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
-     */
-    public BigDecimal assetFeeBurn = null;
+    public List<Tuple3<AssetCls, BigDecimal, BigDecimal>> assetsFee = null;
 
     // transactions
     protected byte feePow = 0;
@@ -892,18 +888,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public BigDecimal getAmount(Account account) {
-        return BigDecimal.ZERO;
-    }
-
-    public BigDecimal getAmount(String account) {
-        return BigDecimal.ZERO;
-    }
-
-    public BigDecimal getFee(String address) {
-
-        if (this.creator != null)
-            if (this.creator.getAddress().equals(address))
-                return this.fee;
         return BigDecimal.ZERO;
     }
 
