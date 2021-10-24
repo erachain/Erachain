@@ -187,6 +187,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // RESET 0 bit - NO AMOUNT
         typeBytes[2] = (byte) (typeBytes[2] & ~NO_AMOUNT_MASK);
 
+        assert (packet != null);
+
         this.flags = flags | USE_PACKET_MASK;
         this.packet = packet;
         this.action = action;
@@ -1422,6 +1424,25 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         //////////////////////////////
         // CHECK IF AMOUNT AND ASSET
+
+        if ((flags & USE_PACKET_MASK) != 0) {
+            if (amount != null) {
+                errorValue = "amount != null && packet != null";
+                return INVALID_AMOUNT;
+            } else if (packet == null) {
+                errorValue = "packet == null";
+                return INVALID_PACKET_SIZE;
+            }
+        } else if ((typeBytes[2] & NO_AMOUNT_MASK) == 0) {
+            if (amount == null) {
+                errorValue = "amount == null";
+                return INVALID_AMOUNT;
+            } else if (packet != null) {
+                errorValue = "packet != null";
+                return INVALID_PACKET_SIZE;
+            }
+        }
+
         if (this.amount != null) {
             BigDecimal assetFee;
             if (assetFEE == null) {
@@ -1435,6 +1456,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 errorValue = result.b;
                 return result.a;
             }
+
         } else if (packet != null) {
             if (packet.length == 0) {
                 errorValue = "=0";
