@@ -5,7 +5,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
-import org.erachain.utils.NumberAsString;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -40,18 +39,6 @@ public class GenesisIssueAssetTransaction extends GenesisIssueItemRecord {
         //position += asset.getDataLength(false);
 
         return new GenesisIssueAssetTransaction(asset);
-    }
-
-    @Override
-    public String viewAmount(Account account) {
-        AssetCls asset = (AssetCls) this.getItem();
-        return NumberAsString.formatAsString(asset.getQuantity());
-    }
-
-    @Override
-    public String viewAmount(String address) {
-        AssetCls asset = (AssetCls) this.getItem();
-        return NumberAsString.formatAsString(asset.getQuantity());
     }
 
     @Override

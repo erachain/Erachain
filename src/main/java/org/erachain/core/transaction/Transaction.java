@@ -1433,7 +1433,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public String viewAmount(Account account) {
-        return account == null ? "" : viewAmount(account.getAddress());
+        return "";
     }
 
     public String viewAmount(String address) {

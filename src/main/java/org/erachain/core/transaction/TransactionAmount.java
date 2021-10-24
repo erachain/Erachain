@@ -17,7 +17,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.BigDecimalUtil;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -137,7 +136,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected AssetCls asset; // or price Asset for packet
 
     /**
-     * 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax, 5: Unit or Fee (reserved - ед.изм или налог), 6: memo, 7: Asset (after setDC())
+     * 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
      */
     protected Object[][] packet;
     // + 1 to len for memo
@@ -255,62 +254,85 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public void makeItemsKeys() {
+
         if (isWiped()) {
-            itemsKeys = new Object[][]{};
-        }
+            itemsKeys = new Object[0][0];
 
-        // запомним что тут две сущности
-        if (key != 0) {
-            if (creatorPersonDuration != null) {
-                if (recipientPersonDuration != null) {
-                    itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
-                    };
-                } else {
-                    itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
-                    };
-                }
-            } else {
-                if (recipientPersonDuration != null) {
-                    itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
-                    };
-                } else {
-                    itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
-                    };
-                }
-            }
         } else {
-            if (creatorPersonDuration != null) {
-                if (recipientPersonDuration != null) {
-                    itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
-                    };
+
+            // запомним что тут две сущности
+            if (key != 0) {
+                if (creatorPersonDuration != null) {
+                    if (recipientPersonDuration != null) {
+                        itemsKeys = new Object[][]{
+                                new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                                new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
+                                new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
+                        };
+                    } else {
+                        itemsKeys = new Object[][]{
+                                new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                                new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
+                        };
+                    }
                 } else {
-                    itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
-                    };
+                    if (recipientPersonDuration != null) {
+                        itemsKeys = new Object[][]{
+                                new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
+                                new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
+                        };
+                    } else {
+                        itemsKeys = new Object[][]{
+                                new Object[]{ItemCls.ASSET_TYPE, getAbsKey(), asset.getTags()}
+                        };
+                    }
                 }
             } else {
-                if (recipientPersonDuration != null) {
-                    itemsKeys = new Object[][]{
-                            new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
-                    };
+                if (creatorPersonDuration != null) {
+                    if (recipientPersonDuration != null) {
+                        itemsKeys = new Object[][]{
+                                new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                                new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
+                        };
+                    } else {
+                        itemsKeys = new Object[][]{
+                                new Object[]{ItemCls.PERSON_TYPE, creatorPersonDuration.a, creatorPerson.getTags()},
+                        };
+                    }
+                } else {
+                    if (recipientPersonDuration != null) {
+                        itemsKeys = new Object[][]{
+                                new Object[]{ItemCls.PERSON_TYPE, recipientPersonDuration.a, recipientPerson.getTags()},
+                        };
+                    } else {
+                        //itemsKeys = new Object[0][0];
+                    }
                 }
+            }
+
+            int len1 = itemsKeys.length;
+
+            // TODO добавить список в накладной
+            if (packet != null) {
+                int len = itemsKeys.length;
+                Object[][] itemsKeysFull;
+                if (len > 0) {
+                    itemsKeysFull = new Object[len + packet.length][];
+                    System.arraycopy(itemsKeys, 0, itemsKeysFull, 0, len);
+                    for (int count = 0; count < packet.length; count++) {
+                        itemsKeysFull[len + count] = new Object[]{ItemCls.ASSET_TYPE, packet[count][0], ((AssetCls) packet[count][7]).getTags()};
+                    }
+                } else {
+                    itemsKeysFull = new Object[packet.length][];
+                    for (int count = 0; count < packet.length; count++) {
+                        itemsKeysFull[count] = new Object[]{ItemCls.ASSET_TYPE, packet[count][0], ((AssetCls) packet[count][7]).getTags()};
+                    }
+                }
+
+                itemsKeys = itemsKeysFull;
             }
         }
 
-        // TODO добавить список в накладной
-        if (packet != null) {
-
-        }
     }
 
     @Override
@@ -324,19 +346,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return this.amount;
     }
 
-    public BigDecimal getAmountAndBackward() {
-        // return this.amount == null? BigDecimal.ZERO: this.amount;
-        if (isBackward()) {
-            return this.amount.negate();
-        } else {
-            return this.amount;
-        }
-    }
-
-    public String getStr() {
-        return "transAmount";
-    }
-    
     // VIEW
     @Override
     public String viewRecipient() {
@@ -345,26 +354,34 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     
     @Override
     public BigDecimal getAmount(String address) {
-        BigDecimal amount = BigDecimal.ZERO;
-        
-        if (this.amount != null) {
-            
-            if (address.equals(this.creator.getAddress())) {
-                // IF SENDER
-                amount = amount.subtract(this.amount);
-            } else if (address.equals(this.recipient.getAddress())) {
-                // IF RECIPIENT
-                amount = amount.add(this.amount);
-            }
+        if (this.amount == null)
+            return BigDecimal.ZERO;
+
+        if (this.creator.equals(address)) {
+            // IF SENDER
+            return amount.negate();
+        } else if (this.recipient.equals(address)) {
+            // IF RECIPIENT
+            return amount;
         }
 
-        return amount;
+        return BigDecimal.ZERO;
     }
 
     @Override
     public BigDecimal getAmount(Account account) {
-        String address = account.getAddress();
-        return getAmount(address);
+        if (this.amount == null)
+            return BigDecimal.ZERO;
+
+        if (this.creator.equals(account)) {
+            // IF SENDER
+            return amount.negate();
+        } else if (this.recipient.equals(account)) {
+            // IF RECIPIENT
+            return amount;
+        }
+
+        return BigDecimal.ZERO;
     }
 
     @Override
@@ -485,21 +502,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return this.amount.toPlainString();
         }
     }
-    
-    @Override
-    public String viewAmount(Account account) {
-        if (amount == null || amount.signum() == 0)
-            return "";
-        String address = account.getAddress();
-        return NumberAsString.formatAsString(getAmount(address));
-    }
-    
-    @Override
-    public String viewAmount(String address) {
-        if (amount == null || amount.signum() == 0)
-            return "";
-        return NumberAsString.formatAsString(getAmount(address));
-    }
 
     @Override
     public String viewFullTypeName() {
@@ -578,7 +580,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             count = 0;
             for (Object[] row : packet) {
                 /**
-                 * 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax, 5: Unit or Fee (reserved - ед.изм или налог), 6: memo, 7: Asset (after setDC())
+                 * 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
                  */
 
                 // WRITE ASSET KEY
@@ -590,19 +592,23 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 pos += 8;
 
                 // WRITE PRICE
-                BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[2]);
+                if (row[2] != null && ((BigDecimal) row[2]).signum() != 0)
+                    BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[2]);
                 pos += 8;
 
                 // WRITE DISCOUNT PRICE
-                BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[3]);
+                if (row[3] != null && ((BigDecimal) row[3]).signum() != 0)
+                    BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[3]);
                 pos += 8;
 
-                // WRITE TAX 1
-                BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[4]);
+                // WRITE TAX
+                if (row[4] != null && ((BigDecimal) row[4]).signum() != 0)
+                    BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[4]);
                 pos += 8;
 
-                // WRITE FEE or TAX 2
-                BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[5]);
+                // WRITE FEE
+                if (row[5] != null && ((BigDecimal) row[5]).signum() != 0)
+                    BigDecimalUtil.toBytes8(buff, pos, (BigDecimal) row[5]);
                 pos += 8;
 
                 // WRITE MEMO LEN
@@ -1399,17 +1405,21 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 return result.a;
             }
         } else if (packet != null) {
-            if (packet.length > Integer.MAX_VALUE) {
-                errorValue = " > " + Integer.MAX_VALUE;
+            if (packet.length == 0) {
+                errorValue = "=0";
+                return INVALID_PACKET_SIZE;
+            } else if (packet.length > 1000) {
+                errorValue = "> " + 1000;
                 return INVALID_PACKET_SIZE;
             } else if (action < ACTION_SEND || action > Account.BALANCE_POS_PLEDGE) {
                 return INVALID_BALANCE_POS;
             } else if (asset == null) {
-                errorValue = " =" + key;
+                errorValue = "" + key;
                 return ITEM_ASSET_NOT_EXIST;
             }
 
             int count = 0;
+            byte[] temp;
             for (Object[] row : packet) {
                 if (row[7] == null) {
                     errorValue = "[" + count + "] = " + row[0];
@@ -1423,7 +1433,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 } else if (((BigDecimal) row[3]).signum() < 0) {
                     errorValue = "DiscontedPrice[" + count + "] = " + row[3];
                     return INVALID_AMOUNT;
+                } else if (row[PACKET_ROW_MEMO_NO] != null && ((String) row[PACKET_ROW_MEMO_NO]).length() > 0) {
+                    temp = ((String) row[PACKET_ROW_MEMO_NO]).getBytes(StandardCharsets.UTF_8);
+                    if (temp.length > 255) {
+                        errorValue = "Memo[" + count + "].length > 255";
+                        return INVALID_MESSAGE_LENGTH;
+                    }
                 }
+
                 Fun.Tuple2<Integer, String> result = isValidAction(dcSet, height, creator, signature, (Long) row[0],
                         (AssetCls) row[7], (BigDecimal) row[1], recipient,
                         isBackward(), fee, assetFee, isPerson, flags, timestamp);

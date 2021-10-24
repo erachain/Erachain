@@ -147,36 +147,25 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
     @Override
     public BigDecimal getAmount(String address) {
-        BigDecimal amount = BigDecimal.ZERO;
-
-        if (address.equals(this.recipient.getAddress())) {
-            //IF RECIPIENT
-            amount = amount.add(this.amount);
+        if (recipient.equals(address)) {
+            return amount;
         }
 
-        return amount;
+        return BigDecimal.ZERO;
     }
 
     @Override
     public BigDecimal getAmount(Account account) {
-        String address = account.getAddress();
-        return getAmount(address);
+        if (recipient.equals(account)) {
+            return amount;
+        }
+
+        return BigDecimal.ZERO;
     }
 
     @Override
     public String viewAmount() {
         return NumberAsString.formatAsString(this.amount);
-    }
-
-    @Override
-    public String viewAmount(Account account) {
-        String address = account.getAddress();
-        return NumberAsString.formatAsString(getAmount(address));
-    }
-
-    @Override
-    public String viewAmount(String address) {
-        return NumberAsString.formatAsString(getAmount(address));
     }
 
     @Override
