@@ -470,10 +470,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.smartContract = smartContract;
 
         this.timestamp = timestamp;
+
         this.flags = flags;
-        if (flags < 0L) {
-            Controller.getInstance().stopAndExit(-111);
-        }
 
         if (feePow < 0)
             feePow = 0;

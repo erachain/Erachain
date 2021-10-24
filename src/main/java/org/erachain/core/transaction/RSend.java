@@ -101,11 +101,48 @@ public class RSend extends TransactionAmount {
 
     }
 
+    public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
+                 int action, long key, Object[][] packet, String title, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
+                 long flags) {
+        super(typeBytes, TYPE_NAME, creator, exLink, smartContract, feePow, recipient, action, key, packet, timestamp, flags);
+
+        if (isText != null)
+            assert (isText.length == 1);
+        if (encrypted != null)
+            assert (encrypted.length == 1);
+
+        this.title = title;
+        if (title == null)
+            this.title = "";
+
+        if (data == null || data.length == 0) {
+            // set version byte
+            typeBytes[3] = (byte) (typeBytes[3] | NO_DATA_MASK);
+        } else {
+            // RESET 0 bit
+            typeBytes[3] = (byte) (typeBytes[3] & ~NO_DATA_MASK);
+            this.data = data;
+            this.encrypted = encrypted;
+            this.isText = isText;
+        }
+
+    }
+
     public RSend(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,
                  BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
                  long flags, byte[] signature) {
         this(typeBytes, creator, null, null, feePow, recipient, key, amount, head, data, isText, encrypted, timestamp, flags);
         this.signature = signature;
+    }
+
+    public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
+                 int action, long key, Object[][] packet, String title, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
+                 long flags, byte[] signature, long seqNo, long feeLong) {
+        this(typeBytes, creator, exLink, smartContract, feePow, recipient, action, key, packet, title, data, isText, encrypted, timestamp, flags);
+        this.signature = signature;
+        if (seqNo > 0)
+            this.setHeightSeq(seqNo);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient, long key,
@@ -289,9 +326,13 @@ public class RSend extends TransactionAmount {
         position += RECIPIENT_LENGTH;
 
         long key = 0;
-        BigDecimal amount = null;
+        BigDecimal amount;
+        Object[][] packet;
+        int action = 0;
+
         if (typeBytes[2] >= 0) {
             // IF here is AMOUNT
+            packet = null;
 
             // READ KEY
             byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
@@ -319,6 +360,7 @@ public class RSend extends TransactionAmount {
 
         } else if ((flagsTX & USE_PACKET_MASK) != 0L) {
             // IF here is PACKET of AMOUNTs
+            amount = null;
 
             // READ KEY
             byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
@@ -328,11 +370,11 @@ public class RSend extends TransactionAmount {
             // READ AMOUNT
             byte[] packetSizeBytes = Arrays.copyOfRange(data, position, position + Integer.BYTES);
             position += Integer.BYTES;
-            int action = packetSizeBytes[1];
+            action = packetSizeBytes[1];
             packetSizeBytes[1] = 0; // clear ACTION
             int packetSize = Ints.fromByteArray(packetSizeBytes);
 
-            Object[][] packet = new Object[packetSize][];
+            packet = new Object[packetSize][];
             Object[] row;
             byte[] memoBytes;
             for (int count = 0; count < packetSize; count++) {
@@ -372,6 +414,9 @@ public class RSend extends TransactionAmount {
                 }
 
             }
+        } else {
+            amount = null;
+            packet = null;
         }
 
         // HEAD LEN
@@ -405,8 +450,12 @@ public class RSend extends TransactionAmount {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RSend(typeBytes, creator, exLink, smartContract, feePow, recipient, key, amount, title, arbitraryData, isTextByte,
-                    encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
+            if (packet == null)
+                return new RSend(typeBytes, creator, exLink, smartContract, feePow, recipient, key, amount, title, arbitraryData, isTextByte,
+                        encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
+            else
+                return new RSend(typeBytes, creator, exLink, smartContract, feePow, recipient, action, key, packet, title, arbitraryData, isTextByte,
+                        encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new RSend(typeBytes, creator, exLink, smartContract, recipient, key, amount, title, arbitraryData, isTextByte,
                     encryptedByte, flagsTX, signatureBytes);
