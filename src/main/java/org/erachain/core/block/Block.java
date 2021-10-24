@@ -900,6 +900,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     public synchronized List<Transaction> getTransactions() {
         if (this.transactions == null) {
+
             //LOAD TRANSACTIONS
             this.transactions = new ArrayList<Transaction>();
 

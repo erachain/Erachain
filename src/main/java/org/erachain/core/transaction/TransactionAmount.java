@@ -158,7 +158,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             typeBytes[2] = (byte) (typeBytes[2] | NO_AMOUNT_MASK);
         } else {
             // RESET 0 bit
-            typeBytes[2] = (byte) (typeBytes[2] & NO_AMOUNT_MASK);
+            typeBytes[2] = (byte) (typeBytes[2] & ~NO_AMOUNT_MASK);
 
             this.amount = amount;
             this.key = key;

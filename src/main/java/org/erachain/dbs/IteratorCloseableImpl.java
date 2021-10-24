@@ -58,7 +58,7 @@ public class IteratorCloseableImpl<T> implements IteratorCloseable<T> {
   public void finalize() throws Throwable {
     if (!isClosed) {
       close();
-      logger.warn("FINALIZE used - " + iterator.getClass().getName());
+      //logger.warn("FINALIZE used - " + iterator.getClass().getName());
     }
 
     super.finalize();
@@ -115,7 +115,7 @@ public class IteratorCloseableImpl<T> implements IteratorCloseable<T> {
       public void finalize() throws Throwable {
         if (!isClosed) {
           close();
-          logger.warn("FINALIZE used - " + iterator.getClass().getName());
+          //logger.warn("FINALIZE used - " + iterator.getClass().getName());
         }
 
         super.finalize();

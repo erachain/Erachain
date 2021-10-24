@@ -38,7 +38,7 @@ public class PeekingIteratorCloseable<T> implements PeekingIterator<T>, Closeabl
     public void finalize() throws Throwable {
         if (!isClosed) {
             close();
-            logger.warn("FINALIZE used - " + parentIterator.getClass().getName());
+            //logger.warn("FINALIZE used - " + parentIterator.getClass().getName());
         }
         super.finalize();
     }

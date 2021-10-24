@@ -91,6 +91,8 @@ public class RSend extends TransactionAmount {
             // set version byte
             typeBytes[3] = (byte) (typeBytes[3] | NO_DATA_MASK);
         } else {
+            // RESET 0 bit
+            typeBytes[3] = (byte) (typeBytes[3] & ~NO_DATA_MASK);
             this.data = data;
             this.encrypted = encrypted;
             this.isText = isText;
@@ -214,9 +216,9 @@ public class RSend extends TransactionAmount {
             test_len -= DATA_SIZE_LENGTH + ENCRYPTED_LENGTH + IS_TEXT_LENGTH;
         }
 
-            if (data.length < test_len) {
+        if (data.length < test_len) {
             throw new Exception("Data does not match RAW length " + data.length + " < " + test_len);
-            }
+        }
 
         long timestamp = 0;
         if (forDeal > Transaction.FOR_MYPACK) {
