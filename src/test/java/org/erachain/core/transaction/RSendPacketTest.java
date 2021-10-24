@@ -91,6 +91,7 @@ public class RSendPacketTest {
         }
 
         assertEquals(parsedTX.viewData(), rSend.viewData());
+        assertEquals(parsedTX.getPacket()[1][6], rSend.getPacket()[1][6]);
 
     }
 }
