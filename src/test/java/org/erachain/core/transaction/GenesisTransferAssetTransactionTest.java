@@ -3,7 +3,6 @@ package org.erachain.core.transaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.GenesisBlock;
-import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.junit.Before;
@@ -18,7 +17,10 @@ public class GenesisTransferAssetTransactionTest {
     @Before
     public void init() {
         Settings.genesisStamp = Settings.DEFAULT_MAINNET_STAMP;
-        dcSet = DCSet.createEmptyDatabaseSet(IDB.DBS_MAP_DB);
+
+        DCSet.reCreateDBinMEmory(false, false);
+        dcSet = DCSet.getInstance();
+
         try {
             chain = new BlockChain(dcSet);
         } catch (Exception e1) {
@@ -36,7 +38,6 @@ public class GenesisTransferAssetTransactionTest {
 
     @Test
     public void toBytes() {
-        ;
 
         init();
         Transaction gsend = gb.getTransaction(111);
