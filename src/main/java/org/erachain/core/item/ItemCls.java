@@ -1105,7 +1105,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         json.put(keyName + "_name", viewName());
         json.put(keyName + "_icon", getImageURL());
         json.put(keyName + "_iconMediaType", getIconMediaType().toString());
+    }
 
+    public JSONObject toJsonInfo() {
+        JSONObject json = new JSONObject();
+        json.put("key", getKey());
+        json.put("name", viewName());
+        json.put("icon", getImageURL());
+        json.put("iconMediaType", getIconMediaType().toString());
+        return json;
     }
 
     public JSONObject toJsonLite() {

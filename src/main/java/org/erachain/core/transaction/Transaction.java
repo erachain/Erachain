@@ -420,9 +420,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
 
     /**
-     * Если еще и комиссия + сжигание с перечисляемого актива - то не НУЛЬ
+     * Если еще и комиссия + сжигание с перечисляемого актива - то не НУЛЬ. Актив - берем из транзакции
      */
-    public List<Tuple3<AssetCls, BigDecimal, BigDecimal>> assetsFee = null;
+    public Tuple2<BigDecimal, BigDecimal> assetFEE = null;
+    /**
+     * Список с активом внутри - комиссия и сколько сожгли при этом
+     */
+    public HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> assetsPacketFEE = null;
 
     // transactions
     protected byte feePow = 0;
