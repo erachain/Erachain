@@ -463,10 +463,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.TYPE_NAME = type_name;
         this.creator = creator;
         if (exLink != null) {
-            typeBytes[2] = (byte) (typeBytes[2] | HAS_EXLINK_MASK);
+            typeBytes[2] |= HAS_EXLINK_MASK;
             this.exLink = exLink;
+        } else {
+            typeBytes[2] &= ~HAS_EXLINK_MASK;
         }
 
+        // NOT NEED HERE setup - typeBytes[2] | HAS_SMART_CONTRACT_MASK()
         this.smartContract = smartContract;
 
         this.timestamp = timestamp;
@@ -1849,7 +1852,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if (smartContract != null) {
             if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                typeBytes[2] = (byte) (typeBytes[2] | HAS_SMART_CONTRACT_MASK());
+                typeBytes[2] |= HAS_SMART_CONTRACT_MASK();
                 data = Bytes.concat(data, smartContract.toBytes(forDeal));
             } else {
                 typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
@@ -1864,8 +1867,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         // SIGNATURE
-        if (withSignature)
+        if (withSignature) {
+            assert (this.signature.length == 64);
             data = Bytes.concat(data, this.signature);
+        }
 
         if (forDeal == FOR_DB_RECORD) {
             // WRITE DBREF

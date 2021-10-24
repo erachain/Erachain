@@ -30,7 +30,7 @@ public class BigDecimalUtil {
         // WRITE AMOUNT
         byte[] amountBytes = Longs.toByteArray(amountBase.unscaledValue().longValue());
         //amountBytes = Bytes.ensureCapacity(amountBytes, AMOUNT_LENGTH, 0);
-        System.arraycopy(amountBytes, 0, data, 1, amountBytes.length);
+        System.arraycopy(amountBytes, 0, data, ++pos, amountBytes.length);
     }
 
     static public BigDecimal fromBytes9(byte[] data, int position) {

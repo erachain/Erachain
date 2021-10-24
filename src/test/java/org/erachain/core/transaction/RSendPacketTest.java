@@ -1,5 +1,6 @@
 package org.erachain.core.transaction;
 
+import com.google.common.primitives.Bytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -11,7 +12,6 @@ import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.SmartContract;
-import org.erachain.smartcontracts.epoch.shibaverse.ShibaVerseSC;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class RSendPacketTest {
     private BlockChain bchain;
 
     ExLink exLink = new ExLinkAppendix(123123L);
-    SmartContract smartContract = new ShibaVerseSC("command1", "ok");
+    SmartContract smartContract = null;
     Object[][] packet = null;
     byte feePow = 0;
     String title = "test";
@@ -56,7 +56,7 @@ public class RSendPacketTest {
     byte[] encryptedByte = new byte[]{0};
     long timestamp = 123L;
     long flagsTX = 0L;
-    byte[] signatureBytes = Crypto.getInstance().digest("123".getBytes());
+    byte[] signatureBytes = Bytes.concat(Crypto.getInstance().digest("456123".getBytes()), Crypto.getInstance().digest("q234234".getBytes()));
     long seqNo = 98123234;
     long feeLong = 123456L;
 
@@ -79,7 +79,7 @@ public class RSendPacketTest {
         rSend = new RSend(typeBytes, maker, exLink, smartContract, feePow, recipient, action, key, packet, title, messageDate, isTextByte,
                 encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
 
-        byte[] raw = rSend.toBytes(Transaction.FOR_NETWORK, false);
+        byte[] raw = rSend.toBytes(Transaction.FOR_NETWORK, true);
 
         RSend parsedTX;
         try {

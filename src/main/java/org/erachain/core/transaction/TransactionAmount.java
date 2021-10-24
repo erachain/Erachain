@@ -139,7 +139,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
      */
     protected Object[][] packet;
     // + 1 to len for memo
-    protected static final int PACKET_ROW_LENGTH = KEY_LENGTH + 5 * AMOUNT_LENGTH + 1;
+    protected static final int PACKET_ROW_LENGTH = KEY_LENGTH + 5 * (1 + AMOUNT_LENGTH) + 1;
     protected static final int PACKET_ROW_MEMO_NO = 6;
 
     /**
@@ -183,6 +183,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 int action, Long priceAssetKey, Object[][] packet, long timestamp, long flags) {
         super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, flags);
         this.recipient = recipient;
+
+        // RESET 0 bit - NO AMOUNT
+        typeBytes[2] = (byte) (typeBytes[2] & ~NO_AMOUNT_MASK);
 
         this.flags = flags | USE_PACKET_MASK;
         this.packet = packet;
@@ -603,31 +606,31 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                 // WRITE ASSET KEY
                 System.arraycopy(Longs.toByteArray((Long) row[0]), 0, buff, pos, Long.BYTES);
-                pos += 8;
+                pos += Long.BYTES;
 
                 // WRITE AMOUNT
                 BigDecimalUtil.toBytes9(buff, pos, (BigDecimal) row[1]);
-                pos += 8;
+                pos += 9;
 
                 // WRITE PRICE
                 if (row[2] != null && ((BigDecimal) row[2]).signum() != 0)
                     BigDecimalUtil.toBytes9(buff, pos, (BigDecimal) row[2]);
-                pos += 8;
+                pos += 9;
 
                 // WRITE DISCOUNT PRICE
                 if (row[3] != null && ((BigDecimal) row[3]).signum() != 0)
                     BigDecimalUtil.toBytes9(buff, pos, (BigDecimal) row[3]);
-                pos += 8;
+                pos += 9;
 
                 // WRITE TAX
                 if (row[4] != null && ((BigDecimal) row[4]).signum() != 0)
                     BigDecimalUtil.toBytes9(buff, pos, (BigDecimal) row[4]);
-                pos += 8;
+                pos += 9;
 
                 // WRITE FEE
                 if (row[5] != null && ((BigDecimal) row[5]).signum() != 0)
                     BigDecimalUtil.toBytes9(buff, pos, (BigDecimal) row[5]);
-                pos += 8;
+                pos += 9;
 
                 // WRITE MEMO LEN
                 buff[pos++] = (byte) memoBytes[count].length;
