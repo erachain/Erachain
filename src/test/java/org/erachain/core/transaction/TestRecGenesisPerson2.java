@@ -48,16 +48,16 @@ public class TestRecGenesisPerson2 {
     private byte[] image = new byte[]{4, 11, 32, 23, 45, 122, 11, -45}; // default value
     private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
     //CREATE EMPTY MEMORY DATABASE
-    private DCSet db;
+    private DCSet dcSet;
     private GenesisBlock gb;
 
     private void initIssue(boolean toProcess) {
 
         //CREATE EMPTY MEMORY DATABASE
-        db = DCSet.createEmptyDatabaseSet(0);
-        dbPA = db.getPersonAddressMap();
-        dbAP = db.getAddressPersonMap();
-        dbPS = db.getPersonStatusMap();
+        dcSet = DCSet.createEmptyDatabaseSet(0);
+        dbPA = dcSet.getPersonAddressMap();
+        dbAP = dcSet.getAddressPersonMap();
+        dbPS = dcSet.getPersonStatusMap();
 
         //CREATE PERSON
         //person = GenesisBlock.makePerson(0);
@@ -85,7 +85,7 @@ public class TestRecGenesisPerson2 {
 
         //genesisIssuePersonTransaction.sign(creator);
         //CHECK IF ISSUE PERSON TRANSACTION IS VALID
-        assertEquals(true, genesisIssuePersonTransaction.isSignatureValid());
+        assertEquals(true, genesisIssuePersonTransaction.isSignatureValid(dcSet));
         assertEquals(Transaction.VALIDATE_OK, genesisIssuePersonTransaction.isValid(Transaction.FOR_NETWORK, txFlags));
 
         //CONVERT TO BYTES
@@ -199,23 +199,23 @@ public class TestRecGenesisPerson2 {
 
         //CHECK REFERENCE RECIPIENT
         //assertNotEquals((long)genesisIssuePersonTransaction.getTimestamp(), (long)maker.getLastReference(db));
-        genesisIssuePersonTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
+        genesisIssuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1, true);
         genesisIssuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
         keyPerson = person.getKey();
 
         //CHECK PERSON EXISTS SENDER
-        assertEquals(true, db.getItemPersonMap().contains(keyPerson));
+        assertEquals(true, dcSet.getItemPersonMap().contains(keyPerson));
         assertEquals(genesisIssuePersonTransaction.getItem().getKey(), keyPerson);
         assertEquals(genesisIssuePersonTransaction.getItem().getName(), person.getName());
 
         //CHECK PERSON IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemPersonMap().get(keyPerson).toBytes(forDeal, true, false), person.toBytes(forDeal, true, false)));
+        assertEquals(true, Arrays.equals(dcSet.getItemPersonMap().get(keyPerson).toBytes(forDeal, true, false), person.toBytes(forDeal, true, false)));
 
         /////////////////
         ///// ORPHAN ////
         genesisIssuePersonTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
-        assertEquals(false, db.getItemPersonMap().contains(keyPerson));
+        assertEquals(false, dcSet.getItemPersonMap().contains(keyPerson));
 
     }
 }

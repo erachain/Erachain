@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 
 import java.util.Arrays;
@@ -86,7 +87,13 @@ public class GenesisRecord extends Transaction {
 
     //VALIDATE
 
-    public boolean isSignatureValid() {
+    @Override
+    public boolean isSignatureValid(DCSet dcSet, boolean asTelegram) {
+        return Arrays.equals(this.signature, this.getSignature());
+    }
+
+    @Override
+    public boolean isSignatureValid(DCSet dcSet) {
         return Arrays.equals(this.signature, this.getSignature());
     }
 

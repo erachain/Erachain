@@ -413,8 +413,6 @@ public class RHashes extends Transaction {
         //UPDATE SENDER
         super.processBody(block, forDeal);
 
-        int height = this.getBlockHeightByParentOrLast(dcSet);
-
         int transactionIndex = -1;
 
         long personKey;

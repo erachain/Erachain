@@ -163,6 +163,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             this.amount = amount;
             this.key = key;
         }
+
     }
 
     /**
@@ -184,7 +185,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, flags);
         this.recipient = recipient;
 
-        // RESET 0 bit - NO AMOUNT
+        // RESET 7 bit - NO AMOUNT
         typeBytes[2] = (byte) (typeBytes[2] & ~NO_AMOUNT_MASK);
 
         assert (packet != null);
@@ -1336,7 +1337,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
         }
 
-        int height = this.height > 0 ? this.height : this.getBlockHeightByParentOrLast(dcSet);
+        if (false) {
+            int height = this.height > 0 ? this.height : this.getBlockHeightByParentOrLast(dcSet);
+        }
+
         boolean wrong = true;
 
         // CHECK IF RECIPIENT IS VALID ADDRESS

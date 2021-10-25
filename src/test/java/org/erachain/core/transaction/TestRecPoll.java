@@ -156,11 +156,13 @@ public class TestRecPoll {
         issuePollTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE POLL TRANSACTION IS VALID
+        issuePollTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, issuePollTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
         issuePollTransaction = new IssuePollRecord(certifier, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0], new byte[64]);
         //CHECK IF ISSUE POLL IS INVALID
+        issuePollTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, issuePollTransaction.isSignatureValid(db));
 
     }

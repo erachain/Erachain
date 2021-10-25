@@ -1551,6 +1551,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                     }
 
                     if (!isSignatureValid) {
+                        // for check SIGN need HEIGHT
+                        transaction.setHeightSeq(heightBlock, seqNo);
                         if (!transaction.isSignatureValid(dcSetPlace)
                                 && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                             //

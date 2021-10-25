@@ -142,29 +142,12 @@ public class TransactionsPool extends MonitoredThread {
             if (txSignsMap.contains(transaction.getSignature()))
                 return;
 
-            // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
-            if (transaction.getCreator() == null
-                    || !transaction.isSignatureValid(DCSet.getInstance())) {
-                // DISHONEST PEER
-                transactionMessage.getSender().ban("invalid transaction signature");
-
-                return;
-            }
-
             long currentTimestamp = this.blockChain.getTimestamp(this.dcSet);
             // DEADTIME
             if (transaction.getDeadline() < this.blockChain.getTimestamp(this.dcSet)
                     || transaction.getTimestamp() > currentTimestamp + 3600000) {
                 // so OLD transaction or from future
                 return;
-            }
-
-            if (LOG_UNCONFIRMED_PROCESS) {
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess 1 period: " + timeCheck);
-                }
-                timeCheck = System.currentTimeMillis();
             }
 
             // ALREADY EXIST
@@ -178,6 +161,16 @@ public class TransactionsPool extends MonitoredThread {
                         LOGGER.debug("TRANSACTION_TYPE process CONTAINS in UNC period: " + timeCheck);
                     }
                 }
+                return;
+            }
+
+            // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
+            transaction.setHeightOrLast(DCSet.getInstance());
+            if (transaction.getCreator() == null
+                    || !transaction.isSignatureValid(DCSet.getInstance())) {
+                // DISHONEST PEER
+                transactionMessage.getSender().ban("invalid transaction signature");
+
                 return;
             }
 
@@ -204,6 +197,7 @@ public class TransactionsPool extends MonitoredThread {
                 }
                 timeCheck = System.currentTimeMillis();
             }
+
 
             // ADD TO UNCONFIRMED TRANSACTIONS
             // нужно проверять существующие для правильного отображения числа их в статусе ГУИ

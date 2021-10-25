@@ -174,6 +174,7 @@ public class TestRecSend {
                     "", null, isText, encrypted, timestamp, 123l
             );
             r_Send.sign(maker, Transaction.FOR_NETWORK);
+            r_Send.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
             r_Send.setDC(db, Transaction.FOR_NETWORK, this.gb.heightBlock, 2, true);
@@ -202,6 +203,7 @@ public class TestRecSend {
             assertEquals(r_Send.getAmount(), r_Send_2.getAmount());
 
             //r_Send_2.sign(maker, false);
+            r_Send_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
             assertEquals(r_Send_2.isSignatureValid(db), true);
             r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1, true);
             assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
@@ -231,7 +233,7 @@ public class TestRecSend {
         /////////////////////// VALIDATE
         int thisScale = 5;
         AssetCls assetA = new AssetVenture(itemAppData, maker, "AAA", icon, image, ".", 0, thisScale, 0L);
-        assetA.insertToMap(db, 0l);
+        assetA.insertToMap(db, 0L);
         long assetKey = assetA.getKey();
         head = "";
         data = null;
@@ -240,17 +242,17 @@ public class TestRecSend {
         BigDecimal bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale);
         r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
                 bal_A_keyA,
-                head, data, isText, encrypted, timestamp, 123l
+                head, data, isText, encrypted, timestamp, 123L
         );
         r_Send.sign(maker, Transaction.FOR_NETWORK);
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
-        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.VALIDATE_OK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0L), Transaction.VALIDATE_OK);
 
         // INVALID
         bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale - 1);
         r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
                 bal_A_keyA,
-                head, data, isText, encrypted, timestamp, 123l
+                head, data, isText, encrypted, timestamp, 123L
         );
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);

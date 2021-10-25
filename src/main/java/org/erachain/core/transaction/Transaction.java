@@ -633,6 +633,21 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.seqNo = seqNo;
     }
 
+    /**
+     * need for sign
+     *
+     * @param dcSet
+     */
+    public void setHeightOrLast(DCSet dcSet) {
+
+        if (this.height > 0)
+            return;
+
+        height = dcSet.getBlocksHeadsMap().size() + 1;
+        this.seqNo = 1;
+        this.dbRef = makeDBRef(height, seqNo);
+    }
+
     public void setErrorValue(String value) {
         errorValue = value;
     }
@@ -1936,14 +1951,18 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return BlockChain.isWiped(this.signature);
     }
 
-    public boolean isSignatureValid(DCSet dcSet) {
+    public boolean isSignatureValid(DCSet dcSet, boolean asTelegram) {
 
         if (this.signature == null || this.signature.length != Crypto.SIGNATURE_LENGTH
                 || Arrays.equals(this.signature, new byte[Crypto.SIGNATURE_LENGTH]))
             return false;
 
-        int height = getBlockHeightByParentOrLast(dcSet);
-        if (height < BlockChain.SKIP_INVALID_SIGN_BEFORE) {
+        if (!asTelegram && height == 0) {
+            // can not be checked!
+            return false;
+        }
+
+        if (!asTelegram && height < BlockChain.SKIP_INVALID_SIGN_BEFORE) {
             return true;
         }
 
@@ -1952,13 +1971,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         if (data == null)
             return false;
 
-        // for skip NOT VALID SIGNs
-        for (byte[] valid_item : BlockChain.VALID_SIGN) {
-            if (Arrays.equals(signature, valid_item)) {
-                if (dcSet.getTransactionFinalMapSigns().contains(signature))
-                    return false;
-                else
-                    return true;
+        if (!asTelegram) {
+            // for skip NOT VALID SIGNs
+            for (byte[] valid_item : BlockChain.VALID_SIGN) {
+                if (Arrays.equals(signature, valid_item)) {
+                    if (dcSet.getTransactionFinalMapSigns().contains(signature))
+                        return false;
+                    else
+                        return true;
+                }
             }
         }
 
@@ -1972,6 +1993,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         if (!Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data)) {
+            if (asTelegram)
+                return false;
+
             boolean wrong = true;
             for (byte[] item : BlockChain.DISCREDIR_ADDRESSES) {
                 if (Arrays.equals(this.creator.getPublicKey(), item)
@@ -1993,11 +2017,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return true;
     }
 
+    public boolean isSignatureValid(DCSet dcSet) {
+        return isSignatureValid(dcSet, false);
+    }
+
     /**
-     *  flags
-     *   = 1 - not check fee
-     *   = 2 - not check person
-     *   = 4 - not check PublicText
+     * flags
+     * = 1 - not check fee
+     * = 2 - not check person
+     * = 4 - not check PublicText
      */
     public int isValid(int forDeal, long flags) {
 
@@ -2056,7 +2084,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             return INVALID_ADDRESS;
         }
 
-        int height = this.getBlockHeightByParentOrLast(dcSet);
+        if (false) {
+            // TODO remove see
+            int height = this.getBlockHeightByParentOrLast(dcSet);
+        }
         //if (height <= 0 || height > 1000)
         //    return INVALID_TIMESTAMP;
 

@@ -330,7 +330,7 @@ public class RSend extends TransactionAmount {
         Object[][] packet;
         int action = 0;
 
-        if ((typeBytes[2] & NO_AMOUNT_MASK) != 0) {
+        if ((typeBytes[2] & NO_AMOUNT_MASK) == 0) {
             // IF here is AMOUNT
             packet = null;
 
@@ -358,7 +358,8 @@ public class RSend extends TransactionAmount {
                 }
             }
 
-        } else if ((flagsTX & USE_PACKET_MASK) != 0L) {
+        } else if (flagsTX < 0L &&
+                (flagsTX & USE_PACKET_MASK) != 0L) {
             // IF here is PACKET of AMOUNTs
             amount = null;
 

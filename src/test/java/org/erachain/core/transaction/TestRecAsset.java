@@ -203,12 +203,14 @@ public class TestRecAsset {
                 issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
 
                 //CHECK IF ISSUE ASSET TRANSACTION IS VALID
+                issueAssetTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
                 assertEquals(true, issueAssetTransaction.isSignatureValid(db));
 
                 //INVALID SIGNATURE
                 issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
                 //CHECK IF ISSUE ASSET IS INVALID
+                issueAssetTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
                 assertEquals(false, issueAssetTransaction.isSignatureValid(db));
             } finally {
                 db.close();
@@ -424,6 +426,7 @@ public class TestRecAsset {
                 assetTransfer.sign(maker, Transaction.FOR_NETWORK);
 
                 //CHECK IF ASSET TRANSFER SIGNATURE IS VALID
+                assetTransfer.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
                 assertEquals(true, assetTransfer.isSignatureValid(db));
 
                 //INVALID SIGNATURE
@@ -432,6 +435,7 @@ public class TestRecAsset {
                 assetTransfer = new RSend(maker, FEE_POWER, recipient, 0, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp + 1, maker.getLastTimestamp(db)[0], assetTransfer.getSignature());
 
                 //CHECK IF ASSET TRANSFER SIGNATURE IS INVALID
+                assetTransfer.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
                 assertEquals(false, assetTransfer.isSignatureValid(db));
             } finally {
                 db.close();
@@ -683,6 +687,7 @@ public class TestRecAsset {
                 messageTransaction.sign(maker, Transaction.FOR_NETWORK);
 
                 //CHECK IF ASSET TRANSFER SIGNATURE IS VALID
+                messageTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
                 assertEquals(true, messageTransaction.isSignatureValid(db));
 
                 //INVALID SIGNATURE
@@ -695,6 +700,7 @@ public class TestRecAsset {
                         timestamp + 1, maker.getLastTimestamp(db)[0], messageTransaction.getSignature());
 
                 //CHECK IF ASSET TRANSFER SIGNATURE IS INVALID
+                messageTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
                 assertEquals(false, messageTransaction.isSignatureValid(db));
 
             } finally {

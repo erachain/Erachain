@@ -1010,7 +1010,7 @@ public class API {
         }
 
         // CHECK IF RECORD VALID
-        if (!transaction.isSignatureValid(DCSet.getInstance())) {
+        if (!transaction.isSignatureValid(null, true)) {
             transaction.updateMapByError(-1, "INVALID_SIGNATURE", out);
             return out;
         }
