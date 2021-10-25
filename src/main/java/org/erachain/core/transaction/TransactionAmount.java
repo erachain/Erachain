@@ -397,6 +397,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     @Override
     public long calcBaseFee(boolean withFreeProtocol) {
 
+        if (creator == null || getType() == CALCULATED_TRANSACTION)
+            return 0L;
+
         long long_fee = super.calcBaseFee(withFreeProtocol);
 
         // TODO packet
