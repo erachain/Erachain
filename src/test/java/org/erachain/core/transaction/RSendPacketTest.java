@@ -5,6 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
@@ -44,6 +45,7 @@ public class RSendPacketTest {
     //CREATE EMPTY MEMORY DATABASE
     private DCSet dcSet;
     private GenesisBlock gb;
+    Block block;
     private BlockChain bchain;
 
     ExLink exLink = new ExLinkAppendix(123123L);
@@ -59,6 +61,30 @@ public class RSendPacketTest {
     byte[] signatureBytes = Bytes.concat(Crypto.getInstance().digest("456123".getBytes()), Crypto.getInstance().digest("q234234".getBytes()));
     long seqNo = 98123234;
     long feeLong = 123456L;
+
+    // INIT ASSETS
+    private void init() {
+
+        System.setProperty("qwe", "qw");
+
+        dcSet = DCSet.createEmptyDatabaseSet(0);
+        Controller.getInstance().setDCSet(dcSet);
+        gb = new GenesisBlock();
+        block = gb;
+
+        try {
+            gb.process(dcSet);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        // FEE FUND
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
+        maker.changeBalance(dcSet, false, false, AssetCls.ERA_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        maker.changeBalance(dcSet, false, false, AssetCls.FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+
+    }
 
     @Test
     public void parse() {
@@ -94,4 +120,31 @@ public class RSendPacketTest {
         assertEquals(parsedTX.getPacket()[1][6], rSend.getPacket()[1][6]);
 
     }
+
+    @Test
+    public void processPacket() {
+
+        init();
+
+        int action = TransactionAmount.ACTION_SEND;
+
+        packet = new Object[2][];
+        // 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
+        packet[0] = new Object[]{AssetCls.ERA_KEY, new BigDecimal("123.023"), new BigDecimal("120.0"),
+                new BigDecimal("0.015"), new BigDecimal("1.5"), null, "memo memo", null};
+        packet[1] = new Object[]{AssetCls.FEE_KEY, new BigDecimal("0.5"), new BigDecimal("0.045"),
+                null, null, new BigDecimal("0.0"), "memo 3 memo", null};
+
+        rSend = new RSend(typeBytes, maker, exLink, smartContract, feePow, recipient, action, key, packet, title, messageDate, isTextByte,
+                encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
+
+        rSend.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        rSend.sign(maker, Transaction.FOR_NETWORK);
+        rSend.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+
+        rSend.processBody(block, Transaction.FOR_NETWORK);
+
+
+    }
+
 }

@@ -142,7 +142,8 @@ public class RSend extends TransactionAmount {
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+
+        //this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient, long key,
@@ -152,7 +153,8 @@ public class RSend extends TransactionAmount {
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+
+        //this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
 

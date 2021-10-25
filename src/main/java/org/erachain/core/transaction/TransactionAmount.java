@@ -185,8 +185,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
      * @param extFlags
      */
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
-                                int balancePos, Long priceAssetKey, Object[][] packet, long timestamp, long flags) {
-        super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, flags);
+                                int balancePos, Long priceAssetKey, Object[][] packet, long timestamp, long extFlags) {
+        super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, extFlags);
         this.recipient = recipient;
 
         // SET 7 bit - HAS NO AMOUNT
@@ -1703,7 +1703,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 amountRow = signs.b > 0 ? (BigDecimal) row[1] : ((BigDecimal) row[1]).negate();
 
 
-                if (assetsPacketFEE.containsKey((AssetCls) row[7]))
+                if (assetsPacketFEE != null && assetsPacketFEE.containsKey((AssetCls) row[7]))
                     assetFeeRow = assetsPacketFEE.get((AssetCls) row[7]).a;
                 else
                     assetFeeRow = null;
