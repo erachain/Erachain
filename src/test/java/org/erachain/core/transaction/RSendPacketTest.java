@@ -81,8 +81,8 @@ public class RSendPacketTest {
 
         // FEE FUND
         maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, dcSet);
-        maker.changeBalance(dcSet, false, false, AssetCls.ERA_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
-        maker.changeBalance(dcSet, false, false, AssetCls.FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        maker.changeBalance(dcSet, false, false, AssetCls.ERA_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        maker.changeBalance(dcSet, false, false, AssetCls.FEE_KEY, BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
 
     }
 
@@ -93,7 +93,7 @@ public class RSendPacketTest {
     @Test
     public void toBytes() {
 
-        int action = TransactionAmount.ACTION_SEND;
+        int balancePos = TransactionAmount.ACTION_SEND;
 
         packet = new Object[2][];
         // 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
@@ -102,7 +102,7 @@ public class RSendPacketTest {
         packet[1] = new Object[]{4L, new BigDecimal("500.0"), new BigDecimal("500.0"),
                 null, null, new BigDecimal("5.0"), "memo 3 memo", null};
 
-        rSend = new RSend(typeBytes, maker, exLink, smartContract, feePow, recipient, action, key, packet, title, messageDate, isTextByte,
+        rSend = new RSend(typeBytes, maker, exLink, smartContract, feePow, recipient, balancePos, key, packet, title, messageDate, isTextByte,
                 encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
 
         byte[] raw = rSend.toBytes(Transaction.FOR_NETWORK, true);
@@ -116,7 +116,7 @@ public class RSendPacketTest {
             parsedTX = null;
         }
 
-        assertEquals(parsedTX.viewData(), rSend.viewData());
+        assertEquals(parsedTX.getPacket()[0][6], rSend.getPacket()[0][6]);
         assertEquals(parsedTX.getPacket()[1][6], rSend.getPacket()[1][6]);
 
     }
@@ -126,7 +126,7 @@ public class RSendPacketTest {
 
         init();
 
-        int action = TransactionAmount.ACTION_SEND;
+        int balancePos = TransactionAmount.ACTION_SEND;
 
         packet = new Object[2][];
         // 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
@@ -135,14 +135,24 @@ public class RSendPacketTest {
         packet[1] = new Object[]{AssetCls.FEE_KEY, new BigDecimal("0.5"), new BigDecimal("0.045"),
                 null, null, new BigDecimal("0.0"), "memo 3 memo", null};
 
-        rSend = new RSend(typeBytes, maker, exLink, smartContract, feePow, recipient, action, key, packet, title, messageDate, isTextByte,
+        rSend = new RSend(typeBytes, maker, exLink, smartContract, feePow, recipient, balancePos, key, packet, title, messageDate, isTextByte,
                 encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
 
         rSend.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         rSend.sign(maker, Transaction.FOR_NETWORK);
         rSend.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
 
+        BigDecimal balMaker1 = maker.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b;
+        BigDecimal balMaker2 = maker.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b;
+        BigDecimal balRecipient1 = recipient.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b;
+        BigDecimal balRecipient2 = recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b;
         rSend.processBody(block, Transaction.FOR_NETWORK);
+
+        assertEquals(balMaker1.subtract((BigDecimal) packet[0][1]), maker.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b);
+        assertEquals(balRecipient1.add((BigDecimal) packet[0][1]), recipient.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b);
+
+        assertEquals(balMaker2.subtract((BigDecimal) packet[1][1]), maker.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
+        assertEquals(balRecipient2.add((BigDecimal) packet[1][1]), recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
 
 
     }
