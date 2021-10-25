@@ -157,7 +157,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             // SET 7 bit - HAS NO AMOUNT
             typeBytes[2] = (byte) (typeBytes[2] | NO_AMOUNT_MASK);
         } else {
-            // RESET 0 bit
+            // RESET 7 bit
             typeBytes[2] = (byte) (typeBytes[2] & ~NO_AMOUNT_MASK);
 
             this.amount = amount;
@@ -194,6 +194,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         assert (packet != null);
 
+        // SET EXTENDED FLAGS MASK + USE_PACKET_MASK
         this.extFlags = extFlags | FLAGS_USED_MASK | USE_PACKET_MASK;
         this.packet = packet;
         this.action = action;
