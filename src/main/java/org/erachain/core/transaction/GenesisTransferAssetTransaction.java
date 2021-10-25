@@ -222,7 +222,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         //CHECK IF RECIPIENT IS VALID ADDRESS
         if (!"1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3".equals(this.recipient.getAddress())) {

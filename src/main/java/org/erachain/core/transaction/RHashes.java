@@ -364,7 +364,7 @@ public class RHashes extends Transaction {
     }
 
     //@Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -386,7 +386,7 @@ public class RHashes extends Transaction {
             return INVALID_PARAMS_LENGTH;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         if (height > BlockChain.VERS_4_23_01) {

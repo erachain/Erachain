@@ -258,7 +258,7 @@ public class RecordReleasePack extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         //CHECK PAYMENTS SIZE
         if (this.transactions.size() < 1 || this.transactions.size() > 400) {
@@ -274,7 +274,7 @@ public class RecordReleasePack extends Transaction {
             Block block = this.dcSet.getBlockMap().getAndProcess(this.height);
             for (Transaction transaction : this.transactions) {
 
-                result = transaction.isValid(forDeal, flags);
+                result = transaction.isValid(forDeal, checkFlags);
                 if (result != Transaction.VALIDATE_OK)
                     // transaction counter x100
                     return result + counter * 100;
@@ -284,7 +284,7 @@ public class RecordReleasePack extends Transaction {
             }
         }
         // IN FORK
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
 
     }
 

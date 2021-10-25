@@ -592,7 +592,7 @@ public class RSend extends TransactionAmount {
 
     // @Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -611,7 +611,7 @@ public class RSend extends TransactionAmount {
             }
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
     }
 
 }

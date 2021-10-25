@@ -219,7 +219,7 @@ public class IssuePersonRecord extends IssueItemRecord {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -319,12 +319,12 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         // IF BALANCE 0 or more - not check FEE
         boolean checkFeeBalance = creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0;
-        int res = super.isValid(forDeal, flags |
+        int res = super.isValid(forDeal, checkFlags |
                 (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
-        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
+        if ((checkFlags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
                 && !creatorIsPerson) {
             // ALL Persons by ADMINS
             for (String admin : BlockChain.GENESIS_ADMINS) {

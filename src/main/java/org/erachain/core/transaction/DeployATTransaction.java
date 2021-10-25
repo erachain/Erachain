@@ -221,7 +221,7 @@ public class DeployATTransaction extends Transaction {
         data = Bytes.concat(data, timestampBytes);
 
         //WRITE FLAGS
-        byte[] flagsBytes = Longs.toByteArray(this.flags);
+        byte[] flagsBytes = Longs.toByteArray(this.extFlags);
         data = Bytes.concat(data, flagsBytes);
 
         //WRITE CREATOR
@@ -302,7 +302,7 @@ public class DeployATTransaction extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
         return isValid(0);
     }
 

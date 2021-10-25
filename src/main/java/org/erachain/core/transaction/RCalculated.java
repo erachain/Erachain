@@ -80,7 +80,7 @@ public class RCalculated extends TransactionAmount {
 
     @Override
     public String viewSignature() {
-        return "calculated_" + Transaction.viewDBRef(flags) + ":" + viewHeightSeq();
+        return "calculated_" + Transaction.viewDBRef(extFlags) + ":" + viewHeightSeq();
     }
 
     @Override
@@ -105,12 +105,12 @@ public class RCalculated extends TransactionAmount {
 
     @Override
     public String getTitle() {
-        return this.message + " (@" + Transaction.viewDBRef(flags) + ")";
+        return this.message + " (@" + Transaction.viewDBRef(extFlags) + ")";
     }
 
     @Override
     public String getTitle(JSONObject langObj) {
-        return Lang.T(this.message, langObj) + " (@" + Transaction.viewDBRef(flags) + ")";
+        return Lang.T(this.message, langObj) + " (@" + Transaction.viewDBRef(extFlags) + ")";
     }
 
     public String getMessage() {
@@ -218,7 +218,7 @@ public class RCalculated extends TransactionAmount {
         data = Bytes.concat(data, this.typeBytes);
 
         // WRITE FLAGS
-        byte[] flagsBytes = Longs.toByteArray(this.flags);
+        byte[] flagsBytes = Longs.toByteArray(this.extFlags);
         data = Bytes.concat(data, flagsBytes);
 
         byte[] dbRefBytes = Longs.toByteArray(this.dbRef);

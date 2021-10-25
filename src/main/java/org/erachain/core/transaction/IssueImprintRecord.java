@@ -181,7 +181,7 @@ public class IssueImprintRecord extends IssueItemRecord {
     //VALIDATE
     //
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -197,7 +197,7 @@ public class IssueImprintRecord extends IssueItemRecord {
             return INVALID_NAME_LENGTH_MAX;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         // CHECK reference in DB

@@ -196,7 +196,7 @@ public class MultiPaymentTransaction extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         //CHECK PAYMENTS SIZE
         if (this.payments.size() < 1 || this.payments.size() > 400) {
@@ -242,7 +242,7 @@ public class MultiPaymentTransaction extends Transaction {
             }
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
     }
 
     //PROCESS/ORPHAN

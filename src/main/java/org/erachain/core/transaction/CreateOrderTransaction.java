@@ -450,7 +450,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     // VALIDATE
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -536,7 +536,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 && this.creator.getForSale(this.dcSet, haveKey, height, true).compareTo(amountHave) >= 0 // ЭРА|BTC есть на счету
                 && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).signum() >= 0 // и COMPU не отрицательные
         ) { // на балансе компушки не минус
-            flags = flags | NOT_VALIDATE_FLAG_FEE;
+            checkFlags = checkFlags | NOT_VALIDATE_FLAG_FEE;
         } else if (haveKey == FEE_KEY) {
             if (!BlockChain.isFeeEnough(height, creator)
                     && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).compareTo(amountHave.add(this.fee)) < 0) {
@@ -630,7 +630,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             }
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
     }
 
     @Override

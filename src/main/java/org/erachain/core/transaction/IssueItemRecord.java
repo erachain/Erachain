@@ -203,7 +203,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -234,7 +234,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
             }
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
 
     }
 

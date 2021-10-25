@@ -159,7 +159,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         data = Bytes.concat(data, timestampBytes);
 
         // WRITE FLAGS
-        data = Bytes.concat(data, Longs.toByteArray(this.flags));
+        data = Bytes.concat(data, Longs.toByteArray(this.extFlags));
 
         // WRITE CREATOR
         data = Bytes.concat(data, this.creator.getPublicKey());
@@ -211,9 +211,9 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != VALIDATE_OK) {
             return result;
         }

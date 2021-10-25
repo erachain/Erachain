@@ -116,18 +116,18 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) {
             return result;
         }
 
-        if ((flags & NOT_VALIDATE_ITEM) == 0) {
+        if ((checkFlags & NOT_VALIDATE_ITEM) == 0) {
             //CHECK QUANTITY
             AssetCls asset = (AssetCls) this.getItem();
 

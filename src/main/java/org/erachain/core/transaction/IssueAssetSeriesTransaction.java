@@ -356,7 +356,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     }
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -399,7 +399,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         }
 
         // выше уже не проверяем обертку
-        return super.isValid(forDeal, flags | NOT_VALIDATE_ITEM);
+        return super.isValid(forDeal, checkFlags | NOT_VALIDATE_ITEM);
     }
 
     // PROCESS/ORPHAN

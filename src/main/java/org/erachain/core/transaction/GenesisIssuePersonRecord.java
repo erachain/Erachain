@@ -34,9 +34,9 @@ public class GenesisIssuePersonRecord extends GenesisIssueItemRecord {
     }
 
     //@Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
-        int res = super.isValid(forDeal, flags);
+        int res = super.isValid(forDeal, checkFlags);
         if (res != Transaction.VALIDATE_OK) return res;
 
         PersonCls person = (PersonCls) this.getItem();

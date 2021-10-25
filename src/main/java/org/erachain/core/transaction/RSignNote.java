@@ -673,7 +673,7 @@ public class RSignNote extends Transaction implements Itemable {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -697,9 +697,9 @@ public class RSignNote extends Transaction implements Itemable {
                 && height > BlockChain.FREE_FEE_FROM_HEIGHT && seqNo <= BlockChain.FREE_FEE_TO_SEQNO
                 && getDataLength(Transaction.FOR_NETWORK, false) < BlockChain.FREE_FEE_LENGTH) {
             // не учитываем комиссию если размер блока маленький
-            result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_FEE);
+            result = super.isValid(forDeal, checkFlags | NOT_VALIDATE_FLAG_FEE);
         } else {
-            result = super.isValid(forDeal, flags);
+            result = super.isValid(forDeal, checkFlags);
         }
 
         if (result != Transaction.VALIDATE_OK) return result;
@@ -875,7 +875,7 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         RSignNote decryptedNote = new RSignNote(typeBytes, creator, feePow, key, exData,
-                dataForDB, timestamp, flags, signature,
+                dataForDB, timestamp, extFlags, signature,
                 seqNo, fee.longValue());
         return new Fun.Tuple3<>(decryptedExData.a, decryptedExData.b, decryptedNote);
 
@@ -896,7 +896,7 @@ public class RSignNote extends Transaction implements Itemable {
         }
 
         RSignNote decryptedNote = new RSignNote(typeBytes, creator, feePow, key, exData,
-                dataForDB, timestamp, flags, signature,
+                dataForDB, timestamp, extFlags, signature,
                 seqNo, fee.longValue());
         return new Fun.Tuple2<>(null, decryptedNote);
 

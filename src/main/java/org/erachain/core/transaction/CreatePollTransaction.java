@@ -186,7 +186,7 @@ public class CreatePollTransaction extends Transaction {
         }
 
         //WRITE FLAGS
-        byte[] flagsBytes = Longs.toByteArray(this.flags);
+        byte[] flagsBytes = Longs.toByteArray(this.extFlags);
         data = Bytes.concat(data, flagsBytes);
 
         //WRITE CREATOR
@@ -241,12 +241,12 @@ public class CreatePollTransaction extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (this.height > BlockChain.ITEM_POLL_FROM)
             return INVALID_TRANSACTION_TYPE;
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
     }
 
     //PROCESS/ORPHAN

@@ -413,7 +413,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     /**
      * external flags of transaction. If FLAGS is USED need to set SINB BIT - use
      */
-    protected long flags = 0L;
+    protected long extFlags = 0L;
     public static final long FLAGS_USED_MASK = Long.MIN_VALUE;
 
 
@@ -458,7 +458,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, long timestamp,
-                          long flags) {
+                          long extFlags) {
         this.typeBytes = typeBytes;
         this.TYPE_NAME = type_name;
         this.creator = creator;
@@ -474,7 +474,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         this.timestamp = timestamp;
 
-        this.flags = flags;
+        this.extFlags = extFlags;
 
         if (feePow < 0)
             feePow = 0;
@@ -1047,8 +1047,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return this.signature;
     }
 
-    public long getFlags() {
-        return this.flags;
+    public long getExtFlags() {
+        return this.extFlags;
     }
 
     public List<byte[]> getOtherSignatures() {
@@ -1854,7 +1854,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         if (typeBytes[0] != ISSUE_IMPRINT_TRANSACTION) {
-            byte[] flagsBytes = Longs.toByteArray(this.flags);
+            byte[] flagsBytes = Longs.toByteArray(this.extFlags);
             data = Bytes.concat(data, flagsBytes);
         }
 
@@ -2027,7 +2027,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * = 2 - not check person
      * = 4 - not check PublicText
      */
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -2093,14 +2093,14 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
         // CHECK IF CREATOR HAS ENOUGH FEE MONEY
-        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0L
+        if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0L
                 && height > BlockChain.ALL_BALANCES_OK_TO
                 && !BlockChain.isFeeEnough(height, creator)
                 && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
             return NOT_ENOUGH_FEE;
         }
 
-        if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0L
+        if ((checkFlags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0L
                 && this.hasPublicText()
                 && !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
                 && !this.creator.isPerson(dcSet, height)) {
@@ -2109,7 +2109,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         if (false &&  // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
-                (flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+                (checkFlags & NOT_VALIDATE_KEY_COLLISION) == 0l
                 && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
                 && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили
                 && this.signature != null

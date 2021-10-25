@@ -452,7 +452,7 @@ public class IssueStatementRecord extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -464,7 +464,7 @@ public class IssueStatementRecord extends Transaction {
         }
 
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         // ITEM EXIST? - for assets transfer not need - amount expect instead

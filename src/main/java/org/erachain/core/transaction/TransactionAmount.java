@@ -190,7 +190,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         assert (packet != null);
 
-        this.flags = flags | USE_PACKET_MASK;
+        this.extFlags = flags | USE_PACKET_MASK;
         this.packet = packet;
         this.action = action;
         this.key = priceAssetKey;
@@ -807,7 +807,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                                             int actionType,
                                                             long key, AssetCls asset, BigDecimal amount, Account recipient,
                                                             boolean backward, BigDecimal fee, BigDecimal assetFee,
-                                                            boolean creatorIsPerson, long flags, long timestamp) {
+                                                            boolean creatorIsPerson, long checkFlags, long timestamp) {
 
         boolean wrong;
 
@@ -824,7 +824,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
 
         // CHECK IF AMOUNT AND ASSET
-        if ((flags & NOT_VALIDATE_FLAG_BALANCE) == 0L
+        if ((checkFlags & NOT_VALIDATE_FLAG_BALANCE) == 0L
                 && amount != null) {
 
             int amount_sign = amount.signum();
@@ -907,7 +907,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         }
 
                         // TRY FEE
-                        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0
+                        if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0
                                 && !BlockChain.isFeeEnough(height, creator)
                                 && creator.getForFee(dcSet).compareTo(fee) < 0) {
                             return new Fun.Tuple2<>(NOT_ENOUGH_FEE, null);
@@ -948,7 +948,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     // asset - for RECIPIENT !
                                     unLimited = asset.isUnlimited(recipient, false);
 
-                                    if (!unLimited && (flags & NOT_VALIDATE_FLAG_BALANCE) == 0) {
+                                    if (!unLimited && (checkFlags & NOT_VALIDATE_FLAG_BALANCE) == 0) {
                                         balance = recipient.getBalance(dcSet, absKey, actionType).b;
                                         ////BigDecimal amountOWN = recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
                                         // amontOWN, balance and amount - is
@@ -961,7 +961,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     return new Fun.Tuple2<>(INVALID_HOLD_DIRECTION, null);
                                 }
 
-                                if ((flags & NOT_VALIDATE_FLAG_FEE) == 0
+                                if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0
                                         && !BlockChain.isFeeEnough(height, creator)
                                         && creator.getForFee(dcSet).compareTo(fee) < 0) {
                                     return new Fun.Tuple2<>(NOT_ENOUGH_FEE, null);
@@ -1041,7 +1041,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     }
                                 }
 
-                                if ((flags & NOT_VALIDATE_FLAG_FEE) == 0
+                                if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0
                                         && !BlockChain.isFeeEnough(height, creator)
                                         && creator.getForFee(dcSet).compareTo(fee) < 0) {
                                     return new Fun.Tuple2<>(NOT_ENOUGH_FEE, null);
@@ -1088,7 +1088,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                                     BigDecimal forSale = creator.getForSale(dcSet, FEE_KEY, height, true);
 
-                                    if ((flags & NOT_VALIDATE_FLAG_FEE) == 0) {
+                                    if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0) {
                                         forSale = forSale.subtract(fee);
                                         if (assetFee != null && assetFee.signum() != 0) {
                                             // учтем что еще процент с актива
@@ -1121,7 +1121,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     unLimited = asset.isUnlimited(creator, false);
                                     if (unLimited) {
                                         // TRY FEE
-                                        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0
+                                        if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0
                                                 && !BlockChain.isFeeEnough(height, creator)
                                                 && creator.getForFee(dcSet).compareTo(fee) < 0) {
                                             return new Fun.Tuple2<>(NOT_ENOUGH_FEE, null);
@@ -1132,7 +1132,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         // ALL OTHER ASSET
 
                                         // проверим баланс по КОМПУ
-                                        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0
+                                        if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0
                                                 && !BlockChain.ERA_COMPU_ALL_UP
                                                 && !BlockChain.isFeeEnough(height, creator)
                                                 && creator.getForFee(dcSet).compareTo(fee) < 0) {
@@ -1228,7 +1228,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 }
 
                                 // TRY FEE
-                                if ((flags & NOT_VALIDATE_FLAG_FEE) == 0
+                                if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0
                                         && !BlockChain.isFeeEnough(height, creator)
                                         && creator.getForFee(dcSet).compareTo(fee) < 0) {
                                     return new Fun.Tuple2<>(NOT_ENOUGH_FEE, null);
@@ -1270,7 +1270,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 }
 
                                 // TRY FEE
-                                if ((flags & NOT_VALIDATE_FLAG_FEE) == 0
+                                if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0
                                         && !BlockChain.isFeeEnough(height, creator)
                                         && creator.getForFee(dcSet).compareTo(fee) < 0) {
                                     return new Fun.Tuple2<>(NOT_ENOUGH_FEE, null);
@@ -1295,7 +1295,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             // TODO first org.erachain.records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
             if (height > BlockChain.ALL_BALANCES_OK_TO
-                    && (flags & NOT_VALIDATE_FLAG_FEE) == 0
+                    && (checkFlags & NOT_VALIDATE_FLAG_FEE) == 0
                     && !BlockChain.isFeeEnough(height, creator)
                     && creator.getForFee(dcSet).compareTo(fee) < 0) {
                 return new Fun.Tuple2<>(NOT_ENOUGH_FEE, null);
@@ -1309,7 +1309,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static Fun.Tuple2<Integer, String> isValidAction(DCSet dcSet, int height, Account creator, byte[] signature,
                                                             long key, AssetCls asset, BigDecimal amount, Account recipient,
                                                             boolean backward, BigDecimal fee, BigDecimal assetFee,
-                                                            boolean creatorIsPerson, long flags, long timestamp) {
+                                                            boolean creatorIsPerson, long checkFlags, long timestamp) {
 
         boolean isDirect = asset.isDirectBalances();
         int actionType = Account.balancePosition(key, amount, backward, isDirect);
@@ -1317,12 +1317,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         return isValidAction(dcSet, height, creator, signature, actionType,
                 key, asset, amount, recipient,
                 backward, fee, assetFee,
-                creatorIsPerson, flags, timestamp);
+                creatorIsPerson, checkFlags, timestamp);
 
     }
 
 
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -1414,7 +1414,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         boolean isPerson = this.creator.isPerson(dcSet, height, creatorPersonDuration);
 
         // PUBLIC TEXT only from PERSONS
-        if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
+        if ((checkFlags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
                 && this.hasPublicText() && !isPerson) {
             if (BlockChain.MAIN_MODE && height < 800000 // TODO: remove on new CHAIN
                 /// wrong: "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")
@@ -1432,7 +1432,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         //////////////////////////////
         // CHECK IF AMOUNT AND ASSET
 
-        if ((flags & USE_PACKET_MASK) != 0) {
+        if ((extFlags & USE_PACKET_MASK) != 0) {
             if (amount != null) {
                 errorValue = "amount != null && packet != null";
                 return INVALID_AMOUNT;
@@ -1458,7 +1458,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 assetFee = assetFEE.b;
 
             Fun.Tuple2<Integer, String> result = isValidAction(dcSet, height, creator, signature, key, asset, amount, recipient,
-                    isBackward(), fee, assetFee, isPerson, flags, timestamp);
+                    isBackward(), fee, assetFee, isPerson, checkFlags, timestamp);
             if (result.a != VALIDATE_OK) {
                 errorValue = result.b;
                 return result.a;
@@ -1520,7 +1520,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                 Fun.Tuple2<Integer, String> result = isValidAction(dcSet, height, creator, signature, rowAssetKey,
                         (AssetCls) row[7], (BigDecimal) row[1], recipient,
-                        isBackward(), fee, rowAssetFEE == null ? null : rowAssetFEE.a, isPerson, flags, timestamp);
+                        isBackward(), fee, rowAssetFEE == null ? null : rowAssetFEE.a, isPerson, checkFlags, timestamp);
 
                 if (result.a != VALIDATE_OK) {
                     errorValue = result.b;
@@ -1534,7 +1534,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             // TODO first org.erachain.records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
             if (height > BlockChain.ALL_BALANCES_OK_TO
-                    && (flags & NOT_VALIDATE_FLAG_FEE) == 0L
+                    && (checkFlags & NOT_VALIDATE_FLAG_FEE) == 0L
                     && !BlockChain.isFeeEnough(height, creator)
                     && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
                 return NOT_ENOUGH_FEE;
@@ -1544,7 +1544,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         // так как мы не лезем в супер класс то тут проверим тоже ее
         if (false && // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
-                (flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+                (checkFlags & NOT_VALIDATE_KEY_COLLISION) == 0l
                 && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили
                 && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0 && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии

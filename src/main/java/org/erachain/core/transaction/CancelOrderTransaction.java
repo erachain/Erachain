@@ -242,7 +242,7 @@ public class CancelOrderTransaction extends Transaction {
     //VALIDATE
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -294,7 +294,7 @@ public class CancelOrderTransaction extends Transaction {
             }
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
     }
 
 

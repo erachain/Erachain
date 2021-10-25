@@ -151,14 +151,14 @@ public class IssueStatusRecord extends IssueItemRecord {
 
     //PARSE CONVERT
 
-    //@Override
-    public int isValid(int forDeal, long flags) {
+    @Override
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         return Transaction.VALIDATE_OK;

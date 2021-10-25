@@ -413,7 +413,7 @@ public class ChangeOrderTransaction extends Transaction {
     }
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -471,7 +471,7 @@ public class ChangeOrderTransaction extends Transaction {
             return AMOUNT_SCALE_WRONG;
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
     }
 
     @Override
