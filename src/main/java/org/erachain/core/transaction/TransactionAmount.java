@@ -154,16 +154,20 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         this.recipient = recipient;
 
         if (amount == null || amount.signum() == 0) {
-            // set version to 1
+            // SET 7 bit - HAS NO AMOUNT
             typeBytes[2] = (byte) (typeBytes[2] | NO_AMOUNT_MASK);
         } else {
-            // RESET 0 bit
+            // RESET 7 bit
             typeBytes[2] = (byte) (typeBytes[2] & ~NO_AMOUNT_MASK);
 
             this.amount = amount;
             this.key = key;
         }
 
+        if (BlockChain.CHECK_BUGS > 1 && flags < 0L) {
+            LOGGER.error("TX FLAG NEGATE!");
+            Controller.getInstance().stopAndExit(6765);
+        }
     }
 
     /**
@@ -178,19 +182,20 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
      * @param recipient
      * @param packet
      * @param timestamp
-     * @param flags
+     * @param extFlags
      */
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
                                 int balancePos, Long priceAssetKey, Object[][] packet, long timestamp, long flags) {
         super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, flags);
         this.recipient = recipient;
 
-        // RESET 7 bit - NO AMOUNT
-        typeBytes[2] = (byte) (typeBytes[2] & ~NO_AMOUNT_MASK);
+        // SET 7 bit - HAS NO AMOUNT
+        typeBytes[2] = (byte) (typeBytes[2] | NO_AMOUNT_MASK);
 
         assert (packet != null);
 
-        this.extFlags = flags | FLAGS_USED_MASK | USE_PACKET_MASK;
+        // SET EXTENDED FLAGS MASK + USE_PACKET_MASK
+        this.extFlags = extFlags | FLAGS_USED_MASK | USE_PACKET_MASK;
         this.packet = packet;
         this.balancePos = balancePos;
         this.key = priceAssetKey;
