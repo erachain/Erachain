@@ -174,6 +174,7 @@ public class TestRecSend {
                     "", null, isText, encrypted, timestamp, 123l
             );
             r_Send.sign(maker, Transaction.FOR_NETWORK);
+            // need for check !
             r_Send.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
@@ -202,7 +203,6 @@ public class TestRecSend {
             
             assertEquals(r_Send.getAmount(), r_Send_2.getAmount());
 
-            //r_Send_2.sign(maker, false);
             r_Send_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
             assertEquals(r_Send_2.isSignatureValid(db), true);
             r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1, true);
@@ -377,6 +377,7 @@ public class TestRecSend {
                     "", null, isText, encrypted, timestamp, 123l
             );
             r_Send.sign(maker, Transaction.FOR_NETWORK);
+            r_Send.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
             assertEquals(r_Send.isSignatureValid(db), true);
             //r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
             r_Send.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1, true);
@@ -404,7 +405,7 @@ public class TestRecSend {
             
             assertEquals(r_Send.getAmount(), r_Send_2.getAmount());
 
-            //r_Send_2.sign(maker, false);
+            r_Send_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
             assertEquals(r_Send_2.isSignatureValid(db), true);
             r_Send_2.setDC(db, Transaction.FOR_NETWORK, gb.heightBlock, 1, true);
             assertEquals(r_Send_2.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
@@ -523,7 +524,8 @@ public class TestRecSend {
                 maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.ALL_VALID_BEFORE, 1, true);
+        assertEquals(r_SendV3.isSignatureValid(db), true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK); //);
 
@@ -554,7 +556,7 @@ public class TestRecSend {
         assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
         assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
 
-        assertEquals(r_SendV3.isSignatureValid(db), true);
+        messageTransactionV3_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(messageTransactionV3_2.isSignatureValid(db), true);
 
         //// MESSAGE ONLY
@@ -572,7 +574,8 @@ public class TestRecSend {
                 timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.ALL_VALID_BEFORE, 1, true);
+        assertEquals(r_SendV3.isSignatureValid(db), true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK); //Transaction.VALIDATE_OK);
 
@@ -602,7 +605,7 @@ public class TestRecSend {
         assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
         assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
 
-        assertEquals(r_SendV3.isSignatureValid(db), true);
+        messageTransactionV3_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(messageTransactionV3_2.isSignatureValid(db), true);
 
 
@@ -621,7 +624,8 @@ public class TestRecSend {
                 timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.ALL_VALID_BEFORE, 1, true);
+        assertEquals(r_SendV3.isSignatureValid(db), true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
@@ -649,7 +653,7 @@ public class TestRecSend {
         assertEquals(r_SendV3.getKey(), messageTransactionV3_2.getKey());
         assertEquals(r_SendV3.getAmount(), messageTransactionV3_2.getAmount());
 
-        assertEquals(r_SendV3.isSignatureValid(db), true);
+        messageTransactionV3_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(messageTransactionV3_2.isSignatureValid(db), true);
 
         //// EMPTY - NOT AMOUNT and NOT TEXT
@@ -666,7 +670,8 @@ public class TestRecSend {
                 timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1, true);
+        assertEquals(r_SendV3.isSignatureValid(db), true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
@@ -694,7 +699,7 @@ public class TestRecSend {
         assertEquals(0, messageTransactionV3_2.getKey());
         assertEquals(r_SendV3.getAmount(), messageTransactionV3_2.getAmount());
 
-        assertEquals(r_SendV3.isSignatureValid(db), true);
+        messageTransactionV3_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(messageTransactionV3_2.isSignatureValid(db), true);
 
         // NEGATE for test HOLD ///////////////////
@@ -712,7 +717,8 @@ public class TestRecSend {
                 ++timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.ALL_VALID_BEFORE, 1, true);
+        assertEquals(r_SendV3.isSignatureValid(db), true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK); //ransaction.VALIDATE_OK);
 
@@ -738,7 +744,7 @@ public class TestRecSend {
         assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
         assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
 
-        assertEquals(r_SendV3.isSignatureValid(db), true);
+        messageTransactionV3_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(messageTransactionV3_2.isSignatureValid(db), true);
 
     }
@@ -792,7 +798,8 @@ public class TestRecSend {
                 ++timestamp, 0l
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
-        arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
+        arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.ALL_VALID_BEFORE, 1, true);
+        assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
@@ -830,7 +837,7 @@ public class TestRecSend {
         assertEquals(arbitraryTransactionV3.getService(), arbitraryTransactionV3_2.getService());
         assertEquals(arbitraryTransactionV3.getCreator(), arbitraryTransactionV3_2.getCreator());
 
-        assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+        arbitraryTransactionV3_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(arbitraryTransactionV3_2.isSignatureValid(db), true);
     }
 
@@ -865,7 +872,8 @@ public class TestRecSend {
                 timestamp, maker.getLastTimestamp(db)[0]
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
-        arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
+        arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.ALL_VALID_BEFORE, 1, true);
+        assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
@@ -895,7 +903,7 @@ public class TestRecSend {
         assertEquals(arbitraryTransactionV3.getService(), arbitraryTransactionV3_2.getService());
         assertEquals(arbitraryTransactionV3.getCreator(), arbitraryTransactionV3_2.getCreator());
 
-        assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+        arbitraryTransactionV3_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(arbitraryTransactionV3_2.isSignatureValid(db), true);
     }
 

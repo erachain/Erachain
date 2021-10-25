@@ -152,11 +152,13 @@ public class TestRecUnion {
         issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE UNION TRANSACTION IS VALID
+        issueUnionTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, issueUnionTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
         issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0], new byte[64]);
         //CHECK IF ISSUE UNION IS INVALID
+        issueUnionTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, issueUnionTransaction.isSignatureValid(db));
 
     }

@@ -122,6 +122,7 @@ public class TestRecSetStatusToItem {
         setStatusTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE STATUS TRANSACTION IS VALID
+        setStatusTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, setStatusTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
@@ -131,6 +132,7 @@ public class TestRecSetStatusToItem {
                 timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE STATUS IS INVALID
+        setStatusTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, setStatusTransaction.isSignatureValid(db));
     }
 

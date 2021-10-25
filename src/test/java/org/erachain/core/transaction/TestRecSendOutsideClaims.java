@@ -155,7 +155,7 @@ public class TestRecSendOutsideClaims {
                 prop2,
                 maker, exLink, smartContract, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1, true);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
         
