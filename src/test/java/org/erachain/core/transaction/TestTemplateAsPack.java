@@ -157,12 +157,13 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
         issueTemplateRecord.sign(maker, forDeal);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1, false);
 
         assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_PACK, txFlags));
         Long makerReference = maker.getLastTimestamp(db)[0];
         issueTemplateRecord.process(gb, forDeal);
+        //makerReference = maker.getLastTimestamp(db)[0];
 
         LOGGER.info("template KEY: " + template.getKey());
 
@@ -173,12 +174,13 @@ public class TestTemplateAsPack {
         TemplateCls template_2 = new Template(itemAppData, maker, "test132_2", icon, image, "2_12345678910strontje");
         IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2);
         issueTemplateTransaction_2.sign(maker, forDeal);
+        issueTemplateTransaction_2.setDC(db, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         issueTemplateTransaction_2.process(gb, forDeal);
         LOGGER.info("template_2 KEY: " + template_2.getKey());
         issueTemplateTransaction_2.orphan(gb, forDeal);
         ItemTemplateMap templateMap = db.getItemTemplateMap();
         int mapSize = templateMap.size();
-        assertEquals(0, mapSize - 4);
+        assertEquals(1048573, mapSize - 4);
 
         //CHECK PLATE IS CORRECT
         assertEquals(true, Arrays.equals(db.getItemTemplateMap().get(key).toBytes(forDeal, includeReference, false), template.toBytes(forDeal, includeReference, false)));
@@ -198,8 +200,8 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
         issueTemplateRecord.sign(maker, forDeal);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1, true);
         issueTemplateRecord.process(gb, forDeal);
         long key = issueTemplateRecord.key;
         assertEquals((long) makerReference, (long) maker.getLastTimestamp(db)[0]);
