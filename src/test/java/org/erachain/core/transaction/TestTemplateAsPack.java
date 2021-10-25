@@ -107,8 +107,8 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
         issueTemplateRecord.sign(maker, forDeal);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1, true);
         issueTemplateRecord.process(gb, forDeal);
 
         //CONVERT TO BYTES
@@ -117,32 +117,32 @@ public class TestTemplateAsPack {
         //CHECK DATA LENGTH
         assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(forDeal, true));
 
+        IssueTemplateRecord parsedIssueTemplateTransaction = null;
         try {
             //PARSE FROM BYTES
-            IssueTemplateRecord parsedIssueTemplateTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueTemplateTransaction, Transaction.FOR_PACK);
-            LOGGER.info("parsedIssueTemplateTransaction: " + parsedIssueTemplateTransaction);
-
-            //CHECK INSTANCE
-            assertEquals(true, parsedIssueTemplateTransaction instanceof IssueTemplateRecord);
-
-            //CHECK SIGNATURE
-            assertEquals(true, Arrays.equals(issueTemplateRecord.getSignature(), parsedIssueTemplateTransaction.getSignature()));
-
-            //CHECK ISSUER
-            assertEquals(issueTemplateRecord.getCreator().getAddress(), parsedIssueTemplateTransaction.getCreator().getAddress());
-
-            //CHECK OWNER
-            assertEquals(issueTemplateRecord.getItem().getMaker().getAddress(), parsedIssueTemplateTransaction.getItem().getMaker().getAddress());
-
-            //CHECK NAME
-            assertEquals(issueTemplateRecord.getItem().getName(), parsedIssueTemplateTransaction.getItem().getName());
-
-            //CHECK DESCRIPTION
-            assertEquals(issueTemplateRecord.getItem().getDescription(), parsedIssueTemplateTransaction.getItem().getDescription());
-
+            parsedIssueTemplateTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueTemplateTransaction, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             fail("Exception while parsing transaction. " + e);
         }
+
+
+        //CHECK INSTANCE
+        assertEquals(true, parsedIssueTemplateTransaction instanceof IssueTemplateRecord);
+
+        //CHECK SIGNATURE
+        assertEquals(true, Arrays.equals(issueTemplateRecord.getSignature(), parsedIssueTemplateTransaction.getSignature()));
+
+        //CHECK ISSUER
+        assertEquals(issueTemplateRecord.getCreator().getAddress(), parsedIssueTemplateTransaction.getCreator().getAddress());
+
+        //CHECK OWNER
+        assertEquals(issueTemplateRecord.getItem().getMaker().getAddress(), parsedIssueTemplateTransaction.getItem().getMaker().getAddress());
+
+        //CHECK NAME
+        assertEquals(issueTemplateRecord.getItem().getName(), parsedIssueTemplateTransaction.getItem().getName());
+
+        //CHECK DESCRIPTION
+        assertEquals(issueTemplateRecord.getItem().getDescription(), parsedIssueTemplateTransaction.getItem().getDescription());
 
     }
 
