@@ -1336,6 +1336,47 @@ public class API {
             out.put(assetKey, array);
         }
 
+        if (BlockChain.ERA_COMPU_ALL_UP) {
+            long assetKey = AssetCls.ERA_KEY;
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> assetsBalance;
+            if (!out.containsKey(assetKey)) {
+                assetsBalance = account.getBalance(assetKey);
+                JSONArray array = new JSONArray();
+                array.add(setJSONArray(assetsBalance.a));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                out.put(assetKey, array);
+            }
+            assetKey = AssetCls.FEE_KEY;
+            if (!out.containsKey(assetKey)) {
+                assetsBalance = account.getBalance(assetKey);
+                JSONArray array = new JSONArray();
+                array.add(setJSONArray(assetsBalance.a));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                out.put(assetKey, array);
+            }
+            if (BlockChain.NOVA_ASSETS != null && !BlockChain.NOVA_ASSETS.isEmpty()) {
+                for (Tuple3<Long, Long, byte[]> nova : BlockChain.NOVA_ASSETS.values()) {
+                    assetKey = nova.a;
+                    if (!out.containsKey(assetKey)) {
+                        assetsBalance = account.getBalance(assetKey);
+                        JSONArray array = new JSONArray();
+                        array.add(setJSONArray(assetsBalance.a));
+                        array.add(setJSONArray(assetsBalance.b));
+                        array.add(setJSONArray(assetsBalance.b));
+                        array.add(setJSONArray(assetsBalance.b));
+                        array.add(setJSONArray(assetsBalance.b));
+                        out.put(assetKey, array);
+                    }
+                }
+            }
+        }
+
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
