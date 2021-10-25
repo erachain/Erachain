@@ -87,7 +87,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     /**
      * used in tx FLATS - set
      */
-    public static final long USE_PACKET_MASK = FLAGS_USED_MASK + 1; //
+    public static final long USE_PACKET_MASK = 1; //
 
     // BALANCES types and ACTION with IT
     // 0 - not used
@@ -190,7 +190,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         assert (packet != null);
 
-        this.extFlags = flags | USE_PACKET_MASK;
+        this.extFlags = flags | FLAGS_USED_MASK | USE_PACKET_MASK;
         this.packet = packet;
         this.action = action;
         this.key = priceAssetKey;
@@ -1432,7 +1432,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         //////////////////////////////
         // CHECK IF AMOUNT AND ASSET
 
-        if ((extFlags & USE_PACKET_MASK) != 0) {
+        if (extFlags < 0L
+                && (extFlags & USE_PACKET_MASK) != 0) {
             if (amount != null) {
                 errorValue = "amount != null && packet != null";
                 return INVALID_AMOUNT;
