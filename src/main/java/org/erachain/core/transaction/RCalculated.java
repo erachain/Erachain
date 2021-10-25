@@ -117,6 +117,11 @@ public class RCalculated extends TransactionAmount {
         return this.message;
     }
 
+    @Override
+    public long calcBaseFee(boolean withFreeProtocol) {
+        return 0L;
+    }
+
     // PARSE/CONVERT
 
     public static Transaction Parse(byte[] data) throws Exception {
