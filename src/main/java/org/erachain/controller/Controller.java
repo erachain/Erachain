@@ -3113,7 +3113,8 @@ public class Controller extends Observable {
         }
 
         // CHECK IF RECORD VALID
-        if (!transaction.isSignatureValid(DCSet.getInstance()))
+        transaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        if (!transaction.isSignatureValid(DCSet.getInstance(), false))
             return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
 
         // CHECK FOR UPDATES
@@ -3128,7 +3129,8 @@ public class Controller extends Observable {
     public Tuple3<Transaction, Integer, String> checkTransaction(Transaction transaction) {
 
         // CHECK IF RECORD VALID
-        if (!transaction.isSignatureValid(DCSet.getInstance()))
+        transaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        if (!transaction.isSignatureValid(DCSet.getInstance(), false))
             return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
 
         // CHECK FOR UPDATES

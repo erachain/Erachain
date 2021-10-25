@@ -66,12 +66,14 @@ public class ControllerTest {
 
         rVouch.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
 
+        // as NETWORK MESSAGE - WILL BE TEST SIGNATURE
         cnt.transactionsPool.processMessage(new TransactionMessage(rVouch));
         assertEquals(rVouch.errorValue, null);
 
-        // make invalid
+        // make signature INVALID
         signature[2]++;
 
+        // as NETWORK MESSAGE - WILL BE TEST SIGNATURE
         cnt.transactionsPool.processMessage(new TransactionMessage(rVouch));
         assertEquals(rVouch.errorValue, "INVALID SIGNATURE");
 

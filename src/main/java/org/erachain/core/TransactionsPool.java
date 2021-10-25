@@ -165,6 +165,8 @@ public class TransactionsPool extends MonitoredThread {
             }
 
             // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
+            // !! NEED SET UP curren HEIGHT for check
+            transaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
             if (transaction.getCreator() == null
                     || !transaction.isSignatureValid(DCSet.getInstance())) {
                 // DISHONEST PEER
