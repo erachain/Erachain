@@ -145,7 +145,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     /**
      * see Account.BALANCE_POS_OWN etc. BACKWARD < 0. Used in case PACKET
      */
-    protected int action;
+    protected int balancePos;
 
     // need for calculate fee by feePow into GUI
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
@@ -181,7 +181,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
      * @param flags
      */
     protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
-                                int action, Long priceAssetKey, Object[][] packet, long timestamp, long flags) {
+                                int balancePos, Long priceAssetKey, Object[][] packet, long timestamp, long flags) {
         super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, flags);
         this.recipient = recipient;
 
@@ -192,7 +192,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         this.extFlags = flags | FLAGS_USED_MASK | USE_PACKET_MASK;
         this.packet = packet;
-        this.action = action;
+        this.balancePos = balancePos;
         this.key = priceAssetKey;
     }
 
@@ -444,13 +444,13 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (!hasAmount())
             return 0;
         return packet == null ? Account.balancePosition(this.key, this.amount, this.isBackward(), asset.isSelfManaged())
-                : action;
+                : balancePos;
     }
 
     // BACKWARD AMOUNT
     public boolean isBackward() {
         return packet == null ? typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0
-                : action < 0;
+                : balancePos < 0;
     }
 
     /*
@@ -514,7 +514,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (packet == null) {
             return viewSubTypeName(key, amount, isBackward(), asset.isDirectBalances());
         } else {
-            return viewSubTypeName(action);
+            return viewSubTypeName(balancePos);
         }
     }
 
@@ -588,7 +588,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             byte[] packetLenBytes = Ints.toByteArray(packet.length);
             // 0 byte - ?
             // 1 byte - action
-            packetLenBytes[1] = (byte) action;
+            packetLenBytes[1] = (byte) balancePos;
             data = Bytes.concat(data, packetLenBytes);
 
             byte[][] memoBytes = new byte[packet.length][];
@@ -679,7 +679,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             }
             asset.toJsonInfo(transaction, "priceAsset");
 
-            transaction.put("balancePos", Math.abs(action));
+            transaction.put("balancePos", Math.abs(balancePos));
             transaction.put("actionName", viewActionType());
             if (this.isBackward())
                 transaction.put("backward", this.isBackward());
@@ -1472,7 +1472,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             } else if (packet.length > 1000) {
                 errorValue = "> " + 1000;
                 return INVALID_PACKET_SIZE;
-            } else if (action < ACTION_SEND || action > Account.BALANCE_POS_PLEDGE) {
+            } else if (balancePos < ACTION_SEND || balancePos > Account.BALANCE_POS_PLEDGE) {
                 return INVALID_BALANCE_POS;
             } else if (asset == null) {
                 errorValue = "" + key;
@@ -1645,15 +1645,74 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     }
 
+    public static void processActionBody(DCSet dcSet, boolean asOrphan, Block block, long dbRef,
+                                         PublicKeyAccount creator, Account recipient,
+                                         int balancePosition, boolean backward, BigDecimal amount,
+                                         long key, long absKey, AssetCls asset, BigDecimal assetFEE) {
+
+        // BACKWARD - CONFISCATE
+        boolean incomeReverse = balancePosition == ACTION_HOLD;
+
+        // STANDARD ACTION ORPHAN
+        processAction(dcSet, asOrphan, creator, recipient, balancePosition, absKey, asset, key, amount, backward, incomeReverse);
+
+        if (absKey == RIGHTS_KEY && block != null) {
+            block.addForgingInfoUpdate(recipient);
+        }
+
+        if (assetFEE != null && assetFEE.signum() != 0) {
+            // proc: this.creator.changeBalance(dcSet, !backward, backward, absKey, this.assetFEE.a, false, false, !incomeReverse);
+            // orph: this.creator.changeBalance(dcSet, backward, backward, absKey, this.assetFEE.a, false, false, !incomeReverse);
+
+            creator.changeBalance(dcSet, asOrphan ^ !backward, backward, absKey, assetFEE, false, false, !incomeReverse);
+
+            if (block != null && !asOrphan) {
+                block.addCalculated(creator, absKey,
+                        assetFEE.negate(), "Asset Fee", dbRef);
+            }
+        }
+
+    }
+
     @Override
     public void processBody(Block block, int forDeal) {
 
         super.processBody(block, forDeal);
 
-        if (this.amount == null)
+        if (this.amount == null) {
+            if (packet == null)
+                return;
+
+            boolean backward = isBackward();
+            BigDecimal assetFeeRow;
+            BigDecimal amountRow;
+            Long assetKeyRow;
+            Fun.Tuple2<Integer, Integer> signs;
+            // ROW:
+            // 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
+            for (Object[] row : packet) {
+
+                // see core.exdata.exActions.ExPays.makeFilterPayList
+                signs = Account.getSignsForBalancePos(balancePos);
+                assetKeyRow = signs.a * (Long) row[0];
+                amountRow = signs.b > 0 ? (BigDecimal) row[1] : ((BigDecimal) row[1]).negate();
+
+
+                if (assetsPacketFEE.containsKey((AssetCls) row[7]))
+                    assetFeeRow = assetsPacketFEE.get((AssetCls) row[7]).a;
+                else
+                    assetFeeRow = null;
+
+                // STANDARD ACTION PROCESS
+                processActionBody(dcSet, false, block, dbRef, creator, recipient,
+                        balancePos, backward, amountRow,
+                        assetKeyRow, (Long) row[0], (AssetCls) row[7], assetFeeRow);
+
+            }
+
             return;
 
-        DCSet db = this.dcSet;
+        }
 
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
         if (amount_sign == 0)
@@ -1675,7 +1734,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         if (assetFEE != null && assetFEE.a.signum() != 0) {
             // учтем что он еще заплатил комиссию с суммы
-            this.creator.changeBalance(db, !backward, backward, absKey, this.assetFEE.a, false, false, !incomeReverse);
+            this.creator.changeBalance(dcSet, !backward, backward, absKey, this.assetFEE.a, false, false, !incomeReverse);
             if (block != null) {
                 block.addCalculated(this.creator, absKey,
                         this.assetFEE.a.negate(), "Asset Fee", this.dbRef);
@@ -1689,8 +1748,39 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         super.orphanBody(block, forDeal);
 
-        if (this.amount == null)
+        if (this.amount == null) {
+            if (packet == null)
+                return;
+
+            boolean backward = isBackward();
+            BigDecimal assetFeeRow;
+            BigDecimal amountRow;
+            Long assetKeyRow;
+            Fun.Tuple2<Integer, Integer> signs;
+            // ROW:
+            // 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
+            for (Object[] row : packet) {
+
+                // see core.exdata.exActions.ExPays.makeFilterPayList
+                signs = Account.getSignsForBalancePos(balancePos);
+                assetKeyRow = signs.a * (Long) row[0];
+                amountRow = signs.b > 0 ? (BigDecimal) row[1] : ((BigDecimal) row[1]).negate();
+
+
+                if (assetsPacketFEE.containsKey((AssetCls) row[7]))
+                    assetFeeRow = assetsPacketFEE.get((AssetCls) row[7]).a;
+                else
+                    assetFeeRow = null;
+
+                // STANDARD ACTION PROCESS
+                processActionBody(dcSet, true, block, dbRef, creator, recipient,
+                        balancePos, backward, amountRow,
+                        assetKeyRow, (Long) row[0], (AssetCls) row[7], assetFeeRow);
+
+            }
+
             return;
+        }
 
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
         if (amount_sign == 0)
