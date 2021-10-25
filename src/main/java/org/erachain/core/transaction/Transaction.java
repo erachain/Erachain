@@ -1957,13 +1957,13 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 || Arrays.equals(this.signature, new byte[Crypto.SIGNATURE_LENGTH]))
             return false;
 
-        if (BlockChain.SKIP_INVALID_SIGN_BEFORE > 0 && !asTelegram && height == 0) {
-            // can not be checked!
-            return false;
-        }
-
-        if (!asTelegram && height < BlockChain.SKIP_INVALID_SIGN_BEFORE) {
-            return true;
+        if (!asTelegram && BlockChain.SKIP_INVALID_SIGN_BEFORE > 0) {
+            if (height == 0) {
+                // can not be checked!
+                return false;
+            } else if (height < BlockChain.SKIP_INVALID_SIGN_BEFORE) {
+                return true;
+            }
         }
 
         // validation with reference - not as a pack in toBytes - in any case!
