@@ -164,6 +164,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             this.key = key;
         }
 
+        if (BlockChain.CHECK_BUGS > 1 && flags < 0L) {
+            LOGGER.error("TX FLAG NEGATE!");
+            Controller.getInstance().stopAndExit(6765);
+        }
     }
 
     /**
