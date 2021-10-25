@@ -33,7 +33,8 @@ public class ControllerTest {
     GenesisBlock gb;
 
     private void init() {
-        Settings.genesisStamp = Settings.DEFAULT_MAINNET_STAMP;
+        Settings.NET_MODE = Settings.NET_MODE_DEMO;
+        //Settings.NET_MODE = Settings.NET_MODE_MAIN;
 
         DCSet.reCreateDBinMEmory(false, false);
 

@@ -1957,7 +1957,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                 || Arrays.equals(this.signature, new byte[Crypto.SIGNATURE_LENGTH]))
             return false;
 
-        if (!asTelegram && height == 0) {
+        if (BlockChain.SKIP_INVALID_SIGN_BEFORE > 0 && !asTelegram && height == 0) {
             // can not be checked!
             return false;
         }
