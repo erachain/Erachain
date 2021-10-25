@@ -803,6 +803,11 @@ public class TransactionCreator {
             transaction.setDC(this.fork, forDeal, this.blockHeight, this.seqNo.incrementAndGet());
         }
 
+        if (false && // not need becose my transactiob I tuast and its is SIGN valid!
+                !transaction.isSignatureValid(fork, false)) {
+            return transaction.INVALID_SIGNATURE;
+        }
+
         int valid = transaction.isValid(forDeal, tryFree ? Transaction.NOT_VALIDATE_FLAG_FEE : 0L);
 
         if (valid == Transaction.VALIDATE_OK) {

@@ -165,11 +165,14 @@ public class TransactionsPool extends MonitoredThread {
             }
 
             // CHECK IF SIGNATURE IS VALID ////// ------- OR GENESIS TRANSACTION
-            transaction.setHeightOrLast(DCSet.getInstance());
             if (transaction.getCreator() == null
                     || !transaction.isSignatureValid(DCSet.getInstance())) {
                 // DISHONEST PEER
-                transactionMessage.getSender().ban("invalid transaction signature");
+                transaction.errorValue = "INVALID SIGNATURE";
+                if (transactionMessage.getSender() != null) {
+                    // in TEST may be NULL
+                    transactionMessage.getSender().ban("invalid transaction signature");
+                }
 
                 return;
             }
