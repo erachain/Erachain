@@ -14,10 +14,12 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.smartcontracts.SmartContract;
 import org.junit.Test;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 
@@ -64,8 +66,6 @@ public class RSendPacketTest {
 
     // INIT ASSETS
     private void init() {
-
-        System.setProperty("qwe", "qw");
 
         dcSet = DCSet.createEmptyDatabaseSet(0);
         Controller.getInstance().setDCSet(dcSet);
@@ -122,9 +122,19 @@ public class RSendPacketTest {
     }
 
     @Test
-    public void processPacket() {
+    public void processPacketSend() {
 
         init();
+
+        BigDecimal tax1 = new BigDecimal("0.01");
+        BigDecimal tax1min = new BigDecimal("1");
+        BigDecimal tax2 = new BigDecimal("0.01");
+        BigDecimal tax2min = new BigDecimal("0.01");
+        BlockChain.ASSET_TRANSFER_PERCENTAGE.put(1L, new Fun.Tuple2<>(tax1, tax1min));
+        BlockChain.ASSET_TRANSFER_PERCENTAGE.put(2L, new Fun.Tuple2<>(tax2, tax2min));
+        BlockChain.ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.25"));
+        BlockChain.ASSET_BURN_PERCENTAGE.put(2L, new BigDecimal("0.25"));
+
 
         int balancePos = TransactionAmount.ACTION_SEND;
 
@@ -148,10 +158,21 @@ public class RSendPacketTest {
         BigDecimal balRecipient2 = recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b;
         rSend.processBody(block, Transaction.FOR_NETWORK);
 
-        assertEquals(balMaker1.subtract((BigDecimal) packet[0][1]), maker.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b);
+        BigDecimal tax1result = Objects.requireNonNull(TransactionAmount.calcSendTAX((Long) packet[0][0], (AssetCls) packet[0][7], (BigDecimal) packet[0][1])).a;
+        BigDecimal tax2result = Objects.requireNonNull(TransactionAmount.calcSendTAX((Long) packet[1][0], (AssetCls) packet[1][7], (BigDecimal) packet[1][1])).a;
+
+        BigDecimal tax1TXresult = rSend.assetsPacketFEE.get((AssetCls) packet[0][7]).a;
+        BigDecimal tax2TXresult = rSend.assetsPacketFEE.get((AssetCls) packet[1][7]).a;
+
+        assertEquals(tax1result, tax1TXresult);
+        assertEquals(tax2result, tax2TXresult);
+
+        assertEquals(balMaker1.subtract((BigDecimal) packet[0][1]).subtract(tax1result),
+                maker.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b);
         assertEquals(balRecipient1.add((BigDecimal) packet[0][1]), recipient.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b);
 
-        assertEquals(balMaker2.subtract((BigDecimal) packet[1][1]).subtract(rSend.getFee()), maker.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
+        assertEquals(balMaker2.subtract((BigDecimal) packet[1][1]).subtract(rSend.getFee()).subtract(tax2result),
+                maker.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
         assertEquals(balRecipient2.add((BigDecimal) packet[1][1]), recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
 
 

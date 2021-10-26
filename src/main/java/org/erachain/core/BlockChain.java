@@ -383,7 +383,7 @@ public class BlockChain {
     public static final long ACTION_ROYALTY_ASSET_2 = 0L;
 
     /**
-     * какие проценты при переводе каких активов - Ключ : процент + минималка.
+     * какие проценты при переводе каких активов - Ключ : коэффициент комиссии + минималка в абсолютных ед.
      * Это Доход форжера за минусом Сгорания
      */
     public static final HashMap<Long, Tuple2<BigDecimal, BigDecimal>> ASSET_TRANSFER_PERCENTAGE = new HashMap<>();
