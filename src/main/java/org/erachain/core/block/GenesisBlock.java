@@ -773,6 +773,10 @@ public class GenesisBlock extends Block {
         return INVALID_NONE;
     }
 
+    @Override
+    public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
+    }
+
     public void process(DCSet dcSet) throws Exception {
 
         this.target = BlockChain.BASE_TARGET;
