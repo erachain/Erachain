@@ -107,7 +107,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         //CHECK IF RECIPIENT IS VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(this.recipient.getAddressBytes())) {
@@ -153,7 +153,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         this.dcSet.getAddressPersonMap().addItem(this.recipient.getShortAddressBytes(), itemA);
         this.dcSet.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
 
-        //UPDATE REFERENCE OF RECIPIENT
+        //UPDATE TIMESTAMP OF RECIPIENT
         this.recipient.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
     }
 
@@ -167,7 +167,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         this.dcSet.getAddressPersonMap().removeItem(this.recipient.getShortAddressBytes());
         this.dcSet.getPersonAddressMap().removeItem(this.key, this.recipient.getAddress());
 
-        //UPDATE REFERENCE OF RECIPIENT
+        //UPDATE TIMESTAMP OF RECIPIENT
         this.recipient.removeLastTimestamp(this.dcSet);
     }
 

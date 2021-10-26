@@ -1010,7 +1010,7 @@ public class API {
         }
 
         // CHECK IF RECORD VALID
-        if (!transaction.isSignatureValid(DCSet.getInstance())) {
+        if (!transaction.isSignatureValid(null, true)) {
             transaction.updateMapByError(-1, "INVALID_SIGNATURE", out);
             return out;
         }
@@ -1334,6 +1334,47 @@ public class API {
             array.add(setJSONArray(assetsBalance.b.d));
             array.add(setJSONArray(assetsBalance.b.e));
             out.put(assetKey, array);
+        }
+
+        if (BlockChain.ERA_COMPU_ALL_UP) {
+            long assetKey = AssetCls.ERA_KEY;
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> assetsBalance;
+            if (!out.containsKey(assetKey)) {
+                assetsBalance = account.getBalance(assetKey);
+                JSONArray array = new JSONArray();
+                array.add(setJSONArray(assetsBalance.a));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                out.put(assetKey, array);
+            }
+            assetKey = AssetCls.FEE_KEY;
+            if (!out.containsKey(assetKey)) {
+                assetsBalance = account.getBalance(assetKey);
+                JSONArray array = new JSONArray();
+                array.add(setJSONArray(assetsBalance.a));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                array.add(setJSONArray(assetsBalance.b));
+                out.put(assetKey, array);
+            }
+            if (BlockChain.NOVA_ASSETS != null && !BlockChain.NOVA_ASSETS.isEmpty()) {
+                for (Tuple3<Long, Long, byte[]> nova : BlockChain.NOVA_ASSETS.values()) {
+                    assetKey = nova.a;
+                    if (!out.containsKey(assetKey)) {
+                        assetsBalance = account.getBalance(assetKey);
+                        JSONArray array = new JSONArray();
+                        array.add(setJSONArray(assetsBalance.a));
+                        array.add(setJSONArray(assetsBalance.b));
+                        array.add(setJSONArray(assetsBalance.b));
+                        array.add(setJSONArray(assetsBalance.b));
+                        array.add(setJSONArray(assetsBalance.b));
+                        out.put(assetKey, array);
+                    }
+                }
+            }
         }
 
         return Response.status(200)

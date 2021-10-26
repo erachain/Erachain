@@ -91,12 +91,14 @@ public class TransactionTests3AssetsAsPack {
         issueAssetTransaction.sign(maker, asPack);
 
         //CHECK IF ISSUE ASSET TRANSACTION IS VALID
+        issueAssetTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, issueAssetTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
         issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l, new byte[64]);
 
         //CHECK IF ISSUE ASSET IS INVALID
+        issueAssetTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, issueAssetTransaction.isSignatureValid(db));
     }
 
@@ -282,6 +284,7 @@ public class TransactionTests3AssetsAsPack {
         assetTransfer.sign(maker, asPack);
 
         //CHECK IF ASSET TRANSFER SIGNATURE IS VALID
+        assetTransfer.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, assetTransfer.isSignatureValid(db));
 
         //INVALID SIGNATURE
@@ -290,6 +293,7 @@ public class TransactionTests3AssetsAsPack {
         assetTransfer = new RSend(maker, recipient, 0, BigDecimal.valueOf(101).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), -123L);
 
         //CHECK IF ASSET TRANSFER SIGNATURE IS INVALID
+        assetTransfer.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, assetTransfer.isSignatureValid(db));
     }
 
@@ -493,12 +497,14 @@ public class TransactionTests3AssetsAsPack {
         Transaction cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[10], FEE_POWER, timestamp, 0l);
         cancelOrderTransaction.sign(maker, asPack);
         //CHECK IF ORDER CANCEL IS VALID
+        cancelOrderTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, cancelOrderTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
         cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[10], FEE_POWER, timestamp, 0l, new byte[1]);
 
         //CHECK IF ORDER CANCEL
+        cancelOrderTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, cancelOrderTransaction.isSignatureValid(db));
     }
     @Ignore
@@ -739,8 +745,10 @@ public class TransactionTests3AssetsAsPack {
                 new byte[]{0},
                 maker.getLastTimestamp()[0]
         );
-        r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         r_Send.sign(creator, asPack);
+        r_Send.setDC(db, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1, true);
+
+        assertEquals(r_Send.isSignatureValid(db), true);
 
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
@@ -766,7 +774,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(r_Send.isEncrypted(), messageTransaction_2.isEncrypted());
         assertEquals(r_Send.isText(), messageTransaction_2.isText());
 
-        assertEquals(r_Send.isSignatureValid(db), true);
+        messageTransaction_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(messageTransaction_2.isSignatureValid(db), true);
     }
 

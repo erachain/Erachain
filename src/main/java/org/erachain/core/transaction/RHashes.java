@@ -138,9 +138,9 @@ public class RHashes extends Transaction {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -228,10 +228,10 @@ public class RHashes extends Transaction {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RHashes(typeBytes, creator, exLink, feePow, url, arbitraryData, hashes, timestamp, reference,
+            return new RHashes(typeBytes, creator, exLink, feePow, url, arbitraryData, hashes, timestamp, flagsTX,
                     signatureBytes, seqNo, feeLong);
         } else {
-            return new RHashes(typeBytes, creator, url, arbitraryData, hashes, reference, signatureBytes);
+            return new RHashes(typeBytes, creator, url, arbitraryData, hashes, flagsTX, signatureBytes);
         }
 
     }
@@ -364,7 +364,7 @@ public class RHashes extends Transaction {
     }
 
     //@Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -386,7 +386,7 @@ public class RHashes extends Transaction {
             return INVALID_PARAMS_LENGTH;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         if (height > BlockChain.VERS_4_23_01) {
@@ -412,8 +412,6 @@ public class RHashes extends Transaction {
 
         //UPDATE SENDER
         super.processBody(block, forDeal);
-
-        int height = this.getBlockHeightByParentOrLast(dcSet);
 
         int transactionIndex = -1;
 

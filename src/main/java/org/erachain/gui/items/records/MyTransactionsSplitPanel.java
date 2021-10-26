@@ -450,6 +450,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         if (transaction == null) return;
 
         DCSet dcSet = DCSet.getInstance();
+        transaction.setHeightOrLast(dcSet);
         if (!transaction.isSignatureValid(dcSet)) {
             JOptionPane.showMessageDialog(new JFrame(),
                     Lang.T("Signature Invalid") + "!",

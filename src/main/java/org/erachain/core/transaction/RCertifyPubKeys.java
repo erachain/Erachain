@@ -202,10 +202,10 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -281,7 +281,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         if (forDeal > Transaction.FOR_MYPACK) {
             return new RCertifyPubKeys(typeBytes, creator, exLink, feePow, key,
                     certifiedPublicKeys,
-                    add_day, timestamp, reference, signature, feeLong,
+                    add_day, timestamp, flagsTX, signature, feeLong,
                     seqNo, certifiedSignatures);
         } else {
             return new RCertifyPubKeys(typeBytes, creator, exLink, key,
@@ -526,7 +526,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
     //
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -534,18 +534,18 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
         for (String admin : BlockChain.GENESIS_ADMINS) {
             if (creator.equals(admin)) {
-                flags = flags | NOT_VALIDATE_FLAG_FEE;
+                checkFlags = checkFlags | NOT_VALIDATE_FLAG_FEE;
                 break;
             }
         }
-        int result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
+        int result = super.isValid(forDeal, checkFlags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
         // сюда без проверки Персоны приходит
         if (result != VALIDATE_OK)
             return result;
 
         ///// CREATOR
-        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
+        if ((checkFlags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
                 && !this.creator.isPerson(dcSet, height, creatorPersonDuration)) {
             boolean creator_admin = false;
             // ALL Persons by ADMINS

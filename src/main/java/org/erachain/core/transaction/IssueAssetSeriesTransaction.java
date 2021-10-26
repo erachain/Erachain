@@ -50,12 +50,12 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
      * @param templateAsset
      * @param feePow
      * @param timestamp
-     * @param reference
+     * @param flags
      */
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator,
                                        ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture templateAsset, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, creator, linkTo, templateAsset, feePow, timestamp, reference);
+                                       AssetVenture templateAsset, byte feePow, long timestamp, long flags) {
+        super(typeBytes, creator, linkTo, templateAsset, feePow, timestamp, flags);
 
         this.origAssetRef = origAssetRef;
         if (origAssetRef == null)
@@ -64,9 +64,9 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     }
 
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture templateAsset, byte feePow, long timestamp, Long reference,
+                                       AssetVenture templateAsset, byte feePow, long timestamp, long flags,
                                        byte[] signature) {
-        this(typeBytes, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, reference);
+        this(typeBytes, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, flags);
         this.signature = signature;
         item.setReference(signature, dbRef);
 
@@ -74,9 +74,9 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
                                        long origAssetKey,
-                                       AssetVenture templateAsset, byte feePow, long timestamp, Long reference,
+                                       AssetVenture templateAsset, byte feePow, long timestamp, long flags,
                                        byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, reference);
+        this(typeBytes, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, flags);
 
         this.origAssetKey = origAssetKey;
         this.signature = signature;
@@ -91,7 +91,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     // as pack
     public IssueAssetSeriesTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
                                        AssetVenture templateAsset, byte[] signature) {
-        super(typeBytes, creator, linkTo, templateAsset, (byte) 0, 0L, null, signature);
+        super(typeBytes, creator, linkTo, templateAsset, (byte) 0, 0L, 0L, signature);
         this.origAssetRef = origAssetRef;
         if (origAssetRef == null)
             typeBytes[3] |= WITHOUT_ORIGINAL_MASK;
@@ -99,14 +99,14 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     }
 
     public IssueAssetSeriesTransaction(PublicKeyAccount creator, ExLink linkTo, byte[] origAssetRef,
-                                       AssetVenture templateAsset, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, reference,
+                                       AssetVenture templateAsset, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, flags,
                 signature);
     }
 
     public IssueAssetSeriesTransaction(PublicKeyAccount creator, ExLink linkTo,
-                                       byte[] origAssetRef, AssetVenture templateAsset, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, reference);
+                                       byte[] origAssetRef, AssetVenture templateAsset, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, origAssetRef, templateAsset, feePow, timestamp, flags);
     }
 
 
@@ -220,10 +220,10 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -308,7 +308,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
 
         if (forDeal > Transaction.FOR_MYPACK) {
             return new IssueAssetSeriesTransaction(typeBytes, creator, linkTo, assetRef, origKey, templateAsset, feePow, timestamp,
-                    reference, signatureBytes, seqNo, feeLong);
+                    flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueAssetSeriesTransaction(typeBytes, creator, linkTo, assetRef, templateAsset, signatureBytes);
         }
@@ -356,7 +356,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     }
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -399,7 +399,7 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
         }
 
         // выше уже не проверяем обертку
-        return super.isValid(forDeal, flags | NOT_VALIDATE_ITEM);
+        return super.isValid(forDeal, checkFlags | NOT_VALIDATE_ITEM);
     }
 
     // PROCESS/ORPHAN

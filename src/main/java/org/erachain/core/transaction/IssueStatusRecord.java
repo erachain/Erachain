@@ -16,32 +16,32 @@ public class IssueStatusRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_STATUS_TRANSACTION;
     public static final String TYPE_NAME = "Issue Status";
 
-    public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, status, feePow, timestamp, reference);
+    public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, status, feePow, timestamp, flags);
     }
 
-    public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, status, feePow, timestamp, reference, signature);
+    public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp, long flags, byte[] signature) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, status, feePow, timestamp, flags, signature);
     }
 
     public IssueStatusRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp,
-                             Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, status, feePow, timestamp, reference, signature);
+                             long flags, byte[] signature, long seqNo, long feeLong) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, status, feePow, timestamp, flags, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
     }
 
     public IssueStatusRecord(byte[] typeBytes, ExLink linkTo, PublicKeyAccount creator, StatusCls status, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, status, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, status, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, status, feePow, timestamp, reference, signature);
+    public IssueStatusRecord(PublicKeyAccount creator, StatusCls status, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, status, feePow, timestamp, flags, signature);
     }
 
-    public IssueStatusRecord(PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, status, feePow, timestamp, reference);
+    public IssueStatusRecord(PublicKeyAccount creator, ExLink linkTo, StatusCls status, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, status, feePow, timestamp, flags);
     }
 
     //GETTERS/SETTERS
@@ -75,10 +75,10 @@ public class IssueStatusRecord extends IssueItemRecord {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -143,7 +143,7 @@ public class IssueStatusRecord extends IssueItemRecord {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssueStatusRecord(typeBytes, creator, linkTo, status, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+            return new IssueStatusRecord(typeBytes, creator, linkTo, status, feePow, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueStatusRecord(typeBytes, linkTo, creator, status, signatureBytes);
         }
@@ -151,14 +151,14 @@ public class IssueStatusRecord extends IssueItemRecord {
 
     //PARSE CONVERT
 
-    //@Override
-    public int isValid(int forDeal, long flags) {
+    @Override
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         return Transaction.VALIDATE_OK;

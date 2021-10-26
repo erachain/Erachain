@@ -201,6 +201,8 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         }
 
                         ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
+                        if (airDrop == null)
+                            return;
                         airDrop.setDC(DCSet.getInstance());
                         airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
                         List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> accruals = airDrop.getResults();
@@ -238,6 +240,9 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         }
 
                         ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
+                        if (airDrop == null)
+                            return;
+
                         airDrop.setDC(DCSet.getInstance());
                         airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), true);
                         List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> results = airDrop.getResults();

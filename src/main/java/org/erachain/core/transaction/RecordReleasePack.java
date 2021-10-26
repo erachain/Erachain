@@ -97,9 +97,9 @@ public class RecordReleasePack extends Transaction {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -169,10 +169,10 @@ public class RecordReleasePack extends Transaction {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, reference,
+            return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, flagsTX,
                     signatureBytes, seqNo, feeLong);
         } else {
-            return new RecordReleasePack(typeBytes, creator, transactions, reference, signatureBytes);
+            return new RecordReleasePack(typeBytes, creator, transactions, flagsTX, signatureBytes);
         }
     }
 
@@ -258,7 +258,7 @@ public class RecordReleasePack extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         //CHECK PAYMENTS SIZE
         if (this.transactions.size() < 1 || this.transactions.size() > 400) {
@@ -274,7 +274,7 @@ public class RecordReleasePack extends Transaction {
             Block block = this.dcSet.getBlockMap().getAndProcess(this.height);
             for (Transaction transaction : this.transactions) {
 
-                result = transaction.isValid(forDeal, flags);
+                result = transaction.isValid(forDeal, checkFlags);
                 if (result != Transaction.VALIDATE_OK)
                     // transaction counter x100
                     return result + counter * 100;
@@ -284,7 +284,7 @@ public class RecordReleasePack extends Transaction {
             }
         }
         // IN FORK
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
 
     }
 

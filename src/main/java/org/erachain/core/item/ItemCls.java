@@ -943,11 +943,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
         if (useAll) {
             //WRITE MAKER
-            //try {
-                data = Bytes.concat(data, this.maker.getPublicKey());
-            //} catch (Exception e) {
-            //DECODE EXCEPTION
-            //}
+            data = Bytes.concat(data, this.maker.getPublicKey());
         }
 
         byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
@@ -1105,7 +1101,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         json.put(keyName + "_name", viewName());
         json.put(keyName + "_icon", getImageURL());
         json.put(keyName + "_iconMediaType", getIconMediaType().toString());
+    }
 
+    public JSONObject toJsonInfo() {
+        JSONObject json = new JSONObject();
+        json.put("key", getKey());
+        json.put("name", viewName());
+        json.put("icon", getImageURL());
+        json.put("iconMediaType", getIconMediaType().toString());
+        return json;
     }
 
     public JSONObject toJsonLite() {

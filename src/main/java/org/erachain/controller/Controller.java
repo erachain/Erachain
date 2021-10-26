@@ -101,7 +101,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.6.1 dev 06 time";
+    public static String version = "5.6.1 dev 07 packet";
     public static String buildTime = "2021-10-05 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -637,30 +637,32 @@ public class Controller extends Observable {
             ////LOGGER.error(e.getMessage(), e);
         }
 
-        // OPENING DATABASES
-        try {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open DataChain"));
-            LOGGER.info("Try Open DataChain");
-            if (Settings.simpleTestNet) {
-                // -testnet
-                reCreateDC(inMemoryDC);
-            } else {
-                this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
-            }
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "DataChain OK"));
-            LOGGER.info("DataChain OK - " + Settings.getInstance().getDataChainPath());
-        } catch (Throwable e) {
-            // Error open DB
-            error = 1;
-            LOGGER.error("Error during startup detected trying to restore backup DataChain...");
-            LOGGER.error(e.getMessage(), e);
+        if (dcSet == null) {
+            // OPENING DATABASES
             try {
-                reCreateDC(inMemoryDC);
-            } catch (Throwable e1) {
-                LOGGER.error(e1.getMessage(), e1);
-                stopAndExit(5);
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open DataChain"));
+                LOGGER.info("Try Open DataChain");
+                if (Settings.simpleTestNet) {
+                    // -testnet
+                    reCreateDC(inMemoryDC);
+                } else {
+                    this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+                }
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "DataChain OK"));
+                LOGGER.info("DataChain OK - " + Settings.getInstance().getDataChainPath());
+            } catch (Throwable e) {
+                // Error open DB
+                error = 1;
+                LOGGER.error("Error during startup detected trying to restore backup DataChain...");
+                LOGGER.error(e.getMessage(), e);
+                try {
+                    reCreateDC(inMemoryDC);
+                } catch (Throwable e1) {
+                    LOGGER.error(e1.getMessage(), e1);
+                    stopAndExit(5);
+                }
             }
         }
 
@@ -3111,7 +3113,8 @@ public class Controller extends Observable {
         }
 
         // CHECK IF RECORD VALID
-        if (!transaction.isSignatureValid(DCSet.getInstance()))
+        transaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        if (!transaction.isSignatureValid(DCSet.getInstance(), false))
             return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
 
         // CHECK FOR UPDATES
@@ -3126,7 +3129,8 @@ public class Controller extends Observable {
     public Tuple3<Transaction, Integer, String> checkTransaction(Transaction transaction) {
 
         // CHECK IF RECORD VALID
-        if (!transaction.isSignatureValid(DCSet.getInstance()))
+        transaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        if (!transaction.isSignatureValid(DCSet.getInstance(), false))
             return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
 
         // CHECK FOR UPDATES

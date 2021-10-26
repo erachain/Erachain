@@ -40,21 +40,22 @@ public class TestRecGenesisAsset {
     long key = 0l;
     GenesisIssueAssetTransaction genesisIssueAssetTransaction;
     //CREATE EMPTY MEMORY DATABASE
-    private DCSet db;
+    private DCSet dcSet;
     private GenesisBlock gb;
 
     private void initIssue(boolean toProcess) {
 
         //CREATE EMPTY MEMORY DATABASE
-        db = DCSet.createEmptyDatabaseSet(0);
+        dcSet = DCSet.createEmptyDatabaseSet(0);
 
         //CREATE ASSET
-        asset = GenesisBlock.makeAsset(0);
+        asset = GenesisBlock.makeAsset(1);
         //byte[] rawAsset = asset.toBytes(true); // reference is new byte[64]
         //assertEquals(rawAsset.length, asset.getDataLength());
 
         //CREATE ISSUE ASSET TRANSACTION
         genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(asset);
+        genesisIssueAssetTransaction.setDC(dcSet);
         if (toProcess) {
             genesisIssueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
             key = asset.getKey();
@@ -72,7 +73,7 @@ public class TestRecGenesisAsset {
 
         //genesisIssueAssetTransaction.sign(creator);
         //CHECK IF ISSUE ASSET TRANSACTION IS VALID
-        assertEquals(true, genesisIssueAssetTransaction.isSignatureValid());
+        assertEquals(true, genesisIssueAssetTransaction.isSignatureValid(dcSet));
         assertEquals(Transaction.VALIDATE_OK, genesisIssueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CONVERT TO BYTES
@@ -199,10 +200,10 @@ public class TestRecGenesisAsset {
 
         //CHECK ASSET EXISTS SENDER
         long key = asset.getKey();
-        assertEquals(true, db.getItemAssetMap().contains(key));
+        assertEquals(true, dcSet.getItemAssetMap().contains(key));
 
         //CHECK ASSET IS CORRECT
-        assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(forDeal, true, false), asset.toBytes(forDeal, true, false)));
+        assertEquals(true, Arrays.equals(dcSet.getItemAssetMap().get(key).toBytes(forDeal, true, false), asset.toBytes(forDeal, true, false)));
 
         //CHECK ASSET BALANCE SENDER - null
         //assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).compareTo(new BigDecimal(asset.getQuantity())) == 0);
@@ -223,17 +224,17 @@ public class TestRecGenesisAsset {
         genesisIssueAssetTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
+        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, dcSet));
 
         //CHECK ASSET EXISTS SENDER
-        assertEquals(false, db.getItemAssetMap().contains(key));
+        assertEquals(false, dcSet.getItemAssetMap().contains(key));
 
         //CHECK ASSET BALANCE SENDER
-        assertEquals(0, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.longValue());
+        assertEquals(0, dcSet.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.longValue());
 
         //CHECK REFERENCE SENDER
         // it for not genesis - assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), maker.getLastReference(db)));
-        assertEquals(null, maker.getLastTimestamp(db));
+        assertEquals(null, maker.getLastTimestamp(dcSet));
 
     }
 
@@ -253,7 +254,7 @@ public class TestRecGenesisAsset {
         //assetTransfer.sign(sender);
 
         //CHECK IF ASSET TRANSFER SIGNATURE IS VALID
-        assertEquals(true, assetTransfer.isSignatureValid(db));
+        assertEquals(true, assetTransfer.isSignatureValid(dcSet));
     }
 
     @Test
@@ -273,7 +274,7 @@ public class TestRecGenesisAsset {
         assetTransfer.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE VALID ASSET TRANSFER
-        maker.changeBalance(db, false, false, 1, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
+        maker.changeBalance(dcSet, false, false, 1, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false, false);
         assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CHECK IF ASSET TRANSFER IS VALID
@@ -381,7 +382,7 @@ public class TestRecGenesisAsset {
         //assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
 
         //CHECK BALANCE RECIPIENT
-        assertEquals(amoSend, recipient.getBalanceUSE(key, db));
+        assertEquals(amoSend, recipient.getBalanceUSE(key, dcSet));
 
 		/* not NEED
 		//CHECK REFERENCE SENDER
@@ -389,7 +390,7 @@ public class TestRecGenesisAsset {
 		 */
 
         //CHECK REFERENCE RECIPIENT
-        assertEquals(assetTransfer.getTimestamp(), recipient.getLastTimestamp(db));
+        assertEquals(assetTransfer.getTimestamp(), recipient.getLastTimestamp(dcSet));
     }
 
     @Test
@@ -413,7 +414,7 @@ public class TestRecGenesisAsset {
         //assertEquals(total, maker.getConfirmedBalance(key, db));
 
         //CHECK BALANCE RECIPIENT
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(key, db));
+        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(key, dcSet));
 
 		/* not NEED
 		//CHECK REFERENCE SENDER
@@ -421,7 +422,7 @@ public class TestRecGenesisAsset {
 		 */
 
         //CHECK REFERENCE RECIPIENT
-        assertNotEquals(assetTransfer.getSignature(), recipient.getLastTimestamp(db));
+        assertNotEquals(assetTransfer.getSignature(), recipient.getLastTimestamp(dcSet));
     }
 
     @Test
@@ -484,10 +485,10 @@ public class TestRecGenesisAsset {
         //assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
 
         //CHECK BALANCE RECIPIENT
-        assertEquals(amoSend, recipient.getBalance(db, -key));
-        System.out.println(" 1: " + recipient.getBalance(db, key));
+        assertEquals(amoSend, recipient.getBalance(dcSet, -key));
+        System.out.println(" 1: " + recipient.getBalance(dcSet, key));
 
-        assertEquals(BigDecimal.ZERO.subtract(amoSend), owner.getBalance(db, -key));
+        assertEquals(BigDecimal.ZERO.subtract(amoSend), owner.getBalance(dcSet, -key));
 
 		/* not NEED
 		//CHECK REFERENCE SENDER
@@ -495,7 +496,7 @@ public class TestRecGenesisAsset {
 		 */
 
         //CHECK REFERENCE RECIPIENT
-        assertEquals(assetTransfer.getTimestamp(), recipient.getLastTimestamp(db));
+        assertEquals(assetTransfer.getTimestamp(), recipient.getLastTimestamp(dcSet));
 
         ///////////////////////////
         ////////////////////////////
@@ -505,13 +506,13 @@ public class TestRecGenesisAsset {
         //assertEquals(total, maker.getConfirmedBalance(key, db));
 
         //CHECK BALANCE RECIPIENT
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalance(db, -key));
-        System.out.println(" 1: " + recipient.getBalance(db, key));
+        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalance(dcSet, -key));
+        System.out.println(" 1: " + recipient.getBalance(dcSet, key));
 
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), owner.getBalance(db, key));
+        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), owner.getBalance(dcSet, key));
 
         //CHECK REFERENCE RECIPIENT
-        assertNotEquals(assetTransfer.getSignature(), recipient.getLastTimestamp(db));
+        assertNotEquals(assetTransfer.getSignature(), recipient.getLastTimestamp(dcSet));
     }
 
 

@@ -267,9 +267,9 @@ public class ChangeOrderTransaction extends Transaction {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -346,7 +346,7 @@ public class ChangeOrderTransaction extends Transaction {
         }
 
         return new ChangeOrderTransaction(typeBytes, creator, orderRef, amountWant, feePow, timestamp,
-                reference, signatureBytes, orderID, seqNo, feeLong);
+                flagsTX, signatureBytes, orderID, seqNo, feeLong);
     }
 
     public byte[] toBytes(int forDeal, boolean withSignature) {
@@ -413,7 +413,7 @@ public class ChangeOrderTransaction extends Transaction {
     }
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -471,7 +471,7 @@ public class ChangeOrderTransaction extends Transaction {
             return AMOUNT_SCALE_WRONG;
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
     }
 
     @Override

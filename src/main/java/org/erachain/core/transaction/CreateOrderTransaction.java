@@ -66,8 +66,8 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     private BigDecimal amountWant;
 
     public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, long haveKey, long wantKey,
-                                  BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, exLink, smartContract, feePow, timestamp, reference);
+                                  BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, exLink, smartContract, feePow, timestamp, flags);
         this.haveKey = haveKey;
         this.wantKey = wantKey;
 
@@ -77,17 +77,17 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     }
 
     public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
-                                  BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
+                                  BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, long flags,
                                   byte[] signature) {
-        this(typeBytes, creator, null, null, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
+        this(typeBytes, creator, null, null, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, flags);
         this.signature = signature;
 
     }
 
     public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, long haveKey, long wantKey,
-                                  BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
+                                  BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, long flags,
                                   byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, exLink, smartContract, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
+        this(typeBytes, creator, exLink, smartContract, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, flags);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
@@ -96,15 +96,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     }
 
     public CreateOrderTransaction(PublicKeyAccount creator, long haveKey, long wantKey, BigDecimal amountHave,
-                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference,
+                                  BigDecimal amountWant, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, flags,
                 signature);
     }
 
     public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave,
-                                  BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
+                                  BigDecimal amountWant, byte feePow, long timestamp, long flags) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, null, have, want, amountHave, amountWant, feePow, timestamp,
-                reference);
+                flags);
     }
 
 
@@ -269,9 +269,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -361,7 +361,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         }
 
         return new CreateOrderTransaction(typeBytes, creator, exLink, smartContract, have, want, amountHave, amountWant, feePow, timestamp,
-                reference, signatureBytes, seqNo, feeLong);
+                flagsTX, signatureBytes, seqNo, feeLong);
     }
 
     // @Override
@@ -450,7 +450,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     // VALIDATE
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -536,7 +536,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 && this.creator.getForSale(this.dcSet, haveKey, height, true).compareTo(amountHave) >= 0 // ЭРА|BTC есть на счету
                 && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).signum() >= 0 // и COMPU не отрицательные
         ) { // на балансе компушки не минус
-            flags = flags | NOT_VALIDATE_FLAG_FEE;
+            checkFlags = checkFlags | NOT_VALIDATE_FLAG_FEE;
         } else if (haveKey == FEE_KEY) {
             if (!BlockChain.isFeeEnough(height, creator)
                     && this.creator.getForSale(this.dcSet, FEE_KEY, height, true).compareTo(amountHave.add(this.fee)) < 0) {
@@ -630,7 +630,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             }
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
     }
 
     @Override

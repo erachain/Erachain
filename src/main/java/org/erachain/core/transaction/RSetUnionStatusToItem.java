@@ -169,10 +169,10 @@ public class RSetUnionStatusToItem extends Transaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -248,7 +248,7 @@ public class RSetUnionStatusToItem extends Transaction {
 
         if (forDeal > Transaction.FOR_MYPACK) {
             return new RSetUnionStatusToItem(typeBytes, creator, feePow, key, itemType, itemKey,
-                    beg_date, end_date, timestamp, reference, signature, seqNo, feeLong);
+                    beg_date, end_date, timestamp, flagsTX, signature, seqNo, feeLong);
         } else {
             return new RSetUnionStatusToItem(typeBytes, creator, key, itemType, itemKey,
                     beg_date, end_date, signature);
@@ -361,13 +361,13 @@ public class RSetUnionStatusToItem extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         //CHECK END_DAY

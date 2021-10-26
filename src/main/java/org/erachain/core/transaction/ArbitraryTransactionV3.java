@@ -23,14 +23,14 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
     protected static final int SERVICE_LENGTH = 4;
     private static final int PAYMENTS_SIZE_LENGTH = 4;
     protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + TIMESTAMP_LENGTH
-            + REFERENCE_LENGTH + CREATOR_LENGTH + SERVICE_LENGTH
+            + FLAGS_LENGTH + CREATOR_LENGTH + SERVICE_LENGTH
             + DATA_SIZE_LENGTH + SIGNATURE_LENGTH
             + PAYMENTS_SIZE_LENGTH;
 
     public ArbitraryTransactionV3(byte[] typeBytes,
                                   PublicKeyAccount creator, List<Payment> payments, int service,
-                                  byte[] data, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, creator, feePow, timestamp, reference);
+                                  byte[] data, byte feePow, long timestamp, long flags) {
+        super(typeBytes, creator, feePow, timestamp, flags);
 
         this.creator = creator;
         if (payments == null) {
@@ -44,22 +44,22 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
     public ArbitraryTransactionV3(byte[] typeBytes,
                                   PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
-                                  byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, payments, service, data, feePow, timestamp, reference);
+                                  byte feePow, long timestamp, long flags, byte[] signature) {
+        this(typeBytes, creator, payments, service, data, feePow, timestamp, flags);
         this.signature = signature;
         //this.calcFee();
     }
 
     public ArbitraryTransactionV3(
             PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
-            byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, feePow, timestamp, reference, signature);
+            byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, feePow, timestamp, flags, signature);
     }
 
     public ArbitraryTransactionV3(
             PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,
-            byte feePow, long timestamp, Long reference) {
-        this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, feePow, timestamp, reference);
+            byte feePow, long timestamp, long flags) {
+        this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, feePow, timestamp, flags);
     }
 
     public static Transaction Parse(byte[] data) throws Exception {
@@ -78,11 +78,11 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         long timestamp = Longs.fromByteArray(timestampBytes);
         position += TIMESTAMP_LENGTH;
 
-        // READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position
-                + REFERENCE_LENGTH);
-        long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        // READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position
+                + FLAGS_LENGTH);
+         long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         // READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position
@@ -137,7 +137,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
                 + SIGNATURE_LENGTH);
 
         return new ArbitraryTransactionV3(typeBytes, creator, payments,
-                service, arbitraryData, feePow, timestamp, reference, signatureBytes);
+                service, arbitraryData, feePow, timestamp, flagsTX, signatureBytes);
     }
 
     // PARSE CONVERT
@@ -156,13 +156,10 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
         // WRITE TIMESTAMP
         byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-        timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
         data = Bytes.concat(data, timestampBytes);
 
-        // WRITE REFERENCE
-        byte[] referenceBytes = Longs.toByteArray(this.reference);
-        referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        // WRITE FLAGS
+        data = Bytes.concat(data, Longs.toByteArray(this.extFlags));
 
         // WRITE CREATOR
         data = Bytes.concat(data, this.creator.getPublicKey());
@@ -214,9 +211,9 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != VALIDATE_OK) {
             return result;
         }

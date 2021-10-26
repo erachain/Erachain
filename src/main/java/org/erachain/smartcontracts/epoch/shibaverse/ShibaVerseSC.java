@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.apache.commons.net.util.Base64;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -11,19 +12,27 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SmartContractValues;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
+import org.erachain.smartcontracts.SmartContract;
 import org.erachain.smartcontracts.epoch.EpochSmartContract;
+import org.erachain.smartcontracts.epoch.shibaverse.server.Farm_01;
 import org.erachain.webserver.WebResource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class ShibaVerseSC extends EpochSmartContract {
 
@@ -31,8 +40,30 @@ public class ShibaVerseSC extends EpochSmartContract {
 
     static public final int ID = 1001;
 
+    final public static byte[] HASH = crypto.digest(Longs.toByteArray(ID));
     // 7G6sJRb7vf8ABEr3ENvV1fo1hwt197r35e
     final public static PublicKeyAccount MAKER = new PublicKeyAccount(crypto.digest(Longs.toByteArray(ID)));
+
+    final public static PublicKeyAccount FARM_01_PUBKEY = noncePubKey(HASH, (byte) 1);
+    private static JSONObject farm_01_settings = new JSONObject();
+
+    public static Farm_01 FARM_01_SERVER = null;
+
+    final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
+
+    static {
+        farm_01_settings.put("account", FARM_01_PUBKEY.getAddress());
+
+        if (SmartContract.settingsJSON.containsKey("shiba")) {
+            boolean farm_01 = (boolean) ((JSONObject) SmartContract.settingsJSON.get("shiba")).getOrDefault("farm_01", false);
+            if (false && farm_01)
+                FARM_01_SERVER = new Farm_01(farm_01_settings);
+        }
+
+        accounts.add(MAKER);
+        accounts.add(FARM_01_PUBKEY);
+    }
+
 
     /**
      * admin account
@@ -40,6 +71,11 @@ public class ShibaVerseSC extends EpochSmartContract {
     final static public Account adminAddress = new Account("7C6cEeHw739uQm8PhdnS9yENdLhT8LUERP");
 
     final static public String COMMAND_CATH_COMET = "catch comets";
+    final static public String COMMAND_STAKE = "stake";
+
+    final static public String COMMAND_FARM = "farm";
+    final static public String COMMAND_CHARGE = "charge";
+    final static public String COMMAND_PICK_UP = "pick up";
     /**
      * GRAVUTA KEY
      */
@@ -60,6 +96,37 @@ public class ShibaVerseSC extends EpochSmartContract {
         String out = super.getHTML(langObj) + "<br>";
         return out + Lang.T("Command", langObj) + ": <b>" + (command == null ? "" : command) + "</b><br>"
                 + Lang.T("Status", langObj) + ": <b>" + (status == null ? "" : status) + "</b>";
+    }
+
+    public static ShibaVerseSC make(Transaction transaction) {
+
+        if (transaction.getBlockHeight() == 1609) {
+            boolean debug = true;
+        }
+
+        if (!BlockChain.TEST_MODE || transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
+            return null;
+
+        RSend txSend = (RSend) transaction;
+        Account recipent = txSend.getRecipient();
+        if (!accounts.contains(recipent)) {
+            return null;
+        }
+
+        if (recipent.equals(FARM_01_PUBKEY)) {
+            if (txSend.balancePosition() == Account.BALANCE_POS_DEBT && txSend.hasAmount()) {
+                return new ShibaVerseSC(txSend.isBackward() ? COMMAND_PICK_UP : COMMAND_FARM, "");
+            } else if (txSend.balancePosition() == Account.BALANCE_POS_OWN) {
+                return new ShibaVerseSC(COMMAND_CHARGE, "");
+            }
+        }
+
+        if (txSend.isText() && !txSend.isEncrypted()) {
+            return new ShibaVerseSC(new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase(), "");
+        } else {
+            return new ShibaVerseSC("", "");
+        }
+
     }
 
     private boolean isAdminCommand(Transaction transaction) {
@@ -85,19 +152,83 @@ public class ShibaVerseSC extends EpochSmartContract {
         }
 
         if (COMMAND_CATH_COMET.equals(command)) {
-            if (transaction instanceof RSend) {
+            if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
+                status = "Wrong transaction type. Need SEND";
+            } else {
                 RSend rsend = (RSend) transaction;
-                if (rsend.getAssetKey() == gravitaKey
-                        && rsend.hasAmount() && rsend.getAmount().signum() > 0
-                        && !rsend.isBackward() && rsend.balancePosition() == Account.BALANCE_POS_OWN) {
+                if (rsend.getAssetKey() != gravitaKey) {
+                    status = "Wrong asset key. Need " + gravitaKey;
+                } else if (!rsend.hasAmount() || rsend.getAmount().signum() <= 0) {
+                    status = "Wrong amount. Need > 0";
+                } else if (rsend.isBackward()) {
+                    status = "Wrong direction - backward";
+                } else if (rsend.balancePosition() != Account.BALANCE_POS_OWN) {
+                    status = "Wrong balance position. Need OWN[1]";
+                } else {
                     return true;
                 }
             }
-            status = "error: " + COMMAND_CATH_COMET + " - wrong data";
-            return false;
+
+        } else if (false && COMMAND_STAKE.equals(command)) {
+            if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
+                status = "Wrong transaction type. Need SEND";
+            } else {
+                RSend rsend = (RSend) transaction;
+                if (rsend.getAssetKey() != gravitaKey) {
+                    status = "Wrong asset key. Need " + gravitaKey;
+                } else if (!rsend.hasAmount() || rsend.getAmount().signum() <= 0) {
+                    status = "Wrong amount. Need > 0";
+                } else if (rsend.isBackward()) {
+                    status = "Wrong direction - backward";
+                } else if (rsend.balancePosition() != Account.BALANCE_POS_OWN) {
+                    status = "Wrong balance position. Need [1]OWN";
+                } else {
+                    return true;
+                }
+            }
+        } else if (COMMAND_FARM.equals(command)) {
+            if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
+                status = "Wrong transaction type. Need SEND";
+            } else {
+                RSend rsend = (RSend) transaction;
+                AssetCls asset = dcSet.getItemAssetMap().get(rsend.getAssetKey());
+                if (!asset.getMaker().equals(MAKER)) {
+                    status = "Wrong asset maker. Need " + MAKER.getAddress();
+                } else if (!rsend.hasAmount()) {
+                    status = "Wrong amount. Need > 0";
+                } else if (rsend.isBackward()) {
+                    status = "Wrong direction - backward";
+                } else if (rsend.balancePosition() != Account.BALANCE_POS_DEBT) {
+                    status = "Wrong balance position. Need [2]DEBT";
+                } else {
+                    return true;
+                }
+            }
+        } else if (COMMAND_PICK_UP.equals(command)) {
+            if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
+                status = "Wrong transaction type. Need SEND";
+            } else {
+                RSend rsend = (RSend) transaction;
+                AssetCls asset = dcSet.getItemAssetMap().get(rsend.getAssetKey());
+                if (!asset.getMaker().equals(MAKER)) {
+                    status = "Wrong asset maker. Need " + MAKER.getAddress();
+                } else if (!rsend.hasAmount()) {
+                    status = "Wrong amount. Need > 0";
+                } else if (!rsend.isBackward()) {
+                    status = "Wrong direction. Need BACKWARD";
+                } else if (rsend.balancePosition() != Account.BALANCE_POS_DEBT) {
+                    status = "Wrong balance position. Need [2]DEBT";
+                } else {
+                    return true;
+                }
+            }
+        } else if (COMMAND_CHARGE.equals(command)) {
+            return true;
+        } else {
+            status = "Unknown command";
         }
 
-        status = "error: unknown command";
+        status = "error: " + command + " - " + status;
         return false;
 
     }
@@ -313,8 +444,84 @@ public class ShibaVerseSC extends EpochSmartContract {
 
     }
 
+    private void stakeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+    }
+
+    // CHARGE all from FARM 01
+    private void farmChargeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        SmartContractValues mapValues = dcSet.getSmartContractValues();
+        Tuple2<Integer, String> farmKeyValue;
+        BigDecimal farmedValue;
+        try (IteratorCloseable iterator = mapValues.getIterator()) {
+            while (iterator.hasNext()) {
+                Object key = iterator.next();
+                farmKeyValue = new Tuple2<>(ID, "farm1" + key.toString());
+                farmedValue = (BigDecimal) mapValues.get(farmKeyValue);
+            }
+        } catch (IOException e) {
+        }
+
+    }
+
+    private void farmAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        if (commandTX.isBackward()) {
+            // WITHDRAW
+            farmChargeAction(dcSet, block, commandTX, asOrphan);
+        } else {
+            // DEPOSITE
+
+        }
+    }
+
+    private static void farm(DCSet dcSet, Block block, boolean asOrphan) {
+        CreditAddressesMap map = dcSet.getCredit_AddressesMap();
+        SmartContractValues mapValues = dcSet.getSmartContractValues();
+        Fun.Tuple3<String, Long, String> key;
+        BigDecimal credit;
+        Tuple2<Integer, String> farmKeyValue;
+        BigDecimal farmedValue;
+        HashMap<String, BigDecimal> results = new HashMap<>();
+        try (IteratorCloseable<Fun.Tuple3<String, Long, String>> iterator = map.getDebitorsIterator(FARM_01_PUBKEY.getAddress())) {
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                credit = map.get(key);
+                if (credit.signum() < 1)
+                    continue;
+
+                farmKeyValue = new Tuple2<>(ID, "farm1" + key.a);
+                farmedValue = (BigDecimal) mapValues.get(farmKeyValue);
+                if (farmedValue.signum() > 0) {
+                    // not charged yet
+                    continue;
+                }
+
+                if (key.b == 1048579L || key.b == 1048587) {
+                    farmedValue = results.get(key.a);
+                    if (farmedValue == null)
+                        farmedValue = BigDecimal.ZERO;
+
+                    farmedValue = farmedValue.add(BigDecimal.ONE);
+                    results.put(key.a, farmedValue);
+                }
+            }
+        } catch (IOException e) {
+        }
+
+        // SAVE RESULTS
+        for (String address : results.keySet()) {
+            farmKeyValue = new Tuple2<>(ID, "farm1" + address);
+            mapValues.put(farmKeyValue, results.get(address));
+        }
+
+
+    }
 
     //////// PROCESSES
+    public static void blockAction(DCSet dcSet, Block block, boolean asOrphan) {
+        if (true && block.heightBlock % 100 == 0) {
+            farm(dcSet, block, asOrphan);
+        }
+    }
 
     private void init(DCSet dcSet, RSend commandTX, Account admin, boolean asOrphan) {
 
@@ -386,6 +593,10 @@ public class ShibaVerseSC extends EpochSmartContract {
                     dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
                     status = "wait";
                     return false;
+                } else if (COMMAND_STAKE.equals(command)) {
+                    stakeAction(dcSet, block, (RSend) transaction, false);
+                } else if (COMMAND_FARM.equals(command) || COMMAND_PICK_UP.equals(command)) {
+                    farmAction(dcSet, block, (RSend) transaction, false);
                 }
             }
         }
@@ -429,6 +640,8 @@ public class ShibaVerseSC extends EpochSmartContract {
             // отмена рождения комет
             dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
             return false;
+        } else if (COMMAND_STAKE.equals(command)) {
+            farmAction(dcSet, null, (RSend) transaction, true);
         }
 
         return false;

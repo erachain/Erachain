@@ -30,11 +30,6 @@ public class TestTemplateAsPack {
 
     int forDeal = Transaction.FOR_NETWORK;
 
-    //Long Transaction.FOR_PACK = null;
-
-    //boolean asPack = true;
-    int asPack = Transaction.FOR_PACK;
-
     boolean includeReference = false;
     long FEE_KEY = 1l;
     byte FEE_POWER = (byte) 1;
@@ -85,15 +80,17 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         Transaction issueTemplateTransaction = new IssueTemplateRecord(maker, template);
-        issueTemplateTransaction.sign(maker, asPack);
+        issueTemplateTransaction.sign(maker, forDeal);
 
         //CHECK IF ISSUE PLATE TRANSACTION IS VALID
+        issueTemplateTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, issueTemplateTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
         issueTemplateTransaction = new IssueTemplateRecord(maker, template, new byte[64]);
 
         //CHECK IF ISSUE PLATE IS INVALID
+        issueTemplateTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, issueTemplateTransaction.isSignatureValid(db));
     }
 
@@ -110,42 +107,42 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
-        issueTemplateRecord.sign(maker, asPack);
-        issueTemplateRecord.process(gb, asPack);
+        issueTemplateRecord.sign(maker, forDeal);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1, true);
+        issueTemplateRecord.process(gb, forDeal);
 
         //CONVERT TO BYTES
         byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(asPack, true));
+        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(forDeal, true));
 
+        IssueTemplateRecord parsedIssueTemplateTransaction = null;
         try {
             //PARSE FROM BYTES
-            IssueTemplateRecord parsedIssueTemplateTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueTemplateTransaction, Transaction.FOR_PACK);
-            LOGGER.info("parsedIssueTemplateTransaction: " + parsedIssueTemplateTransaction);
-
-            //CHECK INSTANCE
-            assertEquals(true, parsedIssueTemplateTransaction instanceof IssueTemplateRecord);
-
-            //CHECK SIGNATURE
-            assertEquals(true, Arrays.equals(issueTemplateRecord.getSignature(), parsedIssueTemplateTransaction.getSignature()));
-
-            //CHECK ISSUER
-            assertEquals(issueTemplateRecord.getCreator().getAddress(), parsedIssueTemplateTransaction.getCreator().getAddress());
-
-            //CHECK OWNER
-            assertEquals(issueTemplateRecord.getItem().getMaker().getAddress(), parsedIssueTemplateTransaction.getItem().getMaker().getAddress());
-
-            //CHECK NAME
-            assertEquals(issueTemplateRecord.getItem().getName(), parsedIssueTemplateTransaction.getItem().getName());
-
-            //CHECK DESCRIPTION
-            assertEquals(issueTemplateRecord.getItem().getDescription(), parsedIssueTemplateTransaction.getItem().getDescription());
-
+            parsedIssueTemplateTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueTemplateTransaction, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             fail("Exception while parsing transaction. " + e);
         }
+
+
+        //CHECK INSTANCE
+        assertEquals(true, parsedIssueTemplateTransaction instanceof IssueTemplateRecord);
+
+        //CHECK SIGNATURE
+        assertEquals(true, Arrays.equals(issueTemplateRecord.getSignature(), parsedIssueTemplateTransaction.getSignature()));
+
+        //CHECK ISSUER
+        assertEquals(issueTemplateRecord.getCreator().getAddress(), parsedIssueTemplateTransaction.getCreator().getAddress());
+
+        //CHECK OWNER
+        assertEquals(issueTemplateRecord.getItem().getMaker().getAddress(), parsedIssueTemplateTransaction.getItem().getMaker().getAddress());
+
+        //CHECK NAME
+        assertEquals(issueTemplateRecord.getItem().getName(), parsedIssueTemplateTransaction.getItem().getName());
+
+        //CHECK DESCRIPTION
+        assertEquals(issueTemplateRecord.getItem().getDescription(), parsedIssueTemplateTransaction.getItem().getDescription());
 
     }
 
@@ -160,12 +157,13 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
-        issueTemplateRecord.sign(maker, asPack);
+        issueTemplateRecord.sign(maker, forDeal);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1, false);
 
         assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_PACK, txFlags));
         Long makerReference = maker.getLastTimestamp(db)[0];
-        issueTemplateRecord.process(gb, asPack);
+        issueTemplateRecord.process(gb, forDeal);
+        //makerReference = maker.getLastTimestamp(db)[0];
 
         LOGGER.info("template KEY: " + template.getKey());
 
@@ -175,13 +173,14 @@ public class TestTemplateAsPack {
 
         TemplateCls template_2 = new Template(itemAppData, maker, "test132_2", icon, image, "2_12345678910strontje");
         IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2);
-        issueTemplateTransaction_2.sign(maker, asPack);
-        issueTemplateTransaction_2.process(gb, asPack);
+        issueTemplateTransaction_2.sign(maker, forDeal);
+        issueTemplateTransaction_2.setDC(db, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        issueTemplateTransaction_2.process(gb, forDeal);
         LOGGER.info("template_2 KEY: " + template_2.getKey());
-        issueTemplateTransaction_2.orphan(gb, asPack);
+        issueTemplateTransaction_2.orphan(gb, forDeal);
         ItemTemplateMap templateMap = db.getItemTemplateMap();
         int mapSize = templateMap.size();
-        assertEquals(0, mapSize - 4);
+        assertEquals(1048573, mapSize - 4);
 
         //CHECK PLATE IS CORRECT
         assertEquals(true, Arrays.equals(db.getItemTemplateMap().get(key).toBytes(forDeal, includeReference, false), template.toBytes(forDeal, includeReference, false)));
@@ -201,13 +200,13 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, 1, 1, true);
-        issueTemplateRecord.sign(maker, asPack);
-        issueTemplateRecord.process(gb, asPack);
+        issueTemplateRecord.sign(maker, forDeal);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1, true);
+        issueTemplateRecord.process(gb, forDeal);
         long key = issueTemplateRecord.key;
         assertEquals((long) makerReference, (long) maker.getLastTimestamp(db)[0]);
 
-        issueTemplateRecord.orphan(gb, asPack);
+        issueTemplateRecord.orphan(gb, forDeal);
 
         //CHECK PLATE EXISTS SENDER
         assertEquals(false, db.getItemTemplateMap().contains(key));

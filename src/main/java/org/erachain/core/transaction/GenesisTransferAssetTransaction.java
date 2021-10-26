@@ -145,38 +145,19 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
             updateFromStateDB();
     }
 
-    @Override
-    public BigDecimal getAmount(String address) {
-        BigDecimal amount = BigDecimal.ZERO;
-
-        if (address.equals(this.recipient.getAddress())) {
-            //IF RECIPIENT
-            amount = amount.add(this.amount);
-        }
-
-        return amount;
-    }
 
     @Override
     public BigDecimal getAmount(Account account) {
-        String address = account.getAddress();
-        return getAmount(address);
+        if (recipient.equals(account)) {
+            return amount;
+        }
+
+        return BigDecimal.ZERO;
     }
 
     @Override
     public String viewAmount() {
         return NumberAsString.formatAsString(this.amount);
-    }
-
-    @Override
-    public String viewAmount(Account account) {
-        String address = account.getAddress();
-        return NumberAsString.formatAsString(getAmount(address));
-    }
-
-    @Override
-    public String viewAmount(String address) {
-        return NumberAsString.formatAsString(getAmount(address));
     }
 
     @Override
@@ -241,7 +222,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         //CHECK IF RECIPIENT IS VALID ADDRESS
         if (!"1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3".equals(this.recipient.getAddress())) {
@@ -279,7 +260,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         this.recipient.changeBalance(this.dcSet, false, false, key, this.amount,
                 false, false, false);
 
-        //UPDATE REFERENCE OF RECIPIENT
+        //UPDATE TIMESTAMP OF RECIPIENT
         this.recipient.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
 
         if (this.getAbsKey() == Transaction.RIGHTS_KEY) {

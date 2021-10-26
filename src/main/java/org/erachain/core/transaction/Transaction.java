@@ -239,14 +239,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int ITEM_PERSON_OWNER_SIGNATURE_INVALID = 258;
     public static final int ITEM_PERSON_MUST_BE_SIGNED = 259;
 
-    // NAMES
-    public static final int NAME_DOES_NOT_EXIST = 5060;
-    public static final int NAME_ALREADY_REGISTRED = 5061;
-    public static final int NAME_ALREADY_ON_SALE = 5062;
-    public static final int NAME_NOT_FOR_SALE = 5063;
-    public static final int BUYER_ALREADY_OWNER = 5064;
-    public static final int NAME_NOT_LOWER_CASE = 5065;
-    public static final int NAME_WITH_SPACE = 5066;
+    public static final int INVALID_PACKET_SIZE = 310;
 
     public static final int CREATOR_NOT_MAKER = 366;
     public static final int CREATOR_NOT_OWNER = 367;
@@ -288,6 +281,15 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int TELEGRAM_DOES_NOT_EXIST = 541;
     public static final int NOT_YET_RELEASED = 599;
     public static final int AT_ERROR = 600; // END error for org.erachain.api.ApiErrorFactory.ERROR
+
+    // NAMES
+    public static final int NAME_DOES_NOT_EXIST = 5060;
+    public static final int NAME_ALREADY_REGISTRED = 5061;
+    public static final int NAME_ALREADY_ON_SALE = 5062;
+    public static final int NAME_NOT_FOR_SALE = 5063;
+    public static final int BUYER_ALREADY_OWNER = 5064;
+    public static final int NAME_NOT_LOWER_CASE = 5065;
+    public static final int NAME_WITH_SPACE = 5066;
 
     // 
     // TYPES *******
@@ -354,7 +356,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int TIMESTAMP_LENGTH = 8;
     public static final int SEQ_NO_LENGTH = 8;
 
-    public static final int REFERENCE_LENGTH = TIMESTAMP_LENGTH;
+    public static final int FLAGS_LENGTH = TIMESTAMP_LENGTH;
 
     public static final int KEY_LENGTH = 8;
     public static final int SIGNATURE_LENGTH = Crypto.SIGNATURE_LENGTH;
@@ -378,7 +380,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected static final int BASE_LENGTH_AS_MYPACK = TYPE_LENGTH;
     protected static final int BASE_LENGTH_AS_PACK = BASE_LENGTH_AS_MYPACK + TIMESTAMP_LENGTH
             + CREATOR_LENGTH + SIGNATURE_LENGTH;
-    protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH;
+    protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + FLAGS_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + TIMESTAMP_LENGTH + FEE_LENGTH;
 
     /**
@@ -396,7 +398,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected DCSet dcSet;
     protected String TYPE_NAME = "unknown";
 
-    /////////   MASKS amd PARS
+    /////////   MASKS and PARS
     public static final byte HAS_EXLINK_MASK = 32;
     public static final byte HAS_SMART_CONTRACT_MASK = 16;
     /**
@@ -408,17 +410,23 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected int seqNo;
     protected long dbRef; // height + SeqNo
 
-    // TODO REMOVE REFERENCE - use TIMESTAMP as reference
-    protected Long reference = 0L;
+    /**
+     * external flags of transaction. If FLAGS is USED need to set SINB BIT - use
+     */
+    protected long extFlags = 0L;
+    public static final long FLAGS_USED_MASK = Long.MIN_VALUE;
+
+
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
+
     /**
-     * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
+     * Если еще и комиссия + сжигание с перечисляемого актива - то не НУЛЬ. Актив - берем из транзакции
      */
-    public BigDecimal assetFee = null;
+    public Tuple2<BigDecimal, BigDecimal> assetFEE = null;
     /**
-     * Если еще и комиссия с перечисляемого актива - то не НУЛЬ
+     * Список с активом внутри - комиссия и сколько сожгли при этом
      */
-    public BigDecimal assetFeeBurn = null;
+    public HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> assetsPacketFEE = null;
 
     // transactions
     protected byte feePow = 0;
@@ -450,20 +458,24 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, long timestamp,
-                          Long reference) {
+                          long extFlags) {
         this.typeBytes = typeBytes;
         this.TYPE_NAME = type_name;
         this.creator = creator;
         if (exLink != null) {
-            typeBytes[2] = (byte) (typeBytes[2] | HAS_EXLINK_MASK);
+            typeBytes[2] |= HAS_EXLINK_MASK;
             this.exLink = exLink;
+        } else {
+            typeBytes[2] &= ~HAS_EXLINK_MASK;
         }
 
+        // NOT NEED HERE setup - typeBytes[2] | HAS_SMART_CONTRACT_MASK()
         this.smartContract = smartContract;
 
-        // this.props = props;
         this.timestamp = timestamp;
-        this.reference = reference;
+
+        this.extFlags = extFlags;
+
         if (feePow < 0)
             feePow = 0;
         else if (feePow > BlockChain.FEE_POW_MAX)
@@ -471,11 +483,14 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.feePow = feePow;
     }
 
+    /*
     protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, byte feePow, long timestamp,
-                          Long reference, byte[] signature) {
-        this(typeBytes, type_name, creator, exLink, null, feePow, timestamp, reference);
+                          long flags, byte[] signature) {
+        this(typeBytes, type_name, creator, exLink, null, feePow, timestamp, flags);
         this.signature = signature;
     }
+
+     */
 
     public static int getVersion(byte[] typeBytes) {
         return Byte.toUnsignedInt(typeBytes[1]);
@@ -616,6 +631,21 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.dbRef = makeDBRef(height, seqNo);
         this.height = height;
         this.seqNo = seqNo;
+    }
+
+    /**
+     * need for sign
+     *
+     * @param dcSet
+     */
+    public void setHeightOrLast(DCSet dcSet) {
+
+        if (this.height > 0)
+            return;
+
+        height = dcSet.getBlocksHeadsMap().size() + 1;
+        this.seqNo = 1;
+        this.dbRef = makeDBRef(height, seqNo);
     }
 
     public void setErrorValue(String value) {
@@ -881,18 +911,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return BigDecimal.ZERO;
     }
 
-    public BigDecimal getAmount(String account) {
-        return BigDecimal.ZERO;
-    }
-
-    public BigDecimal getFee(String address) {
-
-        if (this.creator != null)
-            if (this.creator.getAddress().equals(address))
-                return this.fee;
-        return BigDecimal.ZERO;
-    }
-
     public BigDecimal getFee(Account account) {
         if (this.creator != null)
             if (this.creator.getAddress().equals(account))
@@ -1029,8 +1047,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return this.signature;
     }
 
-    public long getReference() {
-        return this.reference;
+    public long getExtFlags() {
+        return this.extFlags;
     }
 
     public List<byte[]> getOtherSignatures() {
@@ -1419,7 +1437,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public String viewAmount(Account account) {
-        return account == null ? "" : viewAmount(account.getAddress());
+        return "";
     }
 
     public String viewAmount(String address) {
@@ -1835,11 +1853,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             data = Bytes.concat(data, timestampBytes);
         }
 
-        // WRITE REFERENCE - in any case as Pack or not - NOW it reserved FLAGS
-        if (this.reference != null) {
-            // NULL in imprints
-            byte[] referenceBytes = Longs.toByteArray(this.reference);
-            data = Bytes.concat(data, referenceBytes);
+        if (typeBytes[0] != ISSUE_IMPRINT_TRANSACTION) {
+            byte[] flagsBytes = Longs.toByteArray(this.extFlags);
+            data = Bytes.concat(data, flagsBytes);
         }
 
         // WRITE CREATOR
@@ -1851,7 +1867,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if (smartContract != null) {
             if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                typeBytes[2] = (byte) (typeBytes[2] | HAS_SMART_CONTRACT_MASK());
+                typeBytes[2] |= HAS_SMART_CONTRACT_MASK();
                 data = Bytes.concat(data, smartContract.toBytes(forDeal));
             } else {
                 typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
@@ -1866,8 +1882,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         // SIGNATURE
-        if (withSignature)
+        if (withSignature) {
+            assert (this.signature.length == 64);
             data = Bytes.concat(data, this.signature);
+        }
 
         if (forDeal == FOR_DB_RECORD) {
             // WRITE DBREF
@@ -1933,29 +1951,35 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return BlockChain.isWiped(this.signature);
     }
 
-    public boolean isSignatureValid(DCSet dcSet) {
+    public boolean isSignatureValid(DCSet dcSet, boolean asTelegram) {
 
         if (this.signature == null || this.signature.length != Crypto.SIGNATURE_LENGTH
                 || Arrays.equals(this.signature, new byte[Crypto.SIGNATURE_LENGTH]))
             return false;
+
+        if (!asTelegram && BlockChain.SKIP_INVALID_SIGN_BEFORE > 0) {
+            if (height == 0) {
+                // can not be checked!
+                return false;
+            } else if (height < BlockChain.SKIP_INVALID_SIGN_BEFORE) {
+                return true;
+            }
+        }
 
         // validation with reference - not as a pack in toBytes - in any case!
         byte[] data = this.toBytes(FOR_NETWORK, false);
         if (data == null)
             return false;
 
-        int height = getBlockHeightByParentOrLast(dcSet);
-        if (height < BlockChain.SKIP_VALID_SIGN_BEFORE) {
-            return true;
-        }
-
-        // for skip NOT VALID SIGNs
-        for (byte[] valid_item : BlockChain.VALID_SIGN) {
-            if (Arrays.equals(signature, valid_item)) {
-                if (dcSet.getTransactionFinalMapSigns().contains(signature))
-                    return false;
-                else
-                    return true;
+        if (!asTelegram) {
+            // for skip NOT VALID SIGNs
+            for (byte[] valid_item : BlockChain.VALID_SIGN) {
+                if (Arrays.equals(signature, valid_item)) {
+                    if (dcSet.getTransactionFinalMapSigns().contains(signature))
+                        return false;
+                    else
+                        return true;
+                }
             }
         }
 
@@ -1969,6 +1993,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         if (!Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data)) {
+            if (asTelegram)
+                return false;
+
             boolean wrong = true;
             for (byte[] item : BlockChain.DISCREDIR_ADDRESSES) {
                 if (Arrays.equals(this.creator.getPublicKey(), item)
@@ -1990,13 +2017,17 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return true;
     }
 
+    public boolean isSignatureValid(DCSet dcSet) {
+        return isSignatureValid(dcSet, false);
+    }
+
     /**
-     *  flags
-     *   = 1 - not check fee
-     *   = 2 - not check person
-     *   = 4 - not check PublicText
+     * flags
+     * = 1 - not check fee
+     * = 2 - not check person
+     * = 4 - not check PublicText
      */
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -2008,7 +2039,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             return INVALID_FLAGS;
         }
 
-        // CHECK IF REFERENCE IS OK
+        // CHECK IF REFERENCE TIMESTAMP IS OK
         //Long reference = forDeal == null ? this.creator.getLastTimestamp(dcSet) : forDeal;
         if (forDeal > Transaction.FOR_MYPACK && height > BlockChain.ALL_BALANCES_OK_TO) {
             if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
@@ -2037,7 +2068,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
                         && height > BlockChain.VERS_4_11
                 ) {
                     if (BlockChain.TEST_DB == 0) {
-                        errorValue = "INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
+                        errorValue = "INVALID TIME!!! REF TIMESTAMP: " + DateTimeFormat.timestamptoString(reference[0])
                                 + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
                                 + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height);
                         if (BlockChain.CHECK_BUGS > 2)
@@ -2053,20 +2084,23 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             return INVALID_ADDRESS;
         }
 
-        int height = this.getBlockHeightByParentOrLast(dcSet);
+        if (false) {
+            // TODO remove see
+            int height = this.getBlockHeightByParentOrLast(dcSet);
+        }
         //if (height <= 0 || height > 1000)
         //    return INVALID_TIMESTAMP;
 
         // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
         // CHECK IF CREATOR HAS ENOUGH FEE MONEY
-        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0L
+        if ((checkFlags & NOT_VALIDATE_FLAG_FEE) == 0L
                 && height > BlockChain.ALL_BALANCES_OK_TO
                 && !BlockChain.isFeeEnough(height, creator)
                 && this.creator.getForFee(dcSet).compareTo(this.fee) < 0) {
             return NOT_ENOUGH_FEE;
         }
 
-        if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0L
+        if ((checkFlags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0L
                 && this.hasPublicText()
                 && !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
                 && !this.creator.isPerson(dcSet, height)) {
@@ -2075,7 +2109,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         if (false &&  // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
-                (flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+                (checkFlags & NOT_VALIDATE_KEY_COLLISION) == 0l
                 && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
                 && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили
                 && this.signature != null
@@ -2592,10 +2626,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void process(Block block, int forDeal) {
-        if (BlockChain.CHECK_BUGS > 2 && (height == 6460 || height == 6469)) {
-            boolean debug = true;
-        }
-
         processHead(block, forDeal);
         processBody(block, forDeal);
         processTail(block, forDeal);
@@ -2678,10 +2708,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void orphan(Block block, int forDeal) {
-        if (BlockChain.CHECK_BUGS > 2 && (height == 6460 || height == 6469)) {
-            boolean debug = true;
-        }
-
         orphanHead(block, forDeal);
         orphanBody(block, forDeal);
         orphanTail(block, forDeal);
@@ -2723,8 +2749,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             return true;
 
         if (this.getType() == Transaction.CALCULATED_TRANSACTION) {
-            // USE referenced transaction
-            return db.getTransactionFinalMap().contains(this.reference);
+            return true;
         }
 
         return db.getTransactionFinalMapSigns().contains(this.getSignature());

@@ -544,7 +544,7 @@ public class TelegramManager extends Thread {
             return Transaction.INVALID_CREATOR;
         }
 
-        if(!transaction.isSignatureValid(DCSet.getInstance())) {
+        if (!transaction.isSignatureValid(null, true)) {
             return Transaction.INVALID_SIGNATURE;
         }
 

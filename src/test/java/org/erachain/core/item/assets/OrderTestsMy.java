@@ -880,6 +880,7 @@ public class OrderTestsMy {
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
 
                 // CHECK IF ORDER CREATION SIGNATURE IS VALID
+                orderCreation.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
                 assertEquals(true, orderCreation.isSignatureValid(dcSet));
 
                 // INVALID SIGNATURE
@@ -887,6 +888,7 @@ public class OrderTestsMy {
                         BigDecimal.valueOf(1), (byte) 0, timestamp, 0L, new byte[64]);
 
                 // CHECK IF ORDER CREATION SIGNATURE IS INVALID
+                orderCreation.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
                 assertEquals(false, orderCreation.isSignatureValid(dcSet));
             } finally {
                 dcSet.close();
@@ -3540,6 +3542,7 @@ public class OrderTestsMy {
                         0L);
                 cancelOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
                 // CHECK IF ORDER CANCEL IS VALID
+                cancelOrderTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
                 assertEquals(true, cancelOrderTransaction.isSignatureValid(dcSet));
 
                 // INVALID SIGNATURE
@@ -3547,6 +3550,7 @@ public class OrderTestsMy {
                         new byte[1]);
 
                 // CHECK IF ORDER CANCEL
+                cancelOrderTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
                 assertEquals(false, cancelOrderTransaction.isSignatureValid(dcSet));
             } finally {
                 dcSet.close();
