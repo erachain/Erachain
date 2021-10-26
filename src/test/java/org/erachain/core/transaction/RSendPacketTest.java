@@ -156,6 +156,8 @@ public class RSendPacketTest {
         BigDecimal balMaker2 = maker.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b;
         BigDecimal balRecipient1 = recipient.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b;
         BigDecimal balRecipient2 = recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b;
+
+        ///////////////// PROCESS
         rSend.processBody(block, Transaction.FOR_NETWORK);
 
         BigDecimal tax1result = Objects.requireNonNull(TransactionAmount.calcSendTAX((Long) packet[0][0], (AssetCls) packet[0][7], (BigDecimal) packet[0][1])).a;
@@ -175,6 +177,28 @@ public class RSendPacketTest {
                 maker.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
         assertEquals(balRecipient2.add((BigDecimal) packet[1][1]), recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
 
+
+        ///////////////// ORPHAN
+        /// TAKE FORN DB
+        rSend = (RSend) rSend.copy();
+        rSend.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        rSend.orphan(block, Transaction.FOR_NETWORK);
+
+        assertEquals(balMaker1.stripTrailingZeros(),
+                maker.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b.stripTrailingZeros());
+        assertEquals(balRecipient1.stripTrailingZeros(), recipient.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b.stripTrailingZeros());
+
+        assertEquals(balMaker2.stripTrailingZeros(),
+                maker.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b.stripTrailingZeros());
+        assertEquals(balRecipient2.stripTrailingZeros(), recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b.stripTrailingZeros());
+
+
+        /// TAXES
+        tax1TXresult = rSend.assetsPacketFEE.get((AssetCls) packet[0][7]).a;
+        tax2TXresult = rSend.assetsPacketFEE.get((AssetCls) packet[1][7]).a;
+
+        assertEquals(tax1result, tax1TXresult);
+        assertEquals(tax2result, tax2TXresult);
 
     }
 

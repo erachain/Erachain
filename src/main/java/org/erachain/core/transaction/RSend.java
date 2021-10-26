@@ -381,7 +381,7 @@ public class RSend extends TransactionAmount {
             Object[] row;
             byte[] memoBytes;
             for (int count = 0; count < packetSize; count++) {
-                row = new Object[7];
+                row = new Object[8];
                 packet[count] = row;
 
                 // READ KEY
