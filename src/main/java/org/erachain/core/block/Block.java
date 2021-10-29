@@ -1807,7 +1807,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             boolean hasValidatedForkDB = validatedForkDB != null;
             close();
             if (hasValidatedForkDB && BlockChain.CHECK_BUGS > 9) {
-                LOGGER.debug("validatedForkDB is FINALIZED: " + this.toString());
+                LOGGER.debug("validatedForkDB is FINALIZED: " + this);
             }
         }
 
@@ -1943,9 +1943,6 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
     public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
 
-        if (BlockChain.CHECK_BUGS > 2 && heightBlock == 23972) {
-            boolean debug = true;
-        }
         if (BlockChain.TEST_MODE) {
             // EMITTE
             if (earnedAllAssets == null)
@@ -1953,25 +1950,23 @@ public class Block implements Closeable, ExplorerJsonLine {
 
             BigDecimal emite = BigDecimal.ONE;
             addAssetFee(BlockChain.ERA_ASSET, emite, null);
+
             BlockChain.ERA_ASSET.getMaker().changeBalance(dcSet, !asOrphan, false,
                     AssetCls.ERA_KEY, emite, false, false, false);
 
         }
 
-        if (false) {
-            /// все трнзакции уже обработаны и комисси по считаны ранее
-            if (transactionCount > 0) {
-                // подсчет наград с ПЕРЕВОДОВ
-                for (Transaction transaction : getTransactions()) {
-                    if (transaction.assetFEE != null)
-                        addAssetFee(transaction.getAsset(), transaction.assetFEE.a, transaction.assetFEE.b);
+        if (transactionCount > 0) {
+            // подсчет наград с ПЕРЕВОДОВ
+            for (Transaction transaction : getTransactions()) {
+                if (transaction.assetFEE != null)
+                    addAssetFee(transaction.getAsset(), transaction.assetFEE.a, transaction.assetFEE.b);
 
-                    if (transaction.assetsPacketFEE != null) {
-                        Tuple2<BigDecimal, BigDecimal> rowTAX;
-                        for (AssetCls asset : transaction.assetsPacketFEE.keySet()) {
-                            rowTAX = transaction.assetsPacketFEE.get(asset);
-                            addAssetFee(asset, rowTAX.a, rowTAX.b);
-                        }
+                if (transaction.assetsPacketFEE != null && !transaction.assetsPacketFEE.isEmpty()) {
+                    Tuple2<BigDecimal, BigDecimal> rowTAX;
+                    for (AssetCls asset : transaction.assetsPacketFEE.keySet()) {
+                        rowTAX = transaction.assetsPacketFEE.get(asset);
+                        addAssetFee(asset, rowTAX.a, rowTAX.b);
                     }
                 }
             }
@@ -2265,11 +2260,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
             compareCOMPUbals(dcSet, this.heightBlock - 1, "before PROCESS");
-        }
-
-        // for DEBUG
-        if (BlockChain.CHECK_BUGS > 2 && this.heightBlock == 97815) {
-            boolean debug = true;
         }
 
         //PROCESS TRANSACTIONS

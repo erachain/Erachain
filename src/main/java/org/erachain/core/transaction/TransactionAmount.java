@@ -814,11 +814,6 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                                             boolean backward, BigDecimal fee, BigDecimal assetFee,
                                                             boolean creatorIsPerson, long checkFlags, long timestamp) {
 
-        // for DEBUG
-        if (BlockChain.CHECK_BUGS > 2 && height == 97815) {
-            boolean debug = true;
-        }
-
         boolean wrong;
 
         if (!asset.isActive(timestamp)) {
@@ -1466,7 +1461,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             if (assetFEE == null) {
                 assetFee = null;
             } else
-                assetFee = assetFEE.b;
+                assetFee = assetFEE.a;
 
             Fun.Tuple2<Integer, String> result = isValidAction(dcSet, height, creator, signature, key, asset, amount, recipient,
                     isBackward(), fee, assetFee, isPerson, checkFlags, timestamp);
