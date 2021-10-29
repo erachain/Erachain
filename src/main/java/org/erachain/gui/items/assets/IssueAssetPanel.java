@@ -184,6 +184,8 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
         if (asset.getDEXAwards() != null) {
             out += Lang.T("DEX Awards" + ":");
             for (ExLinkAddress award : asset.getDEXAwards()) {
+                if (award == null)
+                    continue;
                 out += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
                         + (award.getMemo() == null || award.getMemo().isEmpty() ? "" : " - " + award.getMemo());
             }
