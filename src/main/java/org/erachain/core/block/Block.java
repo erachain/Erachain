@@ -1943,6 +1943,9 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
     public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
 
+        if (BlockChain.CHECK_BUGS > 2 && heightBlock == 23211) {
+            boolean debug = true;
+        }
         if (BlockChain.TEST_MODE) {
             // EMITTE
             if (earnedAllAssets == null)
@@ -1955,17 +1958,20 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         }
 
-        if (transactionCount > 0) {
-            // подсчет наград с ПЕРЕВОДОВ
-            for (Transaction transaction : getTransactions()) {
-                if (transaction.assetFEE != null)
-                    addAssetFee(transaction.getAsset(), transaction.assetFEE.a, transaction.assetFEE.b);
+        if (false) {
+            /// все трнзакции уже обработаны и комисси по считаны ранее
+            if (transactionCount > 0) {
+                // подсчет наград с ПЕРЕВОДОВ
+                for (Transaction transaction : getTransactions()) {
+                    if (transaction.assetFEE != null)
+                        addAssetFee(transaction.getAsset(), transaction.assetFEE.a, transaction.assetFEE.b);
 
-                if (transaction.assetsPacketFEE != null) {
-                    Tuple2<BigDecimal, BigDecimal> rowTAX;
-                    for (AssetCls asset : transaction.assetsPacketFEE.keySet()) {
-                        rowTAX = transaction.assetsPacketFEE.get(asset);
-                        addAssetFee(asset, rowTAX.a, rowTAX.b);
+                    if (transaction.assetsPacketFEE != null) {
+                        Tuple2<BigDecimal, BigDecimal> rowTAX;
+                        for (AssetCls asset : transaction.assetsPacketFEE.keySet()) {
+                            rowTAX = transaction.assetsPacketFEE.get(asset);
+                            addAssetFee(asset, rowTAX.a, rowTAX.b);
+                        }
                     }
                 }
             }
