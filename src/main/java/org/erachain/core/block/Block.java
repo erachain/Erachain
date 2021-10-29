@@ -1943,7 +1943,7 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
     public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
 
-        if (BlockChain.CHECK_BUGS > 2 && heightBlock == 23211) {
+        if (BlockChain.CHECK_BUGS > 2 && heightBlock == 23972) {
             boolean debug = true;
         }
         if (BlockChain.TEST_MODE) {
@@ -2268,7 +2268,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         // for DEBUG
-        if (this.heightBlock == 97815) {
+        if (BlockChain.CHECK_BUGS > 2 && this.heightBlock == 97815) {
             boolean debug = true;
         }
 

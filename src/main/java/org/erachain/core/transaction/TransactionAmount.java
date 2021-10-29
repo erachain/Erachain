@@ -814,6 +814,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                                             boolean backward, BigDecimal fee, BigDecimal assetFee,
                                                             boolean creatorIsPerson, long checkFlags, long timestamp) {
 
+        // for DEBUG
+        if (BlockChain.CHECK_BUGS > 2 && height == 97815) {
+            boolean debug = true;
+        }
+
         boolean wrong;
 
         if (!asset.isActive(timestamp)) {
