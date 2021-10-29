@@ -1487,7 +1487,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (transaction instanceof GenesisRecord) {
             transaction.setDC((DCSet) databaseSet, Transaction.FOR_PACK, seqNo.a, seqNo.b, false);
         } else {
-            // need for calc FEE
+            // need for calc FEE in orphan and block explorer
             transaction.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, seqNo.a, seqNo.b, false);
         }
 
