@@ -1549,8 +1549,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static String viewAssetFee(AssetCls asset, BigDecimal tax, BigDecimal minFee, BigDecimal result) {
 
         String text = result.stripTrailingZeros().toPlainString() + "[" + asset.viewName() + "] ("
-                + Lang.T("Tax # комиссия") + ": " + tax.stripTrailingZeros().toPlainString()
-                + "%, min: " + minFee.stripTrailingZeros().toPlainString() + ")";
+                + " *" + tax.stripTrailingZeros().toPlainString()
+                + "%, min: " + minFee.stripTrailingZeros().toPlainString() + " )";
         return text;
     }
 

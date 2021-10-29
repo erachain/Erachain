@@ -2,6 +2,7 @@ package org.erachain.core.blockexplorer;
 
 import org.apache.commons.net.util.Base64;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
@@ -208,7 +209,18 @@ public class WebTransactionsHTML {
                         + transaction.getCreator().getPersonAsString() + "</a>";
                 out += "<br><b>" + Lang.T("Public Key", langObj) + ": </b><a href=?address="
                         + tras_json.get("publickey") + get_Lang() + ">" + tras_json.get("publickey") + "</a>";
-                out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + tras_json.get("fee");
+                out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + transaction.getFee().toPlainString();
+
+                if (transaction.assetFEE != null && transaction.assetFEE.a.signum() != 0) {
+                    AssetCls asset = transaction.getAsset();
+                    if (asset == null) {
+                        asset = Controller.getInstance().getAsset(transaction.getAbsKey());
+                    }
+                    Fun.Tuple2<BigDecimal, BigDecimal> taxes = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(asset.getKey());
+
+                    out += "<br>" + Lang.T("Additional Asset FEE", langObj) + ": ";
+                    out += Transaction.viewAssetFee(asset, taxes.a, taxes.b, transaction.assetFEE.a);
+                }
             }
             if (transaction.isWiped()) {
                 out += "<BR><b>" + Lang.T("WIPED", langObj) + ": </b>" + "true";
