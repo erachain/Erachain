@@ -243,6 +243,39 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             }
         });
 
+        jTextField_Amount.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                try {
+                    amount = new BigDecimal(jTextField_Amount.getText());
+                } catch (Exception exc) {
+                    amount = null;
+                }
+                checkReadyToOK();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                try {
+                    amount = new BigDecimal(jTextField_Amount.getText());
+                } catch (Exception exc) {
+                    amount = null;
+                }
+                checkReadyToOK();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                try {
+                    amount = new BigDecimal(jTextField_Amount.getText());
+                } catch (Exception exc) {
+                    amount = null;
+                }
+                checkReadyToOK();
+            }
+        });
+
+
         jButton_ok.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -276,6 +309,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         } else {
             jTextField_Amount.setVisible(false);
             jLabel_Amount.setVisible(false);
+            jLabel_Amount.setText("1"); // for check
         }
 
         if (recipient != null) {
@@ -283,11 +317,12 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         }
 
         refreshLabels();
+
     }
 
     protected void checkReadyToOK() {
 
-        if (creator == null || recipient == null || asset == null) {
+        if (creator == null || recipient == null || asset == null || amount == null || amount.signum() == 0) {
             jButton_ok.setEnabled(false);
             return;
         }
