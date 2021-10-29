@@ -701,7 +701,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.seqNo = seqNo;
         this.dbRef = Transaction.makeDBRef(height, seqNo);
         if (forDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
-            this.calcFee(true);
+            calcFee(true);
 
         if (andUpdateFromState && !isWiped())
             updateFromStateDB();

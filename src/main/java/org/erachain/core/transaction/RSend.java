@@ -136,13 +136,14 @@ public class RSend extends TransactionAmount {
     }
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
-                 int action, long key, Object[][] packet, String title, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
+                 int balancePos, long key, Object[][] packet, String title, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
                  long flags, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, exLink, smartContract, feePow, recipient, action, key, packet, title, data, isText, encrypted, timestamp, flags);
+        this(typeBytes, creator, exLink, smartContract, feePow, recipient, balancePos, key, packet, title, data, isText, encrypted, timestamp, flags);
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+
+        //this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient, long key,
@@ -152,7 +153,8 @@ public class RSend extends TransactionAmount {
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+
+        //this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
 
@@ -328,7 +330,7 @@ public class RSend extends TransactionAmount {
         long key = 0;
         BigDecimal amount;
         Object[][] packet;
-        int action = 0;
+        int balancePos = 0;
 
         if ((typeBytes[2] & NO_AMOUNT_MASK) == 0) {
             // IF here is AMOUNT
@@ -371,15 +373,15 @@ public class RSend extends TransactionAmount {
             // READ AMOUNT
             byte[] packetSizeBytes = Arrays.copyOfRange(data, position, position + Integer.BYTES);
             position += Integer.BYTES;
-            action = packetSizeBytes[1];
-            packetSizeBytes[1] = 0; // clear ACTION
+            balancePos = packetSizeBytes[1];
+            packetSizeBytes[1] = 0; // clear balancePos
             int packetSize = Ints.fromByteArray(packetSizeBytes);
 
             packet = new Object[packetSize][];
             Object[] row;
             byte[] memoBytes;
             for (int count = 0; count < packetSize; count++) {
-                row = new Object[7];
+                row = new Object[8];
                 packet[count] = row;
 
                 // READ KEY
@@ -455,7 +457,7 @@ public class RSend extends TransactionAmount {
                 return new RSend(typeBytes, creator, exLink, smartContract, feePow, recipient, key, amount, title, arbitraryData, isTextByte,
                         encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
             else
-                return new RSend(typeBytes, creator, exLink, smartContract, feePow, recipient, action, key, packet, title, arbitraryData, isTextByte,
+                return new RSend(typeBytes, creator, exLink, smartContract, feePow, recipient, balancePos, key, packet, title, arbitraryData, isTextByte,
                         encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new RSend(typeBytes, creator, exLink, smartContract, recipient, key, amount, title, arbitraryData, isTextByte,
