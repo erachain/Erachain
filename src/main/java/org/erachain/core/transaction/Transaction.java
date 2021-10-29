@@ -1495,7 +1495,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         AssetCls asset = Controller.getInstance().getAsset(Settings.getInstance().getCompuRateAsset());
         if (asset == null)
-            asset = Controller.getInstance().getAsset(840L); // ISO-USD
+            asset = Controller.getInstance().getAsset(95); // ISO-USD
 
         if (asset == null)
             asset = Controller.getInstance().getAsset(1L); // ERA
@@ -1531,6 +1531,26 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             }
         }
 
+        if (assetFEE != null && assetFEE.a.signum() != 0) {
+            /// ASSET FEE
+            asset = this.getAsset();
+            if (asset == null) {
+                asset = Controller.getInstance().getAsset(getAbsKey());
+            }
+
+            text += "<br>" + Lang.T("Additional Asset FEE") + ": ";
+            Tuple2<BigDecimal, BigDecimal> taxes = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(asset.getKey());
+            text += viewAssetFee(asset, taxes.a, taxes.b, assetFEE.a);
+        }
+
+        return text;
+    }
+
+    public static String viewAssetFee(AssetCls asset, BigDecimal tax, BigDecimal minFee, BigDecimal result) {
+
+        String text = result.stripTrailingZeros().toPlainString() + "[" + asset.viewName() + "] ("
+                + Lang.T("Tax # комиссия") + ": " + tax.stripTrailingZeros().toPlainString()
+                + "%, min: " + minFee.stripTrailingZeros().toPlainString() + ")";
         return text;
     }
 
