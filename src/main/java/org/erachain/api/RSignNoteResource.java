@@ -358,12 +358,11 @@ public class RSignNoteResource {
             }
 
             // CREATE TX MESSAGE
-            byte version = (byte) 3;
             byte property1 = (byte) 0;
             byte property2 = (byte) 0;
             long key = 0L; // not need for 3 version
 
-            RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2,
+            RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(RSignNote.CURRENT_VERS, property1, property2,
                     privateKeyAccount, feePow, key, exDataBytes);
 
             int validate = cntr.getTransactionCreator().afterCreate(issueDoc, Transaction.FOR_NETWORK, tryFree, test);

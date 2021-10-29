@@ -38,6 +38,8 @@ import java.util.*;
  */
 public class RSignNote extends Transaction implements Itemable {
 
+    public static final byte CURRENT_VERS = 3;
+
     protected static final byte HAS_TEMPLATE_MASK = (byte) (1 << 7);
     protected static final byte HAS_DATA_MASK = (byte) (1 << 7);
     protected static final byte HAS_DB_DATA_MASK = (byte) 1;
@@ -83,13 +85,13 @@ public class RSignNote extends Transaction implements Itemable {
     }
 
     public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, long flags, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, dataForDB, timestamp, flags, signature);
+        this(new byte[]{TYPE_ID, CURRENT_VERS, 0, 0}, creator, feePow, templateKey, data, dataForDB, timestamp, flags, signature);
         // set props
         this.setTypeBytes();
     }
 
     public RSignNote(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] dataForDB, long timestamp, long flags) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, dataForDB, timestamp, flags);
+        this(new byte[]{TYPE_ID, CURRENT_VERS, 0, 0}, creator, feePow, templateKey, data, dataForDB, timestamp, flags);
         // set props
         this.setTypeBytes();
     }
