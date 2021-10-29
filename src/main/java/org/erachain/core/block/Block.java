@@ -1948,11 +1948,11 @@ public class Block implements Closeable, ExplorerJsonLine {
             if (earnedAllAssets == null)
                 earnedAllAssets = new HashMap<>();
 
-            BigDecimal emite = BigDecimal.ONE;
-            addAssetFee(BlockChain.ERA_ASSET, emite, null);
+            BigDecimal emitted = BigDecimal.ONE;
+            addAssetFee(BlockChain.ERA_ASSET, emitted, null);
 
             BlockChain.ERA_ASSET.getMaker().changeBalance(dcSet, !asOrphan, false,
-                    AssetCls.ERA_KEY, emite, false, false, false);
+                    AssetCls.ERA_KEY, emitted, false, false, false);
 
         }
 
