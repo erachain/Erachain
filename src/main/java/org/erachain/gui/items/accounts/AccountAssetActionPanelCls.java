@@ -169,6 +169,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                 jLabel_Balances.setVisible(!jCheckBox_AssetsPackage.isSelected());
 
                 assetsPackagePanel.setVisible(jCheckBox_AssetsPackage.isSelected());
+
+                checkReadyToOK();
+
             }
         });
 
@@ -340,7 +343,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     protected void checkReadyToOK() {
 
-        if (creator == null || recipient == null || asset == null || amount == null || amount.signum() == 0) {
+        if (creator == null || recipient == null ||
+                !jCheckBox_AssetsPackage.isSelected() && (asset == null || amount == null || amount.signum() == 0)) {
             jButton_ok.setEnabled(false);
             return;
         }
@@ -398,14 +402,16 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                 asset.viewAssetTypeTarget(backward, action, recipientIsOwner) + " " + "Account") + ":");
         this.jLabelRecipientDetail.setText(Lang.T("Account Details") + ":");
 
-        // set scale
-        if (asset instanceof AssetVenture) {
-            jTextField_Amount.setScale(asset.getScale());
-            jTextField_Amount.setVisible(true);
-            jLabel_Amount.setVisible(true);
-        } else {
-            jTextField_Amount.setVisible(false);
-            jLabel_Amount.setVisible(false);
+        if (!jCheckBox_AssetsPackage.isSelected()) {
+            // set scale
+            if (asset instanceof AssetVenture) {
+                jTextField_Amount.setScale(asset.getScale());
+                jTextField_Amount.setVisible(true);
+                jLabel_Amount.setVisible(true);
+            } else {
+                jTextField_Amount.setVisible(false);
+                jLabel_Amount.setVisible(false);
+            }
         }
 
         if (showAssetForm) {
@@ -667,9 +673,20 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         if (!cheskError()) return;
 
         // CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send(RSend.CURRENT_VERS, backward ? TransactionAmount.BACKWARD_MASK : 0,
+        Transaction transaction;
+        Object[][] assetsPackage;
+        int actionPackage;
+        if (jCheckBox_AssetsPackage.isSelected()) {
+            actionPackage = assetsPackagePanel.jComboBoxAction.getSelectedIndex() + 1;
+            assetsPackage = assetsPackagePanel.assetsTableModel.getRows();
+        } else {
+            assetsPackage = null;
+            actionPackage = 0;
+        }
+
+        transaction = Controller.getInstance().r_Send(RSend.CURRENT_VERS, backward ? TransactionAmount.BACKWARD_MASK : 0,
                 (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator), exLink, smartContract, feePow,
-                recipient, getAssetKey(), getAmount(), txTitle, messageBytes, isTextByte, encrypted);
+                recipient, getAssetKey(), getAmount(), actionPackage, assetsPackage, txTitle, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(null, true, transaction,

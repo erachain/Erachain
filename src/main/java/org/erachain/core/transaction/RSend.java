@@ -167,11 +167,17 @@ public class RSend extends TransactionAmount {
         this.signature = signature;
     }
 
-    // FOR BACKWARDS - CONFISCATE CREDIT
     public RSend(byte version, byte property1, byte property2, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow,
                  Account recipient, long key, BigDecimal amount, String title, byte[] data, byte[] isText, byte[] encrypted,
                  long timestamp, long flags) {
         this(new byte[]{TYPE_ID, version, property1, property2}, creator, exLink, smartContract, feePow, recipient, key, amount, title, data,
+                isText, encrypted, timestamp, flags);
+    }
+
+    public RSend(byte version, byte property1, byte property2, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow,
+                 Account recipient, int actionPackage, long key, Object[][] assetsPackage, String title, byte[] data, byte[] isText, byte[] encrypted,
+                 long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, version, property1, property2}, creator, exLink, smartContract, feePow, recipient, actionPackage, key, assetsPackage, title, data,
                 isText, encrypted, timestamp, flags);
     }
 

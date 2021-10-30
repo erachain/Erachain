@@ -3674,10 +3674,11 @@ public class Controller extends Observable {
 
     public Transaction r_Send(byte version, byte property1, byte property2,
                               PrivateKeyAccount sender, ExLink linkTo, SmartContract smartContract, int feePow,
-                              Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
+                              Account recipient, long key, BigDecimal amount, int actionPackage, Object[][] assetsPackage, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, linkTo, smartContract, feePow,
+            return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount,
+                    actionPackage, assetsPackage, linkTo, smartContract, feePow,
                     title, message, isText, encryptMessage);
         }
     }

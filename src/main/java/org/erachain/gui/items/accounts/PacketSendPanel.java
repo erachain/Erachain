@@ -4,7 +4,9 @@ package org.erachain.gui.items.accounts;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.models.RenderComboBoxViewBalance;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -20,8 +22,9 @@ public class PacketSendPanel extends JPanel {
     private final MTable jTableAssets;
     private JScrollPane jScrollPaneAssets;
     private JButton jButtonRemoveAsset;
-    private GridBagConstraints gridBagConstraints;
+    private GridBagConstraints gridBC;
     public JCheckBox defaultCheck;
+    public JComboBox<Integer> jComboBoxAction;
 
     public PacketSendPanel() {
 
@@ -31,6 +34,16 @@ public class PacketSendPanel extends JPanel {
 
         jScrollPaneAssets = new JScrollPane();
         jButtonRemoveAsset = new JButton();
+
+        jComboBoxAction = new JComboBox<>();
+        jComboBoxAction.setModel(new DefaultComboBoxModel(new Integer[]{
+                TransactionAmount.ACTION_SEND,
+                TransactionAmount.ACTION_DEBT,
+                TransactionAmount.ACTION_HOLD,
+                TransactionAmount.ACTION_SPEND,
+                TransactionAmount.ACTION_PLEDGE,
+        }));
+        jComboBoxAction.setRenderer(new RenderComboBoxViewBalance());
 
         defaultCheck = new JCheckBox();
 
@@ -93,25 +106,33 @@ public class PacketSendPanel extends JPanel {
         columnAsset.setWidth(170);
         columnAsset.sizeWidthToFit();
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        ++gridBagConstraints.gridy;
-        gridBagConstraints.gridwidth = 9;
-        gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 0.2;
-        this.add(jScrollPaneAssets, gridBagConstraints);
+        int gridy = 0;
+        gridBC = new GridBagConstraints();
+        JLabel actionLabel = new JLabel(Lang.T("Action") + ":");
+        gridBC.gridx = 1;
+        this.add(actionLabel, gridBC);
 
-        jButtonRemoveAsset.setText(Lang.T("Remove"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
-        this.add(jButtonRemoveAsset, gridBagConstraints);
+        ++gridBC.gridx;
+        this.add(jComboBoxAction, gridBC);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.insets = new Insets(8, 8, 8, 8);
+        jButtonRemoveAsset.setText(Lang.T("Remove Row"));
+        ++gridBC.gridx;
+        gridBC.insets = new Insets(8, 28, 8, 8);
+        this.add(jButtonRemoveAsset, gridBC);
+
+        gridBC = new GridBagConstraints();
+        gridBC.gridwidth = 9;
+        gridBC.gridheight = 3;
+        gridBC.weightx = 0.2;
+        gridBC.weighty = 0.2;
+        gridBC.gridx = 0;
+        gridBC.fill = GridBagConstraints.BOTH;
+        gridBC.gridy = ++gridy;
+        this.add(jScrollPaneAssets, gridBC);
+
+        gridBC = new GridBagConstraints();
+        gridBC.gridx = 2;
+        gridBC.insets = new Insets(8, 8, 8, 8);
         //this.add(defaultCheck, gridBagConstraints);
 
         //reset();
@@ -232,8 +253,10 @@ public class PacketSendPanel extends JPanel {
 
             Object[][] rows = new Object[getRowCount()][];
             for (int i = 0; i < getRowCount(); i++) {
+                Object[] dataRow = (Object[]) this.getDataVector().get(i);
                 Object[] row = new Object[8];
-                System.arraycopy(this.getDataVector().get(i), 1, row, 0, 7);
+                System.arraycopy(dataRow, ASSET_COL + 1, row, 1, 6);
+                row[0] = dataRow[ASSET_COL - 1];
                 rows[i] = row;
             }
 

@@ -614,7 +614,8 @@ public class TransactionCreator {
 
     public Transaction r_Send(byte version, byte property1, byte property2,
                               PrivateKeyAccount creator,
-                              Account recipient, long key, BigDecimal amount, ExLink linkTo, SmartContract smartContract, int feePow, String title,
+                              Account recipient, long key, BigDecimal amount,
+                              int actionPackage, Object[][] assetsPackage, ExLink linkTo, SmartContract smartContract, int feePow, String title,
                               byte[] message, byte[] isText, byte[] encryptMessage) {
 
         this.checkUpdate();
@@ -624,8 +625,14 @@ public class TransactionCreator {
         long timestamp = NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
-        messageTx = new RSend(version, property1, property2, creator, linkTo, smartContract, (byte) feePow, recipient, key, amount, title,
-                message, isText, encryptMessage, timestamp, 0L);
+        if (assetsPackage == null) {
+            messageTx = new RSend(version, property1, property2, creator, linkTo, smartContract, (byte) feePow, recipient, key, amount, title,
+                    message, isText, encryptMessage, timestamp, 0L);
+        } else {
+            messageTx = new RSend(version, property1, property2, creator, linkTo, smartContract, (byte) feePow, recipient, actionPackage, key, assetsPackage, title,
+                    message, isText, encryptMessage, timestamp, 0L);
+        }
+
         messageTx.sign(creator, Transaction.FOR_NETWORK);
         messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, this.seqNo.incrementAndGet());
 
