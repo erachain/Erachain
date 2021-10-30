@@ -1944,7 +1944,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
 
         if (BlockChain.TEST_MODE) {
-            // EMITTE
+            // EMIT
             if (earnedAllAssets == null)
                 earnedAllAssets = new HashMap<>();
 
