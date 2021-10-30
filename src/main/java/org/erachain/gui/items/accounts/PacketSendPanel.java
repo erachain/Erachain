@@ -1,14 +1,15 @@
-package org.erachain.gui.library;
+package org.erachain.gui.items.accounts;
 
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import javax.validation.constraints.Null;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,8 +22,6 @@ public class PacketSendPanel extends JPanel {
     private JButton jButtonRemoveAsset;
     private GridBagConstraints gridBagConstraints;
     public JCheckBox defaultCheck;
-
-    private static int NO_COL = 0;
 
     public PacketSendPanel() {
 
@@ -72,22 +71,23 @@ public class PacketSendPanel extends JPanel {
 
         assetsTableModel = new TableModel();
         jTableAssets = new MTable(assetsTableModel);
+        //jTableAssets.setDefaultRenderer(Object.class, new RendererRight());
         jScrollPaneAssets.setViewportView(jTableAssets);
-        TableColumn columnNo = jTableAssets.getColumnModel().getColumn(NO_COL);
+        TableColumn columnNo = jTableAssets.getColumnModel().getColumn(TableModel.NO_COL);
         columnNo.setMinWidth(30);
         columnNo.setMaxWidth(70);
         columnNo.setPreferredWidth(50);
         columnNo.setWidth(50);
         columnNo.sizeWidthToFit();
 
-        TableColumn columnKey = jTableAssets.getColumnModel().getColumn(NO_COL + 1);
+        TableColumn columnKey = jTableAssets.getColumnModel().getColumn(TableModel.ASSET_COL - 1);
         columnKey.setMinWidth(40);
         columnKey.setMaxWidth(70);
         columnKey.setPreferredWidth(60);
         columnKey.setWidth(60);
         columnKey.sizeWidthToFit();
 
-        TableColumn columnAsset = jTableAssets.getColumnModel().getColumn(NO_COL + 2);
+        TableColumn columnAsset = jTableAssets.getColumnModel().getColumn(TableModel.ASSET_COL);
         columnAsset.setMinWidth(150);
         columnAsset.setPreferredWidth(200);
         columnAsset.setWidth(170);
@@ -133,32 +133,44 @@ public class PacketSendPanel extends JPanel {
     public
     class TableModel extends DefaultTableModel {
 
+        static final int NO_COL = 0;
+        static final int ASSET_COL = 2;
+        static final int MEMO_COL = 8;
+
         public TableModel() {
             super(new Object[]{Lang.T("No."), Lang.T("Key"), Lang.T("Asset"), Lang.T("Volume"), Lang.T("Price"), Lang.T("Discounted Price"),
-                    Lang.T("Tax") + " %", Lang.T("Fee"), Lang.T("Memo")
+                    Lang.T("Tax # налог") + " %", Lang.T("Fee"), Lang.T("Memo")
             }, 0);
             this.addEmpty();
 
         }
 
         private void addEmpty() {
-            this.addRow(new Object[]{getRowCount() + 1, 2L, "", BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, ""});
+            this.addRow(new Object[]{0, 2L, BlockChain.FEE_ASSET, BigDecimal.ONE, null, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, ""});
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            if (column == NO_COL || column == NO_COL + 2)
+            if (column == NO_COL || column == ASSET_COL)
                 return false;
 
             return true;
         }
 
-        public Class<? extends Object> getColumnClass_(int c) {     // set column type
-            if (c == 1)
-                return AssetCls.class;
+        public Class<? extends Object> getColumnClass(int c) {     // set column type
 
-            Object o = getValueAt(0, c);
-            return o == null ? Null.class : o.getClass();
+            switch (c) {
+                case NO_COL:
+                    return Integer.class;
+                case ASSET_COL - 1:
+                    return Long.class;
+                case ASSET_COL:
+                    return AssetCls.class;
+                case MEMO_COL:
+                    return String.class;
+                default:
+                    return BigDecimal.class;
+            }
         }
 
 
@@ -170,16 +182,6 @@ public class PacketSendPanel extends JPanel {
             if (col == NO_COL)
                 return row + 1;
 
-            if (col == 2) {
-                Object value = super.getValueAt(row, 1);
-                if (value != null) {
-                    try {
-                        return Controller.getInstance().getAsset(Long.parseLong(value.toString()));
-                    } catch (Exception e) {
-                    }
-                }
-            }
-
             return super.getValueAt(row, col);
 
 
@@ -187,6 +189,11 @@ public class PacketSendPanel extends JPanel {
 
         @Override
         public void setValueAt(Object aValue, int row, int column) {
+
+            if (column == ASSET_COL - 1) {
+                Long key = (Long) aValue;
+                super.setValueAt(Controller.getInstance().getAsset(key), row, ASSET_COL);
+            }
 
             super.setValueAt(aValue, row, column);
 
