@@ -24,6 +24,7 @@ import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
+import org.erachain.gui.library.PacketSendPanel;
 import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FavoriteComboBoxModel;
@@ -87,6 +88,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
      */
 
     private AccountsComboBoxModel accountsModel;
+
+    private PacketSendPanel packetTable = new PacketSendPanel();
 
     public AccountAssetActionPanelCls(String panelName, String formTitle, boolean backward, AssetCls assetIn,
                                       int action,
