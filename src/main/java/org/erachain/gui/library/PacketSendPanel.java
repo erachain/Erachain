@@ -1,10 +1,8 @@
 package org.erachain.gui.library;
 
 
-import org.erachain.core.item.ItemCls;
+import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.gui.items.assets.ComboBoxAssetsModel;
-import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -37,7 +35,7 @@ public class PacketSendPanel extends JPanel {
 
         defaultCheck = new JCheckBox();
 
-        defaultCheck.setText(Lang.T("Use Assets Package"));
+        defaultCheck.setText(Lang.T("Standard"));
         defaultCheck.setSelected(true);
 
         defaultCheck.addActionListener(new ActionListener() {
@@ -75,12 +73,25 @@ public class PacketSendPanel extends JPanel {
         assetsTableModel = new TableModel();
         jTableAssets = new MTable(assetsTableModel);
         jScrollPaneAssets.setViewportView(jTableAssets);
-        TableColumn columnNo = jTableAssets.getColumnModel().getColumn(NO_COL + 1);
-        columnNo.setMinWidth(80);
-        columnNo.setMaxWidth(120);
-        columnNo.setPreferredWidth(100);
-        columnNo.setWidth(100);
+        TableColumn columnNo = jTableAssets.getColumnModel().getColumn(NO_COL);
+        columnNo.setMinWidth(30);
+        columnNo.setMaxWidth(70);
+        columnNo.setPreferredWidth(50);
+        columnNo.setWidth(50);
         columnNo.sizeWidthToFit();
+
+        TableColumn columnKey = jTableAssets.getColumnModel().getColumn(NO_COL + 1);
+        columnKey.setMinWidth(40);
+        columnKey.setMaxWidth(70);
+        columnKey.setPreferredWidth(60);
+        columnKey.setWidth(60);
+        columnKey.sizeWidthToFit();
+
+        TableColumn columnAsset = jTableAssets.getColumnModel().getColumn(NO_COL + 2);
+        columnAsset.setMinWidth(150);
+        columnAsset.setPreferredWidth(200);
+        columnAsset.setWidth(170);
+        columnAsset.sizeWidthToFit();
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -103,7 +114,9 @@ public class PacketSendPanel extends JPanel {
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
         //this.add(defaultCheck, gridBagConstraints);
 
-        reset();
+        //reset();
+        this.setMinimumSize(new Dimension(0, 160));
+
 
     }
 
@@ -121,7 +134,7 @@ public class PacketSendPanel extends JPanel {
     class TableModel extends DefaultTableModel {
 
         public TableModel() {
-            super(new Object[]{Lang.T("#"), Lang.T("Asset"), Lang.T("Volume"), Lang.T("Price"), Lang.T("Disconted Price"),
+            super(new Object[]{Lang.T("No."), Lang.T("Key"), Lang.T("Asset"), Lang.T("Volume"), Lang.T("Price"), Lang.T("Discounted Price"),
                     Lang.T("Tax") + " %", Lang.T("Fee"), Lang.T("Memo")
             }, 0);
             this.addEmpty();
@@ -129,21 +142,21 @@ public class PacketSendPanel extends JPanel {
         }
 
         private void addEmpty() {
-            JComboBox<ItemCls> jComboBox_Asset = new JComboBox<>();
-            jComboBox_Asset.setModel(new ComboBoxAssetsModel(AssetCls.FEE_KEY));
-            jComboBox_Asset.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
-
-            this.addRow(new Object[]{getRowCount() + 1, jComboBox_Asset, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, ""});
+            this.addRow(new Object[]{getRowCount() + 1, 2L, "", BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, ""});
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            if (column != NO_COL)
-                return true;
-            return false;
+            if (column == NO_COL || column == NO_COL + 2)
+                return false;
+
+            return true;
         }
 
-        public Class<? extends Object> getColumnClass(int c) {     // set column type
+        public Class<? extends Object> getColumnClass_(int c) {     // set column type
+            if (c == 1)
+                return AssetCls.class;
+
             Object o = getValueAt(0, c);
             return o == null ? Null.class : o.getClass();
         }
@@ -153,6 +166,19 @@ public class PacketSendPanel extends JPanel {
 
             if (this.getRowCount() < row || this.getRowCount() == 0)
                 return null;
+
+            if (col == NO_COL)
+                return row + 1;
+
+            if (col == 2) {
+                Object value = super.getValueAt(row, 1);
+                if (value != null) {
+                    try {
+                        return Controller.getInstance().getAsset(Long.parseLong(value.toString()));
+                    } catch (Exception e) {
+                    }
+                }
+            }
 
             return super.getValueAt(row, col);
 

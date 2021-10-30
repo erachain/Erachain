@@ -89,7 +89,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     private AccountsComboBoxModel accountsModel;
 
-    private PacketSendPanel packetTable = new PacketSendPanel();
+    private PacketSendPanel assetsPackagePanel = new PacketSendPanel();
 
     public AccountAssetActionPanelCls(String panelName, String formTitle, boolean backward, AssetCls assetIn,
                                       int action,
@@ -169,7 +169,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                 jTextField_Amount.setVisible(!jCheckBox_AssetsPackage.isSelected());
                 jLabel_Balances.setVisible(!jCheckBox_AssetsPackage.isSelected());
 
-                packetTable.setVisible(jCheckBox_AssetsPackage.isSelected());
+                assetsPackagePanel.setVisible(jCheckBox_AssetsPackage.isSelected());
             }
         });
 
@@ -838,7 +838,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         gridBagConstraints.insets = fieldGBC.insets;
         add(jLabel_Balances, gridBagConstraints);
 
-        add(packetTable, labelGBC);
+        assetsPackagePanel.setVisible(false);
+        add(assetsPackagePanel, fieldGBC);
 
         labelGBC.gridy = ++gridy;
         add(jLabel_Fee, labelGBC);
