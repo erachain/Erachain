@@ -1,13 +1,11 @@
 package org.erachain.gui.library;
 
 
-import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Crypto;
-import org.erachain.core.exdata.exLink.ExLinkAddress;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.assets.AssetType;
+import org.erachain.gui.items.assets.ComboBoxAssetsModel;
+import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -16,7 +14,7 @@ import javax.validation.constraints.Null;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 
 public class PacketSendPanel extends JPanel {
     public final TableModel assetsTableModel;
@@ -26,19 +24,13 @@ public class PacketSendPanel extends JPanel {
     private GridBagConstraints gridBagConstraints;
     public JCheckBox defaultCheck;
 
-    protected JComboBox<Account> ownerComboBox;
-    protected JComboBox<AssetType> assetTypeJComboBox;
-
-    private static int DESCR_COL = 1;
+    private static int NO_COL = 0;
 
     public PacketSendPanel() {
 
         super();
 
         this.setName(Lang.T("Assets Package"));
-
-        this.ownerComboBox = ownerComboBox;
-        this.assetTypeJComboBox = assetTypeJComboBox;
 
         jScrollPaneAssets = new JScrollPane();
         jButtonRemoveAsset = new JButton();
@@ -80,10 +72,10 @@ public class PacketSendPanel extends JPanel {
         });
         this.setLayout(new GridBagLayout());
 
-        assetsTableModel = new TableModel(0);
+        assetsTableModel = new TableModel();
         jTableAssets = new MTable(assetsTableModel);
         jScrollPaneAssets.setViewportView(jTableAssets);
-        TableColumn columnNo = jTableAssets.getColumnModel().getColumn(DESCR_COL + 1);
+        TableColumn columnNo = jTableAssets.getColumnModel().getColumn(NO_COL + 1);
         columnNo.setMinWidth(80);
         columnNo.setMaxWidth(120);
         columnNo.setPreferredWidth(100);
@@ -109,7 +101,7 @@ public class PacketSendPanel extends JPanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.insets = new Insets(8, 8, 8, 8);
-        this.add(defaultCheck, gridBagConstraints);
+        //this.add(defaultCheck, gridBagConstraints);
 
         reset();
 
@@ -120,16 +112,6 @@ public class PacketSendPanel extends JPanel {
         jButtonRemoveAsset.setVisible(!defaultCheck.isSelected());
         this.setMinimumSize(new Dimension(0, !defaultCheck.isSelected() ? 130 : 30));
 
-        if (!defaultCheck.isSelected()) {
-            ExLinkAddress[] items = AssetCls.getDefaultDEXAwards(((AssetType) assetTypeJComboBox.getSelectedItem()).getId(),
-                    (Account) ownerComboBox.getSelectedItem());
-            if (items == null) {
-                assetsTableModel.clearRows(true);
-            } else {
-                assetsTableModel.setRows(items);
-            }
-        }
-
     }
 
     // table model class
@@ -138,22 +120,25 @@ public class PacketSendPanel extends JPanel {
     public
     class TableModel extends DefaultTableModel {
 
-        public TableModel(int rows) {
-            super(new Object[]{Lang.T("Address"), Lang.T("Information"), Lang.T("Royalty") + " %",
-                            Lang.T("Memo")
-                    },
-                    rows);
+        public TableModel() {
+            super(new Object[]{Lang.T("#"), Lang.T("Asset"), Lang.T("Volume"), Lang.T("Price"), Lang.T("Disconted Price"),
+                    Lang.T("Tax") + " %", Lang.T("Fee"), Lang.T("Memo")
+            }, 0);
             this.addEmpty();
 
         }
 
         private void addEmpty() {
-            this.addRow(new Object[]{"", "", 1.000d, ""});
+            JComboBox<ItemCls> jComboBox_Asset = new JComboBox<>();
+            jComboBox_Asset.setModel(new ComboBoxAssetsModel(AssetCls.FEE_KEY));
+            jComboBox_Asset.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
+
+            this.addRow(new Object[]{getRowCount() + 1, jComboBox_Asset, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, ""});
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            if (column != DESCR_COL)
+            if (column != NO_COL)
                 return true;
             return false;
         }
@@ -166,7 +151,8 @@ public class PacketSendPanel extends JPanel {
 
         public Object getValueAt(int row, int col) {
 
-            if (this.getRowCount() < row || this.getRowCount() == 0) return null;
+            if (this.getRowCount() < row || this.getRowCount() == 0)
+                return null;
 
             return super.getValueAt(row, col);
 
@@ -175,44 +161,20 @@ public class PacketSendPanel extends JPanel {
 
         @Override
         public void setValueAt(Object aValue, int row, int column) {
-            //IF STRING
-            if (aValue instanceof String) {
-                //CHECK IF NOT EMPTY
-                String address = (String) aValue;
-                if (!address.isEmpty()) {
-                    //CHECK IF LAST ROW
-                    if (row == this.getRowCount() - 1) {
-                        this.addEmpty();
-                    }
 
-                    Fun.Tuple2<Account, String> result = Account.tryMakeAccount(address);
-                    if (result.a == null) {
-                        super.setValueAt(Lang.T(result.b), row, DESCR_COL);
-                    } else {
-                        super.setValueAt(
-                                Lang.T(Account.getDetailsForEncrypt(address, AssetCls.FEE_KEY, false, true)),
-                                row, DESCR_COL);
-                    }
+            super.setValueAt(aValue, row, column);
 
-                    super.setValueAt(aValue, row, column);
-                }
-            } else {
-                super.setValueAt(aValue, row, column);
-
-                //CHECK IF LAST ROW
-                if (row == this.getRowCount() - 1) {
-                    this.addEmpty();
-                }
+            //CHECK IF LAST ROW
+            if (row == this.getRowCount() - 1) {
+                this.addEmpty();
             }
         }
 
-        public void setRows(ExLinkAddress[] items) {
+        public void setRows(Object[][] items) {
             clearRows(false);
 
             for (int i = 0; i < items.length; ++i) {
-                addRow(new Object[]{items[i].getAccount().getAddress(),
-                        Lang.T(Account.getDetailsForEncrypt(items[i].getAccount().getAddress(), AssetCls.FEE_KEY, false, true)),
-                        items[i].getValue1() / 1000d, items[i].getMemo()});
+                addRow(items[i]);
             }
             addEmpty();
         }
@@ -227,27 +189,22 @@ public class PacketSendPanel extends JPanel {
 
         }
 
-        public ExLinkAddress[] getRows() {
+        /**
+         * 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
+         */
+
+        public Object[][] getRows() {
             if (defaultCheck.isSelected())
                 return null;
 
-            ArrayList<ExLinkAddress> list = new ArrayList<>();
+            Object[][] rows = new Object[getRowCount()][];
             for (int i = 0; i < getRowCount(); i++) {
-                String address = (String) this.getValueAt(i, 0);
-                if (address == null || address.isEmpty())
-                    continue;
-                try {
-                    //ORDINARY ASSET
-                    if (Crypto.getInstance().isValidAddress(address)) {
-                        list.add(new ExLinkAddress(new Account(address),
-                                (int) ((double) this.getValueAt(i, 2) * 1000.0d),
-                                (String) this.getValueAt(i, 3)));
-                    }
-                } catch (Exception e) {
-                }
+                Object[] row = new Object[8];
+                System.arraycopy(this.getDataVector().get(i), 1, row, 0, 7);
+                rows[i] = row;
             }
 
-            return list.toArray(new ExLinkAddress[0]);
+            return rows;
         }
 
     }

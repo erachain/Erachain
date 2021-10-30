@@ -159,6 +159,21 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jComboBox_Asset.setEditable(false);
         //this.jComboBox_Asset.setEnabled(assetIn != null);
 
+        jCheckBox_AssetsPackage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jLabel_Asset.setVisible(!jCheckBox_AssetsPackage.isSelected());
+                jComboBox_Asset.setVisible(!jCheckBox_AssetsPackage.isSelected());
+                jLabel_AssetType.setVisible(!jCheckBox_AssetsPackage.isSelected());
+                jLabel_Amount.setVisible(!jCheckBox_AssetsPackage.isSelected());
+                jTextField_Amount.setVisible(!jCheckBox_AssetsPackage.isSelected());
+                jLabel_Balances.setVisible(!jCheckBox_AssetsPackage.isSelected());
+
+                packetTable.setVisible(jCheckBox_AssetsPackage.isSelected());
+            }
+        });
+
+
         exLinkDescription.setEditable(false);
         exLinkText.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -292,6 +307,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.jCheckBox_Encrypt.setSelected(true);
         this.jCheckBox_isText.setText(Lang.T("As Text"));
         this.jCheckBox_isText.setSelected(true);
+        this.jCheckBox_AssetsPackage.setText(Lang.T("Assets Package"));
         this.jLabel_Asset.setText(Lang.T("Asset") + ":");
         this.jLabel_Amount.setText(Lang.T("Amount") + ":");
 
@@ -694,6 +710,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jTextArea_Message = new javax.swing.JTextArea();
         jCheckBox_Encrypt = new javax.swing.JCheckBox();
         jCheckBox_isText = new javax.swing.JCheckBox();
+        jCheckBox_AssetsPackage = new javax.swing.JCheckBox();
         jLabel_Asset = new javax.swing.JLabel();
         jLabel_AssetType = new javax.swing.JLabel();
         jComboBox_Asset = new javax.swing.JComboBox<>();
@@ -706,6 +723,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea_Account_Description = new javax.swing.JTextArea();
+
+        final JCheckBox assetsPackage = new JCheckBox(Lang.T("Assets Package"));
 
         exLinkTextLabel = new JLabel(Lang.T("Append to") + ":");
         exLinkText = new JTextField();
@@ -789,6 +808,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         fieldGBC.gridy = ++gridy;
         add(jCheckBox_isText, fieldGBC);
 
+        fieldGBC.gridy = ++gridy;
+        add(jCheckBox_AssetsPackage, fieldGBC);
+
         labelGBC.gridy = ++gridy;
         add(jLabel_Asset, labelGBC);
         fieldGBC.gridy = gridy;
@@ -815,6 +837,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         gridBagConstraints.gridy = gridy;
         gridBagConstraints.insets = fieldGBC.insets;
         add(jLabel_Balances, gridBagConstraints);
+
+        add(packetTable, labelGBC);
 
         labelGBC.gridy = ++gridy;
         add(jLabel_Fee, labelGBC);
@@ -910,5 +934,6 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     public JLabel exLinkTextLabel;
     public JLabel exLinkDescriptionLabel;
 
+    public JCheckBox jCheckBox_AssetsPackage;
 
 }
