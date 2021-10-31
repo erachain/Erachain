@@ -540,10 +540,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public String viewActionType() {
-        if (amount == null || amount.signum() == 0)
+        if (hasAmount()) {
+            if (hasPacket()) {
+                return Account.balancePositionName(balancePosition())
+                        + (isBackward() ? " backward" : "");
+            }
+
+            return asset.viewAssetTypeAction(isBackward(), balancePosition(), creator == null ? false : asset.getMaker().equals(creator));
+        } else
             return "Mail";
 
-        return asset.viewAssetTypeAction(isBackward(), balancePosition(), creator == null ? false : asset.getMaker().equals(creator));
     }
 
     // PARSE/CONVERT
@@ -1523,7 +1529,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 }
 
                 // GET ROW ASSET FEE
-                rowAssetFEE = assetsPacketFEE.get(rowAssetKey);
+                if (assetsPacketFEE == null)
+                    rowAssetFEE = null;
+                else
+                    rowAssetFEE = assetsPacketFEE.get(rowAssetKey);
 
                 Fun.Tuple2<Integer, String> result = isValidAction(dcSet, height, creator, signature, rowAssetKey,
                         (AssetCls) row[7], (BigDecimal) row[1], recipient,
