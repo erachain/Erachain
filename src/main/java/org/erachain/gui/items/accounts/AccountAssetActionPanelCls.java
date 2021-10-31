@@ -88,7 +88,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     private AccountsComboBoxModel accountsModel;
 
-    private PacketSendPanel assetsPackagePanel = new PacketSendPanel();
+    protected PacketSendPanel assetsPackagePanel;
 
     public AccountAssetActionPanelCls(String panelName, String formTitle, boolean backward, AssetCls assetIn,
                                       int action,
@@ -102,6 +102,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         this.backward = backward;
         this.action = action;
+        assetsPackagePanel = new PacketSendPanel(this, action, backward);
 
         // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
         // поэтому тут только приватную переменную юзаем дальше
@@ -309,7 +310,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.jCheckBox_Encrypt.setSelected(true);
         this.jCheckBox_isText.setText(Lang.T("As Text"));
         this.jCheckBox_isText.setSelected(true);
-        this.jCheckBox_AssetsPackage.setText(Lang.T("Assets Package"));
+        this.jCheckBox_AssetsPackage.setText(Lang.T("list of Assets"));
         this.jLabel_Asset.setText(Lang.T("Asset") + ":");
         this.jLabel_Amount.setText(Lang.T("Amount") + ":");
 

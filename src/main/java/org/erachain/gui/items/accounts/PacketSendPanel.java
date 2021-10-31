@@ -3,9 +3,12 @@ package org.erachain.gui.items.accounts;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.gui.models.RenderComboBoxViewBalance;
 import org.erachain.lang.Lang;
 
@@ -24,14 +27,20 @@ public class PacketSendPanel extends JPanel {
     private JScrollPane jScrollPaneAssets;
     private JButton jButtonRemoveAsset;
     private GridBagConstraints gridBC;
-    public JCheckBox defaultCheck;
+    public JCheckBox jCheck_Backward;
     public JComboBox<Integer> jComboBoxAction;
+    public JComboBox<ItemCls> jComboBox_PriceAsset;
+    private AccountAssetActionPanelCls parent;
 
-    public PacketSendPanel() {
+    public PacketSendPanel(AccountAssetActionPanelCls parent, int balancePos, boolean backward) {
 
         super();
 
-        this.setName(Lang.T("Assets Package"));
+        this.parent = parent;
+
+        this.setName(Lang.T("list of Assets"));
+
+        setBorder(BorderFactory.createEtchedBorder());
 
         jScrollPaneAssets = new JScrollPane();
         jButtonRemoveAsset = new JButton();
@@ -46,12 +55,18 @@ public class PacketSendPanel extends JPanel {
         }));
         jComboBoxAction.setRenderer(new RenderComboBoxViewBalance());
 
-        defaultCheck = new JCheckBox();
+        if (balancePos != 0) {
+            jComboBoxAction.setSelectedItem(balancePos);
+            jComboBoxAction.setEnabled(false);
+        }
 
-        defaultCheck.setText(Lang.T("Standard"));
-        defaultCheck.setSelected(true);
+        jCheck_Backward = new JCheckBox();
 
-        defaultCheck.addActionListener(new ActionListener() {
+        jCheck_Backward.setText(Lang.T("Backward"));
+        jCheck_Backward.setSelected(backward);
+        jCheck_Backward.setEnabled(false);
+
+        jCheck_Backward.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 reset();
@@ -107,19 +122,49 @@ public class PacketSendPanel extends JPanel {
         columnAsset.setWidth(170);
         columnAsset.sizeWidthToFit();
 
+        TableColumn columnAction = jTableAssets.getColumnModel().getColumn(TableModel.ACTION_COL);
+        columnAction.setMinWidth(130);
+        columnAction.setPreferredWidth(170);
+        columnAction.setWidth(150);
+        columnAction.sizeWidthToFit();
+
         int gridy = 0;
-        gridBC = new GridBagConstraints();
         JLabel actionLabel = new JLabel(Lang.T("Action") + ":");
-        gridBC.gridx = 1;
+        gridBC = new GridBagConstraints();
+        gridBC.gridx = 0;
+        gridBC.anchor = GridBagConstraints.EAST;
         this.add(actionLabel, gridBC);
 
         ++gridBC.gridx;
+        gridBC.anchor = GridBagConstraints.WEST;
         this.add(jComboBoxAction, gridBC);
+
+        ++gridBC.gridx;
+        gridBC.insets = new Insets(0, 28, 0, 8);
+        this.add(jCheck_Backward, gridBC);
 
         jButtonRemoveAsset.setText(Lang.T("Remove Row"));
         ++gridBC.gridx;
-        gridBC.insets = new Insets(8, 28, 8, 8);
+        gridBC.anchor = GridBagConstraints.CENTER;
+        gridBC.insets = new Insets(0, 28, 0, 8);
         this.add(jButtonRemoveAsset, gridBC);
+
+        JLabel jLabel_PriceAsset = new JLabel(Lang.T("Price Asset") + ":");
+        gridBC.gridy = ++gridy;
+        gridBC.gridx = 0;
+        gridBC.anchor = GridBagConstraints.EAST;
+        this.add(jLabel_PriceAsset, gridBC);
+
+        // favorite combo box
+        jComboBox_PriceAsset = new JComboBox<>();
+        jComboBox_PriceAsset.setModel(new ComboBoxAssetsModel(AssetCls.FEE_KEY));
+        jComboBox_PriceAsset.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
+        ++gridBC.gridx;
+        gridBC.gridwidth = 4;
+        gridBC.weightx = 0.7;
+        gridBC.anchor = GridBagConstraints.WEST;
+        gridBC.fill = GridBagConstraints.BOTH;
+        this.add(jComboBox_PriceAsset, gridBC);
 
         gridBC = new GridBagConstraints();
         gridBC.gridwidth = 9;
@@ -130,13 +175,6 @@ public class PacketSendPanel extends JPanel {
         gridBC.fill = GridBagConstraints.BOTH;
         gridBC.gridy = ++gridy;
         this.add(jScrollPaneAssets, gridBC);
-
-        if (false) {
-            gridBC = new GridBagConstraints();
-            gridBC.gridx = 2;
-            gridBC.insets = new Insets(8, 8, 8, 8);
-            this.add(defaultCheck, gridBC);
-        }
 
         //reset();
         this.setMinimumSize(new Dimension(0, 160));
@@ -155,10 +193,11 @@ public class PacketSendPanel extends JPanel {
 
         static final int NO_COL = 0;
         static final int ASSET_COL = 2;
+        static final int ACTION_COL = 3;
         static final int MEMO_COL = 8;
 
         public TableModel() {
-            super(new Object[]{Lang.T("No."), Lang.T("Key"), Lang.T("Asset"), Lang.T("Volume"), Lang.T("Price"), Lang.T("Discounted Price"),
+            super(new Object[]{Lang.T("No."), Lang.T("Key"), Lang.T("Asset"), Lang.T("Action"), Lang.T("Volume"), Lang.T("Price"), Lang.T("Discounted Price"),
                     Lang.T("Tax # налог") + " %", Lang.T("Fee"), Lang.T("Memo")
             }, 0);
             this.addEmpty();
@@ -166,12 +205,12 @@ public class PacketSendPanel extends JPanel {
         }
 
         private void addEmpty() {
-            this.addRow(new Object[]{0, 2L, BlockChain.FEE_ASSET, null, null, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, ""});
+            this.addRow(new Object[]{0, 2L, BlockChain.FEE_ASSET, "", null, null, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, ""});
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            if (column == NO_COL || column == ASSET_COL)
+            if (column == NO_COL || column == ASSET_COL || column == ACTION_COL)
                 return false;
 
             return true;
@@ -186,6 +225,7 @@ public class PacketSendPanel extends JPanel {
                     return Long.class;
                 case ASSET_COL:
                     return AssetCls.class;
+                case ACTION_COL:
                 case MEMO_COL:
                     return String.class;
                 default:
@@ -193,14 +233,20 @@ public class PacketSendPanel extends JPanel {
             }
         }
 
-
         public Object getValueAt(int row, int col) {
 
             if (this.getRowCount() < row || this.getRowCount() == 0)
                 return null;
 
-            if (col == NO_COL)
-                return row + 1;
+            switch (col) {
+                case NO_COL:
+                    return row + 1;
+                case ACTION_COL: {
+                    return Lang.T(AssetCls.viewAssetTypeAction(parent.asset.getKey(), parent.asset.getAssetType(),
+                            parent.backward, parent.action, parent.creator.equals(parent.asset.getMaker())));
+                }
+            }
+
 
             return super.getValueAt(row, col);
 
@@ -249,18 +295,18 @@ public class PacketSendPanel extends JPanel {
         public Object[][] getRows() {
 
             Vector lastRow = (Vector) this.getDataVector().get(getRowCount() - 1);
-            int len = lastRow.get(ASSET_COL) == null || lastRow.get(ASSET_COL + 2) == null ? getRowCount() - 1 : getRowCount();
+            int len = lastRow.get(ASSET_COL) == null || lastRow.get(ACTION_COL + 2) == null ? getRowCount() - 1 : getRowCount();
             Object[][] rows = new Object[len][];
             for (int i = 0; i < len; i++) {
                 Vector dataRow = (Vector) this.getDataVector().get(i);
                 Object[] row = new Object[8];
                 row[0] = dataRow.get(ASSET_COL - 1);
-                row[1] = dataRow.get(ASSET_COL + 1);
-                row[2] = dataRow.get(ASSET_COL + 2);
-                row[3] = dataRow.get(ASSET_COL + 3);
-                row[4] = dataRow.get(ASSET_COL + 4);
-                row[5] = dataRow.get(ASSET_COL + 5);
-                row[6] = dataRow.get(ASSET_COL + 6);
+                row[1] = dataRow.get(ACTION_COL + 1);
+                row[2] = dataRow.get(ACTION_COL + 2);
+                row[3] = dataRow.get(ACTION_COL + 3);
+                row[4] = dataRow.get(ACTION_COL + 4);
+                row[5] = dataRow.get(ACTION_COL + 5);
+                row[6] = dataRow.get(ACTION_COL + 6);
                 row[7] = dataRow.get(ASSET_COL);
                 rows[i] = row;
             }
