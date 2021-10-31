@@ -417,8 +417,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         // ПРОЦЕНТЫ в любом случае посчитаем - даже если халявная транзакция
         // только для передачи в собственность!
-        if (balancePosition() == ACTION_SEND && !creator.equals(asset.getMaker()) && !recipient.equals(asset.getMaker())
-                && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()) {
+        if (balancePosition() == ACTION_SEND && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()) {
             if (packet != null) {
                 assetsPacketFEE = new HashMap<>();
                 Tuple2<BigDecimal, BigDecimal> assetFee;
@@ -428,7 +427,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         assetsPacketFEE.put((AssetCls) row[7], assetFee);
                 }
 
-            } else if (hasAmount()) {
+            } else if (hasAmount() && !creator.equals(asset.getMaker()) && !recipient.equals(asset.getMaker())) {
                 assetFEE = calcSendTAX(key, asset, amount);
                 if (assetFEE != null) {
                     long_fee -= 256L;

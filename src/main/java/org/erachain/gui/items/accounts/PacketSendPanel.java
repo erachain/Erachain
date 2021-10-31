@@ -16,6 +16,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.util.Vector;
 
 public class PacketSendPanel extends JPanel {
     public final TableModel assetsTableModel;
@@ -130,10 +131,12 @@ public class PacketSendPanel extends JPanel {
         gridBC.gridy = ++gridy;
         this.add(jScrollPaneAssets, gridBC);
 
-        gridBC = new GridBagConstraints();
-        gridBC.gridx = 2;
-        gridBC.insets = new Insets(8, 8, 8, 8);
-        //this.add(defaultCheck, gridBagConstraints);
+        if (false) {
+            gridBC = new GridBagConstraints();
+            gridBC.gridx = 2;
+            gridBC.insets = new Insets(8, 8, 8, 8);
+            this.add(defaultCheck, gridBC);
+        }
 
         //reset();
         this.setMinimumSize(new Dimension(0, 160));
@@ -142,10 +145,6 @@ public class PacketSendPanel extends JPanel {
     }
 
     private void reset() {
-        jScrollPaneAssets.setVisible(!defaultCheck.isSelected());
-        jButtonRemoveAsset.setVisible(!defaultCheck.isSelected());
-        this.setMinimumSize(new Dimension(0, !defaultCheck.isSelected() ? 130 : 30));
-
     }
 
     // table model class
@@ -167,7 +166,7 @@ public class PacketSendPanel extends JPanel {
         }
 
         private void addEmpty() {
-            this.addRow(new Object[]{0, 2L, BlockChain.FEE_ASSET, BigDecimal.ONE, null, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, ""});
+            this.addRow(new Object[]{0, 2L, BlockChain.FEE_ASSET, null, null, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, ""});
         }
 
         @Override
@@ -248,15 +247,21 @@ public class PacketSendPanel extends JPanel {
          */
 
         public Object[][] getRows() {
-            if (defaultCheck.isSelected())
-                return null;
 
-            Object[][] rows = new Object[getRowCount()][];
-            for (int i = 0; i < getRowCount(); i++) {
-                Object[] dataRow = (Object[]) this.getDataVector().get(i);
+            Vector lastRow = (Vector) this.getDataVector().get(getRowCount() - 1);
+            int len = lastRow.get(ASSET_COL) == null || lastRow.get(ASSET_COL + 2) == null ? getRowCount() - 1 : getRowCount();
+            Object[][] rows = new Object[len][];
+            for (int i = 0; i < len; i++) {
+                Vector dataRow = (Vector) this.getDataVector().get(i);
                 Object[] row = new Object[8];
-                System.arraycopy(dataRow, ASSET_COL + 1, row, 1, 6);
-                row[0] = dataRow[ASSET_COL - 1];
+                row[0] = dataRow.get(ASSET_COL - 1);
+                row[1] = dataRow.get(ASSET_COL + 1);
+                row[2] = dataRow.get(ASSET_COL + 2);
+                row[3] = dataRow.get(ASSET_COL + 3);
+                row[4] = dataRow.get(ASSET_COL + 4);
+                row[5] = dataRow.get(ASSET_COL + 5);
+                row[6] = dataRow.get(ASSET_COL + 6);
+                row[7] = dataRow.get(ASSET_COL);
                 rows[i] = row;
             }
 
