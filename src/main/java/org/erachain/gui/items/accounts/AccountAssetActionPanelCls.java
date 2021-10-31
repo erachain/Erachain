@@ -675,17 +675,18 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // CREATE TX MESSAGE
         Transaction transaction;
-        Long assetKey = getAssetKey();
+        Long assetKey;
         Object[][] assetsPackage;
         int actionPackage;
         if (jCheckBox_AssetsPackage.isSelected()) {
             actionPackage = assetsPackagePanel.jComboBoxAction.getSelectedIndex() + 1;
             assetsPackage = assetsPackagePanel.assetsTableModel.getRows();
             // ASSET for prices
-            assetKey = Math.abs(assetKey);
+            assetKey = ((AssetCls) assetsPackagePanel.jComboBox_PriceAsset.getSelectedItem()).getKey();
         } else {
             assetsPackage = null;
             actionPackage = 0;
+            assetKey = getAssetKey();
         }
 
         transaction = Controller.getInstance().r_Send(RSend.CURRENT_VERS, backward ? TransactionAmount.BACKWARD_MASK : 0,

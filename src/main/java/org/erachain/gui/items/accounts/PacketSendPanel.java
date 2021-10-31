@@ -46,6 +46,7 @@ public class PacketSendPanel extends JPanel {
         if (parentTX == null) {
             balancePos = parentPanel.action;
             backward = parentPanel.backward;
+
         } else {
             balancePos = parentTX.balancePosition();
             backward = parentTX.isBackward();
@@ -113,6 +114,22 @@ public class PacketSendPanel extends JPanel {
 
         assetsTableModel = new TableModel();
         jTableAssets = new MTable(assetsTableModel);
+
+        if (parentTX != null) {
+            for (Object[] packetRow : parentTX.getPacket()) {
+                Object[] row = new Object[10];
+                row[1] = packetRow[0];
+                row[2] = packetRow[7];
+                row[4] = packetRow[1];
+                row[5] = packetRow[2];
+                row[6] = packetRow[3];
+                row[7] = packetRow[4];
+                row[8] = packetRow[5];
+                row[9] = packetRow[6];
+                assetsTableModel.addRow(row);
+            }
+        }
+
         //jTableAssets.setDefaultRenderer(Object.class, new RendererRight());
         jScrollPaneAssets.setViewportView(jTableAssets);
         TableColumn columnNo = jTableAssets.getColumnModel().getColumn(TableModel.NO_COL);
@@ -218,12 +235,13 @@ public class PacketSendPanel extends JPanel {
         }
 
         private void addEmpty() {
-            this.addRow(new Object[]{0, 2L, BlockChain.FEE_ASSET, "", null, null, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, ""});
+            if (parentTX == null)
+                this.addRow(new Object[]{0, 2L, BlockChain.FEE_ASSET, "", null, null, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, ""});
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            if (column == NO_COL || column == ASSET_COL || column == ACTION_COL)
+            if (parentTX != null || column == NO_COL || column == ASSET_COL || column == ACTION_COL)
                 return false;
 
             return true;
@@ -255,8 +273,11 @@ public class PacketSendPanel extends JPanel {
                 case NO_COL:
                     return row + 1;
                 case ACTION_COL: {
-                    return Lang.T(AssetCls.viewAssetTypeAction((Long) getValueAt(row, ASSET_COL - 1),
-                            ((AssetCls) getValueAt(row, ASSET_COL)).getAssetType(),
+                    AssetCls asset = (AssetCls) getValueAt(row, ASSET_COL);
+                    if (asset == null)
+                        return null;
+
+                    return Lang.T(asset.viewAssetTypeAction(
                             jCheck_Backward.isSelected(), (int) jComboBoxAction.getSelectedItem(),
                             (parentTX == null ? parentPanel.creator : parentTX.getCreator())
                                     .equals(((AssetCls) getValueAt(row, ASSET_COL)).getMaker())));
@@ -283,25 +304,6 @@ public class PacketSendPanel extends JPanel {
             if (row == this.getRowCount() - 1) {
                 this.addEmpty();
             }
-        }
-
-        public void setRows(Object[][] items) {
-            clearRows(false);
-
-            for (int i = 0; i < items.length; ++i) {
-                addRow(items[i]);
-            }
-            addEmpty();
-        }
-
-        public void clearRows(boolean addEmpty) {
-            while (getRowCount() > 0) {
-                this.removeRow(getRowCount() - 1);
-            }
-
-            if (addEmpty)
-                addEmpty();
-
         }
 
         /**

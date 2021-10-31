@@ -491,7 +491,16 @@ public class BlockChain {
             FEE_ASSET_EMITTER = GenesisBlock.CREATOR;
         }
 
-        if (DEMO_MODE) {
+        if (TEST_MODE) {
+
+            // из p130 счета для прорверки
+            NOVA_ASSETS.put("BTC",
+                    new Tuple3<Long, Long, byte[]>(12L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
+            NOVA_ASSETS.put("DOGE",
+                    new Tuple3<Long, Long, byte[]>(18L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
+            NOVA_ASSETS.put("USD",
+                    new Tuple3<Long, Long, byte[]>(95L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
+
             // это как пример для отладки
             ASSET_TRANSFER_PERCENTAGE.put(1L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.05")));
             ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.5"));
@@ -505,36 +514,24 @@ public class BlockChain {
             ASSET_TRANSFER_PERCENTAGE.put(95L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.05")));
             ASSET_BURN_PERCENTAGE.put(95L, new BigDecimal("0.5"));
 
-            // GENERAL TRUST
-            TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
-            TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
-            //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+            if (DEMO_MODE) {
+                // GENERAL TRUST
+                TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+                TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
+                //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
 
-            // права для Кибальникова
-            ASSET_OWNERS.put(7L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
-            ASSET_OWNERS.put(8L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
+                // права для Кибальникова
+                ASSET_OWNERS.put(7L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
+                ASSET_OWNERS.put(8L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
 
-            // из p130 счета для прорверки
-            NOVA_ASSETS.put("BTC",
-                    new Tuple3<Long, Long, byte[]>(12L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
-            NOVA_ASSETS.put("DOGE",
-                    new Tuple3<Long, Long, byte[]>(18L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
-            NOVA_ASSETS.put("USD",
-                    new Tuple3<Long, Long, byte[]>(95L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
+                LOCKED__ADDRESSES.put("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz", "7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1");
+                TRUSTED_ANONYMOUS.add("762eatKnsB3xbyy2t9fwjjqUG1GoxQ8Rhx");
+                ANONYMASERS.add("7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF");
 
-            LOCKED__ADDRESSES.put("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz", "7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1");
-            TRUSTED_ANONYMOUS.add("762eatKnsB3xbyy2t9fwjjqUG1GoxQ8Rhx");
-            ANONYMASERS.add("7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF");
+                ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
+            }
 
-
-            ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
-
-        } else if (TEST_DB > 0 || TEST_MODE) {
-            // это как пример для отладки
-            ASSET_TRANSFER_PERCENTAGE.put(1L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
-            ASSET_TRANSFER_PERCENTAGE.put(12L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.00005")));
-            ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.5"));
-            ASSET_BURN_PERCENTAGE.put(12L, new BigDecimal("0.5"));
+        } else if (TEST_DB > 0) {
         } else if (CLONE_MODE) {
             File file = new File(Settings.CLONE_OR_SIDE.toLowerCase() + "PROTOCOL.json");
             if (file.exists()) {

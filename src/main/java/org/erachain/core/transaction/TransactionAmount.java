@@ -377,7 +377,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
      */
     public static Tuple2<BigDecimal, BigDecimal> calcSendTAX(Long key, AssetCls asset, BigDecimal amount) {
 
-        if (!BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key))
+        if (key == null || !BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key) || asset == null || amount == null)
             return null;
 
         BigDecimal assetFee;

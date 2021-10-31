@@ -57,7 +57,6 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
         }
         if (r_Send.hasPacket()) {
             PacketSendPanel packagePanel = new PacketSendPanel(null, r_Send);
-            packagePanel.assetsTableModel.setRows(r_Send.getPacket());
             fieldGBC.gridy = ++labelGBC.gridy;
             fieldGBC.gridwidth = 2;
             this.add(packagePanel, fieldGBC);
