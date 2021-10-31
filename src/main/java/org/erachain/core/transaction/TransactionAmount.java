@@ -528,6 +528,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
     @Override
     public String viewAmount() {
+
+        if (hasPacket())
+            return "package";
+
         if (amount == null || amount.signum() == 0)
             return "";
 

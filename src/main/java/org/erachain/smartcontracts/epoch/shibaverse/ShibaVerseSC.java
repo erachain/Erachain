@@ -158,7 +158,7 @@ public class ShibaVerseSC extends EpochSmartContract {
                 RSend rsend = (RSend) transaction;
                 if (rsend.getAssetKey() != gravitaKey) {
                     status = "Wrong asset key. Need " + gravitaKey;
-                } else if (!rsend.hasAmount() || rsend.getAmount().signum() <= 0) {
+                } else if (!rsend.hasAmount() || !rsend.hasPacket() && rsend.getAmount().signum() <= 0) {
                     status = "Wrong amount. Need > 0";
                 } else if (rsend.isBackward()) {
                     status = "Wrong direction - backward";
@@ -176,7 +176,7 @@ public class ShibaVerseSC extends EpochSmartContract {
                 RSend rsend = (RSend) transaction;
                 if (rsend.getAssetKey() != gravitaKey) {
                     status = "Wrong asset key. Need " + gravitaKey;
-                } else if (!rsend.hasAmount() || rsend.getAmount().signum() <= 0) {
+                } else if (!rsend.hasAmount() || !rsend.hasPacket() && rsend.getAmount().signum() <= 0) {
                     status = "Wrong amount. Need > 0";
                 } else if (rsend.isBackward()) {
                     status = "Wrong direction - backward";

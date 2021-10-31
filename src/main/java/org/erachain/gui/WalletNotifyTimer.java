@@ -85,13 +85,14 @@ public class WalletNotifyTimer<U> implements Observer {
                     RSend rSend = (RSend) transaction;
                     if (rSend.hasAmount()) {
                         // TRANSFER
+                        String amount = (rSend.hasPacket() ? "package" : rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]") + "\n";
                         if (contr.getWallet().accountExists(creator)) {
                             if (settings.isSoundNewTransactionEnabled())
                                 sound = "send.wav";
 
                             head = Lang.T("Payment send");
                             message = rSend.getCreator().getPersonAsString() + " -> \n "
-                                    + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
+                                    + amount
                                     + rSend.getRecipient().getPersonAsString() + "\n"
                                     + (rSend.getTitle() != null ? "\n" + rSend.getTitle() : "");
                         } else {
@@ -101,7 +102,7 @@ public class WalletNotifyTimer<U> implements Observer {
 
                             head = Lang.T("Payment received");
                             message = rSend.getRecipient().getPersonAsString() + " <- \n "
-                                    + rSend.getAmount().toPlainString() + " [" + rSend.getAbsKey() + "]\n "
+                                    + amount
                                     + rSend.getCreator().getPersonAsString() + "\n"
                                     + (rSend.getTitle() != null ? "\n" + rSend.getTitle() : "");
                         }
