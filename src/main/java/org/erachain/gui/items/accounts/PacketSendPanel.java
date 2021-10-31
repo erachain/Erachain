@@ -5,6 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.MTable;
@@ -30,13 +31,25 @@ public class PacketSendPanel extends JPanel {
     public JCheckBox jCheck_Backward;
     public JComboBox<Integer> jComboBoxAction;
     public JComboBox<ItemCls> jComboBox_PriceAsset;
-    private AccountAssetActionPanelCls parent;
+    private AccountAssetActionPanelCls parentPanel;
+    private RSend parentTX;
 
-    public PacketSendPanel(AccountAssetActionPanelCls parent, int balancePos, boolean backward) {
+    public PacketSendPanel(AccountAssetActionPanelCls parentPanel, RSend parentTX) {
 
         super();
 
-        this.parent = parent;
+        this.parentPanel = parentPanel;
+        this.parentTX = parentTX;
+
+        int balancePos;
+        boolean backward;
+        if (parentTX == null) {
+            balancePos = parentPanel.action;
+            backward = parentPanel.backward;
+        } else {
+            balancePos = parentTX.balancePosition();
+            backward = parentTX.isBackward();
+        }
 
         this.setName(Lang.T("list of Assets"));
 
@@ -242,8 +255,11 @@ public class PacketSendPanel extends JPanel {
                 case NO_COL:
                     return row + 1;
                 case ACTION_COL: {
-                    return Lang.T(AssetCls.viewAssetTypeAction(parent.asset.getKey(), parent.asset.getAssetType(),
-                            parent.backward, parent.action, parent.creator.equals(parent.asset.getMaker())));
+                    return Lang.T(AssetCls.viewAssetTypeAction((Long) getValueAt(row, ASSET_COL - 1),
+                            ((AssetCls) getValueAt(row, ASSET_COL)).getAssetType(),
+                            jCheck_Backward.isSelected(), (int) jComboBoxAction.getSelectedItem(),
+                            (parentTX == null ? parentPanel.creator : parentTX.getCreator())
+                                    .equals(((AssetCls) getValueAt(row, ASSET_COL)).getMaker())));
                 }
             }
 

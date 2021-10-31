@@ -6,6 +6,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.accounts.PacketSendPanel;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
@@ -54,8 +55,14 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             MenuPopupUtil.installContextMenu(head_Text);
             this.add(head_Text, fieldGBC);
         }
+        if (r_Send.hasPacket()) {
+            PacketSendPanel packagePanel = new PacketSendPanel(null, r_Send);
+            packagePanel.assetsTableModel.setRows(r_Send.getPacket());
+            fieldGBC.gridy = ++labelGBC.gridy;
+            fieldGBC.gridwidth = 2;
+            this.add(packagePanel, fieldGBC);
 
-        if (r_Send.getAmount() != null) {
+        } else if (r_Send.getAmount() != null) {
 
             AssetCls asset = r_Send.getAsset();
 

@@ -102,7 +102,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         this.backward = backward;
         this.action = action;
-        assetsPackagePanel = new PacketSendPanel(this, action, backward);
+        assetsPackagePanel = new PacketSendPanel(this, null);
 
         // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
         // поэтому тут только приватную переменную юзаем дальше
