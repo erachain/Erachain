@@ -674,11 +674,14 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         // CREATE TX MESSAGE
         Transaction transaction;
+        Long assetKey = getAssetKey();
         Object[][] assetsPackage;
         int actionPackage;
         if (jCheckBox_AssetsPackage.isSelected()) {
             actionPackage = assetsPackagePanel.jComboBoxAction.getSelectedIndex() + 1;
             assetsPackage = assetsPackagePanel.assetsTableModel.getRows();
+            // ASSET for prices
+            assetKey = Math.abs(assetKey);
         } else {
             assetsPackage = null;
             actionPackage = 0;
@@ -686,7 +689,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         transaction = Controller.getInstance().r_Send(RSend.CURRENT_VERS, backward ? TransactionAmount.BACKWARD_MASK : 0,
                 (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator), exLink, smartContract, feePow,
-                recipient, getAssetKey(), getAmount(), actionPackage, assetsPackage, txTitle, messageBytes, isTextByte, encrypted);
+                recipient, assetKey, getAmount(), actionPackage, assetsPackage, txTitle, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(null, true, transaction,

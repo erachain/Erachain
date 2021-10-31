@@ -145,7 +145,8 @@ public class RSend extends TransactionAmount {
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
 
-        //this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+        // - тут нельзя так как другие комисси еще должны дальше вычислиться
+        // this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient, long key,
@@ -174,6 +175,25 @@ public class RSend extends TransactionAmount {
                 isText, encrypted, timestamp, flags);
     }
 
+    /**
+     * @param version
+     * @param property1
+     * @param property2
+     * @param creator
+     * @param exLink
+     * @param smartContract
+     * @param feePow
+     * @param recipient
+     * @param actionPackage balancePosition
+     * @param key           asset for Prices
+     * @param assetsPackage Assets Package
+     * @param title
+     * @param data
+     * @param isText
+     * @param encrypted
+     * @param timestamp
+     * @param flags
+     */
     public RSend(byte version, byte property1, byte property2, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow,
                  Account recipient, int actionPackage, long key, Object[][] assetsPackage, String title, byte[] data, byte[] isText, byte[] encrypted,
                  long timestamp, long flags) {

@@ -12,6 +12,9 @@ public class BigDecimalUtil {
 
     static public void toBytes9(byte[] data, int pos, BigDecimal amount) {
 
+        if (amount == null)
+            return;
+
         // CALCULATE ACCURACY of AMMOUNT
         int different_scale = amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
         BigDecimal amountBase;

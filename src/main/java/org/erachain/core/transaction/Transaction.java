@@ -1493,16 +1493,16 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         boolean useDEX = Settings.getInstance().getCompuRateUseDEX();
 
-        AssetCls asset = Controller.getInstance().getAsset(Settings.getInstance().getCompuRateAsset());
-        if (asset == null)
-            asset = Controller.getInstance().getAsset(95); // ISO-USD
+        AssetCls assetRate = Controller.getInstance().getAsset(Settings.getInstance().getCompuRateAsset());
+        if (assetRate == null)
+            assetRate = Controller.getInstance().getAsset(95); // ISO-USD
 
-        if (asset == null)
-            asset = Controller.getInstance().getAsset(1L); // ERA
+        if (assetRate == null)
+            assetRate = Controller.getInstance().getAsset(1L); // ERA
 
         BigDecimal compuRate;
         if (useDEX) {
-            Trade lastTrade = DCSet.getInstance().getTradeMap().getLastTrade(AssetCls.FEE_KEY, asset.getKey(), false);
+            Trade lastTrade = DCSet.getInstance().getTradeMap().getLastTrade(AssetCls.FEE_KEY, assetRate.getKey(), false);
             if (lastTrade == null) {
                 compuRate = BigDecimal.ZERO;
             } else {
@@ -1514,16 +1514,16 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         if (compuRate.signum() > 0) {
-            BigDecimal fee_fiat = fee.multiply(compuRate).setScale(asset.getScale(), BigDecimal.ROUND_HALF_UP);
-            if (asset.getKey() != AssetCls.FEE_KEY) {
+            BigDecimal fee_fiat = fee.multiply(compuRate).setScale(assetRate.getScale(), BigDecimal.ROUND_HALF_UP);
+            if (assetRate.getKey() != AssetCls.FEE_KEY) {
                 text += " (" + fee_fiat.toString();
-                fileName = "images" + File.separator + "icons" + File.separator + "assets" + File.separator + asset.getName() + ".png";
+                fileName = "images" + File.separator + "icons" + File.separator + "assets" + File.separator + assetRate.getName() + ".png";
                 File file = new File(fileName);
                 if (file.exists()) {
                     text += "<img width=" + imgSize + " height=" + imgSize
                             + " src='file:" + fileName + "'>";
                 } else {
-                    text += " " + asset.getTickerName();
+                    text += " " + assetRate.getTickerName();
                 }
 
                 text += ")";
@@ -1533,14 +1533,25 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if (assetFEE != null && assetFEE.a.signum() != 0) {
             /// ASSET FEE
-            asset = this.getAsset();
+            AssetCls asset = this.getAsset();
             if (asset == null) {
                 asset = Controller.getInstance().getAsset(getAbsKey());
             }
 
             text += "<br>" + Lang.T("Additional Asset FEE") + ": ";
-            Tuple2<BigDecimal, BigDecimal> taxes = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(asset.getKey());
-            text += viewAssetFee(asset, taxes.a, taxes.b, assetFEE.a);
+            Tuple2<BigDecimal, BigDecimal> assetTax = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(asset.getKey());
+            text += viewAssetFee(asset, assetTax.a, assetTax.b, assetFEE.a);
+        }
+
+        if (assetsPacketFEE != null && !assetsPacketFEE.isEmpty()) {
+            /// ASSET FEE
+            text += "<br>" + Lang.T("Additional Assets Package FEE") + ":";
+            for (AssetCls packageAsset : assetsPacketFEE.keySet()) {
+                Tuple2<BigDecimal, BigDecimal> assetTax = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(packageAsset.getKey());
+                Tuple2<BigDecimal, BigDecimal> assetPacketFee = assetsPacketFEE.get(packageAsset);
+                text += "<br>" + viewAssetFee(packageAsset, assetTax.a, assetTax.b, assetPacketFee.a);
+            }
+
         }
 
         return text;
