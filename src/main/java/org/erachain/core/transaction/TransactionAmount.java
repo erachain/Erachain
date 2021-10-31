@@ -1492,17 +1492,19 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             HashSet<Long> keys = new HashSet<>();
             for (Object[] row : packet) {
                 rowAssetKey = (Long) row[0];
-
-                if (row[7] == null) {
+                if (rowAssetKey == null) {
+                    errorValue = "[" + count + "] = null";
+                    return INVALID_ITEM_KEY;
+                } else if (row[7] == null) {
                     errorValue = "[" + count + "] = " + rowAssetKey;
                     return ITEM_ASSET_NOT_EXIST;
-                } else if (((BigDecimal) row[1]).signum() <= 0) {
+                } else if (row[1] == null || ((BigDecimal) row[1]).signum() <= 0) {
                     errorValue = "Amount[" + count + "] = " + row[1];
                     return INVALID_AMOUNT;
-                } else if (((BigDecimal) row[2]).signum() < 0) {
+                } else if (row[2] != null && ((BigDecimal) row[2]).signum() < 0) {
                     errorValue = "Price[" + count + "] = " + row[2];
                     return INVALID_AMOUNT;
-                } else if (((BigDecimal) row[3]).signum() < 0) {
+                } else if (row[3] != null && ((BigDecimal) row[3]).signum() < 0) {
                     errorValue = "DiscontedPrice[" + count + "] = " + row[3];
                     return INVALID_AMOUNT;
                 } else if (row[PACKET_ROW_MEMO_NO] != null && ((String) row[PACKET_ROW_MEMO_NO]).length() > 0) {

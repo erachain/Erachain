@@ -115,21 +115,6 @@ public class PacketSendPanel extends JPanel {
         assetsTableModel = new TableModel();
         jTableAssets = new MTable(assetsTableModel);
 
-        if (parentTX != null) {
-            for (Object[] packetRow : parentTX.getPacket()) {
-                Object[] row = new Object[10];
-                row[1] = packetRow[0];
-                row[2] = packetRow[7];
-                row[4] = packetRow[1];
-                row[5] = packetRow[2];
-                row[6] = packetRow[3];
-                row[7] = packetRow[4];
-                row[8] = packetRow[5];
-                row[9] = packetRow[6];
-                assetsTableModel.addRow(row);
-            }
-        }
-
         //jTableAssets.setDefaultRenderer(Object.class, new RendererRight());
         jScrollPaneAssets.setViewportView(jTableAssets);
         TableColumn columnNo = jTableAssets.getColumnModel().getColumn(TableModel.NO_COL);
@@ -206,6 +191,23 @@ public class PacketSendPanel extends JPanel {
         gridBC.gridy = ++gridy;
         this.add(jScrollPaneAssets, gridBC);
 
+        if (parentTX != null) {
+            for (Object[] packetRow : parentTX.getPacket()) {
+                Object[] row = new Object[10];
+                row[1] = packetRow[0];
+                row[2] = packetRow[7];
+                row[4] = packetRow[1];
+                row[5] = packetRow[2];
+                row[6] = packetRow[3];
+                row[7] = packetRow[4];
+                row[8] = packetRow[5];
+                row[9] = packetRow[6];
+                assetsTableModel.addRow(row);
+            }
+
+            jComboBox_PriceAsset.setSelectedItem(parentTX.getAsset());
+        }
+
         //reset();
         this.setMinimumSize(new Dimension(0, 160));
 
@@ -224,7 +226,7 @@ public class PacketSendPanel extends JPanel {
         static final int NO_COL = 0;
         static final int ASSET_COL = 2;
         static final int ACTION_COL = 3;
-        static final int MEMO_COL = 8;
+        static final int MEMO_COL = 9;
 
         public TableModel() {
             super(new Object[]{Lang.T("No."), Lang.T("Key"), Lang.T("Asset"), Lang.T("Action"), Lang.T("Volume"), Lang.T("Price"), Lang.T("Discounted Price"),
@@ -280,10 +282,9 @@ public class PacketSendPanel extends JPanel {
                     return Lang.T(asset.viewAssetTypeAction(
                             jCheck_Backward.isSelected(), (int) jComboBoxAction.getSelectedItem(),
                             (parentTX == null ? parentPanel.creator : parentTX.getCreator())
-                                    .equals(((AssetCls) getValueAt(row, ASSET_COL)).getMaker())));
+                                    .equals(asset.getMaker())));
                 }
             }
-
 
             return super.getValueAt(row, col);
 
