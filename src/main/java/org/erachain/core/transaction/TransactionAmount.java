@@ -1502,7 +1502,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     errorValue = "[" + count + "] = null";
                     return INVALID_ITEM_KEY;
                 } else if (row[7] == null) {
-                    errorValue = "[" + count + "] = " + rowAssetKey;
+                    errorValue = "[" + count + "] : " + rowAssetKey;
                     return ITEM_ASSET_NOT_EXIST;
                 } else if (row[1] == null || ((BigDecimal) row[1]).signum() <= 0) {
                     errorValue = "Amount[" + count + "] = " + row[1];
@@ -1522,7 +1522,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 }
 
                 if (keys.contains(rowAssetKey)) {
-                    errorValue = "[" + count + "] = " + rowAssetKey;
+                    errorValue = "[" + count + "] : " + rowAssetKey;
                     return ITEM_DUPLICATE_KEY;
                 } else {
                     keys.add(rowAssetKey);
@@ -1539,7 +1539,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         isBackward(), fee, rowAssetFEE == null ? null : rowAssetFEE.a, isPerson, checkFlags, timestamp);
 
                 if (result.a != VALIDATE_OK) {
-                    errorValue = result.b;
+                    errorValue = "[" + count + "] : " + result.b;
                     return result.a;
                 }
 
