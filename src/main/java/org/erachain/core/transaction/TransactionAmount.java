@@ -109,14 +109,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             // ACTION_RESERVED_6
     };
 
-    public static final String NAME_ACTION_TYPE_PROPERTY = "SEND";
-    public static final String NAME_ACTION_TYPE_PROPERTY_WAS = "Send # was";
-    public static final String NAME_ACTION_TYPE_HOLD = "HOLD";
-    public static final String NAME_ACTION_TYPE_HOLD_WAS = "Hold # was";
-    public static final String NAME_CREDIT = "CREDIT";
-    public static final String NAME_CREDIT_WAS = "Credit # was";
-    public static final String NAME_SPEND = "SPEND";
-    public static final String NAME_SPEND_WAS = "Spend # was";
+    public static final String NAME_ACTION_SEND = "SEND";
+    public static final String NAME_ACTION_SEND_WAS = "Send # was";
+    public static final String NAME_ACTION_DEBT = "CREDIT";
+    public static final String NAME_ACTION_DEBT_WAS = "Credit # was";
+    public static final String NAME_ACTION_HOLD = "HOLD";
+    public static final String NAME_ACTION_HOLD_WAS = "Hold # was";
+    public static final String NAME_ACTION_SPEND = "SPEND";
+    public static final String NAME_ACTION_SPEND_WAS = "Spend # was";
+    public static final String NAME_ACTION_PLEDGE = "PLEDGE";
+    public static final String NAME_ACTION_PLEDGE_WAS = "Pledge # was";
     public static final int AMOUNT_LENGTH = 8;
     public static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
 
@@ -486,13 +488,15 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         switch (actionType) {
             case ACTION_SEND:
-                return NAME_ACTION_TYPE_PROPERTY;
+                return NAME_ACTION_SEND;
             case ACTION_DEBT:
-                return NAME_CREDIT;
+                return NAME_ACTION_DEBT;
             case ACTION_HOLD:
-                return NAME_ACTION_TYPE_HOLD;
+                return NAME_ACTION_HOLD;
             case ACTION_SPEND:
-                return NAME_SPEND;
+                return NAME_ACTION_SPEND;
+            case ACTION_PLEDGE:
+                return NAME_ACTION_PLEDGE;
         }
 
         return "???";
@@ -690,7 +694,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             asset.toJsonInfo(transaction, "priceAsset");
 
             transaction.put("balancePos", Math.abs(balancePos));
-            transaction.put("actionName", viewActionType());
+            transaction.put("actionName", viewSubTypeName(balancePos));
             if (this.isBackward())
                 transaction.put("backward", this.isBackward());
 
