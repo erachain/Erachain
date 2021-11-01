@@ -1660,10 +1660,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         // getSignature - make in GENEIS
         transaction.put("signature", this.getSignature() == null ? "null" : Base58.encode(this.signature));
 
-        int height;
-        if (this.creator == null) {
+        //int height;
+        if (height == 1) {
             transaction.put("creator", "genesis");
-            height = 1;
+        } else if (this.creator == null) {
+            transaction.put("creator", "genesis");
         } else {
             transaction.put("feePow", getFeePow());
             transaction.put("forgedFee", getForgedFee());
@@ -1684,6 +1685,27 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             if (isWiped()) {
                 transaction.put("wiped", true);
             }
+        }
+
+        if (assetFEE != null) {
+            JSONObject jsonFee = new JSONObject();
+            jsonFee.put("fee", assetFEE.a);
+            jsonFee.put("burn", assetFEE.b);
+            transaction.put("assetFEE", jsonFee);
+        }
+
+        if (assetsPacketFEE != null && !assetsPacketFEE.isEmpty()) {
+            Tuple2<BigDecimal, BigDecimal> rowTAX;
+            JSONObject jsonFee = new JSONObject();
+            for (AssetCls asset : assetsPacketFEE.keySet()) {
+                rowTAX = assetsPacketFEE.get(asset);
+                JSONObject assetFee = new JSONObject();
+                assetFee.put("fee", rowTAX.a);
+                assetFee.put("burn", rowTAX.b);
+                jsonFee.put(asset.getKey(), assetFee);
+            }
+            transaction.put("assetPackageFEE", jsonFee);
+
         }
 
         transaction.put("size", this.viewSize(Transaction.FOR_NETWORK));
