@@ -13,9 +13,9 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.OrderProcess;
 import org.erachain.core.item.assets.TradePair;
+import org.erachain.dapp.DAPP;
 import org.erachain.database.PairMapImpl;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
@@ -65,9 +65,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
     private BigDecimal amountHave;
     private BigDecimal amountWant;
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, long haveKey, long wantKey,
+    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, DAPP dapp, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, long flags) {
-        super(typeBytes, TYPE_NAME, creator, exLink, smartContract, feePow, timestamp, flags);
+        super(typeBytes, TYPE_NAME, creator, exLink, dapp, feePow, timestamp, flags);
         this.haveKey = haveKey;
         this.wantKey = wantKey;
 
@@ -84,10 +84,10 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
 
     }
 
-    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, long haveKey, long wantKey,
+    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, DAPP dapp, long haveKey, long wantKey,
                                   BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, long flags,
                                   byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, exLink, smartContract, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, flags);
+        this(typeBytes, creator, exLink, dapp, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, flags);
         this.signature = signature;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
@@ -286,12 +286,12 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             exLink = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -360,7 +360,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             amountWant = amountWant.scaleByPowerOfTen(-accuracy);
         }
 
-        return new CreateOrderTransaction(typeBytes, creator, exLink, smartContract, have, want, amountHave, amountWant, feePow, timestamp,
+        return new CreateOrderTransaction(typeBytes, creator, exLink, dapp, have, want, amountHave, amountWant, feePow, timestamp,
                 flagsTX, signatureBytes, seqNo, feeLong);
     }
 
@@ -435,9 +435,9 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dapp != null) {
+            if (forDeal == FOR_DB_RECORD || !dapp.isEpoch()) {
+                base_len += dapp.length(forDeal);
             }
         }
 

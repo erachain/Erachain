@@ -1,4 +1,4 @@
-package org.erachain.smartcontracts.epoch.shibaverse;
+package org.erachain.dapp.epoch.shibaverse;
 
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.database.IDB;
@@ -7,7 +7,7 @@ import org.erachain.datachain.TimeTXWaitMap;
 import org.junit.Test;
 import org.mapdb.Fun;
 
-public class ShibaVerseSCTest {
+public class ShibaVerseDAPPTest {
 
     DCSet dcSet;
     TimeTXWaitMap timeTXWaitMap;
@@ -49,7 +49,7 @@ public class ShibaVerseSCTest {
 
         int count = 10;
         do {
-            byte[] randomArray = ShibaVerseSC.getRandHash(gb, gb.getTransaction(3), count);
+            byte[] randomArray = ShibaVerseDAPP.getRandHash(gb, gb.getTransaction(3), count);
             // make object name: "c" - comet, "0" - era, Rarity1,2, Value1,2,
             int value1 = Byte.toUnsignedInt(randomArray[7]) >>> 5;
             int value2 = Byte.toUnsignedInt(randomArray[6]) >>> 5;

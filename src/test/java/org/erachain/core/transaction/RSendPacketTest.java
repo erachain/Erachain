@@ -11,8 +11,8 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.SmartContract;
 import org.junit.Test;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
@@ -51,7 +51,7 @@ public class RSendPacketTest {
     private BlockChain bchain;
 
     ExLink exLink = new ExLinkAppendix(123123L);
-    SmartContract smartContract = null;
+    DAPP DAPP = null;
     Object[][] packet = null;
     byte feePow = 0;
     String title = "test";
@@ -102,7 +102,7 @@ public class RSendPacketTest {
         packet[1] = new Object[]{4L, new BigDecimal("500.0"), new BigDecimal("500.0"),
                 null, null, new BigDecimal("5.0"), "memo 3 memo", null};
 
-        rSend = new RSend(typeBytes, maker, exLink, smartContract, feePow, recipient, balancePos, key, packet, title, messageDate, isTextByte,
+        rSend = new RSend(typeBytes, maker, exLink, DAPP, feePow, recipient, balancePos, key, packet, title, messageDate, isTextByte,
                 encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
 
         byte[] raw = rSend.toBytes(Transaction.FOR_NETWORK, true);
@@ -145,7 +145,7 @@ public class RSendPacketTest {
         packet[1] = new Object[]{AssetCls.FEE_KEY, new BigDecimal("0.5"), new BigDecimal("0.045"),
                 null, null, new BigDecimal("0.0"), "memo 3 memo", null};
 
-        rSend = new RSend(typeBytes, maker, exLink, smartContract, feePow, recipient, balancePos, key, packet, title, messageDate, isTextByte,
+        rSend = new RSend(typeBytes, maker, exLink, DAPP, feePow, recipient, balancePos, key, packet, title, messageDate, isTextByte,
                 encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
 
         rSend.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);

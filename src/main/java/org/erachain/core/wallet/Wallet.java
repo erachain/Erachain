@@ -15,6 +15,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.*;
+import org.erachain.dapp.DAPP;
 import org.erachain.database.DBASet;
 import org.erachain.database.wallet.AccountMap;
 import org.erachain.database.wallet.DWSet;
@@ -26,7 +27,6 @@ import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
@@ -1109,9 +1109,9 @@ public class Wallet extends Observable implements Observer {
 			}
 		}
 
-		SmartContract smartContract = transaction.getSmartContract();
-		if (smartContract != null) {
-			for (Object[] itemKey : smartContract.getItemsKeys()) {
+		DAPP dapp = transaction.getSmartContract();
+		if (dapp != null) {
+			for (Object[] itemKey : dapp.getItemsKeys()) {
 				map = this.dwSet.getItemFavoritesSet((int) itemKey[0]);
 				key = (Long) itemKey[1];
 				if (key <= 0)

@@ -6,7 +6,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.templates.TemplateFactory;
-import org.erachain.smartcontracts.SmartContract;
+import org.erachain.dapp.DAPP;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -100,12 +100,12 @@ public class IssueTemplateRecord extends IssueItemRecord {
             linkTo = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;

@@ -15,9 +15,9 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.payment.Payment;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.erachain.smartcontracts.SmartContract;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class TestRecSend {
     long dbRef = 0L;
 
     ExLink exLink = null;
-    SmartContract smartContract = null;
+    DAPP DAPP = null;
 
     byte[] itemAppData = null;
     long txFlags = 0L;
@@ -169,7 +169,7 @@ public class TestRecSend {
             // TRY PARSE - PRICISION must be LESS
             amount = amountForParse.scaleByPowerOfTen(-scale);
 
-            r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey23,
+            r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey23,
                     amount,
                     "", null, isText, encrypted, timestamp, 123l
             );
@@ -211,7 +211,7 @@ public class TestRecSend {
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
             
             // NAGATIVE AMOUNT
-            r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, ERA_KEY,
+            r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, ERA_KEY,
                     amount.negate(),
                     head, data, isText, encrypted, timestamp, 123l
             );
@@ -240,7 +240,7 @@ public class TestRecSend {
 
         // IS VALID
         BigDecimal bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale);
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 bal_A_keyA,
                 head, data, isText, encrypted, timestamp, 123L
         );
@@ -250,7 +250,7 @@ public class TestRecSend {
 
         // INVALID
         bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale - 1);
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 bal_A_keyA,
                 head, data, isText, encrypted, timestamp, 123L
         );
@@ -260,7 +260,7 @@ public class TestRecSend {
         ///////////////////////
         // INVALID
         BigDecimal amountInvalid = amountTest;
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey + 1,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey + 1,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -272,14 +272,14 @@ public class TestRecSend {
         assetA.insertToMap(db, 0l);
         assetKey = assetA.getKey();
 
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
 
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 amountInvalid.negate(),
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -288,7 +288,7 @@ public class TestRecSend {
 
         // INVALID
         amountInvalid = amountForParse.scaleByPowerOfTen(-fromScale - 1);
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -296,7 +296,7 @@ public class TestRecSend {
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
         amountInvalid = amountForParse.scaleByPowerOfTen(-toScale + 1);
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -372,7 +372,7 @@ public class TestRecSend {
             // TRY PARSE - PRICISION must be LESS
             amount = amountForParse.scaleByPowerOfTen(-scale);
 
-            r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKeyBIG,
+            r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKeyBIG,
                     amount,
                     "", null, isText, encrypted, timestamp, 123l
             );
@@ -413,7 +413,7 @@ public class TestRecSend {
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
             
             // NAGATIVE AMOUNT
-            r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, ERA_KEY,
+            r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, ERA_KEY,
                     amount.negate(),
                     head, data, isText, encrypted, timestamp, 123l
             );
@@ -442,7 +442,7 @@ public class TestRecSend {
 
         // IS VALID
         BigDecimal bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale);
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 bal_A_keyA,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -452,7 +452,7 @@ public class TestRecSend {
 
         // VALID because trailing ZERO - amount.stripTrailingZeros()
         bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale - 1);
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 bal_A_keyA,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -462,7 +462,7 @@ public class TestRecSend {
         ///////////////////////
         // INVALID
         BigDecimal amountInvalid = amountTest;
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey + 1,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey + 1,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -470,14 +470,14 @@ public class TestRecSend {
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.ITEM_ASSET_NOT_EXIST);
 
         // INVALID
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
 
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 amountInvalid.negate(),
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -486,7 +486,7 @@ public class TestRecSend {
 
         // INVALID
         amountInvalid = amountForParse.scaleByPowerOfTen(-fromScale - 1);
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -494,7 +494,7 @@ public class TestRecSend {
         assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, 0l), Transaction.VALIDATE_OK);
 
         amountInvalid = amountForParse.scaleByPowerOfTen(-toScale + 1);
-        r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, assetKey,
+        r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, assetKey,
                 amountInvalid,
                 head, data, isText, encrypted, timestamp, 123l
         );
@@ -513,7 +513,7 @@ public class TestRecSend {
 
         /// MESSAGE + AMOUNT
         RSend r_SendV3 = new RSend(
-                maker, exLink, smartContract, FEE_POWER,
+                maker, exLink, DAPP, FEE_POWER,
                 recipient,
                 ERA_KEY,
                 amount,
@@ -564,7 +564,7 @@ public class TestRecSend {
         assertEquals((long) maker.getLastTimestamp(db)[0], gb.getTimestamp());
 
         r_SendV3 = new RSend(
-                maker, exLink, smartContract, FEE_POWER,
+                maker, exLink, DAPP, FEE_POWER,
                 recipient,
                 ERA_KEY,
                 null,
@@ -614,7 +614,7 @@ public class TestRecSend {
         assertEquals((long) maker.getLastTimestamp(db)[0], gb.getTimestamp());
 
         r_SendV3 = new RSend(
-                maker, exLink, smartContract, FEE_POWER,
+                maker, exLink, DAPP, FEE_POWER,
                 recipient,
                 ERA_KEY,
                 amount,
@@ -660,7 +660,7 @@ public class TestRecSend {
         r_SendV3.orphan(block, Transaction.FOR_NETWORK);
 
         r_SendV3 = new RSend(
-                maker, exLink, smartContract, FEE_POWER,
+                maker, exLink, DAPP, FEE_POWER,
                 recipient,
                 ERA_KEY,
                 null,
@@ -707,7 +707,7 @@ public class TestRecSend {
         recipient.changeBalance(db, false, false, -ERA_KEY, amount.negate(), false, false, false);
         /// MESSAGE + AMOUNT
         r_SendV3 = new RSend(
-                maker, exLink, smartContract, FEE_POWER,
+                maker, exLink, DAPP, FEE_POWER,
                 recipient,
                 -ERA_KEY,
                 amount,
@@ -917,7 +917,7 @@ public class TestRecSend {
 
         long era_key = 1l;
         /// DISCREDIR_ADDRESSES
-        RSend r_Send = new RSend(maker, exLink, smartContract, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l);
+        RSend r_Send = new RSend(maker, exLink, DAPP, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l);
 
         byte[] data = r_Send.toBytes(Transaction.FOR_NETWORK, true);
         int port = BlockChain.NETWORK_PORT;

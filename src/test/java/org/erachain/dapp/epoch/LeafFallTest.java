@@ -1,4 +1,4 @@
-package org.erachain.smartcontracts.epoch;
+package org.erachain.dapp.epoch;
 
 import org.erachain.core.transaction.Transaction;
 import org.junit.Test;

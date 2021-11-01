@@ -21,11 +21,11 @@ import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.core.transaction.TransactionFactory;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
-import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -1497,7 +1497,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
 
             makeHoldRoyalty(dcSetPlace, false);
-            SmartContract.processByBlock(dcSetPlace, this, false);
+            DAPP.processByBlock(dcSetPlace, this, false);
 
             this.getTransactions();
 
@@ -2277,7 +2277,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         makeHoldRoyalty(dcSet, false);
-        SmartContract.processByBlock(dcSet, this, false);
+        DAPP.processByBlock(dcSet, this, false);
 
         this.getTransactions();
 
@@ -2453,7 +2453,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         //PROCESS ASSETS FEE - after orphanTransactions!
         assetsFeeProcess(dcSet, true);
 
-        SmartContract.processByBlock(dcSet, this, true);
+        DAPP.processByBlock(dcSet, this, true);
         makeHoldRoyalty(dcSet, true);
 
         if (this.forgingInfoUpdate != null) {

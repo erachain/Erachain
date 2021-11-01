@@ -11,8 +11,8 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
@@ -160,12 +160,12 @@ public class CancelOrderTransaction extends Transaction {
             exLink = null;
         }
 
-        SmartContract smartContract;
+        DAPP dApp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dApp = DAPP.Parses(data, position, forDeal);
+            position += dApp.length(forDeal);
         } else {
-            smartContract = null;
+            dApp = null;
         }
 
         byte feePow = 0;
@@ -315,9 +315,9 @@ public class CancelOrderTransaction extends Transaction {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dapp != null) {
+            if (forDeal == FOR_DB_RECORD || !dapp.isEpoch()) {
+                base_len += dapp.length(forDeal);
             }
         }
 

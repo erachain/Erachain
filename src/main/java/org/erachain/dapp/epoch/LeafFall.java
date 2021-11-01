@@ -1,4 +1,4 @@
-package org.erachain.smartcontracts.epoch;
+package org.erachain.dapp.epoch;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 /**
  * Ctrl+Shift-T (IntellijIDEA) - make test unit
  */
-public class LeafFall extends EpochSmartContract {
+public class LeafFall extends EpochDAPP {
 
     public static final int ID = 1;
 

@@ -6,8 +6,8 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.dapp.epoch.DogePlanet;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.epoch.DogePlanet;
 import org.erachain.webserver.WebResource;
 import org.mapdb.Fun;
 
