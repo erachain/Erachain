@@ -1674,7 +1674,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             transaction.put("deadLine", getDeadline());
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
             creator.toJsonPersonInfo(transaction, "creator");
-            transaction.put("fee", this.fee.toPlainString());
+            if (fee != null && fee.signum() != 0)
+                transaction.put("fee", this.fee.stripTrailingZeros().toPlainString());
             transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
         }
 
@@ -1689,8 +1690,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
         if (assetFEE != null) {
             JSONObject jsonFee = new JSONObject();
-            jsonFee.put("fee", assetFEE.a);
-            jsonFee.put("burn", assetFEE.b);
+            jsonFee.put("fee", assetFEE.a.stripTrailingZeros().toPlainString());
+            if (assetFEE.b != null)
+                jsonFee.put("burn", assetFEE.b.stripTrailingZeros().toPlainString());
             transaction.put("assetFEE", jsonFee);
         }
 
@@ -1700,8 +1702,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             for (AssetCls asset : assetsPacketFEE.keySet()) {
                 rowTAX = assetsPacketFEE.get(asset);
                 JSONObject assetFee = new JSONObject();
-                assetFee.put("fee", rowTAX.a);
-                assetFee.put("burn", rowTAX.b);
+                assetFee.put("fee", rowTAX.a.stripTrailingZeros().toPlainString());
+                if (rowTAX.b != null)
+                    assetFee.put("burn", rowTAX.b.stripTrailingZeros().toPlainString());
                 jsonFee.put(asset.getKey(), assetFee);
             }
             transaction.put("assetPackageFEE", jsonFee);
