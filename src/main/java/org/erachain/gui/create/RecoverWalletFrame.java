@@ -107,7 +107,7 @@ public class RecoverWalletFrame extends JFrame {
         //LABEL
         labelGBC.gridy = 3;
         labelGBC.insets.top = 10;
-        JLabel label3 = new JLabel(Lang.T("Please enter your wallet password") + ":");
+        JLabel label3 = new JLabel(Lang.T("Please create a new wallet password") + ":");
         this.add(label3, labelGBC);
 
         //ADD TEXTBOX
