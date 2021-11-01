@@ -2,6 +2,8 @@ package org.erachain.core.blockexplorer;
 
 import org.apache.commons.net.util.Base64;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
@@ -208,7 +210,18 @@ public class WebTransactionsHTML {
                         + transaction.getCreator().getPersonAsString() + "</a>";
                 out += "<br><b>" + Lang.T("Public Key", langObj) + ": </b><a href=?address="
                         + tras_json.get("publickey") + get_Lang() + ">" + tras_json.get("publickey") + "</a>";
-                out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + tras_json.get("fee");
+                out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + transaction.getFee().toPlainString();
+
+                if (transaction.assetFEE != null && transaction.assetFEE.a.signum() != 0) {
+                    AssetCls asset = transaction.getAsset();
+                    if (asset == null) {
+                        asset = Controller.getInstance().getAsset(transaction.getAbsKey());
+                    }
+                    Fun.Tuple2<BigDecimal, BigDecimal> taxes = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(asset.getKey());
+
+                    out += "<br>" + Lang.T("Additional Asset FEE", langObj) + ": ";
+                    out += Transaction.viewAssetFee(asset, taxes.a, taxes.b, transaction.assetFEE.a);
+                }
             }
             if (transaction.isWiped()) {
                 out += "<BR><b>" + Lang.T("WIPED", langObj) + ": </b>" + "true";
@@ -702,14 +715,54 @@ public class WebTransactionsHTML {
                 + rSend.getRecipient().getAddress() + get_Lang() + "><b>" + rSend.getRecipient().getPersonAsString()
                 + "</b></a>";
 
-        if (rSend.getAmount() != null) {
-            out += "<br>" + Lang.T(rSend.viewActionType(), langObj)
-                    + ": <b>" + rSend.getAmount().toPlainString() + " х "
-                    + itemNameHTML(Controller.getInstance().getAsset(rSend.getAbsKey())) + "</b>";
-        }
-
         if (!rSend.getTitle().equals(""))
             out += "<BR>" + Lang.T("Title", langObj) + ": <b>" + rSend.getTitle() + "</b>";
+
+        if (rSend.hasAmount()) {
+            if (rSend.hasPacket()) {
+                out += "<h3>" + Lang.T("Assets Package", langObj) + "</h3>";
+
+                out += Lang.T("Balance Position", langObj) + ": "
+                        + Lang.T(Account.balancePositionName(rSend.balancePosition()), langObj)
+                        + (rSend.isBackward() ? Lang.T("BACKWARD", langObj) : "")
+                        + "<br>" + Lang.T("Price Asset", langObj) + ": "
+                        + itemNameHTML(Controller.getInstance().getAsset(rSend.getAbsKey())) + "</b>";
+
+                out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>"
+                        + Lang.T("No.", this.langObj)
+                        + "<td>" + Lang.T("Asset", this.langObj)
+                        + "<td>" + Lang.T("Action", this.langObj)
+                        + "<td>" + Lang.T("Volume", this.langObj)
+                        + "<td>" + Lang.T("Price", this.langObj)
+                        + "<td>" + Lang.T("Discounted Price", this.langObj)
+                        + "<td>" + Lang.T("Tax # налог", this.langObj) + " %"
+                        + "<td>" + Lang.T("Fee", this.langObj)
+                        + "<td>" + Lang.T("Memo", this.langObj)
+                        + "</tr>";
+
+                Object[][] assetsPackage = rSend.getPacket();
+                AssetCls asset;
+                for (int count = 0; count < assetsPackage.length; count++) {
+                    asset = (AssetCls) assetsPackage[count][7];
+                    out += "<tr><td>" + (count + 1)
+                            + "<td>" + asset.toString()
+                            + "<td>" + Lang.T(asset.viewAssetTypeAction(rSend.isBackward(), rSend.balancePosition(), rSend.getCreator().equals(asset.getMaker())), langObj)
+                            + "<td>" + (assetsPackage[count][1] == null ? "" : assetsPackage[count][1].toString())
+                            + "<td>" + (assetsPackage[count][2] == null ? "" : assetsPackage[count][2].toString())
+                            + "<td>" + (assetsPackage[count][3] == null ? "" : assetsPackage[count][3].toString())
+                            + "<td>" + (assetsPackage[count][4] == null ? "" : assetsPackage[count][4].toString())
+                            + "<td>" + (assetsPackage[count][5] == null ? "" : assetsPackage[count][5].toString())
+                            + "<td>" + (assetsPackage[count][6] == null ? "" : assetsPackage[count][6].toString())
+                    ;
+                }
+                out += "</table>";
+
+            } else {
+                out += "<br>" + Lang.T(rSend.viewActionType(), langObj)
+                        + ": <b>" + rSend.getAmount().toPlainString() + " х "
+                        + itemNameHTML(Controller.getInstance().getAsset(rSend.getAbsKey())) + "</b>";
+            }
+        }
 
         return out;
 

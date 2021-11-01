@@ -2217,7 +2217,10 @@ public abstract class AssetCls extends ItemCls {
             int total = 0;
             for (int i = 0; i < dexAwards.length; ++i) {
                 ExLinkAddress exAddress = dexAwards[i];
-                if (exAddress.getValue1() <= 0) {
+                if (exAddress == null) {
+                    errorValue = "Award[" + i + "] = Null";
+                    return Transaction.INVALID_AWARD;
+                } else if (exAddress.getValue1() <= 0) {
                     errorValue = "Award[" + i + "] percent is so small (<=0%)";
                     return Transaction.INVALID_AWARD;
                 } else if (exAddress.getValue1() > 25000) {

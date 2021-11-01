@@ -21,7 +21,7 @@ public class AccountAssetSpendPanel extends AccountAssetActionPanelCls {
     }
 
     protected BigDecimal getAmount() {
-        return amount.negate();
+        return amount == null ? null : amount.negate();
     }
 
     protected Long getAssetKey() {

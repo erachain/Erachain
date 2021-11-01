@@ -159,11 +159,13 @@ public abstract class SmartContract {
             if (contract != null)
                 return contract;
 
-            if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND
-                    && txSend.hasAmount() && txSend.getAmount().signum() < 0
-                // && txSend.getAbsKey() == 10234L
+            if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND && txSend.hasAmount()
             ) {
-                return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
+                if (txSend.hasPacket()) {
+
+                } else if (txSend.getAmount().signum() < 0) {
+                    return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
+                }
             }
 
 

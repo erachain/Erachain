@@ -88,6 +88,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     private AccountsComboBoxModel accountsModel;
 
+    protected PacketSendPanel assetsPackagePanel;
+
     public AccountAssetActionPanelCls(String panelName, String formTitle, boolean backward, AssetCls assetIn,
                                       int action,
                                       Account accountFrom, Account accountTo, String message) {
@@ -100,6 +102,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         this.backward = backward;
         this.action = action;
+        assetsPackagePanel = new PacketSendPanel(this, null);
 
         // необходимо входящий параметр отделить так как ниже он по событию изменения актива будет как НУЛь вызваться
         // поэтому тут только приватную переменную юзаем дальше
@@ -155,6 +158,24 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jComboBox_Asset.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
         jComboBox_Asset.setEditable(false);
         //this.jComboBox_Asset.setEnabled(assetIn != null);
+
+        jCheckBox_AssetsPackage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jLabel_Asset.setVisible(!jCheckBox_AssetsPackage.isSelected());
+                jComboBox_Asset.setVisible(!jCheckBox_AssetsPackage.isSelected());
+                jLabel_AssetType.setVisible(!jCheckBox_AssetsPackage.isSelected());
+                jLabel_Amount.setVisible(!jCheckBox_AssetsPackage.isSelected());
+                jTextField_Amount.setVisible(!jCheckBox_AssetsPackage.isSelected());
+                jLabel_Balances.setVisible(!jCheckBox_AssetsPackage.isSelected());
+
+                assetsPackagePanel.setVisible(jCheckBox_AssetsPackage.isSelected());
+
+                checkReadyToOK();
+
+            }
+        });
+
 
         exLinkDescription.setEditable(false);
         exLinkText.getDocument().addDocumentListener(new DocumentListener() {
@@ -243,6 +264,39 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
             }
         });
 
+        jTextField_Amount.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                try {
+                    amount = new BigDecimal(jTextField_Amount.getText());
+                } catch (Exception exc) {
+                    amount = null;
+                }
+                checkReadyToOK();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                try {
+                    amount = new BigDecimal(jTextField_Amount.getText());
+                } catch (Exception exc) {
+                    amount = null;
+                }
+                checkReadyToOK();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                try {
+                    amount = new BigDecimal(jTextField_Amount.getText());
+                } catch (Exception exc) {
+                    amount = null;
+                }
+                checkReadyToOK();
+            }
+        });
+
+
         jButton_ok.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -256,6 +310,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         this.jCheckBox_Encrypt.setSelected(true);
         this.jCheckBox_isText.setText(Lang.T("As Text"));
         this.jCheckBox_isText.setSelected(true);
+        this.jCheckBox_AssetsPackage.setText(Lang.T("list of Assets"));
         this.jLabel_Asset.setText(Lang.T("Asset") + ":");
         this.jLabel_Amount.setText(Lang.T("Amount") + ":");
 
@@ -276,6 +331,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         } else {
             jTextField_Amount.setVisible(false);
             jLabel_Amount.setVisible(false);
+            jLabel_Amount.setText("1"); // for check
         }
 
         if (recipient != null) {
@@ -283,11 +339,13 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         }
 
         refreshLabels();
+
     }
 
     protected void checkReadyToOK() {
 
-        if (creator == null || recipient == null || asset == null) {
+        if (creator == null || recipient == null ||
+                !jCheckBox_AssetsPackage.isSelected() && (asset == null || amount == null || amount.signum() == 0)) {
             jButton_ok.setEnabled(false);
             return;
         }
@@ -345,14 +403,16 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
                 asset.viewAssetTypeTarget(backward, action, recipientIsOwner) + " " + "Account") + ":");
         this.jLabelRecipientDetail.setText(Lang.T("Account Details") + ":");
 
-        // set scale
-        if (asset instanceof AssetVenture) {
-            jTextField_Amount.setScale(asset.getScale());
-            jTextField_Amount.setVisible(true);
-            jLabel_Amount.setVisible(true);
-        } else {
-            jTextField_Amount.setVisible(false);
-            jLabel_Amount.setVisible(false);
+        if (!jCheckBox_AssetsPackage.isSelected()) {
+            // set scale
+            if (asset instanceof AssetVenture) {
+                jTextField_Amount.setScale(asset.getScale());
+                jTextField_Amount.setVisible(true);
+                jLabel_Amount.setVisible(true);
+            } else {
+                jTextField_Amount.setVisible(false);
+                jLabel_Amount.setVisible(false);
+            }
         }
 
         if (showAssetForm) {
@@ -614,9 +674,24 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         if (!cheskError()) return;
 
         // CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send((byte) 2, backward ? TransactionAmount.BACKWARD_MASK : 0,
+        Transaction transaction;
+        Long assetKey;
+        Object[][] assetsPackage;
+        int actionPackage;
+        if (jCheckBox_AssetsPackage.isSelected()) {
+            actionPackage = assetsPackagePanel.jComboBoxAction.getSelectedIndex() + 1;
+            assetsPackage = assetsPackagePanel.assetsTableModel.getRows();
+            // ASSET for prices
+            assetKey = ((AssetCls) assetsPackagePanel.jComboBox_PriceAsset.getSelectedItem()).getKey();
+        } else {
+            assetsPackage = null;
+            actionPackage = 0;
+            assetKey = getAssetKey();
+        }
+
+        transaction = Controller.getInstance().r_Send(RSend.CURRENT_VERS, backward ? TransactionAmount.BACKWARD_MASK : 0,
                 (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator), exLink, smartContract, feePow,
-                recipient, getAssetKey(), getAmount(), txTitle, messageBytes, isTextByte, encrypted);
+                recipient, assetKey, getAmount(), actionPackage, assetsPackage, txTitle, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";
         IssueConfirmDialog confirmDialog = new IssueConfirmDialog(null, true, transaction,
@@ -656,6 +731,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         jTextArea_Message = new javax.swing.JTextArea();
         jCheckBox_Encrypt = new javax.swing.JCheckBox();
         jCheckBox_isText = new javax.swing.JCheckBox();
+        jCheckBox_AssetsPackage = new javax.swing.JCheckBox();
         jLabel_Asset = new javax.swing.JLabel();
         jLabel_AssetType = new javax.swing.JLabel();
         jComboBox_Asset = new javax.swing.JComboBox<>();
@@ -668,6 +744,8 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea_Account_Description = new javax.swing.JTextArea();
+
+        final JCheckBox assetsPackage = new JCheckBox(Lang.T("Assets Package"));
 
         exLinkTextLabel = new JLabel(Lang.T("Append to") + ":");
         exLinkText = new JTextField();
@@ -751,6 +829,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         fieldGBC.gridy = ++gridy;
         add(jCheckBox_isText, fieldGBC);
 
+        fieldGBC.gridy = ++gridy;
+        add(jCheckBox_AssetsPackage, fieldGBC);
+
         labelGBC.gridy = ++gridy;
         add(jLabel_Asset, labelGBC);
         fieldGBC.gridy = gridy;
@@ -777,6 +858,9 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         gridBagConstraints.gridy = gridy;
         gridBagConstraints.insets = fieldGBC.insets;
         add(jLabel_Balances, gridBagConstraints);
+
+        assetsPackagePanel.setVisible(false);
+        add(assetsPackagePanel, fieldGBC);
 
         labelGBC.gridy = ++gridy;
         add(jLabel_Fee, labelGBC);
@@ -872,5 +956,6 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
     public JLabel exLinkTextLabel;
     public JLabel exLinkDescriptionLabel;
 
+    public JCheckBox jCheckBox_AssetsPackage;
 
 }

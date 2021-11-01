@@ -1483,11 +1483,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (transaction == null)
             return null;
 
+        Tuple2<Integer, Integer> seqNo = Transaction.parseDBRef(key);
         if (transaction instanceof GenesisRecord) {
-            Tuple2<Integer, Integer> seqNo = Transaction.parseDBRef(key);
-            transaction.setDC((DCSet) databaseSet, Transaction.FOR_PACK, seqNo.a, seqNo.b);
+            transaction.setDC((DCSet) databaseSet, Transaction.FOR_PACK, seqNo.a, seqNo.b, false);
         } else {
-            transaction.setDC((DCSet) databaseSet);
+            // need for calc FEE in orphan and block explorer
+            transaction.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, seqNo.a, seqNo.b, false);
         }
 
         // наращивание всех данных для скелета - так же необходимо для создания ключей tags

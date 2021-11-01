@@ -45,7 +45,7 @@ typeBytes[1] - version
 #### PROPERTY 2
 typeBytes[3].0 = -128 if NO DATA
 
-## version 3
+## version 3 (cuurent - see CURRENT_VER)
 
  #### PROPERTY 1
  typeBytes[2].0 = -128 if NO AMOUNT - check sign (NO_AMOUNT_MASK)
@@ -59,6 +59,8 @@ typeBytes[3].0 = -128 if NO DATA
  */
 
 public class RSend extends TransactionAmount {
+
+    public static final byte CURRENT_VERS = 2;
 
     public static final byte NO_DATA_MASK = -128; // 0x10000000
     public static final byte MAX_DATA_VIEW = 64;
@@ -136,13 +138,15 @@ public class RSend extends TransactionAmount {
     }
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
-                 int action, long key, Object[][] packet, String title, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
+                 int balancePos, long key, Object[][] packet, String title, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
                  long flags, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, exLink, smartContract, feePow, recipient, action, key, packet, title, data, isText, encrypted, timestamp, flags);
+        this(typeBytes, creator, exLink, smartContract, feePow, recipient, balancePos, key, packet, title, data, isText, encrypted, timestamp, flags);
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+
+        // - тут нельзя так как другие комисси еще должны дальше вычислиться
+        // this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public RSend(byte[] typeBytes, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient, long key,
@@ -152,7 +156,8 @@ public class RSend extends TransactionAmount {
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
-        this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
+
+        //this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
 
@@ -163,7 +168,6 @@ public class RSend extends TransactionAmount {
         this.signature = signature;
     }
 
-    // FOR BACKWARDS - CONFISCATE CREDIT
     public RSend(byte version, byte property1, byte property2, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow,
                  Account recipient, long key, BigDecimal amount, String title, byte[] data, byte[] isText, byte[] encrypted,
                  long timestamp, long flags) {
@@ -171,22 +175,48 @@ public class RSend extends TransactionAmount {
                 isText, encrypted, timestamp, flags);
     }
 
+    /**
+     * @param version
+     * @param property1
+     * @param property2
+     * @param creator
+     * @param exLink
+     * @param smartContract
+     * @param feePow
+     * @param recipient
+     * @param actionPackage balancePosition
+     * @param key           asset for Prices
+     * @param assetsPackage Assets Package
+     * @param title
+     * @param data
+     * @param isText
+     * @param encrypted
+     * @param timestamp
+     * @param flags
+     */
+    public RSend(byte version, byte property1, byte property2, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow,
+                 Account recipient, int actionPackage, long key, Object[][] assetsPackage, String title, byte[] data, byte[] isText, byte[] encrypted,
+                 long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, version, property1, property2}, creator, exLink, smartContract, feePow, recipient, actionPackage, key, assetsPackage, title, data,
+                isText, encrypted, timestamp, flags);
+    }
+
     public RSend(PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient, long key, BigDecimal amount, String title,
                  byte[] data, byte[] isText, byte[] encrypted, long timestamp, long flags) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, exLink, smartContract, feePow, recipient, key, amount, title, data, isText, encrypted,
+        this(new byte[]{TYPE_ID, CURRENT_VERS, 0, 0}, creator, exLink, smartContract, feePow, recipient, key, amount, title, data, isText, encrypted,
                 timestamp, flags);
     }
 
     public RSend(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, String title,
                  byte[] data, byte[] isText, byte[] encrypted, long timestamp, long flags, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, title, data, isText, encrypted,
+        this(new byte[]{TYPE_ID, CURRENT_VERS, 0, 0}, creator, feePow, recipient, key, amount, title, data, isText, encrypted,
                 timestamp, flags, signature);
     }
 
     // as pack
     public RSend(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, String title, byte[] data,
                  byte[] isText, byte[] encrypted, long flags) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, null, (byte) 0, recipient, key, amount, title, data, isText, encrypted,
+        this(new byte[]{TYPE_ID, CURRENT_VERS, 0, 0}, creator, null, null, (byte) 0, recipient, key, amount, title, data, isText, encrypted,
                 0L, flags);
     }
 
@@ -213,18 +243,18 @@ public class RSend extends TransactionAmount {
 
     public RSend(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp,
                  long flags) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, timestamp, flags);
+        this(new byte[]{TYPE_ID, CURRENT_VERS, 0, 0}, creator, feePow, recipient, key, amount, timestamp, flags);
     }
 
     public RSend(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp,
                  long flags, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, timestamp, flags,
+        this(new byte[]{TYPE_ID, CURRENT_VERS, 0, 0}, creator, feePow, recipient, key, amount, timestamp, flags,
                 signature);
     }
 
     // as pack
     public RSend(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, long flags) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte) 0, recipient, key, amount, 0L, flags);
+        this(new byte[]{TYPE_ID, CURRENT_VERS, 0, 0}, creator, (byte) 0, recipient, key, amount, 0L, flags);
     }
 
     // GETTERS/SETTERS
@@ -328,7 +358,7 @@ public class RSend extends TransactionAmount {
         long key = 0;
         BigDecimal amount;
         Object[][] packet;
-        int action = 0;
+        int balancePos = 0;
 
         if ((typeBytes[2] & NO_AMOUNT_MASK) == 0) {
             // IF here is AMOUNT
@@ -371,15 +401,15 @@ public class RSend extends TransactionAmount {
             // READ AMOUNT
             byte[] packetSizeBytes = Arrays.copyOfRange(data, position, position + Integer.BYTES);
             position += Integer.BYTES;
-            action = packetSizeBytes[1];
-            packetSizeBytes[1] = 0; // clear ACTION
+            balancePos = packetSizeBytes[1];
+            packetSizeBytes[1] = 0; // clear balancePos
             int packetSize = Ints.fromByteArray(packetSizeBytes);
 
             packet = new Object[packetSize][];
             Object[] row;
             byte[] memoBytes;
             for (int count = 0; count < packetSize; count++) {
-                row = new Object[7];
+                row = new Object[8];
                 packet[count] = row;
 
                 // READ KEY
@@ -455,7 +485,7 @@ public class RSend extends TransactionAmount {
                 return new RSend(typeBytes, creator, exLink, smartContract, feePow, recipient, key, amount, title, arbitraryData, isTextByte,
                         encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
             else
-                return new RSend(typeBytes, creator, exLink, smartContract, feePow, recipient, action, key, packet, title, arbitraryData, isTextByte,
+                return new RSend(typeBytes, creator, exLink, smartContract, feePow, recipient, balancePos, key, packet, title, arbitraryData, isTextByte,
                         encryptedByte, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new RSend(typeBytes, creator, exLink, smartContract, recipient, key, amount, title, arbitraryData, isTextByte,

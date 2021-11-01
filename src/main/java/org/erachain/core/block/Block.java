@@ -1807,7 +1807,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             boolean hasValidatedForkDB = validatedForkDB != null;
             close();
             if (hasValidatedForkDB && BlockChain.CHECK_BUGS > 9) {
-                LOGGER.debug("validatedForkDB is FINALIZED: " + this.toString());
+                LOGGER.debug("validatedForkDB is FINALIZED: " + this);
             }
         }
 
@@ -1943,15 +1943,16 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
     public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
 
-        if (BlockChain.TEST_MODE && heightBlock > 150000) {
-            // EMITTE
+        if (BlockChain.TEST_MODE) {
+            // EMIT
             if (earnedAllAssets == null)
                 earnedAllAssets = new HashMap<>();
 
-            BigDecimal emite = BigDecimal.ONE;
-            addAssetFee(BlockChain.ERA_ASSET, emite, null);
+            BigDecimal emitted = BigDecimal.ONE;
+            addAssetFee(BlockChain.ERA_ASSET, emitted, null);
+
             BlockChain.ERA_ASSET.getMaker().changeBalance(dcSet, !asOrphan, false,
-                    AssetCls.ERA_KEY, emite, false, false, false);
+                    AssetCls.ERA_KEY, emitted, false, false, false);
 
         }
 
@@ -1961,7 +1962,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                 if (transaction.assetFEE != null)
                     addAssetFee(transaction.getAsset(), transaction.assetFEE.a, transaction.assetFEE.b);
 
-                if (transaction.assetsPacketFEE != null) {
+                if (transaction.assetsPacketFEE != null && !transaction.assetsPacketFEE.isEmpty()) {
                     Tuple2<BigDecimal, BigDecimal> rowTAX;
                     for (AssetCls asset : transaction.assetsPacketFEE.keySet()) {
                         rowTAX = transaction.assetsPacketFEE.get(asset);
@@ -2259,11 +2260,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
             compareCOMPUbals(dcSet, this.heightBlock - 1, "before PROCESS");
-        }
-
-        // for DEBUG
-        if (this.heightBlock == 97815) {
-            boolean debug = true;
         }
 
         //PROCESS TRANSACTIONS

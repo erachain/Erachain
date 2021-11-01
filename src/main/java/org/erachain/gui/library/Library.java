@@ -54,10 +54,11 @@ public class Library {
                         if (Settings.getInstance().isSoundReceivePaymentEnabled())
                             PlaySound.getInstance().playSound("receivepayment.wav");
 
+                        String amount = (r_Send.hasPacket() ? "package"
+                                : r_Send.getAmount().toPlainString() + " [" + r_Send.getAsset() + "]") + "\n";
                         SysTray.getInstance().sendMessage("Payment received",
                                 "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
-                                        + "Asset Key" + ": " + r_Send.getAbsKey() + ", " + "Amount" + ": "
-                                        + r_Send.getAmount().toPlainString()
+                                        + amount
                                         + (r_Send.getTitle() != null ? "\n Title" + ":" + r_Send.getTitle() : "")
                                 ,
                                 MessageType.INFO);
@@ -84,10 +85,11 @@ public class Library {
                         if (Settings.getInstance().isSoundNewTransactionEnabled())
                             PlaySound.getInstance().playSound("newtransaction.wav");
 
+                        String amount = (r_Send.hasPacket() ? "package"
+                                : r_Send.getAmount().toPlainString() + " [" + r_Send.getAsset() + "]") + "\n";
                         SysTray.getInstance().sendMessage("Payment send",
                                 "From: " + transaction.getCreator().getPersonAsString() + "\nTo: " + r_Send.getRecipient().getPersonAsString() + "\n"
-                                        + "Asset Key" + ": " + r_Send.getAbsKey() + ", " + "Amount" + ": "
-                                        + r_Send.getAmount().toPlainString()
+                                        + amount
                                         + (r_Send.getTitle() != null ? "\n Title" + ":" + r_Send.getTitle() : "")
                                 ,
                                 MessageType.INFO);
