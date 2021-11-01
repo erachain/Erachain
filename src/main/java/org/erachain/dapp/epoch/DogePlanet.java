@@ -1,4 +1,4 @@
-package org.erachain.smartcontracts.epoch;
+package org.erachain.dapp.epoch;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -18,7 +18,7 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
-public class DogePlanet extends EpochSmartContract {
+public class DogePlanet extends EpochDAPP {
 
     static public final int ID = 1000;
 

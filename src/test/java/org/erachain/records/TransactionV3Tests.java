@@ -12,9 +12,9 @@ import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.ArbitraryTransactionV3;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.erachain.smartcontracts.SmartContract;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class TransactionV3Tests {
     long timestamp = NTP.getTime();
 
     ExLink exLink = null;
-    SmartContract smartContract = null;
+    DAPP DAPP = null;
 
     byte[] itemAppData = null;
     long txFlags = 0L;
@@ -89,7 +89,7 @@ public class TransactionV3Tests {
 
 
         RSend messageTransactionV3 = new RSend(
-                maker, exLink, smartContract, FEE_POWER, //	ATFunding
+                maker, exLink, DAPP, FEE_POWER, //	ATFunding
                 recipient,
                 ERM_KEY,
                 amount,

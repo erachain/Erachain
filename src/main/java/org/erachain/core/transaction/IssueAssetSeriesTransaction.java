@@ -12,9 +12,9 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.core.item.assets.AssetUniqueSeriesCopy;
 import org.erachain.core.item.assets.AssetVenture;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
-import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
@@ -238,12 +238,12 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
             linkTo = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
 

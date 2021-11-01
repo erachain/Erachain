@@ -10,7 +10,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
-import org.erachain.smartcontracts.SmartContract;
+import org.erachain.dapp.DAPP;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
@@ -124,12 +124,12 @@ public class IssuePersonRecord extends IssueItemRecord {
             linkTo = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;

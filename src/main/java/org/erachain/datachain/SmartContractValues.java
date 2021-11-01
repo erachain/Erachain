@@ -9,7 +9,7 @@ import java.util.HashMap;
 /**
  * Use only for unlinked values
  *
- * <b>Ключ:</b> smartContract.id + var.name<br>
+ * <b>Ключ:</b> DAPP.id + var.name<br>
  *
  * <b>Значение:</b> Value
  */

@@ -18,11 +18,11 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.*;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
-import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -950,7 +950,7 @@ public class WebTransactionsHTML {
 
     public static void getContract(HashMap output, Transaction transaction, JSONObject langObj) {
 
-        SmartContract contract = transaction.getSmartContract();
+        DAPP contract = transaction.getSmartContract();
         if (contract == null) {
             return;
         }

@@ -16,6 +16,7 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.dapp.DAPP;
 import org.erachain.gui.Gui;
 import org.erachain.gui.IconPanel;
 import org.erachain.gui.PasswordPane;
@@ -29,7 +30,6 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
-import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
 import org.mapdb.Fun;
@@ -63,7 +63,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
 
     public ExLink exLink;
 
-    public SmartContract smartContract;
+    public DAPP dapp;
 
     public int feePow;
 
@@ -690,7 +690,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         }
 
         transaction = Controller.getInstance().r_Send(RSend.CURRENT_VERS, backward ? TransactionAmount.BACKWARD_MASK : 0,
-                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator), exLink, smartContract, feePow,
+                (byte) 0, Controller.getInstance().getWalletPrivateKeyAccountByAddress(creator), exLink, dapp, feePow,
                 recipient, assetKey, getAmount(), actionPackage, assetsPackage, txTitle, messageBytes, isTextByte, encrypted);
 
         String Status_text = "";

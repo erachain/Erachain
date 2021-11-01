@@ -1,7 +1,7 @@
 package org.erachain.core.epoch;
 
 import org.erachain.core.transaction.Transaction;
-import org.erachain.smartcontracts.epoch.DogePlanet;
+import org.erachain.dapp.epoch.DogePlanet;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -311,9 +311,9 @@ public class RSetUnionToItem extends Transaction {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dapp != null) {
+            if (forDeal == FOR_DB_RECORD || !dapp.isEpoch()) {
+                base_len += dapp.length(forDeal);
             }
         }
 

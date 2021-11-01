@@ -12,11 +12,11 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.database.PairMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
-import org.erachain.smartcontracts.epoch.shibaverse.ShibaVerseSC;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -609,8 +609,8 @@ public abstract class AssetCls extends ItemCls {
                 return "<b>COMPU</b> is an <u>Accounting Unit</u> allowing a User that has a sufficient amount of such units, with such sufficiency threshold computed in the ERACHAIN Software, to use the ERACHAIN Software for entering that User’s Request Entries on the Log, both on his own and by having such service provided by other Users. The COMPU Accounting Unit operates on the Log as a unit used to pay for the provision of service of making an entry to the Log. For more information see Erachain Licence Agreementon the <a href=\"http://erachain.org\">Erachain.org</a>.";
         }
 
-        if (maker.equals(ShibaVerseSC.MAKER))
-            return ShibaVerseSC.viewDescription(this, description);
+        if (maker.equals(ShibaVerseDAPP.MAKER))
+            return ShibaVerseDAPP.viewDescription(this, description);
 
         return this.description;
     }
