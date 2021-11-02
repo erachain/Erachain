@@ -569,11 +569,11 @@ public class ExData {
         return !isEncrypted() && json.containsKey("FU");
     }
 
-    static long templateRoyaltyFee = 200 * 10;
+    static long templateRoyaltyFee = 2000 * BlockChain.FEE_PER_BYTE;
 
     public long getRoyaltyFee() {
         if (templateKey > 0)
-            return templateRoyaltyFee * BlockChain.FEE_PER_BYTE;
+            return templateRoyaltyFee;
 
         return 0L;
     }
