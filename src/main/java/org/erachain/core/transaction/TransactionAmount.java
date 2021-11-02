@@ -705,14 +705,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             JSONArray packetArray = new JSONArray();
             for (Object[] row : packet) {
                 JSONArray rowArray = new JSONArray();
-                rowArray.add(row[0]);
-                rowArray.add(row[1]);
-                rowArray.add(row[2]);
-                rowArray.add(row[3]);
-                rowArray.add(row[4]);
-                rowArray.add(row[5]);
-                rowArray.add(row[6]);
-                rowArray.add(((AssetCls) row[7]).toJsonInfo());
+                rowArray.add(row[0]); // asset Key
+                rowArray.add(((BigDecimal) row[1]).toPlainString()); // volume
+                rowArray.add(row[2] == null ? "0" : ((BigDecimal) row[2]).toPlainString()); // price
+                rowArray.add(row[3] == null ? "0" : ((BigDecimal) row[3]).toPlainString()); // dicconted price
+                rowArray.add(row[4] == null ? "0" : ((BigDecimal) row[4]).toPlainString()); // tax %
+                rowArray.add(row[5] == null ? "0" : ((BigDecimal) row[5]).toPlainString()); // fee
+                rowArray.add(row[6]); // memo
+                rowArray.add(((AssetCls) row[7]).toJsonInfo()); // asset
                 packetArray.add(rowArray);
             }
             transaction.put("packet", packetArray);
