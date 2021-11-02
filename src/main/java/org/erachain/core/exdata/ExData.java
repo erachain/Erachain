@@ -573,7 +573,7 @@ public class ExData {
 
     public long getRoyaltyFee() {
         if (templateKey > 0)
-            return templateRoyaltyFee;
+            return templateRoyaltyFee * BlockChain.FEE_PER_BYTE;
 
         return 0L;
     }
