@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  * Use states for save values that self-linked (change itself by previous state)
- * <b>Ключ:</b> smartContract.id + state.No<br>
+ * <b>Ключ:</b> DAPP.id + state.No<br>
  *
  * <b>Значение:</b> State values
  */

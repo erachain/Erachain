@@ -23,6 +23,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -30,7 +31,6 @@ import org.erachain.gui.library.ASMutableTreeNode;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -442,7 +442,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected Object[][] itemsKeys;
 
     protected ExLink exLink;
-    protected SmartContract smartContract;
+    protected DAPP dapp;
 
     /**
      * если да то значит взята из Пула трнзакций и на двойную трату проверялась
@@ -457,7 +457,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.TYPE_NAME = type_name;
     }
 
-    protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, long timestamp,
+    protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, DAPP dapp, byte feePow, long timestamp,
                           long extFlags) {
         this.typeBytes = typeBytes;
         this.TYPE_NAME = type_name;
@@ -470,7 +470,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         // NOT NEED HERE setup - typeBytes[2] | HAS_SMART_CONTRACT_MASK()
-        this.smartContract = smartContract;
+        this.dapp = dapp;
 
         this.timestamp = timestamp;
 
@@ -701,7 +701,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.seqNo = seqNo;
         this.dbRef = Transaction.makeDBRef(height, seqNo);
         if (forDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0))
-            calcFee(false);
+            calcFee(true);
 
         if (andUpdateFromState && !isWiped())
             updateFromStateDB();
@@ -938,8 +938,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return exLink;
     }
 
-    public SmartContract getSmartContract() {
-        return smartContract;
+    public DAPP getSmartContract() {
+        return dapp;
     }
 
     public void makeItemsKeys() {
@@ -1660,10 +1660,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         // getSignature - make in GENEIS
         transaction.put("signature", this.getSignature() == null ? "null" : Base58.encode(this.signature));
 
-        int height;
-        if (this.creator == null) {
+        //int height;
+        if (height == 1) {
             transaction.put("creator", "genesis");
-            height = 1;
+        } else if (this.creator == null) {
+            transaction.put("creator", "genesis");
         } else {
             transaction.put("feePow", getFeePow());
             transaction.put("forgedFee", getForgedFee());
@@ -1673,7 +1674,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             transaction.put("deadLine", getDeadline());
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
             creator.toJsonPersonInfo(transaction, "creator");
-            transaction.put("fee", this.fee.toPlainString());
+            if (fee != null && fee.signum() != 0)
+                transaction.put("fee", this.fee.stripTrailingZeros().toPlainString());
             transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
         }
 
@@ -1684,6 +1686,29 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             if (isWiped()) {
                 transaction.put("wiped", true);
             }
+        }
+
+        if (assetFEE != null) {
+            JSONObject jsonFee = new JSONObject();
+            jsonFee.put("fee", assetFEE.a.stripTrailingZeros().toPlainString());
+            if (assetFEE.b != null)
+                jsonFee.put("burn", assetFEE.b.stripTrailingZeros().toPlainString());
+            transaction.put("assetFEE", jsonFee);
+        }
+
+        if (assetsPacketFEE != null && !assetsPacketFEE.isEmpty()) {
+            Tuple2<BigDecimal, BigDecimal> rowTAX;
+            JSONObject jsonFee = new JSONObject();
+            for (AssetCls asset : assetsPacketFEE.keySet()) {
+                rowTAX = assetsPacketFEE.get(asset);
+                JSONObject assetFee = new JSONObject();
+                assetFee.put("fee", rowTAX.a.stripTrailingZeros().toPlainString());
+                if (rowTAX.b != null)
+                    assetFee.put("burn", rowTAX.b.stripTrailingZeros().toPlainString());
+                jsonFee.put(asset.getKey(), assetFee);
+            }
+            transaction.put("assetPackageFEE", jsonFee);
+
         }
 
         transaction.put("size", this.viewSize(Transaction.FOR_NETWORK));
@@ -1896,10 +1921,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             data = Bytes.concat(data, exLink.toBytes());
         }
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
+        if (dapp != null) {
+            if (forDeal == FOR_DB_RECORD || !dapp.isEpoch()) {
                 typeBytes[2] |= HAS_SMART_CONTRACT_MASK();
-                data = Bytes.concat(data, smartContract.toBytes(forDeal));
+                data = Bytes.concat(data, dapp.toBytes(forDeal));
             } else {
                 typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
             }
@@ -1964,9 +1989,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dapp != null) {
+            if (forDeal == FOR_DB_RECORD || !dapp.isEpoch()) {
+                base_len += dapp.length(forDeal);
             }
         }
 
@@ -2641,14 +2666,14 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public void processTail(Block block, int forDeal) {
 
         ///////// SMART CONTRACTS SESSION
-        if (smartContract == null && (block == null || block.heightBlock > 1)) {
+        if (dapp == null && (block == null || block.heightBlock > 1)) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
             // потом он будет записан в базу данных и его можно найти загрузив эту трнзакцию
-            smartContract = SmartContract.make(this);
+            dapp = dapp.make(this);
         }
 
-        if (smartContract != null)
-            smartContract.process(dcSet, block, this);
+        if (dapp != null)
+            dapp.process(dcSet, block, this);
 
         // UPDATE REFERENCE OF SENDER
         if (this.creator != null)
@@ -2668,8 +2693,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * @param block
      */
     public void processByTime(Block block) {
-        if (smartContract != null) {
-            smartContract.processByTime(dcSet, block, this);
+        if (dapp != null) {
+            dapp.processByTime(dcSet, block, this);
             // update status in DB
 
         }
@@ -2685,19 +2710,19 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         ///////// SMART CONTRACTS SESSION
-        if (smartContract == null && block.heightBlock > 1) {
+        if (dapp == null && block.heightBlock > 1) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
             // для Отката нужно это сделать тут
-            smartContract = SmartContract.make(this);
+            dapp = dapp.make(this);
         }
 
-        if (smartContract != null) {
+        if (dapp != null) {
             // если смарт-контракт найден, то тут он Голый и
             // его надо загружать из баазы данных чтобы восстановить все значения связанные с этой транзакцией
             Transaction txInDB = dcSet.getTransactionFinalMap().get(dbRef);
-            smartContract = txInDB.getSmartContract();
+            dapp = txInDB.getSmartContract();
 
-            smartContract.orphan(dcSet, this);
+            dapp.orphan(dcSet, this);
         }
 
     }
@@ -2745,8 +2770,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void orphanByTime(Block block) {
-        if (smartContract != null)
-            smartContract.orphanByTime(dcSet, block, this);
+        if (dapp != null)
+            dapp.orphanByTime(dcSet, block, this);
     }
 
     public Transaction copy() {

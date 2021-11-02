@@ -1,4 +1,4 @@
-package org.erachain.smartcontracts.epoch.shibaverse;
+package org.erachain.dapp.epoch.shibaverse;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -12,14 +12,14 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.dapp.DAPP;
+import org.erachain.dapp.epoch.EpochDAPP;
+import org.erachain.dapp.epoch.shibaverse.server.Farm_01;
 import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.SmartContractValues;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
-import org.erachain.smartcontracts.SmartContract;
-import org.erachain.smartcontracts.epoch.EpochSmartContract;
-import org.erachain.smartcontracts.epoch.shibaverse.server.Farm_01;
 import org.erachain.webserver.WebResource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class ShibaVerseSC extends EpochSmartContract {
+public class ShibaVerseDAPP extends EpochDAPP {
 
     int WAIT_RAND = 3;
 
@@ -54,8 +54,8 @@ public class ShibaVerseSC extends EpochSmartContract {
     static {
         farm_01_settings.put("account", FARM_01_PUBKEY.getAddress());
 
-        if (SmartContract.settingsJSON.containsKey("shiba")) {
-            boolean farm_01 = (boolean) ((JSONObject) SmartContract.settingsJSON.get("shiba")).getOrDefault("farm_01", false);
+        if (DAPP.settingsJSON.containsKey("shiba")) {
+            boolean farm_01 = (boolean) ((JSONObject) DAPP.settingsJSON.get("shiba")).getOrDefault("farm_01", false);
             if (false && farm_01)
                 FARM_01_SERVER = new Farm_01(farm_01_settings);
         }
@@ -85,7 +85,7 @@ public class ShibaVerseSC extends EpochSmartContract {
     private String status;
     private Long gravitaKey;
 
-    public ShibaVerseSC(String command, String status) {
+    public ShibaVerseDAPP(String command, String status) {
         super(ID, MAKER);
 
         this.command = command;
@@ -98,7 +98,7 @@ public class ShibaVerseSC extends EpochSmartContract {
                 + Lang.T("Status", langObj) + ": <b>" + (status == null ? "" : status) + "</b>";
     }
 
-    public static ShibaVerseSC make(Transaction transaction) {
+    public static ShibaVerseDAPP make(Transaction transaction) {
 
         if (transaction.getBlockHeight() == 1609) {
             boolean debug = true;
@@ -115,16 +115,16 @@ public class ShibaVerseSC extends EpochSmartContract {
 
         if (recipent.equals(FARM_01_PUBKEY)) {
             if (txSend.balancePosition() == Account.BALANCE_POS_DEBT && txSend.hasAmount()) {
-                return new ShibaVerseSC(txSend.isBackward() ? COMMAND_PICK_UP : COMMAND_FARM, "");
+                return new ShibaVerseDAPP(txSend.isBackward() ? COMMAND_PICK_UP : COMMAND_FARM, "");
             } else if (txSend.balancePosition() == Account.BALANCE_POS_OWN) {
-                return new ShibaVerseSC(COMMAND_CHARGE, "");
+                return new ShibaVerseDAPP(COMMAND_CHARGE, "");
             }
         }
 
         if (txSend.isText() && !txSend.isEncrypted()) {
-            return new ShibaVerseSC(new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase(), "");
+            return new ShibaVerseDAPP(new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase(), "");
         } else {
-            return new ShibaVerseSC("", "");
+            return new ShibaVerseDAPP("", "");
         }
 
     }
@@ -279,7 +279,7 @@ public class ShibaVerseSC extends EpochSmartContract {
 
     }
 
-    public static ShibaVerseSC Parse(byte[] data, int pos, int forDeal) {
+    public static ShibaVerseDAPP Parse(byte[] data, int pos, int forDeal) {
 
         // skip ID
         pos += 4;
@@ -306,7 +306,7 @@ public class ShibaVerseSC extends EpochSmartContract {
             status = "-";
         }
 
-        return new ShibaVerseSC(command, status);
+        return new ShibaVerseDAPP(command, status);
     }
 
     ///////// COMMANDS

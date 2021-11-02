@@ -13,8 +13,8 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.BigDecimalUtil;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONArray;
@@ -150,9 +150,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     protected int balancePos;
 
     // need for calculate fee by feePow into GUI
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
+    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, DAPP dapp, byte feePow, Account recipient,
                                 BigDecimal amount, long key, long timestamp, long flags) {
-        super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, flags);
+        super(typeBytes, name, creator, exLink, dapp, feePow, timestamp, flags);
         this.recipient = recipient;
 
         if (amount == null || amount.signum() == 0) {
@@ -179,16 +179,16 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
      * @param name
      * @param creator
      * @param exLink
-     * @param smartContract
+     * @param dapp
      * @param feePow
      * @param recipient
      * @param packet
      * @param timestamp
      * @param extFlags
      */
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, SmartContract smartContract, byte feePow, Account recipient,
+    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, ExLink exLink, DAPP dapp, byte feePow, Account recipient,
                                 int balancePos, Long priceAssetKey, Object[][] packet, long timestamp, long extFlags) {
-        super(typeBytes, name, creator, exLink, smartContract, feePow, timestamp, extFlags);
+        super(typeBytes, name, creator, exLink, dapp, feePow, timestamp, extFlags);
         this.recipient = recipient;
 
         // SET 7 bit - HAS NO AMOUNT
@@ -705,14 +705,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             JSONArray packetArray = new JSONArray();
             for (Object[] row : packet) {
                 JSONArray rowArray = new JSONArray();
-                rowArray.add(row[0]);
-                rowArray.add(row[1]);
-                rowArray.add(row[2]);
-                rowArray.add(row[3]);
-                rowArray.add(row[4]);
-                rowArray.add(row[5]);
-                rowArray.add(row[6]);
-                rowArray.add(((AssetCls) row[7]).toJsonInfo());
+                rowArray.add(row[0]); // asset Key
+                rowArray.add(((BigDecimal) row[1]).stripTrailingZeros().toPlainString()); // volume
+                rowArray.add(row[2] == null ? "0" : ((BigDecimal) row[2]).stripTrailingZeros().toPlainString()); // price
+                rowArray.add(row[3] == null ? "0" : ((BigDecimal) row[3]).stripTrailingZeros().toPlainString()); // dicconted price
+                rowArray.add(row[4] == null ? "0" : ((BigDecimal) row[4]).stripTrailingZeros().toPlainString()); // tax %
+                rowArray.add(row[5] == null ? "0" : ((BigDecimal) row[5]).stripTrailingZeros().toPlainString()); // fee
+                rowArray.add(row[6] == null ? "" : row[6]); // memo
+                rowArray.add(((AssetCls) row[7]).toJsonInfo()); // asset
                 packetArray.add(rowArray);
             }
             transaction.put("packet", packetArray);
@@ -766,9 +766,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dapp != null) {
+            if (forDeal == FOR_DB_RECORD || !dapp.isEpoch()) {
+                base_len += dapp.length(forDeal);
             }
         }
 

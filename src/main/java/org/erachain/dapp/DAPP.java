@@ -1,4 +1,4 @@
-package org.erachain.smartcontracts;
+package org.erachain.dapp;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -13,18 +13,18 @@ import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.dapp.epoch.DogePlanet;
+import org.erachain.dapp.epoch.LeafFall;
+import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
-import org.erachain.smartcontracts.epoch.DogePlanet;
-import org.erachain.smartcontracts.epoch.LeafFall;
-import org.erachain.smartcontracts.epoch.shibaverse.ShibaVerseSC;
 import org.erachain.utils.FileUtils;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 
-public abstract class SmartContract {
+public abstract class DAPP {
 
     static protected Controller contr = Controller.getInstance();
     static protected Crypto crypto = Crypto.getInstance();
@@ -42,12 +42,12 @@ public abstract class SmartContract {
     protected final int id;
     protected final PublicKeyAccount maker;
 
-    protected SmartContract(int id, PublicKeyAccount maker) {
+    protected DAPP(int id, PublicKeyAccount maker) {
         this.id = id;
         this.maker = maker;
     }
 
-    protected SmartContract(int id) {
+    protected DAPP(int id) {
         this.id = id;
         this.maker = new PublicKeyAccount(crypto.digest(Longs.toByteArray(id)));
     }
@@ -105,7 +105,7 @@ public abstract class SmartContract {
         return data;
     }
 
-    public static SmartContract Parses(byte[] data, int position, int forDeal) throws Exception {
+    public static DAPP Parses(byte[] data, int position, int forDeal) throws Exception {
 
         byte[] idBuffer = new byte[4];
         System.arraycopy(data, position, idBuffer, 0, 4);
@@ -115,8 +115,8 @@ public abstract class SmartContract {
                 return LeafFall.Parse(data, position, forDeal);
             case DogePlanet.ID:
                 return DogePlanet.Parse(data, position, forDeal);
-            case ShibaVerseSC.ID:
-                return ShibaVerseSC.Parse(data, position, forDeal);
+            case ShibaVerseDAPP.ID:
+                return ShibaVerseDAPP.Parse(data, position, forDeal);
         }
 
         throw new Exception("wrong smart-contract id:" + id);
@@ -132,7 +132,7 @@ public abstract class SmartContract {
      * @param asOrphan
      */
     public static void processByBlock(DCSet dcSet, Block block, boolean asOrphan) {
-        ShibaVerseSC.blockAction(dcSet, block, asOrphan);
+        ShibaVerseDAPP.blockAction(dcSet, block, asOrphan);
     }
 
     abstract public boolean process(DCSet dcSet, Block block, Transaction transaction);
@@ -149,13 +149,13 @@ public abstract class SmartContract {
      * @param transaction
      * @return
      */
-    static public SmartContract make(Transaction transaction) {
+    static public DAPP make(Transaction transaction) {
 
         if (BlockChain.TEST_MODE
                 && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
 
-            SmartContract contract = ShibaVerseSC.make(transaction);
+            DAPP contract = ShibaVerseDAPP.make(transaction);
             if (contract != null)
                 return contract;
 

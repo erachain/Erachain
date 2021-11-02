@@ -1,4 +1,4 @@
-package org.erachain.smartcontracts.epoch.shibaverse.server;
+package org.erachain.dapp.epoch.shibaverse.server;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;

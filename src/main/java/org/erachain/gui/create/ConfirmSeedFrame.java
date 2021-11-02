@@ -110,7 +110,7 @@ public class ConfirmSeedFrame extends JFrame {
         //LABEL
         labelGBC.gridy = labelGBC.gridy + 1;
         labelGBC.insets.top = 10;
-        JLabel label3 = new JLabel(Lang.T("Please enter your wallet password") + ":");
+        JLabel label3 = new JLabel(Lang.T("Please create a new wallet password") + ":");
         this.add(label3, labelGBC);
 
         //ADD TEXTBOX
