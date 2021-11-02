@@ -706,12 +706,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             for (Object[] row : packet) {
                 JSONArray rowArray = new JSONArray();
                 rowArray.add(row[0]); // asset Key
-                rowArray.add(((BigDecimal) row[1]).toPlainString()); // volume
-                rowArray.add(row[2] == null ? "0" : ((BigDecimal) row[2]).toPlainString()); // price
-                rowArray.add(row[3] == null ? "0" : ((BigDecimal) row[3]).toPlainString()); // dicconted price
-                rowArray.add(row[4] == null ? "0" : ((BigDecimal) row[4]).toPlainString()); // tax %
-                rowArray.add(row[5] == null ? "0" : ((BigDecimal) row[5]).toPlainString()); // fee
-                rowArray.add(row[6]); // memo
+                rowArray.add(((BigDecimal) row[1]).stripTrailingZeros().toPlainString()); // volume
+                rowArray.add(row[2] == null ? "0" : ((BigDecimal) row[2]).stripTrailingZeros().toPlainString()); // price
+                rowArray.add(row[3] == null ? "0" : ((BigDecimal) row[3]).stripTrailingZeros().toPlainString()); // dicconted price
+                rowArray.add(row[4] == null ? "0" : ((BigDecimal) row[4]).stripTrailingZeros().toPlainString()); // tax %
+                rowArray.add(row[5] == null ? "0" : ((BigDecimal) row[5]).stripTrailingZeros().toPlainString()); // fee
+                rowArray.add(row[6] == null ? "" : row[6]); // memo
                 rowArray.add(((AssetCls) row[7]).toJsonInfo()); // asset
                 packetArray.add(rowArray);
             }
