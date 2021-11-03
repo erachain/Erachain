@@ -139,14 +139,6 @@ public class PayoutListPanel extends IconPanel implements ExActionPanelInt {
                                         if (str.startsWith("//"))
                                             continue;
 
-                                        // чтобы не было двойных выплат по счет и публичному ключу в списке - делаем Счет
-                                        account = Account.tryMakeAccount(str).a;
-                                        if (account == null)
-                                            continue;
-
-                                        if (lines.contains(account.getAddress()))
-                                            continue;
-
                                         lines.add(str);
                                     }
                                     in.close();

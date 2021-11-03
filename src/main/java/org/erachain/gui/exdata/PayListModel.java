@@ -17,6 +17,7 @@ public class PayListModel extends DefaultTableModel {
         add(Lang.T("No."));
         add(Lang.T("Account"));
         add(Lang.T("Amount"));
+        add(Lang.T("Memo"));
         add(Lang.T("Error"));
     }};
 
@@ -52,26 +53,35 @@ public class PayListModel extends DefaultTableModel {
 
         Vector<Object> rowVector;
         Fun.Tuple2<Account, String> result;
+        String error;
         for (String row : lines) {
+            error = "";
             String[] items = row.split(" ");
             result = Account.tryMakeAccount(items[0]);
             rowVector = new Vector<Object>(8);
             rowVector.addElement(++count);
             if (result.a == null) {
-                rowVector.addElement(items[0]);
-                rowVector.addElement(result.b);
-                lastError = result.b;
+                rowVector.add(items[0]);
+                error = lastError = Lang.T(result.b);
             } else {
-                rowVector.addElement(result.a);
-                rowVector.addElement("");
+                rowVector.add(result.a);
             }
 
             try {
                 rowVector.add(new BigDecimal(items[1]));
             } catch (Exception e) {
-                rowVector.addElement(e.getMessage());
-                rowVector.addElement(null);
+                rowVector.add(items[1]);
+                error = lastError = Lang.T("Wrong amount");
             }
+
+            if (items.length > 2) {
+                int inx = row.indexOf(" ", items[0].length() + 1) + 1;
+                rowVector.add(row.substring(inx));
+            } else {
+                rowVector.add("");
+            }
+
+            rowVector.add(error);
 
             data.add(rowVector);
         }
