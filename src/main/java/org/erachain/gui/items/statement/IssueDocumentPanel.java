@@ -316,7 +316,7 @@ public class IssueDocumentPanel extends IconPanel {
         // Lang.T("Issue Asset"),
         // JOptionPane.YES_NO_OPTION);
 
-        // for calculate ExPays
+        // for calculate ExFilteredPays
         ///issueDoc.setDC(DCSet.getInstance());
         RNoteInfo rNoteInfo = new RNoteInfo(issueDoc); // here load all values and calc FEE
         //rNoteInfo.jPanel2.setVisible(false);

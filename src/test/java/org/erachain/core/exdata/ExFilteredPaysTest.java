@@ -1,13 +1,13 @@
 package org.erachain.core.exdata;
 
-import org.erachain.core.exdata.exActions.ExPays;
+import org.erachain.core.exdata.exActions.ExFilteredPays;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 
 import static org.junit.Assert.assertEquals;
 
-public class ExPaysTest {
+public class ExFilteredPaysTest {
 
     private int flags;
 
@@ -37,18 +37,18 @@ public class ExPaysTest {
     @Test
     public void toByte() {
 
-        ExPays exPays = new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+        ExFilteredPays exFilteredPays = new ExFilteredPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMoreThen, filterBalanceLessThen,
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         byte[] bytes = null;
         try {
-            bytes = exPays.toBytes();
+            bytes = exFilteredPays.toBytes();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        assertEquals(bytes.length, exPays.length());
+        assertEquals(bytes.length, exFilteredPays.length());
 
     }
 
@@ -58,27 +58,27 @@ public class ExPaysTest {
 
     @Test
     public void parse() {
-        ExPays exPays = new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+        ExFilteredPays exFilteredPays = new ExFilteredPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMoreThen, filterBalanceLessThen,
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo,
                 filterByGender, selfPay);
         byte[] bytes = null;
         try {
-            bytes = exPays.toBytes();
+            bytes = exFilteredPays.toBytes();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        assertEquals(bytes.length, exPays.length());
+        assertEquals(bytes.length, exFilteredPays.length());
 
-        ExPays exPaysParsed = null;
+        ExFilteredPays exFilteredPaysParsed = null;
         try {
-            exPaysParsed = ExPays.parse(bytes, 0);
+            exFilteredPaysParsed = ExFilteredPays.parse(bytes, 0);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
-        assertEquals(exPays.filterTimeEnd, exPaysParsed.filterTimeEnd);
+        assertEquals(exFilteredPays.filterTimeEnd, exFilteredPaysParsed.filterTimeEnd);
 
     }
 

@@ -1715,7 +1715,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             // 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
             for (Object[] row : packet) {
 
-                // see core.exdata.exActions.ExPays.makeFilterPayList
+                // see core.exdata.exActions.ExFilteredPays.makeFilterPayList
                 signs = Account.getSignsForBalancePos(balancePos);
                 assetKeyRow = signs.a * (Long) row[0];
                 amountRow = signs.b > 0 ? (BigDecimal) row[1] : ((BigDecimal) row[1]).negate();
@@ -1784,7 +1784,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             // 0: (long) AssetKey, 1: Amount, 2: Price, 3: Discounted Price, 4: Tax as percent, 5: Fee as absolute value, 6: memo, 7: Asset (after setDC())
             for (Object[] row : packet) {
 
-                // see core.exdata.exActions.ExPays.makeFilterPayList
+                // see core.exdata.exActions.ExFilteredPays.makeFilterPayList
                 signs = Account.getSignsForBalancePos(balancePos);
                 assetKeyRow = signs.a * (Long) row[0];
                 amountRow = signs.b > 0 ? (BigDecimal) row[1] : ((BigDecimal) row[1]).negate();

@@ -7,7 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.ExData;
-import org.erachain.core.exdata.exActions.ExPays;
+import org.erachain.core.exdata.exActions.ExFilteredPays;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.IDB;
@@ -76,7 +76,7 @@ public class RSignNoteTest {
         Long assetKey = 1L;
         int balancePos = 1;
         boolean backward = false;
-        int payMethod = ExPays.PAYMENT_METHOD_ABSOLUTE;
+        int payMethod = ExFilteredPays.PAYMENT_METHOD_ABSOLUTE;
         BigDecimal payMethodValue = BigDecimal.ONE;
         BigDecimal amountMin = null;
         BigDecimal amountMax = null;
@@ -88,14 +88,14 @@ public class RSignNoteTest {
         int filterTXType = 0;
         Long filterTXStartSeqNo = null;
         Long filterTXEndSeqNo = null;
-        int filterByGender = ExPays.FILTER_PERSON_ONLY_MAN;
+        int filterByGender = ExFilteredPays.FILTER_PERSON_ONLY_MAN;
         boolean selfPay = true;
 
-        ExPays exPays = new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+        ExFilteredPays exFilteredPays = new ExFilteredPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide, filterBalanceMIN, filterBalanceMAX,
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo, filterByGender, selfPay);
 
-        ExData exData = new ExData(flagsExData, exLink, exPays, "title", (byte) 0, null,
+        ExData exData = new ExData(flagsExData, exLink, exFilteredPays, "title", (byte) 0, null,
                 (byte) 0, null,
                 (byte) 0, null, null, json, null);
 
