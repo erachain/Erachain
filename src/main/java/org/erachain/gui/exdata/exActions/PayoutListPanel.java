@@ -469,7 +469,8 @@ public class PayoutListPanel extends IconPanel implements ExActionPanelInt {
         for (Vector items : vector) {
             JSONArray itemsJson = new JSONArray();
             itemsJson.add(((Account) items.get(1)).getAddress());
-            itemsJson.add(items.get(2));
+            itemsJson.add(items.get(2)); // amount
+            itemsJson.add(items.get(3)); // memo
 
             array.add(itemsJson);
         }
