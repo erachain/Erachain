@@ -20,6 +20,7 @@ import org.erachain.gui.models.RenderComboBoxAssetActions;
 import org.erachain.gui.models.RenderComboBoxViewBalance;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONArray;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,8 +150,7 @@ public class PayoutListPanel extends IconPanel implements ExActionPanelInt {
                                         lines.add(str);
                                     }
                                     in.close();
-                                    addresses = lines.toArray(new String[lines.size()]);
-                                    addressesModel = new PayListModel(addresses);
+                                    addressesModel = new PayListModel(lines);
                                     jTableAddresses.setModel(addressesModel);
 
                                     TableColumnModel columnModel = jTableAddresses.getColumnModel();
@@ -473,15 +473,19 @@ public class PayoutListPanel extends IconPanel implements ExActionPanelInt {
                 = (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>) jComboBoxAccrualAction.getSelectedItem();
 
         Vector<Vector> vector = addressesModel.getDataVector();
-        String[] addresses = new String[vector.size()];
-        for (int i = 0; i < vector.size(); i++) {
-            addresses[i] = ((Account) vector.get(i).get(1)).getAddress();
+        JSONArray array = new JSONArray();
+        for (Vector items : vector) {
+            JSONArray itemsJson = new JSONArray();
+            itemsJson.add(((Account) items.get(1)).getAddress());
+            itemsJson.add(items.get(2));
+
+            array.add(itemsJson);
         }
 
         return ExListPays.make(
                 ((AssetCls) jComboBoxAccrualAsset.getSelectedItem()).getKey(),
                 balancePosition.a.a, balancePosition.a.b,
-                addresses);
+                array);
     }
 
     private JButton jButtonLoad = new JButton();

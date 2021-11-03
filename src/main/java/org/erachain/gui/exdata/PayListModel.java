@@ -16,17 +16,17 @@ public class PayListModel extends DefaultTableModel {
     static Vector<Object> headVector = new Vector<Object>(8) {{
         add(Lang.T("No."));
         add(Lang.T("Account"));
+        add(Lang.T("Amount"));
         add(Lang.T("Error"));
     }};
 
     public PayListModel() {
         super(new Vector(), headVector);
         lastError = null;
-        //addRow(new Object[]{0, "", ""});
     }
 
-    public PayListModel(String[] addresses) {
-        super(setRows(addresses), headVector);
+    public PayListModel(List<String> lines) {
+        super(setRows(lines), headVector);
     }
 
     public PayListModel(List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals, boolean onlyErrors) {
@@ -38,7 +38,13 @@ public class PayListModel extends DefaultTableModel {
         return false && column == 1;
     }
 
-    static Vector setRows(String[] addresses) {
+    /**
+     * separate lines by SPACE
+     *
+     * @param lines
+     * @return
+     */
+    static Vector setRows(List<String> lines) {
         lastError = null;
 
         int count = 0;
@@ -46,17 +52,25 @@ public class PayListModel extends DefaultTableModel {
 
         Vector<Object> rowVector;
         Fun.Tuple2<Account, String> result;
-        for (String item : addresses) {
-            result = Account.tryMakeAccount(item);
+        for (String row : lines) {
+            String[] items = row.split(" ");
+            result = Account.tryMakeAccount(items[0]);
             rowVector = new Vector<Object>(8);
             rowVector.addElement(++count);
             if (result.a == null) {
-                rowVector.addElement(item);
+                rowVector.addElement(items[0]);
                 rowVector.addElement(result.b);
                 lastError = result.b;
             } else {
                 rowVector.addElement(result.a);
                 rowVector.addElement("");
+            }
+
+            try {
+                rowVector.add(new BigDecimal(items[1]));
+            } catch (Exception e) {
+                rowVector.addElement(e.getMessage());
+                rowVector.addElement(null);
             }
 
             data.add(rowVector);
@@ -84,7 +98,7 @@ public class PayListModel extends DefaultTableModel {
             if (item.b == null) {
                 rowVector.addElement("");
             } else {
-                rowVector.addElement(Lang.T(OnDealClick.resultMess(item.b.a)) + (item.b.b == null ? "" : " - " + item.b.b));
+                rowVector.addElement(Lang.T(OnDealClick.resultMess(item.c.a)) + (item.c.b == null ? "" : " - " + item.c.b));
             }
 
             data.add(rowVector);

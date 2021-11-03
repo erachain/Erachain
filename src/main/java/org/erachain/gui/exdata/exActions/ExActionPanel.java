@@ -96,5 +96,5 @@ public class ExActionPanel extends IconPanel {
 
     public javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> selectBox;
     private JPanel actionsPanel = new JPanel();
-    public IconPanel[] actionPanels = new IconPanel[2];
+    public IconPanel[] actionPanels = new IconPanel[3];
 }
