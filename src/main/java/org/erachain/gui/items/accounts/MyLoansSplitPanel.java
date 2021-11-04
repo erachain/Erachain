@@ -71,7 +71,6 @@ public class MyLoansSplitPanel extends SplitPanel {
             selectArg = new Tuple2<>(item.a, item.b);
             assetSelect = asset;
             rightPanel.tableModel.setAccount(item.a);
-            //rightPanel.tableModel.fireTableDataChanged();
             rightPanel.setAsset(asset);
             jScrollPaneJPanelRightPanel.setViewportView(rightPanel);
 
