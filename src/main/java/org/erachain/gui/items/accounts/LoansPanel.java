@@ -16,6 +16,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
@@ -48,14 +50,12 @@ public class LoansPanel extends JPanel {
         buttonGBC.gridy = 0;
 
         //ASSET FAVORITES
-        cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel(AssetCls.FEE_KEY));
+        cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel(AssetCls.ERA_KEY));
         cbxFavorites.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
         this.add(cbxFavorites, buttonGBC);
 
         //TABLE
-        tableModel = new AccountLoansTableModel();
-        // start data in model
-        tableModel.setAsset((AssetCls) cbxFavorites.getSelectedItem());
+        tableModel = new AccountLoansTableModel((AssetCls) cbxFavorites.getSelectedItem());
         table = Gui.createSortableTable(tableModel, 0);
 
         TableColumn column_No = table.getColumnModel().getColumn(tableModel.COLUMN_NO);
@@ -109,6 +109,20 @@ public class LoansPanel extends JPanel {
         tableGBC.gridx = 1;
         tableGBC.gridy = 1;
         this.add(new JScrollPane(table), tableGBC);
+
+        //ON FAVORITES CHANGE
+        cbxFavorites.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                // TODO Auto-generated method stub
+
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+                    tableModel.setAsset(asset);
+                }
+            }
+        });
 
     }
 

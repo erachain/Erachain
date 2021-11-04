@@ -226,7 +226,7 @@ public class TestRecSendInSideAsset {
         r_Send.process(gb, Transaction.FOR_NETWORK);
 
         creditKey = new Tuple3<String, Long, String>(creditor.getAddress(), assetKey, debtor.getAddress());
-        assertEquals(BigDecimal.valueOf(10), db.getCredit_AddressesMap().get(creditKey));
+        assertEquals(BigDecimal.valueOf(10), db.getCreditAddressesMap().get(creditKey));
 
         //CHECK BALANCE CREDITOR
         creditorBalance = creditor.getBalance(db, assetKey);
@@ -250,7 +250,7 @@ public class TestRecSendInSideAsset {
         /////////////////////////////////////////////////
         r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
-        assertEquals(BigDecimal.valueOf(0), db.getCredit_AddressesMap().get(creditKey));
+        assertEquals(BigDecimal.valueOf(0), db.getCreditAddressesMap().get(creditKey));
 
         //CHECK BALANCE CREDITOR
         creditorBalance = creditor.getBalance(db, assetKey);
@@ -271,7 +271,7 @@ public class TestRecSendInSideAsset {
 
         // PROCESS BACK
         r_Send.process(gb, Transaction.FOR_NETWORK);
-        assertEquals(BigDecimal.valueOf(10), db.getCredit_AddressesMap().get(creditKey));
+        assertEquals(BigDecimal.valueOf(10), db.getCreditAddressesMap().get(creditKey));
 
         //////////////////////
         // GET backward credit
@@ -301,7 +301,7 @@ public class TestRecSendInSideAsset {
         r_Send.sign(emitter, Transaction.FOR_NETWORK);
         r_Send.process(gb, Transaction.FOR_NETWORK);
 
-        assertEquals(BigDecimal.valueOf(3), db.getCredit_AddressesMap().get(creditKey));
+        assertEquals(BigDecimal.valueOf(3), db.getCreditAddressesMap().get(creditKey));
 
         //CHECK BALANCE CREDITOR
         creditorBalance = creditor.getBalance(db, assetKey);
@@ -325,7 +325,7 @@ public class TestRecSendInSideAsset {
         /////////////////////////////////////////////////
         r_Send.orphan(gb, Transaction.FOR_NETWORK);
 
-        assertEquals(BigDecimal.valueOf(10), db.getCredit_AddressesMap().get(creditKey));
+        assertEquals(BigDecimal.valueOf(10), db.getCreditAddressesMap().get(creditKey));
 
         //CHECK BALANCE CREDITOR
         creditorBalance = creditor.getBalance(db, assetKey);
@@ -358,9 +358,9 @@ public class TestRecSendInSideAsset {
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         r_Send.process(gb, Transaction.FOR_NETWORK);
 
-        assertEquals(BigDecimal.valueOf(3), db.getCredit_AddressesMap().get(creditKey));
+        assertEquals(BigDecimal.valueOf(3), db.getCreditAddressesMap().get(creditKey));
         creditKeyReverse = new Tuple3<String, Long, String>(debtor.getAddress(), assetKey, creditor.getAddress());
-        assertEquals(BigDecimal.valueOf(0), db.getCredit_AddressesMap().get(creditKeyReverse));
+        assertEquals(BigDecimal.valueOf(0), db.getCreditAddressesMap().get(creditKeyReverse));
 
         // CREDIT 2
         r_Send = new RSend(debtor, exLink, DAPP, FEE_POWER, creditor, -assetKey, BigDecimal.valueOf(30),
@@ -373,8 +373,8 @@ public class TestRecSendInSideAsset {
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         r_Send.process(gb, Transaction.FOR_NETWORK);
 
-        assertEquals(BigDecimal.valueOf(0), db.getCredit_AddressesMap().get(creditKey));
-        assertEquals(BigDecimal.valueOf(27), db.getCredit_AddressesMap().get(creditKeyReverse));
+        assertEquals(BigDecimal.valueOf(0), db.getCreditAddressesMap().get(creditKey));
+        assertEquals(BigDecimal.valueOf(27), db.getCreditAddressesMap().get(creditKeyReverse));
 
 
         //CHECK BALANCE CREDITOR
@@ -384,7 +384,7 @@ public class TestRecSendInSideAsset {
 
         assertEquals(BigDecimal.valueOf(30), creditorBalance.b.a);
         assertEquals(BigDecimal.valueOf(27), creditorBalance.b.b);
-        assertEquals(BigDecimal.valueOf(50+27), creditor.getBalanceUSE(assetKey, db));
+        assertEquals(BigDecimal.valueOf(50 + 27), creditor.getBalanceUSE(assetKey, db));
 
         //CHECK BALANCE DEBTOR
         debtorBalance = debtor.getBalance(db, assetKey);
@@ -407,8 +407,8 @@ public class TestRecSendInSideAsset {
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         r_Send.process(gb, Transaction.FOR_NETWORK);
 
-        assertEquals(BigDecimal.valueOf(0), db.getCredit_AddressesMap().get(creditKey));
-        assertEquals(BigDecimal.valueOf(27), db.getCredit_AddressesMap().get(creditKeyReverse));
+        assertEquals(BigDecimal.valueOf(0), db.getCreditAddressesMap().get(creditKey));
+        assertEquals(BigDecimal.valueOf(27), db.getCreditAddressesMap().get(creditKeyReverse));
 
 
         //CHECK BALANCE CREDITOR
@@ -418,7 +418,7 @@ public class TestRecSendInSideAsset {
 
         assertEquals(BigDecimal.valueOf(30), creditorBalance.b.a);
         assertEquals(BigDecimal.valueOf(27), creditorBalance.b.b);
-        assertEquals(BigDecimal.valueOf(50+27), creditor.getBalanceUSE(assetKey, db));
+        assertEquals(BigDecimal.valueOf(50 + 27), creditor.getBalanceUSE(assetKey, db));
 
         //CHECK BALANCE DEBTOR
         debtorBalance = debtor.getBalance(db, assetKey);

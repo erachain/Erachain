@@ -474,7 +474,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
     }
 
     private static void farm(DCSet dcSet, Block block, boolean asOrphan) {
-        CreditAddressesMap map = dcSet.getCredit_AddressesMap();
+        CreditAddressesMap map = dcSet.getCreditAddressesMap();
         SmartContractValues mapValues = dcSet.getSmartContractValues();
         Fun.Tuple3<String, Long, String> key;
         BigDecimal credit;

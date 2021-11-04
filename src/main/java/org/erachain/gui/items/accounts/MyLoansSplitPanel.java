@@ -1,21 +1,24 @@
 package org.erachain.gui.items.accounts;
 
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.SplitPanel;
 import org.erachain.lang.Lang;
+import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.math.BigDecimal;
 
 
 public class MyLoansSplitPanel extends SplitPanel {
 
-    private static final long serialVersionUID = 1L;
     public LoansPanel loansPanel;
     public AssetCls assetSelect;
-    private Account selectArg;
+    private Tuple2<PublicKeyAccount, Account> selectArg;
     private AccountsRightPanel rightPanel;
 
     public static String NAME = "MyLoansSplitPanel";
@@ -59,14 +62,15 @@ public class MyLoansSplitPanel extends SplitPanel {
         public void valueChanged(ListSelectionEvent arg0) {
 
             AssetCls asset = (AssetCls) loansPanel.cbxFavorites.getSelectedItem();
-            Account account = null;
-            if (loansPanel.table.getSelectedRow() >= 0)
-                account = loansPanel.tableModel.getItem(loansPanel.table.convertRowIndexToModel(loansPanel.table.getSelectedRow()));
+            Fun.Tuple3<PublicKeyAccount, Account, BigDecimal> item = null;
+            if (loansPanel.table.getSelectedRow() >= 0) {
+                item = loansPanel.tableModel.getItem(loansPanel.table.convertRowIndexToModel(loansPanel.table.getSelectedRow()));
+            }
 
-            if (account == null || asset == null || account.equals(selectArg) && asset.equals(assetSelect)) return;
-            selectArg = account;
+            if (item == null || asset == null || item.equals(selectArg) && asset.equals(assetSelect)) return;
+            selectArg = new Tuple2<>(item.a, item.b);
             assetSelect = asset;
-            rightPanel.tableModel.setAccount(account);
+            //rightPanel.tableModel.setAccount(account);
             rightPanel.tableModel.fireTableDataChanged();
             rightPanel.setAsset(asset);
             jScrollPaneJPanelRightPanel.setViewportView(rightPanel);

@@ -1008,7 +1008,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     // BACKWARD - BORROW - CONFISCATE CREDIT
                                     Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
                                             creator.getAddress(), absKey, recipient.getAddress());
-                                    BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+                                    BigDecimal creditAmount = dcSet.getCreditAddressesMap().get(creditKey);
                                     if (creditAmount.compareTo(amount) < 0) {
                                         // NOT ENOUGH DEBT from recipient to THIS creator
                                         return new Fun.Tuple2<>(NO_DEBT_BALANCE, null);
@@ -1036,7 +1036,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
                                                 recipient.getAddress(), absKey, creator.getAddress());
                                         // TRY RETURN
-                                        BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+                                        BigDecimal creditAmount = dcSet.getCreditAddressesMap().get(creditKey);
                                         if (creditAmount.compareTo(amount) < 0) {
 
                                             // TODO: найти ошибку когда возвращаем больше чем на счету
@@ -1604,42 +1604,42 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             if (asOrphan) {
                 if (backward) {
                     // BORROW
-                    dcSet.getCredit_AddressesMap().add(creditKey, amount);
+                    dcSet.getCreditAddressesMap().add(creditKey, amount);
                 } else {
                     // in BACK order - RETURN CREDIT << CREDIT
                     // GET CREDIT for left AMOUNT
-                    BigDecimal leftAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+                    BigDecimal leftAmount = dcSet.getCreditAddressesMap().get(creditKey);
                     if (leftAmount.compareTo(amount) < 0) {
-                        dcSet.getCredit_AddressesMap().sub(creditKey, leftAmount);
+                        dcSet.getCreditAddressesMap().sub(creditKey, leftAmount);
                         // RETURN my DEBT and make reversed DEBT
-                        dcSet.getCredit_AddressesMap().add(creditKeyRecipient, amount.subtract(leftAmount));
+                        dcSet.getCreditAddressesMap().add(creditKeyRecipient, amount.subtract(leftAmount));
                     } else {
                         // ONLY RETURN CREDIT
-                        dcSet.getCredit_AddressesMap().sub(creditKey, amount);
+                        dcSet.getCreditAddressesMap().sub(creditKey, amount);
                     }
                 }
             } else {
                 if (backward) {
                     // BORROW
-                    dcSet.getCredit_AddressesMap().sub(creditKey, amount);
+                    dcSet.getCreditAddressesMap().sub(creditKey, amount);
                 } else {
                     // CREDIT or RETURN CREDIT
-                    BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKeyRecipient);
+                    BigDecimal creditAmount = dcSet.getCreditAddressesMap().get(creditKeyRecipient);
                     if (creditAmount.compareTo(amount) >= 0) {
                         // ALL CREDIT RETURN
-                        dcSet.getCredit_AddressesMap().sub(creditKeyRecipient, amount);
+                        dcSet.getCreditAddressesMap().sub(creditKeyRecipient, amount);
                     } else {
                         // update creditAmount to 0
                         BigDecimal leftAmount;
                         if (creditAmount.signum() != 0) {
-                            dcSet.getCredit_AddressesMap().sub(creditKeyRecipient, creditAmount);
+                            dcSet.getCreditAddressesMap().sub(creditKeyRecipient, creditAmount);
                             // GET CREDIT for left AMOUNT
                             leftAmount = amount.subtract(creditAmount);
                         } else {
                             leftAmount = amount;
                         }
 
-                        dcSet.getCredit_AddressesMap().add(creditKey, leftAmount);
+                        dcSet.getCreditAddressesMap().add(creditKey, leftAmount);
                     }
                 }
             }
