@@ -8,6 +8,7 @@ import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
+import org.erachain.gui.items.accounts.SendableModel;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
-public class AccountLoansTableModel extends WalletTableModel<Tuple3<PublicKeyAccount, Account, BigDecimal>> implements ObserverWaiter {
+public class AccountLoansTableModel extends WalletTableModel<Tuple3<PublicKeyAccount, Account, BigDecimal>> implements SendableModel, ObserverWaiter {
     public final int COLUMN_NO = 0;
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_NAME = 2;
@@ -56,6 +57,21 @@ public class AccountLoansTableModel extends WalletTableModel<Tuple3<PublicKeyAcc
         fireTableDataChanged();
         needUpdate = false;
 
+    }
+
+    public PublicKeyAccount getCreator(int row) {
+        if (list == null)
+            return null;
+
+        return this.list.get(row).a;
+
+    }
+
+    public Account getRecipent(int row) {
+        if (list == null)
+            return null;
+
+        return this.list.get(row).b;
     }
 
     @Override

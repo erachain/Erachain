@@ -5,10 +5,12 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.Gui;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
+import org.erachain.gui.library.DealsPopupMenu;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.AccountLoansTableModel;
 import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.lang.Lang;
+import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -66,10 +68,10 @@ public class LoansPanel extends JPanel {
         column_No.sizeWidthToFit();
 
         //MENU
-        //DealsPopupMenu menu = new DealsPopupMenu(tableModel, table, cbxFavorites);
+        DealsPopupMenu menu = new DealsPopupMenu(table, cbxFavorites);
 
         ////////////////////
-        //TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+        TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
         table.addMouseListener(new MouseAdapter() {
             @Override

@@ -1,5 +1,6 @@
 package org.erachain.gui.library;
 
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base32;
 import org.erachain.core.item.ItemCls;
@@ -8,7 +9,6 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.items.statement.IssueDocumentPanel;
-import org.erachain.gui.models.AccountsTableModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -33,10 +33,10 @@ public class DealsPopupMenu extends JPopupMenu {
 
     protected Logger logger;
 
-    public AccountsTableModel tableModel;
     protected JComboBox<ItemCls> assetSelector;
     protected AssetCls asset;
-    protected PublicKeyAccount pubKey;
+    protected PublicKeyAccount creator;
+    protected Account recipient;
     protected MTable table;
 
     private JMenuItem sendMail;
@@ -62,11 +62,10 @@ public class DealsPopupMenu extends JPopupMenu {
     private JMenuItem spendAsset;
     private JMenuItem spendAssetBackward;
 
-    public DealsPopupMenu(AccountsTableModel tableModel, MTable table, JComboBox<ItemCls> assetSelector) {
+    public DealsPopupMenu(MTable table, JComboBox<ItemCls> assetSelector) {
 
         logger = LoggerFactory.getLogger(getClass());
 
-        this.tableModel = tableModel;
         this.table = table;
         this.assetSelector = assetSelector;
 
@@ -74,7 +73,7 @@ public class DealsPopupMenu extends JPopupMenu {
         sendMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertNewTab(Lang.T("Send mail"),
-                        new MailSendPanel(pubKey, null, null));
+                        new MailSendPanel(creator, recipient, null));
             }
         });
         this.add(sendMail);
@@ -87,7 +86,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
                 // AccountAssetLendPanel
                 MainPanel.getInstance().insertNewTab(sendAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetSendPanel(asset, pubKey, null, null, null, asset.isReverseSend()));
+                        new AccountAssetSendPanel(asset, creator, recipient, null, null, asset.isReverseSend()));
 
             }
         });
@@ -98,7 +97,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
                 // AccountAssetLendPanel
                 MainPanel.getInstance().insertNewTab(sendAssetBackward.getText() + ":" + asset.getKey(),
-                        new AccountAssetSendPanel(asset, pubKey, null, null, null, !asset.isReverseSend()));
+                        new AccountAssetSendPanel(asset, creator, recipient, null, null, !asset.isReverseSend()));
 
             }
         });
@@ -112,7 +111,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
                 //new AccountLendDialog(asset, pubKey);
                 MainPanel.getInstance().insertNewTab(debtAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetLendPanel(asset, pubKey, null, null));
+                        new AccountAssetLendPanel(asset, creator, recipient, null));
 
             }
         });
@@ -123,7 +122,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(debtAssetReturn.getText() + ":" + asset.getKey(),
-                        new AccountAssetRepayDebtPanel(asset, pubKey, null, null));
+                        new AccountAssetRepayDebtPanel(asset, creator, recipient, null));
 
             }
         });
@@ -134,7 +133,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(debtAssetBackward.getText() + ":" + asset.getKey(),
-                        new AccountAssetConfiscateDebtPanel(asset, pubKey, null, null));
+                        new AccountAssetConfiscateDebtPanel(asset, creator, recipient, null));
 
             }
         });
@@ -148,7 +147,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(holdAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetHoldPanel(asset, pubKey, null, null, false));
+                        new AccountAssetHoldPanel(asset, creator, recipient, null, false));
 
             }
         });
@@ -159,7 +158,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(holdAssetBackward.getText() + ":" + asset.getKey(),
-                        new AccountAssetHoldPanel(asset, pubKey, null, null, true));
+                        new AccountAssetHoldPanel(asset, creator, recipient, null, true));
 
             }
         });
@@ -173,7 +172,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(spendAsset.getText() + ":" + asset.getKey(),
-                        new AccountAssetSpendPanel(asset, pubKey, null, null, null, false));
+                        new AccountAssetSpendPanel(asset, creator, recipient, null, null, false));
 
             }
         });
@@ -185,7 +184,7 @@ public class DealsPopupMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertNewTab(spendAssetBackward.getText() + ":" + asset.getKey(),
-                        new AccountAssetSpendPanel(asset, pubKey, null, null, null, true));
+                        new AccountAssetSpendPanel(asset, creator, recipient, null, null, true));
 
             }
         });
@@ -204,7 +203,7 @@ public class DealsPopupMenu extends JPopupMenu {
                 //      Account account = tableModel.getAccount(row);
 
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(pubKey.getAddress());
+                StringSelection value = new StringSelection(creator.getAddress());
                 clipboard.setContents(value, null);
             }
         });
@@ -216,7 +215,7 @@ public class DealsPopupMenu extends JPopupMenu {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 //long key = cbxFavorites.getItemAt(cbxFavorites.getSelectedIndex()).getKey();
                 long key = asset.getKey();
-                StringSelection value = new StringSelection(pubKey.getBalance(key).toString());
+                StringSelection value = new StringSelection(creator.getBalance(key).toString());
                 clipboard.setContents(value, null);
             }
         });
@@ -227,7 +226,7 @@ public class DealsPopupMenu extends JPopupMenu {
         copyPublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(pubKey.getBase58());
+                StringSelection value = new StringSelection(creator.getBase58());
                 clipboard.setContents(value, null);
             }
         });
@@ -236,7 +235,7 @@ public class DealsPopupMenu extends JPopupMenu {
         JMenuItem copyBankKey = new JMenuItem(Lang.T("Copy Public Key for BANK"));
         copyBankKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String bankKeyAccount = "+" + Base32.encode(pubKey.getPublicKey());
+                String bankKeyAccount = "+" + Base32.encode(creator.getPublicKey());
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 StringSelection value = new StringSelection(bankKeyAccount);
                 clipboard.setContents(value, null);
@@ -247,7 +246,7 @@ public class DealsPopupMenu extends JPopupMenu {
         JMenuItem set_name = new JMenuItem(Lang.T("Edit name"));
         set_name.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AccountSetNameDialog(pubKey.getAddress());
+                new AccountSetNameDialog(creator.getAddress());
                 table.repaint();
             }
         });
@@ -261,7 +260,7 @@ public class DealsPopupMenu extends JPopupMenu {
                 try {
                     URLViewer.openWebpage(new URL(Settings.getInstance().getBlockexplorerURL()
                             + "/index/blockexplorer.html"
-                            + "?address=" + pubKey.getAddress()));
+                            + "?address=" + creator.getAddress()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }
@@ -277,7 +276,7 @@ public class DealsPopupMenu extends JPopupMenu {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertNewTab(Lang.T("Issue Document"),
-                        new IssueDocumentPanel(pubKey, null));
+                        new IssueDocumentPanel(creator, null));
 
             }
         });
@@ -287,7 +286,7 @@ public class DealsPopupMenu extends JPopupMenu {
         accruals.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IssueDocumentPanel panel = new IssueDocumentPanel(pubKey, asset);
+                IssueDocumentPanel panel = new IssueDocumentPanel(creator, asset);
                 panel.selectAccruals(null, null);
                 MainPanel.getInstance().insertNewTab(Lang.T("Make Accruals"), panel);
             }
@@ -333,7 +332,8 @@ public class DealsPopupMenu extends JPopupMenu {
                     return;
                 row = table.convertRowIndexToModel(row);
 
-                pubKey = tableModel.getItem(row);
+                creator = ((SendableModel) table.getModel()).getCreator(row);
+                recipient = ((SendableModel) table.getModel()).getRecipent(row);
                 init();
 
             }
@@ -345,9 +345,9 @@ public class DealsPopupMenu extends JPopupMenu {
 
     public void init() {
 
-        boolean isCreatorMaker = asset != null && pubKey.equals(asset.getMaker());
+        boolean isCreatorMaker = asset != null && creator.equals(asset.getMaker());
         boolean isSelfManaged = asset.isSelfManaged();
-        boolean isUnlimited = isSelfManaged || asset.isUnlimited(pubKey, false);
+        boolean isUnlimited = isSelfManaged || asset.isUnlimited(creator, false);
 
         this.sendAsset.setEnabled(true);
         this.sendAssetBackward.setEnabled(true);
@@ -444,7 +444,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
         //// SET ENABLE by BALANCES
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
-                balance = pubKey.getBalance(asset.getKey());
+                balance = creator.getBalance(asset.getKey());
 
         if (isUnlimited || balance.a.b.signum() > 0) {
             this.sendAsset.setEnabled(true);
@@ -467,7 +467,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
             this.debtAssetReturn.setVisible(false);
 
-            if (pubKey.equals(asset.getMaker())) {
+            if (creator.equals(asset.getMaker())) {
                 this.holdAsset.setEnabled(false);
                 this.debtAsset.setEnabled(false);
                 this.debtAssetBackward.setEnabled(false);
@@ -505,7 +505,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_BANK_GUARANTEE:
 
-                balance = pubKey.getBalance(asset.getKey());
+                balance = creator.getBalance(asset.getKey());
                 if (balance.a.b.signum() > 0) {
                     this.holdAsset.setEnabled(false);
                     this.debtAssetReturn.setEnabled(false);
@@ -532,8 +532,8 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_BANK_GUARANTEE_TOTAL:
 
-                balance = pubKey.getBalance(asset.getKey());
-                if (pubKey.equals(asset.getMaker()) || balance.a.b.signum() > 0) {
+                balance = creator.getBalance(asset.getKey());
+                if (creator.equals(asset.getMaker()) || balance.a.b.signum() > 0) {
 
                 } else {
                     this.sendAsset.setEnabled(false);

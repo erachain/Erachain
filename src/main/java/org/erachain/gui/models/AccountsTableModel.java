@@ -7,6 +7,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.gui.ObserverWaiter;
+import org.erachain.gui.items.accounts.SendableModel;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun;
@@ -18,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
-public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> implements ObserverWaiter {
+public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> implements SendableModel, ObserverWaiter {
     public static final int COLUMN_ADDRESS = 1;
     public static final int COLUMN_NAME = 2;
     public static final int COLUMN_BALANCE_1 = 3;
@@ -59,6 +60,19 @@ public class AccountsTableModel extends WalletTableModel<PublicKeyAccount> imple
         needUpdate = false;
 
     }
+
+    public PublicKeyAccount getCreator(int row) {
+        if (list == null)
+            return null;
+
+        return this.list.get(row);
+
+    }
+
+    public Account getRecipent(int row) {
+        return null;
+    }
+
 
     @Override
     public Object getValueAt(int row, int column) {

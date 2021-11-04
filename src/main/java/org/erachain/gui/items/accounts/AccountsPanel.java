@@ -137,7 +137,7 @@ public class AccountsPanel extends JPanel // implements ItemListener
         });
 
         //MENU
-        DealsPopupMenu menu = new DealsPopupMenu(tableModel, table, cbxFavorites);
+        DealsPopupMenu menu = new DealsPopupMenu(table, cbxFavorites);
 
         ////////////////////
         TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
