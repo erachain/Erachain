@@ -1,6 +1,5 @@
 package org.erachain.gui.items.accounts;
 
-import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.Gui;
@@ -30,7 +29,6 @@ public class LoansPanel extends JPanel {
     public JComboBox<ItemCls> cbxFavorites;
     public AccountLoansTableModel tableModel;
     protected AssetCls asset;
-    protected PublicKeyAccount pub_Key;
     MTable table;
 
     @SuppressWarnings("unchecked")

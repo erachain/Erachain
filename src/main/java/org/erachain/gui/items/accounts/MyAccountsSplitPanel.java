@@ -70,7 +70,7 @@ public class MyAccountsSplitPanel extends SplitPanel {
             selectArg = account;
             assetSelect = asset;
             rightPanel.tableModel.setAccount(account);
-            rightPanel.tableModel.fireTableDataChanged();
+            //rightPanel.tableModel.fireTableDataChanged();
             rightPanel.setAsset(asset);
             jScrollPaneJPanelRightPanel.setViewportView(rightPanel);
 
