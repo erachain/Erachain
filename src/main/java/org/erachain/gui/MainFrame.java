@@ -22,10 +22,14 @@ import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -44,6 +48,12 @@ public class MainFrame extends JFrame implements Observer {
     private MenuDeals jMenu2;
     private JMenu jMenuTX;
     private MenuExchange jMenuExchange;
+    private JMenu jWalletMenu;
+    private JMenuItem lockItem;
+    private ImageIcon lockedIcon;
+    private ImageIcon unlockedIcon;
+
+
     private javax.swing.JMenuBar jMenuBar1;
     public MainPanel mainPanel;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -83,6 +93,93 @@ public class MainFrame extends JFrame implements Observer {
         jMenu2 = new MenuDeals();
         jMenuExchange = new MenuExchange();
 
+        jWalletMenu = new JMenu(Lang.T("Wallet"));
+
+        //LOAD IMAGES
+        BufferedImage lockedImage;
+        try {
+            lockedImage = ImageIO.read(new File("images/wallet/locked.png"));
+
+            this.lockedIcon = new ImageIcon(lockedImage.getScaledInstance(20, 16, Image.SCALE_SMOOTH));
+
+            BufferedImage unlockedImage = ImageIO.read(new File("images/wallet/unlocked.png"));
+            this.unlockedIcon = new ImageIcon(unlockedImage.getScaledInstance(20, 16, Image.SCALE_SMOOTH));
+        } catch (IOException e2) {
+            // TODO Auto-generated catch block
+            e2.printStackTrace();
+        }
+
+        jWalletMenu.addMenuListener(new MenuListener() {
+
+            @Override
+            public void menuCanceled(MenuEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void menuSelected(MenuEvent arg0) {
+                // TODO Auto-generated method stub
+
+                if (Controller.getInstance().isWalletUnlocked()) {
+                    lockItem.setText(Lang.T("Lock Wallet"));
+                    lockItem.setIcon(lockedIcon);
+                } else {
+                    lockItem.setText(Lang.T("Unlock Wallet"));
+                    lockItem.setIcon(unlockedIcon);
+                }
+            }
+        });
+
+        lockItem = new JMenuItem();
+        lockItem.getAccessibleContext().setAccessibleDescription(Lang.T("Lock/Unlock Wallet"));
+        lockItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
+
+        lockItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                PasswordPane.switchLockDialog(null);
+            }
+        });
+        jWalletMenu.add(lockItem);
+
+        //SEPARATOR
+        jWalletMenu.addSeparator();
+
+        JMenuItem saveFavorites = new JMenuItem("Save Favorites");
+        saveFavorites.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String result = Controller.getInstance().saveFavorites();
+                if (result == null)
+                    return;
+
+                JOptionPane.showMessageDialog(
+                        null, Lang.T(result), Lang.T("ERROR"), JOptionPane.ERROR_MESSAGE);
+
+            }
+        });
+        jWalletMenu.add(saveFavorites);
+
+        JMenuItem loadFavorites = new JMenuItem("Load Favorites");
+        loadFavorites.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String result = Controller.getInstance().loadFavorites();
+                if (result == null)
+                    return;
+
+                JOptionPane.showMessageDialog(
+                        null, Lang.T(result), Lang.T("ERROR"), JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        jWalletMenu.add(loadFavorites);
+
+
+        ///////////////
         jMenuTX = new JMenu(Lang.T("Transaction"));
 
         JMenuItem readTransItemJSON = new JMenuItem(Lang.T("Read Transaction from JSON"));
@@ -244,6 +341,8 @@ public class MainFrame extends JFrame implements Observer {
 
         jMenu_Files.setText(Lang.T("File"));
         jMenuBar1.add(jMenu_Files);
+
+        jMenuBar1.add(jWalletMenu);
 
         jMenuTX.setText(Lang.T("Transaction"));
         jMenuBar1.add(jMenuTX);

@@ -363,13 +363,13 @@ public class Library {
     /**
      * Save JSON String to era File
      *
-     * @param parent     - getParent()
-     * @param JSONString - JSON STRING
+     * @param parent  - getParent()
+     * @param outText - JSON STRING
      * @param pref
      * @param extDesc
      * @param ext
      */
-    public static void saveToFile(Container parent, String JSONString, String pref, String extDesc, String ext) {
+    public static void saveToFile(Container parent, String outText, String pref, String extDesc, String ext) {
         FileChooser chooser = new FileChooser();
         chooser.setDialogTitle(Lang.T("Save File"));
         // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -386,8 +386,14 @@ public class Library {
         if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 
             String pp = chooser.getSelectedFile().getPath();
+            File testFile = new File(pp);
+            File ff;
+            if (file.isFile()) {
+                ff = testFile;
+            } else {
+                ff = new File(pp + "." + ext);
+            }
 
-            File ff = new File(pp + "." + ext);
             // if file
             if (ff.exists() && ff.isFile()) {
                 int aaa = JOptionPane.showConfirmDialog(chooser,
@@ -404,7 +410,7 @@ public class Library {
             }
 
             try (FileWriter fw = new FileWriter(ff)) {
-                fw.write(JSONString);
+                fw.write(outText);
             } catch (IOException e) {
                 System.out.println(e);
             }
