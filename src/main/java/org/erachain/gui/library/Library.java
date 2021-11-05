@@ -391,7 +391,7 @@ public class Library {
             if (file.isFile()) {
                 ff = testFile;
             } else {
-                ff = new File(pp + "." + ext);
+                ff = new File(pp + File.separator + pref + "." + ext);
             }
 
             // if file
