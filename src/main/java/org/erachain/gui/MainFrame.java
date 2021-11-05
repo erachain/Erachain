@@ -155,8 +155,11 @@ public class MainFrame extends JFrame implements Observer {
         saveFavorites.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String result = Controller.getInstance().saveFavorites();
-                if (result == null)
+                if (result == null) {
+                    JOptionPane.showMessageDialog(
+                            null, Lang.T("Favoruites Saved"), Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
                     return;
+                }
 
                 JOptionPane.showMessageDialog(
                         null, Lang.T(result), Lang.T("ERROR"), JOptionPane.ERROR_MESSAGE);
@@ -169,8 +172,11 @@ public class MainFrame extends JFrame implements Observer {
         loadFavorites.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String result = Controller.getInstance().loadFavorites();
-                if (result == null)
+                if (result == null) {
+                    JOptionPane.showMessageDialog(
+                            null, Lang.T("Favoruites Loaded"), Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
                     return;
+                }
 
                 JOptionPane.showMessageDialog(
                         null, Lang.T(result), Lang.T("ERROR"), JOptionPane.ERROR_MESSAGE);

@@ -367,6 +367,24 @@ public class Wallet extends Observable implements Observer {
 		return this.dwSet.isTransactionFavorite(transaction);
 	}
 
+	private String saveFavoritesLong(FavoriteItemMap map, String name) throws IOException {
+
+		String out = "";
+
+		Object key;
+		try (IteratorCloseable iterator = map.getIterator()) {
+			JSONArray jsonArray = new JSONArray();
+			while (iterator.hasNext()) {
+				jsonArray.add(iterator.next());
+			}
+			out += "\"" + name + "\":" + jsonArray.toJSONString() + ",";
+		} catch (IOException e) {
+			throw e;
+		}
+
+		return out;
+	}
+
 	public String saveFavorites() {
 
 		String out = "{";
@@ -390,8 +408,71 @@ public class Wallet extends Observable implements Observer {
 			return "ERROR: on getFavoriteAccountsMap" + e.getMessage();
 		}
 
+		try {
+			out += saveFavoritesLong(dwSet.getAssetFavoritesSet(), "assets");
+		} catch (IOException e) {
+			return "assets " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getDocumentFavoritesSet(), "documents");
+		} catch (IOException e) {
+			return "documents " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getImprintFavoritesSet(), "imprints");
+		} catch (IOException e) {
+			return "imprints " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getPersonFavoritesSet(), "persons");
+		} catch (IOException e) {
+			return "persons " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getPollFavoritesSet(), "polls");
+		} catch (IOException e) {
+			return "polls " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getStatusFavoritesSet(), "statuses");
+		} catch (IOException e) {
+			return "statuses " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getTemplateFavoritesSet(), "templates");
+		} catch (IOException e) {
+			return "templates " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getUnionFavoritesSet(), "unions");
+		} catch (IOException e) {
+			return "unions " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getTransactionFavoritesSet(), "txs");
+		} catch (IOException e) {
+			return "txs " + e;
+		}
+
 		out += "}";
 		Library.saveToFile(null, out, "favorites", "JSON", "json");
+
+		return null;
+	}
+
+	private String loadFavoritesLong(JSONObject json, FavoriteItemMap map, String name) {
+
+		try {
+			JSONArray rows = (JSONArray) json.get(name);
+			for (Object key : rows) {
+				if (((Long) key) <= 0)
+					return name + " wrong value: " + key;
+
+				map.add((Long) key);
+			}
+		} catch (Exception e) {
+			return name + " - " + e;
+		}
 
 		return null;
 	}
@@ -435,6 +516,37 @@ public class Wallet extends Observable implements Observer {
 				JSONArray row = (JSONArray) rows.get(key);
 				dwSet.addAddressFavorite((String) key, (String) row.get(0), (String) row.get(1), (String) row.get(2));
 			}
+
+			String result = loadFavoritesLong(json, dwSet.getAssetFavoritesSet(), "assets");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getPersonFavoritesSet(), "persons");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getDocumentFavoritesSet(), "documents");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getImprintFavoritesSet(), "imprints");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getPersonFavoritesSet(), "persons");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getPollFavoritesSet(), "polls");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getStatusFavoritesSet(), "statuses");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getTemplateFavoritesSet(), "templates");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getUnionFavoritesSet(), "unions");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getTransactionFavoritesSet(), "txs");
+			if (result != null)
+				return result;
 
 		}
 
