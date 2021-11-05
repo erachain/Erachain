@@ -373,7 +373,7 @@ public class Library {
         FileChooser chooser = new FileChooser();
         chooser.setDialogTitle(Lang.T("Save File"));
         // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+        chooser.setDialogType(JFileChooser.SAVE_DIALOG);
         chooser.setMultiSelectionEnabled(false);
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         FileNameExtensionFilter filter = new FileNameExtensionFilter(extDesc, ext);
@@ -387,15 +387,14 @@ public class Library {
 
             String pp = chooser.getSelectedFile().getPath();
             File testFile = new File(pp);
-            File ff;
-            if (file.isFile()) {
-                ff = testFile;
+            if (testFile.isDirectory()) {
+                file = new File(pp + File.separator + pref + "." + ext);
             } else {
-                ff = new File(pp + File.separator + pref + "." + ext);
+                file = testFile;
             }
 
             // if file
-            if (ff.exists() && ff.isFile()) {
+            if (file.exists() && file.isFile()) {
                 int aaa = JOptionPane.showConfirmDialog(chooser,
                         Lang.T("File") + Lang.T("Exists") + "! "
                                 + Lang.T("Overwrite") + "?",
@@ -405,14 +404,14 @@ public class Library {
                 if (aaa != 0) {
                     return;
                 }
-                ff.delete();
+                file.delete();
 
             }
 
-            try (FileWriter fw = new FileWriter(ff)) {
+            try (FileWriter fw = new FileWriter(file)) {
                 fw.write(outText);
             } catch (IOException e) {
-                System.out.println(e);
+                logger.error(e.getMessage(), e);
             }
 
         }
