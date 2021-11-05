@@ -157,7 +157,7 @@ public class MainFrame extends JFrame implements Observer {
                 String result = Controller.getInstance().saveFavorites();
                 if (result == null) {
                     JOptionPane.showMessageDialog(
-                            null, Lang.T("Favoruites Saved"), Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
+                            null, Lang.T("Favorite recordings are saved"), Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
 
@@ -174,7 +174,7 @@ public class MainFrame extends JFrame implements Observer {
                 String result = Controller.getInstance().loadFavorites();
                 if (result == null) {
                     JOptionPane.showMessageDialog(
-                            null, Lang.T("Favoruites Loaded"), Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
+                            null, Lang.T("Favorite recordings uploaded"), Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
 
