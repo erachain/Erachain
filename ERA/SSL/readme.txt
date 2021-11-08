@@ -3,7 +3,7 @@
 
 Нужно для защиты ответов для команд API
 
-Источник:
+Полное руководство:
 https://docs.google.com/document/d/1N4YO-fm2ORqPcHNu0UWE-D9DeOuM5n084acyGLLDAVo/edit?usp=sharing
 
 Создайте свое хранилище ключей в папке SSL:
