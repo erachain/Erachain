@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Simple pay - for all same amount
+ * Mass pay - address(short), amount, memo
  * Result: recipient + Validate_Result {code, mess}
  */
 
@@ -305,12 +305,7 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
             }
 
             // CHECK AMOUNT
-            try {
-                String amountStr = (String) item.get(1);
-                amount = amountStr == null || amountStr.isEmpty() ? null : new BigDecimal(amountStr);
-            } catch (Exception e) {
-                return new Fun.Tuple2<>(null, i + ":" + item + " - " + "Wrong amount");
-            }
+            amount = (BigDecimal) item.get(1);
             if (amount == null || amount.signum() == 0)
                 return new Fun.Tuple2<>(null, i + ":" + item + " - " + "Wrong amount - null or ZERO");
 

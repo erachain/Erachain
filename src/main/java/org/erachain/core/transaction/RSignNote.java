@@ -788,6 +788,10 @@ public class RSignNote extends Transaction implements Itemable {
             long_fee += allHashes.length * 100 * BlockChain.FEE_PER_BYTE;
         }
 
+        if (false && extendedData.hasRecipients()) {
+            long_fee += extendedData.getRecipients().length * 25 * BlockChain.FEE_PER_BYTE;
+        }
+
         if (getExLink() != null)
             long_fee += 100 * BlockChain.FEE_PER_BYTE;
 

@@ -501,7 +501,7 @@ public class AddressesResource {
 
         }
 
-        CreditAddressesMap map = DCSet.getInstance().getCredit_AddressesMap();
+        CreditAddressesMap map = DCSet.getInstance().getCreditAddressesMap();
         JSONArray out = new JSONArray();
         try (IteratorCloseable<Fun.Tuple3<String, Long, String>> iterator = map.getCreditorsIterator(address, assetKey)) {
             Fun.Tuple3<String, Long, String> key;
@@ -546,7 +546,7 @@ public class AddressesResource {
 
         }
 
-        CreditAddressesMap map = DCSet.getInstance().getCredit_AddressesMap();
+        CreditAddressesMap map = DCSet.getInstance().getCreditAddressesMap();
         JSONArray out = new JSONArray();
         try (IteratorCloseable<Fun.Tuple3<String, Long, String>> iterator = map.getDebitorsIterator(address, assetKey)) {
             Fun.Tuple3<String, Long, String> key;

@@ -81,7 +81,7 @@ public class APIFPool {
                     .build();
         }
 
-        out.put("stake", dcSet.getCredit_AddressesMap().get(address, AssetCls.ERA_KEY, fpool.getAddress()));
+        out.put("stake", dcSet.getCreditAddressesMap().get(address, AssetCls.ERA_KEY, fpool.getAddress()));
 
         out.put("balances", fpool.getAddressBalances(address));
 

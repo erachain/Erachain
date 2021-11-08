@@ -4,15 +4,15 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.exActions.ExAction;
-import org.erachain.core.exdata.exActions.ExAirDrop;
+import org.erachain.core.exdata.exActions.ExListPays;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.IconPanel;
-import org.erachain.gui.exdata.AirDropsModel;
 import org.erachain.gui.exdata.ExDataPanel;
+import org.erachain.gui.exdata.PayListModel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
 import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.MTable;
@@ -20,6 +20,7 @@ import org.erachain.gui.models.RenderComboBoxAssetActions;
 import org.erachain.gui.models.RenderComboBoxViewBalance;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONArray;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,24 +37,25 @@ import java.awt.event.ItemListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 
-public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
+public class PayoutListPanel extends IconPanel implements ExActionPanelInt {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExAirDropPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PayoutListPanel.class);
 
-    public static String NAME = "ExAirDropPanel";
-    public static String TITLE = "Mass Same Payments (airdrop)";
+    public static String NAME = "ExPayListPanel";
+    public static String TITLE = "Payout List";
 
     private ExDataPanel parent;
     public ComboBoxAssetsModel assetsModel;
     private Boolean lock = new Boolean(false);
-    AirDropsModel addressesModel;
+    PayListModel addressesModel;
 
-    public ExAirDropPanel(ExDataPanel parent) {
+    public PayoutListPanel(ExDataPanel parent) {
         super(NAME, TITLE);
         this.parent = parent;
         initComponents();
@@ -137,19 +139,10 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                                         if (str.startsWith("//"))
                                             continue;
 
-                                        // чтобы не было двойных выплат по счет и публичному ключу в списке - делаем Счет
-                                        account = Account.tryMakeAccount(str).a;
-                                        if (account == null)
-                                            continue;
-
-                                        if (lines.contains(account.getAddress()))
-                                            continue;
-
                                         lines.add(str);
                                     }
                                     in.close();
-                                    addresses = lines.toArray(new String[lines.size()]);
-                                    addressesModel = new AirDropsModel(addresses);
+                                    addressesModel = new PayListModel(lines);
                                     jTableAddresses.setModel(addressesModel);
 
                                     TableColumnModel columnModel = jTableAddresses.getColumnModel();
@@ -158,8 +151,8 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                                     columnNo.setMaxWidth(70);
                                     columnNo.setPreferredWidth(50);
 
-                                    if (AirDropsModel.lastError != null) {
-                                        jLabel_FeesResult.setText(Lang.T("Error") + "! " + Lang.T(AirDropsModel.lastError));
+                                    if (PayListModel.lastError != null) {
+                                        jLabel_FeesResult.setText(Lang.T("Error") + "! " + Lang.T(PayListModel.lastError));
                                         jButtonViewResult.setEnabled(true);
                                         return;
                                     }
@@ -200,15 +193,15 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                             return;
                         }
 
-                        ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
-                        if (airDrop == null)
+                        ExListPays listPays = (ExListPays) exActionRes.a;
+                        if (listPays == null)
                             return;
-                        airDrop.setDC(DCSet.getInstance());
-                        airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
-                        List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> accruals = airDrop.getResults();
+                        listPays.setDC(DCSet.getInstance());
+                        listPays.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
+                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = listPays.getResults();
                         jLabel_FeesResult.setText("<html>" + Lang.T("Count # кол-во") + ": <b>" + accruals.size()
-                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(airDrop.getTotalFeeBytes())
-                                + "</b>, " + Lang.T("Total") + ": <b>" + airDrop.getTotalPay());
+                                + "</b>, " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(listPays.getTotalFeeBytes())
+                                + "</b>, " + Lang.T("Total") + ": <b>" + listPays.getTotalPay());
                     } finally {
                         jButtonLoad.setEnabled(true);
                         jButtonCalcCompu.setEnabled(true);
@@ -239,13 +232,13 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                             return;
                         }
 
-                        ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
+                        ExListPays airDrop = (ExListPays) exActionRes.a;
                         if (airDrop == null)
                             return;
 
                         airDrop.setDC(DCSet.getInstance());
                         airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), true);
-                        List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> results = airDrop.getResults();
+                        List<Fun.Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>>> results = airDrop.getResults();
 
                         String result = "<html>";
                         if (airDrop.resultCode != Transaction.VALIDATE_OK) {
@@ -258,7 +251,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         }
                         jLabel_FeesResult.setText(result);
 
-                        addressesModel = new AirDropsModel(results, false
+                        addressesModel = new PayListModel(results, false
                                 /// иначе список ломается - если внутри сделаем хранение данных то можно отражения курочить так
                                 // airDrop.resultCode != Transaction.VALIDATE_OK
                         );
@@ -297,7 +290,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
             return;
 
         int selected = jComboBoxAccrualAction.getSelectedIndex();
-        jComboBoxAccrualAction.setModel(new javax.swing.DefaultComboBoxModel(
+        jComboBoxAccrualAction.setModel(new DefaultComboBoxModel(
                 asset.viewAssetTypeActionsList(creator.equals(asset.getMaker()), false).toArray()));
         if (selected >= 0 && selected < jComboBoxAccrualAction.getModel().getSize())
             jComboBoxAccrualAction.setSelectedIndex(selected);
@@ -322,7 +315,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         jTextFieldAmount = new JTextField("1");
         jButtonCalcCompu = new JButton();
 
-        java.awt.GridBagLayout jPanelLayout = new java.awt.GridBagLayout();
+        GridBagLayout jPanelLayout = new GridBagLayout();
         jPanelLayout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0};
         jPanelLayout.rowHeights = new int[]{0};
 
@@ -366,10 +359,10 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
         int gridy = 0;
 
-        jCheckBoxAccrualsUse.setText(Lang.T("Make Same Payouts"));
+        jCheckBoxAccrualsUse.setText(Lang.T("Make Payouts"));
         add(jCheckBoxAccrualsUse, fieldGBC);
 
-        jLabel_Help.setText("<html>" + Lang.T("ExAirDropPanel_Help") + "</html>");
+        jLabel_Help.setText("<html>" + Lang.T("ExListPaysPanel_Help") + "</html>");
         fieldGBC.gridy = ++gridy;
         //JPanel panel1 = new JPanel(new BorderLayout());
         //panel1.add(jLabel_Help, BorderLayout.CENTER);
@@ -392,7 +385,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         jPanelMain.add(jLabelAssetToPay, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jComboBoxAccrualAsset.setToolTipText(Lang.T("ExAirDropPanel.jComboBoxAccrualAsset"));
+        jComboBoxAccrualAsset.setToolTipText(Lang.T("ExPayListPanel.jComboBoxAccrualAsset"));
         jPanelMain.add(jComboBoxAccrualAsset, fieldGBC);
 
         JLabel jLabelAction = new JLabel(Lang.T("Action"));
@@ -400,14 +393,14 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         jPanelMain.add(jLabelAction, labelGBC);
 
         fieldGBC.gridy = gridy;
-        jComboBoxAccrualAction.setToolTipText(Lang.T("ExAirDropPanel.jComboBoxAccrualAction"));
+        jComboBoxAccrualAction.setToolTipText(Lang.T("ExPayListPanel.jComboBoxAccrualAction"));
         jPanelMain.add(jComboBoxAccrualAction, fieldGBC);
 
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelAmount, labelGBC);
         fieldGBC.gridy = gridy;
         jPanelMain.add(jTextFieldAmount, fieldGBC);
-        jTextFieldAmount.setToolTipText(Lang.T("ExAirDropPanel.jTextFieldAmount"));
+        jTextFieldAmount.setToolTipText(Lang.T("ExPayListPanel.jTextFieldAmount"));
 
         /////////////////////// BUTTONS
 
@@ -432,7 +425,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
         headBGC.gridy = ++gridy;
         jPanel3.add(jLabel_FeesResult, headBGC);
 
-        jTableAddresses = new MTable(new AirDropsModel());
+        jTableAddresses = new MTable(new PayListModel());
 
         jTableAddresses.setAutoCreateRowSorter(true);
         jScrollPaneAccruals.setViewportView(jTableAddresses);
@@ -472,16 +465,20 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                 = (Fun.Tuple2<Fun.Tuple2<Integer, Boolean>, String>) jComboBoxAccrualAction.getSelectedItem();
 
         Vector<Vector> vector = addressesModel.getDataVector();
-        String[] addresses = new String[vector.size()];
-        for (int i = 0; i < vector.size(); i++) {
-            addresses[i] = ((Account) vector.get(i).get(1)).getAddress();
+        JSONArray array = new JSONArray();
+        for (Vector items : vector) {
+            JSONArray itemsJson = new JSONArray();
+            itemsJson.add(((Account) items.get(1)).getAddress());
+            itemsJson.add(items.get(2)); // amount
+            itemsJson.add(items.get(3)); // memo
+
+            array.add(itemsJson);
         }
 
-        return ExAirDrop.make(
+        return ExListPays.make(
                 ((AssetCls) jComboBoxAccrualAsset.getSelectedItem()).getKey(),
-                jTextFieldAmount.getText(),
                 balancePosition.a.a, balancePosition.a.b,
-                addresses);
+                array);
     }
 
     private JButton jButtonLoad = new JButton();
@@ -490,9 +487,9 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
     public JCheckBox jCheckBoxAccrualsUse;
     private JLabel jLabel_Help = new JLabel();
     public JComboBox<ItemCls> jComboBoxAccrualAsset;
-    private javax.swing.JComboBox<Integer> jComboBoxFilterBalancePosition;
-    private javax.swing.JComboBox<String> jComboBoxFilterSideBalance;
-    private javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxAccrualAction;
+    private JComboBox<Integer> jComboBoxFilterBalancePosition;
+    private JComboBox<String> jComboBoxFilterSideBalance;
+    private JComboBox<Fun.Tuple2<Fun.Tuple2, String>> jComboBoxAccrualAction;
     private JLabel jLabel_FeesResult;
     private JLabel jLabelBalancePosition;
     public JPanel jPanelMain;

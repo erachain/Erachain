@@ -4,45 +4,36 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.Gui;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
-import org.erachain.gui.library.*;
-import org.erachain.gui.models.AccountsTableModel;
+import org.erachain.gui.library.DealsPopupMenu;
+import org.erachain.gui.library.MTable;
+import org.erachain.gui.models.AccountLoansTableModel;
 import org.erachain.gui.models.FavoriteComboBoxModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
-import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("serial")
-public class AccountsPanel extends JPanel // implements ItemListener
-
-
-//JInternalFrame
-{
-    //private JFrame parent;
+public class LoansPanel extends JPanel {
 
     public JComboBox<ItemCls> cbxFavorites;
-    public AccountsTableModel tableModel;
-    public WalletCreateAccountButton newAccountButton;
-    public WalletSyncButton updateButton;
+    public AccountLoansTableModel tableModel;
     protected AssetCls asset;
     MTable table;
 
     @SuppressWarnings("unchecked")
-    public AccountsPanel() {
+    public LoansPanel() {
+
         this.setLayout(new GridBagLayout());
 
         //PADDING
@@ -59,43 +50,13 @@ public class AccountsPanel extends JPanel // implements ItemListener
         buttonGBC.gridy = 0;
 
         //ASSET FAVORITES
-        cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel(AssetCls.FEE_KEY));
+        cbxFavorites = new JComboBox<ItemCls>(new ComboBoxAssetsModel(AssetCls.ERA_KEY));
         cbxFavorites.setRenderer(new FavoriteComboBoxModel.IconListRenderer());
         this.add(cbxFavorites, buttonGBC);
 
-        newAccountButton = new WalletCreateAccountButton();
-        buttonGBC.insets = new Insets(10, 10, 10, 0);
-        buttonGBC.gridx += 3;
-        buttonGBC.gridwidth = 1;
-        buttonGBC.weightx = 0;
-        buttonGBC.fill = GridBagConstraints.BASELINE_TRAILING;
-        buttonGBC.anchor = GridBagConstraints.EAST;
-        ++buttonGBC.gridx;
-        this.add(newAccountButton, buttonGBC);
-
-        ++buttonGBC.gridx;
-        WalletImportButton walletImportButton = new WalletImportButton();
-        this.add(walletImportButton, buttonGBC);
-
-        ++buttonGBC.gridx;
-        updateButton = new WalletSyncButton();
-        this.add(updateButton, buttonGBC);
-
         //TABLE
-        tableModel = new AccountsTableModel();
-        // start data in model
-        tableModel.setAsset((AssetCls) cbxFavorites.getSelectedItem());
+        tableModel = new AccountLoansTableModel((AssetCls) cbxFavorites.getSelectedItem());
         table = Gui.createSortableTable(tableModel, 0);
-
-        if (false) {
-            RowSorter sorter = new TableRowSorter(tableModel);
-            table.setRowSorter(sorter);
-
-            List<RowSorter.SortKey> sortKeys = new ArrayList<>(4);
-            sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-            sorter.setSortKeys(sortKeys);
-        }
-        // render
 
         TableColumn column_No = table.getColumnModel().getColumn(tableModel.COLUMN_NO);
         column_No.setMinWidth(50);
@@ -103,21 +64,6 @@ public class AccountsPanel extends JPanel // implements ItemListener
         column_No.setPreferredWidth(50);
         column_No.setWidth(50);
         column_No.sizeWidthToFit();
-
-        //ON FAVORITES CHANGE
-        cbxFavorites.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                // TODO Auto-generated method stub
-
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-                    tableModel.setAsset(asset);
-                }
-
-            }
-        });
 
         //MENU
         DealsPopupMenu menu = new DealsPopupMenu(table, cbxFavorites);
@@ -164,16 +110,26 @@ public class AccountsPanel extends JPanel // implements ItemListener
         tableGBC.gridy = 1;
         this.add(new JScrollPane(table), tableGBC);
 
+        //ON FAVORITES CHANGE
+        cbxFavorites.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                // TODO Auto-generated method stub
+
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+                    tableModel.setAsset(asset);
+                }
+            }
+        });
+
     }
-	
+
 
     private String getTotals() {
-        Fun.Tuple4<BigDecimal, BigDecimal, BigDecimal, BigDecimal> total = tableModel.getTotalBalance();
-        return Lang.T("Confirmed Balance") + ": "
-                + total.a.toPlainString() + " / "
-                + total.b.toPlainString() + " / "
-                + total.c.toPlainString() + " / "
-                + total.d.toPlainString();
+        BigDecimal total = tableModel.getTotalBalance();
+        return Lang.T("Total Loan") + ": " + total.toPlainString();
 
     }
 

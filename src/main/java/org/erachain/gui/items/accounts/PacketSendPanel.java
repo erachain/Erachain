@@ -314,7 +314,8 @@ public class PacketSendPanel extends JPanel {
         public Object[][] getRows() {
 
             Vector lastRow = (Vector) this.getDataVector().get(getRowCount() - 1);
-            int len = lastRow.get(ASSET_COL) == null || lastRow.get(ACTION_COL + 2) == null ? getRowCount() - 1 : getRowCount();
+            BigDecimal volumeLast = (BigDecimal) lastRow.get(ACTION_COL + 1);
+            int len = lastRow.get(ASSET_COL) == null || volumeLast == null || volumeLast.signum() == 0 ? getRowCount() - 1 : getRowCount();
             Object[][] rows = new Object[len][];
             for (int i = 0; i < len; i++) {
                 Vector dataRow = (Vector) this.getDataVector().get(i);

@@ -52,7 +52,8 @@ public class ExActionPanel extends IconPanel {
         selectBox.setModel(new javax.swing.DefaultComboBoxModel(new String[]{
                 Lang.T("Without Action / Payments"),
                 Lang.T("Mass Accruals by Filter"),
-                Lang.T("Mass Payments by List (airdrop)")
+                Lang.T("Mass Same Payments (airdrop)"),
+                Lang.T("Mass Payments")
         }));
 
         selectBox.addItemListener(new ItemListener() {
@@ -66,6 +67,8 @@ public class ExActionPanel extends IconPanel {
 
         actionPanels[ExAction.FILTERED_ACCRUALS_TYPE] = new ExFilteredPaysPanel(parent);
         actionPanels[ExAction.SIMPLE_PAYOUTS_TYPE] = new ExAirDropPanel(parent);
+        actionPanels[ExAction.LIST_PAYOUTS_TYPE] = new PayoutListPanel(parent);
+
 
         for (JPanel actionPanel : actionPanels) {
             actionPanel.setVisible(false);
@@ -93,5 +96,5 @@ public class ExActionPanel extends IconPanel {
 
     public javax.swing.JComboBox<Fun.Tuple2<Fun.Tuple2, String>> selectBox;
     private JPanel actionsPanel = new JPanel();
-    public IconPanel[] actionPanels = new IconPanel[2];
+    public IconPanel[] actionPanels = new IconPanel[3];
 }

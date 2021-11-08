@@ -356,6 +356,20 @@ public class Controller extends Observable {
         return this.wallet;
     }
 
+    public String saveFavorites() {
+        if (doesWalletDatabaseExists())
+            return this.wallet.saveFavorites();
+
+        return null;
+    }
+
+    public String loadFavorites() {
+        if (doesWalletDatabaseExists())
+            return this.wallet.loadFavorites();
+
+        return null;
+    }
+
     public boolean isAllThreadsGood() {
         if (!this.blockGenerator.isAlive()) {
             return false;

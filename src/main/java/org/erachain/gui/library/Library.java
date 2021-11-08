@@ -363,17 +363,17 @@ public class Library {
     /**
      * Save JSON String to era File
      *
-     * @param parent     - getParent()
-     * @param JSONString - JSON STRING
+     * @param parent  - getParent()
+     * @param outText - JSON STRING
      * @param pref
      * @param extDesc
      * @param ext
      */
-    public static void saveToFile(Container parent, String JSONString, String pref, String extDesc, String ext) {
+    public static void saveToFile(Container parent, String outText, String pref, String extDesc, String ext) {
         FileChooser chooser = new FileChooser();
         chooser.setDialogTitle(Lang.T("Save File"));
         // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+        chooser.setDialogType(JFileChooser.SAVE_DIALOG);
         chooser.setMultiSelectionEnabled(false);
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         FileNameExtensionFilter filter = new FileNameExtensionFilter(extDesc, ext);
@@ -386,10 +386,15 @@ public class Library {
         if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 
             String pp = chooser.getSelectedFile().getPath();
+            File testFile = new File(pp);
+            if (testFile.isDirectory()) {
+                file = new File(pp + File.separator + pref + "." + ext);
+            } else {
+                file = testFile;
+            }
 
-            File ff = new File(pp + "." + ext);
             // if file
-            if (ff.exists() && ff.isFile()) {
+            if (file.exists() && file.isFile()) {
                 int aaa = JOptionPane.showConfirmDialog(chooser,
                         Lang.T("File") + Lang.T("Exists") + "! "
                                 + Lang.T("Overwrite") + "?",
@@ -399,14 +404,14 @@ public class Library {
                 if (aaa != 0) {
                     return;
                 }
-                ff.delete();
+                file.delete();
 
             }
 
-            try (FileWriter fw = new FileWriter(ff)) {
-                fw.write(JSONString);
+            try (FileWriter fw = new FileWriter(file)) {
+                fw.write(outText);
             } catch (IOException e) {
-                System.out.println(e);
+                logger.error(e.getMessage(), e);
             }
 
         }

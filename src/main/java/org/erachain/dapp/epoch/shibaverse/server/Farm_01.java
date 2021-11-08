@@ -160,7 +160,7 @@ public class Farm_01 extends Thread {
         BigDecimal totalForginAmount = new BigDecimal(block.getForgingValue());
 
         // make table of credits
-        CreditAddressesMap creditMap = dcSet.getCredit_AddressesMap();
+        CreditAddressesMap creditMap = dcSet.getCreditAddressesMap();
         HashMap<String, BigDecimal> credits = new HashMap();
         try (IteratorCloseable<Tuple3<String, Long, String>> iterator = creditMap.getCreditorsIterator(
                 account.getAddress(), AssetCls.ERA_KEY)) {

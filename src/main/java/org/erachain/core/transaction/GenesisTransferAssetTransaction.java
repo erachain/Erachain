@@ -274,7 +274,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
             // THIS is CREDIT
             this.sender.changeBalance(this.dcSet, true, false, key, this.amount,
                     false, false, false);
-            this.dcSet.getCredit_AddressesMap().add(
+            this.dcSet.getCreditAddressesMap().add(
                     new Tuple3<String, Long, String>(
                             this.sender.getAddress(), -key,
                             this.recipient.getAddress()),

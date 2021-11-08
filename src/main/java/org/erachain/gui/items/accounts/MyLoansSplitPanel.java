@@ -1,28 +1,36 @@
 package org.erachain.gui.items.accounts;
 
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.SplitPanel;
+import org.erachain.lang.Lang;
+import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.math.BigDecimal;
 
-// панель моих адресов
+
 public class MyLoansSplitPanel extends SplitPanel {
 
-    public AccountsPanel accountPanel;
-    public AccountsRightPanel rightPanel;
+    public LoansPanel loansPanel;
+    public AssetCls assetSelect;
+    private Tuple2<PublicKeyAccount, Account> selectArg;
+    private AccountsRightPanel rightPanel;
 
     public static String NAME = "MyLoansSplitPanel";
     public static String TITLE = "My Loans";
 
     public MyLoansSplitPanel() {
         super(NAME, TITLE);
-        //	LayoutManager favoritesGBC = this.getLayout();
+
         this.jScrollPanelLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
         this.toolBarLeftPanel.setVisible(false);
+        this.setName(Lang.T("My Loans"));
         this.jToolBarRightPanel.setVisible(false);
 
         GridBagConstraints PanelGBC = new GridBagConstraints();
@@ -32,38 +40,39 @@ public class MyLoansSplitPanel extends SplitPanel {
         PanelGBC.weighty = 1;
         PanelGBC.gridx = 0;
         PanelGBC.gridy = 0;
-
-        accountPanel = new AccountsPanel();
+        loansPanel = new LoansPanel();
+        this.leftPanel.add(loansPanel, PanelGBC);
+        // EVENTS on CURSOR
+        loansPanel.table.getSelectionModel().addListSelectionListener(new Account_Tab_Listener());
         rightPanel = new AccountsRightPanel();
 
-        this.leftPanel.add(accountPanel, PanelGBC);
-        //this.rightPanel1.add(rightPanel,PanelGBC);
-        jScrollPaneJPanelRightPanel.setViewportView(rightPanel);
-
-        // EVENTS on CURSOR
-        accountPanel.table.getSelectionModel().addListSelectionListener(new Account_Tab_Listener());
-
+        //   this.repaint();
 
     }
 
+    @Override
+    public void onClose() {
+        rightPanel.tableModel.deleteObservers();
+        loansPanel.tableModel.deleteObservers();
+    }
 
     class Account_Tab_Listener implements ListSelectionListener {
 
-        //@SuppressWarnings("deprecation")
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
 
-            AssetCls asset = (AssetCls) accountPanel.cbxFavorites.getSelectedItem();
-            Account account = null;
-            if (accountPanel.table.getSelectedRow() >= 0)
-                account = accountPanel.tableModel.getItem(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
-            //info1.show_001(person);
-            //	rightPanel.jTable1.Search_Accoutnt_Transaction_From_Asset(account, asset);
-//			my_Accounts_SplitPanel.rightPanel.jTable1.revalidate();
-            // PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
-            //my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());
-            ////my_Person_SplitPanel.searchTextFieldSearchToolBarLeftPanelDocument.setEnabled(true);
+            AssetCls asset = (AssetCls) loansPanel.cbxFavorites.getSelectedItem();
+            Fun.Tuple3<PublicKeyAccount, Account, BigDecimal> item = null;
+            if (loansPanel.table.getSelectedRow() >= 0) {
+                item = loansPanel.tableModel.getItem(loansPanel.table.convertRowIndexToModel(loansPanel.table.getSelectedRow()));
+            }
 
+            if (item == null || asset == null || item.equals(selectArg) && asset.equals(assetSelect)) return;
+            selectArg = new Tuple2<>(item.a, item.b);
+            assetSelect = asset;
+            rightPanel.tableModel.setAccount(item.a);
+            rightPanel.setAsset(asset);
+            jScrollPaneJPanelRightPanel.setViewportView(rightPanel);
 
         }
 

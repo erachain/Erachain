@@ -17,25 +17,33 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.*;
 import org.erachain.dapp.DAPP;
 import org.erachain.database.DBASet;
-import org.erachain.database.wallet.AccountMap;
-import org.erachain.database.wallet.DWSet;
-import org.erachain.database.wallet.FavoriteItemMap;
-import org.erachain.database.wallet.SecureWalletDatabase;
+import org.erachain.database.wallet.*;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.ObserverWaiter;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Timer;
 import java.util.*;
 
 /**
@@ -358,6 +366,194 @@ public class Wallet extends Observable implements Observer {
 
 		return this.dwSet.isTransactionFavorite(transaction);
 	}
+
+	private String saveFavoritesLong(FavoriteItemMap map, String name) throws IOException {
+
+		String out = "";
+
+		Object key;
+		try (IteratorCloseable iterator = map.getIterator()) {
+			JSONArray jsonArray = new JSONArray();
+			while (iterator.hasNext()) {
+				jsonArray.add(iterator.next());
+			}
+			out += "\"" + name + "\":" + jsonArray.toJSONString() + ",";
+		} catch (IOException e) {
+			throw e;
+		}
+
+		return out;
+	}
+
+	public String saveFavorites() {
+
+		String out = "{";
+
+		Object key;
+		FavoriteAccountsMap accountsMap = dwSet.getFavoriteAccountsMap();
+		try (IteratorCloseable iterator = accountsMap.getIterator()) {
+			JSONObject accountsJson = new JSONObject();
+			JSONArray jsonRow;
+			while (iterator.hasNext()) {
+				key = iterator.next();
+				Tuple3<String, String, String> value = accountsMap.get((String) key);
+				jsonRow = new JSONArray();
+				jsonRow.add(value.a);
+				jsonRow.add(value.b);
+				jsonRow.add(value.c);
+				accountsJson.put(key, jsonRow);
+			}
+			out += "\"accounts\":" + accountsJson.toJSONString() + ",";
+		} catch (IOException e) {
+			return "ERROR: on getFavoriteAccountsMap" + e.getMessage();
+		}
+
+		try {
+			out += saveFavoritesLong(dwSet.getAssetFavoritesSet(), "assets");
+		} catch (IOException e) {
+			return "assets " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getDocumentFavoritesSet(), "documents");
+		} catch (IOException e) {
+			return "documents " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getImprintFavoritesSet(), "imprints");
+		} catch (IOException e) {
+			return "imprints " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getPersonFavoritesSet(), "persons");
+		} catch (IOException e) {
+			return "persons " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getPollFavoritesSet(), "polls");
+		} catch (IOException e) {
+			return "polls " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getStatusFavoritesSet(), "statuses");
+		} catch (IOException e) {
+			return "statuses " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getTemplateFavoritesSet(), "templates");
+		} catch (IOException e) {
+			return "templates " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getUnionFavoritesSet(), "unions");
+		} catch (IOException e) {
+			return "unions " + e;
+		}
+		try {
+			out += saveFavoritesLong(dwSet.getTransactionFavoritesSet(), "txs");
+		} catch (IOException e) {
+			return "txs " + e;
+		}
+
+		out += "}";
+		Library.saveToFile(null, out, "favorites", "JSON", "json");
+
+		return null;
+	}
+
+	private String loadFavoritesLong(JSONObject json, FavoriteItemMap map, String name) {
+
+		try {
+			JSONArray rows = (JSONArray) json.get(name);
+			for (Object key : rows) {
+				if (((Long) key) <= 0)
+					return name + " wrong value: " + key;
+
+				map.add((Long) key);
+			}
+		} catch (Exception e) {
+			return name + " - " + e;
+		}
+
+		return null;
+	}
+
+	public String loadFavorites() {
+
+		FileChooser chooser = new FileChooser();
+		chooser.setDialogTitle(Lang.T("Open File"));
+		chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
+		chooser.setMultiSelectionEnabled(false);
+		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Favorites", "json");
+		chooser.setFileFilter(filter);
+
+		String res = "";
+		if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+			String pp = chooser.getSelectedFile().getPath();
+			File ff = new File(pp);
+
+			try {
+				BufferedReader in = new BufferedReader(new FileReader(ff));
+				String str;
+				while ((str = in.readLine()) != null) {
+					res += (str);
+				}
+				in.close();
+			} catch (IOException e) {
+				return e.getMessage();
+			}
+
+			JSONObject json = null;
+			try {
+				json = (JSONObject) JSONValue.parseWithException(res);
+			} catch (Exception e) {
+				String error = e.getMessage();
+				return e.toString();
+			}
+
+			JSONObject rows = (JSONObject) json.get("accounts");
+			for (Object key : rows.keySet()) {
+				JSONArray row = (JSONArray) rows.get(key);
+				dwSet.addAddressFavorite((String) key, (String) row.get(0), (String) row.get(1), (String) row.get(2));
+			}
+
+			String result = loadFavoritesLong(json, dwSet.getAssetFavoritesSet(), "assets");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getPersonFavoritesSet(), "persons");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getDocumentFavoritesSet(), "documents");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getImprintFavoritesSet(), "imprints");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getPersonFavoritesSet(), "persons");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getPollFavoritesSet(), "polls");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getStatusFavoritesSet(), "statuses");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getTemplateFavoritesSet(), "templates");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getUnionFavoritesSet(), "unions");
+			if (result != null)
+				return result;
+			result = loadFavoritesLong(json, dwSet.getTransactionFavoritesSet(), "txs");
+			if (result != null)
+				return result;
+
+		}
+
+
+		return null;
+	}
+
 
 	// CREATE
 	public synchronized boolean create(byte[] seed, String password, int depth, boolean synchronize, String path,

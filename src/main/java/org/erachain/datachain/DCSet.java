@@ -900,7 +900,7 @@ public class DCSet extends DBASet implements Closeable {
      *
      * <b>Значение:</b> сумма средств
      */
-    public CreditAddressesMap getCredit_AddressesMap() {
+    public CreditAddressesMap getCreditAddressesMap() {
         return this.credit_AddressesMap;
     }
 

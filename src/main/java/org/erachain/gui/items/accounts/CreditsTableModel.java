@@ -32,7 +32,7 @@ public class CreditsTableModel extends TimerTableModelCls<Transaction> implement
 
     @SuppressWarnings("unchecked")
     public CreditsTableModel() {
-        super(DCSet.getInstance().getCredit_AddressesMap(),
+        super(DCSet.getInstance().getCreditAddressesMap(),
                 new String[]{"Account", "Amount", "Type"}, false);
 
         logger = LoggerFactory.getLogger(CreditsTableModel.class);
@@ -51,7 +51,7 @@ public class CreditsTableModel extends TimerTableModelCls<Transaction> implement
         asset_Key = asset.getKey();
         cred.clear();
         for (PublicKeyAccount account : this.publicKeyAccounts) {
-            cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
+            cred.addAll(DCSet.getInstance().getCreditAddressesMap().getList(account.getAddress(), -asset_Key));
         }
 
         this.transactions_Asset.clear();
@@ -101,7 +101,7 @@ public class CreditsTableModel extends TimerTableModelCls<Transaction> implement
             this.publicKeyAccounts = Controller.getInstance().getWalletPublicKeyAccounts();
             cred.clear();
             for (PublicKeyAccount account : this.publicKeyAccounts) {
-                cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
+                cred.addAll(DCSet.getInstance().getCreditAddressesMap().getList(account.getAddress(), -asset_Key));
             }
 
 
@@ -128,7 +128,7 @@ public class CreditsTableModel extends TimerTableModelCls<Transaction> implement
 
         cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
         for (PublicKeyAccount account : this.publicKeyAccounts) {
-            cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
+            cred.addAll(DCSet.getInstance().getCreditAddressesMap().getList(account.getAddress(), -asset_Key));
         }
 
         Controller.getInstance().addWalletObserver(this);

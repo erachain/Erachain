@@ -104,7 +104,7 @@ public abstract class ExAction<R> {
 
         switch (type) {
             case FILTERED_ACCRUALS_TYPE:
-                return ExPays.parse(data, pos);
+                return ExFilteredPays.parse(data, pos);
             case SIMPLE_PAYOUTS_TYPE:
                 return ExAirDrop.parse(data, pos);
             case LIST_PAYOUTS_TYPE:
@@ -121,7 +121,7 @@ public abstract class ExAction<R> {
             int type = (Integer) json.get("type");
             switch (type) {
                 case FILTERED_ACCRUALS_TYPE:
-                    return ExPays.parseJSON_local(json);
+                    return ExFilteredPays.parseJSON_local(json);
                 case SIMPLE_PAYOUTS_TYPE:
                     return ExAirDrop.parseJSON_local(json);
                 case LIST_PAYOUTS_TYPE:

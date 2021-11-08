@@ -288,7 +288,7 @@ public abstract class CalculatedAmount extends Calculated {
                 // CLOSE IN CLAIM table balance
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.sender.getAddress(),
                         absKey, this.recipient.getAddress());
-                dcSet.getCredit_AddressesMap().sub(creditKey, this.amount);
+                dcSet.getCreditAddressesMap().sub(creditKey, this.amount);
             } else {
                 // UPDATE SENDER
                 this.sender.changeBalance(dcSet, !backward, false, this.assetKey, this.amount, false, false, false);
@@ -330,20 +330,20 @@ public abstract class CalculatedAmount extends Calculated {
                 // BORROW
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.sender.getAddress(),
                         absKey, this.recipient.getAddress());
-                dcSet.getCredit_AddressesMap().sub(creditKey, this.amount);
+                dcSet.getCreditAddressesMap().sub(creditKey, this.amount);
             } else {
                 // CREDIR or RETURN CREDIT
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.recipient.getAddress(),
                         absKey, this.sender.getAddress());
-                BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+                BigDecimal creditAmount = dcSet.getCreditAddressesMap().get(creditKey);
                 if (creditAmount.compareTo(amount) >= 0) {
                     // ALL CREDIT RETURN
-                    dcSet.getCredit_AddressesMap().sub(creditKey, this.amount);
+                    dcSet.getCreditAddressesMap().sub(creditKey, this.amount);
                 } else {
                     // update creditAmount to 0
                     BigDecimal leftAmount;
                     if (creditAmount.signum() != 0) {
-                        dcSet.getCredit_AddressesMap().sub(creditKey, creditAmount);
+                        dcSet.getCreditAddressesMap().sub(creditKey, creditAmount);
                         // GET CREDIT for left AMOUNT
                         leftAmount = amount.subtract(creditAmount);
                     } else {
@@ -352,7 +352,7 @@ public abstract class CalculatedAmount extends Calculated {
                     
                     Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(
                             this.sender.getAddress(), absKey, this.recipient.getAddress()); // REVERSE
-                    dcSet.getCredit_AddressesMap().add(leftCreditKey, leftAmount);
+                    dcSet.getCreditAddressesMap().add(leftCreditKey, leftAmount);
                 }
             }
         }
@@ -411,7 +411,7 @@ public abstract class CalculatedAmount extends Calculated {
 
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.sender.getAddress(),
                         absKey, this.recipient.getAddress());
-                dcSet.getCredit_AddressesMap().add(creditKey, this.amount);
+                dcSet.getCreditAddressesMap().add(creditKey, this.amount);
             } else {
                 // UPDATE SENDER
                 this.sender.changeBalance(dcSet, backward, false, this.assetKey, this.amount, false, false, false);
@@ -456,22 +456,22 @@ public abstract class CalculatedAmount extends Calculated {
                 // BORROW
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.sender.getAddress(),
                         absKey, this.recipient.getAddress());
-                dcSet.getCredit_AddressesMap().add(creditKey, this.amount);
+                dcSet.getCreditAddressesMap().add(creditKey, this.amount);
             } else {
                 // in BACK order - RETURN CREDIT << CREDIT
                 // GET CREDIT for left AMOUNT
                 Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(this.sender.getAddress(),
                         absKey, this.recipient.getAddress()); // REVERSE
-                BigDecimal leftAmount = dcSet.getCredit_AddressesMap().get(leftCreditKey);
+                BigDecimal leftAmount = dcSet.getCreditAddressesMap().get(leftCreditKey);
                 if (leftAmount.compareTo(amount) < 0) {
-                    dcSet.getCredit_AddressesMap().sub(leftCreditKey, leftAmount);
+                    dcSet.getCreditAddressesMap().sub(leftCreditKey, leftAmount);
                     // CREDIR or RETURN CREDIT
                     Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
                             this.recipient.getAddress(), absKey, this.sender.getAddress());
-                    dcSet.getCredit_AddressesMap().add(creditKey, amount.subtract(leftAmount));
+                    dcSet.getCreditAddressesMap().add(creditKey, amount.subtract(leftAmount));
                 } else {
                     // ONLY RETURN CREDIT
-                    dcSet.getCredit_AddressesMap().sub(leftCreditKey, amount);
+                    dcSet.getCreditAddressesMap().sub(leftCreditKey, amount);
                 }
                 
             }
