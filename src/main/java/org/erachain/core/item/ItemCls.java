@@ -1157,22 +1157,25 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         //itemJSON.put("makerPubkey", this.maker.getBase58());
         itemJSON.put("isConfirmed", this.isConfirmed());
         itemJSON.put("is_confirmed", this.isConfirmed());
-        itemJSON.put("reference", Base58.encode(this.reference));
-        itemJSON.put("tx_signature", Base58.encode(this.reference));
 
-        Long txSeqNo = DCSet.getInstance().getTransactionFinalMapSigns().get(getReference());
-        if (txSeqNo != null) {
-            // если транзакция еще не подтверждена - чтобы ошибок не было при отображении в блокэксплорере
-            itemJSON.put("tx_seqNo", Transaction.viewDBRef(txSeqNo));
-            if (referenceTx == null)
-                referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
+        if (reference != null) {
+            itemJSON.put("reference", Base58.encode(this.reference));
+            itemJSON.put("tx_signature", Base58.encode(this.reference));
 
-            if (referenceTx != null) {
-                PublicKeyAccount creatorTX = referenceTx.getCreator();
-                creatorTX.toJsonPersonInfo(itemJSON, "tx_creator");
-                itemJSON.put("tx_creator_pubkey", creatorTX.getBase58());
-                itemJSON.put("tx_timestamp", referenceTx.getTimestamp());
-                itemJSON.put("block_timestamp", Controller.getInstance().blockChain.getTimestamp(referenceTx.getBlockHeight()));
+            Long txSeqNo = DCSet.getInstance().getTransactionFinalMapSigns().get(this.reference);
+            if (txSeqNo != null) {
+                // если транзакция еще не подтверждена - чтобы ошибок не было при отображении в блокэксплорере
+                itemJSON.put("tx_seqNo", Transaction.viewDBRef(txSeqNo));
+                if (referenceTx == null)
+                    referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
+
+                if (referenceTx != null) {
+                    PublicKeyAccount creatorTX = referenceTx.getCreator();
+                    creatorTX.toJsonPersonInfo(itemJSON, "tx_creator");
+                    itemJSON.put("tx_creator_pubkey", creatorTX.getBase58());
+                    itemJSON.put("tx_timestamp", referenceTx.getTimestamp());
+                    itemJSON.put("block_timestamp", Controller.getInstance().blockChain.getTimestamp(referenceTx.getBlockHeight()));
+                }
             }
         }
 
