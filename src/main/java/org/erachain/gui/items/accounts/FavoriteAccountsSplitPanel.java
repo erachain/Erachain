@@ -53,6 +53,10 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         // CREATE TABLE
         this.accountsTableModel = new FavoriteAccountsTableModel();
         final MTable accountsTable = new MTable(this.accountsTableModel);
+        // set showvideo
+        jTableJScrollPanelLeftPanel.setModel(this.accountsTableModel);
+        jTableJScrollPanelLeftPanel = accountsTable;
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // column #1
         TableColumnModel columnModel = accountsTable.getColumnModel();
