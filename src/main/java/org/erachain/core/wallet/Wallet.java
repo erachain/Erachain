@@ -550,6 +550,8 @@ public class Wallet extends Observable implements Observer {
 
 		}
 
+		dwSet.hardFlush();
+
 
 		return null;
 	}
