@@ -132,7 +132,8 @@ public class InsertPersonPanel extends IssuePersonPanel {
             String baseXXstr = getClipboardContents();
             try {
                 byte[] dataPerson = Base58.decode(baseXXstr);
-                setByteCode(dataPerson);
+                person = (PersonHuman) PersonFactory.getInstance().parse(Transaction.FOR_NETWORK, dataPerson, false);
+                setByteCode(null);
             } catch (Exception ee) {
                 try {
                     byte[] dataPerson = Base64.getDecoder().decode(baseXXstr);
@@ -247,15 +248,17 @@ public class InsertPersonPanel extends IssuePersonPanel {
     }
 
     public void setByteCode(byte[] dataPerson) {
-        person = null;
-        reset();
-        try {
-            person = (PersonHuman) PersonFactory.getInstance().parse(Transaction.FOR_NETWORK, dataPerson, false);
-        } catch (Exception ee) {
-            JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.T("Error"),
-                    JOptionPane.ERROR_MESSAGE);
-            return;
+        if (dataPerson != null) {
+            person = null;
+            try {
+                person = (PersonHuman) PersonFactory.getInstance().parse(Transaction.FOR_NETWORK, dataPerson, false);
+            } catch (Exception ee) {
+                JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.T("Error"),
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
+        reset();
 
         nameField.setText(person.viewName());
         addImageLabel.set(person.getImage());
