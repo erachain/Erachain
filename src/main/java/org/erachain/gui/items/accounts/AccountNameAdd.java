@@ -7,8 +7,6 @@ import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
-import org.erachain.utils.StrJSonFine;
-import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
@@ -99,8 +97,6 @@ public class AccountNameAdd extends javax.swing.JDialog {
                     return;
                 }
                 try {
-                    JSONObject json = new JSONObject();
-                    json.put("description", description);
                     String address = th.jTextFieldAccount.getText();
                     Tuple2<Account, String> result = Account.tryMakeAccount(address);
                     if (result.a == null) {
@@ -110,9 +106,9 @@ public class AccountNameAdd extends javax.swing.JDialog {
                         Account newAccount = result.a;
                         if (newAccount instanceof PublicKeyAccount) {
                             favoriteAccountsMap.put(newAccount.getAddress(), new Tuple3(((PublicKeyAccount) newAccount).getBase58(),
-                                    accountName, StrJSonFine.convert(json)));
+                                    accountName, description));
                         } else {
-                            favoriteAccountsMap.put(newAccount.getAddress(), new Tuple3(null, accountName, StrJSonFine.convert(json)));
+                            favoriteAccountsMap.put(newAccount.getAddress(), new Tuple3(null, accountName, description));
                         }
                         setVisible(false);
                     }

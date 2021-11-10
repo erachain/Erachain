@@ -5,9 +5,6 @@ import org.erachain.controller.Controller;
 import org.erachain.database.wallet.FavoriteAccountsMap;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
-import org.erachain.utils.StrJSonFine;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple3;
 
 import javax.swing.*;
@@ -28,8 +25,7 @@ import java.util.List;
  */
 public class AccountSetNameDialog extends javax.swing.JDialog {
 
-    public JSONObject answer;
-    FavoriteAccountsMap db = Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap();
+    FavoriteAccountsMap accountsTab = Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap();
     /**
      * Creates new form Account_Show
      */
@@ -79,20 +75,12 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
         initComponents();
-        answer.put("type", "cancel");
         // account in db?
-        if (db.contains(account)) {
-            // read json
-            Tuple3<String, String, String> ss = db.get(account);
-            accountPubKey = ss.a;
-            answer = (JSONObject) JSONValue.parse(ss.c);
-            answer = answer == null ? new JSONObject() : answer;
-            // set papams
-            th.jTextField_Name.setText(db.get(account).b);
-            th.jTextArea_Description.setText("");
-            if (answer.containsKey("description")) {
-                th.jTextArea_Description.setText((String) answer.get("description"));
-            }
+        if (accountsTab.contains(account)) {
+            Tuple3<String, String, String> row = accountsTab.get(account);
+            accountPubKey = row.a;
+            th.jTextField_Name.setText(row.b);
+            th.jTextArea_Description.setText(row.c == null ? "" : row.c);
         }
 
         jButton_OK.addActionListener(new ActionListener() {
@@ -102,27 +90,9 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
                 // TODO Auto-generated method stub
                 String name = th.jTextField_Name.getText();
                 String desc = th.jTextArea_Description.getText();
-                JSONObject ans = new JSONObject();
 
-                // account in db?
-
-                if (name.length() == 0 && desc.length() == 0) {
-                    db.delete(account);
-                    setVisible(false);
-                    return;
-                } else if (name.length() == 0) {
-                    name = "";
-                }
-
-
-                if (desc.length() != 0) {
-                    // write description
-                    ans.put("description", desc);
-
-                }
-                db.put(account, new Tuple3(accountPubKey, name, StrJSonFine.convert(ans)));
+                accountsTab.put(account, new Tuple3(accountPubKey, name, desc));
                 setVisible(false);
-                //dispose();
             }
 
         });
@@ -133,7 +103,6 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                answer.put("type", "cancel");
                 setVisible(false);
             }
 
@@ -166,7 +135,6 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
         jButton_OK = new javax.swing.JButton();
         jButton_Cancel = new javax.swing.JButton();
         jLabel_Description = new javax.swing.JLabel();
-        answer = new JSONObject();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
