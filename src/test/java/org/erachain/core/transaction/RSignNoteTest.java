@@ -8,7 +8,6 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.exdata.exActions.ExFilteredPays;
-import org.erachain.core.exdata.exActions.ExListPays;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.IDB;
@@ -70,7 +69,7 @@ public class RSignNoteTest {
         init();
 
         ExLink exLink = null;
-        int feePow = 0;
+        byte feePow = 0;
         long templateKey = 0;
 
         int flags = 0;
@@ -132,6 +131,13 @@ public class RSignNoteTest {
 
         assertEquals(bytes.length, noteBytes.length);
 
+        dcSet.getTransactionTab().putDirect(parsedNote);
+
+        RSend rSend = new RSend(maker, feePow, maker_1, FEE_KEY, BigDecimal.ONE, ++timestamp, flags);
+        rSend.sign(maker, Transaction.FOR_NETWORK);
+        dcSet.getTransactionTab().putDirect(rSend);
+
+        assertEquals(rNote, dcSet.getTransactionTab().get(parsedNote.signature));
 
     }
 
@@ -163,7 +169,7 @@ public class RSignNoteTest {
         int filterByGender = ExFilteredPays.FILTER_PERSON_ONLY_MAN;
         boolean selfPay = true;
 
-        ExListPays exFilteredPays = new ExListPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+        ExFilteredPays exFilteredPays = new ExFilteredPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide, filterBalanceMIN, filterBalanceMAX,
                 filterTXType, filterTXStartSeqNo, filterTXEndSeqNo, filterByGender, selfPay);
 

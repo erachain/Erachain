@@ -17,7 +17,7 @@ import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableTuple3String
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
-import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
+import org.erachain.dbs.rocksDB.transformation.ByteableTransactionUnc;
 import org.erachain.dbs.rocksDB.transformation.toBytesStringLongInteger;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -49,7 +49,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     @Override
     public void openMap() {
 
-        map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
+        map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableLong(), new ByteableTransactionUnc(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),

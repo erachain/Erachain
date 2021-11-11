@@ -5,7 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
-import org.erachain.database.serializer.TransactionSerializer;
+import org.erachain.database.serializer.TransactionUncSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.IteratorCloseable;
@@ -51,8 +51,8 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
         // OPEN MAP
         map = database.createHashMap("transactions")
                 .keySerializer(SerializerBase.LONG)
-                .valueSerializer(new TransactionSerializer())
-                .counterEnable()
+                .valueSerializer(new TransactionUncSerializer())
+                .counterEnable() // разрешаем счет размера - это будет немного тормозить работу
                 .makeOrGet();
 
     }

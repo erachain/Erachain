@@ -3,7 +3,7 @@ package org.erachain.dbs.mapDB;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
-import org.erachain.database.serializer.TransactionSerializer;
+import org.erachain.database.serializer.TransactionUncSerializer;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.IteratorCloseable;
@@ -26,8 +26,8 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
         // OPEN MAP
         map = database.createHashMap("transactions")
                 .keySerializer(SerializerBase.LONG)
-                .valueSerializer(new TransactionSerializer())
-                .counterEnable()
+                .valueSerializer(new TransactionUncSerializer())
+                .counterEnable() // разрешаем счет размера - это будет немного тормозить работу
                 .makeOrGet();
 
     }
