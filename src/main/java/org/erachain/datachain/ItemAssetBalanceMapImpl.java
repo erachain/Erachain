@@ -215,4 +215,50 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     }
 
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount) {
+
+        if (assetKey < 0)
+            assetKey = -assetKey;
+
+        return ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey, fromOwnAmount);
+
+    }
+
+    /**
+     * page of Short Address + Own Amount .. start & end ownAmount for keys
+     *
+     * @param assetKey
+     * @param fromOwnAmount
+     * @param pageSize
+     * @return
+     */
+    public Fun.Tuple3<BigDecimal, BigDecimal, List<Tuple2<byte[], BigDecimal>>> gePage(long assetKey, BigDecimal fromOwnAmount, int pageSize) {
+
+        byte[] key;
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> item;
+        List page = new ArrayList<>();
+        BigDecimal startOwnAmount = null;
+        BigDecimal endOwnAmount = null;
+        try (IteratorCloseable<byte[]> iterator = getIteratorByAsset(assetKey, fromOwnAmount)) {
+            while (iterator.hasNext() && pageSize > 0) {
+
+                key = iterator.next();
+                item = get(key);
+                if (item.a.b.signum() == 0)
+                    break;
+
+                page.add(new Tuple2<>(key, item.a.b));
+
+                --pageSize;
+
+            }
+
+        } catch (IOException e) {
+            return null;
+        }
+
+        return new Fun.Tuple3(startOwnAmount, endOwnAmount, page);
+    }
+
+
 }

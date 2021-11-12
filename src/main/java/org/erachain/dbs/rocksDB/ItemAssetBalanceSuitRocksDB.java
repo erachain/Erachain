@@ -23,6 +23,8 @@ import org.rocksdb.WriteOptions;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import static org.erachain.dbs.rocksDB.RockDBSetts.ROCK_BIG_DECIMAL_LEN;
+
 @Slf4j
 public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
@@ -116,6 +118,22 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
         return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
                 Longs.toByteArray(assetKey), false, true);
+    }
+
+    // TODO NEED TEST
+    @Override
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount) {
+
+        byte[] fromKey = new byte[8 + ROCK_BIG_DECIMAL_LEN];
+        // ASSET KEY
+        System.arraycopy(Longs.toByteArray(assetKey), 0, fromKey, 0, 8);
+
+        byte[] shiftForSortBuff = seralizerBigDecimal.toBytes(fromOwnAmount.negate());
+
+        System.arraycopy(shiftForSortBuff, 0, fromKey, 8, 8);
+
+        return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
+                fromKey, false, true);
     }
 
     @Override

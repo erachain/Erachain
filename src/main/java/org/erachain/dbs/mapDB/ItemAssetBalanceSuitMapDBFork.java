@@ -122,12 +122,17 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 IteratorCloseableImpl.make(this.assetKeyMap.subMap(
-                        Fun.t2(Fun.t2(assetKey, null), null),
-                        Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI()))
+                                Fun.t2(Fun.t2(assetKey, null), null),
+                                Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI()))
                         .values().iterator())),
                 // for BYTES primary key
                 Fun.BYTE_ARRAY_COMPARATOR);
 
+    }
+
+    @Override
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount) {
+        return null;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.erachain.database;
 
-import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IMap;
 import org.erachain.dbs.IteratorCloseable;
 
 import java.io.IOException;
@@ -16,12 +16,12 @@ public class PagedMap<T, U> {
     public void rowCalc() {
     }
 
-    DBTabImpl mapImpl;
+    IMap mapImpl;
     protected long timestamp;
 
     protected U currentRow;
 
-    public PagedMap(DBTabImpl mapImpl) {
+    public PagedMap(IMap mapImpl) {
         this.mapImpl = mapImpl;
     }
 

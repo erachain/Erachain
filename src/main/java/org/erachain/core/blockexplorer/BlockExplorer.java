@@ -1767,9 +1767,37 @@ public class BlockExplorer {
             }
         }
 
-        long key = 1l;
+        long key = 1L;
         if (info.getQueryParameters().containsKey("asset"))
             key = Long.valueOf(info.getQueryParameters().getFirst("asset"));
+
+        return jsonQueryTopRichest100(limit, key);
+    }
+
+    public Map jsonQueryHolders(UriInfo info) {
+
+        String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
+        BigDecimal fromID = new BigDecimal(pageFromKeyStr);
+
+        long key = 1L;
+        if (info.getQueryParameters().containsKey("asset"))
+            key = Long.valueOf(info.getQueryParameters().getFirst("asset"));
+
+        List<> page = new ArrayList<>();
+        try (IteratorCloseable<byte[]> iterator = dcSet.getAssetBalanceMap().getIteratorByAsset(key fromID)) {
+            while (iterator.hasNext()) {
+
+
+            }
+
+        }
+        transactions = result.c;
+        if (result.a != null) {
+            output.put("pageFromKey", Transaction.viewDBRef(result.a));
+        }
+        if (result.b != null) {
+            output.put("pageToKey", Transaction.viewDBRef(result.b));
+        }
 
         return jsonQueryTopRichest100(limit, key);
     }
