@@ -158,6 +158,7 @@ public abstract class ExAction<R> {
         toJson.put("type", type);
         toJson.put("typeName", viewType());
         toJson.put("flags", flags);
+        toJson.put("flagsB", "0x" + Integer.toBinaryString(flags));
         toJson.put("assetKey", assetKey);
 
         toJson.put("balancePos", balancePos);
