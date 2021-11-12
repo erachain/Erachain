@@ -1646,10 +1646,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
         transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
         transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
-        transaction.put("property1B", Integer.toBinaryString(Byte.toUnsignedInt(this.typeBytes[2])));
-        transaction.put("property2B", Integer.toBinaryString(Byte.toUnsignedInt(this.typeBytes[3])));
+        transaction.put("property1B", "0x" + Integer.toBinaryString(Byte.toUnsignedInt(this.typeBytes[2])));
+        transaction.put("property2B", "0x" + Integer.toBinaryString(Byte.toUnsignedInt(this.typeBytes[3])));
         transaction.put("flags", extFlags);
-        transaction.put("flagsB", Long.toBinaryString(extFlags));
+        transaction.put("flagsB", "0x" + Long.toBinaryString(extFlags));
 
         transaction.put("confirmations", this.getConfirmations(dcSet));
         transaction.put("type", getType());
