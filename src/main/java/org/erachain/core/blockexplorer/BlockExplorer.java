@@ -1774,32 +1774,76 @@ public class BlockExplorer {
         return jsonQueryTopRichest100(limit, key);
     }
 
-    public Map jsonQueryHolders(UriInfo info) {
+    public JSONArray jsonHoldersPage(AssetCls asset, List<Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> holders) {
 
-        String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
-        BigDecimal fromID = new BigDecimal(pageFromKeyStr);
+        JSONArray holdersJson = new JSONArray();
 
-        long key = 1L;
-        if (info.getQueryParameters().containsKey("asset"))
-            key = Long.valueOf(info.getQueryParameters().getFirst("asset"));
+        for (Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> holder : holders) {
 
-        List<> page = new ArrayList<>();
-        try (IteratorCloseable<byte[]> iterator = dcSet.getAssetBalanceMap().getIteratorByAsset(key fromID)) {
-            while (iterator.hasNext()) {
+            Account account = new Account(holder.a);
 
+            JSONArray jsonRow = new JSONArray();
+            jsonRow.add(holder.a);
+            jsonRow.add(holder.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(holder.c.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(holder.d.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(holder.e.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(holder.f.setScale(asset.getScale()).toPlainString());
 
+            Tuple2<Integer, PersonCls> person = account.getPerson();
+            if (person != null) {
+                jsonRow.add(person.b.getKey());
+                jsonRow.add(person.b.viewName());
             }
 
-        }
-        transactions = result.c;
-        if (result.a != null) {
-            output.put("pageFromKey", Transaction.viewDBRef(result.a));
-        }
-        if (result.b != null) {
-            output.put("pageToKey", Transaction.viewDBRef(result.b));
+            holdersJson.add(jsonRow);
+
         }
 
-        return jsonQueryTopRichest100(limit, key);
+        return holdersJson;
+    }
+
+    public void jsonQueryHolders(UriInfo info) {
+
+        output.put("type", "top");
+        output.put("search_placeholder", Lang.T("Type asset key", langObj));
+
+        long assetKey = 1L;
+        if (info.getQueryParameters().containsKey("asset"))
+            assetKey = Long.valueOf(info.getQueryParameters().getFirst("asset"));
+
+        AssetCls asset = Controller.getInstance().getAsset(assetKey);
+
+        String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
+        BigDecimal fromID = null;
+        if (pageFromKeyStr != null)
+            fromID = new BigDecimal(pageFromKeyStr);
+
+        Tuple3<BigDecimal, BigDecimal, List<Tuple2<byte[], BigDecimal>>> page = dcSet.getAssetBalanceMap().getHoldersPage(assetKey, fromID, pageSize);
+
+        output.put("page", jsonHoldersPage(asset, page.c));
+
+        if (page.a != null) {
+            output.put("pageFromKey", page.a.toPlainString());
+        }
+        if (page.b != null) {
+            output.put("pageToKey", page.b.toPlainString());
+        }
+
+        output.put("Label_Title", (Lang.T("Holders of %assetName%", langObj)
+                .replace("%assetName%", asset.viewName()));
+
+        output.put("Label_Table_Account", Lang.T("Account", langObj));
+        output.put("Label_Balance_1", Lang.T(Account.balancePositionName(1), langObj));
+        output.put("Label_Balance_2", Lang.T(Account.balancePositionName(2), langObj));
+        output.put("Label_Balance_3", Lang.T(Account.balancePositionName(3), langObj));
+        output.put("Label_Balance_4", Lang.T(Account.balancePositionName(4), langObj));
+        output.put("Label_Balance_5", Lang.T(Account.balancePositionName(5), langObj));
+        output.put("Label_Table_Prop", Lang.T("Prop.", langObj));
+        output.put("Label_Table_person", Lang.T("Maker", langObj));
+
+        output.put("assetKey", assetKey);
+
     }
 
 

@@ -7,9 +7,23 @@ import java.math.BigDecimal;
 
 public interface ItemAssetBalanceSuit {
 
+    /**
+     * Amount is negate already
+     *
+     * @param assetKey
+     * @return
+     */
     IteratorCloseable<byte[]> getIteratorByAsset(long assetKey);
 
-    IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount);
+    /**
+     * for list holders. Amount is negate already
+     *
+     * @param assetKey
+     * @param fromOwnAmount
+     * @param descending
+     * @return
+     */
+    IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, boolean descending);
 
     IteratorCloseable<byte[]> accountIterator(Account account);
 

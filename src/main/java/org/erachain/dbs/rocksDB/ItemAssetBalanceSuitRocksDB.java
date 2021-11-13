@@ -122,7 +122,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     // TODO NEED TEST
     @Override
-    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount) {
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, boolean descending) {
 
         byte[] fromKey = new byte[8 + ROCK_BIG_DECIMAL_LEN];
         // ASSET KEY
@@ -133,7 +133,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         System.arraycopy(shiftForSortBuff, 0, fromKey, 8, 8);
 
         return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
-                fromKey, false, true);
+                fromKey, descending, true);
     }
 
     @Override

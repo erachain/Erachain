@@ -142,6 +142,8 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
     }
 
     /**
+     * Amount is negate already
+     *
      * @param assetKey KEY for balance found + found balance
      * @return
      */
@@ -206,6 +208,12 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     }
 
+    /**
+     * Amount is negate already
+     *
+     * @param assetKey
+     * @return
+     */
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
 
         if (assetKey < 0)
@@ -215,12 +223,20 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     }
 
-    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount) {
+    /**
+     * Amount is negate already
+     *
+     * @param assetKey
+     * @param fromOwnAmount
+     * @param descending
+     * @return
+     */
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, boolean descending) {
 
         if (assetKey < 0)
             assetKey = -assetKey;
 
-        return ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey, fromOwnAmount);
+        return ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey, fromOwnAmount, descending);
 
     }
 
@@ -232,24 +248,28 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
      * @param pageSize
      * @return
      */
-    public Fun.Tuple3<BigDecimal, BigDecimal, List<Tuple2<byte[], BigDecimal>>> gePage(long assetKey, BigDecimal fromOwnAmount, int pageSize) {
+    public Fun.Tuple3<BigDecimal, BigDecimal, List<Tuple2<byte[], BigDecimal>>> getHoldersPage(long assetKey, BigDecimal fromOwnAmount, int pageSize) {
 
         byte[] key;
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> item;
         List page = new ArrayList<>();
         BigDecimal startOwnAmount = null;
         BigDecimal endOwnAmount = null;
-        try (IteratorCloseable<byte[]> iterator = getIteratorByAsset(assetKey, fromOwnAmount)) {
-            while (iterator.hasNext() && pageSize > 0) {
+        // already negate direction
+        try (IteratorCloseable<byte[]> iterator = getIteratorByAsset(assetKey, fromOwnAmount, false)) {
+            while (iterator.hasNext() && pageSize-- > 0) {
 
                 key = iterator.next();
                 item = get(key);
-                if (item.a.b.signum() == 0)
+
+                endOwnAmount = item.a.b;
+                if (endOwnAmount.signum() == 0)
                     break;
 
-                page.add(new Tuple2<>(key, item.a.b));
+                page.add(new Tuple2<>(key, endOwnAmount));
 
-                --pageSize;
+                if (startOwnAmount == null)
+                    startOwnAmount = endOwnAmount;
 
             }
 
