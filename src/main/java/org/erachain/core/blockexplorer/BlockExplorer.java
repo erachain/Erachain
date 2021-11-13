@@ -442,8 +442,9 @@ public class BlockExplorer {
 
             //////////////////////////// ASSETS //////////////////////////
             // top 100
-        } else if (info.getQueryParameters().containsKey("top")) {
-            output.putAll(jsonQueryTopRichest(info));
+        } else if (info.getQueryParameters().containsKey("top") || info.getQueryParameters().containsKey("holders")) {
+            //output.putAll(jsonQueryTopRichest(info));
+            jsonQueryHolders(info);
         } else if (info.getQueryParameters().containsKey("assets")) {
             output.put("type", "assets");
 
@@ -1805,7 +1806,7 @@ public class BlockExplorer {
 
     public void jsonQueryHolders(UriInfo info) {
 
-        output.put("type", "top");
+        output.put("type", "holders");
         output.put("search_placeholder", Lang.T("Type asset key", langObj));
 
         long assetKey = 1L;
@@ -1821,7 +1822,7 @@ public class BlockExplorer {
 
         Tuple3<BigDecimal, BigDecimal, List<Tuple2<byte[], BigDecimal>>> page = dcSet.getAssetBalanceMap().getHoldersPage(assetKey, fromID, pageSize);
 
-        output.put("page", jsonHoldersPage(asset, page.c));
+        //output.put("page", jsonHoldersPage(asset, page.c));
 
         if (page.a != null) {
             output.put("pageFromKey", page.a.toPlainString());
@@ -1831,7 +1832,7 @@ public class BlockExplorer {
         }
 
         output.put("Label_Title", (Lang.T("Holders of %assetName%", langObj)
-                .replace("%assetName%", asset.viewName()));
+                .replace("%assetName%", asset.viewName())));
 
         output.put("Label_Table_Account", Lang.T("Account", langObj));
         output.put("Label_Balance_1", Lang.T(Account.balancePositionName(1), langObj));
@@ -2314,33 +2315,13 @@ public class BlockExplorer {
                 // это значит нужно скакнуть в самый низ
             }
 
-            if (true) {
-                Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filterStr, useForge, pageSize, fromID, offset, true);
-                transactions = result.c;
-                if (result.a != null) {
-                    output.put("pageFromKey", Transaction.viewDBRef(result.a));
-                }
-                if (result.b != null) {
-                    output.put("pageToKey", Transaction.viewDBRef(result.b));
-                }
-            } else {
-                // OLD
-                if (filterStr == null) {
-                    transactions = map.getTransactionsFromID(fromID, offset, pageSize, !useForge, true);
-                } else {
-                    transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
-                            offset, pageSize, true);
-                }
-
-                if (transactions.isEmpty()) {
-                    // возможно вниз вышли за границу
-                    output.put("pageFromKey", pageFromKeyStr);
-                } else {
-                    // включим ссылки на листание вверх
-                    output.put("pageFromKey", transactions.get(0).viewHeightSeq());
-                    // это не самый конец - включим листание вниз
-                    output.put("pageToKey", transactions.get(transactions.size() - 1).viewHeightSeq());
-                }
+            Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filterStr, useForge, pageSize, fromID, offset, true);
+            transactions = result.c;
+            if (result.a != null) {
+                output.put("pageFromKey", Transaction.viewDBRef(result.a));
+            }
+            if (result.b != null) {
+                output.put("pageToKey", Transaction.viewDBRef(result.b));
             }
         }
 
