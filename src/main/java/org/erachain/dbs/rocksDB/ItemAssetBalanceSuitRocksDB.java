@@ -162,7 +162,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         return ((DBRocksDBTable) map).getIndexIteratorFilter(secondary, false, false);
     }
 
-    public byte[] getFloorKey(long assetKey, BigDecimal fromAmount) {
+    public byte[] getAssetFloorKey(long assetKey, BigDecimal fromAmount) {
         try (IteratorCloseable<byte[]> iterator = getIteratorByAsset(assetKey, fromAmount, false)) {
             if (iterator.hasNext())
                 return iterator.next();

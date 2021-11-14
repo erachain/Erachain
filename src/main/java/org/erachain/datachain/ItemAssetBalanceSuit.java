@@ -27,7 +27,7 @@ public interface ItemAssetBalanceSuit {
 
     IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, byte[] addressShort, boolean descending);
 
-    IteratorCloseable<byte[]> getIteratorByAsset(byte[] secondaryKey, boolean descending);
+    //IteratorCloseable<byte[]> getIteratorByAsset(byte[] secondaryKey, boolean descending);
 
     IteratorCloseable<byte[]> accountIterator(Account account);
 
@@ -38,6 +38,6 @@ public interface ItemAssetBalanceSuit {
      * @param fromAmount
      * @return
      */
-    byte[] getFloorKey(long assetKey, BigDecimal fromAmount);
+    byte[] getAssetFloorKey(long assetKey, BigDecimal fromAmount);
 
 }

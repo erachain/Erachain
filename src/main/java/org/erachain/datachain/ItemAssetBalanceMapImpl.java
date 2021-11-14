@@ -254,7 +254,19 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
         @Override
         public IteratorCloseable<byte[]> getIterator(byte[] fromKey, boolean descending) {
-            return ((ItemAssetBalanceSuit) map).getIteratorByAsset(fromKey, descending);
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                    balance = (Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>) mapImpl.get(fromKey);
+            BigDecimal fromAmount;
+            if (balance == null) {
+                fromAmount = null;
+            } else {
+                fromAmount = balance.a.b;
+            }
+
+            Long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(fromKey);
+            byte[] address = ItemAssetBalanceMap.getShortAccountFromKey(fromKey);
+
+            return ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey, fromAmount, address, descending);
         }
 
     }
@@ -271,7 +283,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             return null;
         }
 
-        byte[] fromKey = ((ItemAssetBalanceSuit) map).getFloorKey(assetKey, fromOwnAmount);
+        byte[] fromKey = ((ItemAssetBalanceSuit) map).getAssetFloorKey(assetKey, fromOwnAmount);
         if (fromKey == null)
             return new ArrayList<>();
 

@@ -146,7 +146,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
         return null;
     }
 
-    public byte[] getFloorKey(long assetKey, BigDecimal fromAmount) {
+    public byte[] getAssetFloorKey(long assetKey, BigDecimal fromAmount) {
         return null;
     }
 

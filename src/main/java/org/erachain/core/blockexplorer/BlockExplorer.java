@@ -1776,13 +1776,12 @@ public class BlockExplorer {
             page = dcSet.getAssetBalanceMap().getOwnersPage(fromKey, offset, pageSize, true);
         } else {
             pageFromKeyStr = info.getQueryParameters().getFirst("pageAmountKey");
+            BigDecimal fromAmount = null;
             if (pageFromKeyStr != null) {
                 // used Amount
-                BigDecimal fromAmount = new BigDecimal(pageFromKeyStr);
-                page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, offset, pageSize, true);
-            } else {
-                page = dcSet.getAssetBalanceMap().getOwnersPage(null, offset, pageSize, true);
+                fromAmount = new BigDecimal(pageFromKeyStr);
             }
+            page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, offset, pageSize, true);
         }
 
         JSONArray ownersJson = new JSONArray();
