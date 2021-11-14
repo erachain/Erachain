@@ -65,6 +65,11 @@ public interface ItemAssetBalanceMap extends DBTab<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
     getOwnersPage(long assetKey, BigDecimal fromOwnAmount, int offset, int limit, boolean fillFullPage);
 
+    List<Tuple2<byte[], Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+    getOwnersPage(byte[] fromKey, int offset, int limit, boolean fillFullPage);
+
     void addObserver(Observer o);
 
 }

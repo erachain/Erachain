@@ -359,8 +359,8 @@ public class BlockExplorer {
                         //search block
                         jsonQuerySearchPages(info, Block.class, search, offset, null);
                         break;
-                    case "top":
-                        output.putAll(jsonQueryTopRichest100(100, Long.valueOf(search)));
+                    case "owners":
+                        jsonQueryOwners(info);
                         break;
                     case "order":
                         output.putAll(jsonQueryOrder(search));
@@ -442,8 +442,7 @@ public class BlockExplorer {
 
             //////////////////////////// ASSETS //////////////////////////
             // top 100
-        } else if (info.getQueryParameters().containsKey("top") || info.getQueryParameters().containsKey("owners")) {
-            //output.putAll(jsonQueryTopRichest(info));
+        } else if (info.getQueryParameters().containsKey("owners")) {
             jsonQueryOwners(info);
         } else if (info.getQueryParameters().containsKey("assets")) {
             output.put("type", "assets");
@@ -571,7 +570,6 @@ public class BlockExplorer {
         help.put("Unconfirmed Transactions", "blockexplorer.json?unconfirmed");
         help.put("Block", "blockexplorer.json?block={block}[&page={page}]");
         help.put("Blocks List", "blockexplorer.json?blocks[&start={height}]");
-        help.put("Assets List", "blockexplorer.json?assets");
         help.put("Asset", "blockexplorer.json?asset={asset}");
         help.put("Asset Trade", "blockexplorer.json?asset={assetHave}&asset={assetWant}");
         help.put("Polls List", "blockexplorer.json?polls");
@@ -584,11 +582,9 @@ public class BlockExplorer {
         help.put("Address", "blockexplorer.json?address={address}");
         help.put("Address (additional)",
                 "blockexplorer.json?address={address}&start={offset}&allOnOnePage&withoutBlocks&showWithout={1,2,blocks}&showOnly={type}");
-        help.put("Top Richest", "blockexplorer.json?top");
-        help.put("Top Richest", "blockexplorer.json?top={limit}&asset={asset}");
+        help.put("Owners", "blockexplorer.json?owners=asset={asset}");
         help.put("Address All Not Zero", "blockexplorer.json?top=all|[limit]");
         help.put("Address All Addresses", "blockexplorer.json?top=all");
-        help.put("Assets List", "blockexplorer.json?assets");
         help.put("Assets List", "blockexplorer.json?assets");
         help.put("AT List", "blockexplorer.json?aTs");
         help.put("Names List", "blockexplorer.json?names");
@@ -1756,40 +1752,49 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryTopRichest(UriInfo info) {
-        String limitStr = info.getQueryParameters().getFirst("top");
-        int limit = 100;
-        if (limitStr.equals("all")) {
-            limit = 0;
-        } else {
-            try {
-                limit = Integer.valueOf(limitStr);
-            } catch (Exception eee) {
-            }
-        }
+    public void jsonQueryOwners(UriInfo info) {
 
-        long key = 1L;
+        output.put("type", "owners");
+        output.put("search_placeholder", Lang.T("Type asset key", langObj));
+
+        int pageSize = this.pageSize << 1;
+        long assetKey = 1L;
         if (info.getQueryParameters().containsKey("asset"))
-            key = Long.valueOf(info.getQueryParameters().getFirst("asset"));
+            assetKey = Long.valueOf(info.getQueryParameters().getFirst("asset"));
 
-        return jsonQueryTopRichest100(limit, key);
-    }
+        AssetCls asset = Controller.getInstance().getAsset(assetKey);
 
-    public JSONArray jsonOwnersPage(AssetCls asset, List<Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> owners) {
+        int offset = (int) (long) checkAndGetLongParam(info, 0L, "offset");
+
+        List<Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+                page;
+
+        String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
+        if (pageFromKeyStr != null) {
+            // used full KEY
+            byte[] fromKey = Base58.decode(pageFromKeyStr);
+            page = dcSet.getAssetBalanceMap().getOwnersPage(fromKey, offset, pageSize, true);
+        } else {
+            // used Amount
+            pageFromKeyStr = info.getQueryParameters().getFirst("pageAmountKey");
+            BigDecimal fromAmount = new BigDecimal(pageFromKeyStr);
+            page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, offset, pageSize, true);
+        }
 
         JSONArray ownersJson = new JSONArray();
 
-        for (Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> owner : owners) {
+        for (Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                owner : page) {
 
-            Account account = new Account(owner.a);
+            Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(owner.a));
 
             JSONArray jsonRow = new JSONArray();
-            jsonRow.add(owner.a);
-            jsonRow.add(owner.b.setScale(asset.getScale()).toPlainString());
-            jsonRow.add(owner.c.setScale(asset.getScale()).toPlainString());
-            jsonRow.add(owner.d.setScale(asset.getScale()).toPlainString());
-            jsonRow.add(owner.e.setScale(asset.getScale()).toPlainString());
-            jsonRow.add(owner.f.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(account);
+            jsonRow.add(owner.b.a.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.b.b.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.b.c.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.b.d.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.b.e.b.setScale(asset.getScale()).toPlainString());
 
             Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
@@ -1801,30 +1806,7 @@ public class BlockExplorer {
 
         }
 
-        return ownersJson;
-    }
-
-    public void jsonQueryOwners(UriInfo info) {
-
-        output.put("type", "owners");
-        output.put("search_placeholder", Lang.T("Type asset key", langObj));
-
-        long assetKey = 1L;
-        if (info.getQueryParameters().containsKey("asset"))
-            assetKey = Long.valueOf(info.getQueryParameters().getFirst("asset"));
-
-        AssetCls asset = Controller.getInstance().getAsset(assetKey);
-        int offset = 0;
-
-        String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
-        BigDecimal fromID = null;
-        if (pageFromKeyStr != null)
-            fromID = new BigDecimal(pageFromKeyStr);
-
-        List<Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
-                page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromID, offset, pageSize, true);
-
-        output.put("page", jsonOwnersPage(asset, page));
+        output.put("page", ownersJson);
 
         if (!page.isEmpty()) {
             if (page.get(0) != null) {

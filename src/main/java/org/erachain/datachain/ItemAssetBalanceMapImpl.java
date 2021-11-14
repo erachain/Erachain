@@ -33,10 +33,9 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * <b>Список балансов:</b> имущество, займы, хранение, производство, резерв<br>
  * Каждый баланс: Всего Пришло и Остаток<br><br>
  *
- * <b>Ключ:</b> account.address + asset key<br>
+ * <b>Ключ:</b> account.address.short[20] + asset key[8]<br>
  *
  * <b>Значение:</b> Балансы. in_OWN, in_RENT, on_HOLD = in_USE (TOTAL on HAND)
- *
  */
 // TODO SOFT HARD TRUE
 @Slf4j
@@ -67,8 +66,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     // TODO вставить настройки выбора СУБД
     @Override
-    public void openMap()
-    {
+    public void openMap() {
 
 
         if (parent == null) {
@@ -265,13 +263,29 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
     getOwnersPage(long assetKey, BigDecimal fromOwnAmount, int offset, int limit, boolean fillFullPage) {
 
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        byte[] fromKey = ((ItemAssetBalanceSuit) map).getFloorKey(assetKey, fromOwnAmount);
+        if (fromKey == null)
+            return new ArrayList<>();
+
+        PagedOwners pager = new PagedOwners(this);
+        return pager.getPageList(fromKey, offset, limit, fillFullPage);
+
+    }
+
+    public List<Tuple2<byte[], Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+    getOwnersPage(byte[] fromKey, int offset, int limit, boolean fillFullPage) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         PagedOwners pager = new PagedOwners(this);
-        byte[] fromKey = new byte[0];
         return pager.getPageList(fromKey, offset, limit, fillFullPage);
 
     }

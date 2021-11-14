@@ -27,4 +27,13 @@ public interface ItemAssetBalanceSuit {
 
     IteratorCloseable<byte[]> accountIterator(Account account);
 
+    /**
+     * нужно для поиска кобча всего для первой страницы если пользователь задал только Актив и величину Имею
+     *
+     * @param assetKey
+     * @param fromAmount
+     * @return
+     */
+    byte[] getFloorKey(long assetKey, BigDecimal fromAmount);
+
 }

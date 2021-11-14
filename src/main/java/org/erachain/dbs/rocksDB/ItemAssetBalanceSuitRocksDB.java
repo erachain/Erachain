@@ -20,6 +20,7 @@ import org.mapdb.Fun.Tuple5;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
@@ -142,6 +143,17 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         System.arraycopy(account.getShortAddressBytes(), 0, secondary, 0, ADDR_KEY2_LEN);
 
         return ((DBRocksDBTable) map).getIndexIteratorFilter(secondary, false, false);
+    }
+
+    public byte[] getFloorKey(long assetKey, BigDecimal fromAmount) {
+        try (IteratorCloseable<byte[]> iterator = getIteratorByAsset(assetKey, fromAmount, false)) {
+            if (iterator.hasNext())
+                return iterator.next();
+        } catch (IOException e) {
+            return null;
+        }
+
+        return null;
     }
 
 }
