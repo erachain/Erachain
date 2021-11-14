@@ -7,7 +7,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PagedMap<T, U> {
+/**
+ * Vake pages by Index (Secondary Key)
+ *
+ * @param <T> primary Key
+ * @param <K> secondary key
+ * @param <U>
+ */
+public abstract class PagedIndexMap<T, K, U> {
 
     public boolean filterRows() {
         return false;
@@ -21,11 +28,17 @@ public class PagedMap<T, U> {
 
     protected U currentRow;
 
-    public PagedMap(IMap mapImpl) {
+    public PagedIndexMap(IMap mapImpl) {
         this.mapImpl = mapImpl;
     }
 
-    public List<U> getPageList(T fromKey, int offset, int limit, boolean fillFullPage) {
+    public abstract IteratorCloseable<T> getIterator(K fromSecondaryKey, boolean descending);
+
+    public U get(T key) {
+        return (U) mapImpl.get(key);
+    }
+
+    public List<U> getPageList(K fromSecondaryKey, int offset, int limit, boolean fillFullPage) {
 
         timestamp = System.currentTimeMillis();
 
@@ -39,12 +52,12 @@ public class PagedMap<T, U> {
             // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути создаем список обратный что нашли по обратному итератору
             int offsetHere = -(offset + limit);
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, false)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromSecondaryKey, false)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
                     key = iterator.next();
-                    currentRow = (U) mapImpl.get(key);
+                    currentRow = get(key);
                     if (currentRow == null || filterRows()) {
                         continue;
                     }
@@ -60,10 +73,10 @@ public class PagedMap<T, U> {
                     rows.add(0, currentRow);
                 }
 
-                if (fillFullPage && fromKey != null // && fromKey != 0
+                if (fillFullPage && fromSecondaryKey != null // && fromKey != 0
                         && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
-                    for (U pageRow : getPageList(fromKey, 0, limit - count, false)) {
+                    for (U pageRow : getPageList(fromSecondaryKey, 0, limit - count, false)) {
                         if (currentRow == null)
                             continue;
 
@@ -90,7 +103,7 @@ public class PagedMap<T, U> {
 
         } else {
 
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, true)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromSecondaryKey, true)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
@@ -100,7 +113,7 @@ public class PagedMap<T, U> {
                     }
 
                     key = iterator.next();
-                    currentRow = (U) mapImpl.get(key);
+                    currentRow = get(key);
                     if (currentRow == null || filterRows()) {
                         continue;
                     }
@@ -115,12 +128,12 @@ public class PagedMap<T, U> {
                     rows.add(currentRow);
                 }
 
-                if (fillFullPage && fromKey != null // && fromKey != 0
+                if (fillFullPage && fromSecondaryKey != null // && fromKey != 0
                         && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
                     int index = 0;
                     int limitLeft = limit - count;
-                    for (U pageRow : getPageList(fromKey, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
+                    for (U pageRow : getPageList(fromSecondaryKey, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
                         currentRow = pageRow;
                         if (currentRow == null)
                             continue;
@@ -148,7 +161,7 @@ public class PagedMap<T, U> {
         return rows;
     }
 
-    public List<T> getPageKeysList(T fromKey, int offset, int limit, boolean fillFullPage) {
+    public List<T> getPageKeysList(K fromSecondaryKey, int offset, int limit, boolean fillFullPage) {
 
         timestamp = System.currentTimeMillis();
 
@@ -162,7 +175,7 @@ public class PagedMap<T, U> {
             // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути создаем список обратный что нашли по обратному итератору
             int offsetHere = -(offset + limit);
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, false)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromSecondaryKey, false)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
@@ -178,10 +191,10 @@ public class PagedMap<T, U> {
                     keys.add(0, key);
                 }
 
-                if (fillFullPage && fromKey != null // && fromKey != 0
+                if (fillFullPage && fromSecondaryKey != null // && fromKey != 0
                         && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
-                    for (T pageKey : getPageKeysList(fromKey, 0, limit - count, false)) {
+                    for (T pageKey : getPageKeysList(fromSecondaryKey, 0, limit - count, false)) {
                         boolean exist = false;
                         for (T keyHere : keys) {
                             if (pageKey.equals(keyHere)) {
@@ -200,7 +213,7 @@ public class PagedMap<T, U> {
 
         } else {
 
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, true)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromSecondaryKey, true)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
@@ -220,12 +233,12 @@ public class PagedMap<T, U> {
                     keys.add(key);
                 }
 
-                if (fillFullPage && fromKey != null // && fromKey != 0
+                if (fillFullPage && fromSecondaryKey != null // && fromKey != 0
                         && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
                     int index = 0;
                     int limitLeft = limit - count;
-                    for (T pageKey : getPageKeysList(fromKey, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
+                    for (T pageKey : getPageKeysList(fromSecondaryKey, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
                         boolean exist = false;
                         for (T keyHere : keys) {
                             if (pageKey.equals(keyHere)) {

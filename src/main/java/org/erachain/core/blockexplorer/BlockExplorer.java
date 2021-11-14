@@ -1766,23 +1766,12 @@ public class BlockExplorer {
 
         int offset = (int) (long) checkAndGetLongParam(info, 0L, "offset");
 
+        String pageFromKeyStr = info.getQueryParameters().getFirst("pageAmountKey");
+        BigDecimal fromAmount = pageFromKeyStr == null ? null : new BigDecimal(pageFromKeyStr);
+        pageFromKeyStr = info.getQueryParameters().getFirst("pageAddressKey");
+        byte[] fromAddres = pageFromKeyStr == null ? null : Base58.decode(pageFromKeyStr);
         List<Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
-                page;
-
-        String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
-        if (pageFromKeyStr != null) {
-            // used full KEY
-            byte[] fromKey = Base58.decode(pageFromKeyStr);
-            page = dcSet.getAssetBalanceMap().getOwnersPage(fromKey, offset, pageSize, true);
-        } else {
-            pageFromKeyStr = info.getQueryParameters().getFirst("pageAmountKey");
-            BigDecimal fromAmount = null;
-            if (pageFromKeyStr != null) {
-                // used Amount
-                fromAmount = new BigDecimal(pageFromKeyStr);
-            }
-            page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, offset, pageSize, true);
-        }
+                page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, fromAddres, offset, pageSize, true);
 
         JSONArray ownersJson = new JSONArray();
 

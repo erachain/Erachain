@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.database.PagedMap;
+import org.erachain.database.PagedIndexMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -235,7 +235,8 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     }
 
-    public class PagedOwners extends PagedMap<byte[],
+    public class PagedOwners extends PagedIndexMap<byte[],
+            Tuple2<Tuple2<Long, BigDecimal>, byte[]>,
             Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> {
 
         public PagedOwners(DBTabImpl mapImpl) {
@@ -249,20 +250,8 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         }
 
         @Override
-        public IteratorCloseable<byte[]> getIterator(byte[] fromKey, boolean descending) {
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                    balance = (Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>) mapImpl.get(fromKey);
-            BigDecimal fromAmount;
-            if (balance == null) {
-                fromAmount = null;
-            } else {
-                fromAmount = balance.a.b;
-            }
-
-            Long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(fromKey);
-            byte[] address = ItemAssetBalanceMap.getShortAccountFromKey(fromKey);
-
-            return ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey, fromAmount, address, descending);
+        public IteratorCloseable<byte[]> getIterator(Tuple2<Tuple2<Long, BigDecimal>, byte[]> fromSecondaryKey, boolean descending) {
+            return ((ItemAssetBalanceSuit) map).getIteratorByAsset(fromSecondaryKey.a.a, fromSecondaryKey.a.b, fromSecondaryKey.b, descending);
         }
 
     }
@@ -273,58 +262,15 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
     public List<Tuple2<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
-    getOwnersPage(long assetKey, BigDecimal fromOwnAmount, int offset, int limit, boolean fillFullPage) {
-
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
-        }
-
-        byte[] fromKey;
-
-        // найти первый ключ для поиска по Владею
-        IteratorCloseable<byte[]> iterator;
-        try {
-            if (fromOwnAmount == null) {
-                if (offset < 0) {
-                    // прыгнуть в конец
-                    iterator = getIteratorByAsset(assetKey, null, true);
-                } else {
-                    // с самого начала
-                    iterator = getIteratorByAsset(assetKey);
-                }
-            } else {
-                iterator = getIteratorByAsset(assetKey, fromOwnAmount, false);
-            }
-
-            if (iterator.hasNext()) {
-                fromKey = iterator.next();
-            } else
-                return null;
-
-        } catch (IOException e) {
-            iterator = null;
-            return null;
-        } finally {
-            iterator.close();
-        }
-
-        PagedOwners pager = new PagedOwners(this);
-
-        return pager.getPageList(fromKey, offset, limit, fillFullPage);
-
-    }
-
-    public List<Tuple2<byte[], Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
-    getOwnersPage(byte[] fromKey, int offset, int limit, boolean fillFullPage) {
+    getOwnersPage(Long assetKey, BigDecimal fromOwnAmount, byte[] fromAddres, int offset, int limit, boolean fillFullPage) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         PagedOwners pager = new PagedOwners(this);
-        return pager.getPageList(fromKey, offset, limit, fillFullPage);
+
+        return pager.getPageList(new Tuple2<>(new Tuple2<>(assetKey, fromOwnAmount), fromAddres), offset, limit, fillFullPage);
 
     }
 
