@@ -33,7 +33,6 @@ import org.erachain.lang.LangFile;
 import org.erachain.settings.Settings;
 import org.erachain.utils.M_Integer;
 import org.erachain.utils.NumberAsString;
-import org.erachain.utils.ReverseComparator;
 import org.erachain.webserver.API;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -1629,129 +1628,6 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryTopRichest100(int limit, long assetKey) {
-
-        output.put("type", "top");
-        output.put("search_placeholder", Lang.T("Type asset key", langObj));
-
-        Map output = new LinkedHashMap();
-        Map balances = new LinkedHashMap();
-
-        List<Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> top100s = new ArrayList();
-
-        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        byte[] key;
-        Crypto crypto = Crypto.getInstance();
-
-        try (IteratorCloseable<byte[]> iterator = map.getIteratorByAsset(assetKey)) {
-            while (iterator.hasNext()) {
-                key = iterator.next();
-
-                try {
-                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                            balance = map.get(key);
-
-                    // пустые не берем
-                    if (balance.a.b.signum() == 0 && balance.b.b.signum() == 0 && balance.c.b.signum() == 0 && balance.d.b.signum() == 0)
-                        continue;
-
-                    top100s.add(Fun.t6(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)),
-                            balance.a.b, balance.b.b, balance.c.b, balance.d.b, balance.e.b));
-                } catch (java.lang.ArrayIndexOutOfBoundsException e) {
-                    logger.error("Wrong key raw: ");
-                }
-            }
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-
-        Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_top100()));
-
-        int couter = 0;
-        AssetCls asset = Controller.getInstance().getAsset(assetKey);
-
-        for (Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> top100 : top100s) {
-
-            couter++;
-
-            Account account = new Account(top100.a);
-
-            Map balance = new LinkedHashMap();
-            balance.put("address", top100.a);
-            balance.put("OWN", top100.b.setScale(asset.getScale()).toPlainString());
-            balance.put("DEBT", top100.c.setScale(asset.getScale()).toPlainString());
-            balance.put("HOLD", top100.d.setScale(asset.getScale()).toPlainString());
-            balance.put("SPEND", top100.e.setScale(asset.getScale()).toPlainString());
-            balance.put("PLEDGE", top100.f.setScale(asset.getScale()).toPlainString());
-
-            Tuple2<Integer, PersonCls> person = account.getPerson();
-            if (person != null) {
-                balance.put("person", person.b.viewName());
-                balance.put("person_key", person.b.getKey());
-            }
-
-            balances.put(couter, balance);
-
-            if (limit > 0 && couter >= limit) // && limit != -2 && limit != -1) // -2 = all
-            {
-                break;
-            }
-        }
-
-        if (asset == null) {
-            output.put("total", "--");
-            output.put("released", "--");
-            output.put("assetName", "--");
-            output.put("Label_Title", (Lang.T("Top %limit% %assetName% Richest", langObj)
-                    .replace("%limit%", String.valueOf(limit > 0 ? limit : ""))).replace("%assetName%", "--"));
-            output.put("Label_All_non",
-                    (Lang.T("All non-empty %assetName% accounts (%count%)", langObj)
-                            .replace("%assetName%", "--")).replace("%count%", String.valueOf(couter)));
-            output.put("Label_All_accounts",
-                    (Lang.T("All %assetName% accounts (%count%)", langObj)
-                            .replace("%assetName%", "--")).replace("%count%", String.valueOf(couter)));
-        } else {
-            if (asset.getQuantity() > 0) {
-                output.put("total", asset.getQuantity());
-            } else {
-                output.put("total", asset.getReleased(dcSet).toPlainString());
-            }
-            output.put("released", asset.getReleased(dcSet).toPlainString());
-            output.put("assetName", asset.viewName());
-            output.put("Label_Title", (Lang.T("Top %limit% %assetName% Richest", langObj)
-                    .replace("%limit%", String.valueOf(limit > 0 ? limit : ""))).replace("%assetName%", asset.viewName()));
-            output.put("Label_All_non",
-                    (Lang.T("All non-empty %assetName% accounts (%count%)", langObj)
-                            .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
-            output.put("Label_All_accounts",
-                    (Lang.T("All %assetName% accounts (%count%)", langObj)
-                            .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
-        }
-        output.put("Label_Table_Account", Lang.T("Account", langObj));
-        output.put("Label_Balance_1", Lang.T(Account.balancePositionName(1), langObj));
-        output.put("Label_Balance_2", Lang.T(Account.balancePositionName(2), langObj));
-        output.put("Label_Balance_3", Lang.T(Account.balancePositionName(3), langObj));
-        output.put("Label_Balance_4", Lang.T(Account.balancePositionName(4), langObj));
-        output.put("Label_Balance_5", Lang.T(Account.balancePositionName(5), langObj));
-        output.put("Label_Table_Prop", Lang.T("Prop.", langObj));
-        output.put("Label_Table_person", Lang.T("Maker", langObj));
-
-        output.put("Label_Released", Lang.T("released", langObj));
-        output.put("Label_in_order", Lang.T("in order", langObj));
-
-        output.put("Label_Top", Lang.T("Top", langObj));
-
-        output.put("assetKey", assetKey);
-        output.put("limit", limit);
-        output.put("count", couter);
-
-        output.put("top", balances);
-        output.put("Label_Total_coins_in_the_system",
-                Lang.T("Total asset units in the system", langObj));
-
-        return output;
-    }
-
     public void jsonQueryOwners(UriInfo info) {
 
         output.put("type", "owners");
@@ -1766,9 +1642,9 @@ public class BlockExplorer {
 
         int offset = (int) (long) checkAndGetLongParam(info, 0L, "offset");
 
-        String pageFromKeyStr = info.getQueryParameters().getFirst("pageAmountKey");
+        String pageFromKeyStr = info.getQueryParameters().getFirst("pageFromKey");
         BigDecimal fromAmount = pageFromKeyStr == null ? null : new BigDecimal(pageFromKeyStr);
-        pageFromKeyStr = info.getQueryParameters().getFirst("pageAddressKey");
+        pageFromKeyStr = info.getQueryParameters().getFirst("pageFromAddressKey");
         byte[] fromAddres = pageFromKeyStr == null ? null : Base58.decode(pageFromKeyStr);
         List<Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
                 page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, fromAddres, offset, pageSize, true);
@@ -1805,10 +1681,11 @@ public class BlockExplorer {
 
         if (!page.isEmpty()) {
             if (page.get(0) != null) {
-                output.put("pageFromKey", Base58.encode(page.get(0).a));
+                output.put("pageFromAddressKey", Base58.encode(ItemAssetBalanceMap.getShortAccountFromKey(page.get(0).a)));
+                output.put("pageFromKey", page.get(0).b.a.b);
             }
             if (page.get(page.size() - 1) != null) {
-                output.put("pageToKey", Base58.encode(page.get(page.size() - 1).a));
+                output.put("pageToKey", page.get(page.size() - 1).b.a.b);
             }
         }
 

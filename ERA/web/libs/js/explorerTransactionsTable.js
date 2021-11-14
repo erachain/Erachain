@@ -29,7 +29,7 @@ function makePageUri(page, linkName) {
     return uri;
 }
 
-function makePageUri2(pageKey, offset) {
+function makePageUri2(pageKey, offset, uriAdds) {
     // parse url
     var urlParams;
     var match,
@@ -67,7 +67,11 @@ function makePageUri2(pageKey, offset) {
         }
 
         uri += paramKey + '=' + encodeURIComponent(urlParams[paramKey]);
+
     }
+
+    if (uriAdds)
+        uri += '&' + uriAdds;
 
     return uri;
 }
@@ -89,7 +93,7 @@ function pagesComponent(data) {
     return output;
 }
 
-function pagesComponent2(data) {
+function pagesComponent2(data, uriAdds) {
     var output = '';
 
     var listSize = 0 + data.listSize;
@@ -102,7 +106,7 @@ function pagesComponent2(data) {
         var pageFromKey = data.pageFromKey;
         if (pageFromKey != null) {
             // это не самое начало значит можно скакать вверх
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(pageFromKey, -pageSize - 1) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(pageFromKey, -pageSize - 1, uriAdds) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
         }
 
         output += '&emsp; [ <input size="10" type="text" value="' + (pageFromKey == null? '-' : pageFromKey) + '" class="" style="font-size: 1em;"'
@@ -111,7 +115,7 @@ function pagesComponent2(data) {
         var pageToKey = data.pageToKey;
         if (pageToKey != null) {
             // листнуть ниже
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(pageToKey, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(pageFromKey, pageSize, uriAdds) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
         }
 
         // в конец прыгнуть

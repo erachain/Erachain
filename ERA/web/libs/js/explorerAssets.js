@@ -402,7 +402,11 @@ function owners(data) {
 
     output += '<h3>' + data.Label_Title + '</h3>';
 
-    output += pagesComponent2(data);
+    if (data.pageFromAddressKey) {
+        output += pagesComponent2(data, 'pageFromAddressKey=' + data.pageFromAddressKey);
+    } else {
+        output += pagesComponent2(data);
+    }
 
     var table = '<table id=owners BORDER=0  cellpadding=10 cellspacing=0 class="tiny table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.Label_Balance_1 + '<td><b>' + data.Label_Balance_2 + '<td><b>' + data.Label_Balance_3 + '<td><b>' + data.Label_Balance_4
       + '<td><b>' + data.Label_Balance_5 + '<td><b>%';
@@ -431,7 +435,11 @@ function owners(data) {
 
     output += table;
 
-    output += pagesComponent2(data);
+    if (data.pageFromAddressKey) {
+        output += pagesComponent2(data, 'pageFromAddressKey=' + data.pageFromAddressKey);
+    } else {
+        output += pagesComponent2(data);
+    }
 
     return output;
 }
