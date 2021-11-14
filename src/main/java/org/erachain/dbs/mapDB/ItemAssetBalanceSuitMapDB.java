@@ -148,14 +148,12 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, byte[] addressShort, boolean descending) {
         if (descending) {
             return new IndexIterator((NavigableSet) this.assetKeySet.descendingSet().subSet(
-                    //Fun.t2(Fun.t2(fromOwnAmount == null ? assetKey + 1 : assetKey, fromOwnAmount), addressShort == null ? ADDR_KEY2_MAX : addressShort),
-                    Fun.t2(Fun.t2(assetKey, fromOwnAmount), addressShort == null ? ADDR_KEY2_MAX : addressShort),
+                    Fun.t2(Fun.t2(fromOwnAmount == null ? assetKey + 1 : assetKey, fromOwnAmount), addressShort == null ? ADDR_KEY2_MAX : addressShort),
                     Fun.t2(Fun.t2(assetKey, null), ADDR_KEY2_MIN)));
         }
 
         return new IndexIterator((NavigableSet) this.assetKeySet.subSet(
                 Fun.t2(Fun.t2(assetKey, fromOwnAmount), addressShort),
-                //Fun.t2(Fun.t2(fromOwnAmount == null ? assetKey + 1 : assetKey, null), ADDR_KEY2_MAX)));
                 Fun.t2(Fun.t2(assetKey, Fun.HI()), ADDR_KEY2_MAX)));
     }
 
