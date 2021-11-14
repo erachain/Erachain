@@ -108,7 +108,7 @@ public abstract class PagedIndexMap<T, K, U> {
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
 
-                    if (System.currentTimeMillis() - timestamp > 5000) {
+                    if (false && System.currentTimeMillis() - timestamp > 5000) {
                         break;
                     }
 
@@ -218,7 +218,7 @@ public abstract class PagedIndexMap<T, K, U> {
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
 
-                    if (System.currentTimeMillis() - timestamp > 5000) {
+                    if (false && System.currentTimeMillis() - timestamp > 5000) {
                         break;
                     }
 

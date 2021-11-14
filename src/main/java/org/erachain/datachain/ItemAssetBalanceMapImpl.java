@@ -219,22 +219,6 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     }
 
-    /**
-     *
-     * @param assetKey
-     * @param fromOwnAmount
-     * @param descending
-     * @return
-     */
-    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, boolean descending) {
-
-        if (assetKey < 0)
-            assetKey = -assetKey;
-
-        return ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey, fromOwnAmount, descending);
-
-    }
-
     public class PagedOwners extends PagedIndexMap<byte[],
             Tuple2<Tuple2<Long, BigDecimal>, byte[]>,
             Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> {

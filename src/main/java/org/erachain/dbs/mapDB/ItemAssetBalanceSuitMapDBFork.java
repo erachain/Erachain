@@ -131,11 +131,6 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
     }
 
     @Override
-    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, boolean descending) {
-        return null;
-    }
-
-    @Override
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, byte[] addressShort, boolean descending) {
         return null;
     }
