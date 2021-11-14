@@ -1830,9 +1830,10 @@ public class BlockExplorer {
         output.put("Label_Balance_4", Lang.T(Account.balancePositionName(4), langObj));
         output.put("Label_Balance_5", Lang.T(Account.balancePositionName(5), langObj));
         output.put("Label_Table_Prop", Lang.T("Prop.", langObj));
-        output.put("Label_Table_person", Lang.T("Maker", langObj));
+        output.put("Label_Table_person", Lang.T("Owner", langObj));
 
         output.put("assetKey", assetKey);
+        output.put("assetRealeased", asset.getReleased());
 
     }
 
