@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.database.PagedMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -240,41 +241,72 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     }
 
-    /**
-     * page of Short Address + Own Amount .. start & end ownAmount for keys
-     *
-     * @param assetKey
-     * @param fromOwnAmount
-     * @param pageSize
-     * @return
-     */
-    public Fun.Tuple3<BigDecimal, BigDecimal, List<Tuple2<byte[], BigDecimal>>> getHoldersPage(long assetKey, BigDecimal fromOwnAmount, int pageSize) {
+    public class PagedHoldersMap extends PagedMap<byte[],
+            Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> {
 
-        byte[] key;
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> item;
-        List page = new ArrayList<>();
-        BigDecimal startOwnAmount = null;
-        BigDecimal endOwnAmount = null;
-        // already negate direction
-        try (IteratorCloseable<byte[]> iterator = getIteratorByAsset(assetKey, fromOwnAmount, false)) {
-            while (iterator.hasNext() && pageSize-- > 0) {
+        public PagedHoldersMap(DBTabImpl mapImpl) {
+            super(mapImpl);
+        }
 
-                key = iterator.next();
-                item = get(key);
-
-                endOwnAmount = item.a.b;
-                if (endOwnAmount.signum() == 0)
-                    break;
-
-                page.add(new Tuple2<>(key, endOwnAmount));
-
-                if (startOwnAmount == null)
-                    startOwnAmount = endOwnAmount;
-
+        @Override
+        public boolean filterRows() {
+            if (currentRow.b.a.b.signum() == 0) {
+                return true;
             }
 
-        } catch (IOException e) {
-            return null;
+            return false;
+        }
+
+    }
+
+    /**
+     * page of Short Address + Own Amount .. start & end ownAmount for keys
+     */
+    public List<Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+    getHoldersPage(long assetKey, BigDecimal fromOwnAmount, int offset, int limit,
+                   boolean noForge, boolean fillFullPage) {
+
+
+        if (true) {
+            if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+                return null;
+            }
+
+            PagedHoldersMap pager = new PagedHoldersMap(this);
+            byte[] fromKey = new byte[0];
+            return pager.getPageList(fromKey, offset, limit, fillFullPage);
+
+        } else {
+
+            byte[] key;
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> item;
+            List page = new ArrayList<>();
+            BigDecimal startOwnAmount = null;
+            BigDecimal endOwnAmount = null;
+
+            // already negate direction
+            try (IteratorCloseable<byte[]> iterator = getIteratorByAsset(assetKey, fromOwnAmount, false)) {
+                while (iterator.hasNext() && limit-- > 0) {
+
+                    key = iterator.next();
+                    item = get(key);
+
+                    endOwnAmount = item.a.b;
+                    if (endOwnAmount.signum() == 0)
+                        break;
+
+                    page.add(new Tuple2<>(key, endOwnAmount));
+
+                    if (startOwnAmount == null)
+                        startOwnAmount = endOwnAmount;
+
+                }
+
+            } catch (IOException e) {
+                return null;
+            }
         }
 
         return new Fun.Tuple3(startOwnAmount, endOwnAmount, page);

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PagedMap<T, U> {
 
-    public boolean filerRows() {
+    public boolean filterRows() {
         return false;
     }
 
@@ -49,7 +49,7 @@ public class PagedMap<T, U> {
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
                     key = iterator.next();
                     currentRow = (U) mapImpl.get(key);
-                    if (currentRow == null || filerRows()) {
+                    if (currentRow == null || filterRows()) {
                         continue;
                     }
 
@@ -80,7 +80,7 @@ public class PagedMap<T, U> {
                             }
                         }
                         if (!exist) {
-                            if (filerRows()) {
+                            if (filterRows()) {
                                 continue;
                             }
                             rowCalc();
@@ -105,7 +105,7 @@ public class PagedMap<T, U> {
 
                     key = iterator.next();
                     currentRow = (U) mapImpl.get(key);
-                    if (currentRow == null || filerRows()) {
+                    if (currentRow == null || filterRows()) {
                         continue;
                     }
 
@@ -137,7 +137,7 @@ public class PagedMap<T, U> {
                             }
                         }
                         if (!exist) {
-                            if (filerRows()) {
+                            if (filterRows()) {
                                 continue;
                             }
                             rowCalc();

@@ -818,7 +818,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         @Override
-        public boolean filerRows() {
+        public boolean filterRows() {
             if (noForge && currentRow.getType() == Transaction.CALCULATED_TRANSACTION) {
                 RCalculated tx = (RCalculated) currentRow;
                 String mess = tx.getMessage();

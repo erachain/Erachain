@@ -1820,7 +1820,7 @@ public class BlockExplorer {
         if (pageFromKeyStr != null)
             fromID = new BigDecimal(pageFromKeyStr);
 
-        Tuple3<BigDecimal, BigDecimal, List<Tuple2<byte[], BigDecimal>>> page = dcSet.getAssetBalanceMap().getHoldersPage(assetKey, fromID, pageSize);
+        Tuple3<BigDecimal, BigDecimal, List<Tuple2<byte[], BigDecimal>>> page = dcSet.getAssetBalanceMap().PagedHoldersMap(assetKey, fromID, pageSize);
 
         //output.put("page", jsonHoldersPage(asset, page.c));
 
