@@ -241,76 +241,39 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     }
 
-    public class PagedHoldersMap extends PagedMap<byte[],
+    public class PagedOwners extends PagedMap<byte[],
             Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> {
 
-        public PagedHoldersMap(DBTabImpl mapImpl) {
+        public PagedOwners(DBTabImpl mapImpl) {
             super(mapImpl);
         }
 
         @Override
-        public boolean filterRows() {
-            if (currentRow.b.a.b.signum() == 0) {
-                return true;
-            }
+        public Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+        get(byte[] key) {
 
-            return false;
+            return new Tuple2(key, mapImpl.get(key));
         }
 
     }
 
     /**
-     * page of Short Address + Own Amount .. start & end ownAmount for keys
+     * page of Short Address + Balances .. start & end ownAmount for keys
      */
-    public List<Tuple5<
+    public List<Tuple2<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-    getHoldersPage(long assetKey, BigDecimal fromOwnAmount, int offset, int limit,
-                   boolean noForge, boolean fillFullPage) {
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+    getOwnersPage(long assetKey, BigDecimal fromOwnAmount, int offset, int limit, boolean fillFullPage) {
 
 
-        if (true) {
-            if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-                return null;
-            }
-
-            PagedHoldersMap pager = new PagedHoldersMap(this);
-            byte[] fromKey = new byte[0];
-            return pager.getPageList(fromKey, offset, limit, fillFullPage);
-
-        } else {
-
-            byte[] key;
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> item;
-            List page = new ArrayList<>();
-            BigDecimal startOwnAmount = null;
-            BigDecimal endOwnAmount = null;
-
-            // already negate direction
-            try (IteratorCloseable<byte[]> iterator = getIteratorByAsset(assetKey, fromOwnAmount, false)) {
-                while (iterator.hasNext() && limit-- > 0) {
-
-                    key = iterator.next();
-                    item = get(key);
-
-                    endOwnAmount = item.a.b;
-                    if (endOwnAmount.signum() == 0)
-                        break;
-
-                    page.add(new Tuple2<>(key, endOwnAmount));
-
-                    if (startOwnAmount == null)
-                        startOwnAmount = endOwnAmount;
-
-                }
-
-            } catch (IOException e) {
-                return null;
-            }
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
         }
 
-        return new Fun.Tuple3(startOwnAmount, endOwnAmount, page);
-    }
+        PagedOwners pager = new PagedOwners(this);
+        byte[] fromKey = new byte[0];
+        return pager.getPageList(fromKey, offset, limit, fillFullPage);
 
+    }
 
 }

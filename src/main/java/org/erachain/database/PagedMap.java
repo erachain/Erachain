@@ -16,7 +16,7 @@ public class PagedMap<T, U> {
     public void rowCalc() {
     }
 
-    IMap mapImpl;
+    protected IMap mapImpl;
     protected long timestamp;
 
     protected U currentRow;
@@ -27,6 +27,10 @@ public class PagedMap<T, U> {
 
     public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
         return mapImpl.getIterator(fromKey, descending);
+    }
+
+    public U get(T key) {
+        return (U) mapImpl.get(key);
     }
 
     public List<U> getPageList(T fromKey, int offset, int limit, boolean fillFullPage) {
@@ -48,7 +52,7 @@ public class PagedMap<T, U> {
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
                     key = iterator.next();
-                    currentRow = (U) mapImpl.get(key);
+                    currentRow = get(key);
                     if (currentRow == null || filterRows()) {
                         continue;
                     }
@@ -104,7 +108,7 @@ public class PagedMap<T, U> {
                     }
 
                     key = iterator.next();
-                    currentRow = (U) mapImpl.get(key);
+                    currentRow = get(key);
                     if (currentRow == null || filterRows()) {
                         continue;
                     }

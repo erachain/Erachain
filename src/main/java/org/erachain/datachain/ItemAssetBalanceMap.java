@@ -4,7 +4,6 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -61,7 +60,10 @@ public interface ItemAssetBalanceMap extends DBTab<byte[], Tuple5<
 
     IteratorCloseable<byte[]> getIteratorByAccount(Account account);
 
-    Fun.Tuple3<BigDecimal, BigDecimal, List<Tuple2<byte[], BigDecimal>>> getHoldersPage(long assetKey, BigDecimal fromOwnAmount, int pageSize);
+    List<Tuple2<byte[], Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+    getOwnersPage(long assetKey, BigDecimal fromOwnAmount, int offset, int limit, boolean fillFullPage);
 
     void addObserver(Observer o);
 

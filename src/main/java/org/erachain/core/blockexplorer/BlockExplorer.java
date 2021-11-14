@@ -442,9 +442,9 @@ public class BlockExplorer {
 
             //////////////////////////// ASSETS //////////////////////////
             // top 100
-        } else if (info.getQueryParameters().containsKey("top") || info.getQueryParameters().containsKey("holders")) {
+        } else if (info.getQueryParameters().containsKey("top") || info.getQueryParameters().containsKey("owners")) {
             //output.putAll(jsonQueryTopRichest(info));
-            jsonQueryHolders(info);
+            jsonQueryOwners(info);
         } else if (info.getQueryParameters().containsKey("assets")) {
             output.put("type", "assets");
 
@@ -1775,21 +1775,21 @@ public class BlockExplorer {
         return jsonQueryTopRichest100(limit, key);
     }
 
-    public JSONArray jsonHoldersPage(AssetCls asset, List<Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> holders) {
+    public JSONArray jsonOwnersPage(AssetCls asset, List<Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> owners) {
 
-        JSONArray holdersJson = new JSONArray();
+        JSONArray ownersJson = new JSONArray();
 
-        for (Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> holder : holders) {
+        for (Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> owner : owners) {
 
-            Account account = new Account(holder.a);
+            Account account = new Account(owner.a);
 
             JSONArray jsonRow = new JSONArray();
-            jsonRow.add(holder.a);
-            jsonRow.add(holder.b.setScale(asset.getScale()).toPlainString());
-            jsonRow.add(holder.c.setScale(asset.getScale()).toPlainString());
-            jsonRow.add(holder.d.setScale(asset.getScale()).toPlainString());
-            jsonRow.add(holder.e.setScale(asset.getScale()).toPlainString());
-            jsonRow.add(holder.f.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.a);
+            jsonRow.add(owner.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.c.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.d.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.e.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.f.setScale(asset.getScale()).toPlainString());
 
             Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
@@ -1797,16 +1797,16 @@ public class BlockExplorer {
                 jsonRow.add(person.b.viewName());
             }
 
-            holdersJson.add(jsonRow);
+            ownersJson.add(jsonRow);
 
         }
 
-        return holdersJson;
+        return ownersJson;
     }
 
-    public void jsonQueryHolders(UriInfo info) {
+    public void jsonQueryOwners(UriInfo info) {
 
-        output.put("type", "holders");
+        output.put("type", "owners");
         output.put("search_placeholder", Lang.T("Type asset key", langObj));
 
         long assetKey = 1L;
@@ -1814,24 +1814,28 @@ public class BlockExplorer {
             assetKey = Long.valueOf(info.getQueryParameters().getFirst("asset"));
 
         AssetCls asset = Controller.getInstance().getAsset(assetKey);
+        int offset = 0;
 
         String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
         BigDecimal fromID = null;
         if (pageFromKeyStr != null)
             fromID = new BigDecimal(pageFromKeyStr);
 
-        Tuple3<BigDecimal, BigDecimal, List<Tuple2<byte[], BigDecimal>>> page = dcSet.getAssetBalanceMap().PagedHoldersMap(assetKey, fromID, pageSize);
+        List<Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+                page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromID, offset, pageSize, true);
 
-        //output.put("page", jsonHoldersPage(asset, page.c));
+        output.put("page", jsonOwnersPage(asset, page));
 
-        if (page.a != null) {
-            output.put("pageFromKey", page.a.toPlainString());
+        if (!page.isEmpty()) {
+            if (page.get(0) != null) {
+                output.put("pageFromKey", page.get(0).a);
+            }
+            if (page.get(page.size() - 1) != null) {
+                output.put("pageToKey", page.get(page.size() - 1).b);
+            }
         }
-        if (page.b != null) {
-            output.put("pageToKey", page.b.toPlainString());
-        }
 
-        output.put("Label_Title", (Lang.T("Holders of %assetName%", langObj)
+        output.put("Label_Title", (Lang.T("Owners of %assetName%", langObj)
                 .replace("%assetName%", asset.viewName())));
 
         output.put("Label_Table_Account", Lang.T("Account", langObj));
