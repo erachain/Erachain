@@ -249,8 +249,12 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         @Override
         public Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
         get(byte[] key) {
-
             return new Tuple2(key, mapImpl.get(key));
+        }
+
+        @Override
+        public IteratorCloseable<byte[]> getIterator(byte[] fromKey, boolean descending) {
+            return ((ItemAssetBalanceSuit) map).getIteratorByAsset(fromKey, descending);
         }
 
     }

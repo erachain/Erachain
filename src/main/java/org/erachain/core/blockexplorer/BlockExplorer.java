@@ -292,7 +292,7 @@ public class BlockExplorer {
 
         //Основное меню. заголовки и их перевод на выбранный язык
         output.put("id_home2", Lang.T("Blocks", langObj));
-        output.put("id_menu_top_100", Lang.T("Top 100", langObj));
+        output.put("id_menu_owners", Lang.T("Owners", langObj));
         output.put("id_menu_percons", Lang.T("Persons", langObj));
         output.put("id_menu_pals_asset", Lang.T("Polls", langObj));
         output.put("id_menu_assets", Lang.T("Assets", langObj));
@@ -1775,10 +1775,14 @@ public class BlockExplorer {
             byte[] fromKey = Base58.decode(pageFromKeyStr);
             page = dcSet.getAssetBalanceMap().getOwnersPage(fromKey, offset, pageSize, true);
         } else {
-            // used Amount
             pageFromKeyStr = info.getQueryParameters().getFirst("pageAmountKey");
-            BigDecimal fromAmount = new BigDecimal(pageFromKeyStr);
-            page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, offset, pageSize, true);
+            if (pageFromKeyStr != null) {
+                // used Amount
+                BigDecimal fromAmount = new BigDecimal(pageFromKeyStr);
+                page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, offset, pageSize, true);
+            } else {
+                page = dcSet.getAssetBalanceMap().getOwnersPage(null, offset, pageSize, true);
+            }
         }
 
         JSONArray ownersJson = new JSONArray();

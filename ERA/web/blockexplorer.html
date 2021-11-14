@@ -379,8 +379,8 @@ button.white-bgc[disabled]:focus,
                                 if (type == 'statement') {
                                     document.getElementById(dest).innerHTML = statement(data);
                                 } else
-                                if (type == 'top') {
-                                    document.getElementById(dest).innerHTML = top100(data);
+                                if (type == 'owners') {
+                                    document.getElementById(dest).innerHTML = owners(data);
                                 } else
                                 if (type == 'persons') {
                                     document.getElementById(dest).innerHTML = persons(data);
@@ -722,62 +722,6 @@ button.white-bgc[disabled]:focus,
             output += '<select name="SelectMyLove" id = "aa" onChange="polls11(this)"; >';
             output += ' <option value="1" selected>1</option>';
             output += ' <option value="6">6</option> </select>';
-
-            return output;
-        }
-
-        function polls_old(data) {
-
-            var output = "";
-
-            output += lastBlock(data.lastBlock);
-
-
-            output += '<h3>Polls</h3>';
-
-            if (data.hasOwnProperty('error')) {
-                output += '<br><h5>' + data.error + '</h5>';
-
-                return output;
-            }
-
-
-            var table = '<table id=top100 BORDER=0 cellpadding=10 cellspacing=0 class="tiny table table-striped" style="border: 1px solid #ddd; width: auto;">';
-
-            table += '<tr><td><b>Poll<td><b>Votes<td><b>Asset';//<td><b>View';
-
-            asset_key = document.getElementById("aa").options.selectedIndex;
-            dat = data;
-            for (key in data.pools) {
-                table += '<tr>';
-
-                table += '<td>' + escapeHtml(key);
-                if (data.pools[key].new) {
-                    table += ' <b>New!</b>';
-                }
-                table += '<td>' + addCommas(data.pools[key].totalVotes);
-
-// select
-                table += '<td><select style="0" onchange="Onselect(dat,this.options[this.selectedIndex].value)">';
-
-                table += '<option>Выберите актив</option>';
-                a = 0;
-                for (a in data.assets) {
-                    table += '<option>' + data.assets[a].name + '</option>';
-
-                }
-                table += '</select></td>';
-// переход
-//	table += '<td>' + '<a href=?poll='+encodeURIComponent(key)+'&asset='+encodeURIComponent(asset_key)+'>>></a>';
-
-
-            }
-
-
-            table += '</table>';
-
-            output += table;
-
 
             return output;
         }
@@ -1790,12 +1734,12 @@ button.white-bgc[disabled]:focus,
             document.getElementById('menu_assets').href = '?assets&lang=' + params['lang'];
             document.getElementById('menu_statuses').href = '?statuses&lang=' + params['lang'];
             document.getElementById('menu_templates').href = '?templates&lang=' + params['lang'];
-            document.getElementById('menu_top_100').href = '?top=100&lang=' + params['lang'];
+            document.getElementById('menu_owners').href = '?owners&lang=' + params['lang'];
             document.getElementById('menu_peers').href = '?peers&lang=' + params['lang'];
 
             document.getElementById('menuBlocks').setAttribute('class', '');
             document.getElementById('menuAddresses').setAttribute('class', '');
-            document.getElementById('menuTop100').setAttribute('class', '');
+            document.getElementById('menuOwners').setAttribute('class', '');
             document.getElementById('menuPolls').setAttribute('class', '');
             document.getElementById('menuAssets').setAttribute('class', '');
             document.getElementById('menuStatuses').setAttribute('class', '');
@@ -1910,7 +1854,7 @@ button.white-bgc[disabled]:focus,
                                 <option value=polls id=menu_polls_op translate="true">Poll</option>
                                 <option value=statuses id=menu_statuses_op translate="true">Status</option>
                                 <option value=templates id=menu_templates_op translate="true">Template</option>
-                                <option value=top id=menu_tops_op translate="false">TOP 100</option>
+                                <option value=owners id=menu_owners_op translate="true">Owners</option>
                                 <option value=order id=menu_order_op translate="true">Order</option>
                             </select>
                         </div>
@@ -1953,7 +1897,7 @@ button.white-bgc[disabled]:focus,
                                                            translate="true">Statuses</a></li>
                                     <li id=menuTemplates><a href="?templates" id=menu_templates translate="true">Templates</a>
                                     </li>
-                                    <li id=menuTop100><a href="?top=100" id=menu_top_100 translate="true">Top 100</a>
+                                    <li id=menuOwners><a href="?owners" id=menu_owners translate="true">Owners</a>
                                     </li>
                                     <li id=menuOrder><a href="?order" id=menu_order translate="true">Order</a></li>
                                     <li id=menuPeers><a href="?peers" id=menu_peers translate="true">Peers</a></li>

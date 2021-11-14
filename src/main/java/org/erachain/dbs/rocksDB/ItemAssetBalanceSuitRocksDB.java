@@ -137,6 +137,23 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 fromKey, descending, true);
     }
 
+    // TODO NEED TEST
+    @Override
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, byte[] addressShort, boolean descending) {
+
+        byte[] fromKey = new byte[8 + ROCK_BIG_DECIMAL_LEN + Account.ADDRESS_SHORT_LENGTH];
+        // ASSET KEY
+        System.arraycopy(Longs.toByteArray(assetKey), 0, fromKey, 0, 8);
+
+        byte[] shiftForSortBuff = seralizerBigDecimal.toBytes(fromOwnAmount.negate());
+
+        System.arraycopy(shiftForSortBuff, 0, fromKey, 8, 8);
+        System.arraycopy(addressShort, 0, fromKey, 8 + ROCK_BIG_DECIMAL_LEN, ROCK_BIG_DECIMAL_LEN);
+
+        return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
+                fromKey, descending, true);
+    }
+
     @Override
     public IteratorCloseable<byte[]> accountIterator(Account account) {
         byte[] secondary = new byte[ADDR_KEY2_LEN];
