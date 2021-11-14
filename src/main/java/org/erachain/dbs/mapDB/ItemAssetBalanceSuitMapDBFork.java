@@ -99,7 +99,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
                     System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
                     return new Tuple2<Tuple2<Long, BigDecimal>, String>(
-                            new Tuple2<>(Longs.fromByteArray(assetKeyBytes), value.a.b.negate()),
+                            new Tuple2<>(Longs.fromByteArray(assetKeyBytes), value.a.b),
                             Crypto.getInstance().getAddressFromShort(shortAddress)
                     );
                 }

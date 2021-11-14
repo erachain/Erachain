@@ -140,9 +140,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         return value;
     }
 
-    /**
-     * Amount is negate already
-     *
+    /***
      * @param assetKey KEY for balance found + found balance
      * @return
      */
@@ -208,7 +206,6 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
     }
 
     /**
-     * Amount is negate already
      *
      * @param assetKey
      * @return
@@ -223,7 +220,6 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
     }
 
     /**
-     * Amount is negate already
      *
      * @param assetKey
      * @param fromOwnAmount

@@ -97,7 +97,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                         System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
                         byte[] shiftForSortBuff;
-                        shiftForSortBuff = seralizerBigDecimal.toBytes(value.a.b.negate());
+                        shiftForSortBuff = seralizerBigDecimal.toBytes(value.a.b);
 
                         return org.bouncycastle.util.Arrays.concatenate(
                                 assetKeyBytes,
@@ -129,7 +129,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         // ASSET KEY
         System.arraycopy(Longs.toByteArray(assetKey), 0, fromKey, 0, 8);
 
-        byte[] shiftForSortBuff = seralizerBigDecimal.toBytes(fromOwnAmount.negate());
+        byte[] shiftForSortBuff = seralizerBigDecimal.toBytes(fromOwnAmount);
 
         System.arraycopy(shiftForSortBuff, 0, fromKey, 8, 8);
 
@@ -145,7 +145,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         // ASSET KEY
         System.arraycopy(Longs.toByteArray(assetKey), 0, fromKey, 0, 8);
 
-        byte[] shiftForSortBuff = seralizerBigDecimal.toBytes(fromOwnAmount.negate());
+        byte[] shiftForSortBuff = seralizerBigDecimal.toBytes(fromOwnAmount);
 
         System.arraycopy(shiftForSortBuff, 0, fromKey, 8, 8);
         System.arraycopy(addressShort, 0, fromKey, 8 + ROCK_BIG_DECIMAL_LEN, ROCK_BIG_DECIMAL_LEN);

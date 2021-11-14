@@ -390,3 +390,47 @@ function trades(data) {
 
     return output;
 }
+
+function owners(data) {
+
+    var output = "";
+
+    output += lastBlock(data.lastBlock);
+
+    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="900">';
+    output += '<tr><td align=center>';
+
+    output += data.Label_Total_coins_in_the_system + ': <b>' + addCommas(data.total) + '</b>, '
+        + data.Label_in_order + ': <b>' + addCommas(data.allinOrders) + '</b>, '
+        + data.Label_Released + ': <b>' + addCommas(data.released) + '</b><br>';
+
+
+    output += '<h3>' + data.Label_Title + '</h3>';
+
+    var table = '<table id=owners BORDER=0  cellpadding=10 cellspacing=0 class="tiny table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.Label_Balance_1 + '<td><b>' + data.Label_Balance_2 + '<td><b>' + data.Label_Balance_3 + '<td><b>' + data.Label_Balance_4
+      + '<td><b>' + data.Label_Balance_5 + '<td><b>' + data.Label_Table_Prop;
+
+    for (key in data.page) {
+        var item = data.page[key];
+        table += '<tr>';
+        table += '<td>' + key + '<td>' + '<a href="?address=' + item[0] + get_lang() + '">' + item[0] + '</a>';
+
+        if (item.length > 6) {
+            table += '<td><a href="?person=' + item[6] + get_lang() + '">' + item[7] + '</a>';
+        } else {
+            table += '<td>';
+        }
+        table += '<td>' + addCommas(item[1]);
+        table += '<td>' + addCommas(item[2]);
+        table += '<td>' + addCommas(item[3]);
+        table += '<td>' + addCommas(item[4]);
+        table += '<td>' + addCommas(item[5]);
+
+        //table += '<td>' + ((item.OWN / data.total) * 100).toFixed(2) + "%";
+
+    }
+    table += '</table>';
+
+    output += table;
+    return output;
+}

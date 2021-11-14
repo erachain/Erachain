@@ -1792,12 +1792,12 @@ public class BlockExplorer {
             Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(owner.a));
 
             JSONArray jsonRow = new JSONArray();
-            jsonRow.add(account);
+            jsonRow.add(account.getAddress());
             jsonRow.add(owner.b.a.b.setScale(asset.getScale()).toPlainString());
             jsonRow.add(owner.b.b.b.setScale(asset.getScale()).toPlainString());
             jsonRow.add(owner.b.c.b.setScale(asset.getScale()).toPlainString());
             jsonRow.add(owner.b.d.b.setScale(asset.getScale()).toPlainString());
-            jsonRow.add(owner.b.e.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.b.e.b == null ? BigDecimal.ZERO : owner.b.e.b.setScale(asset.getScale()).toPlainString());
 
             Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
@@ -1813,10 +1813,10 @@ public class BlockExplorer {
 
         if (!page.isEmpty()) {
             if (page.get(0) != null) {
-                output.put("pageFromKey", page.get(0).a);
+                output.put("pageFromKey", Base58.encode(page.get(0).a));
             }
             if (page.get(page.size() - 1) != null) {
-                output.put("pageToKey", page.get(page.size() - 1).b);
+                output.put("pageToKey", Base58.encode(page.get(page.size() - 1).a));
             }
         }
 
