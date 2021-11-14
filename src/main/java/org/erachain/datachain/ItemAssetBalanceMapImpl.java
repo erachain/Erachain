@@ -279,11 +279,37 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             return null;
         }
 
-        byte[] fromKey = ((ItemAssetBalanceSuit) map).getAssetFloorKey(assetKey, fromOwnAmount);
-        if (fromKey == null)
-            return new ArrayList<>();
+        byte[] fromKey;
+
+        // найти первый ключ для поиска по Владею
+        IteratorCloseable<byte[]> iterator;
+        try {
+            if (fromOwnAmount == null) {
+                if (offset < 0) {
+                    // прыгнуть в конец
+                    iterator = getIteratorByAsset(assetKey, null, true);
+                } else {
+                    // с самого начала
+                    iterator = getIteratorByAsset(assetKey);
+                }
+            } else {
+                iterator = getIteratorByAsset(assetKey, fromOwnAmount, false);
+            }
+
+            if (iterator.hasNext()) {
+                fromKey = iterator.next();
+            } else
+                return null;
+
+        } catch (IOException e) {
+            iterator = null;
+            return null;
+        } finally {
+            iterator.close();
+        }
 
         PagedOwners pager = new PagedOwners(this);
+
         return pager.getPageList(fromKey, offset, limit, fillFullPage);
 
     }

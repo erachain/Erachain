@@ -179,11 +179,4 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
                 Fun.t2(secondary, ADDR_KEY2_MIN), Fun.t2(secondary, ADDR_KEY2_MAX)));
     }
 
-    public byte[] getAssetFloorKey(long assetKey, BigDecimal fromAmount) {
-        Tuple2<Tuple2<Long, BigDecimal>, byte[]> secondaryKey = assetKeySet.floor(
-                new Tuple2(new Tuple2(assetKey, fromAmount == null ? Fun.HI() : fromAmount), null));
-        return secondaryKey == null ? null : secondaryKey.b;
-
-    }
-
 }

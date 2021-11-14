@@ -1757,7 +1757,7 @@ public class BlockExplorer {
         output.put("type", "owners");
         output.put("search_placeholder", Lang.T("Type asset key", langObj));
 
-        int pageSize = this.pageSize << 1;
+        int pageSize = this.pageSize >> 1;
         long assetKey = 1L;
         if (info.getQueryParameters().containsKey("asset"))
             assetKey = Long.valueOf(info.getQueryParameters().getFirst("asset"));
@@ -1810,6 +1810,9 @@ public class BlockExplorer {
         }
 
         output.put("page", ownersJson);
+        output.put("pageSize", pageSize);
+        output.put("listSize", pageSize * 2);
+        output.put("useoffset", true);
 
         if (!page.isEmpty()) {
             if (page.get(0) != null) {

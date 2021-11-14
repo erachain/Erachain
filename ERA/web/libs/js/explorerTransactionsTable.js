@@ -94,7 +94,6 @@ function pagesComponent2(data) {
 
     var listSize = 0 + data.listSize;
     var pageSize = 0 + data.pageSize;
-    var start = data.start;
 
     if (data.hasOwnProperty('useoffset')) {
         // в начало прыгнуть
@@ -122,7 +121,7 @@ function pagesComponent2(data) {
     }
 
     if (data.hasOwnProperty('start')) {
-        start = data.start;
+        var start = data.start;
     } else {
         var start = listSize;
     }
