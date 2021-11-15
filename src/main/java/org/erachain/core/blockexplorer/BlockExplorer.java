@@ -359,7 +359,7 @@ public class BlockExplorer {
                         jsonQuerySearchPages(info, Block.class, search, offset, null);
                         break;
                     case "owners":
-                        jsonQueryOwners(info);
+                        jsonQueryOwners(info, search, offset);
                         break;
                     case "order":
                         output.putAll(jsonQueryOrder(search));
@@ -442,7 +442,8 @@ public class BlockExplorer {
             //////////////////////////// ASSETS //////////////////////////
             // top 100
         } else if (info.getQueryParameters().containsKey("owners")) {
-            jsonQueryOwners(info);
+            offset = (int) (long) checkAndGetLongParam(info, 0L, "offset");
+            jsonQueryOwners(info, info.getQueryParameters().getFirst("asset"), offset);
         } else if (info.getQueryParameters().containsKey("assets")) {
             output.put("type", "assets");
 
@@ -1629,19 +1630,17 @@ public class BlockExplorer {
     }
 
 
-    public void jsonQueryOwners(UriInfo info) {
+    public void jsonQueryOwners(UriInfo info, String assetKeyStr, int offset) {
 
         output.put("type", "owners");
         output.put("search_placeholder", Lang.T("Type asset key", langObj));
 
-        int pageSize = this.pageSize >> 1;
+        int pageSize = this.pageSize << 1;
         long assetKey = 1L;
-        if (info.getQueryParameters().containsKey("asset"))
-            assetKey = Long.valueOf(info.getQueryParameters().getFirst("asset"));
+        if (assetKeyStr != null)
+            assetKey = Long.valueOf(assetKeyStr);
 
         AssetCls asset = Controller.getInstance().getAsset(assetKey);
-
-        int offset = (int) (long) checkAndGetLongParam(info, 0L, "offset");
 
         // http://127.0.0.1:9067/index/blockexplorer.html?owners=&asset=2&lang=ru&pageFromAddressKey=HxfkJKzU2u48RdEdSwFihtmNm2L&pageKey=1.77353&offset=12
         String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
