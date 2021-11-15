@@ -29,7 +29,7 @@ function makePageUri(page, linkName) {
     return uri;
 }
 
-function makePageUri2(pageKey, offset, uriAdds) {
+function makePageUri2(pageKey, offset, parsAdds) {
     // parse url
     var urlParams;
     var match,
@@ -54,6 +54,11 @@ function makePageUri2(pageKey, offset, uriAdds) {
     else
         urlParams['offset'] = offset;
 
+    if (parsAdds)
+        for (var paramKey in parsAdds) {
+            urlParams[paramKey] = parsAdds[paramKey];
+        }
+
     var uri = '';
 
     for (var paramKey in urlParams) {
@@ -69,9 +74,6 @@ function makePageUri2(pageKey, offset, uriAdds) {
         uri += paramKey + '=' + encodeURIComponent(urlParams[paramKey]);
 
     }
-
-    if (uriAdds)
-        uri += '&' + uriAdds;
 
     return uri;
 }

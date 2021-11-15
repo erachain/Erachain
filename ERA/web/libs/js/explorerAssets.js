@@ -403,7 +403,8 @@ function owners(data) {
     output += '<h3>' + data.Label_Title + '</h3>';
 
     if (data.pageFromAddressKey) {
-        output += pagesComponent2(data, 'pageFromAddressKey=' + data.pageFromAddressKey);
+        var parsAdd = {'pageFromAddressKey': data.pageFromAddressKey};
+        output += pagesComponent2(data, parsAdd);
     } else {
         output += pagesComponent2(data);
     }
@@ -436,7 +437,7 @@ function owners(data) {
     output += table;
 
     if (data.pageFromAddressKey) {
-        output += pagesComponent2(data, 'pageFromAddressKey=' + data.pageFromAddressKey);
+        output += pagesComponent2(data, parsAdd);
     } else {
         output += pagesComponent2(data);
     }
