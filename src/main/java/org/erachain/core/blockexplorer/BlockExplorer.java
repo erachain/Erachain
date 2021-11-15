@@ -682,6 +682,9 @@ public class BlockExplorer {
             assetKey = 2L;
             asset = (AssetCls) dcSet.getItemAssetMap().get(assetKey);
         }
+
+        output.put("search_message", assetKey);
+
         output.put("assetKey", assetKey);
         output.put("assetName", asset.viewName());
 
@@ -731,6 +734,8 @@ public class BlockExplorer {
         if (asset == null) {
             return;
         }
+
+        output.put("search_message", key);
 
         output.put("item", asset.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
@@ -1430,6 +1435,7 @@ public class BlockExplorer {
         if (person == null) {
             return;
         }
+        output.put("search_message", person.getKey());
 
         output.put("item", person.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
@@ -1641,6 +1647,8 @@ public class BlockExplorer {
             assetKey = Long.valueOf(assetKeyStr);
 
         AssetCls asset = Controller.getInstance().getAsset(assetKey);
+        output.put("search_message", assetKey);
+
 
         // http://127.0.0.1:9067/index/blockexplorer.html?owners=&asset=2&lang=ru&pageFromAddressKey=HxfkJKzU2u48RdEdSwFihtmNm2L&pageKey=1.77353&offset=12
         String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
