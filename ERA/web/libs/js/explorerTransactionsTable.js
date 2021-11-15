@@ -56,7 +56,10 @@ function makePageUri2(pageKey, offset, parsAdds) {
 
     if (parsAdds)
         for (var paramKey in parsAdds) {
-            urlParams[paramKey] = parsAdds[paramKey];
+            if (parsAdds[paramKey])
+                urlParams[paramKey] = parsAdds[paramKey];
+            else
+                delete urlParams[paramKey];
         }
 
     var uri = '';
@@ -103,7 +106,14 @@ function pagesComponent2(data, uriAdds) {
 
     if (data.hasOwnProperty('useoffset')) {
         // в начало прыгнуть
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, 0) + '"><b><span class="glyphicon glyphicon-fast-backward"></span></b></a>';
+        if (pageSize > listSize)
+            return '';
+
+        var uriAddsEmpty = {};
+        for (var paramKey in uriAdds) {
+                uriAddsEmpty[paramKey] = null;
+        }
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, 0, uriAddsEmpty) + '"><b><span class="glyphicon glyphicon-fast-backward"></span></b></a>';
 
         var pageFromKey = data.pageFromKey;
         if (pageFromKey != null) {
@@ -121,7 +131,7 @@ function pagesComponent2(data, uriAdds) {
         }
 
         // в конец прыгнуть
-        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, -pageSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, -pageSize, uriAddsEmpty) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
 
         return output;
     }

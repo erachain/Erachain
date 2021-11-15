@@ -1628,6 +1628,7 @@ public class BlockExplorer {
         return output;
     }
 
+
     public void jsonQueryOwners(UriInfo info) {
 
         output.put("type", "owners");
@@ -1642,7 +1643,8 @@ public class BlockExplorer {
 
         int offset = (int) (long) checkAndGetLongParam(info, 0L, "offset");
 
-        String pageFromKeyStr = info.getQueryParameters().getFirst("pageFromKey");
+        // http://127.0.0.1:9067/index/blockexplorer.html?owners=&asset=2&lang=ru&pageFromAddressKey=HxfkJKzU2u48RdEdSwFihtmNm2L&pageKey=1.77353&offset=12
+        String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
         BigDecimal fromAmount = pageFromKeyStr == null ? null : new BigDecimal(pageFromKeyStr);
         pageFromKeyStr = info.getQueryParameters().getFirst("pageFromAddressKey");
         byte[] fromAddres = pageFromKeyStr == null ? null : Base58.decode(pageFromKeyStr);
