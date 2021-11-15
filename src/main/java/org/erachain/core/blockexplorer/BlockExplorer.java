@@ -1667,7 +1667,12 @@ public class BlockExplorer {
 
             JSONArray jsonRow = new JSONArray();
             jsonRow.add(account.getAddress());
-            jsonRow.add(owner.b.a.b.setScale(asset.getScale()).toPlainString());
+            BigDecimal addDemo = Account.addDEVAmount(assetKey, account.getShortAddressBytes());
+            if (addDemo.signum() != 0) {
+                jsonRow.add(addDemo.add(owner.b.a.b).setScale(asset.getScale()).toPlainString());
+            } else {
+                jsonRow.add(owner.b.a.b.setScale(asset.getScale()).toPlainString());
+            }
             jsonRow.add(owner.b.b.b.setScale(asset.getScale()).toPlainString());
             jsonRow.add(owner.b.c.b.setScale(asset.getScale()).toPlainString());
             jsonRow.add(owner.b.d.b.setScale(asset.getScale()).toPlainString());

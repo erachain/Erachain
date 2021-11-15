@@ -380,6 +380,10 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
 
     public int isValid(RSignNote rNote) {
 
+        if (BlockChain.CHECK_BUGS > 2 && rNote.viewHeightSeq().equals("81443-1")) {
+            boolean debug = true;
+        }
+
         if (this.assetKey == 0L) {
             errorValue = "ListPays: assetKey == null or ZERO";
             return Transaction.INVALID_ITEM_KEY;
@@ -394,6 +398,12 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
         PublicKeyAccount creator = rNote.getCreator();
         byte[] signature = rNote.getSignature();
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
+
+        makePayList(dcSet, height, asset, creator, true);
+        if (resultCode != Transaction.VALIDATE_OK) {
+            // ERROR on make LIST
+            return resultCode;
+        }
 
         // возьмем знаки (минус) для создания позиции баланса такой
         Fun.Tuple2<Integer, Integer> signs = Account.getSignsForBalancePos(balancePos);
