@@ -34,6 +34,8 @@ public abstract class PagedIndexMap<T, K, U> {
 
     public abstract IteratorCloseable<T> getIterator(K fromSecondaryKey, boolean descending);
 
+    public abstract K makeSecondaryKey(T key, U value);
+
     public U get(T key) {
         return (U) mapImpl.get(key);
     }
@@ -43,7 +45,7 @@ public abstract class PagedIndexMap<T, K, U> {
         timestamp = System.currentTimeMillis();
 
         List<U> rows = new ArrayList<>();
-        T key;
+        T key = null;
 
         if (offset < 0 || limit < 0) {
             if (limit < 0)
@@ -73,9 +75,12 @@ public abstract class PagedIndexMap<T, K, U> {
                     rows.add(0, currentRow);
                 }
 
-                if (fillFullPage && fromSecondaryKey != null // && fromKey != 0
+                if (fillFullPage && key != null // && fromKey != 0
                         && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
+
+                    // возьмем новый вторичный ключ для старта с текущего значения
+                    fromSecondaryKey = makeSecondaryKey(key, currentRow);
                     for (U pageRow : getPageList(fromSecondaryKey, 0, limit - count, false)) {
                         if (currentRow == null)
                             continue;
@@ -129,11 +134,13 @@ public abstract class PagedIndexMap<T, K, U> {
                     rows.add(currentRow);
                 }
 
-                if (fillFullPage && fromSecondaryKey != null // && fromKey != 0
+                if (fillFullPage && key != null // && fromKey != 0
                         && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
                     int index = 0;
                     int limitLeft = limit - count;
+                    // возьмем новый вторичный ключ для старта с текущего значения
+                    fromSecondaryKey = makeSecondaryKey(key, currentRow);
                     for (U pageRow : getPageList(fromSecondaryKey, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
                         currentRow = pageRow;
                         if (currentRow == null)

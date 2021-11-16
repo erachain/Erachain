@@ -237,6 +237,13 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         }
 
         @Override
+        public Tuple3<Long, BigDecimal, byte[]> makeSecondaryKey(byte[] key,
+                                                                 Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> value) {
+
+            return new Tuple3<>(ItemAssetBalanceMap.getAssetKeyFromKey(key), value.b.a.b, ItemAssetBalanceMap.getShortAccountFromKey(key));
+        }
+
+        @Override
         public IteratorCloseable<byte[]> getIterator(Tuple3<Long, BigDecimal, byte[]> fromSecondaryKey, boolean descending) {
             return ((ItemAssetBalanceSuit) map).getIteratorByAsset(fromSecondaryKey.a, fromSecondaryKey.b, fromSecondaryKey.c, descending);
         }
