@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Vake pages by Index (Secondary Key)
+ * Make pages by Index (Secondary Key)
  *
  * @param <T> primary Key
  * @param <K> secondary key
- * @param <U>
+ * @param <U> Value for page rows
  */
 public abstract class PagedIndexMap<T, K, U> {
 
