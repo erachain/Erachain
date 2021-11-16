@@ -77,7 +77,7 @@ public class ItemAssetBalanceSuitMapDBTest {
         balance = new Fun.Tuple5<>(new Fun.Tuple2<>(BigDecimal.ZERO, amo3),
                 new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO), new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO),
                 new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO), new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO));
-        balsMap.put(Bytes.concat(accountShort3, Longs.toByteArray(assetKey + 1)), balance);
+        balsMap.put(Bytes.concat(accountShort2, Longs.toByteArray(assetKey + 1)), balance);
 
         balance = new Fun.Tuple5<>(new Fun.Tuple2<>(BigDecimal.ZERO, amo2),
                 new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO), new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO),
@@ -87,7 +87,7 @@ public class ItemAssetBalanceSuitMapDBTest {
         balance = new Fun.Tuple5<>(new Fun.Tuple2<>(BigDecimal.ZERO, amo1),
                 new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO), new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO),
                 new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO), new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO));
-        balsMap.put(Bytes.concat(accountShort3, Longs.toByteArray(assetKey - 1)), balance);
+        balsMap.put(Bytes.concat(accountShort2, Longs.toByteArray(assetKey - 1)), balance);
 
         balance = new Fun.Tuple5<>(new Fun.Tuple2<>(BigDecimal.ZERO, amo3),
                 new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO), new Fun.Tuple2<>(BigDecimal.ZERO, BigDecimal.ZERO),
@@ -102,7 +102,25 @@ public class ItemAssetBalanceSuitMapDBTest {
 
         assertEquals(iterator.hasNext(), false);
 
+        iterator = ((ItemAssetBalanceSuit) balsMap.getSuit()).getIteratorByAsset(assetKey, amo2, accountShort2, desc);
+        key = iterator.next();
+        balance = balsMap.get(key);
+        assertEquals(balance.a.b, amo2);
+
+        assertEquals(iterator.hasNext(), false);
+
         iterator = ((ItemAssetBalanceSuit) balsMap.getSuit()).getIteratorByAsset(assetKey, amo1, null, desc);
+        key = iterator.next();
+        balance = balsMap.get(key);
+        assertEquals(balance.a.b, amo1);
+
+        key = iterator.next();
+        balance = balsMap.get(key);
+        assertEquals(balance.a.b, amo2);
+
+        assertEquals(iterator.hasNext(), false);
+
+        iterator = ((ItemAssetBalanceSuit) balsMap.getSuit()).getIteratorByAsset(assetKey, amo1, accountShort1, desc);
         key = iterator.next();
         balance = balsMap.get(key);
         assertEquals(balance.a.b, amo1);
@@ -122,7 +140,25 @@ public class ItemAssetBalanceSuitMapDBTest {
 
         assertEquals(iterator.hasNext(), false);
 
+        iterator = ((ItemAssetBalanceSuit) balsMap.getSuit()).getIteratorByAsset(assetKey, amo3, accountShort3, desc);
+        key = iterator.next();
+        balance = balsMap.get(key);
+        assertEquals(balance.a.b, amo3);
+
+        assertEquals(iterator.hasNext(), false);
+
         iterator = ((ItemAssetBalanceSuit) balsMap.getSuit()).getIteratorByAsset(assetKey, amo1, null, desc);
+        key = iterator.next();
+        balance = balsMap.get(key);
+        assertEquals(balance.a.b, amo1);
+
+        key = iterator.next();
+        balance = balsMap.get(key);
+        assertEquals(balance.a.b, amo3);
+
+        assertEquals(iterator.hasNext(), false);
+
+        iterator = ((ItemAssetBalanceSuit) balsMap.getSuit()).getIteratorByAsset(assetKey, amo1, accountShort1, desc);
         key = iterator.next();
         balance = balsMap.get(key);
         assertEquals(balance.a.b, amo1);

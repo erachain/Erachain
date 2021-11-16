@@ -99,6 +99,7 @@ public abstract class PagedIndexMap<T, K, U> {
                 }
 
             } catch (IOException e) {
+                String mess = e.getLocalizedMessage();
             }
 
         } else {
@@ -156,6 +157,7 @@ public abstract class PagedIndexMap<T, K, U> {
                 }
 
             } catch (IOException e) {
+                String mess = e.getLocalizedMessage();
             }
         }
         return rows;
