@@ -18,6 +18,7 @@ import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import java.io.IOException;
@@ -220,7 +221,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
     }
 
     public class PagedOwners extends PagedIndexMap<byte[],
-            Tuple2<Tuple2<Long, BigDecimal>, byte[]>,
+            Tuple3<Long, BigDecimal, byte[]>,
             Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> {
 
         public PagedOwners(DBTabImpl mapImpl) {
@@ -228,14 +229,16 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         }
 
         @Override
-        public Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+        public Tuple2<byte[],
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
         get(byte[] key) {
-            return new Tuple2(key, mapImpl.get(key));
+
+            return new Tuple2(ItemAssetBalanceMap.getShortAccountFromKey(key), mapImpl.get(key));
         }
 
         @Override
-        public IteratorCloseable<byte[]> getIterator(Tuple2<Tuple2<Long, BigDecimal>, byte[]> fromSecondaryKey, boolean descending) {
-            return ((ItemAssetBalanceSuit) map).getIteratorByAsset(fromSecondaryKey.a.a, fromSecondaryKey.a.b, fromSecondaryKey.b, descending);
+        public IteratorCloseable<byte[]> getIterator(Tuple3<Long, BigDecimal, byte[]> fromSecondaryKey, boolean descending) {
+            return ((ItemAssetBalanceSuit) map).getIteratorByAsset(fromSecondaryKey.a, fromSecondaryKey.b, fromSecondaryKey.c, descending);
         }
 
     }
@@ -254,7 +257,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
         PagedOwners pager = new PagedOwners(this);
 
-        return pager.getPageList(new Tuple2<>(new Tuple2<>(assetKey, fromOwnAmount), fromAddres), offset, limit, fillFullPage);
+        return pager.getPageList(new Tuple3<>(assetKey, fromOwnAmount, fromAddres), offset, limit, fillFullPage);
 
     }
 

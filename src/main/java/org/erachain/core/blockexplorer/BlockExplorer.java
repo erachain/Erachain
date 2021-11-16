@@ -1653,7 +1653,7 @@ public class BlockExplorer {
         String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
         BigDecimal fromAmount = pageFromKeyStr == null ? null : new BigDecimal(pageFromKeyStr);
         pageFromKeyStr = fromAmount == null ? null : info.getQueryParameters().getFirst("pageFromAddressKey");
-        byte[] fromAddres = pageFromKeyStr == null ? null : Base58.decode(pageFromKeyStr);
+        byte[] fromAddres = pageFromKeyStr == null ? null : new Account(pageFromKeyStr).getShortAddressBytes();
         List<Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
                 page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, fromAddres, offset, pageSize, true);
 
@@ -1662,7 +1662,7 @@ public class BlockExplorer {
         for (Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                 owner : page) {
 
-            Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(owner.a));
+            Account account = new Account(owner.a);
 
             JSONArray jsonRow = new JSONArray();
             jsonRow.add(account.getAddress());
@@ -1694,7 +1694,7 @@ public class BlockExplorer {
 
         if (!page.isEmpty()) {
             if (page.get(0) != null) {
-                output.put("pageFromAddressKey", Base58.encode(ItemAssetBalanceMap.getShortAccountFromKey(page.get(0).a)));
+                output.put("pageFromAddressKey", Crypto.getInstance().getAddressFromShort(page.get(0).a));
                 output.put("pageFromKey", page.get(0).b.a.b);
             }
             if (page.get(page.size() - 1) != null) {

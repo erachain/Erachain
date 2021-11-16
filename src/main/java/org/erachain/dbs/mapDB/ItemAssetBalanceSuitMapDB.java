@@ -34,8 +34,8 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     static final byte[] ADDR_KEY2_MAX = new byte[ADDR_KEY2_LEN];
 
 
-    @SuppressWarnings("rawtypes")
-    protected NavigableSet<Tuple2<Tuple2<Long, BigDecimal>, byte[]>> assetKeySet;
+    @Deprecated
+    protected NavigableSet<Tuple2<Tuple2<Long, BigDecimal>, byte[]>> assetKeySet_deprecated;
     // должно шутрее работать так как не весь первичный ключ берем а только Адрес из него сжатый до 8 байт
     protected NavigableMap<Tuple3<Long, BigDecimal, Long>, byte[]> assetKeyMap;
     protected NavigableSet addressKeySet;
@@ -86,60 +86,64 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
             // если включены выплаты - то нужно этот индекс тоже делать - хотя можно отдельно по одному Активу только - нужному
 
             //BIND ASSET KEY
-            /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
-            // - иначе она не сработает так как тут дерево с поиском
-            this.assetKeySet = database.createTreeSet("balances_key_asset_bal_address")
-                    .comparator(new Fun.Tuple2Comparator<>(Fun.TUPLE2_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
-                    //.comparator(new Fun.Tuple2Comparator<>(Fun.TUPLE2_COMPARATOR, UnsignedBytes.lexicographicalComparator()))
-                    .makeOrGet();
 
-            Bind.secondaryKey(hashMap, this.assetKeySet, new Fun.Function2<Tuple2<Long, BigDecimal>,
-                    byte[],
-                    Tuple5<
+            if (false) {
+                /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
+                // - иначе она не сработает так как тут дерево с поиском
+                this.assetKeySet_deprecated = database.createTreeSet("balances_key_asset_bal_address")
+                        .comparator(new Fun.Tuple2Comparator<>(Fun.TUPLE2_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
+                        //.comparator(new Fun.Tuple2Comparator<>(Fun.TUPLE2_COMPARATOR, UnsignedBytes.lexicographicalComparator()))
+                        .makeOrGet();
+
+                Bind.secondaryKey(hashMap, this.assetKeySet_deprecated, new Fun.Function2<Tuple2<Long, BigDecimal>,
+                        byte[],
+                        Tuple5<
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                        () {
+                    @Override
+                    public Tuple2<Long, BigDecimal>
+                    run(byte[] key, Tuple5<
                             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                    () {
-                @Override
-                public Tuple2<Long, BigDecimal>
-                run(byte[] key, Tuple5<
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
-                    // ASSET KEY
-                    byte[] assetKeyBytes = new byte[8];
-                    System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+                        // ASSET KEY
+                        byte[] assetKeyBytes = new byte[8];
+                        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                    return new Tuple2<Long, BigDecimal>(Longs.fromByteArray(assetKeyBytes), value.a.b);
-                }
-            });
+                        return new Tuple2<Long, BigDecimal>(Longs.fromByteArray(assetKeyBytes), value.a.b);
+                    }
+                });
+            } else {
 
 
-            //BIND ASSET KEY
-            /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
-            // - иначе она не сработает так как тут дерево с поиском
-            this.assetKeyMap = database.createTreeMap("balances_key_2_asset_bal_address")
-                    .comparator(new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.COMPARATOR))
-                    .makeOrGet();
+                //BIND ASSET KEY
+                /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
+                // - иначе она не сработает так как тут дерево с поиском
+                this.assetKeyMap = database.createTreeMap("balances_key_2_asset_bal_address")
+                        .comparator(new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.COMPARATOR))
+                        .makeOrGet();
 
-            Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple3<Long, BigDecimal, Long>,
-                    byte[],
-                    Tuple5<
+                Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple3<Long, BigDecimal, Long>,
+                        byte[],
+                        Tuple5<
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                        () {
+                    @Override
+                    public Tuple3<Long, BigDecimal, Long>
+                    run(byte[] key, Tuple5<
                             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                    () {
-                @Override
-                public Tuple3<Long, BigDecimal, Long>
-                run(byte[] key, Tuple5<
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
-                    // ASSET KEY
-                    byte[] assetKeyBytes = new byte[8];
-                    System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+                        // ASSET KEY
+                        byte[] assetKeyBytes = new byte[8];
+                        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                    return new Tuple3<Long, BigDecimal, Long>(Longs.fromByteArray(assetKeyBytes), value.a.b, Longs.fromByteArray(key));
-                }
-            });
+                        return new Tuple3<Long, BigDecimal, Long>(Longs.fromByteArray(assetKeyBytes), value.a.b, Longs.fromByteArray(key));
+                    }
+                });
+            }
 
         }
 
@@ -174,43 +178,25 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
-        return new IndexIterator((NavigableSet) this.assetKeySet.subSet(
-                Fun.t2(Fun.t2(assetKey, null), ADDR_KEY2_MIN), Fun.t2(Fun.t2(assetKey, Fun.HI()), ADDR_KEY2_MAX)));
+        return IteratorCloseableImpl.make(this.assetKeyMap.subMap(
+                Fun.t3(assetKey, null, Long.MAX_VALUE), Fun.t3(assetKey, Fun.HI(), Long.MAX_VALUE)).values().iterator());
     }
 
     @Override
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, byte[] addressShort, boolean descending) {
-        if (true) {
-            if (descending) {
-                if (fromOwnAmount == null)
-                    return IteratorCloseableImpl.make(this.assetKeyMap.descendingMap().subMap(
-                            Fun.t3(assetKey + 1L, null, Long.MAX_VALUE), true,
-                            Fun.t3(assetKey, null, Long.MIN_VALUE), false).values().iterator());
+        if (descending) {
+            if (fromOwnAmount == null)
                 return IteratorCloseableImpl.make(this.assetKeyMap.descendingMap().subMap(
-                        Fun.t3(assetKey, fromOwnAmount, addressShort == null ? Long.MAX_VALUE : Longs.fromByteArray(addressShort)), true,
+                        Fun.t3(assetKey + 1L, null, Long.MAX_VALUE), true,
                         Fun.t3(assetKey, null, Long.MIN_VALUE), false).values().iterator());
-            }
-
-            return IteratorCloseableImpl.make(this.assetKeyMap.subMap(
-                    Fun.t3(assetKey, fromOwnAmount, addressShort == null ? Long.MIN_VALUE : Longs.fromByteArray(addressShort)),
-                    Fun.t3(assetKey, Fun.HI(), Long.MAX_VALUE)).values().iterator());
-
-        } else {
-            // ВНИМАНИЕ!! обязательно нужно использовать вместо NULL - ADDR_KEY2_MШТ | ADDR_KEY2_MAX
-            if (descending) {
-                if (fromOwnAmount == null)
-                    return new IndexIterator((NavigableSet) this.assetKeySet.descendingSet().subSet(
-                            Fun.t2(Fun.t2(assetKey + 1L, null), ADDR_KEY2_MAX), true,
-                            Fun.t2(Fun.t2(assetKey, null), ADDR_KEY2_MIN), false));
-                return new IndexIterator((NavigableSet) this.assetKeySet.descendingSet().subSet(
-                        Fun.t2(Fun.t2(assetKey, fromOwnAmount), addressShort == null ? ADDR_KEY2_MAX : addressShort), true,
-                        Fun.t2(Fun.t2(assetKey, null), ADDR_KEY2_MIN), false));
-            }
-
-            return new IndexIterator((NavigableSet) this.assetKeySet.subSet(
-                    Fun.t2(Fun.t2(assetKey, fromOwnAmount), addressShort == null ? ADDR_KEY2_MIN : addressShort),
-                    Fun.t2(Fun.t2(assetKey, Fun.HI()), ADDR_KEY2_MAX)));
+            return IteratorCloseableImpl.make(this.assetKeyMap.descendingMap().subMap(
+                    Fun.t3(assetKey, fromOwnAmount, addressShort == null ? Long.MAX_VALUE : Longs.fromByteArray(addressShort)), true,
+                    Fun.t3(assetKey, null, Long.MIN_VALUE), false).values().iterator());
         }
+
+        return IteratorCloseableImpl.make(this.assetKeyMap.subMap(
+                Fun.t3(assetKey, fromOwnAmount, addressShort == null ? Long.MIN_VALUE : Longs.fromByteArray(addressShort)),
+                Fun.t3(assetKey, Fun.HI(), Long.MAX_VALUE)).values().iterator());
     }
 
     @Override
