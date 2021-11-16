@@ -43,6 +43,11 @@ public class PagedMap<T, U> {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
+
+                    if (System.currentTimeMillis() - timestamp > 1000) {
+                        break;
+                    }
+
                     key = iterator.next();
                     currentRow = (U) mapImpl.get(key);
                     if (currentRow == null || filterRows()) {
@@ -95,7 +100,7 @@ public class PagedMap<T, U> {
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
 
-                    if (System.currentTimeMillis() - timestamp > 5000) {
+                    if (System.currentTimeMillis() - timestamp > 1000) {
                         break;
                     }
 
@@ -166,6 +171,11 @@ public class PagedMap<T, U> {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
+
+                    if (System.currentTimeMillis() - timestamp > 1000) {
+                        break;
+                    }
+
                     key = iterator.next();
 
                     if (offsetHere > 0 && skipped++ < offsetHere) {
