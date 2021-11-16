@@ -1694,7 +1694,8 @@ public class BlockExplorer {
 
         if (!page.isEmpty()) {
             if (page.get(0) != null) {
-                output.put("pageFromAddressKey", Crypto.getInstance().getAddressFromShort(page.get(0).a));
+                output.put("pageFromAddressKey", ((JSONArray) ownersJson.get(0)).get(0));
+                // берем без добавки addDEVAmount
                 output.put("pageFromKey", page.get(0).b.a.b);
             }
             if (page.get(page.size() - 1) != null) {
