@@ -1641,7 +1641,7 @@ public class BlockExplorer {
         output.put("type", "owners");
         output.put("search_placeholder", Lang.T("Type asset key", langObj));
 
-        int pageSize = this.pageSize << 1;
+        int pageSize = 10; //this.pageSize << 1;
         long assetKey = 1L;
         if (assetKeyStr != null)
             assetKey = Long.valueOf(assetKeyStr);
@@ -1649,11 +1649,10 @@ public class BlockExplorer {
         AssetCls asset = Controller.getInstance().getAsset(assetKey);
         output.put("search_message", assetKey);
 
-
         // http://127.0.0.1:9067/index/blockexplorer.html?owners=&asset=2&lang=ru&pageFromAddressKey=HxfkJKzU2u48RdEdSwFihtmNm2L&pageKey=1.77353&offset=12
         String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
         BigDecimal fromAmount = pageFromKeyStr == null ? null : new BigDecimal(pageFromKeyStr);
-        pageFromKeyStr = info.getQueryParameters().getFirst("pageFromAddressKey");
+        pageFromKeyStr = fromAmount == null ? null : info.getQueryParameters().getFirst("pageFromAddressKey");
         byte[] fromAddres = pageFromKeyStr == null ? null : Base58.decode(pageFromKeyStr);
         List<Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
                 page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, fromAddres, offset, pageSize, true);
