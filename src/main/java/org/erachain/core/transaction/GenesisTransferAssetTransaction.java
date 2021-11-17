@@ -8,6 +8,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -109,6 +110,10 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     @Override
     public String viewSubTypeName() {
         return TransactionAmount.viewSubTypeName(this.key, this.amount, false, false);
+    }
+
+    public String viewSubTypeName(JSONObject langObj) {
+        return Lang.T(TransactionAmount.viewSubTypeName(this.key, this.amount, false, false), langObj);
     }
 
     @Override

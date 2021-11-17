@@ -104,6 +104,8 @@ public class AccountsRightPanel extends JPanel {
         columnModel.getColumn(tableModel.COLUMN_FAVORITE).setPreferredWidth(100);
         columnModel.getColumn(tableModel.COLUMN_FAVORITE).setMaxWidth(150);
 
+        columnModel.getColumn(tableModel.COLUMN_ITEM_CLS).setCellRenderer(new WalletTableRenderer());
+
 
         if (false) {
             // не правильная сортировка - по существующим только и не дает неподтвержденные сюда внести

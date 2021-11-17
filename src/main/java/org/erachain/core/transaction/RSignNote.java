@@ -102,7 +102,6 @@ public class RSignNote extends Transaction implements Itemable {
         this.setTypeBytes();
     }
 
-
     //GETTERS/SETTERS
 
     @Override
@@ -124,6 +123,9 @@ public class RSignNote extends Transaction implements Itemable {
 
     @Override
     public ItemCls getItem() {
+        if (extendedData.hasExAction()) {
+            return getExAction().getAsset();
+        }
         return extendedData.getTemplate();
     }
 
@@ -261,6 +263,11 @@ public class RSignNote extends Transaction implements Itemable {
             if (extendedData == null) {
                 parseDataV2WithoutFiles();
             }
+
+            if (extendedData.hasExAction()) {
+                return getExAction().getAssetKey();
+            }
+
             return extendedData.getTemplateKey();
         }
         return this.key;
@@ -323,6 +330,57 @@ public class RSignNote extends Transaction implements Itemable {
         }
         return extendedData.getMessage();
     }
+
+    @Override
+    public BigDecimal getAmount() {
+        if (extendedData == null) {
+            parseDataV2WithoutFiles();
+        }
+
+        if (extendedData.hasExAction()) {
+            return getExAction().getTotalPay();
+        }
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public BigDecimal getAmount(Account account) {
+        if (extendedData == null) {
+            parseDataV2WithoutFiles();
+        }
+
+        if (extendedData.hasExAction()) {
+            return getExAction().getAmount(account);
+        }
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public String viewSubTypeName() {
+        if (extendedData == null) {
+            parseDataV2WithoutFiles();
+        }
+
+        if (extendedData.hasExAction()) {
+            return Lang.T(getExAction().viewActionType()) + ":" + Lang.T(getExAction().viewType());
+        }
+
+        return "";
+    }
+
+    @Override
+    public String viewSubTypeName(JSONObject langObj) {
+        if (extendedData == null) {
+            parseDataV2WithoutFiles();
+        }
+
+        if (extendedData.hasExAction()) {
+            return Lang.T(getExAction().viewActionType(), langObj) + ":" + Lang.T(getExAction().viewType(), langObj);
+        }
+
+        return "";
+    }
+
 
     public DefaultMutableTreeNode viewLinksTree() {
 

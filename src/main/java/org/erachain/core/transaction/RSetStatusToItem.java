@@ -12,7 +12,6 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
-import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -298,11 +297,6 @@ public class RSetStatusToItem extends Transaction {
     public String viewItemName() {
         ItemCls status = dcSet.getItemStatusMap().get(this.key);
         return status == null ? "null" : status.toString();
-    }
-
-    @Override
-    public String viewAmount(String address) {
-        return DateTimeFormat.timestamptoString(end_date);
     }
 
     @Override

@@ -88,6 +88,10 @@ public class RCalculated extends TransactionAmount {
         return "";
     }
 
+    public String viewSubTypeName(JSONObject langObj) {
+        return "";
+    }
+
     @Override
     public String viewFullTypeName() {
         return viewTypeName();

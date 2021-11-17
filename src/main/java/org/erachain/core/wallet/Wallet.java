@@ -1367,6 +1367,9 @@ public class Wallet extends Observable implements Observer {
 		boolean isInvolved = false;
 		for (Account account : accounts) {
 			// CHECK IF INVOLVED
+			if (transaction.viewHeightSeq().equals("87501-1")) {
+				boolean debug = true;
+			}
 			if (transaction.isInvolved(account)) {
 				isInvolved = true;
 				// ADD TO ACCOUNT TRANSACTIONS

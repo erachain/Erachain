@@ -2839,7 +2839,7 @@ public class BlockExplorer {
                             out.put("timestamp", transaction.viewHeightSeq());
                         }
 
-                        String typeName = Lang.T(transaction.viewFullTypeName(), langObj);
+                        String typeName = transaction.viewFullTypeName(langObj);
                         out.put("type", "");
                         out.put("type_name", typeName);
 
@@ -2857,7 +2857,7 @@ public class BlockExplorer {
                         out.put("signature", Base58.encode(transaction.getSignature()));
                         out.put("timestamp", transaction.getTimestamp());
 
-                        String typeName = Lang.T(transaction.viewFullTypeName(), langObj);
+                        String typeName = transaction.viewFullTypeName(langObj);
                         out.put("type", "@TT" + transaction.getType() + ":");
                         out.put("type_name", typeName);
 

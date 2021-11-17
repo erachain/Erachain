@@ -155,6 +155,10 @@ public class Account {
 
     }
 
+    public static String balancePositionName(int position, JSONObject langObj) {
+        return Lang.T(balancePositionName(position), langObj);
+    }
+
     public static String balanceSideName(int side) {
         switch (side) {
             case BALANCE_SIDE_DEBIT:
@@ -167,6 +171,14 @@ public class Account {
 
         return null;
 
+    }
+
+    public static String balanceSideName(int side, JSONObject langObj) {
+        String result = balanceSideName(side);
+        if (result == null)
+            return null;
+
+        return Lang.T(result, langObj);
     }
 
     public static String balanceCOMPUPositionName(int position) {
