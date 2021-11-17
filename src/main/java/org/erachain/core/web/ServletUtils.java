@@ -2,9 +2,7 @@ package org.erachain.core.web;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Deprecated
 public class ServletUtils {
-
 
     public static boolean isRemoteRequest(HttpServletRequest servletRequestOpt, String ipAddress) {
         if (servletRequestOpt != null) {
@@ -18,6 +16,10 @@ public class ServletUtils {
         }
 
         return false;
+    }
+
+    public static boolean isRemoteRequest(HttpServletRequest servletRequestOpt) {
+        return isRemoteRequest(servletRequestOpt, getRemoteAddress(servletRequestOpt));
     }
 
     public static String getRemoteAddress(HttpServletRequest servletRequest) {
