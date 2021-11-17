@@ -518,9 +518,12 @@ public abstract class PersonCls extends ItemCls {
         itemJson.put("Label_TXCreator", Lang.T("Registrar", langObj));
         itemJson.put("Label_Authorship", Lang.T("Authorship", langObj));
         itemJson.put("Label_Born", Lang.T("Birthday", langObj));
+        itemJson.put("Label_Bornplace", Lang.T("Birthplace", langObj));
         itemJson.put("Label_Gender", Lang.T("Gender", langObj));
 
         itemJson.put("birthday", getBirthdayStr());
+        itemJson.put("birthLatitude", getBirthLatitude());
+        itemJson.put("birthLongitude", getBirthLongitude());
         if (!isAlive(0L)) {
             itemJson.put("deathday", getDeathdayStr());
             itemJson.put("Label_dead", Lang.T("Deathday", langObj));

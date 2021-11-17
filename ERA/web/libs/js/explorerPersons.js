@@ -250,7 +250,13 @@ function person(data, forPrint) {
 
     //////// BODY
 
-    output += '<h4>' + item.Label_Born + ': &nbsp&nbsp<b> ' + item.birthday + '</b>';
+    output += '<h4>' + item.Label_Born + ': &nbsp' + item.birthday;
+
+    // https://yandex.ru/maps/?ll=37.663259%2C55.794333
+    output += ',&nbsp&nbsp' + item.Label_Bornplace + ': &nbsp <a target="_blank" href=https://yandex.ru/maps/?ll=' + item.birthLatitude + ',' + item.birthLongitude + '&mode=whatshere&whatshere%5Bpoint%5D=' + item.birthLatitude + '%2C' + item.birthLongitude + '&whatshere%5Bzoom%5D=10&z=10>Yandex MAP</a>';
+    // https://www.google.com/maps/@55.9571032,38.7714084,9z
+    output += '&nbsp&nbsp <a target="_blank" href="https://www.google.com/maps/place/@' + item.birthLongitude + ',' + item.birthLatitude + ',12z">Google MAP</a>';
+
     if ('deathday' in data) {
         output += ', &nbsp&nbsp ' + item.Label_Dead + ': &nbsp&nbsp<b> ' + item.deathday + '</b>'
     }
