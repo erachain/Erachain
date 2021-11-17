@@ -408,7 +408,9 @@ public class APITXResource {
         List<Transaction> result;
 
         result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), txType,
-                null, null, 0, 1000, true, false);
+                null, null, 0,
+                ServletUtils.isRemoteRequest(request) ? 100 : 1000,
+                true, false);
         if (unconfirmed) {
             if (txType == null || txType == 0)
                 result.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
@@ -451,7 +453,7 @@ public class APITXResource {
         List<Transaction> transs = new ArrayList<Transaction>();
 
         List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address),
-                null, null, null, 0, 1000, true, true);
+                null, null, null, 0, ServletUtils.isRemoteRequest(request) ? 100 : 1000, true, true);
         if (unconfirmed)
             trans.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -497,12 +499,14 @@ public class APITXResource {
         Integer type;
         try {
             type = Integer.valueOf(type1);
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(Account.makeShortBytes(address), type, 1000, 0);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(Account.makeShortBytes(address), type,
+                    ServletUtils.isRemoteRequest(request) ? 100 : 1000, 0);
 
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), null,
-                    null, null, 0, 1000, true, false);
+                    null, null, 0,
+                    ServletUtils.isRemoteRequest(request) ? 100 : 1000, true, false);
             // e.printStackTrace();
         }
 
@@ -700,7 +704,7 @@ public class APITXResource {
         boolean desc = API.checkBoolean(info, "desc");
         boolean noForge = API.checkBoolean(info, "noforge");
 
-        int limitMax = ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request)) ? 10000 : 100;
+        int limitMax = ServletUtils.isRemoteRequest(request) ? 100 : 1000;
         if (limit > limitMax || limit <= 0)
             limit = limitMax;
         if (offset > limitMax)
@@ -755,7 +759,7 @@ public class APITXResource {
                                         @DefaultValue("false") @QueryParam("count") boolean count
     ) {
 
-        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+        if (ServletUtils.isRemoteRequest(request)) {
             if (limit > 50 || limit == 0)
                 limit = 50;
         }
