@@ -550,6 +550,8 @@ public class Wallet extends Observable implements Observer {
 
 		}
 
+		dwSet.hardFlush();
+
 
 		return null;
 	}
@@ -649,7 +651,6 @@ public class Wallet extends Observable implements Observer {
 		byte[] accountSeed = generateAccountSeed(seed, nonce);
 		PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
 
-		JSONObject ob = new JSONObject();
 		// CHECK IF ACCOUNT ALREADY EXISTS
 		if (!this.accountExists(account)) {
 
@@ -657,8 +658,6 @@ public class Wallet extends Observable implements Observer {
 			this.secureDatabase.addPrivateKey(account);
 			this.dwSet.getAccountMap().add(account, nonce + 1);
 
-			// set name
-			ob.put("description", Lang.T("Created by default Account") + " " + (nonce + 1));
 			LOGGER.info("Added account #" + (nonce + 1));
 
 			this.commit();

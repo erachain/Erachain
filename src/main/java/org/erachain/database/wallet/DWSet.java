@@ -18,7 +18,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
-import org.json.simple.JSONObject;
 import org.mapdb.Atomic.Var;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -460,10 +459,7 @@ public class DWSet extends DBASet {
         if (getFavoriteAccountsMap().contains(address) || GenesisBlock.CREATOR.equals(address))
             return;
 
-        JSONObject json = new JSONObject();
-        json.put("description", description);
-
-        getFavoriteAccountsMap().put(address, new Fun.Tuple3<>(pubKey, name, json.toJSONString()));
+        getFavoriteAccountsMap().put(address, new Fun.Tuple3<>(pubKey, name, description));
     }
 
     public boolean isItemFavorite(ItemCls item) {

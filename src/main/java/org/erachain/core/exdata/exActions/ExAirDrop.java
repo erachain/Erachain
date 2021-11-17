@@ -384,8 +384,14 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         height = rNote.getBlockHeight();
 
-        Account recipient = new Account(addresses[0]);
         PublicKeyAccount creator = rNote.getCreator();
+        makePayList(dcSet, height, asset, creator, true);
+        if (resultCode != Transaction.VALIDATE_OK) {
+            // ERROR on make LIST
+            return resultCode;
+        }
+
+        Account recipient = new Account(addresses[0]);
         byte[] signature = rNote.getSignature();
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
 

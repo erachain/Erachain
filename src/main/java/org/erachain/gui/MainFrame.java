@@ -151,7 +151,7 @@ public class MainFrame extends JFrame implements Observer {
         //SEPARATOR
         jWalletMenu.addSeparator();
 
-        JMenuItem saveFavorites = new JMenuItem("Save Favorites");
+        JMenuItem saveFavorites = new JMenuItem(Lang.T("Save Favorites"));
         saveFavorites.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String result = Controller.getInstance().saveFavorites();
@@ -168,7 +168,7 @@ public class MainFrame extends JFrame implements Observer {
         });
         jWalletMenu.add(saveFavorites);
 
-        JMenuItem loadFavorites = new JMenuItem("Load Favorites");
+        JMenuItem loadFavorites = new JMenuItem(Lang.T("Load Favorites"));
         loadFavorites.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String result = Controller.getInstance().loadFavorites();

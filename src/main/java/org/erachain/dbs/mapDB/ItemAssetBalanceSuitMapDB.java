@@ -10,12 +10,15 @@ import org.erachain.datachain.IndexIterator;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.NavigableMap;
 import java.util.NavigableSet;
 
 // TODO SOFT HARD TRUE
@@ -31,8 +34,10 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     static final byte[] ADDR_KEY2_MAX = new byte[ADDR_KEY2_LEN];
 
 
-    @SuppressWarnings("rawtypes")
-    protected NavigableSet assetKeySet;
+    @Deprecated
+    protected NavigableSet<Tuple2<Tuple2<Long, BigDecimal>, byte[]>> assetKeySet_deprecated;
+    // должно шутрее работать так как не весь первичный ключ берем а только Адрес из него сжатый до 8 байт
+    protected NavigableMap<Tuple3<Long, BigDecimal, Long>, byte[]> assetKeyMap;
     protected NavigableSet addressKeySet;
 
     public ItemAssetBalanceSuitMapDB(DBASet databaseSet, DB database, DBTab cover) {
@@ -81,31 +86,64 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
             // если включены выплаты - то нужно этот индекс тоже делать - хотя можно отдельно по одному Активу только - нужному
 
             //BIND ASSET KEY
-            /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
-            // - иначе она не сработает так как тут дерево с поиском
-            this.assetKeySet = database.createTreeSet("balances_key_asset_bal_address")
-                    .comparator(new Fun.Tuple2Comparator<>(Fun.TUPLE2_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
-                    .makeOrGet();
 
-            Bind.secondaryKey(hashMap, this.assetKeySet, new Fun.Function2<Tuple2<Long, BigDecimal>,
-                    byte[],
-                    Tuple5<
+            if (false) {
+                /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
+                // - иначе она не сработает так как тут дерево с поиском
+                this.assetKeySet_deprecated = database.createTreeSet("balances_key_asset_bal_address")
+                        .comparator(new Fun.Tuple2Comparator<>(Fun.TUPLE2_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
+                        //.comparator(new Fun.Tuple2Comparator<>(Fun.TUPLE2_COMPARATOR, UnsignedBytes.lexicographicalComparator()))
+                        .makeOrGet();
+
+                Bind.secondaryKey(hashMap, this.assetKeySet_deprecated, new Fun.Function2<Tuple2<Long, BigDecimal>,
+                        byte[],
+                        Tuple5<
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                        () {
+                    @Override
+                    public Tuple2<Long, BigDecimal>
+                    run(byte[] key, Tuple5<
                             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                    () {
-                @Override
-                public Tuple2<Long, BigDecimal>
-                run(byte[] key, Tuple5<
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
-                    // ASSET KEY
-                    byte[] assetKeyBytes = new byte[8];
-                    System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+                        // ASSET KEY
+                        byte[] assetKeyBytes = new byte[8];
+                        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                    return new Tuple2<Long, BigDecimal>(Longs.fromByteArray(assetKeyBytes), value.a.b.negate());
-                }
-            });
+                        return new Tuple2<Long, BigDecimal>(Longs.fromByteArray(assetKeyBytes), value.a.b);
+                    }
+                });
+            } else {
+
+
+                //BIND ASSET KEY
+                /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
+                // - иначе она не сработает так как тут дерево с поиском
+                this.assetKeyMap = database.createTreeMap("balances_key_2_asset_bal_address")
+                        .comparator(new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.COMPARATOR))
+                        .makeOrGet();
+
+                Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple3<Long, BigDecimal, Long>,
+                        byte[],
+                        Tuple5<
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                        () {
+                    @Override
+                    public Tuple3<Long, BigDecimal, Long>
+                    run(byte[] key, Tuple5<
+                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+
+                        // ASSET KEY
+                        byte[] assetKeyBytes = new byte[8];
+                        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+
+                        return new Tuple3<Long, BigDecimal, Long>(Longs.fromByteArray(assetKeyBytes), value.a.b, Longs.fromByteArray(key));
+                    }
+                });
+            }
 
         }
 
@@ -140,8 +178,25 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
-        return new IndexIterator((NavigableSet) this.assetKeySet.subSet(
-                Fun.t2(Fun.t2(assetKey, null), ADDR_KEY2_MIN), Fun.t2(Fun.t2(assetKey, Fun.HI), ADDR_KEY2_MAX)));
+        return IteratorCloseableImpl.make(this.assetKeyMap.subMap(
+                Fun.t3(assetKey, null, Long.MAX_VALUE), Fun.t3(assetKey, Fun.HI(), Long.MAX_VALUE)).values().iterator());
+    }
+
+    @Override
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, byte[] addressShort, boolean descending) {
+        if (descending) {
+            if (fromOwnAmount == null)
+                return IteratorCloseableImpl.make(this.assetKeyMap.descendingMap().subMap(
+                        Fun.t3(assetKey + 1L, null, Long.MAX_VALUE), true,
+                        Fun.t3(assetKey, null, Long.MIN_VALUE), false).values().iterator());
+            return IteratorCloseableImpl.make(this.assetKeyMap.descendingMap().subMap(
+                    Fun.t3(assetKey, fromOwnAmount, addressShort == null ? Long.MAX_VALUE : Longs.fromByteArray(addressShort)), true,
+                    Fun.t3(assetKey, null, Long.MIN_VALUE), false).values().iterator());
+        }
+
+        return IteratorCloseableImpl.make(this.assetKeyMap.subMap(
+                Fun.t3(assetKey, fromOwnAmount, addressShort == null ? Long.MIN_VALUE : Longs.fromByteArray(addressShort)),
+                Fun.t3(assetKey, Fun.HI(), Long.MAX_VALUE)).values().iterator());
     }
 
     @Override
@@ -153,6 +208,5 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
         return new IndexIterator((NavigableSet) this.addressKeySet.subSet(
                 Fun.t2(secondary, ADDR_KEY2_MIN), Fun.t2(secondary, ADDR_KEY2_MAX)));
     }
-
 
 }

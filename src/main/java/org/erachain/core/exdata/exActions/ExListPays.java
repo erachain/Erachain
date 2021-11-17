@@ -390,8 +390,14 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
 
         height = rNote.getBlockHeight();
 
-        Account recipient = new Account(addresses[0].a);
         PublicKeyAccount creator = rNote.getCreator();
+        makePayList(dcSet, height, asset, creator, true);
+        if (resultCode != Transaction.VALIDATE_OK) {
+            // ERROR on make LIST
+            return resultCode;
+        }
+
+        Account recipient = new Account(addresses[0].a);
         byte[] signature = rNote.getSignature();
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
 

@@ -646,9 +646,9 @@ public class Account {
     // Добавляем величины для тестовых режимов
     public static BigDecimal addDEVAmount(long key, byte[] shortAddressBytes) {
         if (BlockChain.ERA_COMPU_ALL_UP) {
-            if (key == 1)
+            if (key == AssetCls.ERA_KEY)
                 return BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 1000 * (5000 + shortAddressBytes[10]) / 5000);
-            else if (key == 2)
+            else if (key == AssetCls.FEE_KEY)
                 return new BigDecimal("100.0");
 
             if (BlockChain.isNovaAsset(key)) {

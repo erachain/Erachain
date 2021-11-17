@@ -23,6 +23,8 @@ import org.rocksdb.WriteOptions;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import static org.erachain.dbs.rocksDB.RockDBSetts.ROCK_BIG_DECIMAL_LEN;
+
 @Slf4j
 public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
@@ -94,7 +96,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                         System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
                         byte[] shiftForSortBuff;
-                        shiftForSortBuff = seralizerBigDecimal.toBytes(value.a.b.negate());
+                        shiftForSortBuff = seralizerBigDecimal.toBytes(value.a.b);
 
                         return org.bouncycastle.util.Arrays.concatenate(
                                 assetKeyBytes,
@@ -116,6 +118,23 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
         return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
                 Longs.toByteArray(assetKey), false, true);
+    }
+
+    // TODO NEED TEST
+    @Override
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, byte[] addressShort, boolean descending) {
+
+        byte[] fromKey = new byte[8 + ROCK_BIG_DECIMAL_LEN + Long.BYTES];
+        // ASSET KEY
+        System.arraycopy(Longs.toByteArray(assetKey), 0, fromKey, 0, Long.BYTES);
+
+        byte[] shiftForSortBuff = seralizerBigDecimal.toBytes(fromOwnAmount);
+
+        System.arraycopy(shiftForSortBuff, 0, fromKey, Long.BYTES, ROCK_BIG_DECIMAL_LEN);
+        System.arraycopy(addressShort, 0, fromKey, Long.BYTES + ROCK_BIG_DECIMAL_LEN, Long.BYTES);
+
+        return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
+                fromKey, descending, true);
     }
 
     @Override

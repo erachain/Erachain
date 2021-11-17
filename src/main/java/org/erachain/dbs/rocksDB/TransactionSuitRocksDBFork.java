@@ -10,7 +10,7 @@ import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
-import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
+import org.erachain.dbs.rocksDB.transformation.ByteableTransactionUnc;
 import org.rocksdb.WriteOptions;
 
 import java.util.Iterator;
@@ -28,7 +28,7 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     @Override
     public void openMap() {
 
-        map = new DBRocksDBTableDB<>(new ByteableLong(), new ByteableTransaction(), indexes,
+        map = new DBRocksDBTableDB<>(new ByteableLong(), new ByteableTransactionUnc(), indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
