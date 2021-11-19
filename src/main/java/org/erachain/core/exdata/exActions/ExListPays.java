@@ -78,6 +78,28 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
     }
 
     @Override
+    public BigDecimal getTotalPay() {
+        if (totalPay == null) {
+
+            totalPay = BigDecimal.ZERO;
+            for (Tuple3<byte[], BigDecimal, String> item : addresses) {
+                totalPay = totalPay.add(item.b);
+            }
+        }
+
+        return totalPay;
+    }
+
+    @Override
+    public BigDecimal getAmount(Account account) {
+        for (Tuple3<byte[], BigDecimal, String> item : addresses) {
+            if (account.equals(item.a))
+                return item.b;
+        }
+        return BigDecimal.ZERO;
+    }
+
+    @Override
     public int getCount() {
         return addresses.length;
     }
@@ -125,12 +147,19 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
             Account recipient = new Account(item.a);
 
             // IF send from PERSON to ANONYMOUS
-            if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
-                    creatorIsPerson, assetKey, balancePos,
-                    asset)) {
-                resultCode = Transaction.RECEIVER_NOT_PERSONALIZED;
-                errorValue = null;
-                results.add(new Fun.Tuple3(recipient, item.b, new Fun.Tuple2<>(resultCode, null)));
+            if (andValidate) {
+                if (!TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
+                        creatorIsPerson, assetKey, balancePos,
+                        asset)) {
+                    resultCode = Transaction.RECEIVER_NOT_PERSONALIZED;
+                    errorValue = null;
+                    results.add(new Fun.Tuple3(recipient, item.b, new Fun.Tuple2<>(resultCode, null)));
+                }
+                if (creator.equals(recipient)) {
+                    resultCode = Transaction.INVALID_RECEIVERS_LIST;
+                    errorValue = "equal creator";
+                    results.add(new Fun.Tuple3(recipient, item.b, new Fun.Tuple2<>(resultCode, errorValue)));
+                }
             } else {
                 results.add(new Fun.Tuple3(recipient, item.b, null));
             }
@@ -363,7 +392,7 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
         if (onlyTotal)
             return out;
 
-        out += "<b>" + Lang.T("Recipients") + ":</b><br>";
+        out += "<b>" + Lang.T("Recipients", langObj) + ":</b><br>";
         for (Tuple3<byte[], BigDecimal, String> item : addresses) {
             out += item.b.toPlainString() + " " + crypto.getAddressFromShort(item.a)
                     + (item.c == null || item.c.isEmpty() ? "" : " - " + item.c) + "<br>";
@@ -541,11 +570,9 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
     }
 
     public boolean isInvolved(Account account) {
-        if (results != null) {
-            for (Tuple3<Account, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
-                if (item.a.equals(account))
-                    return true;
-            }
+        for (Tuple3<byte[], BigDecimal, String> item : addresses) {
+            if (account.equals(item.a))
+                return true;
         }
         return false;
     }

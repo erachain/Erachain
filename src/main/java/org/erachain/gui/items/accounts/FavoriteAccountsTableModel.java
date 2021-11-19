@@ -27,7 +27,7 @@ public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, 
 
     public FavoriteAccountsTableModel() {
         super(Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap(),
-                new String[]{"No.", "Account", "PubKey", "Name", "Description", "Person"},
+                new String[]{"No.", "Account", "Public Key", "Name", "Description", "Person"},
                 new Boolean[]{true, false, false, false, false}, false, -1);
 
     }

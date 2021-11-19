@@ -852,6 +852,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return "unknown";
     }
 
+    public static String viewTypeName(int type, JSONObject langObj) {
+        return Lang.T(viewTypeName(type), langObj);
+    }
+
     public int getVersion() {
         return Byte.toUnsignedInt(this.typeBytes[1]);
     }
@@ -1404,6 +1408,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return TYPE_NAME;
     }
 
+    public String viewTypeName(JSONObject langObj) {
+        return Lang.T(TYPE_NAME, langObj);
+    }
+
     public String viewProperies() {
         return Byte.toUnsignedInt(typeBytes[2]) + "." + Byte.toUnsignedInt(typeBytes[3]);
     }
@@ -1412,9 +1420,18 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return "";
     }
 
+    public String viewSubTypeName(JSONObject langObj) {
+        return "";
+    }
+
     public String viewFullTypeName() {
         String sub = viewSubTypeName();
-        return sub.length() > 0 ? viewTypeName() + ":" + sub : viewTypeName();
+        return sub.isEmpty() ? Lang.T(viewTypeName()) : Lang.T(viewTypeName()) + ":" + Lang.T(sub);
+    }
+
+    public String viewFullTypeName(JSONObject langObj) {
+        String sub = viewSubTypeName(langObj);
+        return sub.isEmpty() ? viewTypeName(langObj) : viewTypeName(langObj) + ":" + sub;
     }
 
     public static String viewDBRef(long dbRef) {
@@ -1434,14 +1451,6 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public String viewHeightSeq() {
         return this.height + "-" + this.seqNo;
-    }
-
-    public String viewAmount(Account account) {
-        return "";
-    }
-
-    public String viewAmount(String address) {
-        return "";
     }
 
     public String viewCreator() {

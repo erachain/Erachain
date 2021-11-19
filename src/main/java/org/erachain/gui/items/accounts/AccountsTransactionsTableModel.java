@@ -225,8 +225,7 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
 
             if (filterAccount != null && !gen_send.getRecipient().getAddress().equals(this.filterAccount.getAddress()))
                 trr.amount = gen_send.getAmount().negate();
-            // if is creator
-            if (gen_send.getCreator() != null) trr.maker = gen_send.getCreator();
+
             // if is maker
             if (gen_send.getCreator() != null) trr.maker = gen_send.getCreator();
             trr.recipient = gen_send.viewRecipient();
@@ -263,6 +262,17 @@ public class AccountsTransactionsTableModel extends WalletTableModel<AccountsTra
             trr.amount = new BigDecimal(issueAssetSeries.getTotal());
             trr.recipient = ""; // + updateOrder.getAmountWant();
             trr.title = "" + issueAssetSeries.getTitle();
+        } else if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
+            RSignNote signNote = (RSignNote) transaction;
+            trr.recipient = signNote.viewRecipient();
+
+            if (filterAccount != null && trr.amount != null) {
+                if (this.filterAccount.equals(signNote.getCreator())) {
+                    trr.amount = trr.amount.negate();
+                } else {
+                    trr.amount = signNote.getAmount(filterAccount);
+                }
+            }
 
         } else {
             trr.recipient = "";

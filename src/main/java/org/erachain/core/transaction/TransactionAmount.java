@@ -15,6 +15,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.erachain.utils.BigDecimalUtil;
 import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONArray;
@@ -523,6 +524,18 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             return viewSubTypeName(key, amount, isBackward(), asset.isDirectBalances());
         } else {
             return viewSubTypeName(balancePos);
+        }
+    }
+
+    @Override
+    public String viewSubTypeName(JSONObject langObj) {
+        if (packet == null && (amount == null || amount.signum() == 0))
+            return "";
+
+        if (packet == null) {
+            return Lang.T(viewSubTypeName(key, amount, isBackward(), asset.isDirectBalances()), langObj);
+        } else {
+            return Lang.T(viewSubTypeName(balancePos), langObj);
         }
     }
 

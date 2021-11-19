@@ -76,11 +76,21 @@ public abstract class ExAction<R> {
         return totalPay;
     }
 
+    public abstract BigDecimal getAmount(Account account);
+
     public abstract int getCount();
 
     public abstract String viewResults(Transaction transactionParent);
 
     public abstract String viewType();
+
+    public String viewActionType() {
+        return Account.balancePositionName(balancePos);
+    }
+
+    public String viewActionType(JSONObject langObj) {
+        return Lang.T(Account.balancePositionName(balancePos), langObj);
+    }
 
     public abstract long getTotalFeeBytes();
 
@@ -171,13 +181,13 @@ public abstract class ExAction<R> {
     }
 
     public String getInfoHTML(boolean onlyTotal, JSONObject langObj) {
-        String out = "<h4>" + Lang.T(viewType()) + "</h4>";
-        out += Lang.T("Count # кол-во") + ": <b>" + getCount()
-                + "</b> " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(getTotalFeeBytes()) + "</b><br>";
+        String out = "<h4>" + Lang.T(viewType(), langObj) + "</h4>";
+        out += Lang.T("Count # кол-во", langObj) + ": <b>" + getCount()
+                + "</b> " + Lang.T("Additional Fee", langObj) + ": <b>" + BlockChain.feeBG(getTotalFeeBytes()) + "</b><br>";
 
-        out += Lang.T("Asset") + ": <b>" + asset.getName() + "</b><br>";
-        out += Lang.T("Total") + ": <b>" + getTotalPay()
-                + " (" + Lang.T(Account.balancePositionName(balancePos), langObj)
+        out += Lang.T("Asset", langObj) + ": <b>" + asset.getName() + "</b><br>";
+        out += Lang.T("Total", langObj) + ": <b>" + getTotalPay()
+                + " (" + viewActionType(langObj)
                 + (backward ? " " + Lang.T("backward", langObj) : "") + ")</b><br>";
 
         return out;

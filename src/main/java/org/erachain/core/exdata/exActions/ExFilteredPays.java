@@ -221,6 +221,10 @@ public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal
         return "PAY_METHOD_" + mode;
     }
 
+    public static String viewPayMethod(int mode, JSONObject langObj) {
+        return Lang.T(viewPayMethod(mode), langObj);
+    }
+
     public static String viewFilterPersMode(int mode) {
         switch (mode) {
             case 0:
@@ -233,6 +237,10 @@ public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal
                 return "Only for Women";
         }
         return "--";
+    }
+
+    public static String viewFilterPersMode(int mode, JSONObject langObj) {
+        return Lang.T(viewFilterPersMode(mode), langObj);
     }
 
     public void calcTotalFeeBytes() {
@@ -279,6 +287,11 @@ public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal
 
     public boolean hasTXTypeFilterActiveEnd() {
         return (this.flags & ACTIVE_END_FLAG_MASK) != 0;
+    }
+
+    @Override
+    public BigDecimal getAmount(Account account) {
+        return BigDecimal.ZERO;
     }
 
     @Override
@@ -746,12 +759,12 @@ public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal
             json.put("filterAsset", filterAsset.getName());
         }
 
-        json.put("payMethodName", Lang.T(ExFilteredPays.viewPayMethod(payMethod), langObj));
-        json.put("balancePosName", Lang.T(Account.balancePositionName(balancePos), langObj));
-        json.put("filterBalancePosName", Lang.T(Account.balancePositionName(filterBalancePos), langObj));
-        json.put("filterBalanceSideName", Lang.T(Account.balanceSideName(filterBalanceSide), langObj));
-        json.put("filterTXTypeName", Lang.T(Transaction.viewTypeName(filterTXType), langObj));
-        json.put("filterByGenderName", Lang.T(viewFilterPersMode(filterByGender), langObj));
+        json.put("payMethodName", ExFilteredPays.viewPayMethod(payMethod, langObj));
+        json.put("balancePosName", Account.balancePositionName(balancePos, langObj));
+        json.put("filterBalancePosName", Account.balancePositionName(filterBalancePos, langObj));
+        json.put("filterBalanceSideName", Account.balanceSideName(filterBalanceSide, langObj));
+        json.put("filterTXTypeName", Transaction.viewTypeName(filterTXType, langObj));
+        json.put("filterByGenderName", viewFilterPersMode(filterByGender, langObj));
 
         json.put("Label_Action_for_Asset", Lang.T("Action for Asset", langObj));
         json.put("Label_assetKey", Lang.T("Asset", langObj));
@@ -832,7 +845,7 @@ public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal
         if (onlyTotal || results == null)
             return out;
 
-        out += "<b>" + Lang.T("Recipients") + ":</b><br>";
+        out += "<b>" + Lang.T("Recipients", langObj) + ":</b><br>";
         for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
             out += item.c.toPlainString() + " " + item.a.getAddress() + " x " + item.b.toPlainString() + "<br>";
         }

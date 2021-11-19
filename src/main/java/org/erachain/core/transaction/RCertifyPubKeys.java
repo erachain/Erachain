@@ -352,15 +352,6 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
     }
 
     //////// VIEWS
-    @Override
-    public String viewAmount(String address) {
-        return add_day > 0 ? "+" + add_day : "" + add_day;
-    }
-
-    @Override
-    public String viewRecipient() {
-        return Base58.encode(this.certifiedPublicKeys.get(0).getPublicKey());
-    }
 
     //////////////
     @SuppressWarnings("unchecked")
