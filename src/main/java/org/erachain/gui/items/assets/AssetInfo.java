@@ -16,6 +16,7 @@ import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.NumberAsString;
+import org.json.simple.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
@@ -120,6 +121,8 @@ public class AssetInfo extends JTextPane {
                 text += "<td><div  style='float:left'><div>" + Lang.T("Block-SeqNo") + ": <b>" + record.viewHeightSeq() + "</b></div>";
             text += "<div>" + Lang.T("Name") + ": <b>" + asset.viewName() + "</b></div>";
 
+            JSONObject landObj = Lang.getInstance().getLangForNode();
+
             if (asset instanceof AssetUniqueSeriesCopy && ((AssetUniqueSeriesCopy) asset).hasOriginal()) {
                 long origKey = ((AssetUniqueSeriesCopy) asset).getOrigKey();
                 text += "<div>" + Lang.T("Original Asset") + ": <a href = '!!OrigKey'><b>" + origKey + "</b></a></div>";
@@ -146,8 +149,9 @@ public class AssetInfo extends JTextPane {
                     asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:"
                     + Lang.T(asset.viewAssetTypeFull()) + "</a>,";
 
+            text += "<p><b>" + Lang.T("Properties") + "</b>: " + asset.viewProperties(landObj) + "</p>";
+
             if (asset.isUnique()) {
-                text += " <b>" + Lang.T("Unique") + "</b>,";
                 if (asset instanceof AssetUniqueSeriesCopy) {
                     text += " <b>" + Lang.T("Series") + " #" + ((AssetUniqueSeriesCopy) asset).getTotal() + "</b>,";
                 }

@@ -9,6 +9,7 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONObject;
 
 import javax.swing.*;
 
@@ -173,6 +174,7 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
 
         String out = super.makeBodyView();
         AssetCls asset = (AssetCls) item;
+        JSONObject landObj = Lang.getInstance().getLangForNode();
 
         out += Lang.T("Asset Class") + ":&nbsp;"
                 + Lang.T(asset.getItemSubType() + "") + "<br>"
@@ -180,6 +182,8 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
                 + "<b>" + asset.charAssetType() + asset.viewAssetTypeAbbrev() + "</b>:" + Lang.T(asset.viewAssetTypeFull() + "") + "<br>"
                 + Lang.T("Quantity") + ":&nbsp;" + asset.getQuantity() + ", "
                 + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>";
+
+        out += "<p><b>" + Lang.T("Properties") + "</b>: " + asset.viewProperties(landObj) + "</p>";
 
         if (asset.getDEXAwards() != null) {
             out += Lang.T("DEX Awards" + ":");

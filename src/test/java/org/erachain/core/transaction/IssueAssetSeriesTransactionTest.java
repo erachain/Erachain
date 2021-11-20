@@ -133,7 +133,7 @@ public class IssueAssetSeriesTransactionTest {
         Long startDate = System.currentTimeMillis();
         Long stopDate = null;
         itemAppData2 = AssetCls.makeAppData(iconAsURL, iconType, imageAsURL, imageType,
-                startDate, stopDate, "tag", null, true);
+                startDate, stopDate, "tag", null, true, true);
         assetUnique = new AssetUnique(itemAppData2, maker, "NFT", icon2, image2, ".asd..", AssetCls.AS_NON_FUNGIBLE);
         assetUnique.setReference(Crypto.getInstance().digest(assetUnique.toBytes(forDeal, false, false)), dbRef2);
 

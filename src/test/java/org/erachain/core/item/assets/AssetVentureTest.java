@@ -38,7 +38,7 @@ public class AssetVentureTest {
         Long startDate = System.currentTimeMillis();
         Long stopDate = null;
         itemAppData = AssetCls.makeAppData(iconAsURL, iconType, imageAsURL, imageType,
-                startDate, stopDate, "tag", null, true);
+                startDate, stopDate, "tag", null, true, true);
 
         AssetVenture assetVenture = new AssetVenture(itemAppData, maker, "movable", icon, image, "...", 0, 8, 10L);
 
@@ -63,6 +63,8 @@ public class AssetVentureTest {
             assertEquals(assetVenture.getDescription(), parsedAsset.getDescription());
 
             assertEquals(assetVenture.getQuantity(), parsedAsset.getQuantity());
+
+            assertEquals(assetVenture.isAnonimDenied(), parsedAsset.isAnonimDenied());
 
         } catch (Exception e) {
             fail("Exception while parsing transaction.");
