@@ -59,10 +59,10 @@ public class LoansPanel extends JPanel {
         table = Gui.createSortableTable(tableModel, 0);
 
         TableColumn column_No = table.getColumnModel().getColumn(tableModel.COLUMN_NO);
-        column_No.setMinWidth(50);
+        column_No.setMinWidth(70);
         column_No.setMaxWidth(150);
-        column_No.setPreferredWidth(50);
-        column_No.setWidth(50);
+        column_No.setPreferredWidth(70);
+        column_No.setWidth(70);
         column_No.sizeWidthToFit();
 
         //MENU
