@@ -1336,10 +1336,18 @@ public class BlockChain {
             return false;
         }
 
-        if (this.waitWinBuffer != null && block.compareWin(waitWinBuffer) <= 0) {
-            block.close();
-            LOGGER.info("new winBlock is POOR!");
-            return false;
+        if (this.waitWinBuffer != null) {
+            if (block.equals(waitWinBuffer)) {
+                block.close();
+                LOGGER.info("new winBlock is SAME!");
+                return true;
+            }
+            if (block.compareWin(waitWinBuffer) <= 0) {
+                block.close();
+                LOGGER.info("new winBlock is POOR!");
+                return false;
+            }
+
         }
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
