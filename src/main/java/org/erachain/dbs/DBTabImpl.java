@@ -164,7 +164,7 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     @Override
-    public U getDefaultValue() {
+    public U getDefaultValue(T key) {
         return null;
     }
 

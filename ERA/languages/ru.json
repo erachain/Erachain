@@ -110,6 +110,7 @@
   "Amount to pay:": "Кол-во к оплате:",
   "Amount:": "Кол-во:",
   "Amount": "Кол-во",
+  "ANONIM_OWN_DENIED": "Aнонимное владение запрещено",
   "An external service that needs to be provided outside. To notify your wish to provide services you must make demands and then confirm the fulfillment": "Внешняя услуга, которую необходимо оказать вовне. Для уведомления вашего желания на оказание услуги необходимо предъявить требование и потом подтвердить его исполнение для вас",
   "An API call needs authorization!": "Вызова API требует авторизации!",
   "Anyone who has access to your seed will have access to your wallet.": "всем, кто знает ваш ключ будут иметь доступ к вашему кошельку.",

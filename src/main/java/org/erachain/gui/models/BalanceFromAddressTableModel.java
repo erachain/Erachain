@@ -1,7 +1,6 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
@@ -101,11 +100,6 @@ public class BalanceFromAddressTableModel extends TimerTableModelCls<Tuple2<Long
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                         accBalance = balance.b;
-                if (BlockChain.ERA_COMPU_ALL_UP) {
-                    accBalance = new Tuple5<>(new Tuple2<>(accBalance.a.a,
-                            accBalance.a.b.add(Account.addDEVAmount(assetKey, ItemAssetBalanceMap.getShortAccountFromKey(balance.a)))),
-                            accBalance.b, accBalance.c, accBalance.d, accBalance.e);
-                }
 
                 tableBalances.add(new Tuple2(assetKey, accBalance));
                 assetKeys.add(assetKey);

@@ -76,12 +76,12 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                 }
             }
 
-            return getDefaultValue();
+            return getDefaultValue(key);
         } catch (Exception e) {
 
             logger.error(e.getMessage(), e);
 
-            return getDefaultValue();
+            return getDefaultValue(key);
         }
     }
 

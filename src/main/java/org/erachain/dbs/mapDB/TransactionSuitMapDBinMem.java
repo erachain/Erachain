@@ -95,7 +95,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     @Override
     public Transaction get(Long key) {
         if (database.getEngine().isClosed())
-            return getDefaultValue();
+            return getDefaultValue(key);
 
         return super.get(key);
     }
@@ -131,7 +131,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     @Override
     public Transaction remove(Long key) {
         if (database.getEngine().isClosed())
-            return getDefaultValue();
+            return getDefaultValue(key);
         return super.remove(key);
     }
 
@@ -149,7 +149,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     @Override
     public Transaction removeValue(Long key) {
         if (database.getEngine().isClosed())
-            return getDefaultValue();
+            return getDefaultValue(key);
         return super.removeValue(key);
     }
 

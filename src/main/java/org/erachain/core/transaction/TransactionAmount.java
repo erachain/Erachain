@@ -813,9 +813,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static boolean isValidPersonProtect(DCSet dcSet, int height, Account recipient,
                                                boolean creatorIsPerson, long absKey, int actionType,
                                                AssetCls asset) {
-        if (BlockChain.PERSON_SEND_PROTECT && creatorIsPerson && absKey != FEE_KEY
+        if ((BlockChain.PERSON_SEND_PROTECT && creatorIsPerson && absKey != FEE_KEY && asset.isSendPersonProtected()
+                || asset.isAnonimDenied())
                 && actionType != ACTION_DEBT && actionType != ACTION_HOLD && actionType != ACTION_SPEND
-                && asset.isSendPersonProtected()
         ) {
             if (!recipient.isPerson(dcSet, height)
                     && !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {

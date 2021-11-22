@@ -23,9 +23,9 @@ public abstract class DBSuitImpl<T, U> implements DBSuit<T, U> {
     }
 
     @Override
-    public U getDefaultValue() {
+    public U getDefaultValue(T key) {
         if (cover != null)
-            return (U) cover.getDefaultValue();
+            return (U) cover.getDefaultValue(key);
 
         return null;
     }

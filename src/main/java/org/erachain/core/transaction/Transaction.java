@@ -222,6 +222,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int INVALID_OUTSIDE_VALIDATY_PERIOD = 217;
 
     public static final int INVALID_ASSET_TYPE = 222;
+    public static final int ANONIM_OWN_DENIED = 223;
 
     public static final int ITEM_PERSON_IS_DEAD = 235;
     public static final int AMOUNT_LENGHT_SO_LONG = 236;

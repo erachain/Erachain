@@ -21,6 +21,7 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
 
     protected final JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
     protected final JCheckBox isUnTransferable = new JCheckBox(Lang.T("Not transferable"));
+    protected final JCheckBox isAnonimDenied = new JCheckBox(Lang.T("ANONIM_OWN_DENIED"));
     protected MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel(fromJComboBox, assetTypeJComboBox);
 
     protected JTextPane textAreasAssetTypeDescription;
@@ -50,6 +51,9 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
         jPanelAdd.add(isUnTransferable, fieldGBC);
 
         fieldGBC.gridy = gridy++;
+        jPanelAdd.add(isAnonimDenied, fieldGBC);
+
+        fieldGBC.gridy = gridy++;
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = fieldGBC.gridy;
@@ -71,7 +75,8 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
                 !addImageLabel.isInternalMedia(), addImageLabel.getMediaType(),
                 !startCheckBox.isSelected() ? null : startField.getCalendar().getTimeInMillis(),
                 !stopCheckBox.isSelected() ? null : stopField.getCalendar().getTimeInMillis(),
-                tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients(), isUnTransferable.isSelected());
+                tagsField.getText(), multipleRoyaltyPanel.recipientsTableModel.getRecipients(),
+                isUnTransferable.isSelected(), isAnonimDenied.isSelected());
 
     }
 

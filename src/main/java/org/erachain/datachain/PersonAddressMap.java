@@ -62,7 +62,7 @@ public class PersonAddressMap extends DCUMap<
     }
 
     @Override
-    public TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> getDefaultValue() {
+    public TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> getDefaultValue(Long key) {
         return new TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>();
     }
 

@@ -361,10 +361,13 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static byte[] makeAppData(boolean iconAsURL, int iconType, boolean imageAsURL, int imageType,
-                                     Long startDate, Long stopDate, String tags, ExLinkAddress[] dexAwards, boolean isUnTransferable) {
+                                     Long startDate, Long stopDate, String tags, ExLinkAddress[] dexAwards,
+                                     boolean isUnTransferable, boolean isAnonimDenied) {
         long flags = dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK;
         if (isUnTransferable)
             flags |= APP_DATA_UNTRANSFERABLE_MASK;
+        if (isAnonimDenied)
+            flags |= APP_DATA_ANONIM_PROTECT_MASK;
 
         byte[] appData = ItemCls.makeAppData(flags,
                 iconAsURL, iconType, imageAsURL, imageType, startDate, stopDate, tags);
@@ -956,6 +959,15 @@ public abstract class AssetCls extends ItemCls {
                 && !isAccounting()
                 && assetType != AssetCls.AS_INSIDE_BONUS
                 && assetType != AssetCls.AS_INSIDE_VOTE;
+    }
+
+    /**
+     * anonymous ownership is denied
+     *
+     * @return
+     */
+    public boolean isAnonimDenied() {
+        return (flags & APP_DATA_ANONIM_PROTECT_MASK) != 0;
     }
 
     /**
@@ -2179,6 +2191,8 @@ public abstract class AssetCls extends ItemCls {
             joiner.add(Lang.T("Accounting", langObj));
         if (isUnique())
             joiner.add(Lang.T("Unique", langObj));
+        if (isAnonimDenied())
+            joiner.add(Lang.T("ANONIM_OWN_DENIED", langObj));
         if (isUnHoldable())
             joiner.add(Lang.T("Not holdable", langObj));
         if (isOutsideType())
@@ -2272,6 +2286,7 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("isUnlimited", this.isUnlimited(maker, false));
         assetJSON.put("isAccounting", this.isAccounting());
         assetJSON.put("isUnique", this.isUnique());
+        assetJSON.put("isAnonimDenied", this.isAnonimDenied());
         assetJSON.put("isUnHoldable", this.isUnHoldable());
         assetJSON.put("isOutsideType", this.isOutsideType());
         assetJSON.put("isSelfManaged", this.isSelfManaged());

@@ -1,6 +1,5 @@
 package org.erachain.core.account;
 
-import org.erachain.core.BlockChain;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
 import org.erachain.core.transaction.Transaction;
@@ -75,8 +74,7 @@ public class AccountTest {
         Fun.Tuple2 balance3 = account.getBalance(db, Transaction.RIGHTS_KEY, 1);
 
         assertEquals(((BigDecimal) balance3.a).intValue(), 0);
-        assertEquals(((BigDecimal) balance3.b).intValue(), BlockChain.ERA_COMPU_ALL_UP ?
-                account.addDEVAmount(Transaction.RIGHTS_KEY).intValue() : 0);
+        assertEquals(((BigDecimal) balance3.b).intValue(), 331417);
 
     }
 

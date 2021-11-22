@@ -474,6 +474,9 @@ public class OnDealClick {
             case Transaction.INVALID_ASSET_TYPE:
                 mess = "Invalid asset type (not unique?)";
                 break;
+            case Transaction.ANONIM_OWN_DENIED:
+                mess = "ANONIM_OWN_DENIED";
+                break;
 
             case Transaction.INVALID_CREATOR:
                 mess = "Invalid creator";

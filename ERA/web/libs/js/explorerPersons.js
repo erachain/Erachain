@@ -252,10 +252,15 @@ function person(data, forPrint) {
 
     output += '<h4>' + item.Label_Born + ': &nbsp' + item.birthday;
 
-    // https://yandex.ru/maps/?ll=37.663259%2C55.794333
-    output += ',&nbsp&nbsp' + item.Label_Bornplace + ': &nbsp <a target="_blank" href=https://yandex.ru/maps/?ll=' + item.birthLatitude + ',' + item.birthLongitude + '&mode=whatshere&whatshere%5Bpoint%5D=' + item.birthLatitude + '%2C' + item.birthLongitude + '&whatshere%5Bzoom%5D=10&z=10>Yandex</a>';
+    //// почемуто и Гугль и Яндекс меняют местами параметры Longitude и Latitude в разные дни ((
+    //// если ведет не туда карта значит надо значения поменять местам
+    var L1 = item.birthLongitude;
+    var L2 = item.birthLatitude;
+    output += ',&nbsp&nbsp' + item.Label_Bornplace + ': &nbsp <a target="_blank" href=https://yandex.ru/maps/?ll='
+        + L1 + ',' + L2 + '&mode=whatshere&whatshere%5Bpoint%5D=' + L1 + '%2C' + L2
+        + '&whatshere%5Bzoom%5D=10&z=12>Yandex</a>';
     // https://www.google.com/maps/@55.9571032,38.7714084,9z
-    output += ' / <a target="_blank" href="https://www.google.com/maps/place/@' + item.birthLongitude + ',' + item.birthLatitude + ',12z">Google</a>';
+    output += ' / <a target="_blank" href="https://www.google.com/maps/@' + L2 + ',' + L1 + ',12z">Google</a>';
 
     if ('deathday' in data) {
         output += ', &nbsp&nbsp ' + item.Label_Dead + ': &nbsp&nbsp<b> ' + item.deathday + '</b>'

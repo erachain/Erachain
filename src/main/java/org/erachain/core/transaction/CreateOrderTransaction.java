@@ -525,6 +525,10 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             return ITEM_ASSET_NOT_EXIST;
         }
 
+        if ((wantAsset.isAnonimDenied() || haveAsset.isAnonimDenied()) && !creator.isPerson(dcSet, height)) {
+            return ANONIM_OWN_DENIED;
+        }
+
         // CHECK IF SENDER HAS ENOUGH ASSET BALANCE
         if (height < BlockChain.ALL_BALANCES_OK_TO) {
             ; // NOT CHECK
