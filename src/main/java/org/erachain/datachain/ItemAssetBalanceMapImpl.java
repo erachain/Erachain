@@ -108,10 +108,11 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
             long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
             if (assetKey == AssetCls.ERA_KEY)
                 initialAmount = BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 1000 * (5000 + key[10]) / 5000);
+
             else if (assetKey == AssetCls.FEE_KEY)
                 initialAmount = new BigDecimal("100.0");
 
-            if (BlockChain.isNovaAsset(assetKey)) {
+            else if (BlockChain.isNovaAsset(assetKey)) {
                 initialAmount = new BigDecimal("1000.0");
             }
         }
