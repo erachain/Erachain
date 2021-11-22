@@ -1324,11 +1324,7 @@ public class API {
             JSONArray array = new JSONArray();
             long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(assetsBalance.a);
 
-            if (BlockChain.ERA_COMPU_ALL_UP) {
-                array.add(setJSONArray(account.balAaddDEVAmount(assetKey, assetsBalance.b.a)));
-            } else {
-                array.add(setJSONArray(assetsBalance.b.a));
-            }
+            array.add(setJSONArray(assetsBalance.b.a));
             array.add(setJSONArray(assetsBalance.b.b));
             array.add(setJSONArray(assetsBalance.b.c));
             array.add(setJSONArray(assetsBalance.b.d));

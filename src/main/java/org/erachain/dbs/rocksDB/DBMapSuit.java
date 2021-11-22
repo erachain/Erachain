@@ -88,10 +88,10 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
             if (map.containsKey(key)) {
                 return map.get(key);
             }
-            return getDefaultValue();
+            return getDefaultValue(key);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return getDefaultValue();
+            return getDefaultValue(key);
         }
     }
 

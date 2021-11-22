@@ -1,7 +1,6 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.utils.ObserverMessage;
@@ -71,9 +70,6 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
             Tuple5<
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = item.b;
-            if (BlockChain.ERA_COMPU_ALL_UP) {
-                balance = account.balanceAddDEVAmount(assetKey, balance);
-            }
 
             this.addElement(new Pair(new Tuple2(account, assetKey), balance));
         }

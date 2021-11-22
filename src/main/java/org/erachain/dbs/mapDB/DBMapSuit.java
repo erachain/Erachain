@@ -264,11 +264,11 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
                     return u;
                 }
 
-                return this.getDefaultValue();
+                return this.getDefaultValue(key);
 
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                return this.getDefaultValue();
+                return this.getDefaultValue(key);
             }
         } finally {
             this.outUses();

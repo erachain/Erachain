@@ -74,7 +74,7 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
     }
 
     @Override
-    public BigDecimal getDefaultValue() {
+    public BigDecimal getDefaultValue(Tuple3<String, Long, String> key) {
         return BigDecimal.ZERO;
     }
 

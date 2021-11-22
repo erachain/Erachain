@@ -1,7 +1,6 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.ItemAssetBalanceMap;
@@ -60,9 +59,6 @@ public class BalanceFromAssets extends AbstractTableModel implements Observer {
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = this.balances.get(ib);
                 long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.a);
                 Tuple5 balance = item.b;
-                if (BlockChain.ERA_COMPU_ALL_UP) {
-                    balance = account.balanceAddDEVAmount(assetKey, balance);
-                }
                 table_balance.add(new Pair(account, new Pair(assetKey, balance)));
             }
         }

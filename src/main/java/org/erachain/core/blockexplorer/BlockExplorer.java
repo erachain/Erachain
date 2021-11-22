@@ -1666,12 +1666,7 @@ public class BlockExplorer {
 
             JSONArray jsonRow = new JSONArray();
             jsonRow.add(account.getAddress());
-            BigDecimal addDemo = Account.addDEVAmount(assetKey, account.getShortAddressBytes());
-            if (addDemo.signum() != 0) {
-                jsonRow.add(addDemo.add(owner.b.a.b).setScale(asset.getScale()).toPlainString());
-            } else {
-                jsonRow.add(owner.b.a.b.setScale(asset.getScale()).toPlainString());
-            }
+            jsonRow.add(owner.b.a.b.setScale(asset.getScale()).toPlainString());
             jsonRow.add(owner.b.b.b.setScale(asset.getScale()).toPlainString());
             jsonRow.add(owner.b.c.b.setScale(asset.getScale()).toPlainString());
             jsonRow.add(owner.b.d.b.setScale(asset.getScale()).toPlainString());
@@ -1776,7 +1771,6 @@ public class BlockExplorer {
 
                     if (BlockChain.ERA_COMPU_ALL_UP && side == Account.BALANCE_SIDE_LEFT) {
                         bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)
-                                .add(account.addDEVAmount(assetKey))
                                 .setScale(asset.getScale()).toPlainString());
                     } else {
                         bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)

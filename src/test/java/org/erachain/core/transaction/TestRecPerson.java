@@ -451,17 +451,11 @@ public class TestRecPerson {
                 LOGGER.info("person KEY: " + person.getKey());
 
                 BigDecimal eraUSE = new BigDecimal("1000");
-                if (BlockChain.ERA_COMPU_ALL_UP) {
-                    eraUSE = eraUSE.add(registrar.addDEVAmount(ERM_KEY));
-                }
 
                 //CHECK BALANCE ISSUER
                 assertEquals(eraUSE.setScale(registrar.getBalanceUSE(ERM_KEY, dcSet).scale()), registrar.getBalanceUSE(ERM_KEY, dcSet));
 
                 BigDecimal compuUSE = new BigDecimal("1");
-                if (BlockChain.ERA_COMPU_ALL_UP) {
-                    compuUSE = compuUSE.add(registrar.addDEVAmount(FEE_KEY));
-                }
                 assertEquals(compuUSE.subtract(issuePersonTransaction.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
                         registrar.getBalanceUSE(FEE_KEY, dcSet));
 
@@ -773,10 +767,10 @@ public class TestRecPerson {
                 assertEquals(erm_amount_user, userAccount1.getBalanceUSE(ERM_KEY, dcSet));
                 assertEquals(oil_amount_user.add(BlockChain.BONUS_FOR_PERSON(1)), userAccount1.getBalanceUSE(FEE_KEY, dcSet));
 
-                assertEquals(userAccount2.addDEVAmount(ERM_KEY), userAccount2.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(userAccount2.addDEVAmount(FEE_KEY), userAccount2.getBalanceUSE(FEE_KEY, dcSet));
-                assertEquals(userAccount3.addDEVAmount(ERM_KEY), userAccount3.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(userAccount3.addDEVAmount(FEE_KEY), userAccount3.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(userAccount2, userAccount2.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(userAccount2, userAccount2.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(userAccount3, userAccount3.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(userAccount3, userAccount3.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK REFERENCE SENDER
                 assertEquals((long) r_CertifyPubKeys.getTimestamp(), certifier.getLastTimestamp(dcSet)[0]);
@@ -837,10 +831,10 @@ public class TestRecPerson {
                 //CHECK BALANCE RECIPIENT
                 assertEquals(erm_amount_user, userAccount1.getBalanceUSE(ERM_KEY, dcSet));
                 assertEquals(oil_amount_user.setScale(userAccount1.getBalanceUSE(FEE_KEY, dcSet).scale()), userAccount1.getBalanceUSE(FEE_KEY, dcSet));
-                assertEquals(userAccount2.addDEVAmount(ERM_KEY), userAccount2.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(userAccount2.addDEVAmount(FEE_KEY), userAccount2.getBalanceUSE(FEE_KEY, dcSet));
-                assertEquals(userAccount3.addDEVAmount(ERM_KEY), userAccount3.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(userAccount3.addDEVAmount(FEE_KEY), userAccount3.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(userAccount2, userAccount2.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(userAccount2, userAccount2.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(userAccount3, userAccount3.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(userAccount3, userAccount3.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK REFERENCE SENDER
 
