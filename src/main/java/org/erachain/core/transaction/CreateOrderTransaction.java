@@ -525,7 +525,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             return ITEM_ASSET_NOT_EXIST;
         }
 
-        if (wantAsset.isAnonimDenied() ^ haveAsset.isAnonimDenied()) {
+        if ((wantAsset.isAnonimDenied() || haveAsset.isAnonimDenied()) && !creator.isPerson(dcSet, height)) {
             return ANONIM_OWN_DENIED;
         }
 
