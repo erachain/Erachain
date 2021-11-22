@@ -101,7 +101,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.6.1 dev 11";
+    public static String version = "5.7 dev 1";
     public static String buildTime = "2021-10-05 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -718,30 +718,6 @@ public class Controller extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Datachain Ok")));
         // createDataCheckpoint();
-
-        // CHECK IF DB NEEDS UPDATE
-        /*
-         * try { if(this.dcSet.getBlocksHeadMap().getLastBlockSignature() != null) {
-         * //CHECK IF NAME STORAGE NEEDS UPDATE if
-         * (this.dcSet.getLocalDataMap().get("nsupdate") == null ) { //FIRST
-         * NAME STORAGE UPDATE UpdateUtil.repopulateNameStorage( 70000 );
-         * this.dcSet.getLocalDataMap().set("nsupdate", "1"); } //CREATE
-         * TRANSACTIONS FINAL MAP if
-         * (this.dcSet.getLocalDataMap().get("txfinalmap") == null ||
-         * !this.dcSet.getLocalDataMap().get("txfinalmap").equals("2")) {
-         * //FIRST NAME STORAGE UPDATE UpdateUtil.repopulateTransactionFinalMap(
-         * ); this.dcSet.getLocalDataMap().set("txfinalmap", "2"); }
-         *
-         * if (this.dcSet.getLocalDataMap().get("blogpostmap") == null ||
-         * !this.dcSet.getLocalDataMap().get("blogpostmap").equals("2")) {
-         * //recreate comment postmap UpdateUtil.repopulateCommentPostMap();
-         * this.dcSet.getLocalDataMap().set("blogpostmap", "2"); } } else {
-         * this.dcSet.getLocalDataMap().set("nsupdate", "1");
-         * this.dcSet.getLocalDataMap().set("txfinalmap", "2");
-         * this.dcSet.getLocalDataMap().set("blogpostmap", "2"); } } catch
-         * (Exception e12) { createDataCheckpoint(); //
-         * Setting_Json.put("DB_OPEN", "Open BAD - try reCreateDB"); }
-         */
 
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
