@@ -89,8 +89,9 @@ WARNING: All illegal access operations will be denied in a future release
 Не,, чот-то не помогло. Нужно JUnit настривать отдельно - создать тест не как Градле а как JUnit его запускать
 
 # Speedup
+Оптимизация для использования SSD
 
 ### Отключите журналирование в дисковой системе
 
-Отключить журналирование в NTFS. Решать вам, стоит это делать или нет, выполняется из командной строки: fsutil usn
-deletejournal /d c:
+Отключить журналирование в NTFS - из командной строки: fsutil usn deletejournal /d c:
+
