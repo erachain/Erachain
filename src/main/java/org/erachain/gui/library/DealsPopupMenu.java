@@ -456,8 +456,13 @@ public class DealsPopupMenu extends JPopupMenu {
 
         if (isUnlimited || balance.b.b.signum() > 0) {
             this.debtAssetReturn.setEnabled(true);
+            this.debtAssetBackward.setEnabled(false);
+        } else if (balance.b.b.signum() == 0) {
+            this.debtAssetReturn.setEnabled(false);
+            this.debtAssetBackward.setEnabled(false);
         } else {
             this.debtAssetReturn.setEnabled(false);
+            this.debtAssetBackward.setEnabled(true);
         }
 
         // SET by COMMON ASSET TYPE

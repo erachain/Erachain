@@ -32,7 +32,7 @@ public class AccountLoansTableModel extends WalletTableModel<Tuple3<PublicKeyAcc
 
     public AccountLoansTableModel(AssetCls asset) {
         super(Controller.getInstance().getWallet().dwSet.getAccountMap(),
-                new String[]{"No.", "Account", "Name", "Side Account", "Name", "DEBT or LOAN"},
+                new String[]{"Acc.#", "Account", "Name", "Side", "Name", "My DEBT"},
                 new Boolean[]{true, false, false, false, false}, false, -1000);
 
         this.asset = asset;
@@ -165,7 +165,7 @@ public class AccountLoansTableModel extends WalletTableModel<Tuple3<PublicKeyAcc
                 while (creditors.hasNext()) {
                     nextKey = creditors.next();
                     BigDecimal item = creditsMap.get(nextKey);
-                    list.add(new Tuple3<>(myAccount, new Account(nextKey.c), item));
+                    list.add(new Tuple3<>(myAccount, new Account(nextKey.a), item));
                 }
             } catch (IOException e) {
             }
