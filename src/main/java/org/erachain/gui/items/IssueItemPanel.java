@@ -35,7 +35,7 @@ public abstract class IssueItemPanel extends MakeTXPanel {
 
     protected JCheckBox startCheckBox = new JCheckBox(Lang.T("Start"));
     protected JDateChooser startField;
-    protected JCheckBox stopCheckBox = new JCheckBox(Lang.T("Stop"));
+    protected JCheckBox stopCheckBox = new JCheckBox(Lang.T("Stop # Окончание"));
     protected JDateChooser stopField;
     protected JLabel exLinkTextLabel = new JLabel(Lang.T("Append to") + ":");
     protected JLabel exLinkDescriptionLabel = new JLabel(Lang.T("Parent") + ":");
