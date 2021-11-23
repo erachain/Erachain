@@ -129,7 +129,6 @@ public class MultipleRoyaltyPanel extends JPanel {
                 recipientsTableModel.setRecipients(items);
             }
         }
-
     }
 
     // table model class
@@ -139,7 +138,7 @@ public class MultipleRoyaltyPanel extends JPanel {
     class TableModel extends DefaultTableModel {
 
         public TableModel(int rows) {
-            super(new Object[]{Lang.T("Address"), Lang.T("Information"), Lang.T("Royalty") + " %",
+            super(new Object[]{Lang.T("Account"), Lang.T("Account Information"), Lang.T("Royalty") + " %",
                             Lang.T("Memo")
                     },
                     rows);

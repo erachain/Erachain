@@ -23,8 +23,7 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
     public static String NAME = "IssueAssetCopyPanel";
     public static String TITLE = "Issue Series";
 
-    public JTextField assetRefField = new JTextField("");
-    public JCheckBox hasOriginal = new JCheckBox(Lang.T("Original Asset") + ":");
+    public JCheckBox hasOriginal = new JCheckBox(Lang.T("Use Original Asset") + ":");
     byte[] origAssetTXSign;
     public javax.swing.JComboBox<ItemCls> jComboBox_Asset;
 
