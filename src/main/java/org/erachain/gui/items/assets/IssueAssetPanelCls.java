@@ -50,6 +50,7 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(isUnTransferable, fieldGBC);
 
+        isAnonimDenied.setToolTipText(Lang.T("IssueAssetPanel.isAnonimDenied.tip"));
         fieldGBC.gridy = gridy++;
         jPanelAdd.add(isAnonimDenied, fieldGBC);
 

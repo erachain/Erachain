@@ -78,7 +78,7 @@
   "AS_OUTSIDE_CURRENCY_2B": "Withdraw a request to fulfill a monetary claim",
   "AS_OUTSIDE_CURRENCY_4": "Confirm the execution of the monetary claim",
   "AS_NON_FUNGIBLE_D": "A non fungible token (NFT). It can only be sold on the exchange and transferred at issue from the Author to the first Owner. Used for collectibles, charity, and accounting for the ownership of a unique entity",
-  "AS_NON_FUNGIBLE_DEX": "If this is not a sale by the author himself, then 10% is taken in favor of the author, 1% spend to the referral system for the rewards of those who invited the author and 1% commission to the forge for the assembly of the block",
+  "AS_NON_FUNGIBLE_DEX": "If this is not a sale by the author himself, then 10% (by default) is taken in favor of the author, 1% spend to the referral system for the rewards of those who invited the author and 1% commission to the forge for the assembly of the block",
   "AS_NON_FUNGIBLE_Issue": "Initial send from Author to first Owner",
   "AS_INSIDE_CURRENCY_Issue": "Issuing the currency",
   "AS_INSIDE_CURRENCY_1": "Transfer to the ownership of the currency",
@@ -1144,7 +1144,8 @@
   "Digital Index": "Digital index",
   "Other Digital Right of Claim": "Other digital right of claim",
   "AddImageLabel.externalURL.tip": "Set source by URL. Blockchain URL example: '/apiasset/image/{key}. External source not safe by blockchain.",
-  "IssueAssetPanel.isUnTransferable.tip": "All transfers are prohibited except from the creator's account",
+  "IssueAssetPanel.isUnTransferable.tip": "All transfers of property are prohibited except from the account and to the account of the creator",
+  "IssueAssetPanel.isAnonimDenied.tip": "It is forbidden to transfer and sell to anonymous accounts",
   "IssueAssetCopyPanel.titleDescription": "Release of a Series of unique assets of the NFT type. When using the Original, the image specified here will be used as a frame superimposed on top of the media from the Original with an increase in the frame size by 10% on all sides",
   "": ""
 }
