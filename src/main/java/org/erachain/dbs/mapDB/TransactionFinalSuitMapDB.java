@@ -2,6 +2,7 @@ package org.erachain.dbs.mapDB;
 
 //04/01 +- 
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.SignedBytes;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
@@ -15,6 +16,7 @@ import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
+import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -442,7 +444,11 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         if (addressShort == null)
             return getIterator(fromSeqNo, descending);
 
-        return getIteratorByAddressAndType(addressShort, null, null, fromSeqNo, descending);
+        IteratorCloseable<Long> creatorsIterator = getIteratorByCreator(addressShort, fromSeqNo, descending);
+        IteratorCloseable<Long> recipientsIterator = getIteratorByRecipient(addressShort, fromSeqNo, descending);
+
+        return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(creatorsIterator, recipientsIterator),
+                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
     }
 
     @Override
