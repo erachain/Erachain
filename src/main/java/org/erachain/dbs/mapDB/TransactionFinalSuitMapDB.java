@@ -307,7 +307,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.recipientKey.descendingSet() : this.recipientKey)
-                .subSet(Fun.t2(addressKey, fromSeqNo),
+                .subSet(Fun.t2(addressKey, fromSeqNo == null ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
                         Fun.t2(addressKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
     }
 
@@ -322,7 +322,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         }
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.recipientKey.descendingSet() : this.recipientKey)
-                .subSet(Fun.t2(addressKey, fromSeqNo),
+                .subSet(Fun.t2(addressKey, fromSeqNo == null ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
                         Fun.t2(addressKey, toSeqNo)).iterator()));
     }
 
