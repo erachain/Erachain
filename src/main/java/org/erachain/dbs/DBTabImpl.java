@@ -29,7 +29,6 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 
     protected int dbsUsed;
 
-    public static int DEFAULT_INDEX = 0;
     protected DBASet databaseSet;
     protected DB database;
 
@@ -421,10 +420,6 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
                 o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
             }
         }
-    }
-
-    public int getDefaultIndex() {
-        return DEFAULT_INDEX;
     }
 
     @Override

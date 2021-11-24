@@ -25,6 +25,10 @@ public class PagedMap<T, U> {
         this.mapImpl = mapImpl;
     }
 
+    public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
+        return mapImpl.getIterator(fromKey, descending);
+    }
+
     public List<U> getPageList(T fromKey, int offset, int limit, boolean fillFullPage) {
 
         timestamp = System.currentTimeMillis();
@@ -39,7 +43,7 @@ public class PagedMap<T, U> {
             // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути создаем список обратный что нашли по обратному итератору
             int offsetHere = -(offset + limit);
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, false)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromKey, false)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
@@ -95,7 +99,7 @@ public class PagedMap<T, U> {
 
         } else {
 
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, true)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromKey, true)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
@@ -167,7 +171,7 @@ public class PagedMap<T, U> {
             // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути создаем список обратный что нашли по обратному итератору
             int offsetHere = -(offset + limit);
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, false)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromKey, false)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
@@ -210,7 +214,7 @@ public class PagedMap<T, U> {
 
         } else {
 
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, true)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromKey, true)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {

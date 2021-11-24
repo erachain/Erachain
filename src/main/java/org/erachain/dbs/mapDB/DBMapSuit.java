@@ -6,11 +6,8 @@ import org.erachain.dbs.DBSuitImpl;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
-import org.mapdb.BTreeMap;
-import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 
@@ -77,47 +74,6 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
         this(databaseSet, database, logger, false, null);
     }
 
-    /**
-     * Make SECODATY INDEX
-     * INDEX ID = 0 - its is PRIMARY - not use it here
-     *
-     * @param index index ID. Must be 1...9999
-     * @param indexSet
-     * @param descendingIndexSet
-     * @param function
-     * @param <V>
-     */
-    @SuppressWarnings("unchecked")
-    protected <V> void createIndex(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V, T, U> function) {
-        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
-
-        Bind.secondaryKey((Bind.MapWithModificationListener<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
-        this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
-
-        Bind.secondaryKey((Bind.MapWithModificationListener<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
-        this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
-    }
-
-    /**
-     * Make SECODATY INDEX
-     * INDEX ID = 0 - its is PRIMARY - not use it here
-     *
-     * @param index index ID. Must be 1...9999
-     * @param indexSet
-     * @param descendingIndexSet
-     * @param function
-     * @param <V>
-     */
-    @SuppressWarnings("unchecked")
-    protected <V> void createIndexes(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V[], T, U> function) {
-        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
-        Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
-        this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
-
-        Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
-        this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
-    }
-
     @Override
     public Object getSource() {
         return map;
@@ -130,11 +86,12 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
         if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
             // IT IS INDEX ID in this.indexes
 
-            if (descending) {
+            if (false && /// old VERSOPN - сейчас 1 индекс за все направления отвечает
+                    descending) {
                 index += DESCENDING_SHIFT_INDEX;
             }
 
-            return this.indexes.get(index);
+            return this.indexes.get(index).descendingSet();
 
         }
 

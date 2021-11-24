@@ -846,8 +846,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             this.addressShort = addressShort;
         }
 
+        @Override
         public IteratorCloseable<Long> getIterator(Long fromKey, boolean descending) {
-            return ((TransactionFinalSuit) map).getBiDirectionAddressIterator(addressShort, fromKey, descending);
+            return ((TransactionFinalSuit) map).getAddressesIterator(addressShort, fromKey, descending);
         }
 
     }
@@ -873,7 +874,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        return ((TransactionFinalSuit) map).getBiDirectionAddressIterator(addressShort, fromID, descending);
+        return ((TransactionFinalSuit) map).getAddressesIterator(addressShort, fromID, descending);
     }
 
     /**
@@ -1155,21 +1156,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         Iterators.advance(iterator, offset);
 
         return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
-    }
-
-    @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
-        }
-
-        IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map)
-                .getBiDirectionAddressIterator(address == null ? null : Crypto.getInstance().getShortBytesFromAddress(address), fromSeqNo, descending);
-        Iterators.advance(iterator, offset);
-
-        return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
-
     }
 
     @Override

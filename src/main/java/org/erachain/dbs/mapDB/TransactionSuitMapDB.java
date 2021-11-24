@@ -10,7 +10,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
-import org.erachain.utils.ReverseComparator;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -25,8 +24,10 @@ import java.util.List;
 import java.util.NavigableSet;
 
 @Slf4j
-public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionSuit
-{
+public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionSuit {
+
+    @SuppressWarnings("rawtypes")
+    public NavigableSet timestampIndex;
 
     @SuppressWarnings("rawtypes")
     public NavigableSet senderKey;
@@ -61,30 +62,22 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
 
-
         //////////// HERE PROTOCOL INDEX - for GENERATE BLOCL
 
         // TIMESTAMP INDEX
         Tuple2Comparator<Long, Long> comparator = new Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
                 //UnsignedBytes.lexicographicalComparator()
                 Fun.COMPARATOR);
-        NavigableSet<Tuple2<Long, Long>> heightIndex = database
-                .createTreeSet("transactions_index_timestamp")
+        timestampIndex = database.createTreeSet("transactions_index_timestamp")
                 .comparator(comparator)
                 .makeOrGet();
 
-        NavigableSet<Tuple2<Long, Long>> descendingHeightIndex = database
-                .createTreeSet("transactions_index_timestamp_descending")
-                .comparator(new ReverseComparator(comparator))
-                .makeOrGet();
-
-        createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
-                new Fun.Function2<Long, Long, Transaction>() {
-                    @Override
-                    public Long run(Long key, Transaction value) {
-                        return value.getTimestamp();
-                    }
-                });
+        Bind.secondaryKey((Bind.MapWithModificationListener) map, this.timestampIndex, new Fun.Function2<Long, Long, Transaction>() {
+            @Override
+            public Long run(Long key, Transaction value) {
+                return value.getTimestamp();
+            }
+        });
 
         ///////////////
         if (Controller.getInstance().onlyProtocolIndexing)
@@ -171,7 +164,10 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
 
     @Override
     public IteratorCloseable<Long> getTimestampIterator(boolean descending) {
-        return getIndexIterator(TIMESTAMP_INDEX, descending);
+        if (descending)
+            return IteratorCloseableImpl.make(timestampIndex.descendingIterator());
+
+        return IteratorCloseableImpl.make(timestampIndex.iterator());
     }
 
 }

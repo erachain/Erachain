@@ -114,8 +114,6 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     IteratorCloseable<Long> findTransactionsKeys(String address, String sender, String recipient, Long fromSeqNo, int minHeight,
                                                  int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
-    IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit);
-
     List<Transaction> getTransactionsByAddressFromID(byte[] addressShort, Long fromSeqNo, int offset, int limit, boolean noForge, boolean fillFullPage);
 
     byte[] getSignature(int hight, int seg);
