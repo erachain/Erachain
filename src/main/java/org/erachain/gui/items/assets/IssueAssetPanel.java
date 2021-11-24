@@ -52,8 +52,12 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
 
         super.initComponents();
 
+        boolean useStartStop = true;
         // вывод верхней панели
-        int gridy = super.initTopArea(true);
+        int gridy = super.initTopArea(useStartStop);
+        if (useStartStop) {
+            startCheckBox.setToolTipText(Lang.T("IssueAssetPanel.startField"));
+        }
 
         labelGBC.gridy = gridy;
         jPanelAdd.add(typeJLabel, labelGBC);

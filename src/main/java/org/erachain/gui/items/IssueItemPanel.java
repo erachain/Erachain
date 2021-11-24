@@ -172,12 +172,17 @@ public abstract class IssueItemPanel extends MakeTXPanel {
 
             startField = new JDateChooser(new Date(System.currentTimeMillis()), "yyyy-MM-dd HH:mm z");
             startField.setCalendar(calendar);
+
             stopField = new JDateChooser(new Date(System.currentTimeMillis()), "yyyy-MM-dd HH:mm z");
             stopField.setCalendar(calendar);
 
             labelGBC.gridy = y;
             jPanelMain.add(new JLabel(Lang.T("Validity period") + ":"), labelGBC);
             JPanel startStop = new JPanel(new FlowLayout(FlowLayout.LEADING));
+
+            startCheckBox.setToolTipText(Lang.T("IssueItemPanel.startField"));
+            stopCheckBox.setToolTipText(Lang.T("IssueItemPanel.stopField"));
+
             startStop.add(startCheckBox);
             startField.setEnabled(false);
             startStop.add(startField);
@@ -189,11 +194,12 @@ public abstract class IssueItemPanel extends MakeTXPanel {
         }
 
         labelGBC.gridy = y;
+        tagsJLabel.setToolTipText(Lang.T("IssueItemPanel.tagsField"));
         jPanelMain.add(tagsJLabel, labelGBC);
 
         fieldGBC.gridy = y++;
         jPanelMain.add(tagsField, fieldGBC);
-        tagsField.setToolTipText(Lang.T("Use ',' to separate the Tags"));
+        tagsField.setToolTipText(Lang.T("IssueItemPanel.tagsField"));
 
         fieldGBC.gridy = y++;
         jPanelMain.add(jPanelAdd, fieldGBC);

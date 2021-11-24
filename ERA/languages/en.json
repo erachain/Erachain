@@ -1147,5 +1147,9 @@
   "IssueAssetPanel.isUnTransferable.tip": "All transfers of property are prohibited except from the account and to the account of the creator",
   "IssueAssetPanel.isAnonimDenied.tip": "It is forbidden to transfer and sell to anonymous accounts",
   "IssueAssetCopyPanel.titleDescription": "Release of a Series of unique assets of the NFT type. When using the Original, the image specified here will be used as a frame superimposed on top of the media from the Original with an increase in the frame size by 10% on all sides",
+  "IssueItemPanel.startField": "All actions are prohibited before the Start of the Term",
+  "IssueAssetPanel.startField": "Before the Start of the Term, all actions are prohibited, except to transfer from the Creator",
+  "IssueItemPanel.stopField": "After the Expiration of the Term, all actions are prohibited",
+  "IssueItemPanel.tagsField": "Labels for quick search and merge. Use ',' to separate the Tags",
   "": ""
 }
