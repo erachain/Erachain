@@ -263,7 +263,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                 .getIteratorByAddressAndType(addressShort, type, isCreator, descending);
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted), iterator),
-                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR, descending);
+                Fun.COMPARATOR, descending);
 
     }
 
