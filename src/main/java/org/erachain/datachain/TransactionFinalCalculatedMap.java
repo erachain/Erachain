@@ -232,7 +232,8 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
         //iterator = Iterators.concat(senderKeys, recipientKeys);
-        Iterator<Tuple2<Integer, Integer>> iterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+        Iterator<Tuple2<Integer, Integer>> iterator = new MergedOR_IteratorsNoDuplicates(
+                (Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR, false);
 
         Set<BlExpUnit> txs = new TreeSet<>();
         while (iterator.hasNext()) {
@@ -249,7 +250,8 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
         //iterator = Iterators.concat(senderKeys, recipientKeys);
-        Iterator<Tuple2<Integer, Integer>> iterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+        Iterator<Tuple2<Integer, Integer>> iterator = new MergedOR_IteratorsNoDuplicates(
+                (Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR, false);
 
         List<Calculated> txs = new ArrayList<>();
         while (iterator.hasNext()) {
@@ -267,7 +269,8 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         //Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
 
         //iterator = Iterators.concat(senderKeys, recipientKeys);
-        return Iterators.size(new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of((Iterable) senderKeys, recipientKeys), Fun.COMPARATOR));
+        return Iterators.size(new MergedOR_IteratorsNoDuplicates(
+                (Iterable) ImmutableList.of((Iterable) senderKeys, recipientKeys), Fun.COMPARATOR, false));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -351,7 +354,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         if (address != null) {
             //iterator = Iterators.concat(senderKeys, recipientKeys);
             iterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of((Iterable) senderKeys, recipientKeys),
-                    desc ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                    Fun.COMPARATOR, desc);
 
         } else if (sender != null && recipient != null) {
             iterator = senderKeys;

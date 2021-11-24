@@ -126,7 +126,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
                                 Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI()))
                         .values().iterator())),
                 // for BYTES primary key
-                Fun.BYTE_ARRAY_COMPARATOR);
+                Fun.BYTE_ARRAY_COMPARATOR, false);
 
     }
 

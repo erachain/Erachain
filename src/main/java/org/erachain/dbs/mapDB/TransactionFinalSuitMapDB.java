@@ -448,7 +448,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         IteratorCloseable<Long> recipientsIterator = getIteratorByRecipient(addressShort, fromSeqNo, descending);
 
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(creatorsIterator, recipientsIterator),
-                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                Fun.COMPARATOR, descending);
     }
 
     @Override
