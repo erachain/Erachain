@@ -106,8 +106,6 @@ function pagesComponent2(data, uriAdds) {
 
     if (data.hasOwnProperty('useoffset')) {
         // в начало прыгнуть
-        if (pageSize > listSize)
-            return '';
 
         var uriAddsEmpty = {};
         for (var paramKey in uriAdds) {
