@@ -395,6 +395,11 @@ public class SettingsFrame extends JDialog {
             limitConnections = true;
         }
 
+        String blockExplorer = settingsTabPane.settingsBasicPanel.txtBlockExplorer.getText();
+        if (!Settings.getInstance().getBlockexplorerURL().equals(blockExplorer)) {
+            settingsJSONbuf.put("explorerURL", blockExplorer);
+        }
+
         if (Settings.getInstance().isLocalPeersScannerEnabled() != settingsTabPane.settingsBasicPanel.chckbxLocalPeersScannerEnabled.isSelected()) {
             settingsJSONbuf.put("localpeerscanner", settingsTabPane.settingsBasicPanel.chckbxLocalPeersScannerEnabled.isSelected());
             localPeerScanner = true;
