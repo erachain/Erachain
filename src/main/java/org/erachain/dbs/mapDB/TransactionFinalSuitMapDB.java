@@ -322,7 +322,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         }
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.recipientKey.descendingSet() : this.recipientKey)
-                .subSet(Fun.t2(addressKey, (fromSeqNo == null || fromSeqNo == 0) && descending ? Long.MAX_VALUE : fromSeqNo),
+                .subSet(Fun.t2(addressKey, fromSeqNo == null || fromSeqNo == 0 ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
                         Fun.t2(addressKey, toSeqNo)).iterator()));
     }
 
@@ -416,7 +416,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             }
             return IteratorCloseableImpl.make(new IndexIterator((((NavigableSet) this.titleKey).descendingSet()
                     .subSet(
-                            Fun.t2(startFrom, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),// false,
+                            Fun.t2(startFrom, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),
                             Fun.t2(filterLower, 0L)//, true
                     )).iterator()));
         } else {
@@ -426,7 +426,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 filterLowerEnd = filterLower;
             }
             return IteratorCloseableImpl.make(new IndexIterator(this.titleKey.subSet(
-                    Fun.t2(startFrom, fromSeqNo == null || fromSeqNo == 0 ? 0L : fromSeqNo),
+                    Fun.t2(startFrom, fromSeqNo == null ? 0L : fromSeqNo),
                     Fun.t2(filterLowerEnd, Long.MAX_VALUE)).iterator()));
         }
 
