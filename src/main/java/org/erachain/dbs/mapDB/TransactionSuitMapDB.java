@@ -5,6 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
+import org.erachain.database.IndexIterator;
 import org.erachain.database.serializer.TransactionUncSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionSuit;
@@ -165,9 +166,9 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     @Override
     public IteratorCloseable<Long> getTimestampIterator(boolean descending) {
         if (descending)
-            return IteratorCloseableImpl.make(timestampIndex.descendingIterator());
+            return IteratorCloseableImpl.make(new IndexIterator(timestampIndex.descendingSet()));
 
-        return IteratorCloseableImpl.make(timestampIndex.iterator());
+        return IteratorCloseableImpl.make(new IndexIterator(timestampIndex));
     }
 
 }
