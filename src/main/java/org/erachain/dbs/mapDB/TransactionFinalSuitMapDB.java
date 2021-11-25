@@ -307,7 +307,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.recipientKey.descendingSet() : this.recipientKey)
-                .subSet(Fun.t2(addressKey, fromSeqNo == null ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
+                .subSet(Fun.t2(addressKey, fromSeqNo == null || fromSeqNo == 0 ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
                         Fun.t2(addressKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
     }
 
@@ -322,7 +322,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         }
 
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.recipientKey.descendingSet() : this.recipientKey)
-                .subSet(Fun.t2(addressKey, fromSeqNo == null ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
+                .subSet(Fun.t2(addressKey, (fromSeqNo == null || fromSeqNo == 0) && descending ? Long.MAX_VALUE : fromSeqNo),
                         Fun.t2(addressKey, toSeqNo)).iterator()));
     }
 
@@ -448,7 +448,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         IteratorCloseable<Long> recipientsIterator = getIteratorByRecipient(addressShort, fromSeqNo, descending);
 
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(creatorsIterator, recipientsIterator),
-                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                Fun.COMPARATOR, descending);
     }
 
     @Override

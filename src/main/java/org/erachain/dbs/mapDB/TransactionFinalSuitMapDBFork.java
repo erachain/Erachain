@@ -164,7 +164,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         // создаем с учетом удаленных
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted), iteratorForked),
-                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                Fun.COMPARATOR, descending);
 
 
     }
@@ -181,7 +181,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, descending);
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted), iterator),
-                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                Fun.COMPARATOR, descending);
 
     }
 
@@ -202,7 +202,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, fromSeqNo, descending);
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted), iterator),
-                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                Fun.COMPARATOR, descending);
 
     }
 
@@ -227,7 +227,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         IteratorCloseable<Long> parentIterator = ((TransactionFinalMap) parent).getIteratorByCreator(addressShort, fromSeqNo, toSeqNo, descending);
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted), iterator),
-                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                Fun.COMPARATOR, descending);
 
     }
 
@@ -263,7 +263,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                 .getIteratorByAddressAndType(addressShort, type, isCreator, descending);
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted), iterator),
-                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                Fun.COMPARATOR, descending);
 
     }
 
@@ -287,7 +287,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                 .getIteratorByAddressAndType(addressShort, type, isCreator, fromID, descending);
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted), iterator),
-                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                Fun.COMPARATOR, descending);
 
     }
 
@@ -315,7 +315,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                 .getIteratorByAddressAndType(addressShort, type, isCreator, fromID, toID, descending);
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted), iterator),
-                descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                Fun.COMPARATOR, descending);
 
     }
 

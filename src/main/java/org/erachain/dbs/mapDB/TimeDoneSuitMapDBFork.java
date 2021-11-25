@@ -12,7 +12,6 @@ import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.mapdb.Bind;
 import org.mapdb.Fun;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
 
@@ -64,18 +63,15 @@ public class TimeDoneSuitMapDBFork extends DBMapSuitFork<Long, Integer> implemen
 
         IteratorCloseable parentIterator = ((TimeTXintf) parent).getTXIterator(descending);
 
-        Comparator comparatorDuplicates;
-        Iterator iterator;
+       Iterator iterator;
 
         if (descending) {
             iterator = keySet.descendingIterator();
-            comparatorDuplicates = Fun.REVERSE_COMPARATOR;
         } else {
             iterator = keySet.iterator();
-            comparatorDuplicates = Fun.COMPARATOR;
         }
 
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratorParentSecondaryKey(parentIterator, deleted), iterator), comparatorDuplicates);
+                new IteratorParentSecondaryKey(parentIterator, deleted), iterator), Fun.COMPARATOR, descending);
     }
 }
