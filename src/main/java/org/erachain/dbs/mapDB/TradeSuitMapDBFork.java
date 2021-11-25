@@ -12,7 +12,6 @@ import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.IteratorParent;
 import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
-import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeMap;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -68,7 +67,7 @@ public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade>
         // создаем с учетом удаленных
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted), iteratorForked),
-                descending ? new ReverseComparator(Fun.TUPLE2_COMPARATOR) : Fun.TUPLE2_COMPARATOR);
+                Fun.TUPLE2_COMPARATOR, descending);
 
     }
 

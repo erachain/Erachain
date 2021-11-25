@@ -85,8 +85,6 @@ public interface IMap<T, U> {
 
     IteratorCloseable<T> getIterator(T fromKey, boolean descending);
 
-    int getDefaultIndex();
-
     void clear();
 
     void commit();

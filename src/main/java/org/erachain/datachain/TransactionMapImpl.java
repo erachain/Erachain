@@ -52,8 +52,6 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     public TransactionMapImpl(int dbsUsed, DCSet databaseSet, DB database) {
         super(dbsUsed, databaseSet, database);
 
-        DEFAULT_INDEX = TransactionSuit.TIMESTAMP_INDEX;
-
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
             this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
@@ -442,7 +440,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         if (address != null || sender != null && recipient != null) {
             // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
             iteratorMerged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(iteratorSender, iteratorRecipient),
-                    desc ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                    Fun.COMPARATOR, desc);
         } else if (sender != null) {
             iteratorMerged = iteratorSender;
         } else if (recipient != null) {
@@ -507,7 +505,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
         /// берем свой итератор
         try (IteratorCloseable<Long> iterator = new MergedOR_IteratorsNoDuplicates(ImmutableList.of(iteratorSender, iteratorRecipient),
-                Fun.COMPARATOR)) {
+                Fun.COMPARATOR, false)) {
             return getUnconfirmedTransaction(IteratorCloseableImpl.limit(iterator, 200));
         } catch (IOException e) {
             return new ArrayList<>();
@@ -562,7 +560,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         ArrayList<Transaction> values = new ArrayList<Transaction>();
 
         //LOGGER.debug("get ITERATOR");
-        try (IteratorCloseable<Long> iterator = this.getIndexIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
+        try (IteratorCloseable<Long> iterator = this.getTimestampIterator(descending)) {
             //LOGGER.debug("get ITERATOR - DONE"); / for merge
 
             Transaction transaction;
@@ -591,7 +589,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     public List<Transaction> getTransactions(Account account, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = this.getIndexIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
+        try (IteratorCloseable<Long> iterator = this.getTimestampIterator(descending)) {
 
             int i = 0;
             Transaction transaction;
@@ -619,7 +617,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = this.getIndexIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
+        try (IteratorCloseable<Long> iterator = this.getTimestampIterator(descending)) {
             Account account = new Account(address);
 
             int i = 0;

@@ -2,11 +2,8 @@ package org.erachain.gui;
 
 import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.BlockMap;
-import org.erachain.datachain.TransactionSuit;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.BlocksTableModel;
-import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -17,8 +14,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Logger;
 
 
@@ -46,10 +41,6 @@ public class DebugTabPane extends JTabbedPane {
         this.transactionsTableModel = new UnconfirmedTransactionsTableModel();
         this.transactionsTable = new MTable(this.transactionsTableModel);
 
-        //TRANSACTIONS SORTER
-        Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-        indexes.put(SearchTransactionsTableModel.COLUMN_TIMESTAMP, TransactionSuit.TIMESTAMP_INDEX);
-
         //TRANSACTION DETAILS
         this.transactionsTable.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -71,10 +62,6 @@ public class DebugTabPane extends JTabbedPane {
         this.blocksTableModel = new BlocksTableModel();
         JTable blocksTable = new MTable(this.blocksTableModel);
 
-        //BLOCKS SORTER
-        indexes = new TreeMap<Integer, Integer>();
-        indexes.put(BlocksTableModel.COLUMN_HEIGHT, BlockMap.HEIGHT_INDEX);
-
         //ADD BLOCK TABLE
         this.addTab(Lang.T("Blocks"), new JScrollPane(blocksTable));
         //
@@ -88,7 +75,6 @@ public class DebugTabPane extends JTabbedPane {
                     // TODO Auto-generated method stub
 
                 }
-
 
             });
             pppp.add(bb);

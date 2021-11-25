@@ -44,6 +44,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
      */
     ListIndexDB<Long, Transaction, byte[]> addressTypeTxs;
     ArrayIndexDB<Long, Transaction, byte[]> titleIndex;
+    // TODO ужадить его и взять вместо него - addressTypeTxs - как в MapDB
     ListIndexDB<Long, Transaction, byte[]> addressBiDirectionTxs;
 
     public TransactionFinalSuitRocksDB(DBASet databaseSet, DB database, boolean sizeEnable) {
@@ -496,28 +497,10 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     }
 
     @Override
-    public IteratorCloseable<Long> getBiDirectionIterator_old(Long fromSeqNo, boolean descending) {
-        byte[] fromKey;
-
-        if (fromSeqNo == null || fromSeqNo == 0) {
-            //fromKey = new byte[1]{descending ? Byte.MAX_VALUE : Byte.MIN_VALUE};
-            fromKey = null;
-        } else {
-            // используем полный ключ для начального поиска
-            fromKey = Longs.toByteArray(fromSeqNo);
-        }
-        return map.getIndexIteratorFilter(fromKey, null, descending, false);
-
-    }
-
-    @Override
-    public IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
+    public IteratorCloseable<Long> getAddressesIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
 
         if (addressShort == null)
-            if (true)
-                return getIterator(fromSeqNo, descending);
-            else
-                return getBiDirectionIterator_old(fromSeqNo, descending);
+            return getIterator(fromSeqNo, descending);
 
         byte[] fromKey;
 

@@ -44,7 +44,6 @@ import org.erachain.database.DLSet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.TransactionMap;
-import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
@@ -1257,7 +1256,7 @@ public class Controller extends Observable {
             return false;
 
         try {
-            try (IteratorCloseable<Long> iterator = map.getIndexIterator(TransactionSuit.TIMESTAMP_INDEX, false)) {
+            try (IteratorCloseable<Long> iterator = map.getTimestampIterator(false)) {
                 long ping = 0;
                 int counter = 0;
                 ///////// big maxCounter freeze network and make bans on response

@@ -699,8 +699,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return DateTimeFormat.timestamptoString(this.stopDate, Settings.getInstance().getBirthTimeFormat(), "UTC");
     }
 
-    public boolean isActive(long timestamp) {
-        if (startDate != null && timestamp < startDate) {
+    public boolean isActive(long timestamp, boolean forInit) {
+        if (!forInit && startDate != null && timestamp < startDate) {
             errorValue = "< " + viewStartDate();
             return false;
         }

@@ -842,7 +842,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         boolean wrong;
 
-        if (!asset.isActive(timestamp)) {
+        if (!asset.isActive(timestamp, creator.equals(asset.getMaker()))) {
             return new Fun.Tuple2<>(INVALID_OUTSIDE_VALIDATY_PERIOD, asset.errorValue);
         }
 

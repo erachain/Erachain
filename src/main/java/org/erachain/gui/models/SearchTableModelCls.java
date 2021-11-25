@@ -214,13 +214,6 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
     public void getIntervalThis(long start, long end) {
     }
 
-    public int getMapDefaultIndex() {
-        if (map == null)
-            return 0;
-
-        return map.DEFAULT_INDEX;
-    }
-
     public long getMapSize() {
         if (map == null)
             return 0;

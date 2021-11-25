@@ -14,11 +14,6 @@ public abstract class DBSuitImpl<T, U> implements DBSuit<T, U> {
         return sizeEnable;
     }
 
-    @Override
-    public int getDefaultIndex() {
-        return 0;
-    }
-
     protected void createIndexes() {
     }
 

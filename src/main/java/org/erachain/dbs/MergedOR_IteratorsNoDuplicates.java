@@ -2,6 +2,7 @@ package org.erachain.dbs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.utils.ByteArrayUtils;
+import org.erachain.utils.ReverseComparator;
 
 import java.util.*;
 
@@ -25,11 +26,19 @@ public class MergedOR_IteratorsNoDuplicates<T> extends IteratorCloseableImpl<T> 
      *
      * @param iterators
      * @param itemComparator
+     * @param descending
      */
     public MergedOR_IteratorsNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
-                                          final Comparator<? super T> itemComparator) {
+                                          final Comparator<? super T> itemComparator, boolean descending) {
         // A comparator that's used by the heap, allowing the heap
         // to be sorted based on the top of each iterator.
+
+        final Comparator<? super T> localComparator;
+        if (descending)
+            localComparator = new ReverseComparator<>(itemComparator);
+        else
+            localComparator = itemComparator;
+
         Comparator<PeekingIteratorCloseable<T>> heapComparator =
                 new Comparator<PeekingIteratorCloseable<T>>() {
                     @Override
@@ -42,12 +51,12 @@ public class MergedOR_IteratorsNoDuplicates<T> extends IteratorCloseableImpl<T> 
                                 return ByteArrayUtils.compareUnsignedAsMask((byte[]) peek1, (byte[]) peek2);
                             }
                         }
-                        return itemComparator.compare(o1.peek(), o2.peek());
+                        return localComparator.compare(o1.peek(), o2.peek());
                     }
                 };
 
         queue = new PriorityQueue<PeekingIteratorCloseable<T>>(2, heapComparator);
-        this.itemComparator = itemComparator;
+        this.itemComparator = localComparator;
 
         for (Iterator<? extends T> iterator : iterators) {
             if (iterator.hasNext()) {

@@ -1353,7 +1353,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_NON_FUNGIBLE:
                 return "AS_NON_FUNGIBLE_DEX";
         }
-        return null;
+        return "Not used by default";
     }
 
     public static String viewAssetTypeAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorMaker) {

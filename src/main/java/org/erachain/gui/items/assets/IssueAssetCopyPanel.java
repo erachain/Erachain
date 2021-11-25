@@ -23,8 +23,7 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
     public static String NAME = "IssueAssetCopyPanel";
     public static String TITLE = "Issue Series";
 
-    public JTextField assetRefField = new JTextField("");
-    public JCheckBox hasOriginal = new JCheckBox(Lang.T("Original Asset") + ":");
+    public JCheckBox hasOriginal = new JCheckBox(Lang.T("Use Original Asset") + ":");
     byte[] origAssetTXSign;
     public javax.swing.JComboBox<ItemCls> jComboBox_Asset;
 
@@ -57,22 +56,29 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
         //this.jComboBox_Asset.setEnabled(assetIn != null);
 
         labelGBC.gridy = gridy;
-        hasOriginal.setSelected(true);
         jPanelAdd.add(hasOriginal, labelGBC);
 
-        fieldGBC.gridy = gridy++;
+        fieldGBC.gridy = gridy;
+        jComboBox_Asset.setEnabled(false);
         jPanelAdd.add(jComboBox_Asset, fieldGBC);
+
+        JLabel hasOriginalTip = new JLabel(Lang.T("hasOriginalTip"));
+        hasOriginalTip.setVisible(false);
+        fieldGBC.gridy = ++gridy;
+        jPanelAdd.add(hasOriginalTip, fieldGBC);
 
         labelGBC.gridy = ++gridy;
         jPanelAdd.add(quantityJLabel, labelGBC);
 
         fieldGBC.gridy = gridy++;
+        textQuantity.setText("10");
         jPanelAdd.add(textQuantity, fieldGBC);
 
         hasOriginal.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jComboBox_Asset.setEnabled(hasOriginal.isSelected());
+                hasOriginalTip.setVisible(hasOriginal.isSelected());
             }
         });
 
@@ -86,6 +92,12 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
 
         if (hasOriginal.isSelected()) {
             AssetCls asset = (AssetCls) this.jComboBox_Asset.getSelectedItem();
+            if (asset == null) {
+                JOptionPane.showMessageDialog(MainFrame.getInstance(),
+                        Lang.T("Empty Original! Add NTF asset to Favorites first"), Lang.T("Error"),
+                        JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
             origAssetTXSign = asset.getReference();
         } else {
             origAssetTXSign = null;

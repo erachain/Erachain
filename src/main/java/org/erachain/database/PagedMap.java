@@ -25,12 +25,16 @@ public class PagedMap<T, U> {
         this.mapImpl = mapImpl;
     }
 
+    public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
+        return mapImpl.getIterator(fromKey, descending);
+    }
+
     public List<U> getPageList(T fromKey, int offset, int limit, boolean fillFullPage) {
 
         timestamp = System.currentTimeMillis();
 
         List<U> rows = new ArrayList<>();
-        T key;
+        T key = null;
 
         if (offset < 0 || limit < 0) {
             if (limit < 0)
@@ -39,12 +43,12 @@ public class PagedMap<T, U> {
             // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути создаем список обратный что нашли по обратному итератору
             int offsetHere = -(offset + limit);
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, false)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromKey, false)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
 
-                    if (System.currentTimeMillis() - timestamp > 1000) {
+                    if (false && System.currentTimeMillis() - timestamp > 1000) {
                         break;
                     }
 
@@ -68,7 +72,7 @@ public class PagedMap<T, U> {
                 if (fillFullPage && fromKey != null // && fromKey != 0
                         && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
-                    for (U pageRow : getPageList(fromKey, 0, limit - count, false)) {
+                    for (U pageRow : getPageList(key, 0, limit - count, false)) {
                         if (currentRow == null)
                             continue;
 
@@ -81,9 +85,6 @@ public class PagedMap<T, U> {
                             }
                         }
                         if (!exist) {
-                            if (filterRows()) {
-                                continue;
-                            }
                             rowCalc();
                             rows.add(currentRow);
                         }
@@ -95,12 +96,12 @@ public class PagedMap<T, U> {
 
         } else {
 
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, true)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromKey, true)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
 
-                    if (System.currentTimeMillis() - timestamp > 1000) {
+                    if (false && System.currentTimeMillis() - timestamp > 1000) {
                         break;
                     }
 
@@ -122,7 +123,7 @@ public class PagedMap<T, U> {
 
                 if (fillFullPage && fromKey != null // && fromKey != 0
                         && limit > 0 && count < limit) {
-                    // сюда пришло значит не полный список - дополним его
+                    // сюда пришло значит не полный список - дополним его проходом с начального ключа поиска
                     int index = 0;
                     int limitLeft = limit - count;
                     for (U pageRow : getPageList(fromKey, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
@@ -138,9 +139,6 @@ public class PagedMap<T, U> {
                             }
                         }
                         if (!exist) {
-                            if (filterRows()) {
-                                continue;
-                            }
                             rowCalc();
                             rows.add(index++, currentRow);
                         }
@@ -167,7 +165,7 @@ public class PagedMap<T, U> {
             // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути создаем список обратный что нашли по обратному итератору
             int offsetHere = -(offset + limit);
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, false)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromKey, false)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {
@@ -210,7 +208,7 @@ public class PagedMap<T, U> {
 
         } else {
 
-            try (IteratorCloseable<T> iterator = mapImpl.getIterator(fromKey, true)) {
+            try (IteratorCloseable<T> iterator = getIterator(fromKey, true)) {
                 int skipped = 0;
                 int count = 0;
                 while (iterator.hasNext() && (limit <= 0 || count < limit)) {

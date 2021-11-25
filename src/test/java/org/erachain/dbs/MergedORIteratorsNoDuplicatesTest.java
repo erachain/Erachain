@@ -39,14 +39,14 @@ public class MergedORIteratorsNoDuplicatesTest {
 
         Iterator<Long> parentIterator = parent.iterator();
         Iterator<Long> forkIterator = fork.iterator();
-        Iterator<Long> merged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
+        Iterator<Long> merged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR, false);
 
         assertEquals(Iterators.size(merged), 5);
 
         // refresh
         parentIterator = parent.iterator();
         forkIterator = fork.iterator();
-        merged = new MergedOR_IteratorsNoDuplicates<Long>((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
+        merged = new MergedOR_IteratorsNoDuplicates<Long>((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR, false);
 
         for (Long item : list) {
             assertEquals(item, merged.next());
@@ -67,14 +67,14 @@ public class MergedORIteratorsNoDuplicatesTest {
             add(212L);
         }};
         forkIterator = fork.iterator();
-        merged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
+        merged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR, false);
 
         assertEquals(Iterators.size(merged), 4);
 
         // refresh
         parentIterator = parent.iterator();
         forkIterator = fork.iterator();
-        merged = new MergedOR_IteratorsNoDuplicates<Long>((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR);
+        merged = new MergedOR_IteratorsNoDuplicates<Long>((Iterable) ImmutableList.of(parentIterator, forkIterator), Fun.COMPARATOR, false);
 
         list = new ArrayList<Long>() {{
             add(10L);
