@@ -190,7 +190,7 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
         out += "<p><b>" + Lang.T("Properties") + "</b>: " + asset.viewProperties(landObj) + "</p>";
 
         if (asset.getDEXAwards() != null) {
-            out += Lang.T("DEX Awards" + ":");
+            out += Lang.T("DEX royalties" + ":");
             for (ExLinkAddress award : asset.getDEXAwards()) {
                 if (award == null)
                     continue;

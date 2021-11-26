@@ -162,7 +162,7 @@ public class AssetInfo extends JTextPane {
             text += " " + Lang.T("Released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
 
             if (asset.getDEXAwards() != null) {
-                text += "<br>" + Lang.T("DEX Awards" + ":");
+                text += "<br>" + Lang.T("DEX royalties" + ":");
                 for (ExLinkAddress award : asset.getDEXAwards()) {
                     text += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
                             + (award.getMemo() == null || award.getMemo().isEmpty() ? "" : " - " + award.getMemo());
