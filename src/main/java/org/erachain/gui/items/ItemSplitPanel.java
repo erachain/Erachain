@@ -104,19 +104,8 @@ public abstract class ItemSplitPanel extends SplitPanel {
                 return;
             }
             try {
-                // TODO почему-то при выборе персоны сюда 2 раза прилетает и перерисовка дважды идет
-                //jScrollPaneJPanelRightPanel.setViewportView(null);
                 jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-                try {
-                    //jScrollPaneJPanelRightPanel.setViewportView(null);
-                    //jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
-                } catch (Exception e1) {
-                    //jScrollPaneJPanelRightPanel.setViewportView(null);
-                    //jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
-                }
-
             }
 
         });
