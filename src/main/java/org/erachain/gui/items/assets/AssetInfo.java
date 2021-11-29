@@ -50,7 +50,7 @@ public class AssetInfo extends JTextPane {
     private int max_Widht;
     private int max_Height;
     private Image cachedImage;
-    ImageIcon image = null;
+    ImageIcon imageIcn = null;
 
     /**
      * Creates new form Asset_Info003
@@ -77,17 +77,17 @@ public class AssetInfo extends JTextPane {
             if (imageByte != null && imageByte.length > 0) {
                 //   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
                 // label
-                image = new ImageIcon(imageByte);
+                imageIcn = new ImageIcon(imageByte);
 
-                int x = image.getIconWidth();
-                max_Height = image.getIconHeight();
+                int x = imageIcn.getIconWidth();
+                max_Height = imageIcn.getIconHeight();
 
                 max_Widht = 250;
                 double k = ((double) x / (double) max_Widht);
                 max_Height = (int) (max_Height / k);
 
                 if (max_Height > 1) {
-                    cachedImage = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
+                    cachedImage = imageIcn.getImage().getScaledInstance(max_Widht, max_Height, 1);
                 } else {
                     cachedImage = null;
                 }
@@ -96,10 +96,9 @@ public class AssetInfo extends JTextPane {
             }
 
             if (cachedImage == null) {
-                imageByte = asset.getIcon();
-                if (imageByte != null && imageByte.length > 0) {
-                    image = new ImageIcon(imageByte);
-                    cachedImage = image.getImage().getScaledInstance(40, 40, 1);
+                imageIcn = asset.getImageIcon();
+                if (imageIcn != null) {
+                    cachedImage = imageIcn.getImage().getScaledInstance(40, 40, 1);
                 }
             }
 
@@ -203,8 +202,8 @@ public class AssetInfo extends JTextPane {
                         hl_Maker.get_PopupMenu().show(th, x, y);
                         return;
                     } else if (arg0.getDescription().equals("!!img")) {
-                        ImageCropDialog window = new ImageCropDialog(image,
-                                image.getDescription().equals("jpg") ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB) {
+                        ImageCropDialog window = new ImageCropDialog(imageIcn,
+                                imageIcn.getDescription().equals("jpg") ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB) {
                             @Override
                             public void onFinish(BufferedImage image, TypeOfImage typeOfImage, boolean useOriginal) {
                             }

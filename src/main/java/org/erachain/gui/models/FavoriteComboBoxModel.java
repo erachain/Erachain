@@ -146,9 +146,8 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
                 return label;
 
             // Get icon to use for the list item value
-            byte[] iconBytes = ((ItemCls) value).getIcon();
-            if (iconBytes != null && iconBytes.length > 0) {
-                ImageIcon image = new ImageIcon(iconBytes);
+            ImageIcon image = ((ItemCls) value).getImageIcon();
+            if (image != null) {
                 int size = UIManager.getFont("TextField.font").getSize() + 4;
                 Image Im = image.getImage().getScaledInstance(size, size, 1);
                 label.setIcon(new ImageIcon(Im));

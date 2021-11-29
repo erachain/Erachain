@@ -22,6 +22,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
@@ -725,8 +726,8 @@ public abstract class AssetCls extends ItemCls {
     }
 
     @Override
-    public byte[] getImage() {
-        return image;
+    public ImageIcon getImageIcon() {
+        return super.getImageIcon();
     }
 
     public abstract long getQuantity();

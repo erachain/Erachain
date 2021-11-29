@@ -32,8 +32,10 @@ import org.mapdb.Fun.Tuple6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -639,6 +641,24 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     public byte[] getIcon() {
         return this.icon;
     }
+
+    @Override
+    public ImageIcon getImageIcon() {
+        if (icon == null || icon.length == 0)
+            return null;
+
+        if (hasIconURL()) {
+            URL url = null;
+            try {
+                url = new URL(new String(icon, StandardCharsets.UTF_8));
+                return new ImageIcon(url);
+            } catch (Exception e) {
+                return null;
+            }
+        } else
+            return new ImageIcon(icon);
+    }
+
 
     public int getIconType() {
         return iconType;

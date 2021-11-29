@@ -95,12 +95,12 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
         return original;
     }
 
-    @Override
-    public byte[] getIcon() {
-        if (origKey == 0) return null;
-
+    //@Override
+    public byte[] getIcon1() {
         if (icon != null)
             return icon;
+
+        if (origKey == 0) return null;
 
         getOriginal(DCSet.getInstance());
 
@@ -108,8 +108,8 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     }
 
-    @Override
-    public byte[] getImage() {
+    //@Override
+    public byte[] getImage1() {
         if (origKey == 0) return null;
 
         if (image != null)

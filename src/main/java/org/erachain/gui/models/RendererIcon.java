@@ -17,10 +17,9 @@ public class RendererIcon extends DefaultTableCellRenderer {
         if (item == null)
             return;
 
-        byte[] iconBytes = item.getIcon();
-        if (iconBytes != null && iconBytes.length > 0) {
+        ImageIcon image = item.getImageIcon();
+        if (image != null) {
             int size = getFont().getSize() + 2;
-            ImageIcon image = new ImageIcon(iconBytes);
             setIcon(new ImageIcon(image.getImage().getScaledInstance(size, size, 1)));
         } else {
             setIcon(new ImageIcon());
