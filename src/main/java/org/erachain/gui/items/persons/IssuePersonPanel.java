@@ -2,13 +2,13 @@ package org.erachain.gui.items.persons;
 
 import com.toedter.calendar.JDateChooser;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.transaction.IssueItemRecord;
@@ -478,7 +478,7 @@ public class IssuePersonPanel extends IssueItemPanel implements RecipientAddress
 
         //Account
         this.registrarAddressDesc.setText(Lang.T(
-                Account.getDetailsForEncrypt(registrarStr, AssetCls.FEE_KEY, true, true)));
+                Account.getDetailsForEncrypt(registrarStr, BlockChain.FEE_ASSET, true, true)));
 
         registrar = null;
         if (registrarStr != null && !registrarStr.isEmpty()) {

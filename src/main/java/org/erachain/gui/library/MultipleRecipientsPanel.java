@@ -1,10 +1,10 @@
 package org.erachain.gui.library;
 
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.item.assets.AssetCls;
 import org.erachain.lang.Lang;
 import org.mapdb.Fun;
 
@@ -184,7 +184,7 @@ public class MultipleRecipientsPanel extends JPanel {
                         super.setValueAt(Lang.T(result.b), row, column + 1);
                     } else {
                         super.setValueAt(
-                                Lang.T(Account.getDetailsForEncrypt(address, AssetCls.FEE_KEY, true, true)),
+                                Lang.T(Account.getDetailsForEncrypt(address, BlockChain.FEE_ASSET, true, true)),
                                 row, column + 1);
                     }
 

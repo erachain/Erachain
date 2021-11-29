@@ -299,7 +299,7 @@ public class Account {
 
     }
 
-    public static String getDetailsForEncrypt(String address, long itemKey, boolean forEncrypt, boolean okAsMess) {
+    public static String getDetailsForEncrypt(String address, AssetCls itemKey, boolean forEncrypt, boolean okAsMess) {
 
         if (address.isEmpty()) {
             return "";
@@ -310,23 +310,25 @@ public class Account {
             if (forEncrypt && null == Controller.getInstance().getPublicKeyByAddress(address)) {
                 return "address is unknown - can't encrypt for it, please use public key instead";
             }
-            if (itemKey > 0) {
+            if (itemKey != null) {
                 Account account = new Account(address);
+                String info = account.getBalance(itemKey.getKey()).a.b.toPlainString() + "[" + itemKey.getName() + "]";
                 if (account.isPerson()) {
-                    return account.getPerson().b.toString() + " " + account.getBalance(itemKey).a.b.toPlainString();
+                    return account.getPerson().b.toString() + " - " + info;
                 }
-                return " + " + account.getBalance(itemKey).a.b.toPlainString();
+                return info;
             }
             return okAsMess ? "address is OK" : "";
         } else {
             // Base58 string len = 33-34 for ADDRESS and 40-44 for PubKey
             if (PublicKeyAccount.isValidPublicKey(address)) {
-                if (itemKey > 0) {
+                if (itemKey != null) {
                     Account account = new PublicKeyAccount(address);
+                    String info = account.getBalance(itemKey.getKey()).a.b.toPlainString() + "[" + itemKey.getName() + "]";
                     if (account.isPerson()) {
-                        return account.getPerson().b.toString() + " " + account.getBalance(itemKey).a.b.toPlainString();
+                        return account.getPerson().b.toString() + " - " + info;
                     }
-                    return " + " + account.getBalance(itemKey).a.b.toPlainString();
+                    return info;
                 }
                 return okAsMess ? "public key is OK" : "";
             } else {

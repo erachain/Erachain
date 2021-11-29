@@ -424,7 +424,7 @@ public abstract class AccountAssetActionPanelCls extends IconPanel implements Re
         /////////// RECIPIENT DETAILS
         if (recipient != null) {
             String details = Lang.T(
-                    Account.getDetailsForEncrypt(recipient.getAddress(), 0,
+                    Account.getDetailsForEncrypt(recipient.getAddress(), asset,
                             this.jCheckBox_Encrypt.isSelected(), false));
 
             Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>

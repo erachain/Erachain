@@ -1,6 +1,7 @@
 package org.erachain.gui.library;
 
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.exdata.exLink.ExLinkAddress;
@@ -138,7 +139,7 @@ public class MultipleRoyaltyPanel extends JPanel {
     class TableModel extends DefaultTableModel {
 
         public TableModel(int rows) {
-            super(new Object[]{Lang.T("Account"), Lang.T("Account Information"), Lang.T("Royalty") + " %",
+            super(new Object[]{Lang.T("Account"), Lang.T("Account Information"), "%",
                             Lang.T("Memo")
                     },
                     rows);
@@ -189,7 +190,7 @@ public class MultipleRoyaltyPanel extends JPanel {
                         super.setValueAt(Lang.T(result.b), row, DESCR_COL);
                     } else {
                         super.setValueAt(
-                                Lang.T(Account.getDetailsForEncrypt(address, AssetCls.FEE_KEY, false, true)),
+                                Lang.T(Account.getDetailsForEncrypt(address, BlockChain.FEE_ASSET, false, true)),
                                 row, DESCR_COL);
                     }
 
@@ -210,7 +211,7 @@ public class MultipleRoyaltyPanel extends JPanel {
 
             for (int i = 0; i < items.length; ++i) {
                 addRow(new Object[]{items[i].getAccount().getAddress(),
-                        Lang.T(Account.getDetailsForEncrypt(items[i].getAccount().getAddress(), AssetCls.FEE_KEY, false, true)),
+                        Lang.T(Account.getDetailsForEncrypt(items[i].getAccount().getAddress(), BlockChain.FEE_ASSET, false, true)),
                         items[i].getValue1() / 1000d, items[i].getMemo()});
             }
             addEmpty();
