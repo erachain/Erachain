@@ -31,6 +31,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
     private final long origKey;
     private final int total;
     private final int index;
+    AssetCls original;
 
     public AssetUniqueSeriesCopy(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image,
                                  String description, int assetType, long origKey, int total, int index) {
@@ -83,6 +84,35 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     public long getOrigKey() {
         return origKey;
+    }
+
+    public AssetCls getOriginal(DCSet dcSet) {
+        if (origKey == 0) return null;
+
+        if (original == null) {
+            original = dcSet.getItemAssetMap().get(origKey);
+        }
+        return original;
+    }
+
+    @Override
+    public byte[] getIcon() {
+        if (origKey == 0) return null;
+
+        getOriginal(DCSet.getInstance());
+
+        return original.getIcon();
+
+    }
+
+    @Override
+    public byte[] getImage() {
+        if (origKey == 0) return null;
+
+        getOriginal(DCSet.getInstance());
+
+        return original.getImage();
+
     }
 
     public boolean hasOriginal() {
