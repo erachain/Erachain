@@ -16,6 +16,7 @@ import org.erachain.lang.Lang;
 import org.erachain.webserver.PreviewMaker;
 import org.json.simple.JSONObject;
 
+import javax.swing.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -93,6 +94,16 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
             original = dcSet.getItemAssetMap().get(origKey);
         }
         return original;
+    }
+
+    @Override
+    public ImageIcon getImageIcon() {
+        if (index == 1)
+            return super.getImageIcon();
+
+        AssetCls firstAsset = DCSet.getInstance().getItemAssetMap().get(key - index + 1);
+        return firstAsset.getImageIcon();
+
     }
 
     //@Override
