@@ -156,17 +156,18 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
                     resultCode = Transaction.RECEIVER_NOT_PERSONALIZED;
                     errorValue = null;
                     results.add(new Fun.Tuple2(recipient, new Fun.Tuple2<>(resultCode, null)));
-                }
-
-                if (creator.equals(recipient)) {
+                    continue;
+                } else if (creator.equals(recipient)) {
                     resultCode = Transaction.INVALID_RECEIVERS_LIST;
                     errorValue = "equal creator";
                     results.add(new Fun.Tuple2(recipient, new Fun.Tuple2<>(resultCode, errorValue)));
+                    continue;
                 }
-            } else {
-                results.add(new Fun.Tuple2(recipient, null));
             }
+
+            results.add(new Fun.Tuple2(recipient, null));
         }
+
 
         totalPay = amount.multiply(new BigDecimal(addresses.length));
 
