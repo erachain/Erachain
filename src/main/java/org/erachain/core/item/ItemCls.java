@@ -644,6 +644,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
 
     @Override
     public ImageIcon getImageIcon() {
+        byte[] icon = getIcon();
         if (icon == null || icon.length == 0)
             return null;
 
