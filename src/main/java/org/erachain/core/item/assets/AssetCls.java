@@ -1515,7 +1515,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return backward ? null : "AS_INSIDE_ACCESS_2R";
                     case Account.BALANCE_POS_SPEND:
-                        return "AS_INSIDE_ACCESS_4";
+                        return backward ? null : "AS_INSIDE_ACCESS_4";
                     default:
                         return null;
                 }
@@ -1529,7 +1529,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return backward ? null : "AS_INSIDE_VOTE_2R";
                     case Account.BALANCE_POS_SPEND:
-                        return "AS_INSIDE_VOTE_4";
+                        return backward ? null : "AS_INSIDE_VOTE_4";
                     default:
                         return null;
                 }
