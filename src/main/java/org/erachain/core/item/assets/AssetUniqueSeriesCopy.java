@@ -16,6 +16,7 @@ import org.erachain.lang.Lang;
 import org.erachain.webserver.PreviewMaker;
 import org.json.simple.JSONObject;
 
+import javax.swing.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -31,6 +32,7 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
     private final long origKey;
     private final int total;
     private final int index;
+    AssetCls original;
 
     public AssetUniqueSeriesCopy(byte[] typeBytes, byte[] appData, PublicKeyAccount maker, String name, byte[] icon, byte[] image,
                                  String description, int assetType, long origKey, int total, int index) {
@@ -83,6 +85,51 @@ public class AssetUniqueSeriesCopy extends AssetUnique {
 
     public long getOrigKey() {
         return origKey;
+    }
+
+    public AssetCls getOriginal(DCSet dcSet) {
+        if (origKey == 0) return null;
+
+        if (original == null) {
+            original = dcSet.getItemAssetMap().get(origKey);
+        }
+        return original;
+    }
+
+    @Override
+    public ImageIcon getImageIcon() {
+        if (index == 1)
+            return super.getImageIcon();
+
+        AssetCls firstAsset = DCSet.getInstance().getItemAssetMap().get(key - index + 1);
+        return firstAsset.getImageIcon();
+
+    }
+
+    //@Override
+    public byte[] getIcon1() {
+        if (icon != null)
+            return icon;
+
+        if (origKey == 0) return null;
+
+        getOriginal(DCSet.getInstance());
+
+        return original.getIcon();
+
+    }
+
+    //@Override
+    public byte[] getImage1() {
+        if (origKey == 0) return null;
+
+        if (image != null)
+            return image;
+
+        getOriginal(DCSet.getInstance());
+
+        return original.getImage();
+
     }
 
     public boolean hasOriginal() {

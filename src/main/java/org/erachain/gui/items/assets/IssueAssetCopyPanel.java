@@ -150,7 +150,7 @@ public class IssueAssetCopyPanel extends IssueAssetPanelCls {
                 + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>";
 
         if (asset.getDEXAwards() != null) {
-            out += Lang.T("DEX Awards" + ":");
+            out += Lang.T("DEX royalties" + ":");
             for (ExLinkAddress award : asset.getDEXAwards()) {
                 out += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
                         + (award.getMemo() == null || award.getMemo().isEmpty() ? "" : " - " + award.getMemo());

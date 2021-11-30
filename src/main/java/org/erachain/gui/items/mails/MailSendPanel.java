@@ -491,7 +491,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         }
 
         this.txtRecDetails.setText(Lang.T(
-                Account.getDetailsForEncrypt(recipient, asset.getKey(),
+                Account.getDetailsForEncrypt(recipient, asset,
                         encrypted.isSelected(), true)));
 
         Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipient);

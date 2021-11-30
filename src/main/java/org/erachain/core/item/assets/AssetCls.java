@@ -724,11 +724,6 @@ public abstract class AssetCls extends ItemCls {
         return icon;
     }
 
-    @Override
-    public byte[] getImage() {
-        return image;
-    }
-
     public abstract long getQuantity();
 
     public abstract int getScale();
@@ -2111,7 +2106,7 @@ public abstract class AssetCls extends ItemCls {
 
         String dexDesc = AssetCls.viewAssetTypeDescriptionDEX(assetType, startKey);
         if (dexDesc != null) {
-            description += "<br><b>" + Lang.T("DEX rules and taxes", langObj) + ":</b><br>" + Lang.T(dexDesc, langObj);
+            description += "<br><b>" + Lang.T("DEX rules and royalties", langObj) + ":</b><br>" + Lang.T(dexDesc, langObj);
         }
 
         assetTypeJson.put("description", description);
@@ -2375,7 +2370,7 @@ public abstract class AssetCls extends ItemCls {
         itemJson.put("Label_isOutsideOtherClaim", Lang.T("isOutsideOtherClaim", langObj));
         itemJson.put("Label_isReverseSend", Lang.T("isReverseSend", langObj));
         itemJson.put("Label_Properties", Lang.T("Properties", langObj));
-        itemJson.put("Label_DEX_Awards", Lang.T("DEX Awards", langObj));
+        itemJson.put("Label_DEX_Awards", Lang.T("DEX royalties", langObj));
 
         itemJson.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
         itemJson.put("released", getReleased());
@@ -2410,7 +2405,7 @@ public abstract class AssetCls extends ItemCls {
                 + ".<br><b>" + Lang.T("Acceptable actions", langObj) + "</b>: " + joiner.toString();
         String dexDesc = AssetCls.viewAssetTypeDescriptionDEX(assetType, START_KEY());
         if (dexDesc != null) {
-            desc += "<br><b>" + Lang.T("DEX rules and taxes", langObj) + ":</b><br>" + Lang.T(dexDesc, langObj);
+            desc += "<br><b>" + Lang.T("DEX rules and royalties", langObj) + ":</b><br>" + Lang.T(dexDesc, langObj);
         }
 
         itemJson.put("assetTypeDesc", desc);

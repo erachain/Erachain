@@ -717,10 +717,8 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                 long key = this.getAssetKey();
 
                 AssetCls asset = Controller.getInstance().getAsset(this.getAbsAssetKey());
-                byte[] iconBytes = asset.getIcon();
-                if (false && iconBytes != null && iconBytes.length > 1) {
-                    //if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
-                    image = new ImageIcon(iconBytes);
+                ImageIcon image = asset.getImageIcon();
+                if (image != null) {
                     cachedImage = image.getImage().getScaledInstance(fontHeight, fontHeight, 1);
                     img_Local_URL = "http:\\img_" + assetKey;
                     // TODO нужно еще КЭШ картинок сделать как тут org.erachain.gui.items.assets.AssetInfo.HTML_Add_Local_Images

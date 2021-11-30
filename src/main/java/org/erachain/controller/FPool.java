@@ -100,6 +100,11 @@ public class FPool extends MonitoredThread {
         }
 
         privateKeyAccount = controller.getWalletPrivateKeyAccountByAddress((String) settingsJSON.get("address"));
+        if (privateKeyAccount == null) {
+            LOGGER.error("FPool address is EMPTY or WRONG - see in 'settings_fpool.json'. FPool is shutdown...");
+            return;
+        }
+
         POOL_TAX = new BigDecimal(settingsJSON.get("tax").toString()).movePointLeft(2);
         PENDING_PERIOD = Integer.parseInt(settingsJSON.getOrDefault("pending_period", 30).toString());
 

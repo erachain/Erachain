@@ -88,10 +88,9 @@ public class ItemInfo extends JPanel {
 
         ++labelGBC.gridy;
         if (useIcon) {
-            byte[] iconBytes = item.getIcon();
-            if (iconBytes != null && iconBytes.length > 0) {
+            ImageIcon image = item.getImageIcon();
+            if (image != null) {
                 int rowSize = getFont().getSize() << 2;
-                ImageIcon image = new ImageIcon(iconBytes);
                 jLabelIcon.setIcon(new ImageIcon(image.getImage().getScaledInstance(rowSize, rowSize, 1)));
 
                 add(jLabelIcon, labelGBC);
