@@ -46,7 +46,7 @@ public class MultipleRoyaltyPanel extends JPanel {
 
         defaultCheck = new JCheckBox();
 
-        defaultCheck.setText(Lang.T("Use default royalties"));
+        defaultCheck.setText(Lang.T("Use default 'DEX royalties'"));
         defaultCheck.setSelected(true);
 
         defaultCheck.addActionListener(new ActionListener() {
