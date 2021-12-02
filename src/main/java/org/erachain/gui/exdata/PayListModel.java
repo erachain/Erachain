@@ -70,7 +70,7 @@ public class PayListModel extends DefaultTableModel {
             if (items.length < 2) {
                 rowVector.add(row);
                 rowVector.add("");
-                error = lastError = Lang.T("Invalid string format");
+                error = lastError = Lang.T("Amount is missing");
                 rowVector.add(error);
                 data.add(rowVector);
                 continue;
