@@ -1871,7 +1871,7 @@
   "Wrong filterTXStartStr": "Ошибочный номер начала",
   "Wrong filterTXEndStr": "Ошибочный номер окончания",
   "Wrong key": "Ошибочный ключ",
-  "Wrong assetKey (null or ZERO)": "Ошибочный номер актива (нет или ноль)",
+  "Wrong asset key (null or ZERO)": "Ошибочный номер актива (нет или ноль)",
   "Wrong filterAssetKey (null or ZERO)": "Ошибочный номер актива фильтра (нет или ноль)",
   "Wrong payMethodValue (null or ZERO)": "Ошибочная Величина у способа начисления (нет или ноль)",
   "Wrong Signer": "Не тот подписант",
