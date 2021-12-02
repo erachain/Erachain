@@ -80,7 +80,7 @@ public class PayListModel extends DefaultTableModel {
                 rowVector.add(new BigDecimal(items[1]));
             } catch (Exception e) {
                 rowVector.add(items[1]);
-                error = lastError = Lang.T("Wrong amount");
+                error = lastError = Lang.T("Wrong amount # Ошибка в кол-ве");
             }
 
             if (items.length > 2) {

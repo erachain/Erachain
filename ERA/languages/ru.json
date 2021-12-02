@@ -1861,6 +1861,7 @@
   "Write & Sign": "Подписать и записать",
   "Wrong Address or PublicKey": "Негодные Адрес или Публичный Ключ",
   "Wrong amount": "Ошибочное значение",
+  "Wrong amount # Ошибка в кол-ве": "Ошибка в кол-ве",
   "Wrong amountMin": "Ошибочное Минимальное значение",
   "Wrong amountMax": "Ошибочный Максимальное значение",
   "Wrong Base58 format": "Ошибочный формат Base58",
