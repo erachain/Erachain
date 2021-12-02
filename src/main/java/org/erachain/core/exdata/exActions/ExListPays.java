@@ -334,7 +334,12 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
             }
 
             // CHECK AMOUNT
-            amount = (BigDecimal) item.get(1);
+            try {
+                amount = (BigDecimal) item.get(1);
+            } catch (ClassCastException e) {
+                amount = null;
+            }
+
             if (amount == null || amount.signum() == 0)
                 return new Fun.Tuple2<>(null, i + ":" + item + " - " + "Wrong amount - null or ZERO");
 
