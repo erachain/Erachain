@@ -315,7 +315,7 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
         BigDecimal amount;
 
         if (assetKey == null || assetKey <= 0L) {
-            return new Fun.Tuple2<>(null, "Wrong assetKey (null or ZERO)");
+            return new Fun.Tuple2<>(null, Lang.T("Wrong assetKey (null or ZERO)"));
         }
 
         Fun.Tuple2<Account, String> result;
