@@ -55,16 +55,25 @@ public class PayListModel extends DefaultTableModel {
         Fun.Tuple2<Account, String> result;
         String error;
         for (String row : lines) {
+            rowVector = new Vector<Object>(8);
             error = "";
             String[] items = row.split(" ");
             result = Account.tryMakeAccount(items[0]);
-            rowVector = new Vector<Object>(8);
             rowVector.addElement(++count);
             if (result.a == null) {
                 rowVector.add(items[0]);
                 error = lastError = Lang.T(result.b);
             } else {
                 rowVector.add(result.a);
+            }
+
+            if (items.length < 2) {
+                rowVector.add(row);
+                rowVector.add("");
+                error = lastError = Lang.T("Invalid string format");
+                rowVector.add(error);
+                data.add(rowVector);
+                continue;
             }
 
             try {

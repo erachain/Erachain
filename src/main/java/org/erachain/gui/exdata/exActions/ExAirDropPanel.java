@@ -132,15 +132,23 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                                     BufferedReader in = new BufferedReader(new FileReader(file));
                                     Account account;
                                     String str;
+                                    int count = 0;
                                     while ((str = in.readLine()) != null) {
+                                        count++;
                                         str = str.trim();
                                         if (str.startsWith("//"))
                                             continue;
 
                                         // чтобы не было двойных выплат по счет и публичному ключу в списке - делаем Счет
                                         account = Account.tryMakeAccount(str).a;
-                                        if (account == null)
-                                            continue;
+                                        if (account == null) {
+                                            JOptionPane.showMessageDialog(new JFrame(),
+                                                    Lang.T(OnDealClick.resultMess(Transaction.INVALID_ADDRESS)) + " "
+                                                            + Lang.T("in line") + " #" + count + ":\n" + str,
+                                                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+
+                                            return;
+                                        }
 
                                         if (lines.contains(account.getAddress()))
                                             continue;
