@@ -314,11 +314,8 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
         int steep = 0;
         BigDecimal amount;
 
-        //Controller cntr = Controller.getInstance();
-        //BlockChain chain = cntr.getBlockChain();
-
         if (assetKey == null || assetKey <= 0L) {
-            return new Fun.Tuple2<>(null, "Wrong assetKey (null or ZERO)");
+            return new Fun.Tuple2<>(null, Lang.T("Wrong asset key (null or ZERO)"));
         }
 
         Fun.Tuple2<Account, String> result;
@@ -330,13 +327,18 @@ public class ExListPays extends ExAction<List<Tuple3<Account, BigDecimal, Fun.Tu
             // CHECH ADDRESS
             result = Account.tryMakeAccount((String) item.get(0));
             if (result.a == null) {
-                return new Fun.Tuple2<>(null, i + ":" + item.toJSONString() + " - " + result.b);
+                return new Fun.Tuple2<>(null, (i + 1) + ":" + item.toJSONString() + " - " + result.b);
             }
 
             // CHECK AMOUNT
-            amount = (BigDecimal) item.get(1);
+            try {
+                amount = (BigDecimal) item.get(1);
+            } catch (ClassCastException e) {
+                return new Fun.Tuple2<>(null, (i + 1) + ":" + item + " - " + Lang.T("Wrong amount # Ошибка в кол-ве"));
+            }
+
             if (amount == null || amount.signum() == 0)
-                return new Fun.Tuple2<>(null, i + ":" + item + " - " + "Wrong amount - null or ZERO");
+                return new Fun.Tuple2<>(null, (i + 1) + ":" + item + " - " + Lang.T("Wrong amount # Ошибка в кол-ве"));
 
             // CHECK MEMO
             String memoStr = (String) item.get(2);

@@ -20,7 +20,7 @@ public abstract class IssueAssetPanelCls extends IssueItemPanel {
     protected final JLabel quantityJLabel = new JLabel(Lang.T("Quantity") + ":");
 
     protected final JComboBox<AssetType> assetTypeJComboBox = new JComboBox();
-    protected final JCheckBox isUnTransferable = new JCheckBox(Lang.T("Not transferable"));
+    protected final JCheckBox isUnTransferable = new JCheckBox(Lang.T("NOT_TRANSFERABLE"));
     protected final JCheckBox isAnonimDenied = new JCheckBox(Lang.T("ANONIM_OWN_DENIED"));
     protected MultipleRoyaltyPanel multipleRoyaltyPanel = new MultipleRoyaltyPanel(fromJComboBox, assetTypeJComboBox);
 

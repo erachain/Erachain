@@ -52,7 +52,7 @@ public class ItemAssetsResource {
         help.put("POST assets/issueraw/{creator} {\"linkTo\":<SeqNo>, \"feePow\":<int>, \"password\":<String>, \"linkTo\":<SeqNo>, \"raw\":RAW-Base58", "Issue Asset by Base58 RAW in POST body");
 
         help.put("assets/types", "get types");
-        help.put("assets/balances/{key}", "get balances for key");
+        help.put("assets/balances/{key}?offset=0&position=1&limit=50", "get balances for key");
 
         return StrJSonFine.convert(help);
     }

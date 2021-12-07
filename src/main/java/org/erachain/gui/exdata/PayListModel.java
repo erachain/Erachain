@@ -55,10 +55,10 @@ public class PayListModel extends DefaultTableModel {
         Fun.Tuple2<Account, String> result;
         String error;
         for (String row : lines) {
+            rowVector = new Vector<Object>(8);
             error = "";
             String[] items = row.split(" ");
             result = Account.tryMakeAccount(items[0]);
-            rowVector = new Vector<Object>(8);
             rowVector.addElement(++count);
             if (result.a == null) {
                 rowVector.add(items[0]);
@@ -67,11 +67,20 @@ public class PayListModel extends DefaultTableModel {
                 rowVector.add(result.a);
             }
 
+            if (items.length < 2) {
+                rowVector.add(BigDecimal.ZERO);
+                rowVector.add("");
+                error = lastError = Lang.T("Amount is missing");
+                rowVector.add(error);
+                data.add(rowVector);
+                continue;
+            }
+
             try {
                 rowVector.add(new BigDecimal(items[1]));
             } catch (Exception e) {
                 rowVector.add(items[1]);
-                error = lastError = Lang.T("Wrong amount");
+                error = lastError = Lang.T("Wrong amount # Ошибка в кол-ве");
             }
 
             if (items.length > 2) {
