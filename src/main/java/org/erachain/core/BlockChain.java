@@ -300,15 +300,18 @@ public class BlockChain {
      * };
      */
 
-    public static final byte[][] VALID_ADDRESSES = TEST_DB > 0? new byte[][]{} : new byte[][]{
+    public static final byte[][] VALID_ADDRESSES = TEST_DB > 0 ? new byte[][]{} : new byte[][]{
             Base58.decode("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3")
     };
 
-    public static final byte[][] DISCREDIR_ADDRESSES = TEST_DB > 0? new byte[][]{} : new byte[][]{
+    /**
+     * PUB KEY ONLY!
+     */
+    public static final byte[][] DISCREDIR_ADDRESSES = TEST_DB > 0 ? new byte[][]{} : new byte[][]{
             Base58.decode("HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7"),
-            Base58.decode("AoPMZ3Q8u5q2g9aK8JZSQRnb6iS53FjUjrtT8hCfHg9F") // 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
+            Base58.decode("AoPMZ3Q8u5q2g9aK8JZSQRnb6iS53FjUjrtT8hCfHg9F") // == 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
     };
-    public static final byte[][] VALID_SIGN = TEST_DB > 0? new byte[][]{} : new byte[][]{
+    public static final byte[][] VALID_SIGN = TEST_DB > 0 ? new byte[][]{} : new byte[][]{
             //Base58.decode("4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W")
     };
 
