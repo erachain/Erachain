@@ -129,8 +129,13 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
-                            jLabel_FeesResult.setText(Lang.T("Error") + "! " + exActionRes.a == null ? Lang.T(exActionRes.b) :
-                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue)));
+                            String messError = Lang.T("Error") + "! " + exActionRes.a == null ? Lang.T(exActionRes.b) :
+                                    Lang.T(exActionRes.b) + (exActionRes.a == null
+                                            || exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue));
+                            jLabel_FeesResult.setText(messError);
+                            JOptionPane.showMessageDialog(null, messError,
+                                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+
                             return;
                         }
 
@@ -168,9 +173,13 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
-                            jLabel_FeesResult.setText(Lang.T("Error") + "! " + (exActionRes.a == null ? Lang.T(exActionRes.b) :
-                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue))));
-                            jButtonViewResult.setEnabled(true);
+                            String messError = Lang.T("Error") + "! " + exActionRes.a == null ? Lang.T(exActionRes.b) :
+                                    Lang.T(exActionRes.b) + (exActionRes.a == null
+                                            || exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue));
+                            jLabel_FeesResult.setText(messError);
+                            JOptionPane.showMessageDialog(null, messError,
+                                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+
                             return;
                         }
 
@@ -716,6 +725,10 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
                 if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 
                     String path = chooser.getSelectedFile().getPath();
+                    if (!path.toLowerCase().endsWith(".txt")) {
+                        path += ".txt";
+                    }
+
                     File file = new File(path);
                     // if file
                     if (file.exists()) {
