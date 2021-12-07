@@ -1829,6 +1829,10 @@ public class BlockExplorer {
                 transactionDataJSON.put("targetCreator", orderTarget.getCreator().getAddress());
                 transactionDataJSON.put("targetCreatorName", orderTarget.getCreator().getPersonAsString());
 
+                transactionDataJSON.put("label_Trade", Lang.T("Trade # Сделка", langObj));
+                transactionDataJSON.put("label_Order", Lang.T("Order # Заказ", langObj));
+                transactionDataJSON.put("label_Taking_Order", Lang.T("Taking order # Берущий заказ", langObj));
+
 
             } else {
                 Order orderInitiator = trade.getInitiatorOrder(dcSet);

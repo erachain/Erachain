@@ -1101,12 +1101,12 @@ button.white-bgc[disabled]:focus,
 
                         output += '<tr><td><a class=without href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
                         output += '<a href=?trade=' + data[i].trade.initiatorTxSeqNo + '/' + data[i].trade.targetTxSeqNo + get_lang() + '>';
-                        output += data[i].trade.initiatorTxSeqNo + '/' + data[i].trade.targetTxSeqNo + '</a></td>';
+                        output += data[i].trade.label_Trade + ' #' + data[i].trade.initiatorTxSeqNo + '/' + data[i].trade.targetTxSeqNo + '</a></td>';
 
                         output += '<td><a href=?order=' + data[i].trade.initiatorTxSeqNo + get_lang() + '>';
-                        output += data[i].trade.initiatorTxSeqNo + '</a> ';
+                        output += data[i].trade.label_Taking_Order + ' #' + data[i].trade.initiatorTxSeqNo + '</a> ';
                         output += '<td><a href=?order=' + data[i].trade.targetTxSeqNo + get_lang() + '>';
-                        output += data[i].trade.targetTxSeqNo + '</a></td>';
+                        output += data[i].trade.label_Order + ' #' + data[i].trade.targetTxSeqNo + '</a></td>';
 
                         output += '<td align=right width=250>Height: <a href=?block=' + data[i].trade.height + get_lang() + '>' + data[i].trade.height + '</a>';
                         output += ' / confirmations: ' + data[i].trade.confirmations + '</td>';
@@ -1178,8 +1178,6 @@ button.white-bgc[disabled]:focus,
                         output += '<td>' + ' <a href=?asset=' + data[i].trade.haveKey + get_lang() + '>' + getItemName(1000, data[i].trade.haveKey, data[i].trade.haveName) + '</a>';
 
                         output += '<td>' + addCommas(data[i].trade.reversePrice);
-                        output += '<br>' + getItemNameMini('asset', data[i].trade.haveKey, data[i].trade.haveName);
-                        output += '/' + getItemNameMini('asset', data[i].trade.wantKey, data[i].trade.wantName);
 
                         if (data[i].hasOwnProperty('balance')) {
                             output += '<td>' + printBalance(data[i].balance) + '</td>';
