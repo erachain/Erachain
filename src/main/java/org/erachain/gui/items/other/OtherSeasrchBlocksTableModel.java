@@ -161,6 +161,11 @@ public class OtherSeasrchBlocksTableModel extends AbstractTableModel {
                     int height = block.getHeight();
                     Tuple3<Integer, Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, height);
 
+                    if (forgingPoint == null) {
+                        // in TEST_MODE - first blocks = null
+                        return "";
+                    }
+
                     return forgingPoint.b + " "
                             + (height - forgingPoint.a) + " "
                             + block.getWinValue() + " "
