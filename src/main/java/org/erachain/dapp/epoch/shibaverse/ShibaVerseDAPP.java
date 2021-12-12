@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.apache.commons.net.util.Base64;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -70,7 +69,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
     /**
      * admin account
      */
-    final static public Account adminAddress = new Account("7C6cEeHw739uQm8PhdnS9yENdLhT8LUERP");
+    final static public Account adminAddress = new Account("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP");
 
     final static public String COMMAND_CATH_COMET = "catch comets";
     final static public String COMMAND_STAKE = "stake";
@@ -100,16 +99,8 @@ public class ShibaVerseDAPP extends EpochDAPP {
                 + Lang.T("Status", langObj) + ": <b>" + (status == null ? "" : status) + "</b>";
     }
 
-    public static ShibaVerseDAPP make(Transaction transaction) {
+    public static ShibaVerseDAPP make(RSend txSend, String command) {
 
-        if (transaction.getBlockHeight() == 1609) {
-            boolean debug = true;
-        }
-
-        if (!BlockChain.TEST_MODE || transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
-            return null;
-
-        RSend txSend = (RSend) transaction;
         Account recipent = txSend.getRecipient();
         if (!accounts.contains(recipent)) {
             return null;
@@ -123,11 +114,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
             }
         }
 
-        if (txSend.isText() && !txSend.isEncrypted()) {
-            return new ShibaVerseDAPP(new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase(), "");
-        } else {
-            return new ShibaVerseDAPP("", "");
-        }
+        return new ShibaVerseDAPP(command, "");
 
     }
 

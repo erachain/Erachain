@@ -23,6 +23,7 @@ import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 
 public abstract class DAPP {
 
@@ -152,43 +153,48 @@ public abstract class DAPP {
      */
     static public DAPP make(Transaction transaction) {
 
+        /////////// EVENTS
         if (BlockChain.TEST_MODE
-                && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-            RSend txSend = (RSend) transaction;
-
-            DAPP contract = ShibaVerseDAPP.make(transaction);
-            if (contract != null)
-                return contract;
-
-            if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND && txSend.hasAmount()
+                && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
+            CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
+            if (createOrder.getHaveKey() == AssetCls.ERA_KEY
+                    && createOrder.getAmountHave().compareTo(new BigDecimal(100)) >= 0 //  && createOrder.getWantKey() == AssetCls.USD_KEY
+                    || createOrder.getWantKey() == AssetCls.ERA_KEY
+                    && createOrder.getAmountWant().compareTo(new BigDecimal(100)) >= 0 // && createOrder.getHaveKey() == AssetCls.USD_KEY
             ) {
-                if (txSend.hasPacket()) {
-
-                } else if (txSend.getAmount().signum() < 0) {
-                    return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
-                }
-            }
-
-        } else
-            ///////////
-            if (BlockChain.TEST_MODE
-                    && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
-                CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
-                if (createOrder.getHaveKey() == AssetCls.ERA_KEY
-                        && createOrder.getAmountHave().compareTo(new BigDecimal(100)) >= 0 //  && createOrder.getWantKey() == AssetCls.USD_KEY
-                        || createOrder.getWantKey() == AssetCls.ERA_KEY
-                        && createOrder.getAmountWant().compareTo(new BigDecimal(100)) >= 0 // && createOrder.getHaveKey() == AssetCls.USD_KEY
-                ) {
-                    Order order = createOrder.getDCSet().getCompletedOrderMap().get(createOrder.getOrderId());
-                    if (order != null)
-                        return new LeafFall();
+                Order order = createOrder.getDCSet().getCompletedOrderMap().get(createOrder.getOrderId());
+                if (order != null)
+                    return new LeafFall();
             }
         }
 
-        if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-            RSend txSend = (RSend) transaction;
-            if (txSend.getRecipient().isDAppOwned()) {
-                ///////////////////// cALL DAPPS HERE
+        if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
+            return null;
+
+        RSend txSend = (RSend) transaction;
+        if (!txSend.getRecipient().isDAppOwned())
+            return null;
+
+        ///////////////////// CALL DAPPS HERE
+
+        String command;
+        if (txSend.isText() && !txSend.isEncrypted()) {
+            command = new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase();
+        } else {
+            command = txSend.getTitle();
+            if (command == null) command = "";
+        }
+
+        DAPP contract = ShibaVerseDAPP.make(txSend, command);
+        if (contract != null)
+            return contract;
+
+        if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND && txSend.hasAmount()
+        ) {
+            if (txSend.hasPacket()) {
+
+            } else if (txSend.getAmount().signum() < 0) {
+                return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
             }
         }
 
