@@ -418,7 +418,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
                     json.put("random", Base64.encodeBase64StringUnChunked(randomArray));
                     String description = json.toJSONString();
 
-                    comet = new AssetVenture(null, maker, name, null, null,
+                    comet = new AssetVenture(null, stock, name, null, null,
                             description, AssetCls.AS_INSIDE_ASSETS, 0, 0);
                     comet.setReference(commandTX.getSignature(), commandTX.getDBRef());
 
@@ -432,7 +432,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
             // TRANSFER ASSET
             creator.changeBalance(dcSet, asOrphan, false, assetKey,
                     BigDecimal.ONE, false, false, false);
-            maker.changeBalance(dcSet, !asOrphan, false, assetKey,
+            stock.changeBalance(dcSet, !asOrphan, false, assetKey,
                     BigDecimal.ONE, false, false, false);
 
         } while (--count > 0);
@@ -536,7 +536,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
             dcSet.getItemAssetMap().decrementDelete(gravitaKey);
 
         } else {
-            AssetVenture gravita = new AssetVenture(null, maker, "GR", null, null,
+            AssetVenture gravita = new AssetVenture(null, stock, "GR", null, null,
                     null, AssetCls.AS_INSIDE_ASSETS, 6, 0);
             gravita.setReference(commandTX.getSignature(), commandTX.getDBRef());
 
@@ -549,7 +549,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
         // TRANSFER GRAVITA to ADMIN
         admin.changeBalance(dcSet, asOrphan, false, gravitaKey,
                 new BigDecimal("10000"), false, false, false);
-        maker.changeBalance(dcSet, !asOrphan, false, gravitaKey,
+        stock.changeBalance(dcSet, !asOrphan, false, gravitaKey,
                 new BigDecimal("10000"), false, false, false);
 
     }

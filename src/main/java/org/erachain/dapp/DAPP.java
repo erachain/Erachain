@@ -40,28 +40,28 @@ public abstract class DAPP {
     }
 
     protected final int id;
-    protected final PublicKeyAccount maker;
+    protected final PublicKeyAccount stock;
 
-    protected DAPP(int id, PublicKeyAccount maker) {
+    protected DAPP(int id, PublicKeyAccount stock) {
         this.id = id;
-        this.maker = maker;
+        this.stock = stock;
     }
 
     protected DAPP(int id) {
         this.id = id;
-        this.maker = new PublicKeyAccount(crypto.digest(Longs.toByteArray(id)));
+        this.stock = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(id)));
     }
 
     public int getID() {
         return this.id;
     }
 
-    public PublicKeyAccount getMaker() {
-        return this.maker;
+    public PublicKeyAccount getStock() {
+        return this.stock;
     }
 
     public String getHTML(JSONObject langObj) {
-        return "ID: <b>" + id + "</b><br>" + Lang.T("Maker", langObj) + ": <b>" + maker.getAddress() + "</b>";
+        return "ID: <b>" + id + "</b><br>" + Lang.T("Maker", langObj) + ": <b>" + stock.getAddress() + "</b>";
     }
 
     public Object[][] getItemsKeys() {
@@ -97,7 +97,7 @@ public abstract class DAPP {
     }
 
     public byte[] toBytes(int forDeal) {
-        byte[] pubKey = maker.getPublicKey();
+        byte[] pubKey = stock.getPublicKey();
         byte[] data = new byte[4 + pubKey.length];
         System.arraycopy(Ints.toByteArray(id), 0, data, 0, 4);
         System.arraycopy(pubKey, 0, data, 4, pubKey.length);

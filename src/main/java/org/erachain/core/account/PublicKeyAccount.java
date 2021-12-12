@@ -16,8 +16,23 @@ public class PublicKeyAccount extends Account {
         this.publicKey = publicKey;
     }
 
+    /**
+     * for make DAPP publick key
+     *
+     * @param type
+     * @param publicKey
+     */
+    public PublicKeyAccount(byte type, byte[] publicKey) {
+        super(Crypto.getInstance().getAddressBytes(type, publicKey));
+        this.publicKey = publicKey;
+    }
+
     public PublicKeyAccount(String publicKey) {
         this(Base58.decode(publicKey, PUBLIC_KEY_LENGTH));
+    }
+
+    public static PublicKeyAccount makeForDApp(byte[] publicKey) {
+        return new PublicKeyAccount(Crypto.AT_ADDRESS_VERSION, publicKey);
     }
 
     //CHECK IF IS VALID PUBLIC KEY and MAKE NEW

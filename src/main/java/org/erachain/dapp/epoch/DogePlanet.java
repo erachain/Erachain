@@ -127,7 +127,7 @@ public class DogePlanet extends EpochDAPP {
 
             totalIssued++;
 
-            planet = new AssetUnique(null, maker, "Shiba Planet #" + totalIssued, null, null,
+            planet = new AssetUnique(null, stock, "Shiba Planet #" + totalIssued, null, null,
                     null, AssetCls.AS_NON_FUNGIBLE);
             planet.setReference(transaction.getSignature(), transaction.getDBRef());
 

@@ -103,44 +103,29 @@ public class Crypto {
         return Arrays.copyOfRange(bytes, 1, bytes.length - 4);
     }
 
-
     public String getAddressFromShort(byte[] addressShort) {
         return Base58.encode(getAddressFromShort(ADDRESS_VERSION, addressShort));
     }
 
-    public String getAddress(byte[] publicKey) {
-        //SHA256 PUBLICKEY FOR PROTECTION
-        byte[] publicKeyHash = this.digest(publicKey);
-
-        //RIPEMD160 TO CREATE A SHORTER ADDRESS
-        RIPEMD160 ripEmd160 = new RIPEMD160();
-        publicKeyHash = ripEmd160.digest(publicKeyHash);
-
-        return this.getAddressFromShort(publicKeyHash);
-
-    }
     public byte[] getAddressBytes(byte[] publicKey) {
-        //SHA256 PUBLICKEY FOR PROTECTION
-        byte[] publicKeyHash = this.digest(publicKey);
-
-        //RIPEMD160 TO CREATE A SHORTER ADDRESS
-        RIPEMD160 ripEmd160 = new RIPEMD160();
-        publicKeyHash = ripEmd160.digest(publicKeyHash);
-
-        return getAddressFromShort(ADDRESS_VERSION, publicKeyHash);
+        return getAddressBytes(ADDRESS_VERSION, publicKey);
 
     }
 
     public byte[] getDAppAddress(byte[] signature) {
-        //SHA256 SIGNATURE TO CONVERT IT TO 32BYTE
-        byte[] publicKeyHash = this.digest(signature);
+        return getAddressBytes(AT_ADDRESS_VERSION, signature);
+
+    }
+
+    public byte[] getAddressBytes(byte type, byte[] publicKeyOrSignarure) {
+        //TO CONVERT IT TO 32BYTE
+        byte[] publicKeyHash = this.digest(publicKeyOrSignarure);
 
         //RIPEMD160 TO CREATE A SHORTER ADDRESS
         RIPEMD160 ripEmd160 = new RIPEMD160();
         publicKeyHash = ripEmd160.digest(publicKeyHash);
 
-        return getAddressFromShort(AT_ADDRESS_VERSION, publicKeyHash);
-
+        return getAddressFromShort(type, publicKeyHash);
     }
 
     public String getDAppAddressB58(byte[] signature) {
