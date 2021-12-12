@@ -168,24 +168,26 @@ public abstract class DAPP {
                 }
             }
 
-
-        } else if (BlockChain.TEST_MODE
-                && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
-            CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
-            if (createOrder.getHaveKey() == AssetCls.ERA_KEY
-                    && createOrder.getAmountHave().compareTo(new BigDecimal(100)) >= 0 //  && createOrder.getWantKey() == AssetCls.USD_KEY
-                    || createOrder.getWantKey() == AssetCls.ERA_KEY
-                    && createOrder.getAmountWant().compareTo(new BigDecimal(100)) >= 0 // && createOrder.getHaveKey() == AssetCls.USD_KEY
-            ) {
-                Order order = createOrder.getDCSet().getCompletedOrderMap().get(createOrder.getOrderId());
-                if (order != null)
-                    return new LeafFall();
+        } else
+            ///////////
+            if (BlockChain.TEST_MODE
+                    && transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
+                CreateOrderTransaction createOrder = (CreateOrderTransaction) transaction;
+                if (createOrder.getHaveKey() == AssetCls.ERA_KEY
+                        && createOrder.getAmountHave().compareTo(new BigDecimal(100)) >= 0 //  && createOrder.getWantKey() == AssetCls.USD_KEY
+                        || createOrder.getWantKey() == AssetCls.ERA_KEY
+                        && createOrder.getAmountWant().compareTo(new BigDecimal(100)) >= 0 // && createOrder.getHaveKey() == AssetCls.USD_KEY
+                ) {
+                    Order order = createOrder.getDCSet().getCompletedOrderMap().get(createOrder.getOrderId());
+                    if (order != null)
+                        return new LeafFall();
             }
         }
 
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
             RSend txSend = (RSend) transaction;
             if (txSend.getRecipient().isDAppOwned()) {
+                ///////////////////// cALL DAPPS HERE
             }
         }
 
