@@ -127,11 +127,11 @@ public class Crypto {
         RIPEMD160 ripEmd160 = new RIPEMD160();
         publicKeyHash = ripEmd160.digest(publicKeyHash);
 
-        return this.getAddressFromShortBytes(publicKeyHash);
+        return getAddressFromShort(ADDRESS_VERSION, publicKeyHash);
 
     }
 
-    public String getATAddress(byte[] signature) {
+    public byte[] getDAppAddress(byte[] signature) {
         //SHA256 SIGNATURE TO CONVERT IT TO 32BYTE
         byte[] publicKeyHash = this.digest(signature);
 
@@ -139,8 +139,12 @@ public class Crypto {
         RIPEMD160 ripEmd160 = new RIPEMD160();
         publicKeyHash = ripEmd160.digest(publicKeyHash);
 
-        return Base58.encode(getAddressFromShort(AT_ADDRESS_VERSION, publicKeyHash));
+        return getAddressFromShort(AT_ADDRESS_VERSION, publicKeyHash);
 
+    }
+
+    public String getDAppAddressB58(byte[] signature) {
+        return Base58.encode(getDAppAddress(signature));
     }
 
     public boolean isValidAddress(byte[] addressBytes) {
@@ -157,10 +161,6 @@ public class Crypto {
             //REMOVE CHECKSUM
             byte[] checkSum = new byte[4];
             System.arraycopy(addressBytes, Account.ADDRESS_LENGTH - 4, checkSum, 0, 4);
-            //checkSum[3] = addressBytes[Account.ADDRESS_LENGTH - 1];
-            //checkSum[2] = addressBytes[Account.ADDRESS_LENGTH - 2];
-            //checkSum[1] = addressBytes[Account.ADDRESS_LENGTH - 3];
-            //checkSum[0] = addressBytes[Account.ADDRESS_LENGTH - 4];
 
             //GENERATE ADDRESS CHECKSUM
             byte[] shortBytes = new byte[Account.ADDRESS_LENGTH - 4];
@@ -168,10 +168,6 @@ public class Crypto {
             byte[] digest = this.doubleDigest(shortBytes); // Arrays.copyOfRange(addressBytes, 0, 21));
             byte[] checkSumTwo = new byte[4];
             System.arraycopy(digest, 0, checkSumTwo, 0, 4);
-            //checkSumTwo[0] = digest[0];
-            //checkSumTwo[1] = digest[1];
-            //checkSumTwo[2] = digest[2];
-            //checkSumTwo[3] = digest[3];
 
             //CHECK IF CHECKSUMS ARE THE SAME
             return Arrays.equals(checkSum, checkSumTwo);

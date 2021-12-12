@@ -206,7 +206,7 @@ public class OrderTestsMy {
         accountA = new PrivateKeyAccount(privateKey);
 
         String addr1 = accountA.getAddress();
-        Account accShort = Account.makeAccountFromShort(accountA.getShortAddressBytes());
+        Account accShort = new Account(accountA.getShortAddressBytes());
         String addr2 = accShort.getAddress();
 
         assertEquals(addr1, addr2);
@@ -248,7 +248,7 @@ public class OrderTestsMy {
         accountA = new PrivateKeyAccount(privateKey);
 
         String addr1 = accountA.getAddress();
-        Account accShort = Account.makeAccountFromShort(accountA.getShortAddressBytes());
+        Account accShort = new Account(accountA.getShortAddressBytes());
         String addr2 = accShort.getAddress();
 
         assertEquals(addr1, addr2);
@@ -1105,7 +1105,7 @@ public class OrderTestsMy {
         accountA = new PrivateKeyAccount(privateKey);
 
         String addr1 = accountA.getAddress();
-        Account accShort = Account.makeAccountFromShort(accountA.getShortAddressBytes());
+        Account accShort = new Account(accountA.getShortAddressBytes());
         String addr2 = accShort.getAddress();
 
         BigDecimal amountHave = new BigDecimal("123.456");

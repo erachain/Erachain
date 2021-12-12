@@ -132,13 +132,13 @@ public class CSend extends CalculatedAmount {
 
         // READ CREATOR
         byte[] senderBytes = Arrays.copyOfRange(data, position, position + Transaction.CREATOR_LENGTH);
-        Account sender = Account.makeAccountFromShort(senderBytes);
+        Account sender = new Account(senderBytes);
         position += Transaction.CREATOR_LENGTH;
 
         // READ RECIPIENT
         byte[] recipientBytes = Arrays.copyOfRange(data, position, position + TransactionAmount.RECIPIENT_LENGTH);
         //Account recipient = new Account(Base58.encode(recipientBytes));
-        Account recipient = Account.makeAccountFromShort(recipientBytes);
+        Account recipient = new Account(recipientBytes);
         position += TransactionAmount.RECIPIENT_LENGTH;
 
         // READ ASSET KEY

@@ -183,6 +183,12 @@ public abstract class DAPP {
             }
         }
 
+        if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+            RSend txSend = (RSend) transaction;
+            if (txSend.getRecipient().isDAppOwned()) {
+            }
+        }
+
         return null;
 
     }
