@@ -44,6 +44,7 @@ public abstract class DAPP {
 
     protected DAPP(int id, PublicKeyAccount stock) {
         this.id = id;
+        assert (stock.isDAppOwned());
         this.stock = stock;
     }
 
@@ -89,7 +90,7 @@ public abstract class DAPP {
         byte[] hash = new byte[base.length];
         System.arraycopy(base, 0, hash, 0, base.length);
         hash[base.length - 1] += nonce;
-        return new PublicKeyAccount(hash);
+        return PublicKeyAccount.makeForDApp(hash);
     }
 
     public int length(int forDeal) {

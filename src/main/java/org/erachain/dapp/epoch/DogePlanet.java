@@ -22,7 +22,7 @@ public class DogePlanet extends EpochDAPP {
 
     static public final int ID = 1000;
 
-    static public final PublicKeyAccount MAKER = new PublicKeyAccount(crypto.digest(Longs.toByteArray(ID)));
+    static public final PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
     private int count;
     private long keyEnd;
 

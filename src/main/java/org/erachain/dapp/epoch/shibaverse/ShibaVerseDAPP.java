@@ -41,9 +41,10 @@ public class ShibaVerseDAPP extends EpochDAPP {
     static public final int ID = 1001;
 
     final public static byte[] HASH = crypto.digest(Longs.toByteArray(ID));
-    // 7G6sJRb7vf8ABEr3ENvV1fo1hwt197r35e
-    final public static PublicKeyAccount MAKER = new PublicKeyAccount(crypto.digest(Longs.toByteArray(ID)));
+    // AUohBHyRc6qAihxjRjb2tfyJjywYvUkMYD (old 7G6sJRb7vf8ABEr3ENvV1fo1hwt197r35e)
+    final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
+    // AJLCCguWKGxV7uziF14uQHKGbiUFhgqQf4
     final public static PublicKeyAccount FARM_01_PUBKEY = noncePubKey(HASH, (byte) 1);
     private static JSONObject farm_01_settings = new JSONObject();
 
@@ -62,6 +63,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
 
         accounts.add(MAKER);
         accounts.add(FARM_01_PUBKEY);
+
     }
 
 
