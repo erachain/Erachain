@@ -15,6 +15,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.dapp.DAPPFactory;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.OrderMapImpl;
@@ -133,7 +134,7 @@ public class Account {
     }
 
     public boolean isDAppOwned() {
-        return bytes[0] == Crypto.AT_ADDRESS_VERSION;
+        return bytes[0] == Crypto.DAPP_ADDRESS_VERSION;
     }
 
     public static String balancePositionName(int position) {
@@ -306,11 +307,14 @@ public class Account {
 
         // CHECK IF RECIPIENT IS VALID ADDRESS
         if (Crypto.getInstance().isValidAddress(address)) {
+            Account account = new Account(address);
+            if (account.isDAppOwned()) {
+                return DAPPFactory.getName(account);
+            }
             if (forEncrypt && null == Controller.getInstance().getPublicKeyByAddress(address)) {
                 return "address is unknown - can't encrypt for it, please use public key instead";
             }
             if (itemKey != null) {
-                Account account = new Account(address);
                 String info = account.getBalance(itemKey.getKey()).a.b.toPlainString() + "[" + itemKey.getName() + "]";
                 if (account.isPerson()) {
                     return account.getPerson().b.toString() + " - " + info;

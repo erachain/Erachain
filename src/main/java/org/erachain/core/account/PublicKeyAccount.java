@@ -32,7 +32,7 @@ public class PublicKeyAccount extends Account {
     }
 
     public static PublicKeyAccount makeForDApp(byte[] publicKey) {
-        return new PublicKeyAccount(Crypto.AT_ADDRESS_VERSION, publicKey);
+        return new PublicKeyAccount(Crypto.DAPP_ADDRESS_VERSION, publicKey);
     }
 
     //CHECK IF IS VALID PUBLIC KEY and MAKE NEW

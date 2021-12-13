@@ -17,7 +17,7 @@ public class Crypto {
     public static final int SIGNATURE_LENGTH = 2 * HASH_LENGTH;
 
     public static final byte ADDRESS_VERSION = 15;
-    public static final byte AT_ADDRESS_VERSION = 23;
+    public static final byte DAPP_ADDRESS_VERSION = 23;
     static Logger LOGGER = LoggerFactory.getLogger(Crypto.class.getName());
     private static Crypto instance;
 
@@ -84,8 +84,14 @@ public class Crypto {
 
         //ADD VERSION BYTE
         addressBytes[0] = type;
+        if (type == DAPP_ADDRESS_VERSION) {
+            addressBytes[1] = 83;
+            addressBytes[2] = 118;
+            System.arraycopy(addressShort, 2, addressBytes, 3, addressShort.length - 2);
+        } else {
+            System.arraycopy(addressShort, 0, addressBytes, 1, addressShort.length);
+        }
 
-        System.arraycopy(addressShort, 0, addressBytes, 1, addressShort.length);
 
         //GENERATE CHECKSUM
         byte[] checkSum = this.doubleDigest(Arrays.copyOfRange(addressBytes, 0, 21));
@@ -113,17 +119,34 @@ public class Crypto {
     }
 
     public byte[] getDAppAddress(byte[] signature) {
-        return getAddressBytes(AT_ADDRESS_VERSION, signature);
+        return getAddressBytes(DAPP_ADDRESS_VERSION, signature);
 
     }
 
     public byte[] getAddressBytes(byte type, byte[] publicKeyOrSignarure) {
+
+        if (type == DAPP_ADDRESS_VERSION && publicKeyOrSignarure.length >= HASH_LENGTH) {
+            publicKeyOrSignarure[4] = (publicKeyOrSignarure[6] = (publicKeyOrSignarure[8] = (publicKeyOrSignarure[10] =
+                    (publicKeyOrSignarure[12] = (publicKeyOrSignarure[14] =
+                            (publicKeyOrSignarure[16] = (publicKeyOrSignarure[18] = (publicKeyOrSignarure[20] =
+                                    (publicKeyOrSignarure[22] = (publicKeyOrSignarure[24] =
+                                            (publicKeyOrSignarure[26] = (publicKeyOrSignarure[28] = 0))))))))))));
+        } else if (type == ADDRESS_VERSION && publicKeyOrSignarure.length >= HASH_LENGTH
+                && publicKeyOrSignarure[4] == 0 && publicKeyOrSignarure[6] == 0 && publicKeyOrSignarure[8] == 0
+                && publicKeyOrSignarure[10] == 0 && publicKeyOrSignarure[12] == 0 && publicKeyOrSignarure[14] == 0
+                && publicKeyOrSignarure[16] == 0 && publicKeyOrSignarure[18] == 0 && publicKeyOrSignarure[20] == 0
+                && publicKeyOrSignarure[22] == 0 && publicKeyOrSignarure[24] == 0
+                && publicKeyOrSignarure[26] == 0 && publicKeyOrSignarure[28] == 0) {
+            type = DAPP_ADDRESS_VERSION;
+        }
+
         //TO CONVERT IT TO 32BYTE
         byte[] publicKeyHash = this.digest(publicKeyOrSignarure);
 
         //RIPEMD160 TO CREATE A SHORTER ADDRESS
         RIPEMD160 ripEmd160 = new RIPEMD160();
         publicKeyHash = ripEmd160.digest(publicKeyHash);
+
 
         return getAddressFromShort(type, publicKeyHash);
     }
@@ -141,7 +164,7 @@ public class Crypto {
 
         //CHECK VERSION
         if (addressBytes[0] == ADDRESS_VERSION
-                || addressBytes[0] == AT_ADDRESS_VERSION) {
+                || addressBytes[0] == DAPP_ADDRESS_VERSION) {
 
             //REMOVE CHECKSUM
             byte[] checkSum = new byte[4];

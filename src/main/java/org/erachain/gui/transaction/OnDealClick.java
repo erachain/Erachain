@@ -178,6 +178,10 @@ public class OnDealClick {
             case Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT:
                 mess = "Unknown public key (need for encrypt)";
                 break;
+            case Transaction.ENCRYPT_DENIED_FOR_DAPP:
+                mess = "Encryption is denied for dApps";
+                break;
+
 
             case Transaction.HASH_ALREADY_EXIST:
                 mess = "HASH_ALREADY_EXIST";

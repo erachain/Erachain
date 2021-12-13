@@ -262,9 +262,9 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (dapp != null) {
-            if (forDeal == FOR_DB_RECORD || !dapp.isEpoch()) {
-                base_len += dapp.length(forDeal);
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+                base_len += dApp.length(forDeal);
             }
         }
 

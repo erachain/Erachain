@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 public class DogePlanet extends EpochDAPP {
 
     static public final int ID = 1000;
+    static public final String NAME = "Doge Planets";
 
     static public final PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
     private int count;
@@ -37,6 +38,10 @@ public class DogePlanet extends EpochDAPP {
         super(ID);
         this.count = count;
         this.keyEnd = keyEnd;
+    }
+
+    public String getName() {
+        return NAME;
     }
 
     public int getCount() {

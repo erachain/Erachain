@@ -11,7 +11,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DAPPFactory;
 import org.erachain.dapp.epoch.EpochDAPP;
 import org.erachain.dapp.epoch.shibaverse.server.Farm_01;
 import org.erachain.datachain.CreditAddressesMap;
@@ -38,12 +38,13 @@ public class ShibaVerseDAPP extends EpochDAPP {
     int WAIT_RAND = 3;
 
     static public final int ID = 1001;
+    static public final String NAME = "Shiba Verse";
 
     final public static byte[] HASH = crypto.digest(Longs.toByteArray(ID));
-    // AUohBHyRc6qAihxjRjb2tfyJjywYvUkMYD (old 7G6sJRb7vf8ABEr3ENvV1fo1hwt197r35e)
+    //  APPB8SABCynnxZJNtyrp5CKwV9KWbURszn
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
-    // AJLCCguWKGxV7uziF14uQHKGbiUFhgqQf4
+    //  APPBpicooVqDRZxPvZxjhEKdLP5YvpM4dp
     final public static PublicKeyAccount FARM_01_PUBKEY = noncePubKey(HASH, (byte) 1);
     private static JSONObject farm_01_settings = new JSONObject();
 
@@ -54,8 +55,8 @@ public class ShibaVerseDAPP extends EpochDAPP {
     static {
         farm_01_settings.put("account", FARM_01_PUBKEY.getAddress());
 
-        if (DAPP.settingsJSON.containsKey("shiba")) {
-            boolean farm_01 = (boolean) ((JSONObject) DAPP.settingsJSON.get("shiba")).getOrDefault("farm_01", false);
+        if (DAPPFactory.settingsJSON.containsKey("shiba")) {
+            boolean farm_01 = (boolean) ((JSONObject) DAPPFactory.settingsJSON.get("shiba")).getOrDefault("farm_01", false);
             if (false && farm_01)
                 FARM_01_SERVER = new Farm_01(farm_01_settings);
         }
@@ -91,6 +92,10 @@ public class ShibaVerseDAPP extends EpochDAPP {
 
         this.command = command;
         this.status = status;
+    }
+
+    public String getName() {
+        return NAME;
     }
 
     public String getHTML(JSONObject langObj) {

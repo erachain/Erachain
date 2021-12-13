@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 public class LeafFall extends EpochDAPP {
 
     public static final int ID = 1;
+    static public final String NAME = "Magic Leaf";
 
     // global values - save in smart-contracts maps
     private int count;
@@ -49,6 +50,10 @@ public class LeafFall extends EpochDAPP {
     public LeafFall(int resultHash) {
         super(ID);
         this.resultHash = resultHash;
+    }
+
+    public String getName() {
+        return NAME;
     }
 
     public int getCount() {
