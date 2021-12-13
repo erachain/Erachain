@@ -126,17 +126,15 @@ public class Crypto {
     public byte[] getAddressBytes(byte type, byte[] publicKeyOrSignarure) {
 
         if (type == DAPP_ADDRESS_VERSION && publicKeyOrSignarure.length >= HASH_LENGTH) {
-            publicKeyOrSignarure[4] = (publicKeyOrSignarure[6] = (publicKeyOrSignarure[8] = (publicKeyOrSignarure[10] =
-                    (publicKeyOrSignarure[12] = (publicKeyOrSignarure[14] =
-                            (publicKeyOrSignarure[16] = (publicKeyOrSignarure[18] = (publicKeyOrSignarure[20] =
-                                    (publicKeyOrSignarure[22] = (publicKeyOrSignarure[24] =
-                                            (publicKeyOrSignarure[26] = (publicKeyOrSignarure[28] = 0))))))))))));
+            publicKeyOrSignarure[2] = (publicKeyOrSignarure[5] = (publicKeyOrSignarure[8] = (publicKeyOrSignarure[11] =
+                    (publicKeyOrSignarure[14] = (publicKeyOrSignarure[17] =
+                            (publicKeyOrSignarure[20] = (publicKeyOrSignarure[23] = (publicKeyOrSignarure[26] =
+                                    (publicKeyOrSignarure[29] = 0)))))))));
         } else if (type == ADDRESS_VERSION && publicKeyOrSignarure.length >= HASH_LENGTH
-                && publicKeyOrSignarure[4] == 0 && publicKeyOrSignarure[6] == 0 && publicKeyOrSignarure[8] == 0
-                && publicKeyOrSignarure[10] == 0 && publicKeyOrSignarure[12] == 0 && publicKeyOrSignarure[14] == 0
-                && publicKeyOrSignarure[16] == 0 && publicKeyOrSignarure[18] == 0 && publicKeyOrSignarure[20] == 0
-                && publicKeyOrSignarure[22] == 0 && publicKeyOrSignarure[24] == 0
-                && publicKeyOrSignarure[26] == 0 && publicKeyOrSignarure[28] == 0) {
+                && publicKeyOrSignarure[2] == 0 && publicKeyOrSignarure[5] == 0 && publicKeyOrSignarure[8] == 0
+                && publicKeyOrSignarure[11] == 0 && publicKeyOrSignarure[14] == 0 && publicKeyOrSignarure[17] == 0
+                && publicKeyOrSignarure[20] == 0 && publicKeyOrSignarure[23] == 0 && publicKeyOrSignarure[26] == 0
+                && publicKeyOrSignarure[29] == 0) {
             type = DAPP_ADDRESS_VERSION;
         }
 
