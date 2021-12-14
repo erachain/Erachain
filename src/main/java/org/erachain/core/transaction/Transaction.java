@@ -24,6 +24,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DAPPFactory;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -198,6 +199,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static final int INVALID_MESSAGE_FORMAT = 195;
     public static final int INVALID_MESSAGE_LENGTH = 196;
     public static final int UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT = 197;
+    public static final int ENCRYPT_DENIED_FOR_DAPP = 198;
 
     public static final int INVALID_FLAGS = 199;
 
@@ -443,7 +445,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     protected Object[][] itemsKeys;
 
     protected ExLink exLink;
-    protected DAPP dapp;
+    protected DAPP dApp;
 
     /**
      * если да то значит взята из Пула трнзакций и на двойную трату проверялась
@@ -458,7 +460,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         this.TYPE_NAME = type_name;
     }
 
-    protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, DAPP dapp, byte feePow, long timestamp,
+    protected Transaction(byte[] typeBytes, String type_name, PublicKeyAccount creator, ExLink exLink, DAPP dApp, byte feePow, long timestamp,
                           long extFlags) {
         this.typeBytes = typeBytes;
         this.TYPE_NAME = type_name;
@@ -471,7 +473,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         }
 
         // NOT NEED HERE setup - typeBytes[2] | HAS_SMART_CONTRACT_MASK()
-        this.dapp = dapp;
+        this.dApp = dApp;
 
         this.timestamp = timestamp;
 
@@ -944,7 +946,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public DAPP getSmartContract() {
-        return dapp;
+        return dApp;
     }
 
     public void makeItemsKeys() {
@@ -1935,10 +1937,10 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             data = Bytes.concat(data, exLink.toBytes());
         }
 
-        if (dapp != null) {
-            if (forDeal == FOR_DB_RECORD || !dapp.isEpoch()) {
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
                 typeBytes[2] |= HAS_SMART_CONTRACT_MASK();
-                data = Bytes.concat(data, dapp.toBytes(forDeal));
+                data = Bytes.concat(data, dApp.toBytes(forDeal));
             } else {
                 typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
             }
@@ -2003,9 +2005,9 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (dapp != null) {
-            if (forDeal == FOR_DB_RECORD || !dapp.isEpoch()) {
-                base_len += dapp.length(forDeal);
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+                base_len += dApp.length(forDeal);
             }
         }
 
@@ -2680,14 +2682,16 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public void processTail(Block block, int forDeal) {
 
         ///////// SMART CONTRACTS SESSION
-        if (dapp == null && (block == null || block.heightBlock > 1)) {
+        if (dApp == null && (block == null || block.heightBlock > 1)) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
-            // потом он будет записан в базу данных и его можно найти загрузив эту трнзакцию
-            dapp = dapp.make(this);
+            // потом он будет записан в базу данных и его можно найти загрузив эту транзакцию
+            // !!! ВНИМАНИЕ - делать эпохальный можно только тут - а не перед isValid или в setDCSet
+            // так как иначе он будет при парсе транзакции учтен и байты съедут
+            dApp = DAPPFactory.make(this);
         }
 
-        if (dapp != null)
-            dapp.process(dcSet, block, this);
+        if (dApp != null)
+            dApp.process(dcSet, block, this);
 
         // UPDATE REFERENCE OF SENDER
         if (this.creator != null)
@@ -2707,8 +2711,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
      * @param block
      */
     public void processByTime(Block block) {
-        if (dapp != null) {
-            dapp.processByTime(dcSet, block, this);
+        if (dApp != null) {
+            dApp.processByTime(dcSet, block, this);
             // update status in DB
 
         }
@@ -2724,19 +2728,19 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         ///////// SMART CONTRACTS SESSION
-        if (dapp == null && block.heightBlock > 1) {
+        if (dApp == null && block.heightBlock > 1) {
             // если у транзакции нет изначально контракта то попробуем сделать эпохальныый
             // для Отката нужно это сделать тут
-            dapp = dapp.make(this);
+            dApp = DAPPFactory.make(this);
         }
 
-        if (dapp != null) {
+        if (dApp != null) {
             // если смарт-контракт найден, то тут он Голый и
             // его надо загружать из баазы данных чтобы восстановить все значения связанные с этой транзакцией
             Transaction txInDB = dcSet.getTransactionFinalMap().get(dbRef);
-            dapp = txInDB.getSmartContract();
+            dApp = txInDB.getSmartContract();
 
-            dapp.orphan(dcSet, this);
+            dApp.orphan(dcSet, this);
         }
 
     }
@@ -2784,8 +2788,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     }
 
     public void orphanByTime(Block block) {
-        if (dapp != null)
-            dapp.orphanByTime(dcSet, block, this);
+        if (dApp != null)
+            dApp.orphanByTime(dcSet, block, this);
     }
 
     public Transaction copy() {

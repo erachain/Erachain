@@ -116,29 +116,6 @@ public class TelegramSplitPanel extends SplitPanel {
 
         });
 
-
-// set position sender
-        if (Settings.getInstance().getTelegramDefaultSender() != null) {
-
-            try {
-                leftTelegram.jComboAccount
-                        .setSelectedItem(new Account(Settings.getInstance().getTelegramDefaultSender()));
-                leftTelegram.jComboAccount.repaint();
-                rightTelegramPanel.jLabelLeft.setText(Settings.getInstance().getTelegramDefaultSender());
-                rightTelegramPanel.walletTelegramsFilterTableModel.setSender(Settings.getInstance().getTelegramDefaultSender());
-                sender = (Account) this.leftTelegram.jComboAccount.getSelectedItem();
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
-        } else {
-            leftTelegram.jComboAccount
-                    .setSelectedIndex(0);
-            rightTelegramPanel.walletTelegramsFilterTableModel.setSender(leftTelegram.jComboAccount.getItemAt(0).getAddress());
-            rightTelegramPanel.jLabelLeft.setText(leftTelegram.jComboAccount.getItemAt(0).getAddress());
-            leftTelegram.jComboAccount.repaint();
-            sender = (Account) this.leftTelegram.jComboAccount.getSelectedItem();
-        }
-
         leftTelegram.jComboAccount.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -409,6 +386,23 @@ public class TelegramSplitPanel extends SplitPanel {
 
         TableMenuPopupUtil.installContextMenu(tableFavoriteAccounts, menu);
 
+        if (Settings.getInstance().getTelegramDefaultSender() != null) {
+            try {
+                leftTelegram.jComboAccount
+                        .setSelectedItem(new Account(Settings.getInstance().getTelegramDefaultSender()));
+                leftTelegram.jComboAccount.repaint();
+                sender = (Account) this.leftTelegram.jComboAccount.getSelectedItem();
+            } catch (Exception e) {
+            }
+        }
+
+        if (sender == null) {
+            leftTelegram.jComboAccount.setSelectedIndex(0);
+            sender = (Account) this.leftTelegram.jComboAccount.getSelectedItem();
+        }
+
+        rightTelegramPanel.jLabelLeft.setText(sender.getAddress());
+        rightTelegramPanel.walletTelegramsFilterTableModel.setSender(sender.getAddress());
 
     }
 

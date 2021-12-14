@@ -641,6 +641,11 @@ public class RSend extends TransactionAmount {
             }
         }
 
+        if (dApp != null && isText() && isEncrypted()) {
+            errorValue = "DAPP used";
+            return ENCRYPT_DENIED_FOR_DAPP;
+        }
+
         return super.isValid(forDeal, checkFlags);
     }
 

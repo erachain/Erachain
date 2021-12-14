@@ -356,7 +356,7 @@ public class DeployATTransaction extends Transaction {
                 return returnCode + AT_ERROR;
             }
 
-            String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
+            String atId = Crypto.getInstance().getDAppAddressB58(getBytesForAddress(this.dcSet));
             if (this.dcSet.getATMap().getAT(atId) != null) {
                 return 12 + AT_ERROR;
             }
@@ -382,7 +382,7 @@ public class DeployATTransaction extends Transaction {
                 false, false, false);
 
         //CREATE AT ID = ADDRESS
-        String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
+        String atId = Crypto.getInstance().getDAppAddressB58(getBytesForAddress(this.dcSet));
 
         Account atAccount = new Account(atId);
 
@@ -426,7 +426,7 @@ public class DeployATTransaction extends Transaction {
 
         bf.putInt(getBlockHeightByParentOrLast(db));
 
-        String atId = Crypto.getInstance().getATAddress(bf.array().clone());
+        String atId = Crypto.getInstance().getDAppAddressB58(bf.array().clone());
 
         return new Account(atId);
     }
@@ -441,7 +441,7 @@ public class DeployATTransaction extends Transaction {
         this.creator.changeBalance(this.dcSet, false, false, Transaction.FEE_KEY, this.amount,
                 false, false, false);
 
-        String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
+        String atId = Crypto.getInstance().getDAppAddressB58(getBytesForAddress(this.dcSet));
 
         Account atAccount = new Account(atId);
 

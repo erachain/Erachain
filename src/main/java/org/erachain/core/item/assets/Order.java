@@ -510,7 +510,7 @@ public class Order implements Comparable<Order> {
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-        Account creator = Account.makeAccountFromShort(creatorBytes);
+        Account creator = new Account(creatorBytes);
         position += CREATOR_LENGTH;
 
         //READ HAVE

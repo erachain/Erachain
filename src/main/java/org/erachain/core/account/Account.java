@@ -15,6 +15,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.dapp.DAPPFactory;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.OrderMapImpl;
@@ -73,37 +74,32 @@ public class Account {
         this.address = address;
     }
 
-    public Account(byte[] addressBytes) {
+    public Account(byte[] addressBytes, byte type) {
         if (addressBytes.length == ADDRESS_SHORT_LENGTH) {
             // AS SHORT BYTES
             this.shortBytes = addressBytes;
-            this.bytes = Crypto.getInstance().getAddressFromShortBytes(addressBytes);
+            this.bytes = Crypto.getInstance().getAddressFromShort(type, addressBytes);
         } else if (addressBytes.length == ADDRESS_LENGTH) {
             // AS FULL 25 byres
             this.bytes = addressBytes;
             this.shortBytes = Arrays.copyOfRange(addressBytes, 1, this.bytes.length - 4);
 
         } else {
-            assert(addressBytes.length == ADDRESS_LENGTH);
+            assert (addressBytes.length == ADDRESS_LENGTH);
         }
+    }
 
-        /// make on demand this.address = Base58.encode(bytes);
+    public Account(byte[] addressBytes) {
+        this(addressBytes, Crypto.ADDRESS_VERSION);
     }
 
     public static byte[] makeShortBytes(String address) {
         return Arrays.copyOfRange(Base58.decode(address), 1, ADDRESS_LENGTH - 4);
 
     }
-    public static Account makeAccountFromShort(byte[] addressShort) {
-
-        String address = Crypto.getInstance().getAddressFromShort(addressShort);
-        return new Account(address);
-    }
 
     public static Account makeAccountFromShort(BigInteger addressShort) {
-
-        String address = Crypto.getInstance().getAddressFromShort(addressShort.toByteArray());
-        return new Account(address);
+        return new Account(addressShort.toByteArray());
     }
 
     public static Tuple2<Account, String> tryMakeAccount(String address) {
@@ -135,6 +131,10 @@ public class Account {
             return new Tuple2<Account, String>(null, "The name is not registered");
         }
 
+    }
+
+    public boolean isDAppOwned() {
+        return bytes[0] == Crypto.DAPP_ADDRESS_VERSION;
     }
 
     public static String balancePositionName(int position) {
@@ -307,11 +307,14 @@ public class Account {
 
         // CHECK IF RECIPIENT IS VALID ADDRESS
         if (Crypto.getInstance().isValidAddress(address)) {
+            Account account = new Account(address);
+            if (account.isDAppOwned()) {
+                return DAPPFactory.getName(account);
+            }
             if (forEncrypt && null == Controller.getInstance().getPublicKeyByAddress(address)) {
                 return "address is unknown - can't encrypt for it, please use public key instead";
             }
             if (itemKey != null) {
-                Account account = new Account(address);
                 String info = account.getBalance(itemKey.getKey()).a.b.toPlainString() + "[" + itemKey.getName() + "]";
                 if (account.isPerson()) {
                     return account.getPerson().b.toString() + " - " + info;

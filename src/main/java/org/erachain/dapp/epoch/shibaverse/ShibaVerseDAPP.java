@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.apache.commons.net.util.Base64;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -12,7 +11,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.DAPP;
+import org.erachain.dapp.DAPPFactory;
 import org.erachain.dapp.epoch.EpochDAPP;
 import org.erachain.dapp.epoch.shibaverse.server.Farm_01;
 import org.erachain.datachain.CreditAddressesMap;
@@ -39,11 +38,13 @@ public class ShibaVerseDAPP extends EpochDAPP {
     int WAIT_RAND = 3;
 
     static public final int ID = 1001;
+    static public final String NAME = "Shiba Verse";
 
     final public static byte[] HASH = crypto.digest(Longs.toByteArray(ID));
-    // 7G6sJRb7vf8ABEr3ENvV1fo1hwt197r35e
-    final public static PublicKeyAccount MAKER = new PublicKeyAccount(crypto.digest(Longs.toByteArray(ID)));
+    // APPC45p29ZjcEEvSzhgUe8RfUzMZ1i2GFG
+    final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
+    // APPBttBTR6pSEg6FBny3reRG4rkdp8dtG8
     final public static PublicKeyAccount FARM_01_PUBKEY = noncePubKey(HASH, (byte) 1);
     private static JSONObject farm_01_settings = new JSONObject();
 
@@ -54,21 +55,22 @@ public class ShibaVerseDAPP extends EpochDAPP {
     static {
         farm_01_settings.put("account", FARM_01_PUBKEY.getAddress());
 
-        if (DAPP.settingsJSON.containsKey("shiba")) {
-            boolean farm_01 = (boolean) ((JSONObject) DAPP.settingsJSON.get("shiba")).getOrDefault("farm_01", false);
+        if (DAPPFactory.settingsJSON.containsKey("shiba")) {
+            boolean farm_01 = (boolean) ((JSONObject) DAPPFactory.settingsJSON.get("shiba")).getOrDefault("farm_01", false);
             if (false && farm_01)
                 FARM_01_SERVER = new Farm_01(farm_01_settings);
         }
 
         accounts.add(MAKER);
         accounts.add(FARM_01_PUBKEY);
+
     }
 
 
     /**
      * admin account
      */
-    final static public Account adminAddress = new Account("7C6cEeHw739uQm8PhdnS9yENdLhT8LUERP");
+    final static public Account adminAddress = new Account("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP");
 
     final static public String COMMAND_CATH_COMET = "catch comets";
     final static public String COMMAND_STAKE = "stake";
@@ -92,22 +94,18 @@ public class ShibaVerseDAPP extends EpochDAPP {
         this.status = status;
     }
 
+    public String getName() {
+        return NAME;
+    }
+
     public String getHTML(JSONObject langObj) {
         String out = super.getHTML(langObj) + "<br>";
         return out + Lang.T("Command", langObj) + ": <b>" + (command == null ? "" : command) + "</b><br>"
                 + Lang.T("Status", langObj) + ": <b>" + (status == null ? "" : status) + "</b>";
     }
 
-    public static ShibaVerseDAPP make(Transaction transaction) {
+    public static ShibaVerseDAPP make(RSend txSend, String command) {
 
-        if (transaction.getBlockHeight() == 1609) {
-            boolean debug = true;
-        }
-
-        if (!BlockChain.TEST_MODE || transaction.getType() != Transaction.SEND_ASSET_TRANSACTION)
-            return null;
-
-        RSend txSend = (RSend) transaction;
         Account recipent = txSend.getRecipient();
         if (!accounts.contains(recipent)) {
             return null;
@@ -121,11 +119,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
             }
         }
 
-        if (txSend.isText() && !txSend.isEncrypted()) {
-            return new ShibaVerseDAPP(new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase(), "");
-        } else {
-            return new ShibaVerseDAPP("", "");
-        }
+        return new ShibaVerseDAPP(command, "");
 
     }
 
@@ -418,7 +412,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
                     json.put("random", Base64.encodeBase64StringUnChunked(randomArray));
                     String description = json.toJSONString();
 
-                    comet = new AssetVenture(null, maker, name, null, null,
+                    comet = new AssetVenture(null, stock, name, null, null,
                             description, AssetCls.AS_INSIDE_ASSETS, 0, 0);
                     comet.setReference(commandTX.getSignature(), commandTX.getDBRef());
 
@@ -432,7 +426,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
             // TRANSFER ASSET
             creator.changeBalance(dcSet, asOrphan, false, assetKey,
                     BigDecimal.ONE, false, false, false);
-            maker.changeBalance(dcSet, !asOrphan, false, assetKey,
+            stock.changeBalance(dcSet, !asOrphan, false, assetKey,
                     BigDecimal.ONE, false, false, false);
 
         } while (--count > 0);
@@ -536,7 +530,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
             dcSet.getItemAssetMap().decrementDelete(gravitaKey);
 
         } else {
-            AssetVenture gravita = new AssetVenture(null, maker, "GR", null, null,
+            AssetVenture gravita = new AssetVenture(null, stock, "GR", null, null,
                     null, AssetCls.AS_INSIDE_ASSETS, 6, 0);
             gravita.setReference(commandTX.getSignature(), commandTX.getDBRef());
 
@@ -549,7 +543,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
         // TRANSFER GRAVITA to ADMIN
         admin.changeBalance(dcSet, asOrphan, false, gravitaKey,
                 new BigDecimal("10000"), false, false, false);
-        maker.changeBalance(dcSet, !asOrphan, false, gravitaKey,
+        stock.changeBalance(dcSet, !asOrphan, false, gravitaKey,
                 new BigDecimal("10000"), false, false, false);
 
     }

@@ -21,8 +21,9 @@ import java.math.BigDecimal;
 public class DogePlanet extends EpochDAPP {
 
     static public final int ID = 1000;
+    static public final String NAME = "Doge Planets";
 
-    static public final PublicKeyAccount MAKER = new PublicKeyAccount(crypto.digest(Longs.toByteArray(ID)));
+    static public final PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
     private int count;
     private long keyEnd;
 
@@ -37,6 +38,10 @@ public class DogePlanet extends EpochDAPP {
         super(ID);
         this.count = count;
         this.keyEnd = keyEnd;
+    }
+
+    public String getName() {
+        return NAME;
     }
 
     public int getCount() {
@@ -127,7 +132,7 @@ public class DogePlanet extends EpochDAPP {
 
             totalIssued++;
 
-            planet = new AssetUnique(null, maker, "Shiba Planet #" + totalIssued, null, null,
+            planet = new AssetUnique(null, stock, "Shiba Planet #" + totalIssued, null, null,
                     null, AssetCls.AS_NON_FUNGIBLE);
             planet.setReference(transaction.getSignature(), transaction.getDBRef());
 

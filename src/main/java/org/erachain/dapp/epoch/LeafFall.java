@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 public class LeafFall extends EpochDAPP {
 
     public static final int ID = 1;
+    static public final String NAME = "Magic Leaf";
 
     // global values - save in smart-contracts maps
     private int count;
@@ -49,6 +50,10 @@ public class LeafFall extends EpochDAPP {
     public LeafFall(int resultHash) {
         super(ID);
         this.resultHash = resultHash;
+    }
+
+    public String getName() {
+        return NAME;
     }
 
     public int getCount() {
@@ -121,7 +126,7 @@ public class LeafFall extends EpochDAPP {
         // TRANSFER LEAF from MAKER to RECIPIENT
         creator.changeBalance(dcSet, asOrphan, false, leafKey,
                 BigDecimal.ONE, false, false, false);
-        maker.changeBalance(dcSet, !asOrphan, false, leafKey,
+        stock.changeBalance(dcSet, !asOrphan, false, leafKey,
                 BigDecimal.ONE, false, false, false);
 
         //
@@ -129,7 +134,7 @@ public class LeafFall extends EpochDAPP {
         // ACCAUNTING RARITY RESULT from MAKER to RECIPIENT
         creator.changeBalance(dcSet, asOrphan, false, keyInit,
                 resultBG, false, false, false);
-        maker.changeBalance(dcSet, !asOrphan, false, keyInit,
+        stock.changeBalance(dcSet, !asOrphan, false, keyInit,
                 resultBG, false, false, false);
 
         if (block != null) {
@@ -196,7 +201,7 @@ public class LeafFall extends EpochDAPP {
         /**
          * for accounting total leaf for person
          */
-        AssetVenture leafSum = new AssetVenture(null, maker, "LeafFall_sum", null, null,
+        AssetVenture leafSum = new AssetVenture(null, stock, "LeafFall_sum", null, null,
                 null, AssetCls.AS_SELF_MANAGED_ACCOUNTING, 0, 0);
         leafSum.setReference(transaction.getSignature(), transaction.getDBRef());
 
@@ -207,7 +212,7 @@ public class LeafFall extends EpochDAPP {
         ItemAssetMap map = dcSet.getItemAssetMap();
         for (long leafKey : leafs) {
             AssetCls leafAsset = map.get(leafKey);
-            leafAsset.setMaker(maker);
+            leafAsset.setMaker(stock);
             // update MAKER
             map.put(leafKey, leafAsset);
         }
