@@ -1148,7 +1148,7 @@
   "Digital Index": "Digital index",
   "Other Digital Right of Claim": "Other digital right of claim",
   "AddImageLabel.externalURL.tip": "Set source by URL. Blockchain URL example: '/apiasset/image/{key}. External source not safe by blockchain.",
-  "NOT_TRANSFERABLE": "Not transferable (All transfers of property are prohibited except from the account and to the account of the creator)",
+  "NOT_TRANSFERABLE": "Not transferable (All transfers of property are prohibited except from the account of the creator)",
   "IssueAssetPanel.isUnTransferable.tip": "All transfers of property are prohibited except from the account and to the account of the creator",
   "IssueAssetPanel.isAnonimDenied.tip": "It is forbidden to transfer and sell to anonymous accounts",
   "IssueAssetCopyPanel.titleDescription": "Release of a Series of unique assets of the NFT type. When using the Original, the image specified here will be used as a frame superimposed on top of the media from the Original with an increase in the frame size by 10% on all sides",
