@@ -717,12 +717,17 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                 long key = this.getAssetKey();
 
                 AssetCls asset = Controller.getInstance().getAsset(this.getAbsAssetKey());
-                ImageIcon image = asset.getImageIcon();
-                if (image != null) {
+                if (false && asset.getIcon() != null) {
+                    // не пашет img_Local_URL = "data:image/gif;base64," + Base64.encodeBase64String(asset.getIcon());
+
+                    // TODO нужно еще КЭШ картинок сделать как тут org.erachain.gui.items.assets.AssetInfo.HTML_Add_Local_Images
+                    // но по ходу в строках таблицы так не сделать
+                    ImageIcon image = asset.getImageIcon();
                     cachedImage = image.getImage().getScaledInstance(fontHeight, fontHeight, 1);
                     img_Local_URL = "http:\\img_" + assetKey;
-                    // TODO нужно еще КЭШ картинок сделать как тут org.erachain.gui.items.assets.AssetInfo.HTML_Add_Local_Images
 
+                } else {
+                    img_Local_URL = null;
                 }
 
                 String actionName = tx.viewFullTypeName();
@@ -730,7 +735,7 @@ public class MailsHTMLTableModel extends JTable implements Observer {
                         //+ Lang.T("Amount") + ": "
                         + NumberAsString.formatAsString(this.amount) + "</font> "
                         // TODO ошибка открытия
-                        + (cachedImage == null ? "" : "<img src='" + img_Local_URL + "'>")
+                        + (img_Local_URL == null ? "" : "<img src='" + img_Local_URL + "'>")
                         + " " + asset.toString()
                         + "</b>";
             }
