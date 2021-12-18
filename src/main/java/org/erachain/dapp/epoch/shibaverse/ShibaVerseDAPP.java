@@ -784,4 +784,10 @@ public class ShibaVerseDAPP extends EpochDAPP {
         return "<html>RARY: <b>" + format2.format(rary) + "</b><br>" + description + "</html>";
     }
 
+    public static void setDAPPFactory(HashMap<Account, Integer> skocks) {
+        for (Account account : accounts) {
+            skocks.put(account, ID);
+        }
+    }
+
 }
