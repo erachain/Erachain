@@ -73,6 +73,9 @@ public class ShibaVerseDAPP extends EpochDAPP {
     final static public Account adminAddress = new Account("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP");
 
     final static public String COMMAND_CATH_COMET = "catch comets";
+    final static public String COMMAND_BUSTER_01 = "buster01";
+    final static public long buster01Key = 11111L;
+
     final static public String COMMAND_STAKE = "stake";
 
     final static public String COMMAND_FARM = "farm";
@@ -111,7 +114,12 @@ public class ShibaVerseDAPP extends EpochDAPP {
             return null;
         }
 
-        if (recipent.equals(FARM_01_PUBKEY)) {
+        if (recipent.equals(MAKER)) {
+            if (command.equals(COMMAND_BUSTER_01)) {
+                return new ShibaVerseDAPP(command, "");
+            }
+            return new ShibaVerseDAPP(command, "");
+        } else if (recipent.equals(FARM_01_PUBKEY)) {
             if (txSend.balancePosition() == Account.BALANCE_POS_DEBT && txSend.hasAmount()) {
                 return new ShibaVerseDAPP(txSend.isBackward() ? COMMAND_PICK_UP : COMMAND_FARM, "");
             } else if (txSend.balancePosition() == Account.BALANCE_POS_OWN) {
@@ -152,6 +160,23 @@ public class ShibaVerseDAPP extends EpochDAPP {
                 RSend rsend = (RSend) transaction;
                 if (rsend.getAssetKey() != gravitaKey) {
                     status = "Wrong asset key. Need " + gravitaKey;
+                } else if (!rsend.hasAmount() || !rsend.hasPacket() && rsend.getAmount().signum() <= 0) {
+                    status = "Wrong amount. Need > 0";
+                } else if (rsend.isBackward()) {
+                    status = "Wrong direction - backward";
+                } else if (rsend.balancePosition() != Account.BALANCE_POS_OWN) {
+                    status = "Wrong balance position. Need OWN[1]";
+                } else {
+                    return true;
+                }
+            }
+        } else if (COMMAND_BUSTER_01.equals(command)) {
+            if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
+                status = "Wrong transaction type. Need SEND";
+            } else {
+                RSend rsend = (RSend) transaction;
+                if (rsend.getAssetKey() != 18) {
+                    status = "Wrong asset key. Need " + 18;
                 } else if (!rsend.hasAmount() || !rsend.hasPacket() && rsend.getAmount().signum() <= 0) {
                     status = "Wrong amount. Need > 0";
                 } else if (rsend.isBackward()) {
@@ -438,6 +463,29 @@ public class ShibaVerseDAPP extends EpochDAPP {
 
     }
 
+    private void sellBuster01(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        // рождение комет
+        SmartContractValues valuesMap = dcSet.getSmartContractValues();
+        PublicKeyAccount creator = commandTX.getCreator();
+        int count = commandTX.getAmount().intValue() / 10;
+
+        // TODO - deposite
+        BigDecimal leftAmount = commandTX.getAmount().subtract(new BigDecimal(count));
+
+
+        // TRANSFER ASSET
+        creator.changeBalance(dcSet, asOrphan, false, buster01Key,
+                new BigDecimal(count), false, false, false);
+        stock.changeBalance(dcSet, !asOrphan, false, buster01Key,
+                new BigDecimal(count), false, false, false);
+
+        if (asOrphan)
+            status = "wait";
+        else
+            status = "done";
+
+    }
+
     private void stakeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
     }
 
@@ -580,13 +628,15 @@ public class ShibaVerseDAPP extends EpochDAPP {
                         rsend.getCreator() // need for TEST - not adminAddress
                 );
             } else {
-                if (COMMAND_CATH_COMET.equals(command)
+                if (COMMAND_CATH_COMET.equals(command) || COMMAND_BUSTER_01.equals(command)
                         // это не проверка вне блока - в ней блока нет
                         && block != null) {
                     // рождение комет
                     dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
                     status = "wait";
                     return false;
+                } else if (COMMAND_BUSTER_01.equals(command)) {
+                    stakeAction(dcSet, block, (RSend) transaction, false);
                 } else if (COMMAND_STAKE.equals(command)) {
                     stakeAction(dcSet, block, (RSend) transaction, false);
                 } else if (COMMAND_FARM.equals(command) || COMMAND_PICK_UP.equals(command)) {
@@ -603,6 +653,8 @@ public class ShibaVerseDAPP extends EpochDAPP {
 
         if (COMMAND_CATH_COMET.equals(command)) {
             catchComets(dcSet, block, (RSend) transaction, false);
+        } else if (COMMAND_BUSTER_01.equals(command)) {
+            sellBuster01(dcSet, block, (RSend) transaction, false);
         }
 
         return false;
@@ -630,7 +682,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
             );
         }
 
-        if (COMMAND_CATH_COMET.equals(command)) {
+        if (COMMAND_CATH_COMET.equals(command) || COMMAND_BUSTER_01.equals(command)) {
             // отмена рождения комет
             dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
             return false;
@@ -645,6 +697,8 @@ public class ShibaVerseDAPP extends EpochDAPP {
     public boolean orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
         if (COMMAND_CATH_COMET.equals(command)) {
             catchComets(dcSet, block, (RSend) transaction, true);
+        } else if (COMMAND_BUSTER_01.equals(command)) {
+            sellBuster01(dcSet, block, (RSend) transaction, true);
         }
 
         return false;
