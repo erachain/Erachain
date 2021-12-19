@@ -70,13 +70,25 @@ public abstract class DAPPFactory {
         if (!txSend.getRecipient().isDAppOwned())
             return null;
 
-        String command;
-        if (txSend.isText() && !txSend.isEncrypted()) {
-            command = new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase();
-        } else {
-            command = txSend.getTitle();
-            if (command == null) command = "";
+        ///// OLD VERSION
+        if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND && txSend.hasAmount()
+        ) {
+            if (txSend.hasPacket()) {
+
+            } else if (txSend.getAmount().signum() < 0) {
+                return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
+            }
         }
+        //////
+
+        /////// NEW VERSION
+
+        String command = txSend.getTitle();
+        if ((command == null || command.isEmpty()) && txSend.isText() && !txSend.isEncrypted()) {
+            command = new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase();
+        }
+        if (command == null)
+            command = "";
 
         ///////////////////// CALL DAPPS HERE
         Integer dappID = skocks.get(txSend.getRecipient());
@@ -86,15 +98,6 @@ public abstract class DAPPFactory {
         switch (dappID) {
             case ShibaVerseDAPP.ID:
                 return ShibaVerseDAPP.make(txSend, command);
-        }
-
-        if (txSend.balancePosition() == TransactionAmount.ACTION_SPEND && txSend.hasAmount()
-        ) {
-            if (txSend.hasPacket()) {
-
-            } else if (txSend.getAmount().signum() < 0) {
-                return new DogePlanet(Math.abs(transaction.getAmount().intValue()));
-            }
         }
 
         return null;

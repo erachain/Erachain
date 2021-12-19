@@ -39,17 +39,23 @@ public class ShibaVerseDAPP extends EpochDAPP {
     static public final int ID = 1001;
     static public final String NAME = "Shiba Verse";
 
+    final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
+
     final public static byte[] HASH = crypto.digest(Longs.toByteArray(ID));
     // APPC45p29ZjcEEvSzhgUe8RfUzMZ1i2GFG
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
     // APPBttBTR6pSEg6FBny3reRG4rkdp8dtG8
     final public static PublicKeyAccount FARM_01_PUBKEY = noncePubKey(HASH, (byte) 1);
+
+    static {
+        accounts.add(MAKER);
+        accounts.add(FARM_01_PUBKEY);
+    }
+
     private static JSONObject farm_01_settings = new JSONObject();
 
     public static Farm_01 FARM_01_SERVER = null;
-
-    final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
 
     static {
         farm_01_settings.put("account", FARM_01_PUBKEY.getAddress());
@@ -59,10 +65,6 @@ public class ShibaVerseDAPP extends EpochDAPP {
             if (false && farm_01)
                 FARM_01_SERVER = new Farm_01(farm_01_settings);
         }
-
-        accounts.add(MAKER);
-        accounts.add(FARM_01_PUBKEY);
-
     }
 
 
@@ -189,7 +191,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
                     status = "Wrong balance position. Need OWN[1]";
                 } else if (!rsend.isText()) {
                     status = "Not text message";
-                } else if (!rsend.isEncrypted()) {
+                } else if (rsend.isEncrypted()) {
                     status = "Encrypted message";
                 } else {
                     long assetKey = 0;
@@ -200,7 +202,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
                         return false;
                     }
 
-                    if (assetKey != buster01Key) {
+                    if (false && assetKey != buster01Key) {
                         status = "Wrong asset key";
                     } else {
                         return true;
@@ -484,14 +486,21 @@ public class ShibaVerseDAPP extends EpochDAPP {
     }
 
     private BigDecimal shopPrice(long assetKey, long assetToSell) {
-        if (assetToSell == buster01Key) {
-            switch ((int) assetKey) {
-                case 18:
-                    return new BigDecimal("0.1");
-                default:
-                    return new BigDecimal("0.01");
-            }
+        switch ((int) assetToSell) {
+            case (int) buster01Key:
+                switch ((int) assetKey) {
+                    case 18:
+                        return new BigDecimal("0.1");
+                    default:
+                        // for TEST ONLY
+                        return new BigDecimal("0.01");
+                }
         }
+        if (true) {
+            // for TEST ONLY
+            return new BigDecimal("0.1");
+        }
+
         return BigDecimal.ZERO;
     }
 
