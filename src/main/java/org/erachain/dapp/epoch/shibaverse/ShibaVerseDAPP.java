@@ -485,10 +485,10 @@ public class ShibaVerseDAPP extends EpochDAPP {
 
     }
 
-    private BigDecimal shopPrice(long assetKey, long assetToSell) {
+    private BigDecimal shopPrice(long incomedAssetKey, long assetToSell) {
         switch ((int) assetToSell) {
             case (int) buster01Key:
-                switch ((int) assetKey) {
+                switch ((int) incomedAssetKey) {
                     case 18:
                         return new BigDecimal("0.1");
                     default:
@@ -519,7 +519,6 @@ public class ShibaVerseDAPP extends EpochDAPP {
         PublicKeyAccount creator = commandTX.getCreator();
         long incomedAssetKey = commandTX.getAssetKey();
         long assetKeyToSell = Long.parseLong(new String(commandTX.getData(), StandardCharsets.UTF_8));
-        AssetCls assetToSell = commandTX.getAsset();
 
         if (asOrphan) {
             Object[] result = removeState(dcSet);
@@ -539,10 +538,13 @@ public class ShibaVerseDAPP extends EpochDAPP {
                 }
             }
         } else {
+            AssetCls incomedAsset = commandTX.getAsset();
+            AssetCls assetToSell = dcSet.getItemAssetMap().get(assetKeyToSell);
+            BigDecimal leftAmount = commandTX.getAmount();
 
             BigDecimal sellPrice = shopPrice(incomedAssetKey, assetKeyToSell);
-            BigDecimal amountToSell = new BigDecimal(commandTX.getAmount().multiply(sellPrice).intValue());
-            if (!assetToSell.isUnlimited(stock, false)) {
+            BigDecimal amountToSell = leftAmount.multiply(sellPrice).setScale(assetToSell.getScale(), BigDecimal.ROUND_HALF_DOWN);
+            if (amountToSell.signum() > 0 && !incomedAsset.isUnlimited(stock, false)) {
                 Tuple2<BigDecimal, BigDecimal> stockBal = stock.getBalance(dcSet, assetKeyToSell, Account.BALANCE_POS_OWN);
                 if (amountToSell.compareTo(stockBal.b) > 0) {
                     // if not enought amount
@@ -556,22 +558,20 @@ public class ShibaVerseDAPP extends EpochDAPP {
                         amountToSell, false, false, false);
                 stock.changeBalance(dcSet, true, false, assetKeyToSell,
                         amountToSell, false, false, false);
-
                 // RETURN change
-                BigDecimal leftAmount = commandTX.getAmount().subtract(amountToSell.divide(sellPrice, assetToSell.getScale(), BigDecimal.ROUND_DOWN));
-                if (leftAmount.signum() > 0) {
-                    creator.changeBalance(dcSet, false, false, incomedAssetKey,
-                            leftAmount, false, false, false);
-                    stock.changeBalance(dcSet, true, false, incomedAssetKey,
-                            leftAmount, false, false, false);
-                }
-
-                // store results for orphan
-                putState(dcSet, new Object[]{amountToSell, leftAmount});
-
-            } else {
-                putState(dcSet, new Object[]{});
+                leftAmount = leftAmount.subtract(amountToSell.divide(sellPrice, incomedAsset.getScale(), BigDecimal.ROUND_DOWN));
             }
+
+            if (leftAmount.signum() > 0) {
+                creator.changeBalance(dcSet, false, false, incomedAssetKey,
+                        leftAmount, false, false, false);
+                stock.changeBalance(dcSet, true, false, incomedAssetKey,
+                        leftAmount, false, false, false);
+            }
+
+            // store results for orphan
+            putState(dcSet, new Object[]{amountToSell, leftAmount});
+
 
             status = "done";
         }
