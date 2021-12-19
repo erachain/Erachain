@@ -75,6 +75,19 @@ public abstract class DAPP {
         return PublicKeyAccount.makeForDApp(hash);
     }
 
+
+    public void putState(DCSet dcSet, Object[] values) {
+        dcSet.getSmartContractState().putState(id, values);
+    }
+
+    public Object[] peekState(DCSet dcSet) {
+        return dcSet.getSmartContractState().peekState(id);
+    }
+
+    public Object[] removeState(DCSet dcSet) {
+        return dcSet.getSmartContractState().removeState(id);
+    }
+
     public int length(int forDeal) {
         return 4 + 32;
     }

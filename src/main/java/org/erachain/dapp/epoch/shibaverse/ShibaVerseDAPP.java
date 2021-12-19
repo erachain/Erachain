@@ -16,6 +16,7 @@ import org.erachain.dapp.epoch.EpochDAPP;
 import org.erachain.dapp.epoch.shibaverse.server.Farm_01;
 import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.SmartContractValues;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
@@ -29,9 +30,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class ShibaVerseDAPP extends EpochDAPP {
 
@@ -72,11 +71,18 @@ public class ShibaVerseDAPP extends EpochDAPP {
      */
     final static public Account adminAddress = new Account("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP");
 
+    final static public String COMMAND_WITHDRAW = "withdraw";
     final static public String COMMAND_CATH_COMET = "catch comets";
-    final static public String COMMAND_BUSTER_01 = "buster01";
+    /**
+     * in Title: buy
+     * in message - asset key
+     */
+    final static public String COMMAND_BUY = "buy";
     final static public long buster01Key = 11111L;
 
     final static public String COMMAND_STAKE = "stake";
+
+    final static public String COMMAND_RANDOM = "random";
 
     final static public String COMMAND_FARM = "farm";
     final static public String COMMAND_CHARGE = "charge";
@@ -88,6 +94,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
 
     private String command;
     private String status;
+
     private Long gravitaKey;
 
     public ShibaVerseDAPP(String command, String status) {
@@ -115,9 +122,6 @@ public class ShibaVerseDAPP extends EpochDAPP {
         }
 
         if (recipent.equals(MAKER)) {
-            if (command.equals(COMMAND_BUSTER_01)) {
-                return new ShibaVerseDAPP(command, "");
-            }
             return new ShibaVerseDAPP(command, "");
         } else if (recipent.equals(FARM_01_PUBKEY)) {
             if (txSend.balancePosition() == Account.BALANCE_POS_DEBT && txSend.hasAmount()) {
@@ -170,21 +174,37 @@ public class ShibaVerseDAPP extends EpochDAPP {
                     return true;
                 }
             }
-        } else if (COMMAND_BUSTER_01.equals(command)) {
+        } else if (COMMAND_BUY.equals(command)) {
             if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
                 status = "Wrong transaction type. Need SEND";
             } else {
                 RSend rsend = (RSend) transaction;
-                if (rsend.getAssetKey() != 18) {
-                    status = "Wrong asset key. Need " + 18;
+                if (rsend.getAssetKey() != 1 && rsend.getAssetKey() != 18) {
+                    status = "Wrong asset key. Need 1 or 18";
                 } else if (!rsend.hasAmount() || !rsend.hasPacket() && rsend.getAmount().signum() <= 0) {
                     status = "Wrong amount. Need > 0";
                 } else if (rsend.isBackward()) {
                     status = "Wrong direction - backward";
                 } else if (rsend.balancePosition() != Account.BALANCE_POS_OWN) {
                     status = "Wrong balance position. Need OWN[1]";
+                } else if (!rsend.isText()) {
+                    status = "Not text message";
+                } else if (!rsend.isEncrypted()) {
+                    status = "Encrypted message";
                 } else {
-                    return true;
+                    long assetKey = 0;
+                    try {
+                        assetKey = Long.parseLong(new String(rsend.getData(), StandardCharsets.UTF_8));
+                    } catch (Exception e) {
+                        status = "Wrong asset key in message";
+                        return false;
+                    }
+
+                    if (assetKey != buster01Key) {
+                        status = "Wrong asset key";
+                    } else {
+                        return true;
+                    }
                 }
             }
 
@@ -463,21 +483,52 @@ public class ShibaVerseDAPP extends EpochDAPP {
 
     }
 
-    private void sellBuster01(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
-        // рождение комет
-        SmartContractValues valuesMap = dcSet.getSmartContractValues();
+    private BigDecimal shopPrice(long assetKey, long assetToSell) {
+        if (assetToSell == buster01Key) {
+            switch ((int) assetKey) {
+                case 18:
+                    return new BigDecimal("0.1");
+                default:
+                    return new BigDecimal("0.01");
+            }
+        }
+        return BigDecimal.ZERO;
+    }
+
+    private void random(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+    }
+
+    /**
+     * shop for sell items
+     *
+     * @param dcSet
+     * @param block
+     * @param commandTX
+     * @param asOrphan
+     */
+    private void shopBuy(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
         PublicKeyAccount creator = commandTX.getCreator();
-        int count = commandTX.getAmount().intValue() / 10;
+        long assetToSell = Long.parseLong(new String(commandTX.getData(), StandardCharsets.UTF_8));
 
-        // TODO - deposite
-        BigDecimal leftAmount = commandTX.getAmount().subtract(new BigDecimal(count));
+        BigDecimal sellPrice = shopPrice(commandTX.getAssetKey(), assetToSell);
+        BigDecimal amountToSell = new BigDecimal(commandTX.getAmount().multiply(sellPrice).intValue());
 
+        if (amountToSell.signum() > 0) {
+            // TRANSFER ASSET
+            creator.changeBalance(dcSet, asOrphan, false, assetToSell,
+                    amountToSell, false, false, false);
+            stock.changeBalance(dcSet, !asOrphan, false, assetToSell,
+                    amountToSell, false, false, false);
 
-        // TRANSFER ASSET
-        creator.changeBalance(dcSet, asOrphan, false, buster01Key,
-                new BigDecimal(count), false, false, false);
-        stock.changeBalance(dcSet, !asOrphan, false, buster01Key,
-                new BigDecimal(count), false, false, false);
+            // RETURN change
+            BigDecimal leftAmount = commandTX.getAmount().subtract(amountToSell.divide(sellPrice, commandTX.getAsset().getScale(), BigDecimal.ROUND_DOWN));
+            if (leftAmount.signum() > 0) {
+                creator.changeBalance(dcSet, asOrphan, false, assetToSell,
+                        leftAmount, false, false, false);
+                stock.changeBalance(dcSet, !asOrphan, false, assetToSell,
+                        leftAmount, false, false, false);
+            }
+        }
 
         if (asOrphan)
             status = "wait";
@@ -565,6 +616,61 @@ public class ShibaVerseDAPP extends EpochDAPP {
         }
     }
 
+    private void adminWithdraw(DCSet dcSet, RSend commandTX, Account admin, boolean asOrphan) {
+        if (asOrphan) {
+            // restore results for orphan
+            List<Tuple2<Long, BigDecimal>> results = (List<Tuple2<Long, BigDecimal>>) removeState(dcSet)[0];
+
+            for (Tuple2<Long, BigDecimal> row : results) {
+                // RE-TRANSFER ASSET from ADMIN
+                admin.changeBalance(dcSet, true, false, row.a,
+                        row.b, false, false, false);
+                stock.changeBalance(dcSet, false, false, row.a,
+                        row.b, false, false, false);
+
+            }
+
+        } else {
+            ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+            try (IteratorCloseable<byte[]> iterator = map.getIteratorByAccount(stock)) {
+                List<Tuple2<byte[], Fun.Tuple5<
+                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> assetsBalances
+                        = map.getBalancesList(stock);
+                byte[] key;
+                long assetKey;
+                List<Tuple2<Long, BigDecimal>> results = new ArrayList<>();
+                while (iterator.hasNext()) {
+                    key = iterator.next();
+
+                    assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+                    if (assetKey == AssetCls.LIA_KEY) {
+                        continue;
+                    }
+
+                    Fun.Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                            itemBals = map.get(key);
+
+                    if (itemBals == null)
+                        continue;
+
+                    // TRANSFER ASSET to ADMIN
+                    admin.changeBalance(dcSet, false, false, assetKey,
+                            itemBals.a.b, false, false, false);
+                    stock.changeBalance(dcSet, true, false, assetKey,
+                            itemBals.a.b, false, false, false);
+
+                    results.add(new Tuple2(assetKey, itemBals.a.b));
+                }
+
+                // store results for orphan
+                putState(dcSet, new Object[]{results});
+
+            } catch (IOException e) {
+            }
+        }
+    }
+
     private void init(DCSet dcSet, RSend commandTX, Account admin, boolean asOrphan) {
 
         /**
@@ -609,7 +715,8 @@ public class ShibaVerseDAPP extends EpochDAPP {
         if ("init".equals(command)) {
             init(dcSet, commandTX, admin, false);
         } else if (command.startsWith("emite")) {
-
+        } else if (command.startsWith(COMMAND_WITHDRAW)) {
+            adminWithdraw(dcSet, commandTX, admin, false);
         }
 
         return false;
@@ -628,15 +735,15 @@ public class ShibaVerseDAPP extends EpochDAPP {
                         rsend.getCreator() // need for TEST - not adminAddress
                 );
             } else {
-                if (COMMAND_CATH_COMET.equals(command) || COMMAND_BUSTER_01.equals(command)
+                if (COMMAND_RANDOM.equals(command)
                         // это не проверка вне блока - в ней блока нет
                         && block != null) {
                     // рождение комет
                     dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
                     status = "wait";
                     return false;
-                } else if (COMMAND_BUSTER_01.equals(command)) {
-                    stakeAction(dcSet, block, (RSend) transaction, false);
+                } else if (COMMAND_BUY.equals(command)) {
+                    shopBuy(dcSet, block, (RSend) transaction, false);
                 } else if (COMMAND_STAKE.equals(command)) {
                     stakeAction(dcSet, block, (RSend) transaction, false);
                 } else if (COMMAND_FARM.equals(command) || COMMAND_PICK_UP.equals(command)) {
@@ -653,8 +760,8 @@ public class ShibaVerseDAPP extends EpochDAPP {
 
         if (COMMAND_CATH_COMET.equals(command)) {
             catchComets(dcSet, block, (RSend) transaction, false);
-        } else if (COMMAND_BUSTER_01.equals(command)) {
-            sellBuster01(dcSet, block, (RSend) transaction, false);
+        } else if (COMMAND_RANDOM.equals(command)) {
+            random(dcSet, block, (RSend) transaction, false);
         }
 
         return false;
@@ -663,6 +770,8 @@ public class ShibaVerseDAPP extends EpochDAPP {
     public boolean orphanAdminCommands(DCSet dcSet, RSend commandTX, Account admin) {
         if ("init".equals(command)) {
             init(dcSet, commandTX, admin, true);
+        } else if (command.startsWith(COMMAND_WITHDRAW)) {
+            adminWithdraw(dcSet, commandTX, admin, true);
         }
 
         return false;
@@ -682,10 +791,12 @@ public class ShibaVerseDAPP extends EpochDAPP {
             );
         }
 
-        if (COMMAND_CATH_COMET.equals(command) || COMMAND_BUSTER_01.equals(command)) {
+        if (COMMAND_CATH_COMET.equals(command) || COMMAND_RANDOM.equals(command)) {
             // отмена рождения комет
             dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
             return false;
+        } else if (COMMAND_BUY.equals(command)) {
+            shopBuy(dcSet, null, (RSend) transaction, true);
         } else if (COMMAND_STAKE.equals(command)) {
             farmAction(dcSet, null, (RSend) transaction, true);
         }
@@ -697,8 +808,8 @@ public class ShibaVerseDAPP extends EpochDAPP {
     public boolean orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
         if (COMMAND_CATH_COMET.equals(command)) {
             catchComets(dcSet, block, (RSend) transaction, true);
-        } else if (COMMAND_BUSTER_01.equals(command)) {
-            sellBuster01(dcSet, block, (RSend) transaction, true);
+        } else if (COMMAND_RANDOM.equals(command)) {
+            random(dcSet, block, (RSend) transaction, true);
         }
 
         return false;

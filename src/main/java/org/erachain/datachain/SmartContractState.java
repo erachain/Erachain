@@ -36,10 +36,9 @@ public class SmartContractState extends DCUMap<Tuple2<Integer, Integer>, Object[
         map = new HashMap<Tuple2<Integer, Integer>, Object[]>();
     }
 
-    @Override
-    public void put(Tuple2<Integer, Integer> key, Object[] state) {
-        Tuple2<Integer, Integer> firstKey = new Tuple2<>(key.a, 0);
-        Object[] first = get(firstKey);
+    public void putState(Integer dAppID, Object[] values) {
+        Tuple2<Integer, Integer> firstKey = new Tuple2<>(dAppID, 0);
+        Object[] first = super.get(firstKey);
         int stateID;
         if (first == null) {
             super.put(firstKey, new Object[]{1});
@@ -47,16 +46,23 @@ public class SmartContractState extends DCUMap<Tuple2<Integer, Integer>, Object[
         } else {
             stateID = (int) first[0] + 1;
         }
-        super.put(new Tuple2<>(key.a, stateID), state);
+        super.put(new Tuple2<>(dAppID, stateID), values);
     }
 
-    @Override
-    public void delete(Tuple2<Integer, Integer> key) {
-        Tuple2<Integer, Integer> firstKey = new Tuple2<>(key.a, 0);
+    public Object[] peekState(Integer dAppID) {
+        Tuple2<Integer, Integer> firstKey = new Tuple2<>(dAppID, 0);
         Object[] first = get(firstKey);
         int stateID = (int) first[0];
-        super.delete(new Tuple2<>(key.a, stateID));
+        return super.get(new Tuple2<>(dAppID, stateID));
+    }
+
+    public Object[] removeState(Integer dAppID) {
+        Tuple2<Integer, Integer> firstKey = new Tuple2<>(dAppID, 0);
+        Object[] first = get(firstKey);
+        int stateID = (int) first[0];
+        Object[] removerValues = super.remove(new Tuple2<>(dAppID, stateID));
         super.put(firstKey, new Object[]{stateID - 1});
+        return removerValues;
     }
 
 }
