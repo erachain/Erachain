@@ -508,32 +508,64 @@ public class ShibaVerseDAPP extends EpochDAPP {
      */
     private void shopBuy(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
         PublicKeyAccount creator = commandTX.getCreator();
-        long assetToSell = Long.parseLong(new String(commandTX.getData(), StandardCharsets.UTF_8));
+        long incomedAssetKey = commandTX.getAssetKey();
+        long assetKeyToSell = Long.parseLong(new String(commandTX.getData(), StandardCharsets.UTF_8));
+        AssetCls assetToSell = commandTX.getAsset();
 
-        BigDecimal sellPrice = shopPrice(commandTX.getAssetKey(), assetToSell);
-        BigDecimal amountToSell = new BigDecimal(commandTX.getAmount().multiply(sellPrice).intValue());
+        if (asOrphan) {
+            Object[] result = removeState(dcSet);
+            if (result.length > 0) {
+                BigDecimal amountToSell = (BigDecimal) result[0];
+                creator.changeBalance(dcSet, true, false, assetKeyToSell,
+                        amountToSell, false, false, false);
+                stock.changeBalance(dcSet, false, false, assetKeyToSell,
+                        amountToSell, false, false, false);
 
-        if (amountToSell.signum() > 0) {
-            // TRANSFER ASSET
-            creator.changeBalance(dcSet, asOrphan, false, assetToSell,
-                    amountToSell, false, false, false);
-            stock.changeBalance(dcSet, !asOrphan, false, assetToSell,
-                    amountToSell, false, false, false);
-
-            // RETURN change
-            BigDecimal leftAmount = commandTX.getAmount().subtract(amountToSell.divide(sellPrice, commandTX.getAsset().getScale(), BigDecimal.ROUND_DOWN));
-            if (leftAmount.signum() > 0) {
-                creator.changeBalance(dcSet, asOrphan, false, assetToSell,
-                        leftAmount, false, false, false);
-                stock.changeBalance(dcSet, !asOrphan, false, assetToSell,
-                        leftAmount, false, false, false);
+                BigDecimal leftAmount = (BigDecimal) result[1];
+                if (leftAmount.signum() > 0) {
+                    creator.changeBalance(dcSet, true, false, incomedAssetKey,
+                            leftAmount, false, false, false);
+                    stock.changeBalance(dcSet, false, false, incomedAssetKey,
+                            leftAmount, false, false, false);
+                }
             }
-        }
+        } else {
 
-        if (asOrphan)
-            status = "wait";
-        else
+            BigDecimal sellPrice = shopPrice(incomedAssetKey, assetKeyToSell);
+            BigDecimal amountToSell = new BigDecimal(commandTX.getAmount().multiply(sellPrice).intValue());
+            if (!assetToSell.isUnlimited(stock, false)) {
+                Tuple2<BigDecimal, BigDecimal> stockBal = stock.getBalance(dcSet, assetKeyToSell, Account.BALANCE_POS_OWN);
+                if (amountToSell.compareTo(stockBal.b) > 0) {
+                    // if not enought amount
+                    amountToSell = stockBal.b;
+                }
+            }
+
+            if (amountToSell.signum() > 0) {
+                // TRANSFER ASSET
+                creator.changeBalance(dcSet, false, false, assetKeyToSell,
+                        amountToSell, false, false, false);
+                stock.changeBalance(dcSet, true, false, assetKeyToSell,
+                        amountToSell, false, false, false);
+
+                // RETURN change
+                BigDecimal leftAmount = commandTX.getAmount().subtract(amountToSell.divide(sellPrice, assetToSell.getScale(), BigDecimal.ROUND_DOWN));
+                if (leftAmount.signum() > 0) {
+                    creator.changeBalance(dcSet, false, false, incomedAssetKey,
+                            leftAmount, false, false, false);
+                    stock.changeBalance(dcSet, true, false, incomedAssetKey,
+                            leftAmount, false, false, false);
+                }
+
+                // store results for orphan
+                putState(dcSet, new Object[]{amountToSell, leftAmount});
+
+            } else {
+                putState(dcSet, new Object[]{});
+            }
+
             status = "done";
+        }
 
     }
 

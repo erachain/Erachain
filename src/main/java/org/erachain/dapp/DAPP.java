@@ -76,14 +76,32 @@ public abstract class DAPP {
     }
 
 
+    /**
+     * save current state values
+     *
+     * @param dcSet
+     * @param values
+     */
     public void putState(DCSet dcSet, Object[] values) {
         dcSet.getSmartContractState().putState(id, values);
     }
 
+    /**
+     * Peek state values
+     *
+     * @param dcSet
+     * @return
+     */
     public Object[] peekState(DCSet dcSet) {
         return dcSet.getSmartContractState().peekState(id);
     }
 
+    /**
+     * Remove state values
+     *
+     * @param dcSet
+     * @return
+     */
     public Object[] removeState(DCSet dcSet) {
         return dcSet.getSmartContractState().removeState(id);
     }
