@@ -81,6 +81,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
      */
     final static public String COMMAND_BUY = "buy";
     final static public long buster01Key = 11111L;
+    final static public String COMMAND_SET_PRICE = "set price";
 
     final static public String COMMAND_STAKE = "stake";
 
