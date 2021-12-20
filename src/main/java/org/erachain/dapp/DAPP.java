@@ -3,6 +3,7 @@ package org.erachain.dapp;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
@@ -13,6 +14,8 @@ import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
+
+import java.math.BigDecimal;
 
 public abstract class DAPP {
 
@@ -75,6 +78,23 @@ public abstract class DAPP {
         return PublicKeyAccount.makeForDApp(hash);
     }
 
+    public static void transfer(DCSet dcSet, Block block, Transaction commandTX,
+                                Account from, Account to, BigDecimal amount, long assetKey, boolean asOrphan,
+                                String memoFrom, String memoTo) {
+        // TRANSFER ASSET
+        from.changeBalance(dcSet, !asOrphan, false, assetKey,
+                amount, false, false, false);
+        to.changeBalance(dcSet, asOrphan, false, assetKey,
+                amount, false, false, false);
+
+        if (block != null) {
+            if (memoFrom != null)
+                block.addCalculated(from, assetKey, amount, memoFrom, commandTX.getDBRef());
+            if (memoTo != null)
+                block.addCalculated(to, assetKey, amount, memoTo, commandTX.getDBRef());
+        }
+
+    }
 
     /**
      * save current state values

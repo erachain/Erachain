@@ -471,10 +471,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
             }
 
             // TRANSFER ASSET
-            creator.changeBalance(dcSet, asOrphan, false, assetKey,
-                    BigDecimal.ONE, false, false, false);
-            stock.changeBalance(dcSet, !asOrphan, false, assetKey,
-                    BigDecimal.ONE, false, false, false);
+            transfer(dcSet, block, commandTX, stock, creator, BigDecimal.ONE, assetKey, asOrphan, null, "catchComets");
 
         } while (--count > 0);
 
@@ -524,17 +521,11 @@ public class ShibaVerseDAPP extends EpochDAPP {
             Object[] result = removeState(dcSet);
             if (result.length > 0) {
                 BigDecimal amountToSell = (BigDecimal) result[0];
-                creator.changeBalance(dcSet, true, false, assetKeyToSell,
-                        amountToSell, false, false, false);
-                stock.changeBalance(dcSet, false, false, assetKeyToSell,
-                        amountToSell, false, false, false);
+                transfer(dcSet, null, commandTX, creator, stock, amountToSell, assetKeyToSell, true, null, null);
 
                 BigDecimal leftAmount = (BigDecimal) result[1];
                 if (leftAmount.signum() > 0) {
-                    creator.changeBalance(dcSet, true, false, incomedAssetKey,
-                            leftAmount, false, false, false);
-                    stock.changeBalance(dcSet, false, false, incomedAssetKey,
-                            leftAmount, false, false, false);
+                    transfer(dcSet, null, commandTX, creator, stock, leftAmount, incomedAssetKey, true, null, null);
                 }
             }
         } else {
@@ -548,25 +539,24 @@ public class ShibaVerseDAPP extends EpochDAPP {
                 Tuple2<BigDecimal, BigDecimal> stockBal = stock.getBalance(dcSet, assetKeyToSell, Account.BALANCE_POS_OWN);
                 if (amountToSell.compareTo(stockBal.b) > 0) {
                     // if not enought amount
-                    amountToSell = stockBal.b;
+                    if (stockBal.b.signum() > 0) {
+                        amountToSell = stockBal.b;
+                    } else {
+                        amountToSell = BigDecimal.ZERO;
+                    }
                 }
             }
 
             if (amountToSell.signum() > 0) {
                 // TRANSFER ASSET
-                creator.changeBalance(dcSet, false, false, assetKeyToSell,
-                        amountToSell, false, false, false);
-                stock.changeBalance(dcSet, true, false, assetKeyToSell,
-                        amountToSell, false, false, false);
+                transfer(dcSet, block, commandTX, stock, creator, amountToSell, assetKeyToSell, false, null, "buy");
+
                 // RETURN change
                 leftAmount = leftAmount.subtract(amountToSell.divide(sellPrice, incomedAsset.getScale(), BigDecimal.ROUND_DOWN));
             }
 
             if (leftAmount.signum() > 0) {
-                creator.changeBalance(dcSet, false, false, incomedAssetKey,
-                        leftAmount, false, false, false);
-                stock.changeBalance(dcSet, true, false, incomedAssetKey,
-                        leftAmount, false, false, false);
+                transfer(dcSet, block, commandTX, stock, creator, leftAmount, incomedAssetKey, false, null, "change");
             }
 
             // store results for orphan
@@ -657,18 +647,14 @@ public class ShibaVerseDAPP extends EpochDAPP {
         }
     }
 
-    private void adminWithdraw(DCSet dcSet, RSend commandTX, Account admin, boolean asOrphan) {
+    private void adminWithdraw(DCSet dcSet, Block block, RSend commandTX, Account admin, boolean asOrphan) {
         if (asOrphan) {
             // restore results for orphan
             List<Tuple2<Long, BigDecimal>> results = (List<Tuple2<Long, BigDecimal>>) removeState(dcSet)[0];
 
             for (Tuple2<Long, BigDecimal> row : results) {
                 // RE-TRANSFER ASSET from ADMIN
-                admin.changeBalance(dcSet, true, false, row.a,
-                        row.b, false, false, false);
-                stock.changeBalance(dcSet, false, false, row.a,
-                        row.b, false, false, false);
-
+                transfer(dcSet, null, commandTX, admin, stock, row.b, row.a, true, null, null);
             }
 
         } else {
@@ -696,12 +682,10 @@ public class ShibaVerseDAPP extends EpochDAPP {
                         continue;
 
                     // TRANSFER ASSET to ADMIN
-                    admin.changeBalance(dcSet, false, false, assetKey,
-                            itemBals.a.b, false, false, false);
-                    stock.changeBalance(dcSet, true, false, assetKey,
-                            itemBals.a.b, false, false, false);
+                    transfer(dcSet, block, commandTX, stock, admin, itemBals.a.b, assetKey, false, null, "adminWithdraw");
 
                     results.add(new Tuple2(assetKey, itemBals.a.b));
+
                 }
 
                 // store results for orphan
@@ -712,7 +696,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
         }
     }
 
-    private void init(DCSet dcSet, RSend commandTX, Account admin, boolean asOrphan) {
+    private void init(DCSet dcSet, Block block, RSend commandTX, Account admin, boolean asOrphan) {
 
         /**
          * issue main currency
@@ -736,10 +720,8 @@ public class ShibaVerseDAPP extends EpochDAPP {
         }
 
         // TRANSFER GRAVITA to ADMIN
-        admin.changeBalance(dcSet, asOrphan, false, gravitaKey,
-                new BigDecimal("10000"), false, false, false);
-        stock.changeBalance(dcSet, !asOrphan, false, gravitaKey,
-                new BigDecimal("10000"), false, false, false);
+        BigDecimal amount = new BigDecimal("10000");
+        transfer(dcSet, block, commandTX, stock, admin, amount, gravitaKey, false, null, "init");
 
     }
 
@@ -754,10 +736,10 @@ public class ShibaVerseDAPP extends EpochDAPP {
      */
     public boolean processAdminCommands(DCSet dcSet, Block block, RSend commandTX, Account admin) {
         if ("init".equals(command)) {
-            init(dcSet, commandTX, admin, false);
+            init(dcSet, block, commandTX, admin, false);
         } else if (command.startsWith("emite")) {
         } else if (command.startsWith(COMMAND_WITHDRAW)) {
-            adminWithdraw(dcSet, commandTX, admin, false);
+            adminWithdraw(dcSet, block, commandTX, admin, false);
         }
 
         return false;
@@ -810,9 +792,9 @@ public class ShibaVerseDAPP extends EpochDAPP {
 
     public boolean orphanAdminCommands(DCSet dcSet, RSend commandTX, Account admin) {
         if ("init".equals(command)) {
-            init(dcSet, commandTX, admin, true);
+            init(dcSet, null, commandTX, admin, true);
         } else if (command.startsWith(COMMAND_WITHDRAW)) {
-            adminWithdraw(dcSet, commandTX, admin, true);
+            adminWithdraw(dcSet, null, commandTX, admin, true);
         }
 
         return false;
