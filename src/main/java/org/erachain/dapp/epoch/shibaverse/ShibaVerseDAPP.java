@@ -1,6 +1,5 @@
 package org.erachain.dapp.epoch.shibaverse;
 
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.apache.commons.net.util.Base64;
@@ -12,14 +11,13 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.DAPPFactory;
-import org.erachain.dapp.epoch.EpochDAPP;
+import org.erachain.dapp.EpochDAPPjson;
 import org.erachain.dapp.epoch.shibaverse.server.Farm_01;
 import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.SmartContractValues;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.lang.Lang;
 import org.erachain.webserver.WebResource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -32,7 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 
-public class ShibaVerseDAPP extends EpochDAPP {
+public class ShibaVerseDAPP extends EpochDAPPjson {
 
     int WAIT_RAND = 3;
 
@@ -95,29 +93,22 @@ public class ShibaVerseDAPP extends EpochDAPP {
      */
     static final private Tuple2 INIT_KEY = new Tuple2(ID, "i");
 
-    private String command;
-    private String status;
-
     private Long gravitaKey;
 
-    public ShibaVerseDAPP(String command, String status) {
-        super(ID, MAKER);
+    public ShibaVerseDAPP(String command, String data, String status) {
+        super(ID, MAKER, command, data, status);
+    }
 
-        this.command = command;
-        this.status = status;
+    public ShibaVerseDAPP(String data, String status) {
+        super(ID, MAKER, null, data, status);
     }
 
     public String getName() {
         return NAME;
     }
 
-    public String getHTML(JSONObject langObj) {
-        String out = super.getHTML(langObj) + "<br>";
-        return out + Lang.T("Command", langObj) + ": <b>" + (command == null ? "" : command) + "</b><br>"
-                + Lang.T("Status", langObj) + ": <b>" + (status == null ? "" : status) + "</b>";
-    }
 
-    public static ShibaVerseDAPP make(RSend txSend, String command) {
+    public static ShibaVerseDAPP make(RSend txSend, String title, String data) {
 
         Account recipent = txSend.getRecipient();
         if (!accounts.contains(recipent)) {
@@ -125,7 +116,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
         }
 
         if (recipent.equals(MAKER)) {
-            return new ShibaVerseDAPP(command, "");
+            return new ShibaVerseDAPP(title, data, "");
         } else if (recipent.equals(FARM_01_PUBKEY)) {
             if (txSend.balancePosition() == Account.BALANCE_POS_DEBT && txSend.hasAmount()) {
                 return new ShibaVerseDAPP(txSend.isBackward() ? COMMAND_PICK_UP : COMMAND_FARM, "");
@@ -134,7 +125,7 @@ public class ShibaVerseDAPP extends EpochDAPP {
             }
         }
 
-        return new ShibaVerseDAPP(command, "");
+        return new ShibaVerseDAPP(title, data, "");
 
     }
 
@@ -276,79 +267,35 @@ public class ShibaVerseDAPP extends EpochDAPP {
     }
 
     /// PARSE / TOBYTES
-    @Override
-    public int length(int forDeal) {
 
-        int len = 4;
-        if (forDeal == Transaction.FOR_DB_RECORD) {
-            len += 8;
-            if (status != null)
-                len += status.length();
-            if (command != null)
-                len += command.length();
-        }
-
-        return len;
-    }
-
-    @Override
-    public byte[] toBytes(int forDeal) {
-
-        byte[] data = Ints.toByteArray(id);
-
-        if (forDeal == Transaction.FOR_DB_RECORD) {
-            byte[] commandBytes;
-            byte[] statusBytes;
-
-            if (command != null) {
-                commandBytes = command.getBytes(StandardCharsets.UTF_8);
-            } else {
-                commandBytes = new byte[0];
-            }
-            if (status != null) {
-                statusBytes = status.getBytes(StandardCharsets.UTF_8);
-            } else {
-                statusBytes = new byte[0];
-            }
-            data = Bytes.concat(data, Ints.toByteArray(commandBytes.length));
-            data = Bytes.concat(data, commandBytes);
-
-            data = Bytes.concat(data, Ints.toByteArray(statusBytes.length));
-            data = Bytes.concat(data, statusBytes);
-        }
-
-        return data;
-
-    }
-
-    public static ShibaVerseDAPP Parse(byte[] data, int pos, int forDeal) {
+    public static ShibaVerseDAPP Parse(byte[] bytes, int pos, int forDeal) {
 
         // skip ID
         pos += 4;
 
-        String command;
+        String data;
         String status;
         if (forDeal == Transaction.FOR_DB_RECORD) {
-            byte[] commandSizeBytes = Arrays.copyOfRange(data, pos, pos + 4);
-            int commandSize = Ints.fromByteArray(commandSizeBytes);
+            byte[] dataSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
+            int dataSize = Ints.fromByteArray(dataSizeBytes);
             pos += 4;
-            byte[] commandBytes = Arrays.copyOfRange(data, pos, pos + commandSize);
-            pos += commandSize;
-            command = new String(commandBytes, StandardCharsets.UTF_8);
+            byte[] dataBytes = Arrays.copyOfRange(bytes, pos, pos + dataSize);
+            pos += dataSize;
+            data = new String(dataBytes, StandardCharsets.UTF_8);
 
-            byte[] statusSizeBytes = Arrays.copyOfRange(data, pos, pos + 4);
+            byte[] statusSizeBytes = Arrays.copyOfRange(bytes, pos, pos + 4);
             int statusLen = Ints.fromByteArray(statusSizeBytes);
             pos += 4;
-            byte[] statusBytes = Arrays.copyOfRange(data, pos, pos + statusLen);
+            byte[] statusBytes = Arrays.copyOfRange(bytes, pos, pos + statusLen);
             pos += statusLen;
             status = new String(statusBytes, StandardCharsets.UTF_8);
 
         } else {
-            command = "-";
-            status = "-";
+            data = "";
+            status = "";
         }
 
-        return new ShibaVerseDAPP(command, status);
+        return new ShibaVerseDAPP(data, status);
     }
 
     ///////// COMMANDS
