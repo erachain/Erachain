@@ -112,9 +112,6 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
     public static ShibaVerseDAPP make(RSend txSend, String dataStr) {
 
         Account recipent = txSend.getRecipient();
-        if (!accounts.contains(recipent)) {
-            return null;
-        }
 
         if (recipent.equals(FARM_01_PUBKEY)) {
             if (txSend.balancePosition() == Account.BALANCE_POS_DEBT && txSend.hasAmount()) {
@@ -369,7 +366,8 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         return BigDecimal.ZERO;
     }
 
-    private void random(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+    private boolean random(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        return true;
     }
 
     /**
@@ -510,7 +508,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
 
     private boolean farmAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
 
-        status = "error";
+        error("-");
 
         if (asOrphan) {
             return true;
@@ -644,27 +642,27 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                         error("Not JSON: " + item.getValue().toString());
                         return false;
                     }
-                    for (Map.Entry<String, Object> price : (Set<Map.Entry<String, Object>>) ((JSONObject) item.getValue()).entrySet()) {
+
+                    for (Map.Entry<String, Object> priceItem : (Set<Map.Entry<String, Object>>) ((JSONObject) item.getValue()).entrySet()) {
                         try {
-                            long assetKey = Long.parseLong(item.getKey());
+                            long assetKey = Long.parseLong(priceItem.getKey());
                             if (!dcSet.getItemAssetMap().contains(assetKey)) {
-                                error("Asset not exist for Key: " + item.getKey());
+                                error("Asset not exist for Key: " + priceItem.getKey());
                                 return false;
                             }
                         } catch (Exception e) {
-                            error("Wrong assetKey: " + item.getKey());
+                            error("Wrong assetKey: " + priceItem.getKey());
                             return false;
                         }
 
                         try {
-                            new BigDecimal(item.getKey());
+                            new BigDecimal(priceItem.getValue().toString());
                         } catch (Exception e) {
-                            error("Wrong price value: " + item.getKey());
+                            error("Wrong price value: " + priceItem.getValue());
                             return false;
                         }
 
                     }
-
                 }
             }
 
@@ -786,12 +784,12 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             gravitaKey = dcSet.getItemAssetMap().incrementPut(gravita);
             dcSet.getSmartContractValues().put(INIT_KEY, gravitaKey);
 
+            // TRANSFER GRAVITA to ADMIN
+            BigDecimal amount = new BigDecimal("10000");
+            transfer(dcSet, block, commandTX, stock, admin, amount, gravitaKey, false, null, "init");
+
             status = "done";
         }
-
-        // TRANSFER GRAVITA to ADMIN
-        BigDecimal amount = new BigDecimal("10000");
-        transfer(dcSet, block, commandTX, stock, admin, amount, gravitaKey, false, null, "init");
 
         return true;
     }
@@ -868,27 +866,27 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
 
     }
 
-    public boolean orphanAdminCommands(DCSet dcSet, RSend rSend, Account admin) {
+    public void orphanAdminCommands(DCSet dcSet, RSend rSend, Account admin) {
         if ("init".equals(command)) {
-            return init(dcSet, null, rSend, admin, true);
+            init(dcSet, null, rSend, admin, true);
         } else if (command.startsWith(COMMAND_WITHDRAW)) {
-            return adminWithdraw(dcSet, null, rSend, admin, true);
+            adminWithdraw(dcSet, null, rSend, admin, true);
         } else if (COMMAND_SET_PRICE.equals(command)) {
-            return shopSetPrices(dcSet, null, rSend, true);
+            shopSetPrices(dcSet, null, rSend, true);
         }
 
     }
 
     @Override
-    public boolean orphan(DCSet dcSet, Transaction transaction) {
+    public void orphan(DCSet dcSet, Transaction transaction) {
 
         if (status.startsWith("error")) {
             // not processed
-            return true;
+            return;
         }
 
         if (isAdminCommand(transaction)) {
-            return orphanAdminCommands(dcSet, (RSend) transaction,
+            orphanAdminCommands(dcSet, (RSend) transaction,
                     transaction.getCreator() // need for TEST - not adminAddress
             );
         }
@@ -896,21 +894,20 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         if (COMMAND_CATH_COMET.equals(command) || COMMAND_RANDOM.equals(command)) {
             // отмена рождения комет
             dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
-            return false;
         } else if (COMMAND_BUY.equals(command)) {
-            return shopBuy(dcSet, null, (RSend) transaction, true);
+            shopBuy(dcSet, null, (RSend) transaction, true);
         } else if (COMMAND_STAKE.equals(command)) {
-            return farmAction(dcSet, null, (RSend) transaction, true);
+            farmAction(dcSet, null, (RSend) transaction, true);
         }
 
     }
 
     @Override
-    public boolean orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
+    public void orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
         if (COMMAND_CATH_COMET.equals(command)) {
-            return catchComets(dcSet, block, (RSend) transaction, true);
+            catchComets(dcSet, block, (RSend) transaction, true);
         } else if (COMMAND_RANDOM.equals(command)) {
-            return random(dcSet, block, (RSend) transaction, true);
+            random(dcSet, block, (RSend) transaction, true);
         }
 
     }
