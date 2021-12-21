@@ -110,6 +110,9 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
 
 
     public static ShibaVerseDAPP make(RSend txSend, String dataStr) {
+        // dataStr = null
+        if (dataStr == null || dataStr.isEmpty())
+            return null;
 
         Account recipent = txSend.getRecipient();
 
@@ -396,8 +399,8 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             }
         } else {
 
-            long priceAssetKey;
             long shopAssetKey;
+            AssetCls shopAsset;
             if (!commandTX.hasAmount()) {
                 error("Has not amount");
                 return false;
@@ -430,12 +433,22 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                 }
             }
 
-            priceAssetKey = commandTX.getAssetKey();
+            long priceAssetKey = commandTX.getAssetKey();
+            BigDecimal sellPrice = shopPrice(dcSet, shopAssetKey, priceAssetKey);
+            if (sellPrice == null || sellPrice.signum() < 1) {
+                error("not priced");
+                return false;
+            }
+
+            shopAsset = dcSet.getItemAssetMap().get(shopAssetKey);
+            if (shopAsset == null) {
+                error("Shop asset not exist");
+                return false;
+            }
+
             AssetCls priceAsset = commandTX.getAsset();
-            AssetCls shopAsset = dcSet.getItemAssetMap().get(shopAssetKey);
             BigDecimal leftAmount = commandTX.getAmount();
 
-            BigDecimal sellPrice = shopPrice(dcSet, shopAssetKey, priceAssetKey);
             BigDecimal amountToSell = leftAmount.multiply(sellPrice).setScale(shopAsset.getScale(), BigDecimal.ROUND_HALF_DOWN);
             if (amountToSell.signum() > 0 && !priceAsset.isUnlimited(stock, false)) {
                 Tuple2<BigDecimal, BigDecimal> stockBal = stock.getBalance(dcSet, shopAssetKey, Account.BALANCE_POS_OWN);
@@ -457,11 +470,12 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                 leftAmount = leftAmount.subtract(amountToSell.divide(sellPrice, priceAsset.getScale(), BigDecimal.ROUND_DOWN));
             }
 
+            status = "done x" + sellPrice.toPlainString();
+
             if (leftAmount.signum() > 0) {
                 transfer(dcSet, block, commandTX, stock, creator, leftAmount, priceAssetKey, false, null, "change");
-                status = "done. change " + leftAmount.toPlainString();
-            } else
-                status = "done";
+                status += ", change: " + leftAmount.toPlainString();
+            }
 
             // store results for orphan
             putState(dcSet, new Object[]{amountToSell, leftAmount});
