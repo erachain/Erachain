@@ -82,12 +82,15 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
     /**
      * use as JSONArray in TX message. Title will be ignoged.
      * ["set price", { "shop assetKey1": {"price assetKey1": "price value", ...}}]<br>For example:
-     * ["set price",{"1": {"2":"0.1","18":"1"}}]
+     * ["set price",{"1": {"2":"0.1","18":2}}]
      */
     final static public String COMMAND_SET_PRICE = "set price";
 
     final static public String COMMAND_STAKE = "stake";
 
+    /**
+     * make random from future
+     */
     final static public String COMMAND_RANDOM = "random";
 
     final static public String COMMAND_FARM = "farm";
@@ -343,6 +346,14 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         return new Tuple2(ID, "pr" + ("" + shopAssetKey + priceAssetKey).hashCode());
     }
 
+    /**
+     * get current price
+     *
+     * @param dcSet
+     * @param shopAssetKey
+     * @param priceAssetKey
+     * @return
+     */
     private BigDecimal shopPrice(DCSet dcSet, long shopAssetKey, long priceAssetKey) {
 
         SmartContractValues map = dcSet.getSmartContractValues();
@@ -374,7 +385,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
     }
 
     /**
-     * shop for sell items. Example of command: ["buy", 1001]
+     * shop for sell items. Example of message: ["buy", 1001]
      *
      * @param dcSet
      * @param block
@@ -844,7 +855,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                         rsend.getCreator() // need for TEST - not adminAddress
                 );
             } else {
-                if (COMMAND_RANDOM.equals(command)
+                if (COMMAND_CATH_COMET.equals(command) || COMMAND_RANDOM.equals(command)
                         // это не проверка вне блока - в ней блока нет
                         && block != null) {
                     // рождение комет
