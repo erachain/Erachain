@@ -82,13 +82,7 @@ public abstract class DAPPFactory {
         //////
 
         /////// NEW VERSION
-
-        String command = txSend.getTitle();
-        if ((command == null || command.isEmpty()) && txSend.isText() && !txSend.isEncrypted()) {
-            command = new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase();
-        }
-        if (command == null)
-            command = "";
+        String dataStr = txSend.isText() && !txSend.isEncrypted() ? new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase() : null;
 
         ///////////////////// CALL DAPPS HERE
         Integer dappID = skocks.get(txSend.getRecipient());
@@ -97,7 +91,7 @@ public abstract class DAPPFactory {
 
         switch (dappID) {
             case ShibaVerseDAPP.ID:
-                return ShibaVerseDAPP.make(txSend, command);
+                return ShibaVerseDAPP.make(txSend, dataStr);
         }
 
         return null;

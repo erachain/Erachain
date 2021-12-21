@@ -21,31 +21,34 @@ public abstract class EpochDAPPjson extends EpochDAPP {
     protected JSONArray pars;
     protected String status;
 
-    public EpochDAPPjson(int id, PublicKeyAccount maker, String command, String dataStr, String status) {
+    public EpochDAPPjson(int id, PublicKeyAccount maker, String dataStr, String status) {
         super(id, maker);
 
-        this.command = command;
         this.dataStr = dataStr;
+        this.status = status == null ? "" : status;
 
         if (dataStr != null && !dataStr.isEmpty()) {
 
-            try {
-                //READ JSON
-                pars = (JSONArray) JSONValue.parseWithException(dataStr);
-                if (command == null || command.isEmpty()) {
+            if (dataStr.charAt(0) == '[') {
+                try {
+                    //READ JSON
+                    pars = (JSONArray) JSONValue.parseWithException(dataStr);
                     this.command = (String) pars.get(0);
+                } catch (ParseException | NullPointerException | ClassCastException e) {
+                    //JSON EXCEPTION
+                    this.status = e.getMessage();
                 }
-                this.status = status;
-            } catch (ParseException | NullPointerException | ClassCastException e) {
-                //JSON EXCEPTION
-                this.status = e.getMessage();
-            }
-        }
+
+            } else
+                command = dataStr;
+
+        } else
+            command = "";
 
     }
 
     public EpochDAPPjson(int id, String dataStr, String status) {
-        this(id, PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(id))), null, dataStr, status);
+        this(id, PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(id))), dataStr, status);
 
     }
 
