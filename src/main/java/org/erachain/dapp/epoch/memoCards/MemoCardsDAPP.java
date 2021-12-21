@@ -13,7 +13,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.DAPPFactory;
 import org.erachain.dapp.EpochDAPPjson;
 import org.erachain.dapp.epoch.shibaverse.server.Farm_01;
-import org.erachain.datachain.CreditAddressesMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.SmartContractValues;
@@ -112,16 +111,6 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         // dataStr = null
         if (dataStr == null || dataStr.isEmpty())
             return null;
-
-        Account recipent = txSend.getRecipient();
-
-        if (recipent.equals(FARM_01_PUBKEY)) {
-            if (txSend.balancePosition() == Account.BALANCE_POS_DEBT && txSend.hasAmount()) {
-                return new MemoCardsDAPP(txSend.isBackward() ? COMMAND_PICK_UP : COMMAND_FARM, "");
-            } else if (txSend.balancePosition() == Account.BALANCE_POS_OWN) {
-                return new MemoCardsDAPP(COMMAND_CHARGE, "");
-            }
-        }
 
         return new MemoCardsDAPP(dataStr, "");
 
@@ -492,126 +481,6 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         return true;
     }
 
-    private boolean stakeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
-        if (commandTX.getAssetKey() != gravitaKey) {
-            error("Wrong asset key. Need " + gravitaKey);
-            return false;
-        } else if (!commandTX.hasAmount() || !commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
-            error("Wrong amount. Need > 0");
-            return false;
-        } else if (commandTX.isBackward()) {
-            error("Wrong direction - backward");
-            return false;
-        } else if (commandTX.balancePosition() != Account.BALANCE_POS_OWN) {
-            error("Wrong balance position. Need [1]OWN");
-            return false;
-        }
-
-        error("-");
-        return false;
-    }
-
-    // CHARGE all from FARM 01
-    private void farmChargeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
-        SmartContractValues mapValues = dcSet.getSmartContractValues();
-        Tuple2<Integer, String> farmKeyValue;
-        BigDecimal farmedValue;
-        try (IteratorCloseable iterator = mapValues.getIterator()) {
-            while (iterator.hasNext()) {
-                Object key = iterator.next();
-                farmKeyValue = new Tuple2<>(ID, "farm1" + key.toString());
-                farmedValue = (BigDecimal) mapValues.get(farmKeyValue);
-            }
-        } catch (IOException e) {
-        }
-
-    }
-
-    private boolean farmAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
-
-        error("-");
-
-        if (asOrphan) {
-            return true;
-
-        } else {
-            AssetCls asset = dcSet.getItemAssetMap().get(commandTX.getAssetKey());
-            if (!asset.getMaker().equals(MAKER)) {
-                error("Wrong asset maker. Need " + MAKER.getAddress());
-                return false;
-            } else if (!commandTX.hasAmount()) {
-                error("Wrong amount. Need > 0");
-                return false;
-            } else if (commandTX.isBackward()) {
-                error("Wrong direction - backward");
-                return false;
-            } else if (commandTX.balancePosition() != Account.BALANCE_POS_DEBT) {
-                error("Wrong balance position. Need [2]DEBT");
-                return false;
-            }
-        }
-
-        if (commandTX.isBackward()) {
-            // WITHDRAW
-            farmChargeAction(dcSet, block, commandTX, asOrphan);
-        } else {
-            // DEPOSITE
-
-        }
-
-        return false;
-    }
-
-    private static void farm(DCSet dcSet, Block block, boolean asOrphan) {
-        CreditAddressesMap map = dcSet.getCreditAddressesMap();
-        SmartContractValues mapValues = dcSet.getSmartContractValues();
-        Fun.Tuple3<String, Long, String> key;
-        BigDecimal credit;
-        Tuple2<Integer, String> farmKeyValue;
-        BigDecimal farmedValue;
-        HashMap<String, BigDecimal> results = new HashMap<>();
-        try (IteratorCloseable<Fun.Tuple3<String, Long, String>> iterator = map.getDebitorsIterator(FARM_01_PUBKEY.getAddress())) {
-            while (iterator.hasNext()) {
-                key = iterator.next();
-                credit = map.get(key);
-                if (credit.signum() < 1)
-                    continue;
-
-                farmKeyValue = new Tuple2<>(ID, "farm1" + key.a);
-                farmedValue = (BigDecimal) mapValues.get(farmKeyValue);
-                if (farmedValue.signum() > 0) {
-                    // not charged yet
-                    continue;
-                }
-
-                if (key.b == 1048579L || key.b == 1048587) {
-                    farmedValue = results.get(key.a);
-                    if (farmedValue == null)
-                        farmedValue = BigDecimal.ZERO;
-
-                    farmedValue = farmedValue.add(BigDecimal.ONE);
-                    results.put(key.a, farmedValue);
-                }
-            }
-        } catch (IOException e) {
-        }
-
-        // SAVE RESULTS
-        for (String address : results.keySet()) {
-            farmKeyValue = new Tuple2<>(ID, "farm1" + address);
-            mapValues.put(farmKeyValue, results.get(address));
-        }
-
-
-    }
-
-    //////// PROCESSES
-    public static void blockAction(DCSet dcSet, Block block, boolean asOrphan) {
-        if (true && block.heightBlock % 100 == 0) {
-            farm(dcSet, block, asOrphan);
-        }
-    }
-
     //////////////////// ADMIN PROCCESS
 
     /**
@@ -860,10 +729,6 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                     return false;
                 } else if (COMMAND_BUY.equals(command)) {
                     return shopBuy(dcSet, block, rsend, false);
-                } else if (COMMAND_STAKE.equals(command)) {
-                    return stakeAction(dcSet, block, rsend, false);
-                } else if (COMMAND_FARM.equals(command) || COMMAND_PICK_UP.equals(command)) {
-                    return farmAction(dcSet, block, rsend, false);
                 }
             }
         }
@@ -917,8 +782,6 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
         } else if (COMMAND_BUY.equals(command)) {
             shopBuy(dcSet, null, (RSend) transaction, true);
-        } else if (COMMAND_STAKE.equals(command)) {
-            farmAction(dcSet, null, (RSend) transaction, true);
         }
 
     }
