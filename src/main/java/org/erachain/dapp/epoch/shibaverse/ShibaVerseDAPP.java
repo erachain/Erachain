@@ -135,182 +135,23 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
     @Override
     public boolean isValid(DCSet dcSet, Transaction transaction) {
         if (isAdminCommand(transaction)) {
-            if (command.equals("init") && dcSet.getSmartContractValues().contains(INIT_KEY)) {
-                status = "error: already initated";
-                return false;
-            }
             return true;
+        }
+
+        if (!dcSet.getSmartContractValues().contains(INIT_KEY)) {
+            error("not initated yet");
+            return false;
         }
 
         if (gravitaKey == null)
             gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
 
         if (gravitaKey == null) {
-            status = "error: not initated yet";
+            error("not initated yet");
             return false;
         }
 
-        if (COMMAND_CATH_COMET.equals(command)) {
-            if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
-                status = "Wrong transaction type. Need SEND";
-            } else {
-                RSend rsend = (RSend) transaction;
-                if (rsend.getAssetKey() != gravitaKey) {
-                    status = "Wrong asset key. Need " + gravitaKey;
-                } else if (!rsend.hasAmount() || !rsend.hasPacket() && rsend.getAmount().signum() <= 0) {
-                    status = "Wrong amount. Need > 0";
-                } else if (rsend.isBackward()) {
-                    status = "Wrong direction - backward";
-                } else if (rsend.balancePosition() != Account.BALANCE_POS_OWN) {
-                    status = "Wrong balance position. Need OWN[1]";
-                } else {
-                    return true;
-                }
-            }
-        } else if (COMMAND_BUY.equals(command)) {
-            if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
-                status = "Wrong transaction type. Need SEND";
-            } else {
-                RSend rsend = (RSend) transaction;
-                if (rsend.getAssetKey() != 1 && rsend.getAssetKey() != 18) {
-                    status = "Wrong asset key. Need 1 or 18";
-                } else if (!rsend.hasAmount() || !rsend.hasPacket() && rsend.getAmount().signum() <= 0) {
-                    status = "Wrong amount. Need > 0";
-                } else if (rsend.isBackward()) {
-                    status = "Wrong direction - backward";
-                } else if (rsend.balancePosition() != Account.BALANCE_POS_OWN) {
-                    status = "Wrong balance position. Need OWN[1]";
-                } else if (!rsend.isText()) {
-                    status = "Not text message";
-                } else if (rsend.isEncrypted()) {
-                    status = "Encrypted message";
-                } else {
-                    long assetKey = 0;
-                    try {
-                        assetKey = Long.parseLong(new String(rsend.getData(), StandardCharsets.UTF_8));
-                    } catch (Exception e) {
-                        status = "Wrong asset key in message";
-                        return false;
-                    }
-
-                    if (false && assetKey != buster01Key) {
-                        status = "Wrong asset key";
-                    } else {
-                        return true;
-                    }
-                }
-            }
-
-        } else if (false && COMMAND_STAKE.equals(command)) {
-            if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
-                status = "Wrong transaction type. Need SEND";
-            } else {
-                RSend rsend = (RSend) transaction;
-                if (rsend.getAssetKey() != gravitaKey) {
-                    status = "Wrong asset key. Need " + gravitaKey;
-                } else if (!rsend.hasAmount() || !rsend.hasPacket() && rsend.getAmount().signum() <= 0) {
-                    status = "Wrong amount. Need > 0";
-                } else if (rsend.isBackward()) {
-                    status = "Wrong direction - backward";
-                } else if (rsend.balancePosition() != Account.BALANCE_POS_OWN) {
-                    status = "Wrong balance position. Need [1]OWN";
-                } else {
-                    return true;
-                }
-            }
-        } else if (COMMAND_FARM.equals(command)) {
-            if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
-                status = "Wrong transaction type. Need SEND";
-            } else {
-                RSend rsend = (RSend) transaction;
-                AssetCls asset = dcSet.getItemAssetMap().get(rsend.getAssetKey());
-                if (!asset.getMaker().equals(MAKER)) {
-                    status = "Wrong asset maker. Need " + MAKER.getAddress();
-                } else if (!rsend.hasAmount()) {
-                    status = "Wrong amount. Need > 0";
-                } else if (rsend.isBackward()) {
-                    status = "Wrong direction - backward";
-                } else if (rsend.balancePosition() != Account.BALANCE_POS_DEBT) {
-                    status = "Wrong balance position. Need [2]DEBT";
-                } else {
-                    return true;
-                }
-            }
-
-        } else if (COMMAND_PICK_UP.equals(command)) {
-            if (transaction.getType() != Transaction.SEND_ASSET_TRANSACTION) {
-                status = "Wrong transaction type. Need SEND";
-            } else {
-                RSend rsend = (RSend) transaction;
-                AssetCls asset = dcSet.getItemAssetMap().get(rsend.getAssetKey());
-                if (!asset.getMaker().equals(MAKER)) {
-                    status = "Wrong asset maker. Need " + MAKER.getAddress();
-                } else if (!rsend.hasAmount()) {
-                    status = "Wrong amount. Need > 0";
-                } else if (!rsend.isBackward()) {
-                    status = "Wrong direction. Need BACKWARD";
-                } else if (rsend.balancePosition() != Account.BALANCE_POS_DEBT) {
-                    status = "Wrong balance position. Need [2]DEBT";
-                } else {
-                    return true;
-                }
-            }
-
-        } else if (COMMAND_CHARGE.equals(command)) {
-            return true;
-
-        } else if (COMMAND_SET_PRICE.equals(command)) {
-            if (pars == null) {
-                status = "Wrong JSON params";
-            } else if (pars.size() < 2) {
-                status = "Wrong params size <2";
-            } else {
-                JSONObject prices = (JSONObject) pars.get(1);
-                for (Map.Entry<String, Object> item : (Set<Map.Entry<String, Object>>) prices.entrySet()) {
-                    try {
-                        long assetKey = Long.parseLong(item.getKey());
-                        if (!dcSet.getItemAssetMap().contains(assetKey)) {
-                            status = "Asset not exist for Key: " + item.getKey();
-                            return false;
-                        }
-                    } catch (Exception e) {
-                        status = "Wrong assetKey: " + item.getKey();
-                        return false;
-                    }
-                    if (!(item.getValue() instanceof JSONObject)) {
-                        status = "Not JSON: " + item.getValue().toString();
-                        return false;
-                    }
-                    for (Map.Entry<String, Object> price : (Set<Map.Entry<String, Object>>) ((JSONObject) item.getValue()).entrySet()) {
-                        try {
-                            long assetKey = Long.parseLong(item.getKey());
-                            if (!dcSet.getItemAssetMap().contains(assetKey)) {
-                                status = "Asset not exist for Key: " + item.getKey();
-                                return false;
-                            }
-                        } catch (Exception e) {
-                            status = "Wrong assetKey: " + item.getKey();
-                            return false;
-                        }
-
-                        try {
-                            new BigDecimal(item.getKey());
-                        } catch (Exception e) {
-                            status = "Wrong price value: " + item.getKey();
-                            return false;
-                        }
-
-                    }
-
-                }
-                return true;
-            }
-        } else {
-            status = "Unknown command";
-        }
-
-        status = "error: " + command + " - " + status;
-        return false;
+        return true;
 
     }
 
@@ -397,8 +238,26 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
      * @param commandTX
      * @param asOrphan
      */
-    private void catchComets(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+    private boolean catchComets(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
         // рождение комет
+
+        if (gravitaKey == null)
+            gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
+
+        if (commandTX.getAssetKey() != gravitaKey) {
+            error("Wrong asset key. Need " + gravitaKey);
+            return false;
+        } else if (!commandTX.hasAmount() || !commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
+            error("Wrong amount. Need > 0");
+            return false;
+        } else if (commandTX.isBackward()) {
+            error("Wrong direction - backward");
+            return false;
+        } else if (commandTX.balancePosition() != Account.BALANCE_POS_OWN) {
+            error("Wrong balance position. Need OWN[1]");
+            return false;
+        }
+
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
         PublicKeyAccount creator = commandTX.getCreator();
         int count = 5 * commandTX.getAmount().intValue();
@@ -476,6 +335,8 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         else
             status = "done";
 
+        return true;
+
     }
 
     private static Tuple2<Integer, String> priceKey(long shopAssetKey, long priceAssetKey) {
@@ -512,19 +373,19 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
     }
 
     /**
-     * shop for sell items
+     * shop for sell items. Example of command: ["buy", 1001]
      *
      * @param dcSet
      * @param block
      * @param commandTX
      * @param asOrphan
      */
-    private void shopBuy(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+    private boolean shopBuy(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
         PublicKeyAccount creator = commandTX.getCreator();
-        long priceAssetKey = commandTX.getAssetKey();
-        long shopAssetKey = Long.parseLong(new String(commandTX.getData(), StandardCharsets.UTF_8));
 
         if (asOrphan) {
+            long priceAssetKey = commandTX.getAssetKey();
+            long shopAssetKey = Long.parseLong(pars.get(1).toString());
             Object[] result = removeState(dcSet);
             if (result.length > 0) {
                 BigDecimal amountToSell = (BigDecimal) result[0];
@@ -536,6 +397,42 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                 }
             }
         } else {
+
+            long priceAssetKey;
+            long shopAssetKey;
+            if (!commandTX.hasAmount()) {
+                error("Has not amount");
+                return false;
+            } else if (commandTX.getAssetKey() != 1 && commandTX.getAssetKey() != 18) {
+                error("Wrong asset key. Need 1 or 18");
+                return false;
+            } else if (commandTX.balancePosition() != Account.BALANCE_POS_OWN) {
+                error("Wrong balance position. Need OWN[1]");
+                return false;
+            } else if (!commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
+                error("Wrong amount. Need > 0");
+                return false;
+            } else if (commandTX.isBackward()) {
+                error("Wrong direction - backward");
+                return false;
+            } else if (pars == null) {
+                error("Empty pars");
+                return false;
+            } else {
+                try {
+                    shopAssetKey = Long.parseLong(pars.get(1).toString());
+                } catch (Exception e) {
+                    error("Wrong asset key: " + pars.get(1));
+                    return false;
+                }
+
+                if (false && shopAssetKey != buster01Key) {
+                    error("Wrong asset key");
+                    return false;
+                }
+            }
+
+            priceAssetKey = commandTX.getAssetKey();
             AssetCls priceAsset = commandTX.getAsset();
             AssetCls shopAsset = dcSet.getItemAssetMap().get(shopAssetKey);
             BigDecimal leftAmount = commandTX.getAmount();
@@ -564,63 +461,35 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
 
             if (leftAmount.signum() > 0) {
                 transfer(dcSet, block, commandTX, stock, creator, leftAmount, priceAssetKey, false, null, "change");
-            }
+                status = "done. change " + leftAmount.toPlainString();
+            } else
+                status = "done";
 
             // store results for orphan
             putState(dcSet, new Object[]{amountToSell, leftAmount});
 
-
-            status = "done";
         }
 
+        return true;
     }
 
-    private void shopSetPrices(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
-
-        SmartContractValues map = dcSet.getSmartContractValues();
-        if (asOrphan) {
-            Object[] result = removeState(dcSet);
-            if (result.length > 0) {
-                for (Fun.Tuple3<Long, Long, BigDecimal> item : (Fun.Tuple3<Long, Long, BigDecimal>[]) result) {
-                    map.put(priceKey(item.a, item.b), item.c);
-                }
-            }
-
-        } else {
-
-            Long shopAssetKey;
-            Long priceAssetKey;
-            BigDecimal price;
-            JSONObject prices = (JSONObject) pars.get(1);
-            List<Fun.Tuple3<Long, Long, BigDecimal>> oldPrices = new ArrayList();
-            for (Map.Entry<String, Object> item : (Set<Map.Entry<String, Object>>) prices.entrySet()) {
-                shopAssetKey = Long.parseLong(item.getKey());
-
-                for (Map.Entry<String, Object> priceItem : (Set<Map.Entry<String, Object>>) ((JSONObject) item.getValue()).entrySet()) {
-                    priceAssetKey = Long.parseLong(priceItem.getKey());
-
-                    // OLD PRICE SAVE
-                    price = (BigDecimal) map.get(priceKey(shopAssetKey, priceAssetKey));
-                    if (price != null) {
-                        oldPrices.add(new Fun.Tuple3<>(shopAssetKey, priceAssetKey, price));
-                    }
-
-                    // NEW PRICE
-                    price = new BigDecimal(priceItem.getValue().toString());
-                    map.put(priceKey(shopAssetKey, priceAssetKey), price);
-
-                }
-            }
-
-            // store results for orphan
-            putState(dcSet, oldPrices.toArray());
-
-            status = "done";
+    private boolean stakeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        if (commandTX.getAssetKey() != gravitaKey) {
+            error("Wrong asset key. Need " + gravitaKey);
+            return false;
+        } else if (!commandTX.hasAmount() || !commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
+            error("Wrong amount. Need > 0");
+            return false;
+        } else if (commandTX.isBackward()) {
+            error("Wrong direction - backward");
+            return false;
+        } else if (commandTX.balancePosition() != Account.BALANCE_POS_OWN) {
+            error("Wrong balance position. Need [1]OWN");
+            return false;
         }
 
-    }
-
-    private void stakeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        error("-");
+        return false;
     }
 
     // CHARGE all from FARM 01
@@ -639,7 +508,30 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
 
     }
 
-    private void farmAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+    private boolean farmAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+
+        status = "error";
+
+        if (asOrphan) {
+            return true;
+
+        } else {
+            AssetCls asset = dcSet.getItemAssetMap().get(commandTX.getAssetKey());
+            if (!asset.getMaker().equals(MAKER)) {
+                error("Wrong asset maker. Need " + MAKER.getAddress());
+                return false;
+            } else if (!commandTX.hasAmount()) {
+                error("Wrong amount. Need > 0");
+                return false;
+            } else if (commandTX.isBackward()) {
+                error("Wrong direction - backward");
+                return false;
+            } else if (commandTX.balancePosition() != Account.BALANCE_POS_DEBT) {
+                error("Wrong balance position. Need [2]DEBT");
+                return false;
+            }
+        }
+
         if (commandTX.isBackward()) {
             // WITHDRAW
             farmChargeAction(dcSet, block, commandTX, asOrphan);
@@ -647,6 +539,8 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             // DEPOSITE
 
         }
+
+        return false;
     }
 
     private static void farm(DCSet dcSet, Block block, boolean asOrphan) {
@@ -699,7 +593,112 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         }
     }
 
-    private void adminWithdraw(DCSet dcSet, Block block, RSend commandTX, Account admin, boolean asOrphan) {
+    //////////////////// ADMIN PROCCESS
+
+    /**
+     * Example of command: ["set price", {"1001": {"1": 0.1, "18":"0.01"}}]
+     *
+     * @param dcSet
+     * @param block
+     * @param commandTX
+     * @param asOrphan
+     */
+    private boolean shopSetPrices(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+
+        SmartContractValues map = dcSet.getSmartContractValues();
+        if (asOrphan) {
+            Object[] result = removeState(dcSet);
+            if (result.length > 0) {
+                for (Fun.Tuple3<Long, Long, BigDecimal> item : (Fun.Tuple3<Long, Long, BigDecimal>[]) result) {
+                    map.put(priceKey(item.a, item.b), item.c);
+                }
+            }
+
+        } else {
+
+            Long shopAssetKey;
+            Long priceAssetKey;
+            JSONObject prices;
+            BigDecimal price;
+
+            if (pars == null) {
+                error("Wrong JSON params");
+                return false;
+            } else if (pars.size() < 2) {
+                error("Wrong params size <2");
+                return false;
+            } else {
+                prices = (JSONObject) pars.get(1);
+                for (Map.Entry<String, Object> item : (Set<Map.Entry<String, Object>>) prices.entrySet()) {
+                    try {
+                        long assetKey = Long.parseLong(item.getKey());
+                        if (!dcSet.getItemAssetMap().contains(assetKey)) {
+                            error("Asset not exist for Key: " + item.getKey());
+                            return false;
+                        }
+                    } catch (Exception e) {
+                        error("Wrong assetKey: " + item.getKey());
+                        return false;
+                    }
+                    if (!(item.getValue() instanceof JSONObject)) {
+                        error("Not JSON: " + item.getValue().toString());
+                        return false;
+                    }
+                    for (Map.Entry<String, Object> price : (Set<Map.Entry<String, Object>>) ((JSONObject) item.getValue()).entrySet()) {
+                        try {
+                            long assetKey = Long.parseLong(item.getKey());
+                            if (!dcSet.getItemAssetMap().contains(assetKey)) {
+                                error("Asset not exist for Key: " + item.getKey());
+                                return false;
+                            }
+                        } catch (Exception e) {
+                            error("Wrong assetKey: " + item.getKey());
+                            return false;
+                        }
+
+                        try {
+                            new BigDecimal(item.getKey());
+                        } catch (Exception e) {
+                            error("Wrong price value: " + item.getKey());
+                            return false;
+                        }
+
+                    }
+
+                }
+            }
+
+            List<Fun.Tuple3<Long, Long, BigDecimal>> oldPrices = new ArrayList();
+            for (Map.Entry<String, Object> item : (Set<Map.Entry<String, Object>>) prices.entrySet()) {
+                shopAssetKey = Long.parseLong(item.getKey());
+
+                for (Map.Entry<String, Object> priceItem : (Set<Map.Entry<String, Object>>) ((JSONObject) item.getValue()).entrySet()) {
+                    priceAssetKey = Long.parseLong(priceItem.getKey());
+
+                    // OLD PRICE SAVE
+                    price = (BigDecimal) map.get(priceKey(shopAssetKey, priceAssetKey));
+                    if (price != null) {
+                        oldPrices.add(new Fun.Tuple3<>(shopAssetKey, priceAssetKey, price));
+                    }
+
+                    // NEW PRICE
+                    price = new BigDecimal(priceItem.getValue().toString());
+                    map.put(priceKey(shopAssetKey, priceAssetKey), price);
+
+                }
+            }
+
+            // store results for orphan
+            putState(dcSet, oldPrices.toArray());
+
+            status = "done";
+        }
+
+        return true;
+
+    }
+
+    private boolean adminWithdraw(DCSet dcSet, Block block, RSend commandTX, Account admin, boolean asOrphan) {
         if (asOrphan) {
             // restore results for orphan
             List<Tuple2<Long, BigDecimal>> results = (List<Tuple2<Long, BigDecimal>>) removeState(dcSet)[0];
@@ -710,6 +709,12 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             }
 
         } else {
+
+            if (!dcSet.getSmartContractValues().contains(INIT_KEY)) {
+                error("not initated yet");
+                return false;
+            }
+
             ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
             try (IteratorCloseable<byte[]> iterator = map.getIteratorByAccount(stock)) {
                 List<Tuple2<byte[], Fun.Tuple5<
@@ -743,12 +748,18 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                 // store results for orphan
                 putState(dcSet, new Object[]{results});
 
+                status = "done";
+
             } catch (IOException e) {
+                error(e.getMessage());
             }
         }
+
+        return true;
+
     }
 
-    private void init(DCSet dcSet, Block block, RSend commandTX, Account admin, boolean asOrphan) {
+    private boolean init(DCSet dcSet, Block block, RSend commandTX, Account admin, boolean asOrphan) {
 
         /**
          * issue main currency
@@ -761,6 +772,12 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             dcSet.getItemAssetMap().decrementDelete(gravitaKey);
 
         } else {
+
+            if (dcSet.getSmartContractValues().contains(INIT_KEY)) {
+                error("already initated");
+                return false;
+            }
+
             AssetVenture gravita = new AssetVenture(null, stock, "GR", null, null,
                     null, AssetCls.AS_INSIDE_ASSETS, 6, 0);
             gravita.setReference(commandTX.getSignature(), commandTX.getDBRef());
@@ -769,12 +786,14 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             gravitaKey = dcSet.getItemAssetMap().incrementPut(gravita);
             dcSet.getSmartContractValues().put(INIT_KEY, gravitaKey);
 
+            status = "done";
         }
 
         // TRANSFER GRAVITA to ADMIN
         BigDecimal amount = new BigDecimal("10000");
         transfer(dcSet, block, commandTX, stock, admin, amount, gravitaKey, false, null, "init");
 
+        return true;
     }
 
     /**
@@ -782,18 +801,21 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
      *
      * @param dcSet
      * @param block
-     * @param commandTX
+     * @param rSend
      * @param admin
      * @return
      */
-    public boolean processAdminCommands(DCSet dcSet, Block block, RSend commandTX, Account admin) {
+    public boolean processAdminCommands(DCSet dcSet, Block block, RSend rSend, Account admin) {
         if ("init".equals(command)) {
-            init(dcSet, block, commandTX, admin, false);
+            return init(dcSet, block, rSend, admin, false);
         } else if (command.startsWith("emite")) {
         } else if (command.startsWith(COMMAND_WITHDRAW)) {
-            adminWithdraw(dcSet, block, commandTX, admin, false);
+            return adminWithdraw(dcSet, block, rSend, admin, false);
+        } else if (COMMAND_SET_PRICE.equals(command)) {
+            return shopSetPrices(dcSet, block, rSend, false);
         }
 
+        error("unknow command");
         return false;
     }
 
@@ -818,40 +840,43 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                     status = "wait";
                     return false;
                 } else if (COMMAND_BUY.equals(command)) {
-                    shopBuy(dcSet, block, rsend, false);
-                } else if (COMMAND_SET_PRICE.equals(command)) {
-                    shopSetPrices(dcSet, block, rsend, false);
+                    return shopBuy(dcSet, block, rsend, false);
                 } else if (COMMAND_STAKE.equals(command)) {
-                    stakeAction(dcSet, block, rsend, false);
+                    return stakeAction(dcSet, block, rsend, false);
                 } else if (COMMAND_FARM.equals(command) || COMMAND_PICK_UP.equals(command)) {
-                    farmAction(dcSet, block, rsend, false);
+                    return farmAction(dcSet, block, rsend, false);
                 }
             }
         }
 
+        error("unknow command");
         return false;
+
     }
 
     @Override
     public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
 
         if (COMMAND_CATH_COMET.equals(command)) {
-            catchComets(dcSet, block, (RSend) transaction, false);
+            return catchComets(dcSet, block, (RSend) transaction, false);
         } else if (COMMAND_RANDOM.equals(command)) {
-            random(dcSet, block, (RSend) transaction, false);
+            return random(dcSet, block, (RSend) transaction, false);
         }
 
+        error("unknow command");
         return false;
+
     }
 
-    public boolean orphanAdminCommands(DCSet dcSet, RSend commandTX, Account admin) {
+    public boolean orphanAdminCommands(DCSet dcSet, RSend rSend, Account admin) {
         if ("init".equals(command)) {
-            init(dcSet, null, commandTX, admin, true);
+            return init(dcSet, null, rSend, admin, true);
         } else if (command.startsWith(COMMAND_WITHDRAW)) {
-            adminWithdraw(dcSet, null, commandTX, admin, true);
+            return adminWithdraw(dcSet, null, rSend, admin, true);
+        } else if (COMMAND_SET_PRICE.equals(command)) {
+            return shopSetPrices(dcSet, null, rSend, true);
         }
 
-        return false;
     }
 
     @Override
@@ -873,25 +898,21 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
             return false;
         } else if (COMMAND_BUY.equals(command)) {
-            shopBuy(dcSet, null, (RSend) transaction, true);
-        } else if (COMMAND_SET_PRICE.equals(command)) {
-            shopSetPrices(dcSet, null, (RSend) transaction, true);
+            return shopBuy(dcSet, null, (RSend) transaction, true);
         } else if (COMMAND_STAKE.equals(command)) {
-            farmAction(dcSet, null, (RSend) transaction, true);
+            return farmAction(dcSet, null, (RSend) transaction, true);
         }
 
-        return false;
     }
 
     @Override
     public boolean orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
         if (COMMAND_CATH_COMET.equals(command)) {
-            catchComets(dcSet, block, (RSend) transaction, true);
+            return catchComets(dcSet, block, (RSend) transaction, true);
         } else if (COMMAND_RANDOM.equals(command)) {
-            random(dcSet, block, (RSend) transaction, true);
+            return random(dcSet, block, (RSend) transaction, true);
         }
 
-        return false;
     }
 
     private static String[][][] imgsStr;

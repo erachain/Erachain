@@ -107,4 +107,13 @@ public abstract class EpochDAPPjson extends EpochDAPP {
 
     }
 
+    /**
+     * "error:" - need for stop orphan
+     *
+     * @param mess
+     */
+    protected void error(String mess) {
+        status = "error: " + mess;
+    }
+
 }
