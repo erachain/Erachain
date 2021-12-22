@@ -115,6 +115,8 @@ public abstract class DAPPFactory {
                 return DogePlanet.NAME;
             case ShibaVerseDAPP.ID:
                 return ShibaVerseDAPP.NAME;
+            case MemoCardsDAPP.ID:
+                return MemoCardsDAPP.NAME;
         }
 
         return null;

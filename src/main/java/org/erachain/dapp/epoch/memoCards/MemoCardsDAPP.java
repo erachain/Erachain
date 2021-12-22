@@ -67,6 +67,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
     /**
      * in Title: buy
      * in message - asset key
+     * Example of message: ["buy", 1001]
      */
     final static public String COMMAND_BUY = "buy";
     final static public long BUSTER_1_KEY = 11111L;
@@ -791,12 +792,15 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                         rsend.getCreator() // need for TEST - not adminAddress
                 );
             } else {
-                if (COMMAND_RANDOM.equals(command)
-                        // это не проверка вне блока - в ней блока нет
-                        && block != null) {
-                    // рождение комет
-                    dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
-                    status = "wait";
+                if (COMMAND_RANDOM.equals(command)) {
+                    // это не проверка вне блока - в ней блока нет
+                    if (block != null) {
+                        // рождение комет
+                        dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
+                        status = "wait";
+                        return false;
+                    }
+                    status = "wait block";
                     return false;
                 } else if (COMMAND_BUY.equals(command)) {
                     return shopBuy(dcSet, block, rsend, false);

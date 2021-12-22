@@ -161,6 +161,9 @@ public class Lang {
     }
 
     public static String T(String message, JSONObject langObj) {
+        if (message == null)
+            return "NULL";
+
         //COMMENT AFTER # FOR TRANSLATE THAT WOULD BE THE SAME TEXT IN DIFFERENT WAYS TO TRANSLATE
         String messageWithoutComment = message.replaceFirst("(?<!\\\\)#.*$", "").trim();
         messageWithoutComment = messageWithoutComment.replace("\\#", "#");

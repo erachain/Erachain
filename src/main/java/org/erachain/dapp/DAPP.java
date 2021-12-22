@@ -10,6 +10,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.epoch.DogePlanet;
 import org.erachain.dapp.epoch.LeafFall;
+import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
 import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
@@ -151,6 +152,8 @@ public abstract class DAPP {
                 return DogePlanet.Parse(data, position, forDeal);
             case ShibaVerseDAPP.ID:
                 return ShibaVerseDAPP.Parse(data, position, forDeal);
+            case MemoCardsDAPP.ID:
+                return MemoCardsDAPP.Parse(data, position, forDeal);
         }
 
         throw new Exception("wrong smart-contract id:" + id);
