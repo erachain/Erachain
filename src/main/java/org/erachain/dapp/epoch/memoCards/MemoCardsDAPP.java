@@ -37,7 +37,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
 
-    // APPC45p29ZjcEEvSzhgUe8RfUzMZ1i2GFG
+    // APPBQyonEPbk2ZazbUuHZ2ffN1QJYaK1ow
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
     static {
