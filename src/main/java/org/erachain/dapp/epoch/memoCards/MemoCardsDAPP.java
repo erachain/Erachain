@@ -70,7 +70,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
      * Example of message: ["buy", 1001]
      */
     final static public String COMMAND_BUY = "buy";
-    final static public long BUSTER_1_KEY = 11111L;
+    final static public long BUSTER_1_KEY = 1001L;
     /**
      * use as JSONArray in TX message. Title will be ignoged.
      * ["set price", { "shop assetKey1": {"price assetKey1": "price value", ...}}]<br>For example:
@@ -495,7 +495,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                     return false;
                 }
 
-                if (false && shopAssetKey != BUSTER_1_KEY) {
+                if (shopAssetKey != BUSTER_1_KEY) {
                     error("Wrong asset key");
                     return false;
                 }
@@ -793,15 +793,15 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                 );
             } else {
                 if (COMMAND_RANDOM.equals(command)) {
-                    // это не проверка вне блока - в ней блока нет
-                    if (block != null) {
-                        // рождение комет
-                        dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
-                        status = "wait";
+                    if (block == null) {
+                        status = "wait block";
                         return false;
                     }
-                    status = "wait block";
+                    // это не проверка вне блока - в ней блока нет
+                    dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
+                    status = "wait";
                     return false;
+
                 } else if (COMMAND_BUY.equals(command)) {
                     return shopBuy(dcSet, block, rsend, false);
                 }
