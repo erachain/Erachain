@@ -12,6 +12,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.dapp.epoch.DogePlanet;
 import org.erachain.dapp.epoch.LeafFall;
+import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
 import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.utils.FileUtils;
 import org.json.simple.JSONObject;
@@ -36,6 +37,7 @@ public abstract class DAPPFactory {
         }
 
         ShibaVerseDAPP.setDAPPFactory(skocks);
+        MemoCardsDAPP.setDAPPFactory(skocks);
 
     }
 
@@ -82,16 +84,19 @@ public abstract class DAPPFactory {
         //////
 
         /////// NEW VERSION
-        String dataStr = txSend.isText() && !txSend.isEncrypted() ? new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase() : null;
 
         ///////////////////// CALL DAPPS HERE
         Integer dappID = skocks.get(txSend.getRecipient());
         if (dappID == null)
             return null;
 
+        String dataStr = txSend.isText() && !txSend.isEncrypted() ? new String(txSend.getData(), StandardCharsets.UTF_8).toLowerCase() : null;
+
         switch (dappID) {
             case ShibaVerseDAPP.ID:
                 return ShibaVerseDAPP.make(txSend, dataStr);
+            case MemoCardsDAPP.ID:
+                return MemoCardsDAPP.make(txSend, dataStr);
         }
 
         return null;

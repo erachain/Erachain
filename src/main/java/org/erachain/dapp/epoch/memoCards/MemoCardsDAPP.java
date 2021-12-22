@@ -2,7 +2,6 @@ package org.erachain.dapp.epoch.memoCards;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.apache.commons.net.util.Base64;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
@@ -38,10 +37,8 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     final public static HashSet<PublicKeyAccount> accounts = new HashSet<>();
 
-    final public static byte[] HASH = crypto.digest(Longs.toByteArray(ID));
     // APPC45p29ZjcEEvSzhgUe8RfUzMZ1i2GFG
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
-
 
     static {
         accounts.add(MAKER);
@@ -67,13 +64,12 @@ public class MemoCardsDAPP extends EpochDAPPjson {
     final static public Account adminAddress = new Account("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP");
 
     final static public String COMMAND_WITHDRAW = "withdraw";
-    final static public String COMMAND_CATH_COMET = "catch comets";
     /**
      * in Title: buy
      * in message - asset key
      */
     final static public String COMMAND_BUY = "buy";
-    final static public long buster01Key = 11111L;
+    final static public long BUSTER_1_KEY = 11111L;
     /**
      * use as JSONArray in TX message. Title will be ignoged.
      * ["set price", { "shop assetKey1": {"price assetKey1": "price value", ...}}]<br>For example:
@@ -88,15 +84,17 @@ public class MemoCardsDAPP extends EpochDAPPjson {
      */
     final static public String COMMAND_RANDOM = "random";
 
-    final static public String COMMAND_FARM = "farm";
-    final static public String COMMAND_CHARGE = "charge";
-    final static public String COMMAND_PICK_UP = "pick up";
     /**
      * GRAVUTA KEY
      */
     static final private Tuple2 INIT_KEY = new Tuple2(ID, "i");
 
     private Long gravitaKey;
+
+    public static final int RARE_COMMON = 0;
+    public static final int RARE_UNCOMMON = 1;
+    public static final int RARE_RARE = 2;
+    public static final int RARE_EPIC = 3;
 
     public MemoCardsDAPP(String data, String status) {
         super(ID, MAKER, data, status);
@@ -177,6 +175,12 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     ///////// COMMANDS
 
+    /**
+     * @param block
+     * @param transaction
+     * @param nonce
+     * @return
+     */
     public static byte[] getRandHash(Block block, Transaction transaction, int nonce) {
 
         byte[] hash = new byte[32];
@@ -189,35 +193,156 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         int slotRare;
         int slotRareLvl;
 
-        byte[] randomArray = new byte[8];
+        byte[] randomArray = new byte[28];
 
-        // GET 4 rabdom levels of Rarity
+        // GET 2 rabdom levels of Rarity
         int index = 0;
         do {
             slotRare = Ints.fromBytes((byte) 0, (byte) 0, hash[index++], hash[index++]);
-            if ((slotRare >> 11) == 0) {
+            if (slotRare == 0)
+                slotRareLvl = 15;
+            else if (slotRare < 3)
+                slotRareLvl = 14;
+            else if (slotRare < 7)
+                slotRareLvl = 13;
+            else if (slotRare < 15)
+                slotRareLvl = 12;
+            else if (slotRare < 31)
+                slotRareLvl = 11;
+            else if (slotRare < 63)
+                slotRareLvl = 10;
+            else if (slotRare < 127)
+                slotRareLvl = 9;
+            else if (slotRare < 255)
+                slotRareLvl = 8;
+            else if (slotRare < 511)
+                slotRareLvl = 7;
+            else if (slotRare < 1023)
+                slotRareLvl = 6;
+            else if (slotRare < 2047)
                 slotRareLvl = 5;
-            } else if ((slotRare >> 12) == 0) {
+            else if (slotRare < 4095)
                 slotRareLvl = 4;
-            } else if ((slotRare >> 13) == 0) {
+            else if (slotRare < 8192)
                 slotRareLvl = 3;
-            } else if ((slotRare >> 14) == 0) {
+            else if (slotRare < 16383)
                 slotRareLvl = 2;
-            } else if ((slotRare >> 15) == 0) {
+            else if (slotRare < 32767)
                 slotRareLvl = 1;
-            } else {
+            else
                 slotRareLvl = 0;
-            }
+
             randomArray[slot] = (byte) slotRareLvl;
 
-        } while (slot++ < 3);
+        } while (++slot < 2);
 
-        // GET 4 rabdom values
+        // GET 32 - 2*2 rabdom values
         do {
             randomArray[slot] = hash[index++];
-        } while (slot++ < 7);
+        } while (++slot < 28);
 
         return randomArray;
+
+    }
+
+    /**
+     * @param dcSet
+     * @param block
+     * @param commandTX
+     * @param setID     ID of set
+     * @param rareLevel level of card rarity
+     * @param charValue characterictic value
+     * @param asOrphan
+     */
+    private void makeAsset(DCSet dcSet, Block block, RSend commandTX, int setID, int rareLevel, int charValue, boolean asOrphan) {
+        if (setID == 1)
+            charValue >>= 3;
+
+        String name = "ca" + setID + "." + rareLevel + "." + charValue;
+        Tuple2 keyID = new Tuple2(ID, name);
+
+        Long assetKey;
+        SmartContractValues valuesMap = dcSet.getSmartContractValues();
+
+        if (asOrphan) {
+            assetKey = (Long) valuesMap.get(keyID);
+
+            AssetCls asset = dcSet.getItemAssetMap().get(assetKey);
+            if (asset.getReleased(dcSet).equals(BigDecimal.ONE)) {
+                // DELETE FROM BLOCKCHAIN DATABASE
+                dcSet.getItemAssetMap().decrementDelete(assetKey);
+
+                // DELETE FROM CONTRACT DATABASE
+                valuesMap.delete(keyID);
+
+            }
+
+        } else {
+            // seek if already exist
+            if (valuesMap.contains(keyID)) {
+                assetKey = (Long) valuesMap.get(keyID);
+            } else {
+                // make new COMET
+                JSONObject json = new JSONObject();
+                json.put("value", charValue);
+                json.put("rare", rareLevel);
+                json.put("set", setID);
+                json.put("type", "card");
+                String description = json.toJSONString();
+
+                AssetVenture randomAsset = new AssetVenture(null, stock, name, null, null,
+                        description, AssetCls.AS_INSIDE_ASSETS, 0, 0);
+                randomAsset.setReference(commandTX.getSignature(), commandTX.getDBRef());
+
+                //INSERT INTO BLOCKCHAIN DATABASE
+                assetKey = dcSet.getItemAssetMap().incrementPut(randomAsset);
+                //INSERT INTO CONTRACT DATABASE
+                dcSet.getSmartContractValues().put(keyID, assetKey);
+            }
+        }
+
+        // TRANSFER ASSET
+        transfer(dcSet, block, commandTX, stock, commandTX.getCreator(), BigDecimal.ONE, assetKey, asOrphan, null, "buster_1");
+
+    }
+
+    /**
+     * make pack by RARE
+     *
+     * @return
+     */
+    private void openBuster_1_getPack(DCSet dcSet, Block block, RSend commandTX, int nonce, boolean asOrphan) {
+        // GET RANDOM
+        byte[] randomArray = getRandHash(block, commandTX, nonce);
+
+        int index = 2;
+        if (randomArray[0] < 2) {
+            // make COMMON cards
+            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+
+            // make UNCOMMON cards
+            makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+
+        } else if (randomArray[0] < 4) {
+            // make COMMON cards
+            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+
+            // make UNCOMMON cards
+            makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+            makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+        } else {
+            // make COMMON cards
+            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+
+            // make UNCOMMON cards
+            makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+
+            // make RARE cards
+            makeAsset(dcSet, block, commandTX, 1, RARE_RARE, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+        }
 
     }
 
@@ -226,16 +351,10 @@ public class MemoCardsDAPP extends EpochDAPPjson {
      * @param commandTX
      * @param asOrphan
      */
-    private boolean catchComets(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
-        // рождение комет
+    private boolean openBuster_1(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        // открываем бустер
 
-        if (gravitaKey == null)
-            gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
-
-        if (commandTX.getAssetKey() != gravitaKey) {
-            error("Wrong asset key. Need " + gravitaKey);
-            return false;
-        } else if (!commandTX.hasAmount() || !commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
+        if (!commandTX.hasAmount() || !commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
             error("Wrong amount. Need > 0");
             return false;
         } else if (commandTX.isBackward()) {
@@ -248,7 +367,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
         PublicKeyAccount creator = commandTX.getCreator();
-        int count = 5 * commandTX.getAmount().intValue();
+        int count = commandTX.getAmount().intValue();
 
         // need select direction by asOrphan, else decrementDelete will not work!
         int nonce;
@@ -257,64 +376,14 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         else
             nonce = count;
 
-        AssetVenture comet;
-        Long assetKey;
         do {
 
-            // GET RANDOM
-            byte[] randomArray = getRandHash(block, commandTX, nonce);
             if (asOrphan)
                 nonce++;
             else
                 nonce--;
 
-            // make object name: "c" - comet, "0" - era, Rarity1,2, Value1,2,
-            int value1 = Byte.toUnsignedInt(randomArray[7]) >>> 5;
-            int value2 = Byte.toUnsignedInt(randomArray[6]) >>> 5;
-            String name = "c0" + randomArray[0] + randomArray[1] + value1 + value2;
-            Tuple2 keyID = new Tuple2(ID, name);
-
-            if (asOrphan) {
-                assetKey = (Long) valuesMap.get(keyID);
-
-                AssetCls asset = dcSet.getItemAssetMap().get(assetKey);
-                if (asset.getReleased(dcSet).equals(BigDecimal.ONE)) {
-                    // DELETE FROM BLOCKCHAIN DATABASE
-                    dcSet.getItemAssetMap().decrementDelete(assetKey);
-
-                    // DELETE FROM CONTRACT DATABASE
-                    valuesMap.delete(keyID);
-
-                }
-
-            } else {
-                // seek if already exist
-                if (valuesMap.contains(keyID)) {
-                    assetKey = (Long) valuesMap.get(keyID);
-                } else {
-                    // make new COMET
-                    JSONObject json = new JSONObject();
-                    json.put("value1", value1);
-                    json.put("value2", value2);
-                    json.put("rare1", Byte.toUnsignedInt(randomArray[6]));
-                    json.put("rare2", Byte.toUnsignedInt(randomArray[7]));
-                    json.put("type", "Comet");
-                    json.put("random", Base64.encodeBase64StringUnChunked(randomArray));
-                    String description = json.toJSONString();
-
-                    comet = new AssetVenture(null, stock, name, null, null,
-                            description, AssetCls.AS_INSIDE_ASSETS, 0, 0);
-                    comet.setReference(commandTX.getSignature(), commandTX.getDBRef());
-
-                    //INSERT INTO BLOCKCHAIN DATABASE
-                    assetKey = dcSet.getItemAssetMap().incrementPut(comet);
-                    //INSERT INTO CONTRACT DATABASE
-                    dcSet.getSmartContractValues().put(keyID, assetKey);
-                }
-            }
-
-            // TRANSFER ASSET
-            transfer(dcSet, block, commandTX, stock, creator, BigDecimal.ONE, assetKey, asOrphan, null, "catchComets");
+            openBuster_1_getPack(dcSet, block, commandTX, nonce, asOrphan);
 
         } while (--count > 0);
 
@@ -348,7 +417,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             return price;
 
         switch ((int) shopAssetKey) {
-            case (int) buster01Key:
+            case (int) BUSTER_1_KEY:
                 switch ((int) priceAssetKey) {
                     case 18:
                         return new BigDecimal("0.1");
@@ -366,6 +435,8 @@ public class MemoCardsDAPP extends EpochDAPPjson {
     }
 
     private boolean random(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        if (commandTX.getAssetKey() == BUSTER_1_KEY)
+            return openBuster_1(dcSet, block, commandTX, asOrphan);
         return true;
     }
 
@@ -423,7 +494,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                     return false;
                 }
 
-                if (false && shopAssetKey != buster01Key) {
+                if (false && shopAssetKey != BUSTER_1_KEY) {
                     error("Wrong asset key");
                     return false;
                 }
@@ -720,7 +791,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                         rsend.getCreator() // need for TEST - not adminAddress
                 );
             } else {
-                if (COMMAND_CATH_COMET.equals(command) || COMMAND_RANDOM.equals(command)
+                if (COMMAND_RANDOM.equals(command)
                         // это не проверка вне блока - в ней блока нет
                         && block != null) {
                     // рождение комет
@@ -741,9 +812,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
     @Override
     public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
 
-        if (COMMAND_CATH_COMET.equals(command)) {
-            return catchComets(dcSet, block, (RSend) transaction, false);
-        } else if (COMMAND_RANDOM.equals(command)) {
+        if (COMMAND_RANDOM.equals(command)) {
             return random(dcSet, block, (RSend) transaction, false);
         }
 
@@ -777,7 +846,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             );
         }
 
-        if (COMMAND_CATH_COMET.equals(command) || COMMAND_RANDOM.equals(command)) {
+        if (COMMAND_RANDOM.equals(command)) {
             // отмена рождения комет
             dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
         } else if (COMMAND_BUY.equals(command)) {
@@ -788,9 +857,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     @Override
     public void orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
-        if (COMMAND_CATH_COMET.equals(command)) {
-            catchComets(dcSet, block, (RSend) transaction, true);
-        } else if (COMMAND_RANDOM.equals(command)) {
+        if (COMMAND_RANDOM.equals(command)) {
             random(dcSet, block, (RSend) transaction, true);
         }
 
