@@ -246,6 +246,23 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     }
 
+    private int openBuster_1_getSetCount(int setID, int rareLevel) {
+        switch (setID) {
+            case 1:
+                switch (rareLevel) {
+                    case RARE_COMMON:
+                        return 10;
+                    case RARE_UNCOMMON:
+                        return 3;
+                    case RARE_RARE:
+                        return 1;
+                    case RARE_EPIC:
+                        return 0;
+                }
+        }
+        return 256;
+    }
+
     /**
      * @param dcSet
      * @param block
@@ -256,8 +273,8 @@ public class MemoCardsDAPP extends EpochDAPPjson {
      * @param asOrphan
      */
     private void makeAsset(DCSet dcSet, Block block, RSend commandTX, int setID, int rareLevel, int charValue, boolean asOrphan) {
-        if (setID == 1)
-            charValue >>= 3 + 2 * rareLevel;
+        int setCount = openBuster_1_getSetCount(setID, rareLevel);
+        charValue = setCount * 2 * Short.MAX_VALUE / charValue;
 
         String name = "ca" + setID + "." + rareLevel + "." + charValue;
         Tuple2 keyID = new Tuple2(ID, name);
