@@ -115,6 +115,9 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
     public static ShibaVerseDAPP make(RSend txSend, String dataStr) {
         // dataStr = null
         if (dataStr == null || dataStr.isEmpty())
+            dataStr = txSend.getTitle();
+
+        if (dataStr == null || dataStr.isEmpty())
             return null;
 
         Account recipent = txSend.getRecipient();
