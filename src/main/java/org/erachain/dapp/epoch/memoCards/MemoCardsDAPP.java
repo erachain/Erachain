@@ -741,9 +741,14 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         /**
          * issue main currency
          */
+        BigDecimal amount = new BigDecimal("10000");
         if (asOrphan) {
+
             // need to remove INIT_KEY - for reinit after orphans
             gravitaKey = (Long) dcSet.getSmartContractValues().remove(INIT_KEY);
+
+            // BACKWARDS from ADMIN
+            transfer(dcSet, block, commandTX, stock, admin, amount, gravitaKey, true, null, null);
 
             // orphan GRAVITA ASSET
             dcSet.getItemAssetMap().decrementDelete(gravitaKey);
@@ -764,7 +769,6 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             dcSet.getSmartContractValues().put(INIT_KEY, gravitaKey);
 
             // TRANSFER GRAVITA to ADMIN
-            BigDecimal amount = new BigDecimal("10000");
             transfer(dcSet, block, commandTX, stock, admin, amount, gravitaKey, false, null, "init");
 
             status = "done";
