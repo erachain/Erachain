@@ -2,9 +2,11 @@ package org.erachain.dapp.epoch.memoCards;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.exdata.exLink.ExLinkAddress;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
@@ -70,7 +72,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
      * Example of message: ["buy", 1001]
      */
     final static public String COMMAND_BUY = "buy";
-    final static public long BUSTER_1_KEY = 1001L;
+    final static public long BUSTER_1_KEY = BlockChain.DEMO_MODE ? 1048593L : 9999L;
     /**
      * use as JSONArray in TX message. Title will be ignoged.
      * ["set price", { "shop assetKey1": {"price assetKey1": "price value", ...}}]<br>For example:
@@ -272,7 +274,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
      * @param charValue characterictic value
      * @param asOrphan
      */
-    private void makeAsset(DCSet dcSet, Block block, RSend commandTX, int setID, int rareLevel, int charValue, boolean asOrphan) {
+    private Object[] makeAsset(DCSet dcSet, Block block, RSend commandTX, int setID, int rareLevel, int charValue, boolean asOrphan) {
         int setCount = openBuster_1_getSetCount(setID, rareLevel);
         charValue = setCount * (2 * Short.MAX_VALUE - 1) / charValue;
 
@@ -296,9 +298,12 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             }
 
         } else {
+
+            Object[] issuedAsset;
             // seek if already exist
             if (valuesMap.contains(keyID)) {
                 assetKey = (Long) valuesMap.get(keyID);
+                issuedAsset = null;
             } else {
                 // make new COMET
                 JSONObject json = new JSONObject();
@@ -308,7 +313,20 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                 json.put("type", "card");
                 String description = json.toJSONString();
 
-                AssetVenture randomAsset = new AssetVenture(null, stock, name, null, null,
+                boolean iconAsURL = false;
+                int iconType = 0;
+                boolean imageAsURL = false;
+                int imageType = 0;
+                Long startDate = null;
+                Long stopDate = null;
+                String tags = "mtga, :nft, prolog set";
+                ExLinkAddress[] dexAwards = null;
+                boolean isUnTransferable = false;
+                boolean isAnonimDenied = false;
+
+                AssetVenture randomAsset = new AssetVenture(AssetCls.makeAppData(
+                        iconAsURL, iconType, imageAsURL, imageType, startDate, stopDate, tags, dexAwards, isUnTransferable, isAnonimDenied),
+                        stock, name, null, null,
                         description, AssetCls.AS_INSIDE_ASSETS, 0, 0);
                 randomAsset.setReference(commandTX.getSignature(), commandTX.getDBRef());
 
@@ -316,6 +334,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                 assetKey = dcSet.getItemAssetMap().incrementPut(randomAsset);
                 //INSERT INTO CONTRACT DATABASE
                 dcSet.getSmartContractValues().put(keyID, assetKey);
+                assetKey
             }
         }
 
@@ -333,33 +352,48 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         // GET RANDOM
         byte[] randomArray = getRandHash(block, commandTX, nonce);
 
-        int index = 2;
-        if (randomArray[0] < 2) {
-            // make COMMON cards
-            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
-            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
-            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
-            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+        if (asOrphan) {
+            assetKey = (Long) valuesMap.get(keyID);
 
-            // make UNCOMMON cards
-            makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+            AssetCls asset = dcSet.getItemAssetMap().get(assetKey);
+            if (asset.getReleased(dcSet).equals(BigDecimal.ONE)) {
+                // DELETE FROM BLOCKCHAIN DATABASE
+                dcSet.getItemAssetMap().decrementDelete(assetKey);
 
-        } else if (randomArray[0] < 4) {
-            // make COMMON cards
-            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+                // DELETE FROM CONTRACT DATABASE
+                valuesMap.delete(keyID);
 
-            // make UNCOMMON cards
-            makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
-            makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+            }
+
         } else {
-            // make COMMON cards
-            makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+            int index = 2;
+            if (randomArray[0] < 2) {
+                // make COMMON cards
+                makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+                makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+                makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+                makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
 
-            // make UNCOMMON cards
-            makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+                // make UNCOMMON cards
+                makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
 
-            // make RARE cards
-            makeAsset(dcSet, block, commandTX, 1, RARE_RARE, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+            } else if (randomArray[0] < 4) {
+                // make COMMON cards
+                makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+
+                // make UNCOMMON cards
+                makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+                makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+            } else {
+                // make COMMON cards
+                makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+
+                // make UNCOMMON cards
+                makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+
+                // make RARE cards
+                makeAsset(dcSet, block, commandTX, 1, RARE_RARE, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan);
+            }
         }
 
     }
@@ -434,16 +468,16 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         if (price != null)
             return price;
 
-        switch ((int) shopAssetKey) {
-            case (int) BUSTER_1_KEY:
-                switch ((int) priceAssetKey) {
-                    case 18:
-                        return new BigDecimal("0.1");
-                    default:
-                        // for TEST ONLY
-                        return new BigDecimal("0.01");
-                }
+        if (shopAssetKey == BUSTER_1_KEY) {
+            switch ((int) priceAssetKey) {
+                case 18:
+                    return new BigDecimal("0.1");
+                default:
+                    // for TEST ONLY
+                    return new BigDecimal("0.01");
+            }
         }
+
         if (true) {
             // for TEST ONLY
             return new BigDecimal("0.1");
