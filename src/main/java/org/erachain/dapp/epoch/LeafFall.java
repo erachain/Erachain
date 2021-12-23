@@ -257,7 +257,7 @@ public class LeafFall extends EpochDAPP {
     }
 
     @Override
-    public boolean orphan(DCSet dcSet, Transaction transaction) {
+    public void orphan(DCSet dcSet, Transaction transaction) {
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
         loadValues(valuesMap);
@@ -274,12 +274,10 @@ public class LeafFall extends EpochDAPP {
             valuesMap.put(COUN_VAR, --count);
         }
 
-        return false;
     }
 
     @Override
-    public boolean orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
-        return false;
+    public void orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
     }
 
     private void wipe(DCSet dcSet, SmartContractValues valuesMap) {

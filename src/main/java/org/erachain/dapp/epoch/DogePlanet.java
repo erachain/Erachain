@@ -163,7 +163,7 @@ public class DogePlanet extends EpochDAPP {
 
 
     @Override
-    public boolean orphan(DCSet dcSet, Transaction transaction) {
+    public void orphan(DCSet dcSet, Transaction transaction) {
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
         Integer totalIssued = (Integer) valuesMap.get(COUNT_KEY);
@@ -180,12 +180,10 @@ public class DogePlanet extends EpochDAPP {
 
         valuesMap.put(COUNT_KEY, totalIssued - count);
 
-        return false;
     }
 
     @Override
-    public boolean orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
-        return false;
+    public void orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
     }
 
     private static String[][][] imgsStr;
