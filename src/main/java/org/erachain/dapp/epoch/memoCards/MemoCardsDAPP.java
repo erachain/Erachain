@@ -274,7 +274,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
      */
     private void makeAsset(DCSet dcSet, Block block, RSend commandTX, int setID, int rareLevel, int charValue, boolean asOrphan) {
         int setCount = openBuster_1_getSetCount(setID, rareLevel);
-        charValue = setCount * 2 * Short.MAX_VALUE / charValue;
+        charValue = setCount * (2 * Short.MAX_VALUE - 1) / charValue;
 
         String name = "ca" + setID + "." + rareLevel + "." + charValue;
         Tuple2 keyID = new Tuple2(ID, name);
