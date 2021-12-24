@@ -2211,14 +2211,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     }
 
-    /**
-     * обработка всего что в конце блока прилипло
-     *
-     * @param dcSet
-     */
-    private void processTail(DCSet dcSet) {
-        // clear old orders
-        OrderProcess.clearOldOrders(dcSet, this, false);
+    private void processTimed(DCSet dcSet) {
 
         // time wait process
         TimeTXWaitMap timeWaitMap = dcSet.getTimeTXWaitMap();
@@ -2243,6 +2236,17 @@ public class Block implements Closeable, ExplorerJsonLine {
         } catch (IOException e) {
             Controller.getInstance().stopAndExit(99999);
         }
+    }
+
+    /**
+     * обработка всего что в конце блока прилипло
+     *
+     * @param dcSet
+     */
+    private void processTail(DCSet dcSet) {
+        // clear old orders
+        OrderProcess.clearOldOrders(dcSet, this, false);
+
     }
 
     // TODO - make it trownable
@@ -2366,6 +2370,8 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         }
 
+        processTimed(dcSet);
+
         timerStart = System.currentTimeMillis();
         this.process_after(cnt, dcSet);
         LOGGER.debug("BLOCK process_after: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
@@ -2384,26 +2390,26 @@ public class Block implements Closeable, ExplorerJsonLine {
     }
 
     /**
-     * обработка всего что в конце блока прилипло
+     * Обязательно надо это вызвать после того как удалили все Вычисленные транзакции - так как иначе удалени активов тут вызовет крах в них
      *
      * @param dcSet
      */
-    private void orphanHead(DCSet dcSet) {
+    private void orphanTimed(DCSet dcSet) {
 
         // time wait process
         TimeTXWaitMap timeWaitMap = dcSet.getTimeTXWaitMap();
-        TimeTXDoneMap timewDoneMap = dcSet.getTimeTXDoneMap();
+        TimeTXDoneMap timeDoneMap = dcSet.getTimeTXDoneMap();
         TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
         Transaction tx;
         Tuple2<Integer, Long> key;
-        try (IteratorCloseable<Tuple2<Integer, Long>> iteraator = timewDoneMap.getTXIterator(true)) {
+        try (IteratorCloseable<Tuple2<Integer, Long>> iteraator = timeDoneMap.getTXIterator(true)) {
             while (iteraator.hasNext()) {
                 key = iteraator.next();
                 // reversed pair - key = <Block, dbRef>
                 if (key.a < heightBlock)
                     break;
 
-                timewDoneMap.remove(key.b);
+                timeDoneMap.remove(key.b);
                 timeWaitMap.put(key.b, key.a);
 
                 tx = txMap.get(key.b);
@@ -2413,6 +2419,18 @@ public class Block implements Closeable, ExplorerJsonLine {
         } catch (IOException e) {
             Controller.getInstance().stopAndExit(99999);
         }
+
+        // clear old orders
+        OrderProcess.clearOldOrders(dcSet, this, true);
+
+    }
+
+    /**
+     * обработка всего что в конце блока прилипло
+     *
+     * @param dcSet
+     */
+    private void orphanHead(DCSet dcSet) {
 
         // clear old orders
         OrderProcess.clearOldOrders(dcSet, this, true);
@@ -2523,6 +2541,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         // CLEAR ASSETS FEE
         earnedAllAssets = new HashMap<>();
 
+        boolean calculatedBefore = true;
+
         // DELETE ALL BY DB ITERATOR
         // It delete all CALCULATED FIRST correct and all txs too
         /// если форк их тут вообще нету - нужно выцепить из Родительской таблицы
@@ -2539,6 +2559,12 @@ public class Block implements Closeable, ExplorerJsonLine {
                 Transaction transaction = finalMap.get(dbRef);
 
                 if (!(transaction instanceof RCalculated)) {
+
+                    if (calculatedBefore) {
+                        calculatedBefore = false;
+                        // если перед этим были только вычисляемые и начались обычные, то сперва все запуски по времени откатим
+                        orphanTimed(dcSet);
+                    }
 
                     if (!transaction.isWiped()) {
                         transaction.orphan(this, Transaction.FOR_NETWORK);
@@ -2569,6 +2595,11 @@ public class Block implements Closeable, ExplorerJsonLine {
                 // полное удалени включая Посиковые Метки tags
                 finalMap.delete(dbRef);
             }
+        }
+
+        if (calculatedBefore) {
+            // если не было транзакций обычных вообще, только вычисляемые, то теперь откатим запуски по времени
+            orphanTimed(dcSet);
         }
 
     }
