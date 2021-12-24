@@ -338,12 +338,53 @@ public class MemoCardsDAPP extends EpochDAPPjson {
      *
      * @return
      */
-    private void openBuster_1_getPack(DCSet dcSet, Block block, RSend commandTX, int nonce, boolean asOrphan) {
+    private void openBuster_1_getPack(DCSet dcSet, Block block, RSend commandTX, int nonce, List actions) {
+
+        // GET RANDOM
+        byte[] randomArray = getRandHash(block, commandTX, nonce);
+        int index = 2;
+        if (randomArray[0] < 2) {
+            // make COMMON cards
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+
+            // make UNCOMMON cards
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+
+        } else if (randomArray[0] < 4) {
+            // make COMMON cards
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+
+            // make UNCOMMON cards
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+        } else {
+            // make COMMON cards
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+
+            // make UNCOMMON cards
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+
+            // make RARE cards
+            actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_RARE, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+        }
+
+    }
+
+    /**
+     * @param dcSet
+     * @param commandTX
+     * @param asOrphan
+     */
+    private boolean openBuster_1(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+        // открываем бустер
 
         if (asOrphan) {
 
             SmartContractValues valuesMap = dcSet.getSmartContractValues();
-            Object[] actions = removeState(dcSet);
+            Object[] actions = removeState(dcSet, commandTX.getDBRef());
 
             int index = actions.length;
             Object[] act;
@@ -366,52 +407,10 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                 }
             }
 
-        } else {
+            status = "wait";
 
-            // GET RANDOM
-            byte[] randomArray = getRandHash(block, commandTX, nonce);
-            List actions = new ArrayList();
-            int index = 2;
-            if (randomArray[0] < 2) {
-                // make COMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-
-                // make UNCOMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-
-            } else if (randomArray[0] < 4) {
-                // make COMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-
-                // make UNCOMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-            } else {
-                // make COMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-
-                // make UNCOMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-
-                // make RARE cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_RARE, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
-            }
-
-            putState(dcSet, actions.toArray());
+            return true;
         }
-
-    }
-
-    /**
-     * @param dcSet
-     * @param commandTX
-     * @param asOrphan
-     */
-    private boolean openBuster_1(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
-        // открываем бустер
 
         if (!commandTX.hasAmount() || !commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
             fail("Wrong amount. Need > 0");
@@ -429,27 +428,20 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         int count = commandTX.getAmount().intValue();
 
         // need select direction by asOrphan, else decrementDelete will not work!
-        int nonce;
-        if (asOrphan)
-            nonce = 1;
-        else
-            nonce = count;
+        int nonce = count;
 
+        List actions = new ArrayList();
         do {
 
-            if (asOrphan)
-                nonce++;
-            else
-                nonce--;
+            nonce--;
 
-            openBuster_1_getPack(dcSet, block, commandTX, nonce, asOrphan);
+            openBuster_1_getPack(dcSet, block, commandTX, nonce, actions);
 
         } while (--count > 0);
 
-        if (asOrphan)
-            status = "wait";
-        else
-            status = "done";
+        putState(dcSet, commandTX.getDBRef(), actions.toArray());
+
+        status = "done";
 
         return true;
 
@@ -513,7 +505,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         if (asOrphan) {
             long priceAssetKey = commandTX.getAssetKey();
             long shopAssetKey = Long.parseLong(pars.get(1).toString());
-            Object[] result = removeState(dcSet);
+            Object[] result = removeState(dcSet, commandTX.getDBRef());
             if (result.length > 0) {
                 BigDecimal amountToSell = (BigDecimal) result[0];
                 transfer(dcSet, null, commandTX, creator, stock, amountToSell, shopAssetKey, true, null, null);
@@ -604,7 +596,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             }
 
             // store results for orphan
-            putState(dcSet, new Object[]{amountToSell, leftAmount});
+            putState(dcSet, commandTX.getDBRef(), new Object[]{amountToSell, leftAmount});
 
         }
 
@@ -625,7 +617,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
         SmartContractValues map = dcSet.getSmartContractValues();
         if (asOrphan) {
-            Object[] result = removeState(dcSet);
+            Object[] result = removeState(dcSet, commandTX.getDBRef());
             if (result.length > 0) {
                 for (Fun.Tuple3<Long, Long, BigDecimal> item : (Fun.Tuple3<Long, Long, BigDecimal>[]) result) {
                     map.put(priceKey(item.a, item.b), item.c);
@@ -709,7 +701,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             }
 
             // store results for orphan
-            putState(dcSet, oldPrices.toArray());
+            putState(dcSet, commandTX.getDBRef(), oldPrices.toArray());
 
             status = "done";
         }
@@ -724,7 +716,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
         if (asOrphan) {
             // restore results for orphan
-            List<Tuple2<Long, BigDecimal>> results = (List<Tuple2<Long, BigDecimal>>) removeState(dcSet)[0];
+            List<Tuple2<Long, BigDecimal>> results = (List<Tuple2<Long, BigDecimal>>) removeState(dcSet, commandTX.getDBRef())[0];
 
             for (Tuple2<Long, BigDecimal> row : results) {
                 // RE-TRANSFER ASSET from ADMIN
@@ -772,7 +764,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                 }
 
                 // store results for orphan
-                putState(dcSet, new Object[]{results});
+                putState(dcSet, commandTX.getDBRef(), new Object[]{results});
 
                 status = "done";
 
@@ -785,7 +777,12 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     }
 
-    private boolean init(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+    private boolean init(DCSet dcSet, Block block, Transaction commandTX, boolean asOrphan) {
+
+        if (!(commandTX instanceof RSend)) {
+            fail("not RSend type");
+            return false;
+        }
 
         Account adminAccount = commandTX.getCreator();
 
@@ -836,6 +833,10 @@ public class MemoCardsDAPP extends EpochDAPPjson {
     @Override
     public boolean process(DCSet dcSet, Block block, Transaction commandTX) {
 
+        if ("init".equals(command)) // INIT HERE - before common isValid
+            return init(dcSet, block, commandTX, false);
+
+
         if (!isValid(dcSet, commandTX))
             return true;
 
@@ -861,8 +862,6 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                 return shopBuy(dcSet, block, rsend, false);
 
                 /// ADMIN COMMAND
-            } else if ("init".equals(command)) {
-                return init(dcSet, block, rsend, false);
             } else if (COMMAND_WITHDRAW.startsWith(command)) {
                 return adminWithdraw(dcSet, block, rsend, false);
             } else if (COMMAND_SET_PRICE.equals(command)) {
@@ -903,7 +902,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         } else if (COMMAND_BUY.equals(command)) {
             shopBuy(dcSet, null, (RSend) commandTX, true);
 
-            /// ADMIN
+            /// ADMIN COMMANDS
         } else if ("init".equals(command)) {
             init(dcSet, null, (RSend) commandTX, true);
         } else if (COMMAND_WITHDRAW.startsWith(command)) {

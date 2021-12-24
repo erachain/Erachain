@@ -104,18 +104,8 @@ public abstract class DAPP {
      * @param dcSet
      * @param values
      */
-    public void putState(DCSet dcSet, Object[] values) {
-        dcSet.getSmartContractState().putState(id, values);
-    }
-
-    /**
-     * Peek state values
-     *
-     * @param dcSet
-     * @return
-     */
-    public Object[] peekState(DCSet dcSet) {
-        return dcSet.getSmartContractState().peekState(id);
+    public void putState(DCSet dcSet, Long seqNo, Object[] values) {
+        dcSet.getSmartContractState().put(new Fun.Tuple2<>(id, seqNo), values);
     }
 
     /**
@@ -124,8 +114,8 @@ public abstract class DAPP {
      * @param dcSet
      * @return
      */
-    public Object[] removeState(DCSet dcSet) {
-        return dcSet.getSmartContractState().removeState(id);
+    public Object[] removeState(DCSet dcSet, Long seqNo) {
+        return dcSet.getSmartContractState().remove(new Fun.Tuple2<>(id, seqNo));
     }
 
     public boolean valueSet(DCSet dcSet, Object key, Object value) {

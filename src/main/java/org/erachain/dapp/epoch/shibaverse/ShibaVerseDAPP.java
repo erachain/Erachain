@@ -401,7 +401,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         if (asOrphan) {
             long priceAssetKey = commandTX.getAssetKey();
             long shopAssetKey = Long.parseLong(pars.get(1).toString());
-            Object[] result = removeState(dcSet);
+            Object[] result = removeState(dcSet, commandTX.getDBRef());
             if (result.length > 0) {
                 BigDecimal amountToSell = (BigDecimal) result[0];
                 transfer(dcSet, null, commandTX, creator, stock, amountToSell, shopAssetKey, true, null, null);
@@ -492,7 +492,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             }
 
             // store results for orphan
-            putState(dcSet, new Object[]{amountToSell, leftAmount});
+            putState(dcSet, commandTX.getDBRef(), new Object[]{amountToSell, leftAmount});
 
         }
 
@@ -633,7 +633,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
 
         SmartContractValues map = dcSet.getSmartContractValues();
         if (asOrphan) {
-            Object[] result = removeState(dcSet);
+            Object[] result = removeState(dcSet, commandTX.getDBRef());
             if (result.length > 0) {
                 for (Fun.Tuple3<Long, Long, BigDecimal> item : (Fun.Tuple3<Long, Long, BigDecimal>[]) result) {
                     map.put(priceKey(item.a, item.b), item.c);
@@ -715,7 +715,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             }
 
             // store results for orphan
-            putState(dcSet, oldPrices.toArray());
+            putState(dcSet, commandTX.getDBRef(), oldPrices.toArray());
 
             status = "done";
         }
@@ -727,7 +727,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
     private boolean adminWithdraw(DCSet dcSet, Block block, RSend commandTX, Account admin, boolean asOrphan) {
         if (asOrphan) {
             // restore results for orphan
-            List<Tuple2<Long, BigDecimal>> results = (List<Tuple2<Long, BigDecimal>>) removeState(dcSet)[0];
+            List<Tuple2<Long, BigDecimal>> results = (List<Tuple2<Long, BigDecimal>>) removeState(dcSet, commandTX.getDBRef())[0];
 
             for (Tuple2<Long, BigDecimal> row : results) {
                 // RE-TRANSFER ASSET from ADMIN
@@ -772,7 +772,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                 }
 
                 // store results for orphan
-                putState(dcSet, new Object[]{results});
+                putState(dcSet, commandTX.getDBRef(), new Object[]{results});
 
                 status = "done";
 
