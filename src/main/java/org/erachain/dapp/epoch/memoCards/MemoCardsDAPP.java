@@ -118,8 +118,8 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     }
 
-    private boolean isAdminCommand(Transaction transaction) {
-        return transaction.getCreator().equals(adminAddress);
+    private boolean isAdminCommand(Account txCreator) {
+        return txCreator.equals(adminAddress);
     }
 
     @Override
@@ -638,7 +638,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             JSONObject prices;
             BigDecimal price;
 
-            if (isAdminCommand(commandTX)) {
+            if (!isAdminCommand(commandTX.getCreator())) {
                 fail("not admin");
                 return false;
             } else if (pars == null) {
@@ -733,7 +733,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
         } else {
 
-            if (isAdminCommand(commandTX)) {
+            if (!isAdminCommand(adminAccount)) {
                 fail("not admin");
                 return false;
             } else if (!dcSet.getSmartContractValues().contains(INIT_KEY)) {
@@ -787,12 +787,12 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     private boolean init(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
 
-        if (isAdminCommand(commandTX)) {
+        Account adminAccount = commandTX.getCreator();
+
+        if (!isAdminCommand(adminAccount)) {
             fail("not admin");
             return false;
         }
-
-        Account adminAccount = commandTX.getCreator();
 
         /**
          * issue main currency
@@ -847,15 +847,16 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                     fail("wrong action: " + rsend.viewActionType());
                     return false;
                 } else if (block == null) {
-                    status = "wait block";
+                    fail("wait block");
                     return false;
                 }
 
-                // это не проверка вне блока - в ней блока нет
+                /// WAIT RANDOM FROM FUTURE
                 dcSet.getTimeTXWaitMap().put(commandTX.getDBRef(), block.heightBlock + WAIT_RAND);
                 status = "wait";
                 return false;
 
+                /// COMMANDS
             } else if (COMMAND_BUY.equals(command)) {
                 return shopBuy(dcSet, block, rsend, false);
 
@@ -894,9 +895,11 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             return;
         }
 
-        if (COMMAND_RANDOM.equals(command)) {
-            // отмена рождения комет
+        if (status.startsWith("wait")) {
+            /// WAIT RANDOM FROM FUTURE
             dcSet.getTimeTXWaitMap().remove(commandTX.getDBRef());
+
+            /// COMMANDS
         } else if (COMMAND_BUY.equals(command)) {
             shopBuy(dcSet, null, (RSend) commandTX, true);
 
