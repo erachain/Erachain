@@ -124,12 +124,9 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     @Override
     public boolean isValid(DCSet dcSet, Transaction transaction) {
-        if (isAdminCommand(transaction)) {
-            return true;
-        }
 
         if (!dcSet.getSmartContractValues().contains(INIT_KEY)) {
-            error("not initated yet");
+            fail("not initated yet");
             return false;
         }
 
@@ -137,7 +134,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
 
         if (gravitaKey == null) {
-            error("not initated yet");
+            fail("not initated yet");
             return false;
         }
 
@@ -417,13 +414,13 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         // открываем бустер
 
         if (!commandTX.hasAmount() || !commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
-            error("Wrong amount. Need > 0");
+            fail("Wrong amount. Need > 0");
             return false;
         } else if (commandTX.isBackward()) {
-            error("Wrong direction - backward");
+            fail("Wrong direction - backward");
             return false;
         } else if (commandTX.balancePosition() != Account.BALANCE_POS_OWN) {
-            error("Wrong balance position. Need OWN[1]");
+            fail("Wrong balance position. Need OWN[1]");
             return false;
         }
 
@@ -531,33 +528,33 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             long shopAssetKey;
             AssetCls shopAsset;
             if (!commandTX.hasAmount()) {
-                error("Has not amount");
+                fail("Has not amount");
                 return false;
             } else if (commandTX.getAssetKey() != 1 && commandTX.getAssetKey() != 18) {
-                error("Wrong asset key. Need 1 or 18");
+                fail("Wrong asset key. Need 1 or 18");
                 return false;
             } else if (commandTX.balancePosition() != Account.BALANCE_POS_OWN) {
-                error("Wrong balance position. Need OWN[1]");
+                fail("Wrong balance position. Need OWN[1]");
                 return false;
             } else if (!commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
-                error("Wrong amount. Need > 0");
+                fail("Wrong amount. Need > 0");
                 return false;
             } else if (commandTX.isBackward()) {
-                error("Wrong direction - backward");
+                fail("Wrong direction - backward");
                 return false;
             } else if (pars == null) {
-                error("Empty pars");
+                fail("Empty pars");
                 return false;
             } else {
                 try {
                     shopAssetKey = Long.parseLong(pars.get(1).toString());
                 } catch (Exception e) {
-                    error("Wrong asset key: " + pars.get(1));
+                    fail("Wrong asset key: " + pars.get(1));
                     return false;
                 }
 
                 if (shopAssetKey != BUSTER_1_KEY) {
-                    error("Wrong asset key");
+                    fail("Wrong asset key");
                     return false;
                 }
             }
@@ -565,13 +562,13 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             long priceAssetKey = commandTX.getAssetKey();
             BigDecimal sellPrice = shopPrice(dcSet, shopAssetKey, priceAssetKey);
             if (sellPrice == null || sellPrice.signum() < 1) {
-                error("not priced");
+                fail("not priced");
                 return false;
             }
 
             shopAsset = dcSet.getItemAssetMap().get(shopAssetKey);
             if (shopAsset == null) {
-                error("Shop asset not exist");
+                fail("Shop asset not exist");
                 return false;
             }
 
@@ -636,17 +633,19 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             }
 
         } else {
-
             Long shopAssetKey;
             Long priceAssetKey;
             JSONObject prices;
             BigDecimal price;
 
-            if (pars == null) {
-                error("Wrong JSON params");
+            if (isAdminCommand(commandTX)) {
+                fail("not admin");
+                return false;
+            } else if (pars == null) {
+                fail("Wrong JSON params");
                 return false;
             } else if (pars.size() < 2) {
-                error("Wrong params size <2");
+                fail("Wrong params size <2");
                 return false;
             } else {
                 prices = (JSONObject) pars.get(1);
@@ -654,15 +653,15 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                     try {
                         long assetKey = Long.parseLong(item.getKey());
                         if (!dcSet.getItemAssetMap().contains(assetKey)) {
-                            error("Asset not exist for Key: " + item.getKey());
+                            fail("Asset not exist for Key: " + item.getKey());
                             return false;
                         }
                     } catch (Exception e) {
-                        error("Wrong assetKey: " + item.getKey());
+                        fail("Wrong assetKey: " + item.getKey());
                         return false;
                     }
                     if (!(item.getValue() instanceof JSONObject)) {
-                        error("Not JSON: " + item.getValue().toString());
+                        fail("Not JSON: " + item.getValue().toString());
                         return false;
                     }
 
@@ -670,18 +669,18 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                         try {
                             long assetKey = Long.parseLong(priceItem.getKey());
                             if (!dcSet.getItemAssetMap().contains(assetKey)) {
-                                error("Asset not exist for Key: " + priceItem.getKey());
+                                fail("Asset not exist for Key: " + priceItem.getKey());
                                 return false;
                             }
                         } catch (Exception e) {
-                            error("Wrong assetKey: " + priceItem.getKey());
+                            fail("Wrong assetKey: " + priceItem.getKey());
                             return false;
                         }
 
                         try {
                             new BigDecimal(priceItem.getValue().toString());
                         } catch (Exception e) {
-                            error("Wrong price value: " + priceItem.getValue());
+                            fail("Wrong price value: " + priceItem.getValue());
                             return false;
                         }
 
@@ -719,20 +718,26 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     }
 
-    private boolean adminWithdraw(DCSet dcSet, Block block, RSend commandTX, Account admin, boolean asOrphan) {
+    private boolean adminWithdraw(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+
+        Account adminAccount = commandTX.getCreator();
+
         if (asOrphan) {
             // restore results for orphan
             List<Tuple2<Long, BigDecimal>> results = (List<Tuple2<Long, BigDecimal>>) removeState(dcSet)[0];
 
             for (Tuple2<Long, BigDecimal> row : results) {
                 // RE-TRANSFER ASSET from ADMIN
-                transfer(dcSet, null, commandTX, admin, stock, row.b, row.a, true, null, null);
+                transfer(dcSet, null, commandTX, adminAccount, stock, row.b, row.a, true, null, null);
             }
 
         } else {
 
-            if (!dcSet.getSmartContractValues().contains(INIT_KEY)) {
-                error("not initated yet");
+            if (isAdminCommand(commandTX)) {
+                fail("not admin");
+                return false;
+            } else if (!dcSet.getSmartContractValues().contains(INIT_KEY)) {
+                fail("not initated yet");
                 return false;
             }
 
@@ -760,7 +765,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                         continue;
 
                     // TRANSFER ASSET to ADMIN
-                    transfer(dcSet, block, commandTX, stock, admin, itemBals.a.b, assetKey, false, null, "adminWithdraw");
+                    transfer(dcSet, block, commandTX, stock, adminAccount, itemBals.a.b, assetKey, false, null, "adminWithdraw");
 
                     results.add(new Tuple2(assetKey, itemBals.a.b));
 
@@ -772,7 +777,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
                 status = "done";
 
             } catch (IOException e) {
-                error(e.getMessage());
+                fail(e.getMessage());
             }
         }
 
@@ -780,7 +785,14 @@ public class MemoCardsDAPP extends EpochDAPPjson {
 
     }
 
-    private boolean init(DCSet dcSet, Block block, RSend commandTX, Account admin, boolean asOrphan) {
+    private boolean init(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
+
+        if (isAdminCommand(commandTX)) {
+            fail("not admin");
+            return false;
+        }
+
+        Account adminAccount = commandTX.getCreator();
 
         /**
          * issue main currency
@@ -792,7 +804,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             gravitaKey = (Long) dcSet.getSmartContractValues().remove(INIT_KEY);
 
             // BACKWARDS from ADMIN
-            transfer(dcSet, block, commandTX, stock, admin, amount, gravitaKey, true, null, null);
+            transfer(dcSet, block, commandTX, stock, adminAccount, amount, gravitaKey, true, null, null);
 
             // orphan GRAVITA ASSET
             dcSet.getItemAssetMap().decrementDelete(gravitaKey);
@@ -800,7 +812,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         } else {
 
             if (dcSet.getSmartContractValues().contains(INIT_KEY)) {
-                error("already initated");
+                fail("already initated");
                 return false;
             }
 
@@ -813,7 +825,7 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             dcSet.getSmartContractValues().put(INIT_KEY, gravitaKey);
 
             // TRANSFER GRAVITA to ADMIN
-            transfer(dcSet, block, commandTX, stock, admin, amount, gravitaKey, false, null, "init");
+            transfer(dcSet, block, commandTX, stock, adminAccount, amount, gravitaKey, false, null, "init");
 
             status = "done";
         }
@@ -821,59 +833,43 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         return true;
     }
 
-    /**
-     * admin commands
-     *
-     * @param dcSet
-     * @param block
-     * @param rSend
-     * @param admin
-     * @return
-     */
-    public boolean processAdminCommands(DCSet dcSet, Block block, RSend rSend, Account admin) {
-        if ("init".equals(command)) {
-            return init(dcSet, block, rSend, admin, false);
-        } else if (command.startsWith("emite")) {
-        } else if (command.startsWith(COMMAND_WITHDRAW)) {
-            return adminWithdraw(dcSet, block, rSend, admin, false);
-        } else if (COMMAND_SET_PRICE.equals(command)) {
-            return shopSetPrices(dcSet, block, rSend, false);
-        }
-
-        error("unknow command");
-        return false;
-    }
-
     @Override
-    public boolean process(DCSet dcSet, Block block, Transaction transaction) {
+    public boolean process(DCSet dcSet, Block block, Transaction commandTX) {
 
-        if (!isValid(dcSet, transaction))
+        if (!isValid(dcSet, commandTX))
             return true;
 
-        if (transaction instanceof RSend) {
-            RSend rsend = (RSend) transaction;
-            if (isAdminCommand(transaction)) {
-                return processAdminCommands(dcSet, block, rsend,
-                        rsend.getCreator() // need for TEST - not adminAddress
-                );
-            } else {
-                if (COMMAND_RANDOM.equals(command)) {
-                    if (block == null) {
-                        status = "wait block";
-                        return false;
-                    }
-                    // это не проверка вне блока - в ней блока нет
-                    dcSet.getTimeTXWaitMap().put(transaction.getDBRef(), block.heightBlock + WAIT_RAND);
-                    status = "wait";
-                    return false;
+        if (commandTX instanceof RSend) {
+            RSend rsend = (RSend) commandTX;
 
-                } else if (COMMAND_BUY.equals(command)) {
-                    return shopBuy(dcSet, block, rsend, false);
+            if (COMMAND_RANDOM.equals(command)) {
+                if (rsend.isBackward() || rsend.balancePosition() != Account.BALANCE_POS_OWN) {
+                    fail("wrong action: " + rsend.viewActionType());
+                    return false;
+                } else if (block == null) {
+                    status = "wait block";
+                    return false;
                 }
+
+                // это не проверка вне блока - в ней блока нет
+                dcSet.getTimeTXWaitMap().put(commandTX.getDBRef(), block.heightBlock + WAIT_RAND);
+                status = "wait";
+                return false;
+
+            } else if (COMMAND_BUY.equals(command)) {
+                return shopBuy(dcSet, block, rsend, false);
+
+                /// ADMIN COMMAND
+            } else if ("init".equals(command)) {
+                return init(dcSet, block, rsend, false);
+            } else if (COMMAND_WITHDRAW.startsWith(command)) {
+                return adminWithdraw(dcSet, block, rsend, false);
+            } else if (COMMAND_SET_PRICE.equals(command)) {
+                return shopSetPrices(dcSet, block, rsend, false);
             }
         }
 
-        error("unknow command");
+        fail("unknow command");
         return false;
 
     }
@@ -885,41 +881,32 @@ public class MemoCardsDAPP extends EpochDAPPjson {
             return random(dcSet, block, (RSend) transaction, false);
         }
 
-        error("unknow command");
+        fail("unknow command");
         return false;
 
     }
 
-    public void orphanAdminCommands(DCSet dcSet, RSend rSend, Account admin) {
-        if ("init".equals(command)) {
-            init(dcSet, null, rSend, admin, true);
-        } else if (command.startsWith(COMMAND_WITHDRAW)) {
-            adminWithdraw(dcSet, null, rSend, admin, true);
-        } else if (COMMAND_SET_PRICE.equals(command)) {
-            shopSetPrices(dcSet, null, rSend, true);
-        }
-
-    }
-
     @Override
-    public void orphan(DCSet dcSet, Transaction transaction) {
+    public void orphan(DCSet dcSet, Transaction commandTX) {
 
-        if (status.startsWith("error")) {
+        if (status.startsWith("fail")) {
             // not processed
             return;
         }
 
-        if (isAdminCommand(transaction)) {
-            orphanAdminCommands(dcSet, (RSend) transaction,
-                    transaction.getCreator() // need for TEST - not adminAddress
-            );
-        }
-
         if (COMMAND_RANDOM.equals(command)) {
             // отмена рождения комет
-            dcSet.getTimeTXWaitMap().remove(transaction.getDBRef());
+            dcSet.getTimeTXWaitMap().remove(commandTX.getDBRef());
         } else if (COMMAND_BUY.equals(command)) {
-            shopBuy(dcSet, null, (RSend) transaction, true);
+            shopBuy(dcSet, null, (RSend) commandTX, true);
+
+            /// ADMIN
+        } else if ("init".equals(command)) {
+            init(dcSet, null, (RSend) commandTX, true);
+        } else if (COMMAND_WITHDRAW.startsWith(command)) {
+            adminWithdraw(dcSet, null, (RSend) commandTX, true);
+        } else if (COMMAND_SET_PRICE.equals(command)) {
+            shopSetPrices(dcSet, null, (RSend) commandTX, true);
         }
 
     }

@@ -145,7 +145,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         }
 
         if (!dcSet.getSmartContractValues().contains(INIT_KEY)) {
-            error("not initated yet");
+            fail("not initated yet");
             return false;
         }
 
@@ -153,7 +153,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
 
         if (gravitaKey == null) {
-            error("not initated yet");
+            fail("not initated yet");
             return false;
         }
 
@@ -251,16 +251,16 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             gravitaKey = (Long) dcSet.getSmartContractValues().get(INIT_KEY);
 
         if (commandTX.getAssetKey() != gravitaKey) {
-            error("Wrong asset key. Need " + gravitaKey);
+            fail("Wrong asset key. Need " + gravitaKey);
             return false;
         } else if (!commandTX.hasAmount() || !commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
-            error("Wrong amount. Need > 0");
+            fail("Wrong amount. Need > 0");
             return false;
         } else if (commandTX.isBackward()) {
-            error("Wrong direction - backward");
+            fail("Wrong direction - backward");
             return false;
         } else if (commandTX.balancePosition() != Account.BALANCE_POS_OWN) {
-            error("Wrong balance position. Need OWN[1]");
+            fail("Wrong balance position. Need OWN[1]");
             return false;
         }
 
@@ -416,33 +416,33 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             long shopAssetKey;
             AssetCls shopAsset;
             if (!commandTX.hasAmount()) {
-                error("Has not amount");
+                fail("Has not amount");
                 return false;
             } else if (commandTX.getAssetKey() != 1 && commandTX.getAssetKey() != 18) {
-                error("Wrong asset key. Need 1 or 18");
+                fail("Wrong asset key. Need 1 or 18");
                 return false;
             } else if (commandTX.balancePosition() != Account.BALANCE_POS_OWN) {
-                error("Wrong balance position. Need OWN[1]");
+                fail("Wrong balance position. Need OWN[1]");
                 return false;
             } else if (!commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
-                error("Wrong amount. Need > 0");
+                fail("Wrong amount. Need > 0");
                 return false;
             } else if (commandTX.isBackward()) {
-                error("Wrong direction - backward");
+                fail("Wrong direction - backward");
                 return false;
             } else if (pars == null) {
-                error("Empty pars");
+                fail("Empty pars");
                 return false;
             } else {
                 try {
                     shopAssetKey = Long.parseLong(pars.get(1).toString());
                 } catch (Exception e) {
-                    error("Wrong asset key: " + pars.get(1));
+                    fail("Wrong asset key: " + pars.get(1));
                     return false;
                 }
 
                 if (false && shopAssetKey != buster01Key) {
-                    error("Wrong asset key");
+                    fail("Wrong asset key");
                     return false;
                 }
             }
@@ -450,13 +450,13 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             long priceAssetKey = commandTX.getAssetKey();
             BigDecimal sellPrice = shopPrice(dcSet, shopAssetKey, priceAssetKey);
             if (sellPrice == null || sellPrice.signum() < 1) {
-                error("not priced");
+                fail("not priced");
                 return false;
             }
 
             shopAsset = dcSet.getItemAssetMap().get(shopAssetKey);
             if (shopAsset == null) {
-                error("Shop asset not exist");
+                fail("Shop asset not exist");
                 return false;
             }
 
@@ -501,20 +501,20 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
 
     private boolean stakeAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
         if (commandTX.getAssetKey() != gravitaKey) {
-            error("Wrong asset key. Need " + gravitaKey);
+            fail("Wrong asset key. Need " + gravitaKey);
             return false;
         } else if (!commandTX.hasAmount() || !commandTX.hasPacket() && commandTX.getAmount().signum() <= 0) {
-            error("Wrong amount. Need > 0");
+            fail("Wrong amount. Need > 0");
             return false;
         } else if (commandTX.isBackward()) {
-            error("Wrong direction - backward");
+            fail("Wrong direction - backward");
             return false;
         } else if (commandTX.balancePosition() != Account.BALANCE_POS_OWN) {
-            error("Wrong balance position. Need [1]OWN");
+            fail("Wrong balance position. Need [1]OWN");
             return false;
         }
 
-        error("-");
+        fail("-");
         return false;
     }
 
@@ -536,7 +536,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
 
     private boolean farmAction(DCSet dcSet, Block block, RSend commandTX, boolean asOrphan) {
 
-        error("-");
+        fail("-");
 
         if (asOrphan) {
             return true;
@@ -544,16 +544,16 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         } else {
             AssetCls asset = dcSet.getItemAssetMap().get(commandTX.getAssetKey());
             if (!asset.getMaker().equals(MAKER)) {
-                error("Wrong asset maker. Need " + MAKER.getAddress());
+                fail("Wrong asset maker. Need " + MAKER.getAddress());
                 return false;
             } else if (!commandTX.hasAmount()) {
-                error("Wrong amount. Need > 0");
+                fail("Wrong amount. Need > 0");
                 return false;
             } else if (commandTX.isBackward()) {
-                error("Wrong direction - backward");
+                fail("Wrong direction - backward");
                 return false;
             } else if (commandTX.balancePosition() != Account.BALANCE_POS_DEBT) {
-                error("Wrong balance position. Need [2]DEBT");
+                fail("Wrong balance position. Need [2]DEBT");
                 return false;
             }
         }
@@ -648,10 +648,10 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             BigDecimal price;
 
             if (pars == null) {
-                error("Wrong JSON params");
+                fail("Wrong JSON params");
                 return false;
             } else if (pars.size() < 2) {
-                error("Wrong params size <2");
+                fail("Wrong params size <2");
                 return false;
             } else {
                 prices = (JSONObject) pars.get(1);
@@ -659,15 +659,15 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                     try {
                         long assetKey = Long.parseLong(item.getKey());
                         if (!dcSet.getItemAssetMap().contains(assetKey)) {
-                            error("Asset not exist for Key: " + item.getKey());
+                            fail("Asset not exist for Key: " + item.getKey());
                             return false;
                         }
                     } catch (Exception e) {
-                        error("Wrong assetKey: " + item.getKey());
+                        fail("Wrong assetKey: " + item.getKey());
                         return false;
                     }
                     if (!(item.getValue() instanceof JSONObject)) {
-                        error("Not JSON: " + item.getValue().toString());
+                        fail("Not JSON: " + item.getValue().toString());
                         return false;
                     }
 
@@ -675,18 +675,18 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                         try {
                             long assetKey = Long.parseLong(priceItem.getKey());
                             if (!dcSet.getItemAssetMap().contains(assetKey)) {
-                                error("Asset not exist for Key: " + priceItem.getKey());
+                                fail("Asset not exist for Key: " + priceItem.getKey());
                                 return false;
                             }
                         } catch (Exception e) {
-                            error("Wrong assetKey: " + priceItem.getKey());
+                            fail("Wrong assetKey: " + priceItem.getKey());
                             return false;
                         }
 
                         try {
                             new BigDecimal(priceItem.getValue().toString());
                         } catch (Exception e) {
-                            error("Wrong price value: " + priceItem.getValue());
+                            fail("Wrong price value: " + priceItem.getValue());
                             return false;
                         }
 
@@ -737,7 +737,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         } else {
 
             if (!dcSet.getSmartContractValues().contains(INIT_KEY)) {
-                error("not initated yet");
+                fail("not initated yet");
                 return false;
             }
 
@@ -777,7 +777,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
                 status = "done";
 
             } catch (IOException e) {
-                error(e.getMessage());
+                fail(e.getMessage());
             }
         }
 
@@ -800,7 +800,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         } else {
 
             if (dcSet.getSmartContractValues().contains(INIT_KEY)) {
-                error("already initated");
+                fail("already initated");
                 return false;
             }
 
@@ -841,7 +841,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             return shopSetPrices(dcSet, block, rSend, false);
         }
 
-        error("unknow command");
+        fail("unknow command");
         return false;
     }
 
@@ -875,7 +875,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             }
         }
 
-        error("unknow command");
+        fail("unknow command");
         return false;
 
     }
@@ -889,7 +889,7 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
             return random(dcSet, block, (RSend) transaction, false);
         }
 
-        error("unknow command");
+        fail("unknow command");
         return false;
 
     }

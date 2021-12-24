@@ -112,8 +112,8 @@ public abstract class EpochDAPPjson extends EpochDAPP {
      *
      * @param mess
      */
-    protected void error(String mess) {
-        status = "error: " + mess;
+    protected void fail(String mess) {
+        status = "fail: " + mess;
     }
 
 }
