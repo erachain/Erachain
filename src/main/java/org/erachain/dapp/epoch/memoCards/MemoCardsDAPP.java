@@ -7,6 +7,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLinkAddress;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.RSend;
@@ -272,9 +273,8 @@ public class MemoCardsDAPP extends EpochDAPPjson {
      * @param setID     ID of set
      * @param rareLevel level of card rarity
      * @param charValue characterictic value
-     * @param asOrphan
      */
-    private Object[] makeAsset(DCSet dcSet, Block block, RSend commandTX, int setID, int rareLevel, int charValue, boolean asOrphan) {
+    private Object[] makeAsset(DCSet dcSet, Block block, RSend commandTX, int setID, int rareLevel, int charValue) {
         int setCount = openBuster_1_getSetCount(setID, rareLevel);
         charValue = setCount * (2 * Short.MAX_VALUE - 1) / charValue;
 
@@ -284,64 +284,55 @@ public class MemoCardsDAPP extends EpochDAPPjson {
         Long assetKey;
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
 
-        if (asOrphan) {
+        Object[] issuedAsset = new Object[2];
+
+        // seek if already exist
+        if (valuesMap.contains(keyID)) {
             assetKey = (Long) valuesMap.get(keyID);
-
-            AssetCls asset = dcSet.getItemAssetMap().get(assetKey);
-            if (asset.getReleased(dcSet).equals(BigDecimal.ONE)) {
-                // DELETE FROM BLOCKCHAIN DATABASE
-                dcSet.getItemAssetMap().decrementDelete(assetKey);
-
-                // DELETE FROM CONTRACT DATABASE
-                valuesMap.delete(keyID);
-
-            }
+            issuedAsset[1] = false;
 
         } else {
+            // make new COMET
 
-            Object[] issuedAsset;
-            // seek if already exist
-            if (valuesMap.contains(keyID)) {
-                assetKey = (Long) valuesMap.get(keyID);
-                issuedAsset = null;
-            } else {
-                // make new COMET
-                JSONObject json = new JSONObject();
-                json.put("value", charValue);
-                json.put("rare", rareLevel);
-                json.put("set", setID);
-                json.put("type", "card");
-                String description = json.toJSONString();
+            // for orphan action
+            issuedAsset[1] = true;
 
-                boolean iconAsURL = false;
-                int iconType = 0;
-                boolean imageAsURL = false;
-                int imageType = 0;
-                Long startDate = null;
-                Long stopDate = null;
-                String tags = "mtga, :nft, prolog set";
-                ExLinkAddress[] dexAwards = null;
-                boolean isUnTransferable = false;
-                boolean isAnonimDenied = false;
+            JSONObject json = new JSONObject();
+            json.put("value", charValue);
+            json.put("rare", rareLevel);
+            json.put("set", setID);
+            json.put("type", "card");
+            String description = json.toJSONString();
 
-                AssetVenture randomAsset = new AssetVenture(AssetCls.makeAppData(
-                        iconAsURL, iconType, imageAsURL, imageType, startDate, stopDate, tags, dexAwards, isUnTransferable, isAnonimDenied),
-                        stock, name, null, null,
-                        description, AssetCls.AS_INSIDE_ASSETS, 0, 0);
-                randomAsset.setReference(commandTX.getSignature(), commandTX.getDBRef());
+            boolean iconAsURL = false;
+            int iconType = 0;
+            boolean imageAsURL = false;
+            int imageType = 0;
+            Long startDate = null;
+            Long stopDate = null;
+            String tags = "mtga, :nft, prolog set";
+            ExLinkAddress[] dexAwards = null;
+            boolean isUnTransferable = false;
+            boolean isAnonimDenied = false;
 
-                //INSERT INTO BLOCKCHAIN DATABASE
-                assetKey = dcSet.getItemAssetMap().incrementPut(randomAsset);
-                //INSERT INTO CONTRACT DATABASE
-                dcSet.getSmartContractValues().put(keyID, assetKey);
+            AssetVenture randomAsset = new AssetVenture(AssetCls.makeAppData(
+                    iconAsURL, iconType, imageAsURL, imageType, startDate, stopDate, tags, dexAwards, isUnTransferable, isAnonimDenied),
+                    stock, name, null, null,
+                    description, AssetCls.AS_INSIDE_ASSETS, 0, 0);
+            randomAsset.setReference(commandTX.getSignature(), commandTX.getDBRef());
 
-                return new Object[]{assetKey};
+            //INSERT INTO BLOCKCHAIN DATABASE
+            assetKey = dcSet.getItemAssetMap().incrementPut(randomAsset);
+            //INSERT INTO CONTRACT DATABASE
+            dcSet.getSmartContractValues().put(keyID, assetKey);
 
-            }
         }
 
         // TRANSFER ASSET
-        transfer(dcSet, block, commandTX, stock, commandTX.getCreator(), BigDecimal.ONE, assetKey, asOrphan, null, "buster_1");
+        transfer(dcSet, block, commandTX, stock, commandTX.getCreator(), BigDecimal.ONE, assetKey, false, null, "buster_1");
+        issuedAsset[0] = assetKey;
+
+        return issuedAsset;
 
     }
 
@@ -351,51 +342,65 @@ public class MemoCardsDAPP extends EpochDAPPjson {
      * @return
      */
     private void openBuster_1_getPack(DCSet dcSet, Block block, RSend commandTX, int nonce, boolean asOrphan) {
-        // GET RANDOM
-        byte[] randomArray = getRandHash(block, commandTX, nonce);
 
         if (asOrphan) {
-            assetKey = (Long) valuesMap.get(keyID);
 
-            AssetCls asset = dcSet.getItemAssetMap().get(assetKey);
-            if (asset.getReleased(dcSet).equals(BigDecimal.ONE)) {
-                // DELETE FROM BLOCKCHAIN DATABASE
-                dcSet.getItemAssetMap().decrementDelete(assetKey);
+            SmartContractValues valuesMap = dcSet.getSmartContractValues();
+            Object[] actions = removeState(dcSet);
 
-                // DELETE FROM CONTRACT DATABASE
-                valuesMap.delete(keyID);
+            int index = actions.length;
+            Object[] act;
+            Long assetKey;
+            ItemCls asset;
 
+            while (--index > 0) {
+                act = (Object[]) actions[index];
+
+                assetKey = (Long) act[0];
+                transfer(dcSet, null, commandTX, stock, commandTX.getCreator(), BigDecimal.ONE, assetKey, true, null, null);
+
+                if ((boolean) act[1]) {
+                    // DELETE FROM BLOCKCHAIN DATABASE
+                    asset = dcSet.getItemAssetMap().decrementRemove(assetKey);
+
+                    // DELETE FROM CONTRACT DATABASE
+                    valuesMap.delete(new Tuple2(ID, asset.getName()));
+
+                }
             }
 
         } else {
+
+            // GET RANDOM
+            byte[] randomArray = getRandHash(block, commandTX, nonce);
             List actions = new ArrayList();
             int index = 2;
             if (randomArray[0] < 2) {
                 // make COMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
 
                 // make UNCOMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
 
             } else if (randomArray[0] < 4) {
                 // make COMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
 
                 // make UNCOMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
             } else {
                 // make COMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_COMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
 
                 // make UNCOMMON cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_UNCOMMON, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
 
                 // make RARE cards
-                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_RARE, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++]), asOrphan));
+                actions.add(makeAsset(dcSet, block, commandTX, 1, RARE_RARE, Ints.fromBytes((byte) 0, (byte) 0, randomArray[index++], randomArray[index++])));
             }
 
             putState(dcSet, actions.toArray());

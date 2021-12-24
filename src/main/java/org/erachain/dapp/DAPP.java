@@ -15,6 +15,7 @@ import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
@@ -125,6 +126,22 @@ public abstract class DAPP {
      */
     public Object[] removeState(DCSet dcSet) {
         return dcSet.getSmartContractState().removeState(id);
+    }
+
+    public boolean valueSet(DCSet dcSet, Object key, Object value) {
+        return dcSet.getSmartContractValues().set(new Fun.Tuple2(id, key), value);
+    }
+
+    public void valuePut(DCSet dcSet, Object key, Object value) {
+        dcSet.getSmartContractValues().put(new Fun.Tuple2(id, key), value);
+    }
+
+    public void valuesDelete(DCSet dcSet, String key) {
+        dcSet.getSmartContractValues().delete(new Fun.Tuple2(id, key));
+    }
+
+    public Object valuesRemove(DCSet dcSet, String key) {
+        return dcSet.getSmartContractValues().remove(new Fun.Tuple2(id, key));
     }
 
     public int length(int forDeal) {

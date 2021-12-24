@@ -364,13 +364,20 @@ public class WebTransactionsHTML {
             out += cancelOrder.toJson();
         }
 
-        CreateOrderTransaction createOrder = (CreateOrderTransaction) dcSet.getTransactionFinalMap().get(key);
-
         out += "</br><h3>" + Lang.T("Order to Cancel", langObj) + "</h3>";
-        if (createOrder == null) {
+
+        Transaction txActor = dcSet.getTransactionFinalMap().get(key);
+        if (txActor == null) {
             out += "not found" + " : " + cancelOrder.viewSignature();
         } else {
-            out += create_Order_HTML(createOrder);
+            if (txActor instanceof ChangeOrderTransaction) {
+                out += update_Order_HTML(txActor);
+
+            } else if (txActor instanceof CreateOrderTransaction) {
+                out += create_Order_HTML(txActor);
+            } else {
+                out += "uncnow type tx: " + txActor.toString();
+            }
         }
 
         return out;
