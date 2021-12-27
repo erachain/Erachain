@@ -208,6 +208,11 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     }
 
     @Override
+    public IteratorCloseable<Long> getIteratorByType(Integer type, Long fromSeqNo, boolean descending) {
+        return null;
+    }
+
+    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending) {

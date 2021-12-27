@@ -33,6 +33,8 @@ public interface TransactionFinalSuit {
 
     IteratorCloseable<Long> getIteratorOfDialog(byte[] addressesKey, Long fromSeqNo, boolean descending);
 
+    IteratorCloseable<Long> getIteratorByType(Integer type, Long fromSeqNo, boolean descending);
+
     /**
      * @param addressShort
      * @param type         - TRANSACTION type

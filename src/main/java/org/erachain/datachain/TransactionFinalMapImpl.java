@@ -309,6 +309,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return ((TransactionFinalSuit) map).getIteratorOfDialog(TransactionFinalMap.makeDialogKey(account1, account2), fromSeqNo, descending);
     }
 
+    public IteratorCloseable<Long> getIteratorByType(Integer type, Long fromID, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorByType(type, fromID, descending);
+    }
+
     /**
      * Поиск активности данного счета по Созданным трнзакция за данный промежуток времени
      *

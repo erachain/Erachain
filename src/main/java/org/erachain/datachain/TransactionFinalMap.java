@@ -79,6 +79,8 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
 
     IteratorCloseable<Long> getIteratorOfDialog(Account account1, Account account2, Long fromSeqNo, boolean descending);
 
+    IteratorCloseable<Long> getIteratorByType(Integer type, Long fromID, boolean descending);
+
     boolean isCreatorWasActive(byte[] addressShort, Long fromSeqNo, int typeTX, Long toSeqNo);
 
 
