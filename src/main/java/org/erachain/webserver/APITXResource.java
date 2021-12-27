@@ -87,7 +87,8 @@ public class APITXResource {
         help.put("api/tx/search?q={query}&from=[seqNo]&useforge={false}&offset={offset}&limit={limit}&fullpage={false}",
                 Lang.T("Search transactions by Query via title and tags. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
 
-        help.put("api/tx/transactions/dialog/{address1}/{address2}?from=fromID&offset=0&limit=50&desc=false&unconfirmed=false",
+        // todo &unconfirmed=false
+        help.put("api/tx/transactions/dialog/{address1}/{address2}?from=fromID&offset=0&limit=50&desc=false",
                 Lang.T("Find transactions for dialog between address1 and address2. Set [fromID] as 1234-1"));
 
         help.put("api/tx/rawbyblock/{height}?forDeal={DEAL}", "Get raw transaction(encoding Base58). forDeal = 1..5 (FOR_MYPACK, FOR_PACK, FOR_NETWORK, FOR_DB_RECORD). By default forDeal is 3(for network)");
