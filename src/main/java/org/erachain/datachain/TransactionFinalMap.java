@@ -77,7 +77,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
 
     IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, Long fromID, Long toID, boolean descending);
 
-    IteratorCloseable<Long> getIteratorOfDialog(byte[] addressShort_1, byte[] addressShort_2, Long fromSeqNo, boolean descending);
+    IteratorCloseable<Long> getIteratorOfDialog(Account account1, Account account2, Long fromSeqNo, boolean descending);
 
     boolean isCreatorWasActive(byte[] addressShort, Long fromSeqNo, int typeTX, Long toSeqNo);
 
@@ -127,4 +127,23 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     Transaction get(byte[] signature);
 
     void put(Transaction transaction);
+
+    static byte[] makeDialogKey(Account account1, Account account2) {
+
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN * 2];
+        if (account1.compareTo(account2) > 0) {
+            System.arraycopy(account1.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+            System.arraycopy(account2.getShortAddressBytes(), 0, addressKey, TransactionFinalMap.ADDRESS_KEY_LEN, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        } else {
+            // mirror
+            System.arraycopy(account2.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+            System.arraycopy(account1.getShortAddressBytes(), 0, addressKey, TransactionFinalMap.ADDRESS_KEY_LEN, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        }
+
+        return addressKey;
+
+    }
+
 }

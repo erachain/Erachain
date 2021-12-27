@@ -25,6 +25,7 @@ import org.rocksdb.WriteOptions;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -34,11 +35,14 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     private final String NAME_TABLE = "TRANSACTION_FINAL_TABLE";
     private final String senderTransactionsIndexName = "senderTxs";
     private final String recipientTransactionsIndexName = "recipientTxs";
+    private final String dialogTransactionsIndexName = "dialogTxs";
     private final String addressTypeTransactionsIndexName = "addressTypeTxs";
     private final String titleIndexName = "titleTypeTxs";
 
     SimpleIndexDB<Long, Transaction, byte[]> creatorTxs;
     ListIndexDB<Long, Transaction, byte[]> recipientTxs;
+    ArrayIndexDB<Long, Transaction, byte[]> dialogTxs;
+
     /**
      * С учетом Создатель или Получатель (1 или 0)
      */
@@ -125,6 +129,33 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                         recipients.add(addressKey);
                     }
                     return recipients;
+                }, (result) -> result);
+
+        dialogTxs = new ArrayIndexDB<>(dialogTransactionsIndexName,
+                (Long aLong, Transaction transaction) -> {
+
+                    // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                    if (transaction.noDCSet()) {
+                        transaction.setDC((DCSet) databaseSet, true);
+                    }
+
+                    Account creator = transaction.getCreator();
+                    if (creator == null)
+                        return null;
+
+                    HashSet<Account> recipients = transaction.getRecipientAccounts();
+                    if (recipients == null || recipients.isEmpty())
+                        return null;
+
+                    int size = recipients.size();
+                    byte[][] keys = new byte[size][];
+
+                    int count = 0;
+                    for (Account recipient : recipients) {
+                        keys[count++] = TransactionFinalMap.makeDialogKey(creator, recipient);
+                    }
+
+                    return keys;
                 }, (result) -> result);
 
         titleIndex = new ArrayIndexDB<>(titleIndexName,
@@ -308,17 +339,17 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorOfDialog(byte[] addressShort_1, byte[] addressShort_2, Long fromSeqNo, boolean descending) {
+    public IteratorCloseable<Long> getIteratorOfDialog(byte[] addressesKey, Long fromSeqNo, boolean descending) {
 
         // todo
         if (fromSeqNo == null) {
             byte[] fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-            System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+            System.arraycopy(addressesKey, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
             return map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), fromKey, descending, true);
         }
 
         byte[] fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + Long.BYTES];
-        System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+        System.arraycopy(addressesKey, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
         System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
 
         return map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), fromKey, null, descending, true);

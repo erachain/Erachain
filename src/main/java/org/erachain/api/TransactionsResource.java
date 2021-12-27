@@ -625,11 +625,21 @@ public class TransactionsResource {
 
         Long fromSeqNo = Transaction.parseDBRef(fromSeqNoStr);
 
+        Fun.Tuple2<Account, String> account1 = Account.tryMakeAccount(address1);
+        if (account1.b != null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ADDRESS);
+        }
+
+        Fun.Tuple2<Account, String> account2 = Account.tryMakeAccount(address2);
+        if (account1.b != null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.INVALID_ADDRESS);
+        }
+
         JSONArray array = new JSONArray();
         try (IteratorCloseable iterator = DCSet.getInstance().getTransactionFinalMap().getIteratorOfDialog(
-                Crypto.getInstance().getShortBytesFromAddress(address1),
-                Crypto.getInstance().getShortBytesFromAddress(address2),
-                fromSeqNo, desc)) {
+                account1.a, account2.a, fromSeqNo, desc)) {
 
             if (count) {
                 int result = 0;

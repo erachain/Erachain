@@ -186,7 +186,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
         this.dialogKey = database.createTreeSet("dialog_txs")
                 //.comparator(comparatorAddressT2) // - for Tuple2 String
-                .comparator(SignedBytes.lexicographicalComparator())
+                .comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.COMPARATOR))
                 .makeOrGet();
 
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.dialogKey,
@@ -207,22 +207,12 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                             return null;
 
                         int size = recipients.size();
-                        byte[][] keys = new byte[size * 2][];
+                        byte[][] keys = new byte[size][];
                         int count = 0;
-                        byte[] addressKey;
                         for (Account recipient : recipients) {
-                            addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN * 2];
-                            System.arraycopy(creator.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-                            System.arraycopy(recipient.getShortAddressBytes(), TransactionFinalMap.ADDRESS_KEY_LEN, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-                            keys[count++] = addressKey;
-
-                            // mirror
-                            addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN * 2];
-                            System.arraycopy(recipient.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-                            System.arraycopy(creator.getShortAddressBytes(), TransactionFinalMap.ADDRESS_KEY_LEN, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-                            keys[count++] = addressKey;
-
+                            keys[count++] = TransactionFinalMap.makeDialogKey(creator, recipient);
                         }
+
                         return keys;
                     }
                 });
@@ -347,17 +337,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorOfDialog(byte[] addressShort_1, byte[] addressShort_2, Long fromSeqNo, boolean descending) {
-
-        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN * 2];
-        System.arraycopy(addressShort_1, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-
-        Iterable keys = Fun.filter(descending ? this.recipientKey.descendingSet() : this.recipientKey, addressKey);
-        return IteratorCloseableImpl.make(keys.iterator());
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, Long fromSeqNo, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
@@ -380,6 +359,15 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.recipientKey.descendingSet() : this.recipientKey)
                 .subSet(Fun.t2(addressKey, fromSeqNo == null || fromSeqNo == 0 ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
                         Fun.t2(addressKey, toSeqNo)).iterator()));
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public IteratorCloseable<Long> getIteratorOfDialog(byte[] addressesKey, Long fromSeqNo, boolean descending) {
+
+        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.dialogKey.descendingSet() : this.dialogKey)
+                .subSet(Fun.t2(addressesKey, fromSeqNo == null || fromSeqNo == 0 ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
+                        Fun.t2(addressesKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
     }
 
     @Override

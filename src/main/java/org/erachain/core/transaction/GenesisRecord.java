@@ -104,7 +104,7 @@ public class GenesisRecord extends Transaction {
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        HashSet<Account> accounts = new HashSet<>();
+        HashSet<Account> accounts = new HashSet<>(1, 1);
         return accounts;
     }
 

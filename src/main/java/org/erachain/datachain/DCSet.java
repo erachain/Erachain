@@ -42,7 +42,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 536; // vers 5.6.1 orderID
+    final static int CURRENT_VERSION = 540; // vers 5.7.1 dialog
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.

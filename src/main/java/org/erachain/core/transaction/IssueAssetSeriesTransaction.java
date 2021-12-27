@@ -484,11 +484,6 @@ public class IssueAssetSeriesTransaction extends IssueAssetTransaction {
     }
 
     @Override
-    public HashSet<Account> getRecipientAccounts() {
-        return new HashSet<>(1, 1);
-    }
-
-    @Override
     public boolean isInvolved(Account account) {
 
         if (account.equals(this.creator)) {
