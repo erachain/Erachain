@@ -66,7 +66,9 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     List<Transaction> getTransactionsByCreator(String address, Long fromID, int limit, int offset);
 
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, boolean descending);
+
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, boolean descending);
+
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending);
 
     IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, boolean descending);
@@ -74,6 +76,8 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, Long fromID, boolean descending);
 
     IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, Long fromID, Long toID, boolean descending);
+
+    IteratorCloseable<Long> getIteratorOfDialog(byte[] addressShort_1, byte[] addressShort_2, Long fromSeqNo, boolean descending);
 
     boolean isCreatorWasActive(byte[] addressShort, Long fromSeqNo, int typeTX, Long toSeqNo);
 

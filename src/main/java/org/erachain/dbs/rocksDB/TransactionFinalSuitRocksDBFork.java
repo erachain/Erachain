@@ -203,6 +203,11 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     }
 
     @Override
+    public IteratorCloseable<Long> getIteratorOfDialog(byte[] addressShort_1, byte[] addressShort_2, Long fromSeqNo, boolean descending) {
+        return null;
+    }
+
+    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending) {

@@ -307,6 +307,23 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public IteratorCloseable<Long> getIteratorOfDialog(byte[] addressShort_1, byte[] addressShort_2, Long fromSeqNo, boolean descending) {
+
+        // todo
+        if (fromSeqNo == null) {
+            byte[] fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+            System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+            return map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), fromKey, descending, true);
+        }
+
+        byte[] fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + Long.BYTES];
+        System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+        System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
+
+        return map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), fromKey, null, descending, true);
+    }
+
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK

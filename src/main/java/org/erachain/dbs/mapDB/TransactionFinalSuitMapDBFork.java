@@ -237,6 +237,11 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
+    public IteratorCloseable<Long> getIteratorOfDialog(byte[] addressShort_1, byte[] addressShort_2, Long fromSeqNo, boolean descending) {
+        return null;
+    }
+
+    @Override
     public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, Long fromSeqNo, boolean descending) {
         return null;
     }

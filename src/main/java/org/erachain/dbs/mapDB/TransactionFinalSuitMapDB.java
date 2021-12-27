@@ -63,6 +63,8 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @SuppressWarnings("rawtypes")
     private NavigableSet recipientKey;
 
+    private NavigableSet dialogKey;
+
     @SuppressWarnings("rawtypes")
     private NavigableSet titleKey;
 
@@ -182,6 +184,49 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     }
                 });
 
+        this.dialogKey = database.createTreeSet("dialog_txs")
+                //.comparator(comparatorAddressT2) // - for Tuple2 String
+                .comparator(SignedBytes.lexicographicalComparator())
+                .makeOrGet();
+
+        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.dialogKey,
+                new Function2<byte[][], Long, Transaction>() {
+                    @Override
+                    public byte[][] run(Long key, Transaction transaction) {
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                        if (transaction.noDCSet()) {
+                            transaction.setDC((DCSet) databaseSet, true);
+                        }
+
+                        Account creator = transaction.getCreator();
+                        if (creator == null)
+                            return null;
+
+                        HashSet<Account> recipients = transaction.getRecipientAccounts();
+                        if (recipients == null || recipients.isEmpty())
+                            return null;
+
+                        int size = recipients.size();
+                        byte[][] keys = new byte[size * 2][];
+                        int count = 0;
+                        byte[] addressKey;
+                        for (Account recipient : recipients) {
+                            addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN * 2];
+                            System.arraycopy(creator.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                            System.arraycopy(recipient.getShortAddressBytes(), TransactionFinalMap.ADDRESS_KEY_LEN, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                            keys[count++] = addressKey;
+
+                            // mirror
+                            addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN * 2];
+                            System.arraycopy(recipient.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                            System.arraycopy(creator.getShortAddressBytes(), TransactionFinalMap.ADDRESS_KEY_LEN, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                            keys[count++] = addressKey;
+
+                        }
+                        return keys;
+                    }
+                });
+
         this.titleKey = database.createTreeSet("title_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
@@ -295,6 +340,17 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, boolean descending) {
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        Iterable keys = Fun.filter(descending ? this.recipientKey.descendingSet() : this.recipientKey, addressKey);
+        return IteratorCloseableImpl.make(keys.iterator());
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public IteratorCloseable<Long> getIteratorOfDialog(byte[] addressShort_1, byte[] addressShort_2, Long fromSeqNo, boolean descending) {
+
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN * 2];
+        System.arraycopy(addressShort_1, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         Iterable keys = Fun.filter(descending ? this.recipientKey.descendingSet() : this.recipientKey, addressKey);
         return IteratorCloseableImpl.make(keys.iterator());

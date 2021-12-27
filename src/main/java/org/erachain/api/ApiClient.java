@@ -271,10 +271,16 @@ public class ApiClient {
                     },
 
                     {
-                            "POST transactions/find {\"address\":\"<address>\", \"sender\":\"<sender>\", \"recipient\":\"<recipient>\", \"type\":<type>, \"service\":<service>, \"offset\":<offset>, \"limit\":<limit>, \"minHeight\":<minHeight>, \"maxHeight\":<maxHeight>, \"desc\":<true/false>, \"count\":<true/false>}",
-                            "Returns an array of the <limit> transactions from given <offset> with a specific params. Set parameter \"count\" to true to find out the number of transactions. Set parameter \"desc\" to true for reverse order. Parameter \"service\" means service of ArbitraryTransaction. \"minHeight\" and \"maxHeight\" means height of blocks. All params are optional, but must be specified at least one address field.",
+                            "POST transactions/find {\"address\":\"<address>\", \"sender\":\"<sender>\", \"recipient\":\"<recipient>\", \"type\":<type>, \"from\":<from>, \"offset\":<offset>, \"limit\":<limit>, \"minHeight\":<minHeight>, \"maxHeight\":<maxHeight>, \"desc\":<true/false>, \"count\":<true/false>}, \"unconfirmed\":<true/false>",
+                            "Returns an array of the <limit> transactions from given <offset> with a specific params. Set parameter \"count\" to true to find out the number of transactions. Set parameter \"desc\" to true for reverse order. Parameter \"from\" - from seq-No. \"minHeight\" and \"maxHeight\" means height of blocks. All params are optional, but must be specified at least one address field.",
                             "Errors: 102 - Invalid address."
                     },
+                    {
+                            "GET transactions/dialog/{address1}/{address2}?from=fromID&offset=0&limit=50&desc=false&unconfirmed=false",
+                            "Returns an array of the <limit> transactions from given <offset> for dialod between addres1 and address2. Set parameter \"desc\" to true for reverse order.",
+                            "Errors: 102 - Invalid address."
+                    },
+
                     {
                             "GET transactions/datadecrypt/{signature}?password={password}",
                             "Returns decrypted data for transaction.",

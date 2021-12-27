@@ -304,6 +304,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, typeTX, isCreator, fromID, toID, descending);
     }
 
+    public IteratorCloseable<Long> getIteratorOfDialog(byte[] addressShort_1, byte[] addressShort_2, Long fromSeqNo, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorOfDialog(addressShort_1, addressShort_2, fromSeqNo, descending);
+    }
+
     /**
      * Поиск активности данного счета по Созданным трнзакция за данный промежуток времени
      *

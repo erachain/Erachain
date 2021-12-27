@@ -608,6 +608,58 @@ public class TransactionsResource {
         return array.toJSONString();
     }
 
+    @GET
+    @Path("dialog/{address1}/{address2}")
+    public static String getTransactionsDialog(@Context UriInfo info,
+                                               @PathParam("address1") String address1,
+                                               @PathParam("address2") String address2,
+                                               @QueryParam("from") String fromSeqNoStr,
+                                               @QueryParam("offset") int offset,
+                                               @QueryParam("limit") int limit
+    ) {
+
+        boolean desc = API.checkBoolean(info, "desc");
+        boolean count = API.checkBoolean(info, "count");
+        // TODO unconf
+        boolean unconfirmed = API.checkBoolean(info, "unconfirmed");
+
+        Long fromSeqNo = Transaction.parseDBRef(fromSeqNoStr);
+
+        JSONArray array = new JSONArray();
+        try (IteratorCloseable iterator = DCSet.getInstance().getTransactionFinalMap().getIteratorOfDialog(
+                Crypto.getInstance().getShortBytesFromAddress(address1),
+                Crypto.getInstance().getShortBytesFromAddress(address2),
+                fromSeqNo, desc)) {
+
+            if (count) {
+                int result = 0;
+                while (iterator.hasNext()) {
+                    result++;
+                    if (limit > 0 && result > limit)
+                        break;
+                }
+                return "" + result;
+            }
+
+            Long key;
+            Transaction transaction;
+            DCSet dcSet = DCSet.getInstance();
+            TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
+            while (iterator.hasNext()) {
+                key = (Long) iterator.next();
+                Fun.Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                transaction = map.get(key);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+                array.add(transaction.toJson());
+            }
+
+        } catch (IOException e) {
+            throw ApiErrorFactory.getInstance().createError(e.getMessage());
+        }
+
+        return array.toJSONString();
+    }
+
     @SuppressWarnings("unchecked")
     @GET
     @Path("sender/{address}/limit/{limit}")
