@@ -8,12 +8,12 @@ import java.util.HashMap;
 
 /**
  * Use states for save values that self-linked (change itself by previous state)
- * <b>Ключ:</b> DAPP.id + state.No<br>
+ * <b>Ключ:</b> DAPP.id + state.No (as SeqNo)<br>
  *
  * <b>Значение:</b> State values
  */
 
-public class SmartContractState extends DCUMap<Tuple2<Integer, Integer>, Object[]> {
+public class SmartContractState extends DCUMap<Tuple2<Integer, Long>, Object[]> {
 
     public SmartContractState(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -33,36 +33,7 @@ public class SmartContractState extends DCUMap<Tuple2<Integer, Integer>, Object[
 
     @Override
     protected void getMemoryMap() {
-        map = new HashMap<Tuple2<Integer, Integer>, Object[]>();
-    }
-
-    public void putState(Integer dAppID, Object[] values) {
-        Tuple2<Integer, Integer> firstKey = new Tuple2<>(dAppID, 0);
-        Object[] first = super.get(firstKey);
-        int stateID;
-        if (first == null) {
-            super.put(firstKey, new Object[]{1});
-            stateID = 1;
-        } else {
-            stateID = (int) first[0] + 1;
-        }
-        super.put(new Tuple2<>(dAppID, stateID), values);
-    }
-
-    public Object[] peekState(Integer dAppID) {
-        Tuple2<Integer, Integer> firstKey = new Tuple2<>(dAppID, 0);
-        Object[] first = get(firstKey);
-        int stateID = (int) first[0];
-        return super.get(new Tuple2<>(dAppID, stateID));
-    }
-
-    public Object[] removeState(Integer dAppID) {
-        Tuple2<Integer, Integer> firstKey = new Tuple2<>(dAppID, 0);
-        Object[] first = get(firstKey);
-        int stateID = (int) first[0];
-        Object[] removerValues = super.remove(new Tuple2<>(dAppID, stateID));
-        super.put(firstKey, new Object[]{stateID - 1});
-        return removerValues;
+        map = new HashMap<Tuple2<Integer, Long>, Object[]>();
     }
 
 }

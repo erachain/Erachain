@@ -15,6 +15,7 @@ import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
@@ -103,18 +104,8 @@ public abstract class DAPP {
      * @param dcSet
      * @param values
      */
-    public void putState(DCSet dcSet, Object[] values) {
-        dcSet.getSmartContractState().putState(id, values);
-    }
-
-    /**
-     * Peek state values
-     *
-     * @param dcSet
-     * @return
-     */
-    public Object[] peekState(DCSet dcSet) {
-        return dcSet.getSmartContractState().peekState(id);
+    public void putState(DCSet dcSet, Long seqNo, Object[] values) {
+        dcSet.getSmartContractState().put(new Fun.Tuple2<>(id, seqNo), values);
     }
 
     /**
@@ -123,8 +114,24 @@ public abstract class DAPP {
      * @param dcSet
      * @return
      */
-    public Object[] removeState(DCSet dcSet) {
-        return dcSet.getSmartContractState().removeState(id);
+    public Object[] removeState(DCSet dcSet, Long seqNo) {
+        return dcSet.getSmartContractState().remove(new Fun.Tuple2<>(id, seqNo));
+    }
+
+    public boolean valueSet(DCSet dcSet, Object key, Object value) {
+        return dcSet.getSmartContractValues().set(new Fun.Tuple2(id, key), value);
+    }
+
+    public void valuePut(DCSet dcSet, Object key, Object value) {
+        dcSet.getSmartContractValues().put(new Fun.Tuple2(id, key), value);
+    }
+
+    public void valuesDelete(DCSet dcSet, String key) {
+        dcSet.getSmartContractValues().delete(new Fun.Tuple2(id, key));
+    }
+
+    public Object valuesRemove(DCSet dcSet, String key) {
+        return dcSet.getSmartContractValues().remove(new Fun.Tuple2(id, key));
     }
 
     public int length(int forDeal) {
