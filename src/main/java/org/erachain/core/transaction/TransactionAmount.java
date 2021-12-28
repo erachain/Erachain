@@ -1706,9 +1706,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
 
         if (assetFEE != null && assetFEE.signum() != 0) {
-            // proc: this.creator.changeBalance(dcSet, !backward, backward, absKey, this.assetFEE.a, false, false, !incomeReverse);
-            // orph: this.creator.changeBalance(dcSet, backward, backward, absKey, this.assetFEE.a, false, false, !incomeReverse);
-
+            ///
+            // in proc: this.creator.changeBalance(dcSet, !backward, backward, absKey, this.assetFEE.a, false, false, !incomeReverse);
+            // in orph: this.creator.changeBalance(dcSet, backward, backward, absKey, this.assetFEE.a, false, false, !incomeReverse);
+            /// USE: (asOrphan ^ !backward) for both actions
             creator.changeBalance(dcSet, asOrphan ^ !backward, backward, absKey, assetFEE, false, false, !incomeReverse);
 
             if (block != null && !asOrphan) {
