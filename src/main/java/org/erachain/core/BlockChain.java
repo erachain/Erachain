@@ -367,11 +367,15 @@ public class BlockChain {
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
-    public static final int FREE_FEE_LENGTH = 1 << 10;
-    public static final int FREE_FEE_TO_SEQNO = CLONE_MODE ? -1 : 1;
-    public static final int FREE_FEE_FROM_HEIGHT = CLONE_MODE ? Integer.MAX_VALUE : MAIN_MODE ? 1610000 : 1;
+    /**
+     * add to all TX for fee
+     */
 
     public static final int ADD_FEE_BYTES_FOR_COMMON_TX = 0;
+
+    public static final int FREE_FEE_LENGTH = ADD_FEE_BYTES_FOR_COMMON_TX + (1 << 10);
+    public static final int FREE_FEE_TO_SEQNO = CLONE_MODE ? -1 : 1;
+    public static final int FREE_FEE_FROM_HEIGHT = CLONE_MODE ? Integer.MAX_VALUE : MAIN_MODE ? 1610000 : 1;
 
 
     /**
