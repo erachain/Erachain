@@ -217,10 +217,11 @@ public class WebTransactionsHTML {
                     if (asset == null) {
                         asset = Controller.getInstance().getAsset(transaction.getAbsKey());
                     }
-                    Fun.Tuple2<BigDecimal, BigDecimal> taxes = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(asset.getKey());
+                    BigDecimal taxes = BlockChain.ASSET_TRANSFER_PERCENTAGE(transaction.getBlockHeight(), asset.getKey());
+                    BigDecimal taxesMin = BlockChain.ASSET_TRANSFER_PERCENTAGE_MIN(transaction.getBlockHeight(), asset.getKey());
 
                     out += "<br>" + Lang.T("Additional Asset FEE", langObj) + ": ";
-                    out += Transaction.viewAssetFee(asset, taxes.a, taxes.b, transaction.assetFEE.a);
+                    out += Transaction.viewAssetFee(asset, taxes, taxesMin, transaction.assetFEE.a);
                 }
             }
             if (transaction.isWiped()) {

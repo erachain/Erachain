@@ -1551,17 +1551,19 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
             }
 
             text += "<br>" + Lang.T("Additional Asset FEE") + ": ";
-            Tuple2<BigDecimal, BigDecimal> assetTax = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(asset.getKey());
-            text += viewAssetFee(asset, assetTax.a, assetTax.b, assetFEE.a);
+            BigDecimal assetTax = BlockChain.ASSET_TRANSFER_PERCENTAGE(height, asset.getKey());
+            BigDecimal assetTaxMin = BlockChain.ASSET_TRANSFER_PERCENTAGE_MIN(height, asset.getKey());
+            text += viewAssetFee(asset, assetTax, assetTaxMin, assetFEE.a);
         }
 
         if (assetsPacketFEE != null && !assetsPacketFEE.isEmpty()) {
             /// ASSET FEE
             text += "<br>" + Lang.T("Additional Assets Package FEE") + ":";
             for (AssetCls packageAsset : assetsPacketFEE.keySet()) {
-                Tuple2<BigDecimal, BigDecimal> assetTax = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(packageAsset.getKey());
+                BigDecimal assetTax = BlockChain.ASSET_TRANSFER_PERCENTAGE(height, packageAsset.getKey());
+                BigDecimal assetTaxMin = BlockChain.ASSET_TRANSFER_PERCENTAGE_MIN(height, packageAsset.getKey());
                 Tuple2<BigDecimal, BigDecimal> assetPacketFee = assetsPacketFEE.get(packageAsset);
-                text += "<br>" + viewAssetFee(packageAsset, assetTax.a, assetTax.b, assetPacketFee.a);
+                text += "<br>" + viewAssetFee(packageAsset, assetTax, assetTaxMin, assetPacketFee.a);
             }
 
         }

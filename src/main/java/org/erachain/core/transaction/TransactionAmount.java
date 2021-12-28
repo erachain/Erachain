@@ -378,28 +378,37 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
      * call only if (balancePosition() == ACTION_SEND && !creator.equals(asset.getMaker()) && !recipient.equals(asset.getMaker())
      * && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()
      */
-    public static Tuple2<BigDecimal, BigDecimal> calcSendTAX(Long key, AssetCls asset, BigDecimal amount) {
+    public static Tuple2<BigDecimal, BigDecimal> calcSendTAX(int height, Long key, AssetCls asset, BigDecimal amount) {
 
-        if (key == null || !BlockChain.ASSET_TRANSFER_PERCENTAGE.containsKey(key) || asset == null || amount == null)
+        if (key == null || asset == null || amount == null)
             return null;
 
-        BigDecimal assetFee;
-        BigDecimal assetFeeBurn;
-
-        Fun.Tuple2<BigDecimal, BigDecimal> percItem = BlockChain.ASSET_TRANSFER_PERCENTAGE.get(key);
-        assetFee = amount.abs().multiply(percItem.a).setScale(asset.getScale(), RoundingMode.DOWN);
-        if (assetFee.compareTo(percItem.b) < 0) {
-            // USE MINIMAL VALUE
-            assetFee = percItem.b.setScale(asset.getScale(), RoundingMode.DOWN);
+        BigDecimal assetFeeMin = BlockChain.ASSET_TRANSFER_PERCENTAGE_MIN(height, key);
+        if (assetFeeMin == null) {
+            return null;
         }
-        if (!BlockChain.ASSET_BURN_PERCENTAGE.isEmpty()
-                && BlockChain.ASSET_BURN_PERCENTAGE.containsKey(key)) {
-            assetFeeBurn = assetFee.multiply(BlockChain.ASSET_BURN_PERCENTAGE.get(key)).setScale(asset.getScale(), RoundingMode.UP);
-        } else
-            assetFeeBurn = BigDecimal.ZERO;
 
-        return new Tuple2<>(assetFee, assetFeeBurn);
+        BigDecimal feeKoeff = BlockChain.ASSET_TRANSFER_PERCENTAGE(height, key);
+        BigDecimal assetFee;
+        if (feeKoeff == BigDecimal.ZERO) {
+            assetFee = assetFeeMin;
+        } else {
+            assetFee = amount.abs().multiply(feeKoeff).setScale(asset.getScale(), RoundingMode.DOWN);
+            if (assetFee.compareTo(assetFeeMin) < 0) {
+                // USE MINIMAL VALUE
+                assetFee = assetFeeMin.setScale(asset.getScale(), RoundingMode.DOWN);
+            }
+        }
 
+        BigDecimal burnedFeeKoeff = BlockChain.ASSET_BURN_PERCENTAGE(height, key);
+        BigDecimal assetFurned = assetFee.multiply(burnedFeeKoeff).setScale(asset.getScale(), RoundingMode.UP);
+
+        return new Tuple2<>(assetFee, assetFurned);
+
+    }
+
+    public Tuple2<BigDecimal, BigDecimal> calcSendTAX(Long key, AssetCls asset, BigDecimal amount) {
+        return calcSendTAX(height, key, asset, amount);
     }
 
     @Override
@@ -420,7 +429,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         // ПРОЦЕНТЫ в любом случае посчитаем - даже если халявная транзакция
         // только для передачи в собственность!
-        if (balancePosition() == ACTION_SEND && !BlockChain.ASSET_TRANSFER_PERCENTAGE.isEmpty()) {
+        if (balancePosition() == ACTION_SEND && !BlockChain.ASSET_TRANSFER_PERCENTAGE_MIN_TAB.isEmpty()) {
             if (packet != null) {
                 assetsPacketFEE = new HashMap<>();
                 Tuple2<BigDecimal, BigDecimal> assetFee;
