@@ -398,7 +398,7 @@ public class BlockChain {
     public static final BigDecimal ASSET_TRANSFER_PERCENTAGE_DEFAULT = new BigDecimal("0.001");
 
     /**
-     * минимальная комиссия - бсолютное значение. Эксли не задано то и процент комиссии не берем!
+     * минимальная комиссия для актива - абсолютное значение. Если не задано, то и процент комиссии не берется!
      */
     public static final HashMap<Long, BigDecimal> ASSET_TRANSFER_PERCENTAGE_MIN_TAB = new HashMap<>();
     /**
