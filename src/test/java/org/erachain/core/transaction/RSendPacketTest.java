@@ -171,13 +171,14 @@ public class RSendPacketTest {
         assertEquals(tax1result, tax1TXresult);
         assertEquals(tax2result, tax2TXresult);
 
+        assertEquals(balRecipient1.add((BigDecimal) packet[0][1]), recipient.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b);
+        assertEquals(balRecipient2.add((BigDecimal) packet[1][1]), recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
+
         assertEquals(balMaker1.subtract((BigDecimal) packet[0][1]).subtract(tax1result),
                 maker.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b);
-        assertEquals(balRecipient1.add((BigDecimal) packet[0][1]), recipient.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b);
 
         assertEquals(balMaker2.subtract((BigDecimal) packet[1][1]).subtract(rSend.getFee()).subtract(tax2result),
                 maker.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
-        assertEquals(balRecipient2.add((BigDecimal) packet[1][1]), recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
 
 
         ///////////////// ORPHAN
