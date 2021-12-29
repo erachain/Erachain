@@ -401,7 +401,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
 
         BigDecimal burnedFeeKoeff = BlockChain.ASSET_BURN_PERCENTAGE(height, key);
-        BigDecimal assetFurned = assetFee.multiply(burnedFeeKoeff).setScale(asset.getScale(), RoundingMode.UP);
+        BigDecimal assetFurned = burnedFeeKoeff == BigDecimal.ZERO ? BigDecimal.ZERO : assetFee.multiply(burnedFeeKoeff).setScale(asset.getScale(), RoundingMode.UP);
 
         return new Tuple2<>(assetFee, assetFurned);
 
