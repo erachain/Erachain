@@ -565,6 +565,9 @@ public class OnDealClick {
             case Transaction.ACCOUNT_ACCSES_DENIED:
                 mess = "Access denied for account";
                 break;
+            case Transaction.ACTION_DENIED:
+                mess = "Access denied";
+                break;
             case Transaction.KEY_COLLISION:
                 mess = "Key collision, try again";
                 break;

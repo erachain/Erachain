@@ -122,6 +122,12 @@ public class IssueAssetTransaction extends IssueItemRecord {
             return VALIDATE_OK;
         }
 
+        if (BlockChain.CLONE_MODE) {
+            if (creator.getBalanceUSE(key, dcSet).compareTo(BlockChain.MIN_GENERATING_BALANCE_BD) < 0) {
+                return Transaction.ACTION_DENIED;
+            }
+        }
+
         int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) {
             return result;

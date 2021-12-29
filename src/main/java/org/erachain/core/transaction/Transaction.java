@@ -276,6 +276,7 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
 
     public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 501;
     public static final int ACCOUNT_ACCSES_DENIED = 520;
+    public static final int ACTION_DENIED = 521;
 
     public static final int PRIVATE_KEY_NOT_FOUND = 530;
     public static final int INVALID_UPDATE_VALUE = 540;
@@ -1574,8 +1575,8 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
     public static String viewAssetFee(AssetCls asset, BigDecimal tax, BigDecimal minFee, BigDecimal result) {
 
         String text = result.stripTrailingZeros().toPlainString() + "[" + asset.viewName() + "] ("
-                + "" + tax.movePointRight(2).stripTrailingZeros().toPlainString()
-                + "%, min: " + minFee.stripTrailingZeros().toPlainString() + ")";
+                + "" + (tax == null ? "0" : tax.movePointRight(2).stripTrailingZeros().toPlainString())
+                + "%, min: " + (minFee == null ? "0" : minFee.stripTrailingZeros().toPlainString()) + ")";
         return text;
     }
 
