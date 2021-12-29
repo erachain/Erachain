@@ -123,7 +123,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
         }
 
         if (BlockChain.CLONE_MODE) {
-            if (creator.getBalanceUSE(key, dcSet).compareTo(BlockChain.MIN_GENERATING_BALANCE_BD) < 0) {
+            if (creator.getBalanceUSE(RIGHTS_KEY, dcSet).compareTo(BlockChain.MIN_GENERATING_BALANCE_BD) < 0) {
                 errorValue = "USE balance < " + BlockChain.MIN_GENERATING_BALANCE_BD;
                 return Transaction.ACTION_DENIED;
             }
