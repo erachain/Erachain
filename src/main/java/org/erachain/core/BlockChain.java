@@ -462,6 +462,12 @@ public class BlockChain {
     public static HashSet<String> TRUSTED_ANONYMOUS = new HashSet<String>();
     public static HashSet<String> ANONYMASERS = new HashSet<String>();
     public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
+
+    /**
+     * Used for freeze some amount on period list. [Height, freezed amount],...<br>
+     * example:<br>
+     * .put("7DMJcs8kw7EXUSeEFfNwznRKRLHLrcXJFm", new int[][]{{225655, 150000}, {333655, 100000}});
+     */
     public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
     public static HashSet<String> FREEZED_FORGING = new HashSet<String>();
 
