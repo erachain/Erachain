@@ -2,6 +2,7 @@ package org.erachain.core.crypto;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,6 +124,7 @@ public class Crypto {
 
     }
 
+    static final byte[] EMPTY_PUB_KEY = new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH];
     public byte[] getAddressBytes(byte type, byte[] publicKeyOrSignarure) {
 
         if (type == DAPP_ADDRESS_VERSION && publicKeyOrSignarure.length >= HASH_LENGTH) {
@@ -134,7 +136,10 @@ public class Crypto {
                 && publicKeyOrSignarure[2] == 0 && publicKeyOrSignarure[5] == 0 && publicKeyOrSignarure[8] == 0
                 && publicKeyOrSignarure[11] == 0 && publicKeyOrSignarure[14] == 0 && publicKeyOrSignarure[17] == 0
                 && publicKeyOrSignarure[20] == 0 && publicKeyOrSignarure[23] == 0 && publicKeyOrSignarure[26] == 0
-                && publicKeyOrSignarure[29] == 0) {
+                && publicKeyOrSignarure[29] == 0
+                // it si not the GENESIS PUB KEY
+                && !Arrays.equals(publicKeyOrSignarure, EMPTY_PUB_KEY)
+        ) {
             type = DAPP_ADDRESS_VERSION;
         }
 
