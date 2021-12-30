@@ -434,7 +434,7 @@ public class RSetUnionToItem extends Transaction {
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        return new HashSet<>();
+        return new HashSet<>(1, 1);
     }
 
     @Override

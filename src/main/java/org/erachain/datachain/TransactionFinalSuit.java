@@ -31,6 +31,10 @@ public interface TransactionFinalSuit {
 
     IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending);
 
+    IteratorCloseable<Long> getIteratorOfDialog(byte[] addressesKey, Long fromSeqNo, boolean descending);
+
+    IteratorCloseable<Long> getIteratorByType(Integer type, Long fromSeqNo, boolean descending);
+
     /**
      * @param addressShort
      * @param type         - TRANSACTION type
@@ -39,6 +43,7 @@ public interface TransactionFinalSuit {
      * @return
      */
     IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type, Boolean isCreator, boolean descending);
+
     /**
      * Здесь обязательно нужно задавать тип транзакции и получатель или создатель - иначе по FROM_ID работать не будет в RocksDB.
      * Иначе используйте getIteratorByCreator.

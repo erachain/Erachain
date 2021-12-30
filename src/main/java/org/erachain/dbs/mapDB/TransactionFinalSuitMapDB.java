@@ -56,12 +56,16 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     private static int CUT_NAME_INDEX = 12;
 
+    private NavigableSet typeKey;
+
     @SuppressWarnings("rawtypes")
     private NavigableSet creatorKey;
     @SuppressWarnings("rawtypes")
     private NavigableSet addressTypeKey;
     @SuppressWarnings("rawtypes")
     private NavigableSet recipientKey;
+
+    private NavigableSet dialogKey;
 
     @SuppressWarnings("rawtypes")
     private NavigableSet titleKey;
@@ -155,6 +159,17 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             // NOT USE SECONDARY INDEXES
             return;
 
+        this.typeKey = database.createTreeSet("type_txs")
+                .makeOrGet();
+
+        // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
+        Bind.secondaryKey((Bind.MapWithModificationListener) map, this.typeKey, new Function2<Integer, Long, Transaction>() {
+            @Override
+            public Integer run(Long key, Transaction transaction) {
+                return transaction.getType();
+            }
+        });
+
         this.recipientKey = database.createTreeSet("recipient_txs")
                 .comparator(comparatorAddressT2) // - for Tuple2 String
                 //.comparator(SignedBytes.lexicographicalComparator())
@@ -178,6 +193,39 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                             System.arraycopy(recipient.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
                             keys[count++] = addressKey;
                         }
+                        return keys;
+                    }
+                });
+
+        this.dialogKey = database.createTreeSet("dialog_txs")
+                //.comparator(comparatorAddressT2) // - for Tuple2 String
+                .comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.COMPARATOR))
+                .makeOrGet();
+
+        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.dialogKey,
+                new Function2<byte[][], Long, Transaction>() {
+                    @Override
+                    public byte[][] run(Long key, Transaction transaction) {
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                        if (transaction.noDCSet()) {
+                            transaction.setDC((DCSet) databaseSet, true);
+                        }
+
+                        Account creator = transaction.getCreator();
+                        if (creator == null)
+                            return null;
+
+                        HashSet<Account> recipients = transaction.getRecipientAccounts();
+                        if (recipients == null || recipients.isEmpty())
+                            return null;
+
+                        int size = recipients.size();
+                        byte[][] keys = new byte[size][];
+                        int count = 0;
+                        for (Account recipient : recipients) {
+                            keys[count++] = TransactionFinalMap.makeDialogKey(creator, recipient);
+                        }
+
                         return keys;
                     }
                 });
@@ -324,6 +372,24 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         return IteratorCloseableImpl.make(new IndexIterator((descending ? this.recipientKey.descendingSet() : this.recipientKey)
                 .subSet(Fun.t2(addressKey, fromSeqNo == null || fromSeqNo == 0 ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
                         Fun.t2(addressKey, toSeqNo)).iterator()));
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public IteratorCloseable<Long> getIteratorOfDialog(byte[] addressesKey, Long fromSeqNo, boolean descending) {
+
+        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.dialogKey.descendingSet() : this.dialogKey)
+                .subSet(Fun.t2(addressesKey, fromSeqNo == null || fromSeqNo == 0 ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
+                        Fun.t2(addressesKey, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public IteratorCloseable<Long> getIteratorByType(Integer type, Long fromSeqNo, boolean descending) {
+
+        return IteratorCloseableImpl.make(new IndexIterator((descending ? this.typeKey.descendingSet() : this.typeKey)
+                .subSet(Fun.t2(type, fromSeqNo == null || fromSeqNo == 0 ? descending ? Long.MAX_VALUE : Long.MIN_VALUE : fromSeqNo),
+                        Fun.t2(fromSeqNo, descending ? Long.MIN_VALUE : Long.MAX_VALUE)).iterator()));
     }
 
     @Override

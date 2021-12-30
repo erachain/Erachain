@@ -284,7 +284,7 @@ public class VoteOnPollTransaction extends Transaction {
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        return new HashSet<Account>();
+        return new HashSet<Account>(1, 1);
     }
 
     @Override

@@ -23,6 +23,7 @@ import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -39,7 +40,7 @@ import java.util.*;
 /**
  * обработка ключей и криптографии
  */
-public class Account {
+public class Account implements Comparable {
 
     public static final int ADDRESS_SHORT_LENGTH = 20;
     public static final int ADDRESS_LENGTH = 25;
@@ -1449,4 +1450,27 @@ public class Account {
         return Controller.getInstance().getWallet().dwSet.getAccountMap().getAccountNo(getAddress());
     }
 
+    @Override
+    public int compareTo(@NotNull Object o) {
+
+        if (o instanceof Account) {
+            Account comp = (Account) o;
+            int res = hashCode() - comp.hashCode();
+            if (res == 0) {
+                for (int i = 0; i < Account.ADDRESS_SHORT_LENGTH; i++) {
+                    res = shortBytes[i] - comp.shortBytes[i];
+                    if (res != 0)
+                        break;
+                }
+                return 0;
+            }
+
+            if (res > 0)
+                return 1;
+            else if (res < 0)
+                return -1;
+        }
+
+        return 0;
+    }
 }

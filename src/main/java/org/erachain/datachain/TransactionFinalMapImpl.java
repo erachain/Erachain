@@ -110,6 +110,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         return ((DCSet) this.databaseSet).getTransactionFinalMapSigns().size();
     }
+
     /**
      * Это протокольный вызов - поэтому в форке он тоже бывает
      *
@@ -304,6 +305,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, typeTX, isCreator, fromID, toID, descending);
     }
 
+    public IteratorCloseable<Long> getIteratorOfDialog(Account account1, Account account2, Long fromSeqNo, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorOfDialog(TransactionFinalMap.makeDialogKey(account1, account2), fromSeqNo, descending);
+    }
+
+    public IteratorCloseable<Long> getIteratorByType(Integer type, Long fromID, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorByType(type, fromID, descending);
+    }
+
     /**
      * Поиск активности данного счета по Созданным трнзакция за данный промежуток времени
      *
@@ -363,6 +372,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
         return txs;
     }
+
     public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit, int offset) {
         return getTransactionsByAddressAndType(Account.makeShortBytes(address), type, limit, offset);
     }

@@ -12,9 +12,9 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.exdata.exLink.ExLinkAppendix;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.dapp.DAPP;
+import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.junit.Test;
-import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +67,7 @@ public class RSendPacketTest {
     // INIT ASSETS
     private void init() {
 
-        dcSet = DCSet.createEmptyDatabaseSet(0);
+        dcSet = DCSet.createEmptyDatabaseSet(IDB.DBS_MAP_DB);
         Controller.getInstance().setDCSet(dcSet);
         gb = new GenesisBlock();
         block = gb;
@@ -130,10 +130,12 @@ public class RSendPacketTest {
         BigDecimal tax1min = new BigDecimal("1");
         BigDecimal tax2 = new BigDecimal("0.01");
         BigDecimal tax2min = new BigDecimal("0.01");
-        BlockChain.ASSET_TRANSFER_PERCENTAGE.put(1L, new Fun.Tuple2<>(tax1, tax1min));
-        BlockChain.ASSET_TRANSFER_PERCENTAGE.put(2L, new Fun.Tuple2<>(tax2, tax2min));
-        BlockChain.ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.25"));
-        BlockChain.ASSET_BURN_PERCENTAGE.put(2L, new BigDecimal("0.25"));
+        BlockChain.ASSET_TRANSFER_PERCENTAGE_TAB.put(1L, tax1);
+        BlockChain.ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(1L, tax1min);
+        BlockChain.ASSET_TRANSFER_PERCENTAGE_TAB.put(2L, tax2);
+        BlockChain.ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(2L, tax2min);
+        BlockChain.ASSET_BURN_PERCENTAGE_TAB.put(1L, new BigDecimal("0.25"));
+        BlockChain.ASSET_BURN_PERCENTAGE_TAB.put(2L, new BigDecimal("0.25"));
 
 
         int balancePos = TransactionAmount.ACTION_SEND;
@@ -160,8 +162,8 @@ public class RSendPacketTest {
         ///////////////// PROCESS
         rSend.processBody(block, Transaction.FOR_NETWORK);
 
-        BigDecimal tax1result = Objects.requireNonNull(TransactionAmount.calcSendTAX((Long) packet[0][0], (AssetCls) packet[0][7], (BigDecimal) packet[0][1])).a;
-        BigDecimal tax2result = Objects.requireNonNull(TransactionAmount.calcSendTAX((Long) packet[1][0], (AssetCls) packet[1][7], (BigDecimal) packet[1][1])).a;
+        BigDecimal tax1result = Objects.requireNonNull(TransactionAmount.calcSendTAX(999, (Long) packet[0][0], (AssetCls) packet[0][7], (BigDecimal) packet[0][1])).a;
+        BigDecimal tax2result = Objects.requireNonNull(TransactionAmount.calcSendTAX(999, (Long) packet[1][0], (AssetCls) packet[1][7], (BigDecimal) packet[1][1])).a;
 
         BigDecimal tax1TXresult = rSend.assetsPacketFEE.get((AssetCls) packet[0][7]).a;
         BigDecimal tax2TXresult = rSend.assetsPacketFEE.get((AssetCls) packet[1][7]).a;
@@ -169,13 +171,14 @@ public class RSendPacketTest {
         assertEquals(tax1result, tax1TXresult);
         assertEquals(tax2result, tax2TXresult);
 
-        assertEquals(balMaker1.subtract((BigDecimal) packet[0][1]).subtract(tax1result),
-                maker.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b);
         assertEquals(balRecipient1.add((BigDecimal) packet[0][1]), recipient.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b);
+        assertEquals(balRecipient2.add((BigDecimal) packet[1][1]), recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
+
+        BigDecimal balMaker1new = maker.getBalance(dcSet, AssetCls.ERA_KEY, balancePos).b;
+        assertEquals(balMaker1.subtract((BigDecimal) packet[0][1]).subtract(tax1result), balMaker1new);
 
         assertEquals(balMaker2.subtract((BigDecimal) packet[1][1]).subtract(rSend.getFee()).subtract(tax2result),
                 maker.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
-        assertEquals(balRecipient2.add((BigDecimal) packet[1][1]), recipient.getBalance(dcSet, AssetCls.FEE_KEY, balancePos).b);
 
 
         ///////////////// ORPHAN

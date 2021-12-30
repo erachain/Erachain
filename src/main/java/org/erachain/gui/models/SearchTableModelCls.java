@@ -98,13 +98,19 @@ public abstract class SearchTableModelCls extends AbstractTableModel {
         clear();
 
         if (filter == null || (filter = filter.trim()).isEmpty()) {
-            try (IteratorCloseable<Long> iterator = ((TransactionFinalMap) map).getIndexIterator(0, true)) {
+            try (IteratorCloseable<Long> iterator =
+                         onlyType > 0 ?
+                                 ((TransactionFinalMap) map).getIteratorByType(onlyType, null, true)
+                                 : ((TransactionFinalMap) map).getIndexIterator(0, true)) {
                 int limit = 200;
                 int countForge = 0;
                 while (iterator.hasNext() && limit > 0) {
                     Transaction transaction = ((TransactionFinalMap) map).get(iterator.next());
-                    if (onlyType > 0 && onlyType != transaction.getType())
-                        continue;
+
+                    if (onlyType > 0 && onlyType != transaction.getType()) {
+                        // уже на другой тип пепешли - выход
+                        break;
+                    }
 
                     if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
                         RCalculated tx = (RCalculated) transaction;
