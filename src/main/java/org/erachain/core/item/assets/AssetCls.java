@@ -1301,15 +1301,15 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_OTHER_CLAIM:
                 return "Other external rights, requirements and obligations. Any obligation (as well as other external assets), which can be claimed by the record \"summon\" and discharged by the record \"confirmation of fulfillment\" of this obligation. You can take it into your hands";
             case AS_INSIDE_ASSETS:
-                return "Internal (digital) asset. It does not require any external additional actions when transferring between accounts inside Erachain";
+                return "AS_INSIDE_ASSETS_D";
             case AS_INSIDE_CURRENCY:
                 return "Digital money";
             case AS_INSIDE_UTILITY:
-                return "Digital service or a cost is something that can be used inside Erachain nvironment, for example as a payment for external services";
+                return "AS_INSIDE_UTILITY_D";
             case AS_INSIDE_SHARE:
                 return "Digital share. The share of ownership of an external or internal enterpris, the possession of which establishes the right to own the corresponding share of the enterprise without the need to take any external actions";
             case AS_INSIDE_BONUS:
-                return "Digital loyalty points, bonuses, awards, discount points (bonus). It has no generally accepted value and can not be exchanged for other types of assets inside the Erachain environment. The exchange for other bonuses and rewards are allowed";
+                return "AS_INSIDE_BONUS_D";
             case AS_INSIDE_ACCESS:
                 return "Digital rights of access and control, membership, pass";
             case AS_INSIDE_VOTE:
