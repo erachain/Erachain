@@ -1,7 +1,5 @@
 package org.erachain.gui.items.accounts;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -10,27 +8,19 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
-import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemImprintsTableModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
-import org.erachain.utils.SaveStrToFile;
 import org.erachain.utils.TableMenuPopupUtil;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -38,12 +28,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 public class FavoriteAccountsSplitPanel extends SplitPanel {
 
@@ -52,10 +36,8 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = LoggerFactory.getLogger(FavoriteAccountsSplitPanel.class);
-    protected FileChooser chooser;
     protected int row;
     private FavoriteAccountsTableModel accountsTableModel;
-    private JButton button3_ToolBar_LeftPanel;
     private FavoriteAccountsMap accountsMap;
 
     public FavoriteAccountsSplitPanel() {
@@ -68,29 +50,19 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         if (Controller.getInstance().doesWalletDatabaseExists())
             accountsMap = Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap();
 
-        searthLabel2.setVisible(true);
-        button1ToolBarLeftPanel.setText(Lang.T("Load"));
-        button2ToolBarLeftPanel.setText(Lang.T("Save"));
-        button3_ToolBar_LeftPanel = new JButton();
-        button3_ToolBar_LeftPanel.setText(Lang.T("Add"));
-        this.toolBarLeftPanel.add(button3_ToolBar_LeftPanel);
-        jButton1_jToolBar_RightPanel.setVisible(false);
-        jButton2_jToolBar_RightPanel.setVisible(false);
-
         // CREATE TABLE
         this.accountsTableModel = new FavoriteAccountsTableModel();
-        final MTable imprintsTable = new MTable(this.accountsTableModel);
+        final MTable accountsTable = new MTable(this.accountsTableModel);
+        // set showvideo
+        jTableJScrollPanelLeftPanel.setModel(this.accountsTableModel);
+        jTableJScrollPanelLeftPanel = accountsTable;
+        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // column #1
-        TableColumnModel columnModel = imprintsTable.getColumnModel();
+        TableColumnModel columnModel = accountsTable.getColumnModel();
         TableColumn column1 = columnModel.getColumn(WalletItemImprintsTableModel.COLUMN_KEY);
         column1.setMaxWidth(100);
         column1.setPreferredWidth(50);
-
-        // set showvideo
-        jTableJScrollPanelLeftPanel.setModel(this.accountsTableModel);
-        jTableJScrollPanelLeftPanel = imprintsTable;
-        jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         JPanel panel = new JPanel();
         GridBagConstraints gbc_panel = new GridBagConstraints();
@@ -100,25 +72,26 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         gbc_panel.gridy = 0;
         leftPanel.add(panel, gbc_panel);
 
-        JButton btnLoadButton = new JButton(Lang.T("Load"));
-        panel.add(btnLoadButton);
-
+        GridBagConstraints GBC = new GridBagConstraints();
+        GBC.insets = new Insets(5, 20, 10, 15);
+        GBC.anchor = GridBagConstraints.NORTHWEST;
         JButton btnSaveButton = new JButton(Lang.T("Save"));
-        panel.add(btnSaveButton);
+        panel.add(btnSaveButton, GBC);
+
+        JButton btnLoadButton = new JButton(Lang.T("Load"));
+        panel.add(btnLoadButton, GBC);
 
         JButton btnAddButton = new JButton(Lang.T("Add"));
-        panel.add(btnAddButton);
+        panel.add(btnAddButton, GBC);
+
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
-        button3_ToolBar_LeftPanel.setVisible(false);
+        jButton1_jToolBar_RightPanel.setVisible(false);
+        jButton2_jToolBar_RightPanel.setVisible(false);
+        Label_search_Info_Panel.setVisible(false);
+        search_Info_Panel.setVisible(false);
 
         // Event LISTENER
-        jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent arg0) {
-            }
-
-        });
 
         btnAddButton.addActionListener(new ActionListener() {
 
@@ -151,11 +124,11 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
                 // TODO Auto-generated method stub
-                int row1 = imprintsTable.getSelectedRow();
+                int row1 = accountsTable.getSelectedRow();
                 if (row1 < 0)
                     return;
 
-                row = imprintsTable.convertRowIndexToModel(row1);
+                row = accountsTable.convertRowIndexToModel(row1);
 
             }
         });
@@ -230,7 +203,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
             public void actionPerformed(ActionEvent e) {
                 Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
                 new AccountSetNameDialog(item.a);
-                imprintsTable.repaint();
+                accountsTable.repaint();
 
             }
         });
@@ -257,9 +230,9 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
                     }
                 }
 
-                int row = imprintsTable.getSelectedRow();
+                int row = accountsTable.getSelectedRow();
                 try {
-                    row = imprintsTable.convertRowIndexToModel(row);
+                    row = accountsTable.convertRowIndexToModel(row);
                     Tuple2<String, Tuple3<String, String, String>> item = accountsTableModel.getItem(row);
                     accountsMap.delete(item.a);
                 } catch (Exception e1) {
@@ -270,7 +243,7 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
         });
         menu.add(menuItemDelete);
 
-        TableMenuPopupUtil.installContextMenu(imprintsTable, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+        TableMenuPopupUtil.installContextMenu(accountsTable, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
         btnSaveButton.addActionListener(new ActionListener() {
 
@@ -278,71 +251,17 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                chooser = new FileChooser();
 
-                chooser.setDialogTitle(Lang.T("Save File"));
-                chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
-                chooser.setMultiSelectionEnabled(false);
-
-                // add filters
-                FileNameExtensionFilter xmlFilter = new FileNameExtensionFilter("Era Name Accounts files (*.enaf)",
-                        "enaf");
-                chooser.setAcceptAllFileFilterUsed(false);// only filter
-                chooser.addChoosableFileFilter(xmlFilter);
-                chooser.setFileFilter(xmlFilter);
-
-                if (chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
-
-                    String pp = chooser.getSelectedFile().getPath();
-                    if (!pp.contains(".enaf"))
-                        pp += ".enaf";
-                    File ff = new File(pp);
-                    // if file
-                    if (ff.exists() && ff.isFile()) {
-                        int aaa = JOptionPane.showConfirmDialog(chooser,
-                                Lang.T("File") + Lang.T("Exists") + "! "
-                                        + Lang.T("Overwrite") + "?",
-                                Lang.T("Message"), JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.INFORMATION_MESSAGE);
-                        System.out.print("\n gggg " + aaa);
-                        if (aaa != 0) {
-                            return;
-                        }
-                        ff.delete();
-
-                    }
-
-                    try (FileOutputStream fos = new FileOutputStream(pp)) {
-
-                        // buffer
-                        JSONObject output = new JSONObject();
-
-                        // TODO переделать с  db.getList() на перебор по ключу
-                        for (String key : accountsMap.keySet()) {
-                            JSONObject account = new JSONObject();
-                            Tuple3<String, String, String> item = accountsMap.get(key);
-                            if (item.a != null) account.put("punKey", item.a);
-                            account.put("name", item.b);
-                            account.put("json", item.c);
-                            output.put(key, account);
-
-                        }
-                        try {
-                            SaveStrToFile.saveJsonFine(pp, output);
-                        } catch (IOException e) {
-                            LOGGER.error(e.getMessage(), e);
-                            JOptionPane
-                                    .showMessageDialog(new JFrame(),
-                                            "Error writing to the file: " + Settings.getInstance().getSettingsPath()
-                                                    + "\nProbably there is no access.",
-                                            "Error!", JOptionPane.ERROR_MESSAGE);
-                        }
-
-                    } catch (IOException ex) {
-
-                        System.out.println(ex.getMessage());
-                    }
+                String result = Controller.getInstance().saveFavorites();
+                if (result == null) {
+                    JOptionPane.showMessageDialog(
+                            null, Lang.T("Favorite recordings are saved"), Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
+                    return;
                 }
+
+                JOptionPane.showMessageDialog(
+                        null, Lang.T(result), Lang.T("ERROR"), JOptionPane.ERROR_MESSAGE);
+
             }
         });
 
@@ -352,59 +271,16 @@ public class FavoriteAccountsSplitPanel extends SplitPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
 
-                chooser = new FileChooser();
-
-                chooser.setDialogTitle(Lang.T("Open File"));
-                chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
-                chooser.setMultiSelectionEnabled(false);
-
-                // add filters
-                FileNameExtensionFilter xmlFilter = new FileNameExtensionFilter("Era Name Accounts files (*.enaf)",
-                        "enaf");
-                chooser.setAcceptAllFileFilterUsed(false);// only filter
-                chooser.addChoosableFileFilter(xmlFilter);
-                chooser.setFileFilter(xmlFilter);
-
-                if (chooser.showOpenDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
-
-                    File file = new File(chooser.getSelectedFile().getPath());
-
-                    JSONObject inJSON;
-                    try {
-                        // OPEN FILE
-                        // READ SETTINS JSON FILE
-                        List<String> lines = Files.readLines(file, Charsets.UTF_8);
-
-                        String jsonString = "";
-                        for (String line : lines) {
-
-                            // correcting single backslash bug
-                            if (line.contains("userpath")) {
-                                line = line.replace("\\", File.separator);
-                            }
-
-                            jsonString += line;
-                        }
-
-                        // CREATE JSON OBJECT
-                        inJSON = (JSONObject) JSONValue.parse(jsonString);
-                        inJSON = inJSON == null ? new JSONObject() : inJSON;
-
-                        Set<String> keys = inJSON.keySet();
-                        Iterator<String> itKeys = keys.iterator();
-                        while (itKeys.hasNext()) {
-                            String a = itKeys.next();
-                            JSONObject item = (JSONObject) inJSON.get(a);
-                            accountsMap.put(a, new Tuple3(item.get("pubKey"), item.get("name"), item.get("json")));
-                        }
-
-                    } catch (Exception e) {
-                        LOGGER.info("Error while reading/creating settings.json " + file.getAbsolutePath()
-                                + " using default!");
-                        LOGGER.error(e.getMessage(), e);
-                        inJSON = new JSONObject();
-                    }
+                String result = Controller.getInstance().loadFavorites();
+                if (result == null) {
+                    JOptionPane.showMessageDialog(
+                            null, Lang.T("Favorite recordings uploaded"), Lang.T("INFO"), JOptionPane.INFORMATION_MESSAGE);
+                    return;
                 }
+
+                JOptionPane.showMessageDialog(
+                        null, Lang.T(result), Lang.T("ERROR"), JOptionPane.ERROR_MESSAGE);
+
             }
 
         });

@@ -83,7 +83,7 @@ public class GenesisIssueItemRecord extends GenesisRecord implements Itemable {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         //CHECK NAME LENGTH
         int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;

@@ -3,7 +3,10 @@ package org.erachain.core.transaction;
 import com.google.common.primitives.Bytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 
 import java.util.Arrays;
@@ -33,6 +36,11 @@ public class GenesisRecord extends Transaction {
 
         this.signature = digest;
 
+    }
+
+    @Override
+    public PublicKeyAccount getCreator() {
+        return GenesisBlock.CREATOR;
     }
 
     @Override
@@ -79,7 +87,13 @@ public class GenesisRecord extends Transaction {
 
     //VALIDATE
 
-    public boolean isSignatureValid() {
+    @Override
+    public boolean isSignatureValid(DCSet dcSet, boolean asTelegram) {
+        return Arrays.equals(this.signature, this.getSignature());
+    }
+
+    @Override
+    public boolean isSignatureValid(DCSet dcSet) {
         return Arrays.equals(this.signature, this.getSignature());
     }
 
@@ -90,7 +104,7 @@ public class GenesisRecord extends Transaction {
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        HashSet<Account> accounts = new HashSet<>();
+        HashSet<Account> accounts = new HashSet<>(1, 1);
         return accounts;
     }
 

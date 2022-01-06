@@ -6,7 +6,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.item.unions.UnionFactory;
-import org.erachain.smartcontracts.SmartContract;
+import org.erachain.dapp.DAPP;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -15,32 +15,32 @@ public class IssueUnionRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_UNION_TRANSACTION;
     public static final String TYPE_NAME = "Issue Union";
 
-    public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, union, feePow, timestamp, reference);
+    public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, flags);
     }
 
-    public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, reference, signature);
+    public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, long flags, byte[] signature) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, flags, signature);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp,
-                            Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, reference, signature);
+                            long flags, byte[] signature, long seqNo, long feeLong) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, feePow, timestamp, flags, signature);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueUnionRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, union, (byte) 0, 0l, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, union, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, union, feePow, timestamp, reference, signature);
+    public IssueUnionRecord(PublicKeyAccount creator, UnionCls union, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, union, feePow, timestamp, flags, signature);
     }
 
-    public IssueUnionRecord(PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, union, feePow, timestamp, reference);
+    public IssueUnionRecord(PublicKeyAccount creator, ExLink linkTo, UnionCls union, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, union, feePow, timestamp, flags);
     }
 
     //GETTERS/SETTERS
@@ -74,10 +74,10 @@ public class IssueUnionRecord extends IssueItemRecord {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -92,12 +92,12 @@ public class IssueUnionRecord extends IssueItemRecord {
             linkTo = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -142,7 +142,7 @@ public class IssueUnionRecord extends IssueItemRecord {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssueUnionRecord(typeBytes, creator, linkTo, union, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+            return new IssueUnionRecord(typeBytes, creator, linkTo, union, feePow, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueUnionRecord(typeBytes, creator, linkTo, union, signatureBytes);
         }
@@ -151,13 +151,13 @@ public class IssueUnionRecord extends IssueItemRecord {
     //PARSE CONVERT
 
     //@Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
 		/*

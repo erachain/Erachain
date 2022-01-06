@@ -66,7 +66,9 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     List<Transaction> getTransactionsByCreator(String address, Long fromID, int limit, int offset);
 
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, boolean descending);
+
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, boolean descending);
+
     IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo, Long toSeqNo, boolean descending);
 
     IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, boolean descending);
@@ -74,6 +76,10 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, Long fromID, boolean descending);
 
     IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer typeTX, Boolean isCreator, Long fromID, Long toID, boolean descending);
+
+    IteratorCloseable<Long> getIteratorOfDialog(Account account1, Account account2, Long fromSeqNo, boolean descending);
+
+    IteratorCloseable<Long> getIteratorByType(Integer type, Long fromID, boolean descending);
 
     boolean isCreatorWasActive(byte[] addressShort, Long fromSeqNo, int typeTX, Long toSeqNo);
 
@@ -114,8 +120,6 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     IteratorCloseable<Long> findTransactionsKeys(String address, String sender, String recipient, Long fromSeqNo, int minHeight,
                                                  int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
-    IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit);
-
     List<Transaction> getTransactionsByAddressFromID(byte[] addressShort, Long fromSeqNo, int offset, int limit, boolean noForge, boolean fillFullPage);
 
     byte[] getSignature(int hight, int seg);
@@ -125,4 +129,23 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>,
     Transaction get(byte[] signature);
 
     void put(Transaction transaction);
+
+    static byte[] makeDialogKey(Account account1, Account account2) {
+
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN * 2];
+        if (account1.compareTo(account2) > 0) {
+            System.arraycopy(account1.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+            System.arraycopy(account2.getShortAddressBytes(), 0, addressKey, TransactionFinalMap.ADDRESS_KEY_LEN, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        } else {
+            // mirror
+            System.arraycopy(account2.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+            System.arraycopy(account1.getShortAddressBytes(), 0, addressKey, TransactionFinalMap.ADDRESS_KEY_LEN, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        }
+
+        return addressKey;
+
+    }
+
 }

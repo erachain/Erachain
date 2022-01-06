@@ -46,7 +46,7 @@ public class SourcesModel extends DefaultTableModel {
         return true;
     }
 
-    private void addEmpty() {
+    public void addEmpty() {
         this.addRow(new Object[]{"1-1", 1, "", ""});
     }
 

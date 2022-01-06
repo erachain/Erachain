@@ -32,6 +32,7 @@ public class SettingsBasicPanel extends JPanel {
     public JTextField txtWebport;
     public JTextField textDataFolder;
     public JTextField textWallet;
+    public JTextField txtBlockExplorer;
     public JPasswordField textWebKeystorePass;
     public JPasswordField textWebCertificatePass;
     public JCheckBox chckbxGuiEnabled;
@@ -556,6 +557,26 @@ public class SettingsBasicPanel extends JPanel {
         gbc_chckbxLocalPeersScannerEnabled.gridx = 1;
         gbc_chckbxLocalPeersScannerEnabled.gridy = ++panelRow;//13;
         add(chckbxLocalPeersScannerEnabled, gbc_chckbxLocalPeersScannerEnabled);
+
+        JLabel lblBlockExplorer = new JLabel(Lang.T("BlockExplorer") + ":");
+        GridBagConstraints gbcLabel = new GridBagConstraints();
+        gbcLabel.anchor = GridBagConstraints.EAST;
+        gbcLabel.insets = new Insets(0, 0, 5, 5);
+        gbcLabel.gridx = 3;
+        gbcLabel.gridy = panelRow;
+        add(lblBlockExplorer, gbcLabel);
+
+        txtBlockExplorer = new JTextField();
+        txtBlockExplorer.setText(Settings.getInstance().getBlockexplorerURL());
+        txtBlockExplorer.setHorizontalAlignment(SwingConstants.LEFT);
+        txtBlockExplorer.setColumns(10);
+        GridBagConstraints gbcField = new GridBagConstraints();
+        gbcField.anchor = GridBagConstraints.WEST;
+        gbcField.insets = new Insets(0, 0, 5, 5);
+        gbcField.fill = GridBagConstraints.HORIZONTAL;
+        gbcField.gridx = 4;
+        gbcField.gridy = panelRow;//11;
+        add(txtBlockExplorer, gbcField);
 
         setEnableSslSettingOption();
 

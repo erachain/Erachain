@@ -1,6 +1,5 @@
 package org.erachain.gui.items.accounts;
 
-import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.Gui;
@@ -40,15 +39,10 @@ public class AccountsPanel extends JPanel // implements ItemListener
     public WalletCreateAccountButton newAccountButton;
     public WalletSyncButton updateButton;
     protected AssetCls asset;
-    //protected Account account;
-    protected PublicKeyAccount pub_Key;
     MTable table;
-    private AccountsPanel th;
 
     @SuppressWarnings("unchecked")
     public AccountsPanel() {
-        th = this;
-        //this.parent = parent;
         this.setLayout(new GridBagLayout());
 
         //PADDING
@@ -94,22 +88,14 @@ public class AccountsPanel extends JPanel // implements ItemListener
         table = Gui.createSortableTable(tableModel, 0);
 
         if (false) {
-            //TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
-            //sorter.setComparator(0, new IntegerComparator());
             RowSorter sorter = new TableRowSorter(tableModel);
             table.setRowSorter(sorter);
 
             List<RowSorter.SortKey> sortKeys = new ArrayList<>(4);
             sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-            // IF NEED add SORTED ROW
-            //sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
             sorter.setSortKeys(sortKeys);
-            //sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
         }
         // render
-
-
-        // column size
 
         TableColumn column_No = table.getColumnModel().getColumn(tableModel.COLUMN_NO);
         column_No.setMinWidth(50);
@@ -118,7 +104,6 @@ public class AccountsPanel extends JPanel // implements ItemListener
         column_No.setWidth(50);
         column_No.sizeWidthToFit();
 
-
         //ON FAVORITES CHANGE
         cbxFavorites.addItemListener(new ItemListener() {
 
@@ -126,18 +111,16 @@ public class AccountsPanel extends JPanel // implements ItemListener
             public void itemStateChanged(ItemEvent e) {
                 // TODO Auto-generated method stub
 
-
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
                     tableModel.setAsset(asset);
                 }
 
-
             }
         });
 
         //MENU
-        DealsPopupMenu menu = new DealsPopupMenu(tableModel, table, cbxFavorites);
+        DealsPopupMenu menu = new DealsPopupMenu(table, cbxFavorites);
 
         ////////////////////
         TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON

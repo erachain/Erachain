@@ -16,8 +16,8 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
@@ -202,10 +202,10 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -220,12 +220,12 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             exLink = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -281,7 +281,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         if (forDeal > Transaction.FOR_MYPACK) {
             return new RCertifyPubKeys(typeBytes, creator, exLink, feePow, key,
                     certifiedPublicKeys,
-                    add_day, timestamp, reference, signature, feeLong,
+                    add_day, timestamp, flagsTX, signature, feeLong,
                     seqNo, certifiedSignatures);
         } else {
             return new RCertifyPubKeys(typeBytes, creator, exLink, key,
@@ -352,15 +352,6 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
     }
 
     //////// VIEWS
-    @Override
-    public String viewAmount(String address) {
-        return add_day > 0 ? "+" + add_day : "" + add_day;
-    }
-
-    @Override
-    public String viewRecipient() {
-        return Base58.encode(this.certifiedPublicKeys.get(0).getPublicKey());
-    }
 
     //////////////
     @SuppressWarnings("unchecked")
@@ -457,9 +448,9 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+                base_len += dApp.length(forDeal);
             }
         }
 
@@ -526,7 +517,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
     //
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -534,18 +525,18 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
 
         for (String admin : BlockChain.GENESIS_ADMINS) {
             if (creator.equals(admin)) {
-                flags = flags | NOT_VALIDATE_FLAG_FEE;
+                checkFlags = checkFlags | NOT_VALIDATE_FLAG_FEE;
                 break;
             }
         }
-        int result = super.isValid(forDeal, flags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
+        int result = super.isValid(forDeal, checkFlags | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
 
         // сюда без проверки Персоны приходит
         if (result != VALIDATE_OK)
             return result;
 
         ///// CREATOR
-        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
+        if ((checkFlags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
                 && !this.creator.isPerson(dcSet, height, creatorPersonDuration)) {
             boolean creator_admin = false;
             // ALL Persons by ADMINS
@@ -751,7 +742,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             dcSet.getPersonAddressMap().addItem(key, address, itemP);
 
             // TODO удалить это если публичный ключ будет сохраняться в таблице Счетов
-            if (publicAccount.getLastTimestamp(dcSet) == null) {
+            if (publicAccount.getLastTimestamp(dcSet) == null && !publicAccount.equals(transaction.getCreator())) {
                 // for quick search public keys by address - use PUB_KEY from Person DATA owner
                 // used in - controller.Controller.getPublicKeyByAddress
                 publicAccount.setLastTimestamp(new long[]{transaction.timestamp, transaction.dbRef}, dcSet);
@@ -781,7 +772,7 @@ public class RCertifyPubKeys extends Transaction implements Itemable {
             // TODO удалить это если публичный ключ будет созраняться в таблице Счетов
             // при откате нужно след в истории удалить а сам публичный ключ отсавить на всякий случай?
             long[] lastPoint = publicAccount.getLastTimestamp(dcSet);
-            if (lastPoint != null && lastPoint[0] == transaction.timestamp) {
+            if (lastPoint != null && lastPoint[0] == transaction.timestamp && !publicAccount.equals(transaction.getCreator())) {
                 publicAccount.removeLastTimestamp(dcSet, transaction.timestamp);
             }
 

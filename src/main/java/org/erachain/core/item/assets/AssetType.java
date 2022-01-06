@@ -34,7 +34,7 @@ public class AssetType {
 
         String dexDesc = AssetCls.viewAssetTypeDescriptionDEX(assetType, startKey);
         if (dexDesc != null) {
-            description += "<br><b>" + Lang.T("DEX rules and taxes") + ":</b><br>" + Lang.T(dexDesc);
+            description += "<br><b>" + Lang.T("DEX rules and royalties") + ":</b><br>" + Lang.T(dexDesc);
         }
 
     }

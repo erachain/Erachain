@@ -10,8 +10,8 @@ import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -147,9 +147,9 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -164,12 +164,12 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
             exLink = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -210,10 +210,10 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         position += OPTION_SIZE_LENGTH;
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, feePow, timestamp, reference,
+            return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, feePow, timestamp, flagsTX,
                     signatureBytes, seqNo, feeLong);
         } else {
-            return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, reference, signatureBytes);
+            return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, flagsTX, signatureBytes);
         }
     }
 
@@ -262,9 +262,9 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+                base_len += dApp.length(forDeal);
             }
         }
 
@@ -278,7 +278,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -294,12 +294,12 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
             return POLL_OPTION_NOT_EXISTS;
         }
 
-        if (!poll.isActive(timestamp)) {
+        if (!poll.isActive(timestamp, false)) {
             errorValue = poll.errorValue;
             return INVALID_OUTSIDE_VALIDATY_PERIOD;
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
 
     }
 
@@ -353,7 +353,7 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        return new HashSet<>();
+        return new HashSet<>(1, 1);
     }
 
     @Override

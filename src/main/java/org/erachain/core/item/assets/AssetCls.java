@@ -12,6 +12,8 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.dapp.epoch.memoCards.MemoCardsDAPP;
+import org.erachain.dapp.epoch.shibaverse.ShibaVerseDAPP;
 import org.erachain.database.PairMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
@@ -41,6 +43,8 @@ public abstract class AssetCls extends ItemCls {
     protected static final long APP_DATA_DEX_AWARDS_MASK = 1L;
     // untransferable
     protected static final long APP_DATA_UNTRANSFERABLE_MASK = 2L;
+    // anonimouse protection
+    protected static final long APP_DATA_ANONIM_PROTECT_MASK = 4L;
 
     //
     protected int assetType;
@@ -358,10 +362,13 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static byte[] makeAppData(boolean iconAsURL, int iconType, boolean imageAsURL, int imageType,
-                                     Long startDate, Long stopDate, String tags, ExLinkAddress[] dexAwards, boolean isUnTransferable) {
+                                     Long startDate, Long stopDate, String tags, ExLinkAddress[] dexAwards,
+                                     boolean isUnTransferable, boolean isAnonimDenied) {
         long flags = dexAwards == null ? 0 : APP_DATA_DEX_AWARDS_MASK;
         if (isUnTransferable)
             flags |= APP_DATA_UNTRANSFERABLE_MASK;
+        if (isAnonimDenied)
+            flags |= APP_DATA_ANONIM_PROTECT_MASK;
 
         byte[] appData = ItemCls.makeAppData(flags,
                 iconAsURL, iconType, imageAsURL, imageType, startDate, stopDate, tags);
@@ -606,6 +613,11 @@ public abstract class AssetCls extends ItemCls {
                 return "<b>COMPU</b> is an <u>Accounting Unit</u> allowing a User that has a sufficient amount of such units, with such sufficiency threshold computed in the ERACHAIN Software, to use the ERACHAIN Software for entering that User’s Request Entries on the Log, both on his own and by having such service provided by other Users. The COMPU Accounting Unit operates on the Log as a unit used to pay for the provision of service of making an entry to the Log. For more information see Erachain Licence Agreementon the <a href=\"http://erachain.org\">Erachain.org</a>.";
         }
 
+        if (maker.equals(ShibaVerseDAPP.MAKER))
+            return ShibaVerseDAPP.viewDescription(this, description);
+        else if (maker.equals(MemoCardsDAPP.MAKER))
+            return MemoCardsDAPP.viewDescription(this, description);
+
         return this.description;
     }
 
@@ -713,11 +725,6 @@ public abstract class AssetCls extends ItemCls {
                 return icon;
         }
         return icon;
-    }
-
-    @Override
-    public byte[] getImage() {
-        return image;
     }
 
     public abstract long getQuantity();
@@ -950,6 +957,15 @@ public abstract class AssetCls extends ItemCls {
                 && !isAccounting()
                 && assetType != AssetCls.AS_INSIDE_BONUS
                 && assetType != AssetCls.AS_INSIDE_VOTE;
+    }
+
+    /**
+     * anonymous ownership is denied
+     *
+     * @return
+     */
+    public boolean isAnonimDenied() {
+        return (flags & APP_DATA_ANONIM_PROTECT_MASK) != 0;
     }
 
     /**
@@ -1285,15 +1301,15 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_OTHER_CLAIM:
                 return "Other external rights, requirements and obligations. Any obligation (as well as other external assets), which can be claimed by the record \"summon\" and discharged by the record \"confirmation of fulfillment\" of this obligation. You can take it into your hands";
             case AS_INSIDE_ASSETS:
-                return "Internal (digital) asset. It does not require any external additional actions when transferring between accounts inside Erachain";
+                return "AS_INSIDE_ASSETS_D";
             case AS_INSIDE_CURRENCY:
                 return "Digital money";
             case AS_INSIDE_UTILITY:
-                return "Digital service or a cost is something that can be used inside Erachain nvironment, for example as a payment for external services";
+                return "AS_INSIDE_UTILITY_D";
             case AS_INSIDE_SHARE:
                 return "Digital share. The share of ownership of an external or internal enterpris, the possession of which establishes the right to own the corresponding share of the enterprise without the need to take any external actions";
             case AS_INSIDE_BONUS:
-                return "Digital loyalty points, bonuses, awards, discount points (bonus). It has no generally accepted value and can not be exchanged for other types of assets inside the Erachain environment. The exchange for other bonuses and rewards are allowed";
+                return "AS_INSIDE_BONUS_D";
             case AS_INSIDE_ACCESS:
                 return "Digital rights of access and control, membership, pass";
             case AS_INSIDE_VOTE:
@@ -1335,7 +1351,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_NON_FUNGIBLE:
                 return "AS_NON_FUNGIBLE_DEX";
         }
-        return null;
+        return "Not used by default";
     }
 
     public static String viewAssetTypeAction(long assetKey, int assetType, boolean backward, int actionType, boolean isCreatorMaker) {
@@ -1502,7 +1518,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return backward ? null : "AS_INSIDE_ACCESS_2R";
                     case Account.BALANCE_POS_SPEND:
-                        return "AS_INSIDE_ACCESS_4";
+                        return backward ? null : "AS_INSIDE_ACCESS_4";
                     default:
                         return null;
                 }
@@ -1516,7 +1532,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return backward ? null : "AS_INSIDE_VOTE_2R";
                     case Account.BALANCE_POS_SPEND:
-                        return "AS_INSIDE_VOTE_4";
+                        return backward ? null : "AS_INSIDE_VOTE_4";
                     default:
                         return null;
                 }
@@ -2093,7 +2109,7 @@ public abstract class AssetCls extends ItemCls {
 
         String dexDesc = AssetCls.viewAssetTypeDescriptionDEX(assetType, startKey);
         if (dexDesc != null) {
-            description += "<br><b>" + Lang.T("DEX rules and taxes", langObj) + ":</b><br>" + Lang.T(dexDesc, langObj);
+            description += "<br><b>" + Lang.T("DEX rules and royalties", langObj) + ":</b><br>" + Lang.T(dexDesc, langObj);
         }
 
         assetTypeJson.put("description", description);
@@ -2173,6 +2189,8 @@ public abstract class AssetCls extends ItemCls {
             joiner.add(Lang.T("Accounting", langObj));
         if (isUnique())
             joiner.add(Lang.T("Unique", langObj));
+        if (isAnonimDenied())
+            joiner.add(Lang.T("ANONIM_OWN_DENIED", langObj));
         if (isUnHoldable())
             joiner.add(Lang.T("Not holdable", langObj));
         if (isOutsideType())
@@ -2211,7 +2229,10 @@ public abstract class AssetCls extends ItemCls {
             int total = 0;
             for (int i = 0; i < dexAwards.length; ++i) {
                 ExLinkAddress exAddress = dexAwards[i];
-                if (exAddress.getValue1() <= 0) {
+                if (exAddress == null) {
+                    errorValue = "Award[" + i + "] = Null";
+                    return Transaction.INVALID_AWARD;
+                } else if (exAddress.getValue1() <= 0) {
                     errorValue = "Award[" + i + "] percent is so small (<=0%)";
                     return Transaction.INVALID_AWARD;
                 } else if (exAddress.getValue1() > 25000) {
@@ -2263,6 +2284,7 @@ public abstract class AssetCls extends ItemCls {
         assetJSON.put("isUnlimited", this.isUnlimited(maker, false));
         assetJSON.put("isAccounting", this.isAccounting());
         assetJSON.put("isUnique", this.isUnique());
+        assetJSON.put("isAnonimDenied", this.isAnonimDenied());
         assetJSON.put("isUnHoldable", this.isUnHoldable());
         assetJSON.put("isOutsideType", this.isOutsideType());
         assetJSON.put("isSelfManaged", this.isSelfManaged());
@@ -2351,7 +2373,7 @@ public abstract class AssetCls extends ItemCls {
         itemJson.put("Label_isOutsideOtherClaim", Lang.T("isOutsideOtherClaim", langObj));
         itemJson.put("Label_isReverseSend", Lang.T("isReverseSend", langObj));
         itemJson.put("Label_Properties", Lang.T("Properties", langObj));
-        itemJson.put("Label_DEX_Awards", Lang.T("DEX Awards", langObj));
+        itemJson.put("Label_DEX_Awards", Lang.T("DEX royalties", langObj));
 
         itemJson.put("assetTypeNameFull", charAssetType() + viewAssetTypeAbbrev() + ":" + Lang.T(viewAssetTypeFull(), langObj));
         itemJson.put("released", getReleased());
@@ -2386,7 +2408,7 @@ public abstract class AssetCls extends ItemCls {
                 + ".<br><b>" + Lang.T("Acceptable actions", langObj) + "</b>: " + joiner.toString();
         String dexDesc = AssetCls.viewAssetTypeDescriptionDEX(assetType, START_KEY());
         if (dexDesc != null) {
-            desc += "<br><b>" + Lang.T("DEX rules and taxes", langObj) + ":</b><br>" + Lang.T(dexDesc, langObj);
+            desc += "<br><b>" + Lang.T("DEX rules and royalties", langObj) + ":</b><br>" + Lang.T(dexDesc, langObj);
         }
 
         itemJson.put("assetTypeDesc", desc);

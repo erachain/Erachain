@@ -1,6 +1,8 @@
 package org.erachain.gui;
 
+import javax.swing.*;
+
 public interface Iconable {
 
-    byte[] getIcon();
+    ImageIcon getImageIcon();
 }

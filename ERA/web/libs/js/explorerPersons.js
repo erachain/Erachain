@@ -250,7 +250,18 @@ function person(data, forPrint) {
 
     //////// BODY
 
-    output += '<h4>' + item.Label_Born + ': &nbsp&nbsp<b> ' + item.birthday + '</b>';
+    output += '<h4>' + item.Label_Born + ': &nbsp' + item.birthday;
+
+    //// почемуто и Гугль и Яндекс меняют местами параметры Longitude и Latitude в разные дни ((
+    //// если ведет не туда карта значит надо значения поменять местам
+    var L1 = item.birthLongitude;
+    var L2 = item.birthLatitude;
+    output += ',&nbsp&nbsp' + item.Label_Bornplace + ': &nbsp <a target="_blank" href=https://yandex.ru/maps/?ll='
+        + L1 + ',' + L2 + '&mode=whatshere&whatshere%5Bpoint%5D=' + L1 + '%2C' + L2
+        + '&whatshere%5Bzoom%5D=10&z=12>Yandex</a>';
+    // https://www.google.com/maps/@55.9571032,38.7714084,9z
+    output += ' / <a target="_blank" href="https://www.google.com/maps/@' + L2 + ',' + L1 + ',12z">Google</a>';
+
     if ('deathday' in data) {
         output += ', &nbsp&nbsp ' + item.Label_Dead + ': &nbsp&nbsp<b> ' + item.deathday + '</b>'
     }

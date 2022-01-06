@@ -178,6 +178,10 @@ public class OnDealClick {
             case Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT:
                 mess = "Unknown public key (need for encrypt)";
                 break;
+            case Transaction.ENCRYPT_DENIED_FOR_DAPP:
+                mess = "Encryption is denied for dApps";
+                break;
+
 
             case Transaction.HASH_ALREADY_EXIST:
                 mess = "HASH_ALREADY_EXIST";
@@ -474,6 +478,9 @@ public class OnDealClick {
             case Transaction.INVALID_ASSET_TYPE:
                 mess = "Invalid asset type (not unique?)";
                 break;
+            case Transaction.ANONIM_OWN_DENIED:
+                mess = "ANONIM_OWN_DENIED";
+                break;
 
             case Transaction.INVALID_CREATOR:
                 mess = "Invalid creator";
@@ -545,6 +552,10 @@ public class OnDealClick {
                 mess = "Amount point scale wrong";
                 break;
 
+            case Transaction.INVALID_PACKET_SIZE:
+                mess = "Invalid packet size";
+                break;
+
             case Transaction.INVALID_BLOCK_HEIGHT:
                 mess = "Invalid block height";
                 break;
@@ -553,6 +564,9 @@ public class OnDealClick {
                 break;
             case Transaction.ACCOUNT_ACCSES_DENIED:
                 mess = "Access denied for account";
+                break;
+            case Transaction.ACTION_DENIED:
+                mess = "Access denied";
                 break;
             case Transaction.KEY_COLLISION:
                 mess = "Key collision, try again";

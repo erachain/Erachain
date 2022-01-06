@@ -2,13 +2,14 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetFactory;
 import org.erachain.core.item.assets.AssetUnique;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.SmartContract;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -20,17 +21,17 @@ public class IssueAssetTransaction extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     public static final String TYPE_NAME = "Issue Asset";
 
-    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, reference);
+    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, flags);
     }
 
-    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, reference, signature);
+    public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, long flags, byte[] signature) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, flags, signature);
     }
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow,
-                                 long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, reference, signature);
+                                 long timestamp, long flags, byte[] signature, long seqNo, long feeLong) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, feePow, timestamp, flags, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -38,24 +39,24 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     // as pack
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, asset, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, asset, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, feePow, timestamp, reference);
+    public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, feePow, timestamp, flags);
     }
 
-    public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, feePow, timestamp, reference, signature);
+    public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, feePow, timestamp, flags, signature);
     }
 
     // as pack
-    public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, (byte) 0, 0L, reference, signature);
+    public IssueAssetTransaction(PublicKeyAccount creator, AssetCls asset, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, asset, (byte) 0, 0L, flags, signature);
     }
 
-    public IssueAssetTransaction(PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, asset, feePow, timestamp, reference);
+    public IssueAssetTransaction(PublicKeyAccount creator, ExLink linkTo, AssetCls asset, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, asset, feePow, timestamp, flags);
     }
 
     //GETTERS/SETTERS
@@ -93,8 +94,8 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     @Override
-    public BigDecimal getAmount(String address) {
-        if (address.equals(creator.getAddress())) {
+    public BigDecimal getAmount(Account account) {
+        if (creator.equals(account)) {
             return getAmount();
         }
         AssetCls asset = (AssetCls) item;
@@ -102,11 +103,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     //VALIDATE
-
-    @Override
-    public String viewAmount(String address) {
-        return this.getAmount().toString();
-    }
 
     @Override
     public boolean hasPublicText() {
@@ -120,18 +116,25 @@ public class IssueAssetTransaction extends IssueItemRecord {
     }
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(forDeal, flags);
+        if (BlockChain.CLONE_MODE) {
+            if (creator.getBalanceUSE(RIGHTS_KEY, dcSet).compareTo(BlockChain.MIN_GENERATING_BALANCE_BD) < 0) {
+                errorValue = "USE balance < " + BlockChain.MIN_GENERATING_BALANCE_BD;
+                return Transaction.ACTION_DENIED;
+            }
+        }
+
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) {
             return result;
         }
 
-        if ((flags & NOT_VALIDATE_ITEM) == 0) {
+        if ((checkFlags & NOT_VALIDATE_ITEM) == 0) {
             //CHECK QUANTITY
             AssetCls asset = (AssetCls) this.getItem();
 
@@ -202,10 +205,10 @@ public class IssueAssetTransaction extends IssueItemRecord {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -220,12 +223,12 @@ public class IssueAssetTransaction extends IssueItemRecord {
             linkTo = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -270,7 +273,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssueAssetTransaction(typeBytes, creator, linkTo, asset, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+            return new IssueAssetTransaction(typeBytes, creator, linkTo, asset, feePow, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueAssetTransaction(typeBytes, creator, linkTo, asset, signatureBytes);
         }

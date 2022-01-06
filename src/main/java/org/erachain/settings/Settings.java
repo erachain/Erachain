@@ -28,7 +28,7 @@ import java.util.List;
 public class Settings {
 
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L; // MAIN Net
-    public static final long DEFAULT_DEMO_NET_STAMP = 1626861600000L; // DEMO Net
+    public static final long DEFAULT_DEMO_NET_STAMP = 1639404195000L; // DEMO Net
 
     public static String APP_NAME = "";
     public static String APP_FULL_NAME = "";
@@ -1250,9 +1250,8 @@ public class Settings {
                 //OPEN FILE
 
                 settingsJSON = FileUtils.readCommentedJSONObject(file.getPath());
-                if (settingsJSON == null) {
+                if (settingsJSON == null)
                     settingsJSON = new JSONObject();
-                }
 
                 alreadyPassed++;
 

@@ -30,7 +30,7 @@ public class TransactionMessage extends Message {
 
         int position = Transaction.TYPE_LENGTH
                 + Transaction.TIMESTAMP_LENGTH
-                + Transaction.REFERENCE_LENGTH
+                + Transaction.FLAGS_LENGTH
                 + Transaction.CREATOR_LENGTH
                 + 1 // FEE POWER
                 ;

@@ -94,8 +94,8 @@ public class TestRecTemplate {
 
         //CREATE ISSUE PLATE TRANSACTION
         issueTemplateRecord = new IssueTemplateRecord(maker, null, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
-        issueTemplateRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1, true);
         issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
+        issueTemplateRecord.setDC(db, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1, true);
         if (process) {
             issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);
             templateKey = template.getKey();
@@ -118,12 +118,14 @@ public class TestRecTemplate {
         initTemplate(false);
 
         //CHECK IF ISSUE PLATE TRANSACTION IS VALID
+        issueTemplateRecord.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, issueTemplateRecord.isSignatureValid(db));
 
         //INVALID SIGNATURE
         issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE PLATE IS INVALID
+        issueTemplateRecord.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, issueTemplateRecord.isSignatureValid(db));
     }
 
@@ -265,12 +267,14 @@ public class TestRecTemplate {
         signNoteRecord.sign(maker, asPack);
 
         //CHECK IF ISSUE PLATE TRANSACTION IS VALID
+        signNoteRecord.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, signNoteRecord.isSignatureValid(db));
 
         //INVALID SIGNATURE
         signNoteRecord = new RSignNote(maker, FEE_POWER, templateKey, data, dbData, timestamp + 10, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE PLATE IS INVALID
+        signNoteRecord.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, signNoteRecord.isSignatureValid(db));
     }
 

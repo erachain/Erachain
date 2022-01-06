@@ -32,7 +32,7 @@ function assets(data) {
         output += '<tr>';
         output += '<td>';
         //output += makeMediaIcon(item, '', 'width:2em')
-        output += '<div class="row"><div class="col-lg-2"><a href=?asset=' + item.key + get_lang() + '>' + makeMediaIcon(item, '', 'width:3em') + '</a></div><div class="col-lg-10">';
+        output += '<div class="row" style="white-space:normal;"><div class="col-lg-2"><a href=?asset=' + item.key + get_lang() + '>' + makeMediaIcon(item, '', 'width:3em') + '</a></div><div class="col-lg-10">';
         output += '<div class="row"><a href=?asset=' + item.key + get_lang() + '>' + cutBlank(escapeHtml(item.nameOrig), 70) + '</a></div>';
         output += '<div class="row" style="font-size:0.8em">' + item.key;
 
@@ -119,7 +119,7 @@ function asset(data, forPrint) {
     output += ', &nbsp&nbsp' + item.Label_Released + ': <b>' + addCommas(item.released) + '</b>';
 
     if (!forPrint)
-        output += ', &nbsp&nbsp<a href=?top=all&asset=' + item.key + get_lang() + ' class="button ll-blue-bgc"><b>' + item.Label_Holders + '</b></a>';
+        output += ', &nbsp&nbsp<a href=?owners&asset=' + item.key + get_lang() + ' class="button ll-blue-bgc"><b>' + item.Label_Holders + '</b></a>';
 
     output += '<br>' + item.Label_AssetType + ': ';
     if (forPrint) {
@@ -387,6 +387,60 @@ function trades(data) {
     output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + get_lang() + '>' + getItemName2(1000, data.assetWant, data.assetWantName) + '</a>';
     output += '&nbsp;&nbsp;<a href=?asset=' + data.assetWant + '&asset=' + data.assetHave + get_lang() + '>' + getItemName2(1000, data.assetWant, data.assetWantName) + '/' + getItemName2(1000, data.assetHave, data.assetHaveName);
     output += '</b>';
+
+    return output;
+}
+
+function owners(data) {
+
+    var output = "";
+
+    output += lastBlock(data.lastBlock);
+
+    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="900">';
+    output += '<tr><td align=center>';
+
+    output += '<h3>' + data.Label_Title + '</h3>';
+
+    if (data.pageFromAddressKey) {
+        var parsAdd = {'pageFromAddressKey': data.pageFromAddressKey};
+        output += pagesComponent2(data, parsAdd);
+    } else {
+        output += pagesComponent2(data);
+    }
+
+    var table = '<table id=owners BORDER=0  cellpadding=10 cellspacing=0 class="tiny table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.Label_Balance_1 + '<td><b>' + data.Label_Balance_2 + '<td><b>' + data.Label_Balance_3 + '<td><b>' + data.Label_Balance_4
+      + '<td><b>' + data.Label_Balance_5 + '<td><b>%';
+
+    var totalReleased = data.assetRealeased;
+    for (key in data.page) {
+        var item = data.page[key];
+        table += '<tr>';
+        table += '<td>' + '<a href="?address=' + item[0] + get_lang() + '">' + item[0] + '</a>';
+
+        if (item.length > 6) {
+            table += '<td><a href="?person=' + item[6] + get_lang() + '">' + item[7] + '</a>';
+        } else {
+            table += '<td>';
+        }
+        table += '<td>' + addCommas(item[1]);
+        table += '<td>' + addCommas(item[2]);
+        table += '<td>' + addCommas(item[3]);
+        table += '<td>' + addCommas(item[4]);
+        table += '<td>' + addCommas(item[5]);
+
+        table += '<td>' + ((item[1] / totalReleased) * 100).toFixed(5) + "%";
+
+    }
+    table += '</table>';
+
+    output += table;
+
+    if (data.pageFromAddressKey) {
+        output += pagesComponent2(data, parsAdd);
+    } else {
+        output += pagesComponent2(data);
+    }
 
     return output;
 }

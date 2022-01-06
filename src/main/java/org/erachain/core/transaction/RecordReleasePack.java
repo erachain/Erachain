@@ -8,8 +8,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -97,9 +97,9 @@ public class RecordReleasePack extends Transaction {
         }
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -114,12 +114,12 @@ public class RecordReleasePack extends Transaction {
             exLink = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -169,10 +169,10 @@ public class RecordReleasePack extends Transaction {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, reference,
+            return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, flagsTX,
                     signatureBytes, seqNo, feeLong);
         } else {
-            return new RecordReleasePack(typeBytes, creator, transactions, reference, signatureBytes);
+            return new RecordReleasePack(typeBytes, creator, transactions, flagsTX, signatureBytes);
         }
     }
 
@@ -237,9 +237,9 @@ public class RecordReleasePack extends Transaction {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+                base_len += dApp.length(forDeal);
             }
         }
 
@@ -258,7 +258,7 @@ public class RecordReleasePack extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         //CHECK PAYMENTS SIZE
         if (this.transactions.size() < 1 || this.transactions.size() > 400) {
@@ -274,7 +274,7 @@ public class RecordReleasePack extends Transaction {
             Block block = this.dcSet.getBlockMap().getAndProcess(this.height);
             for (Transaction transaction : this.transactions) {
 
-                result = transaction.isValid(forDeal, flags);
+                result = transaction.isValid(forDeal, checkFlags);
                 if (result != Transaction.VALIDATE_OK)
                     // transaction counter x100
                     return result + counter * 100;
@@ -284,7 +284,7 @@ public class RecordReleasePack extends Transaction {
             }
         }
         // IN FORK
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
 
     }
 

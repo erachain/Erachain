@@ -569,7 +569,7 @@ public class ExData {
         return !isEncrypted() && json.containsKey("FU");
     }
 
-    static long templateRoyaltyFee = 200 * 10;
+    static long templateRoyaltyFee = 2000 * BlockChain.FEE_PER_BYTE;
 
     public long getRoyaltyFee() {
         if (templateKey > 0)
@@ -1607,6 +1607,7 @@ public class ExData {
                 recipients.add(recipient.getAddress());
             }
             toJson.put("recipientsFlags", recipientsFlags);
+            toJson.put("recipientsFlagsB", "0x" + Integer.toBinaryString(Byte.toUnsignedInt(recipientsFlags)));
             toJson.put("recipients", recipients);
         }
 
@@ -1616,6 +1617,7 @@ public class ExData {
                 authors.add(author.toJson());
             }
             toJson.put("authorsFlags", authorsFlags);
+            toJson.put("authorsFlagsB", "0x" + Integer.toBinaryString(Byte.toUnsignedInt(authorsFlags)));
             toJson.put("authors", authors);
         }
 
@@ -1625,6 +1627,7 @@ public class ExData {
                 sources.add(source.toJson());
             }
             toJson.put("sourcesFlags", sourcesFlags);
+            toJson.put("sourcesFlagsB", "0x" + Integer.toBinaryString(Byte.toUnsignedInt(sourcesFlags)));
             toJson.put("sources", sources);
         }
 
@@ -1638,6 +1641,7 @@ public class ExData {
                 secretsArray.add(Base58.encode(secret));
             }
             toJson.put("secretsFlags", secretsFlags);
+            toJson.put("secretsFlagsB", "0x" + Integer.toBinaryString(Byte.toUnsignedInt(secretsFlags)));
             toJson.put("secrets", secretsArray);
             toJson.put("encryptedData64", Base64.getEncoder().encodeToString(encryptedData));
 

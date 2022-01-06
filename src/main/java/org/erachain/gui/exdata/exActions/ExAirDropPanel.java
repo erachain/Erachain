@@ -46,7 +46,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExAirDropPanel.class);
 
     public static String NAME = "ExAirDropPanel";
-    public static String TITLE = "AirDrops";
+    public static String TITLE = "Mass Same Payments (airdrop)";
 
     private ExDataPanel parent;
     public ComboBoxAssetsModel assetsModel;
@@ -132,15 +132,23 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                                     BufferedReader in = new BufferedReader(new FileReader(file));
                                     Account account;
                                     String str;
+                                    int count = 0;
                                     while ((str = in.readLine()) != null) {
+                                        count++;
                                         str = str.trim();
                                         if (str.startsWith("//"))
                                             continue;
 
                                         // чтобы не было двойных выплат по счет и публичному ключу в списке - делаем Счет
                                         account = Account.tryMakeAccount(str).a;
-                                        if (account == null)
-                                            continue;
+                                        if (account == null) {
+                                            JOptionPane.showMessageDialog(new JFrame(),
+                                                    Lang.T(OnDealClick.resultMess(Transaction.INVALID_ADDRESS)) + " "
+                                                            + Lang.T("in line") + " #" + count + ":\n" + str,
+                                                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+
+                                            return;
+                                        }
 
                                         if (lines.contains(account.getAddress()))
                                             continue;
@@ -201,6 +209,8 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         }
 
                         ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
+                        if (airDrop == null)
+                            return;
                         airDrop.setDC(DCSet.getInstance());
                         airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
                         List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> accruals = airDrop.getResults();
@@ -238,6 +248,9 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
                         }
 
                         ExAirDrop airDrop = (ExAirDrop) exActionRes.a;
+                        if (airDrop == null)
+                            return;
+
                         airDrop.setDC(DCSet.getInstance());
                         airDrop.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), true);
                         List<Fun.Tuple2<Account, Fun.Tuple2<Integer, String>>> results = airDrop.getResults();
@@ -361,7 +374,7 @@ public class ExAirDropPanel extends IconPanel implements ExActionPanelInt {
 
         int gridy = 0;
 
-        jCheckBoxAccrualsUse.setText(Lang.T("Make Payouts"));
+        jCheckBoxAccrualsUse.setText(Lang.T("Make Same Payouts"));
         add(jCheckBoxAccrualsUse, fieldGBC);
 
         jLabel_Help.setText("<html>" + Lang.T("ExAirDropPanel_Help") + "</html>");

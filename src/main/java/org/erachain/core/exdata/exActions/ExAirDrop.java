@@ -63,8 +63,25 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
     }
 
+    @Override
+    public BigDecimal getTotalPay() {
+        if (totalPay == null)
+            totalPay = amount.multiply(BigDecimal.valueOf(addresses.length));
+
+        return totalPay;
+    }
+
     public BigDecimal getAmount() {
         return amount;
+    }
+
+    @Override
+    public BigDecimal getAmount(Account account) {
+        for (byte[] address : addresses) {
+            if (account.equals(address))
+                return amount;
+        }
+        return BigDecimal.ZERO;
     }
 
     public byte[][] getAddresses() {
@@ -132,17 +149,25 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
             Account recipient = new Account(recipientShort);
 
             // IF send from PERSON to ANONYMOUS
-            if (andValidate && !TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
-                    creatorIsPerson, assetKey, balancePos,
-                    asset)) {
-                resultCode = Transaction.RECEIVER_NOT_PERSONALIZED;
-                errorValue = null;
-                results.add(new Fun.Tuple2(recipient, new Fun.Tuple2<>(resultCode, null)));
-            } else {
-                results.add(new Fun.Tuple2(recipient, null));
+            if (andValidate) {
+                if (!TransactionAmount.isValidPersonProtect(dcSet, height, recipient,
+                        creatorIsPerson, assetKey, balancePos,
+                        asset)) {
+                    resultCode = Transaction.RECEIVER_NOT_PERSONALIZED;
+                    errorValue = null;
+                    results.add(new Fun.Tuple2(recipient, new Fun.Tuple2<>(resultCode, null)));
+                    continue;
+                } else if (creator.equals(recipient)) {
+                    resultCode = Transaction.INVALID_RECEIVERS_LIST;
+                    errorValue = "equal creator";
+                    results.add(new Fun.Tuple2(recipient, new Fun.Tuple2<>(resultCode, errorValue)));
+                    continue;
+                }
             }
 
+            results.add(new Fun.Tuple2(recipient, null));
         }
+
 
         totalPay = amount.multiply(new BigDecimal(addresses.length));
 
@@ -350,12 +375,12 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         String out = super.getInfoHTML(onlyTotal, langObj);
 
-        out += Lang.T("Accrual") + ": <b>" + amount.toPlainString() + "</b><br>";
+        out += Lang.T("Accrual", langObj) + ": <b>" + amount.toPlainString() + "</b><br>";
 
         if (onlyTotal)
             return out;
 
-        out += "<b>" + Lang.T("Recipients") + ":</b><br>";
+        out += "<b>" + Lang.T("Recipients", langObj) + ":</b><br>";
         for (byte[] recipientShort : addresses) {
             out += crypto.getAddressFromShort(recipientShort) + "<br>";
         }
@@ -384,8 +409,14 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
 
         height = rNote.getBlockHeight();
 
-        Account recipient = new Account(addresses[0]);
         PublicKeyAccount creator = rNote.getCreator();
+        makePayList(dcSet, height, asset, creator, true);
+        if (resultCode != Transaction.VALIDATE_OK) {
+            // ERROR on make LIST
+            return resultCode;
+        }
+
+        Account recipient = new Account(addresses[0]);
         byte[] signature = rNote.getSignature();
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
 
@@ -506,11 +537,9 @@ public class ExAirDrop extends ExAction<List<Fun.Tuple2<Account, Fun.Tuple2<Inte
     }
 
     public boolean isInvolved(Account account) {
-        if (results != null) {
-            for (Fun.Tuple2<Account, Fun.Tuple2<Integer, String>> item : results) {
-                if (item.a.equals(account))
-                    return true;
-            }
+        for (byte[] item : addresses) {
+            if (account.equals(item))
+                return true;
         }
         return false;
     }

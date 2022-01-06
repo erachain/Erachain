@@ -21,6 +21,8 @@ import java.util.Arrays;
  * 1 - record version
  * 2 - property 1
  * 3 = property 2
+ * <br>
+ * flags - is reference to Parent transaction
  */
 public class RCalculated extends TransactionAmount {
 
@@ -78,11 +80,15 @@ public class RCalculated extends TransactionAmount {
 
     @Override
     public String viewSignature() {
-        return "calculated_" + Transaction.viewDBRef(reference) + ":" + viewHeightSeq();
+        return "calculated_" + Transaction.viewDBRef(extFlags) + ":" + viewHeightSeq();
     }
 
     @Override
     public String viewSubTypeName() {
+        return "";
+    }
+
+    public String viewSubTypeName(JSONObject langObj) {
         return "";
     }
 
@@ -103,16 +109,21 @@ public class RCalculated extends TransactionAmount {
 
     @Override
     public String getTitle() {
-        return this.message + " (@" + Transaction.viewDBRef(reference) + ")";
+        return this.message + " (@" + Transaction.viewDBRef(extFlags) + ")";
     }
 
     @Override
     public String getTitle(JSONObject langObj) {
-        return Lang.T(this.message, langObj) + " (@" + Transaction.viewDBRef(reference) + ")";
+        return Lang.T(this.message, langObj) + " (@" + Transaction.viewDBRef(extFlags) + ")";
     }
 
     public String getMessage() {
         return this.message;
+    }
+
+    @Override
+    public long calcBaseFee(boolean withFreeProtocol) {
+        return 0L;
     }
 
     // PARSE/CONVERT
@@ -124,9 +135,9 @@ public class RCalculated extends TransactionAmount {
         int position = TYPE_LENGTH;
 
         //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        long txReference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long txReference = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         long seqNo = 0;
         //READ SEQ_NO
@@ -210,13 +221,11 @@ public class RCalculated extends TransactionAmount {
         // WRITE TYPE
         data = Bytes.concat(data, this.typeBytes);
 
-        // WRITE REFERENCE
-        byte[] referenceBytes = Longs.toByteArray(this.reference);
-        referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        // WRITE FLAGS
+        byte[] flagsBytes = Longs.toByteArray(this.extFlags);
+        data = Bytes.concat(data, flagsBytes);
 
         byte[] dbRefBytes = Longs.toByteArray(this.dbRef);
-        dbRefBytes = Bytes.ensureCapacity(dbRefBytes, TIMESTAMP_LENGTH, 0);
         data = Bytes.concat(data, dbRefBytes);
 
         ////////// LOAD
@@ -282,7 +291,7 @@ public class RCalculated extends TransactionAmount {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
 
-        return TYPE_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH
+        return TYPE_LENGTH + FLAGS_LENGTH + TIMESTAMP_LENGTH
                 /// LOAD
                 + RECIPIENT_LENGTH
                 + (this.amount == null ? 0 : AMOUNT_LENGTH + KEY_LENGTH)

@@ -15,6 +15,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.dapp.DAPPFactory;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.OrderMapImpl;
@@ -22,6 +23,7 @@ import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -38,7 +40,7 @@ import java.util.*;
 /**
  * обработка ключей и криптографии
  */
-public class Account {
+public class Account implements Comparable {
 
     public static final int ADDRESS_SHORT_LENGTH = 20;
     public static final int ADDRESS_LENGTH = 25;
@@ -73,37 +75,32 @@ public class Account {
         this.address = address;
     }
 
-    public Account(byte[] addressBytes) {
+    public Account(byte[] addressBytes, byte type) {
         if (addressBytes.length == ADDRESS_SHORT_LENGTH) {
             // AS SHORT BYTES
             this.shortBytes = addressBytes;
-            this.bytes = Crypto.getInstance().getAddressFromShortBytes(addressBytes);
+            this.bytes = Crypto.getInstance().getAddressFromShort(type, addressBytes);
         } else if (addressBytes.length == ADDRESS_LENGTH) {
             // AS FULL 25 byres
             this.bytes = addressBytes;
             this.shortBytes = Arrays.copyOfRange(addressBytes, 1, this.bytes.length - 4);
 
         } else {
-            assert(addressBytes.length == ADDRESS_LENGTH);
+            assert (addressBytes.length == ADDRESS_LENGTH);
         }
+    }
 
-        /// make on demand this.address = Base58.encode(bytes);
+    public Account(byte[] addressBytes) {
+        this(addressBytes, Crypto.ADDRESS_VERSION);
     }
 
     public static byte[] makeShortBytes(String address) {
         return Arrays.copyOfRange(Base58.decode(address), 1, ADDRESS_LENGTH - 4);
 
     }
-    public static Account makeAccountFromShort(byte[] addressShort) {
-
-        String address = Crypto.getInstance().getAddressFromShort(addressShort);
-        return new Account(address);
-    }
 
     public static Account makeAccountFromShort(BigInteger addressShort) {
-
-        String address = Crypto.getInstance().getAddressFromShort(addressShort.toByteArray());
-        return new Account(address);
+        return new Account(addressShort.toByteArray());
     }
 
     public static Tuple2<Account, String> tryMakeAccount(String address) {
@@ -137,6 +134,10 @@ public class Account {
 
     }
 
+    public boolean isDAppOwned() {
+        return bytes[0] == Crypto.DAPP_ADDRESS_VERSION;
+    }
+
     public static String balancePositionName(int position) {
         switch (position) {
             case BALANCE_POS_OWN:
@@ -155,6 +156,10 @@ public class Account {
 
     }
 
+    public static String balancePositionName(int position, JSONObject langObj) {
+        return Lang.T(balancePositionName(position), langObj);
+    }
+
     public static String balanceSideName(int side) {
         switch (side) {
             case BALANCE_SIDE_DEBIT:
@@ -167,6 +172,14 @@ public class Account {
 
         return null;
 
+    }
+
+    public static String balanceSideName(int side, JSONObject langObj) {
+        String result = balanceSideName(side);
+        if (result == null)
+            return null;
+
+        return Lang.T(result, langObj);
     }
 
     public static String balanceCOMPUPositionName(int position) {
@@ -287,7 +300,7 @@ public class Account {
 
     }
 
-    public static String getDetailsForEncrypt(String address, long itemKey, boolean forEncrypt, boolean okAsMess) {
+    public static String getDetailsForEncrypt(String address, AssetCls itemKey, boolean forEncrypt, boolean okAsMess) {
 
         if (address.isEmpty()) {
             return "";
@@ -295,26 +308,31 @@ public class Account {
 
         // CHECK IF RECIPIENT IS VALID ADDRESS
         if (Crypto.getInstance().isValidAddress(address)) {
+            Account account = new Account(address);
+            if (account.isDAppOwned()) {
+                return DAPPFactory.getName(account);
+            }
             if (forEncrypt && null == Controller.getInstance().getPublicKeyByAddress(address)) {
                 return "address is unknown - can't encrypt for it, please use public key instead";
             }
-            if (itemKey > 0) {
-                Account account = new Account(address);
+            if (itemKey != null) {
+                String info = account.getBalance(itemKey.getKey()).a.b.toPlainString() + "[" + itemKey.getName() + "]";
                 if (account.isPerson()) {
-                    return account.getPerson().b.toString() + " " + account.getBalance(itemKey).a.b.toPlainString();
+                    return account.getPerson().b.toString() + " - " + info;
                 }
-                return " + " + account.getBalance(itemKey).a.b.toPlainString();
+                return info;
             }
             return okAsMess ? "address is OK" : "";
         } else {
             // Base58 string len = 33-34 for ADDRESS and 40-44 for PubKey
             if (PublicKeyAccount.isValidPublicKey(address)) {
-                if (itemKey > 0) {
+                if (itemKey != null) {
                     Account account = new PublicKeyAccount(address);
+                    String info = account.getBalance(itemKey.getKey()).a.b.toPlainString() + "[" + itemKey.getName() + "]";
                     if (account.isPerson()) {
-                        return account.getPerson().b.toString() + " " + account.getBalance(itemKey).a.b.toPlainString();
+                        return account.getPerson().b.toString() + " - " + info;
                     }
-                    return " + " + account.getBalance(itemKey).a.b.toPlainString();
+                    return info;
                 }
                 return okAsMess ? "public key is OK" : "";
             } else {
@@ -642,50 +660,6 @@ public class Account {
         return ownVol.add(inDebt);
     }
 
-
-    // Добавляем величины для тестовых режимов
-    public static BigDecimal addDEVAmount(long key, byte[] shortAddressBytes) {
-        if (BlockChain.ERA_COMPU_ALL_UP) {
-            if (key == 1)
-                return BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 1000 * (5000 + shortAddressBytes[10]) / 5000);
-            else if (key == 2)
-                return new BigDecimal("100.0");
-
-            if (BlockChain.isNovaAsset(key)) {
-                return new BigDecimal("1000.0");
-            }
-        }
-
-        return BigDecimal.ZERO;
-
-    }
-
-    public BigDecimal addDEVAmount(long key) {
-        return addDEVAmount(key, shortBytes);
-
-    }
-
-    public Tuple2<BigDecimal, BigDecimal> balAaddDEVAmount(long key, Tuple2<BigDecimal, BigDecimal> balA) {
-        BigDecimal addAmount = addDEVAmount(key, shortBytes);
-        if (addAmount.signum() == 0)
-            return balA;
-
-        return new Tuple2<>(balA.a, balA.b.add(addAmount));
-
-    }
-
-    public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-        balanceAddDEVAmount(long key, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                            balance) {
-        BigDecimal addAmount = addDEVAmount(key, this.getShortAddressBytes());
-        if (addAmount.signum() == 0)
-            return balance;
-
-        return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                    new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addAmount)),
-                    balance.b, balance.c, balance.d, balance.e);
-    }
-
     public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getBalance(
             DCSet db, long key) {
         if (key < 0)
@@ -693,9 +667,6 @@ public class Account {
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 balance = db.getAssetBalanceMap().get(getShortAddressBytes(), key);
-        if (BlockChain.ERA_COMPU_ALL_UP) {
-            return balanceAddDEVAmount(key, balance);
-        }
         return balance;
 
     }
@@ -708,12 +679,7 @@ public class Account {
                 .getAssetBalanceMap().get(getShortAddressBytes(), key);
 
         if (actionType == BALANCE_POS_OWN) {
-            if (BlockChain.ERA_COMPU_ALL_UP) {
-                return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key, this.getShortAddressBytes())));
-            }
-
             return balance.a;
-
         } else if (actionType == BALANCE_POS_DEBT)
             return balance.b;
         else if (actionType == BALANCE_POS_HOLD)
@@ -1484,4 +1450,27 @@ public class Account {
         return Controller.getInstance().getWallet().dwSet.getAccountMap().getAccountNo(getAddress());
     }
 
+    @Override
+    public int compareTo(@NotNull Object o) {
+
+        if (o instanceof Account) {
+            Account comp = (Account) o;
+            int res = hashCode() - comp.hashCode();
+            if (res == 0) {
+                for (int i = 0; i < Account.ADDRESS_SHORT_LENGTH; i++) {
+                    res = shortBytes[i] - comp.shortBytes[i];
+                    if (res != 0)
+                        break;
+                }
+                return 0;
+            }
+
+            if (res > 0)
+                return 1;
+            else if (res < 0)
+                return -1;
+        }
+
+        return 0;
+    }
 }

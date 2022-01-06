@@ -6,7 +6,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.exdata.exActions.ExAction;
-import org.erachain.core.exdata.exActions.ExPays;
+import org.erachain.core.exdata.exActions.ExFilteredPays;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
@@ -16,12 +16,14 @@ import org.erachain.gui.IconPanel;
 import org.erachain.gui.exdata.AccrualsModel;
 import org.erachain.gui.exdata.ExDataPanel;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RenderComboBoxActionFilter;
 import org.erachain.gui.models.RenderComboBoxAssetActions;
 import org.erachain.gui.models.RenderComboBoxViewBalance;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
+import org.erachain.utils.SaveStrToFile;
 import org.mapdb.Fun;
 
 import javax.swing.*;
@@ -32,6 +34,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,10 +100,10 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
         jLabelMethodPaymentDescription.setHorizontalAlignment(SwingConstants.LEFT);
         jComboBoxPersonFilter.setModel(new DefaultComboBoxModel<>(new String[]{
-                Lang.T(ExPays.viewFilterPersMode(0)),
-                Lang.T(ExPays.viewFilterPersMode(1)),
-                Lang.T(ExPays.viewFilterPersMode(2)),
-                Lang.T(ExPays.viewFilterPersMode(3))}));
+                Lang.T(ExFilteredPays.viewFilterPersMode(0)),
+                Lang.T(ExFilteredPays.viewFilterPersMode(1)),
+                Lang.T(ExFilteredPays.viewFilterPersMode(2)),
+                Lang.T(ExFilteredPays.viewFilterPersMode(3))}));
 
         jCheckBoxAccrualsUse.setSelected(false);
         jCheckBoxAccrualsUse.addActionListener(new ActionListener() {
@@ -125,12 +129,17 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
-                            jLabel_FeesResult.setText(Lang.T("Error") + "! " + exActionRes.a == null ? Lang.T(exActionRes.b) :
-                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue)));
+                            String messError = Lang.T("Error") + "! " + exActionRes.a == null ? Lang.T(exActionRes.b) :
+                                    Lang.T(exActionRes.b) + (exActionRes.a == null
+                                            || exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue));
+                            jLabel_FeesResult.setText(messError);
+                            JOptionPane.showMessageDialog(null, messError,
+                                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+
                             return;
                         }
 
-                        ExPays pays = (ExPays) exActionRes.a;
+                        ExFilteredPays pays = (ExFilteredPays) exActionRes.a;
                         pays.setDC(DCSet.getInstance());
                         pays.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), false);
                         List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> accruals = pays.getResults();
@@ -164,13 +173,17 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                         Fun.Tuple2<ExAction, String> exActionRes = getResult();
                         if (exActionRes.b != null) {
-                            jLabel_FeesResult.setText(Lang.T("Error") + "! " + (exActionRes.a == null ? Lang.T(exActionRes.b) :
-                                    Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue))));
-                            jButtonViewResult.setEnabled(true);
+                            String messError = Lang.T("Error") + "! " + exActionRes.a == null ? Lang.T(exActionRes.b) :
+                                    Lang.T(exActionRes.b) + (exActionRes.a == null
+                                            || exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue));
+                            jLabel_FeesResult.setText(messError);
+                            JOptionPane.showMessageDialog(null, messError,
+                                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+
                             return;
                         }
 
-                        ExPays pays = (ExPays) exActionRes.a;
+                        ExFilteredPays pays = (ExFilteredPays) exActionRes.a;
                         pays.setDC(DCSet.getInstance());
                         pays.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), true);
                         List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> results = pays.getResults();
@@ -247,7 +260,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
     private void updateLabelsByMethod() {
         switch (jComboBoxMethodPaymentType.getSelectedIndex()) {
-            case ExPays.PAYMENT_METHOD_TOTAL:
+            case ExFilteredPays.PAYMENT_METHOD_TOTAL:
                 jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_0_D"));
                 jLabelAmount.setText(Lang.T("Total Amount"));
@@ -256,7 +269,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
 
                 jCheckBoxSelfPay.setVisible(true);
                 return;
-            case ExPays.PAYMENT_METHOD_COEFF:
+            case ExFilteredPays.PAYMENT_METHOD_COEFF:
                 jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_1_D"));
                 jLabelAmount.setText(Lang.T("Coefficient"));
@@ -267,7 +280,7 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
                 jCheckBoxSelfPay.setVisible(false);
 
                 return;
-            case ExPays.PAYMENT_METHOD_ABSOLUTE:
+            case ExFilteredPays.PAYMENT_METHOD_ABSOLUTE:
                 jLabelMethodPaymentDescription.setText("<html>" +
                         Lang.T("PAY_METHOD_2_D"));
                 jLabelAmount.setText(Lang.T("Amount"));
@@ -443,9 +456,9 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         labelGBC.gridy = ++gridy;
         jPanelMain.add(jLabelMethod, labelGBC);
         jComboBoxMethodPaymentType.setModel(new DefaultComboBoxModel<>(new String[]{
-                Lang.T(ExPays.viewPayMethod(0)),
-                Lang.T(ExPays.viewPayMethod(1)),
-                Lang.T(ExPays.viewPayMethod(2)),
+                Lang.T(ExFilteredPays.viewPayMethod(0)),
+                Lang.T(ExFilteredPays.viewPayMethod(1)),
+                Lang.T(ExFilteredPays.viewPayMethod(2)),
         }));
         fieldGBC.gridy = gridy;
         jPanelMain.add(jComboBoxMethodPaymentType, fieldGBC);
@@ -682,6 +695,77 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
         gridBagConstraints.gridx = 1;
         jPanel3.add(jButtonViewResult, gridBagConstraints);
 
+        JButton downloadBtn = new JButton(Lang.T("Download Action Results"));
+        gridBagConstraints.gridx = 2;
+        jPanel3.add(downloadBtn, gridBagConstraints);
+        downloadBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+
+                Fun.Tuple2<ExAction, String> exActionRes = getResult();
+                if (exActionRes.b != null) {
+                    jLabel_FeesResult.setText(Lang.T("Error") + "! " + (exActionRes.a == null ? Lang.T(exActionRes.b) :
+                            Lang.T(exActionRes.b) + (exActionRes.a.errorValue == null ? "" : Lang.T(exActionRes.a.errorValue))));
+                    jButtonViewResult.setEnabled(true);
+                    return;
+                }
+
+                ExFilteredPays pays = (ExFilteredPays) exActionRes.a;
+                pays.setDC(DCSet.getInstance());
+                pays.preProcess(Controller.getInstance().getMyHeight(), (Account) parent.parentPanel.jComboBox_Account_Work.getSelectedItem(), true);
+                List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> results = pays.getResults();
+                pays.calcTotalFeeBytes();
+
+                FileChooser chooser = new FileChooser();
+                chooser.setDialogTitle(Lang.T("Save Action Results"));
+                chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+                chooser.setMultiSelectionEnabled(false);
+                chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+                if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+
+                    String path = chooser.getSelectedFile().getPath();
+                    if (!path.toLowerCase().endsWith(".txt")) {
+                        path += ".txt";
+                    }
+
+                    File file = new File(path);
+                    // if file
+                    if (file.exists()) {
+                        if (0 != JOptionPane.showConfirmDialog(chooser,
+                                Lang.T("File") + " " + file.getName()
+                                        + " " + Lang.T("Exists") + "! "
+                                        + Lang.T("Overwrite") + "?", Lang.T("Message"),
+                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE)) {
+                            return;
+                        }
+                        file.delete();
+                    }
+
+                    List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>> resultsArray = pays.getResults();
+                    String text = "";
+                    for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : resultsArray) {
+                        text += item.a.getAddress() + " " + item.c.toPlainString() + "\n";
+                    }
+
+                    try {
+                        SaveStrToFile.save(file, text);
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(new JFrame(), e.getMessage() + "!",
+                                Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            Lang.T("Results of the actions were downloaded to a %1")
+                                    .replace("%1", file.getPath())
+                                    + ".",
+                            Lang.T("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+                }
+            }
+        });
+
         headBGC.gridy = ++gridy;
         jPanel3.add(jLabel_FeesResult, headBGC);
 
@@ -748,9 +832,9 @@ public class ExFilteredPaysPanel extends IconPanel implements ExActionPanelInt {
             jTextFieldDateEndStr = null;
         }
 
-        boolean minMaxUse = jComboBoxMethodPaymentType.getSelectedIndex() == ExPays.PAYMENT_METHOD_COEFF;
+        boolean minMaxUse = jComboBoxMethodPaymentType.getSelectedIndex() == ExFilteredPays.PAYMENT_METHOD_COEFF;
 
-        return ExPays.make(
+        return ExFilteredPays.make(
                 asset.getKey(),
                 balancePosition.a.a, balancePosition.a.b,
                 jComboBoxMethodPaymentType.getSelectedIndex(),

@@ -1,4 +1,4 @@
-package org.erachain.smartcontracts.epoch;
+package org.erachain.dapp.epoch;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -18,9 +18,10 @@ import java.math.BigDecimal;
 /**
  * Ctrl+Shift-T (IntellijIDEA) - make test unit
  */
-public class LeafFall extends EpochSmartContract {
+public class LeafFall extends EpochDAPP {
 
     public static final int ID = 1;
+    static public final String NAME = "Magic Leaf";
 
     // global values - save in smart-contracts maps
     private int count;
@@ -49,6 +50,10 @@ public class LeafFall extends EpochSmartContract {
     public LeafFall(int resultHash) {
         super(ID);
         this.resultHash = resultHash;
+    }
+
+    public String getName() {
+        return NAME;
     }
 
     public int getCount() {
@@ -121,7 +126,7 @@ public class LeafFall extends EpochSmartContract {
         // TRANSFER LEAF from MAKER to RECIPIENT
         creator.changeBalance(dcSet, asOrphan, false, leafKey,
                 BigDecimal.ONE, false, false, false);
-        maker.changeBalance(dcSet, !asOrphan, false, leafKey,
+        stock.changeBalance(dcSet, !asOrphan, false, leafKey,
                 BigDecimal.ONE, false, false, false);
 
         //
@@ -129,7 +134,7 @@ public class LeafFall extends EpochSmartContract {
         // ACCAUNTING RARITY RESULT from MAKER to RECIPIENT
         creator.changeBalance(dcSet, asOrphan, false, keyInit,
                 resultBG, false, false, false);
-        maker.changeBalance(dcSet, !asOrphan, false, keyInit,
+        stock.changeBalance(dcSet, !asOrphan, false, keyInit,
                 resultBG, false, false, false);
 
         if (block != null) {
@@ -196,7 +201,7 @@ public class LeafFall extends EpochSmartContract {
         /**
          * for accounting total leaf for person
          */
-        AssetVenture leafSum = new AssetVenture(null, maker, "LeafFall_sum", null, null,
+        AssetVenture leafSum = new AssetVenture(null, stock, "LeafFall_sum", null, null,
                 null, AssetCls.AS_SELF_MANAGED_ACCOUNTING, 0, 0);
         leafSum.setReference(transaction.getSignature(), transaction.getDBRef());
 
@@ -207,7 +212,7 @@ public class LeafFall extends EpochSmartContract {
         ItemAssetMap map = dcSet.getItemAssetMap();
         for (long leafKey : leafs) {
             AssetCls leafAsset = map.get(leafKey);
-            leafAsset.setMaker(maker);
+            leafAsset.setMaker(stock);
             // update MAKER
             map.put(leafKey, leafAsset);
         }
@@ -246,17 +251,13 @@ public class LeafFall extends EpochSmartContract {
         return false;
     }
 
-    private void wipe(DCSet dcSet, SmartContractValues valuesMap) {
-        // remove ASSET
-        dcSet.getItemAssetMap().decrementDelete(keyInit);
-
-        // TODO - сделать удаление всех разом по Tuple2(id, null)
-        valuesMap.delete(INIT_KEY);
-        valuesMap.delete(COUN_VAR);
+    @Override
+    public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
+        return false;
     }
 
     @Override
-    public boolean orphan(DCSet dcSet, Transaction transaction) {
+    public void orphan(DCSet dcSet, Transaction transaction) {
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
         loadValues(valuesMap);
@@ -273,8 +274,19 @@ public class LeafFall extends EpochSmartContract {
             valuesMap.put(COUN_VAR, --count);
         }
 
-        return false;
     }
 
+    @Override
+    public void orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
+    }
+
+    private void wipe(DCSet dcSet, SmartContractValues valuesMap) {
+        // remove ASSET
+        dcSet.getItemAssetMap().decrementDelete(keyInit);
+
+        // TODO - сделать удаление всех разом по Tuple2(id, null)
+        valuesMap.delete(INIT_KEY);
+        valuesMap.delete(COUN_VAR);
+    }
 
 }

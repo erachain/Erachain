@@ -11,8 +11,8 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.SmartContract;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
@@ -48,18 +48,18 @@ public class CancelOrderTransaction extends Transaction {
     private long orderID;
 
 
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, flags);
         this.orderSignature = orderSignature;
     }
 
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, orderSignature, feePow, timestamp, reference);
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(typeBytes, creator, orderSignature, feePow, timestamp, flags);
         this.signature = signature;
     }
 
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, long orderID, byte feePow, long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, orderSignature, feePow, timestamp, reference);
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, long orderID, byte feePow, long timestamp, long flags, byte[] signature, long seqNo, long feeLong) {
+        this(typeBytes, creator, orderSignature, feePow, timestamp, flags);
         this.signature = signature;
         this.orderID = orderID;
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
@@ -67,12 +67,12 @@ public class CancelOrderTransaction extends Transaction {
             this.setHeightSeq(seqNo);
     }
 
-    public CancelOrderTransaction(PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderSignature, feePow, timestamp, reference, signature);
+    public CancelOrderTransaction(PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderSignature, feePow, timestamp, flags, signature);
     }
 
-    public CancelOrderTransaction(PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderSignature, feePow, timestamp, reference);
+    public CancelOrderTransaction(PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderSignature, feePow, timestamp, flags);
     }
 
     //GETTERS/SETTERS
@@ -142,10 +142,10 @@ public class CancelOrderTransaction extends Transaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flags = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -160,12 +160,12 @@ public class CancelOrderTransaction extends Transaction {
             exLink = null;
         }
 
-        SmartContract smartContract;
+        DAPP dApp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dApp = DAPP.Parses(data, position, forDeal);
+            position += dApp.length(forDeal);
         } else {
-            smartContract = null;
+            dApp = null;
         }
 
         byte feePow = 0;
@@ -206,7 +206,7 @@ public class CancelOrderTransaction extends Transaction {
             position += SEQ_NO_LENGTH;
         }
 
-        return new CancelOrderTransaction(typeBytes, creator, orderSignature, orderID, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+        return new CancelOrderTransaction(typeBytes, creator, orderSignature, orderID, feePow, timestamp, flags, signatureBytes, seqNo, feeLong);
     }
 
     //@Override
@@ -242,7 +242,7 @@ public class CancelOrderTransaction extends Transaction {
     //VALIDATE
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -294,7 +294,7 @@ public class CancelOrderTransaction extends Transaction {
             }
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
     }
 
 
@@ -315,9 +315,9 @@ public class CancelOrderTransaction extends Transaction {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+                base_len += dApp.length(forDeal);
             }
         }
 

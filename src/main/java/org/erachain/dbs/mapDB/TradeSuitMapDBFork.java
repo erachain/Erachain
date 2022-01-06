@@ -52,15 +52,22 @@ public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade>
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getIteratorByInitiator(Long orderID, boolean descending) {
         // берем из родителя
-        IteratorCloseable<Tuple2<Long, Long>> parentIterator = ((TradeMapImpl) parent).getIteratorByInitiator(orderID);
+        IteratorCloseable<Tuple2<Long, Long>> parentIterator = ((TradeMapImpl) parent).getIteratorByInitiator(orderID, descending);
         // берем свои
-        Iterator<Tuple2<Long, Long>> iteratorForked = ((BTreeMap<Tuple2<Long, Long>, Trade>) map).subMap(
-                Fun.t2(orderID, null),
-                Fun.t2(orderID, Long.MAX_VALUE)).keySet().iterator();
+        Iterator<Tuple2<Long, Long>> iteratorForked;
+        if (descending)
+            iteratorForked = ((BTreeMap<Tuple2<Long, Long>, Trade>) map).descendingMap().subMap(
+                    Fun.t2(orderID, Long.MAX_VALUE),
+                    Fun.t2(orderID, null)).keySet().iterator();
+        else
+            iteratorForked = ((BTreeMap<Tuple2<Long, Long>, Trade>) map).subMap(
+                    Fun.t2(orderID, null),
+                    Fun.t2(orderID, Long.MAX_VALUE)).keySet().iterator();
 
         // создаем с учетом удаленных
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratorParent(parentIterator, deleted), iteratorForked), Fun.TUPLE2_COMPARATOR);
+                new IteratorParent(parentIterator, deleted), iteratorForked),
+                Fun.TUPLE2_COMPARATOR, descending);
 
     }
 

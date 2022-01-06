@@ -18,13 +18,13 @@ public abstract class AddressItemRefs extends Transaction {
 
     public static final long START_KEY = 1000L; // << 20;
 
-    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, reference);
+    public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, long flags) {
+        super(typeBytes, NAME_ID, creator, null, null, feePow, timestamp, flags);
         this.item = item;
     }
 
     public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature, long dbRef) {
-        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, null);
+        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, 0L);
         this.signature = signature;
         this.item.setReference(signature, dbRef);
     }
@@ -84,7 +84,7 @@ public abstract class AddressItemRefs extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -105,7 +105,7 @@ public abstract class AddressItemRefs extends Transaction {
             return INVALID_DESCRIPTION_LENGTH_MAX;
         }
 
-        return super.isValid(forDeal, flags);
+        return super.isValid(forDeal, checkFlags);
 
     }
 

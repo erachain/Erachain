@@ -56,7 +56,9 @@ public class GenesisBlock extends Block {
         // ISSUE ITEMS
         this.initItems();
 
-        if (BlockChain.TEST_MODE && !BlockChain.DEMO_MODE) {
+        if (BlockChain.DEMO_MODE) {
+            ;
+        } else if (BlockChain.TEST_MODE) {
             this.testnetInfo = "";
 
             //ADD TESTNET GENESIS TRANSACTIONS
@@ -144,6 +146,8 @@ public class GenesisBlock extends Block {
             }
 
         } else {
+
+            /// MAIN MODE
 
             List<Tuple2<Account, BigDecimal>> sends_toUsers = new ArrayList<Tuple2<Account, BigDecimal>>();
 
@@ -513,7 +517,8 @@ public class GenesisBlock extends Block {
             case (int) AssetCls.ERA_KEY:
                 return new AssetVenture(itemAppData, CREATOR, AssetCls.ERA_NAME, icon, image, AssetCls.ERA_DESCR, 0, 8, 0L);
             case (int) AssetCls.FEE_KEY:
-                return new AssetVenture(itemAppData, BlockChain.FEE_ASSET_EMITTER, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 0, 8, 0L);
+                return new AssetVenture(itemAppData, BlockChain.FEE_ASSET_EMITTER == null ? (BlockChain.FEE_ASSET_EMITTER = CREATOR) : CREATOR,
+                        AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, 0, 8, 0L);
             case (int) AssetCls.TRUST_KEY:
                 return new AssetVenture(itemAppData, CREATOR, AssetCls.TRUST_NAME, icon, image, AssetCls.TRUST_DESCR, 0, 8, 0L);
             case (int) AssetCls.REAL_KEY:
@@ -704,8 +709,8 @@ public class GenesisBlock extends Block {
         data = Bytes.concat(data, versionBytes);
 
         //WRITE REFERENCE
-        byte[] referenceBytes = Bytes.ensureCapacity(genesisReference, Crypto.SIGNATURE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        byte[] flagsBytes = Bytes.ensureCapacity(genesisReference, Crypto.SIGNATURE_LENGTH, 0);
+        data = Bytes.concat(data, flagsBytes);
 
         //WRITE TIMESTAMP
         byte[] genesisTimestampBytes = Longs.toByteArray(this.genesisTimestamp);
@@ -766,6 +771,10 @@ public class GenesisBlock extends Block {
         }
 
         return INVALID_NONE;
+    }
+
+    @Override
+    public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
     }
 
     public void process(DCSet dcSet) throws Exception {

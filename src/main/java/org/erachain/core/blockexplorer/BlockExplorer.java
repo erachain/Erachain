@@ -33,7 +33,6 @@ import org.erachain.lang.LangFile;
 import org.erachain.settings.Settings;
 import org.erachain.utils.M_Integer;
 import org.erachain.utils.NumberAsString;
-import org.erachain.utils.ReverseComparator;
 import org.erachain.webserver.API;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -292,7 +291,7 @@ public class BlockExplorer {
 
         //Основное меню. заголовки и их перевод на выбранный язык
         output.put("id_home2", Lang.T("Blocks", langObj));
-        output.put("id_menu_top_100", Lang.T("Top 100", langObj));
+        output.put("id_menu_owners", Lang.T("Owners", langObj));
         output.put("id_menu_percons", Lang.T("Persons", langObj));
         output.put("id_menu_pals_asset", Lang.T("Polls", langObj));
         output.put("id_menu_assets", Lang.T("Assets", langObj));
@@ -359,8 +358,8 @@ public class BlockExplorer {
                         //search block
                         jsonQuerySearchPages(info, Block.class, search, offset, null);
                         break;
-                    case "top":
-                        output.putAll(jsonQueryTopRichest100(100, Long.valueOf(search)));
+                    case "owners":
+                        jsonQueryOwners(info, search, offset);
                         break;
                     case "order":
                         output.putAll(jsonQueryOrder(search));
@@ -442,8 +441,9 @@ public class BlockExplorer {
 
             //////////////////////////// ASSETS //////////////////////////
             // top 100
-        } else if (info.getQueryParameters().containsKey("top")) {
-            output.putAll(jsonQueryTopRichest(info));
+        } else if (info.getQueryParameters().containsKey("owners")) {
+            offset = (int) (long) checkAndGetLongParam(info, 0L, "offset");
+            jsonQueryOwners(info, info.getQueryParameters().getFirst("asset"), offset);
         } else if (info.getQueryParameters().containsKey("assets")) {
             output.put("type", "assets");
 
@@ -570,7 +570,6 @@ public class BlockExplorer {
         help.put("Unconfirmed Transactions", "blockexplorer.json?unconfirmed");
         help.put("Block", "blockexplorer.json?block={block}[&page={page}]");
         help.put("Blocks List", "blockexplorer.json?blocks[&start={height}]");
-        help.put("Assets List", "blockexplorer.json?assets");
         help.put("Asset", "blockexplorer.json?asset={asset}");
         help.put("Asset Trade", "blockexplorer.json?asset={assetHave}&asset={assetWant}");
         help.put("Polls List", "blockexplorer.json?polls");
@@ -583,11 +582,9 @@ public class BlockExplorer {
         help.put("Address", "blockexplorer.json?address={address}");
         help.put("Address (additional)",
                 "blockexplorer.json?address={address}&start={offset}&allOnOnePage&withoutBlocks&showWithout={1,2,blocks}&showOnly={type}");
-        help.put("Top Richest", "blockexplorer.json?top");
-        help.put("Top Richest", "blockexplorer.json?top={limit}&asset={asset}");
+        help.put("Owners", "blockexplorer.json?owners=asset={asset}");
         help.put("Address All Not Zero", "blockexplorer.json?top=all|[limit]");
         help.put("Address All Addresses", "blockexplorer.json?top=all");
-        help.put("Assets List", "blockexplorer.json?assets");
         help.put("Assets List", "blockexplorer.json?assets");
         help.put("AT List", "blockexplorer.json?aTs");
         help.put("Names List", "blockexplorer.json?names");
@@ -685,6 +682,9 @@ public class BlockExplorer {
             assetKey = 2L;
             asset = (AssetCls) dcSet.getItemAssetMap().get(assetKey);
         }
+
+        output.put("search_message", assetKey);
+
         output.put("assetKey", assetKey);
         output.put("assetName", asset.viewName());
 
@@ -734,6 +734,8 @@ public class BlockExplorer {
         if (asset == null) {
             return;
         }
+
+        output.put("search_message", key);
 
         output.put("item", asset.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
@@ -1433,6 +1435,7 @@ public class BlockExplorer {
         if (person == null) {
             return;
         }
+        output.put("search_message", person.getKey());
 
         output.put("item", person.jsonForExplorerInfo(dcSet, langObj, forPrint));
 
@@ -1632,104 +1635,72 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryTopRichest100(int limit, long assetKey) {
 
-        output.put("type", "top");
+    public void jsonQueryOwners(UriInfo info, String assetKeyStr, int offset) {
+
+        output.put("type", "owners");
         output.put("search_placeholder", Lang.T("Type asset key", langObj));
 
-        Map output = new LinkedHashMap();
-        Map balances = new LinkedHashMap();
+        int pageSize = this.pageSize << 1;
+        long assetKey = 1L;
+        if (assetKeyStr != null)
+            assetKey = Long.valueOf(assetKeyStr);
 
-        List<Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> top100s = new ArrayList();
-
-        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        byte[] key;
-        Crypto crypto = Crypto.getInstance();
-
-        try (IteratorCloseable<byte[]> iterator = map.getIteratorByAsset(assetKey)) {
-            while (iterator.hasNext()) {
-                key = iterator.next();
-
-                try {
-                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                            balance = map.get(key);
-
-                    // пустые не берем
-                    if (balance.a.b.signum() == 0 && balance.b.b.signum() == 0 && balance.c.b.signum() == 0 && balance.d.b.signum() == 0)
-                        continue;
-
-                    top100s.add(Fun.t6(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)),
-                            balance.a.b, balance.b.b, balance.c.b, balance.d.b, balance.e.b));
-                } catch (java.lang.ArrayIndexOutOfBoundsException e) {
-                    logger.error("Wrong key raw: ");
-                }
-            }
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-
-        Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_top100()));
-
-        int couter = 0;
         AssetCls asset = Controller.getInstance().getAsset(assetKey);
+        output.put("search_message", assetKey);
 
-        for (Fun.Tuple6<String, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> top100 : top100s) {
+        // http://127.0.0.1:9067/index/blockexplorer.html?owners=&asset=2&lang=ru&pageFromAddressKey=HxfkJKzU2u48RdEdSwFihtmNm2L&pageKey=1.77353&offset=12
+        String pageFromKeyStr = info.getQueryParameters().getFirst("pageKey");
+        BigDecimal fromAmount = pageFromKeyStr == null ? null : new BigDecimal(pageFromKeyStr);
+        pageFromKeyStr = fromAmount == null ? null : info.getQueryParameters().getFirst("pageFromAddressKey");
+        byte[] fromAddres = pageFromKeyStr == null ? null : new Account(pageFromKeyStr).getShortAddressBytes();
+        List<Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+                page = dcSet.getAssetBalanceMap().getOwnersPage(assetKey, fromAmount, fromAddres, offset, pageSize, true);
 
-            couter++;
+        JSONArray ownersJson = new JSONArray();
 
-            Account account = new Account(top100.a);
+        for (Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                owner : page) {
 
-            Map balance = new LinkedHashMap();
-            balance.put("address", top100.a);
-            balance.put("OWN", top100.b.setScale(asset.getScale()).toPlainString());
-            balance.put("DEBT", top100.c.setScale(asset.getScale()).toPlainString());
-            balance.put("HOLD", top100.d.setScale(asset.getScale()).toPlainString());
-            balance.put("SPEND", top100.e.setScale(asset.getScale()).toPlainString());
-            balance.put("PLEDGE", top100.f.setScale(asset.getScale()).toPlainString());
+            Account account = new Account(owner.a);
+
+            JSONArray jsonRow = new JSONArray();
+            jsonRow.add(account.getAddress());
+            jsonRow.add(owner.b.a.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.b.b.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.b.c.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.b.d.b.setScale(asset.getScale()).toPlainString());
+            jsonRow.add(owner.b.e.b == null ? BigDecimal.ZERO : owner.b.e.b.setScale(asset.getScale()).toPlainString());
 
             Tuple2<Integer, PersonCls> person = account.getPerson();
             if (person != null) {
-                balance.put("person", person.b.viewName());
-                balance.put("person_key", person.b.getKey());
+                jsonRow.add(person.b.getKey());
+                jsonRow.add(person.b.viewName());
             }
 
-            balances.put(couter, balance);
+            ownersJson.add(jsonRow);
 
-            if (limit > 0 && couter >= limit) // && limit != -2 && limit != -1) // -2 = all
-            {
-                break;
+        }
+
+        output.put("page", ownersJson);
+        output.put("pageSize", pageSize);
+        output.put("listSize", pageSize * 2);
+        output.put("useoffset", true);
+
+        if (!page.isEmpty()) {
+            if (page.get(0) != null) {
+                output.put("pageFromAddressKey", ((JSONArray) ownersJson.get(0)).get(0));
+                // берем без добавки addDEVAmount
+                output.put("pageFromKey", page.get(0).b.a.b);
+            }
+            if (page.get(page.size() - 1) != null) {
+                output.put("pageToKey", page.get(page.size() - 1).b.a.b);
             }
         }
 
-        if (asset == null) {
-            output.put("total", "--");
-            output.put("released", "--");
-            output.put("assetName", "--");
-            output.put("Label_Title", (Lang.T("Top %limit% %assetName% Richest", langObj)
-                    .replace("%limit%", String.valueOf(limit > 0 ? limit : ""))).replace("%assetName%", "--"));
-            output.put("Label_All_non",
-                    (Lang.T("All non-empty %assetName% accounts (%count%)", langObj)
-                            .replace("%assetName%", "--")).replace("%count%", String.valueOf(couter)));
-            output.put("Label_All_accounts",
-                    (Lang.T("All %assetName% accounts (%count%)", langObj)
-                            .replace("%assetName%", "--")).replace("%count%", String.valueOf(couter)));
-        } else {
-            if (asset.getQuantity() > 0) {
-                output.put("total", asset.getQuantity());
-            } else {
-                output.put("total", asset.getReleased(dcSet).toPlainString());
-            }
-            output.put("released", asset.getReleased(dcSet).toPlainString());
-            output.put("assetName", asset.viewName());
-            output.put("Label_Title", (Lang.T("Top %limit% %assetName% Richest", langObj)
-                    .replace("%limit%", String.valueOf(limit > 0 ? limit : ""))).replace("%assetName%", asset.viewName()));
-            output.put("Label_All_non",
-                    (Lang.T("All non-empty %assetName% accounts (%count%)", langObj)
-                            .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
-            output.put("Label_All_accounts",
-                    (Lang.T("All %assetName% accounts (%count%)", langObj)
-                            .replace("%assetName%", asset.viewName())).replace("%count%", String.valueOf(couter)));
-        }
+        output.put("Label_Title", (Lang.T("Owners of %assetName%", langObj)
+                .replace("%assetName%", asset.viewName())));
+
         output.put("Label_Table_Account", Lang.T("Account", langObj));
         output.put("Label_Balance_1", Lang.T(Account.balancePositionName(1), langObj));
         output.put("Label_Balance_2", Lang.T(Account.balancePositionName(2), langObj));
@@ -1737,41 +1708,11 @@ public class BlockExplorer {
         output.put("Label_Balance_4", Lang.T(Account.balancePositionName(4), langObj));
         output.put("Label_Balance_5", Lang.T(Account.balancePositionName(5), langObj));
         output.put("Label_Table_Prop", Lang.T("Prop.", langObj));
-        output.put("Label_Table_person", Lang.T("Maker", langObj));
-
-        output.put("Label_Released", Lang.T("released", langObj));
-        output.put("Label_in_order", Lang.T("in order", langObj));
-
-        output.put("Label_Top", Lang.T("Top", langObj));
+        output.put("Label_Table_person", Lang.T("Owner", langObj));
 
         output.put("assetKey", assetKey);
-        output.put("limit", limit);
-        output.put("count", couter);
+        output.put("assetRealeased", asset.getReleased());
 
-        output.put("top", balances);
-        output.put("Label_Total_coins_in_the_system",
-                Lang.T("Total asset units in the system", langObj));
-
-        return output;
-    }
-
-    public Map jsonQueryTopRichest(UriInfo info) {
-        String limitStr = info.getQueryParameters().getFirst("top");
-        int limit = 100;
-        if (limitStr.equals("all")) {
-            limit = 0;
-        } else {
-            try {
-                limit = Integer.valueOf(limitStr);
-            } catch (Exception eee) {
-            }
-        }
-
-        long key = 1l;
-        if (info.getQueryParameters().containsKey("asset"))
-            key = Long.valueOf(info.getQueryParameters().getFirst("asset"));
-
-        return jsonQueryTopRichest100(limit, key);
     }
 
 
@@ -1830,7 +1771,6 @@ public class BlockExplorer {
 
                     if (BlockChain.ERA_COMPU_ALL_UP && side == Account.BALANCE_SIDE_LEFT) {
                         bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)
-                                .add(account.addDEVAmount(assetKey))
                                 .setScale(asset.getScale()).toPlainString());
                     } else {
                         bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side)
@@ -1888,6 +1828,10 @@ public class BlockExplorer {
                 transactionDataJSON.put("initiatorCreatorName", orderInitiator.getCreator().getPersonAsString());
                 transactionDataJSON.put("targetCreator", orderTarget.getCreator().getAddress());
                 transactionDataJSON.put("targetCreatorName", orderTarget.getCreator().getPersonAsString());
+
+                transactionDataJSON.put("label_Trade", Lang.T("Trade # Сделка", langObj));
+                transactionDataJSON.put("label_Order", Lang.T("Order # Заказ", langObj));
+                transactionDataJSON.put("label_Taking_Order", Lang.T("Taking order # Берущий заказ", langObj));
 
 
             } else {
@@ -2242,33 +2186,13 @@ public class BlockExplorer {
                 // это значит нужно скакнуть в самый низ
             }
 
-            if (true) {
-                Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filterStr, useForge, pageSize, fromID, offset, true);
-                transactions = result.c;
-                if (result.a != null) {
-                    output.put("pageFromKey", Transaction.viewDBRef(result.a));
-                }
-                if (result.b != null) {
-                    output.put("pageToKey", Transaction.viewDBRef(result.b));
-                }
-            } else {
-                // OLD
-                if (filterStr == null) {
-                    transactions = map.getTransactionsFromID(fromID, offset, pageSize, !useForge, true);
-                } else {
-                    transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
-                            offset, pageSize, true);
-                }
-
-                if (transactions.isEmpty()) {
-                    // возможно вниз вышли за границу
-                    output.put("pageFromKey", pageFromKeyStr);
-                } else {
-                    // включим ссылки на листание вверх
-                    output.put("pageFromKey", transactions.get(0).viewHeightSeq());
-                    // это не самый конец - включим листание вниз
-                    output.put("pageToKey", transactions.get(transactions.size() - 1).viewHeightSeq());
-                }
+            Tuple3<Long, Long, List<Transaction>> result = Transaction.searchTransactions(dcSet, filterStr, useForge, pageSize, fromID, offset, true);
+            transactions = result.c;
+            if (result.a != null) {
+                output.put("pageFromKey", Transaction.viewDBRef(result.a));
+            }
+            if (result.b != null) {
+                output.put("pageToKey", Transaction.viewDBRef(result.b));
             }
         }
 
@@ -2564,6 +2488,7 @@ public class BlockExplorer {
         output.put("Label_pubKey", Lang.T("Public Key", langObj));
         output.put("Label_signature", Lang.T("Signature", langObj));
         output.put("Label_Link", Lang.T("Link", langObj));
+        output.put("Label_RAW", Lang.T("RAW"));
 
         int block = rNote.getBlockHeight();
         int seqNo = rNote.getSeqNo();
@@ -2912,7 +2837,7 @@ public class BlockExplorer {
                             out.put("timestamp", transaction.viewHeightSeq());
                         }
 
-                        String typeName = Lang.T(transaction.viewFullTypeName(), langObj);
+                        String typeName = transaction.viewFullTypeName(langObj);
                         out.put("type", "");
                         out.put("type_name", typeName);
 
@@ -2930,7 +2855,7 @@ public class BlockExplorer {
                         out.put("signature", Base58.encode(transaction.getSignature()));
                         out.put("timestamp", transaction.getTimestamp());
 
-                        String typeName = Lang.T(transaction.viewFullTypeName(), langObj);
+                        String typeName = transaction.viewFullTypeName(langObj);
                         out.put("type", "@TT" + transaction.getType() + ":");
                         out.put("type_name", typeName);
 

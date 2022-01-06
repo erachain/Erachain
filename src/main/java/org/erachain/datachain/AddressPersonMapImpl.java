@@ -70,7 +70,7 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
     }
 
     @Override
-    public Stack<Tuple4<Long, Integer, Integer, Integer>> getDefaultValue() {
+    public Stack<Tuple4<Long, Integer, Integer, Integer>> getDefaultValue(byte[] key) {
         return new Stack<Tuple4<Long, Integer, Integer, Integer>>();
     }
 

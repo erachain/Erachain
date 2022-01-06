@@ -215,13 +215,6 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         }
     }
 
-    public int getMapDefaultIndex() {
-        if (map == null)
-            return 0;
-
-        return map.getDefaultIndex();
-    }
-
     public void setInterval(Object startKey) {
         this.startKey = startKey;
 

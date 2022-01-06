@@ -5,7 +5,6 @@ import org.erachain.core.account.Account;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.WalletTableModel;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -28,7 +27,7 @@ public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, 
 
     public FavoriteAccountsTableModel() {
         super(Controller.getInstance().getWallet().dwSet.getFavoriteAccountsMap(),
-                new String[]{"No.", "Account", "PubKey", "Name", "Description", "Person"},
+                new String[]{"No.", "Account", "Public Key", "Name", "Description", "Person"},
                 new Boolean[]{true, false, false, false, false}, false, -1);
 
     }
@@ -67,13 +66,7 @@ public class FavoriteAccountsTableModel extends WalletTableModel<Tuple2<String, 
             case COLUMN_PERSON:
                 return new Account(item.a).viewPerson();
             case COLUMN_DESCRIPTION:
-                json = (JSONObject) JSONValue.parse(item.b.c);
-                json = json == null ? new JSONObject() : json;
-                // set papams
-                if (json.containsKey("description")) {
-                    return json.get("description");
-                }
-                return "";
+                return item.b.c == null ? "" : item.b.c;
         }
 
         return null;

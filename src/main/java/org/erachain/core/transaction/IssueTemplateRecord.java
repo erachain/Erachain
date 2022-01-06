@@ -6,7 +6,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.templates.TemplateFactory;
-import org.erachain.smartcontracts.SmartContract;
+import org.erachain.dapp.DAPP;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -15,40 +15,40 @@ public class IssueTemplateRecord extends IssueItemRecord {
     public static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
     public static final String TYPE_NAME = "Issue Template";
 
-    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, reference);
+    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, flags);
     }
 
-    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, reference, signature);
+    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, long flags, byte[] signature) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, flags, signature);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow,
-                               long timestamp, Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, reference, signature);
+                               long timestamp, long flags, byte[] signature, long seqNo, long feeLong) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, feePow, timestamp, flags, signature);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, template, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, template, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, feePow, timestamp, reference, signature);
+    public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, feePow, timestamp, flags, signature);
     }
 
     public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, (byte) 0, 0L, null, signature);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssueTemplateRecord(PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, template, feePow, timestamp, reference);
+    public IssueTemplateRecord(PublicKeyAccount creator, ExLink linkTo, TemplateCls template, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, linkTo, template, feePow, timestamp, flags);
     }
 
     public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, (byte) 0, 0L, null);
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, template, (byte) 0, 0L, 0L);
     }
 
     //GETTERS/SETTERS
@@ -82,10 +82,10 @@ public class IssueTemplateRecord extends IssueItemRecord {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -100,12 +100,12 @@ public class IssueTemplateRecord extends IssueItemRecord {
             linkTo = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -150,7 +150,7 @@ public class IssueTemplateRecord extends IssueItemRecord {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssueTemplateRecord(typeBytes, creator, linkTo, template, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+            return new IssueTemplateRecord(typeBytes, creator, linkTo, template, feePow, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new IssueTemplateRecord(typeBytes, creator, linkTo, template, signatureBytes);
         }
@@ -159,13 +159,13 @@ public class IssueTemplateRecord extends IssueItemRecord {
     //PARSE CONVERT
 
     //@Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         return Transaction.VALIDATE_OK;

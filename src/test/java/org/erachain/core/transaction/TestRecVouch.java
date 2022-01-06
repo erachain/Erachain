@@ -77,12 +77,14 @@ public class TestRecVouch {
         vouchRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF TRANSACTION IS VALID
+        vouchRecord.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, vouchRecord.isSignatureValid(db));
 
         //INVALID SIGNATURE
         vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF VOUCH IS INVALID
+        vouchRecord.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, vouchRecord.isSignatureValid(db));
     }
 

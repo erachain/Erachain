@@ -8,7 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.smartcontracts.SmartContract;
+import org.erachain.dapp.DAPP;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
@@ -40,21 +40,21 @@ public class RVouch extends Transaction {
     protected int refHeight;
     protected int refSeqNo;
 
-    public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int refHeight, int refSeqNo, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, reference);
+    public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int refHeight, int refSeqNo, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, null, null, feePow, timestamp, flags);
 
         this.refHeight = refHeight;
         this.refSeqNo = refSeqNo;
     }
 
-    public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, height, seq, timestamp, reference);
+    public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, long flags, byte[] signature) {
+        this(typeBytes, creator, feePow, height, seq, timestamp, flags);
         this.signature = signature;
     }
 
     public RVouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp,
-                  Long reference, byte[] signature, long seqNo, long feeLong) {
-        this(typeBytes, creator, feePow, height, seq, timestamp, reference);
+                  long flags, byte[] signature, long seqNo, long feeLong) {
+        this(typeBytes, creator, feePow, height, seq, timestamp, flags);
         this.signature = signature;
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -62,22 +62,22 @@ public class RVouch extends Transaction {
     }
 
     // as pack
-    public RVouch(byte[] typeBytes, PublicKeyAccount creator, int height, int seq, Long reference, byte[] signature) {
-        this(typeBytes, creator, (byte) 0, height, seq, 0l, reference);
+    public RVouch(byte[] typeBytes, PublicKeyAccount creator, int height, int seq, long flags, byte[] signature) {
+        this(typeBytes, creator, (byte) 0, height, seq, 0L, flags);
         this.signature = signature;
     }
 
-    public RVouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, height, seq, timestamp, reference);
+    public RVouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, height, seq, timestamp, flags);
     }
 
-    public RVouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, height, seq, timestamp, reference, signature);
+    public RVouch(PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, height, seq, timestamp, flags, signature);
     }
 
     // as pack
-    public RVouch(PublicKeyAccount creator, int height, int seq, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte) 0, height, seq, 0l, reference);
+    public RVouch(PublicKeyAccount creator, int height, int seq, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte) 0, height, seq, 0L, flags);
     }
 
 
@@ -129,10 +129,10 @@ public class RVouch extends Transaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -147,12 +147,12 @@ public class RVouch extends Transaction {
             exLink = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -192,10 +192,10 @@ public class RVouch extends Transaction {
         position += SEQ_LENGTH;
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new RVouch(typeBytes, creator, feePow, vouchHeight, vouchSeqNo, timestamp, reference,
+            return new RVouch(typeBytes, creator, feePow, vouchHeight, vouchSeqNo, timestamp, flagsTX,
                     signatureBytes, seqNo, feeLong);
         } else {
-            return new RVouch(typeBytes, creator, vouchHeight, vouchSeqNo, reference, signatureBytes);
+            return new RVouch(typeBytes, creator, vouchHeight, vouchSeqNo, flagsTX, signatureBytes);
         }
 
     }
@@ -245,9 +245,9 @@ public class RVouch extends Transaction {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+                base_len += dApp.length(forDeal);
             }
         }
 
@@ -259,7 +259,7 @@ public class RVouch extends Transaction {
     }
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -275,7 +275,7 @@ public class RVouch extends Transaction {
             return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         Transaction transaction = this.dcSet.getTransactionFinalMap().get(Transaction.makeDBRef(this.refHeight, this.refSeqNo));

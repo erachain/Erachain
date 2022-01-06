@@ -1,7 +1,7 @@
 package org.erachain.core.account;
 
-import org.erachain.core.BlockChain;
 import org.erachain.core.block.GenesisBlock;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 
@@ -49,6 +50,20 @@ public class AccountTest {
     }
 
     @Test
+    public void appAcc() {
+
+        // 23, 83, 118
+        Account account = new Account("APPCGgH8c63VrrgEw1wQA4Dno1JuPLTsWe");
+        assertEquals(account.isDAppOwned(), true);
+
+        account = PublicKeyAccount.makeForDApp(Crypto.getInstance().digest("APPCGgH8c63VrrgEw1wQA4Dno1JuPLTsWe".getBytes(StandardCharsets.UTF_8)));
+        assertEquals(account.getAddress(), "APPBcJaUSzwgK7tKZy3ZwRiivz9DiEizW4");
+        assertEquals(account.isDAppOwned(), true);
+
+
+    }
+
+    @Test
     public void getBalance() {
         init();
 
@@ -56,7 +71,7 @@ public class AccountTest {
         Account account = new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe");
 
         Fun.Tuple5 balance5 = account.getBalance(db, Transaction.RIGHTS_KEY);
-        assertEquals(((BigDecimal)((Fun.Tuple2)balance5.a).a).intValue(), 323980);
+        assertEquals(((BigDecimal) ((Fun.Tuple2) balance5.a).a).intValue(), 323980);
         assertEquals(((BigDecimal)((Fun.Tuple2)balance5.a).b).intValue(), 331417);
 
         Fun.Tuple2 balance = account.getBalance(db, Transaction.RIGHTS_KEY, 1);
@@ -75,8 +90,7 @@ public class AccountTest {
         Fun.Tuple2 balance3 = account.getBalance(db, Transaction.RIGHTS_KEY, 1);
 
         assertEquals(((BigDecimal) balance3.a).intValue(), 0);
-        assertEquals(((BigDecimal) balance3.b).intValue(), BlockChain.ERA_COMPU_ALL_UP ?
-                account.addDEVAmount(Transaction.RIGHTS_KEY).intValue() : 0);
+        assertEquals(((BigDecimal) balance3.b).intValue(), 331417);
 
     }
 

@@ -98,12 +98,14 @@ public class TestRecStatus {
         issueStatusTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE STATUS TRANSACTION IS VALID
+        issueStatusTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, issueStatusTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
         issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE STATUS IS INVALID
+        issueStatusTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, issueStatusTransaction.isSignatureValid(db));
     }
 

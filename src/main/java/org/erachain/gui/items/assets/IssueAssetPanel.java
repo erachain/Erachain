@@ -9,6 +9,7 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.utils.GUIConstants;
 import org.erachain.lang.Lang;
+import org.json.simple.JSONObject;
 
 import javax.swing.*;
 
@@ -51,8 +52,12 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
 
         super.initComponents();
 
+        boolean useStartStop = true;
         // вывод верхней панели
-        int gridy = super.initTopArea(true);
+        int gridy = super.initTopArea(useStartStop);
+        if (useStartStop) {
+            startCheckBox.setToolTipText(Lang.T("IssueAssetPanel.startField"));
+        }
 
         labelGBC.gridy = gridy;
         jPanelAdd.add(typeJLabel, labelGBC);
@@ -173,6 +178,7 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
 
         String out = super.makeBodyView();
         AssetCls asset = (AssetCls) item;
+        JSONObject landObj = Lang.getInstance().getLangForNode();
 
         out += Lang.T("Asset Class") + ":&nbsp;"
                 + Lang.T(asset.getItemSubType() + "") + "<br>"
@@ -181,9 +187,13 @@ public class IssueAssetPanel extends IssueAssetPanelCls {
                 + Lang.T("Quantity") + ":&nbsp;" + asset.getQuantity() + ", "
                 + Lang.T("Scale") + ":&nbsp;" + asset.getScale() + "<br>";
 
+        out += "<p><b>" + Lang.T("Properties") + "</b>: " + asset.viewProperties(landObj) + "</p>";
+
         if (asset.getDEXAwards() != null) {
-            out += Lang.T("DEX Awards" + ":");
+            out += Lang.T("DEX royalties" + ":");
             for (ExLinkAddress award : asset.getDEXAwards()) {
+                if (award == null)
+                    continue;
                 out += "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + award.getAccount().getPersonAsString() + " <b>" + award.getValue1() * 0.001d + "%</b>"
                         + (award.getMemo() == null || award.getMemo().isEmpty() ? "" : " - " + award.getMemo());
             }

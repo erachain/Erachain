@@ -87,6 +87,10 @@ public class APITXResource {
         help.put("api/tx/search?q={query}&from=[seqNo]&useforge={false}&offset={offset}&limit={limit}&fullpage={false}",
                 Lang.T("Search transactions by Query via title and tags. Query=SeqNo|Signature|FilterWords. Result[0-1] - START & END Seq-No for use in paging (see as make it in blockexplorer. Signature as Base58. Set Set FilterWords as preffix words separated by space. Set [seqNo] as 1234-1. For use forge set &useforge=true. For fill full page - use fullpage=true"));
 
+        // todo &unconfirmed=false
+        help.put("api/tx/transactions/dialog/{address1}/{address2}?from=fromID&offset=0&limit=50&desc=false",
+                Lang.T("Find transactions for dialog between address1 and address2. Set [fromID] as 1234-1"));
+
         help.put("api/tx/rawbyblock/{height}?forDeal={DEAL}", "Get raw transaction(encoding Base58). forDeal = 1..5 (FOR_MYPACK, FOR_PACK, FOR_NETWORK, FOR_DB_RECORD). By default forDeal is 3(for network)");
 
         help.put("api/tx/raw64byblock/{height}?forDeal={DEAL}", "Get raw transaction(encoding Base44 - more fast). forDeal = 1..5 (FOR_MYPACK, FOR_PACK, FOR_NETWORK, FOR_DB_RECORD). By default forDeal is 3(for network)");
@@ -408,7 +412,9 @@ public class APITXResource {
         List<Transaction> result;
 
         result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(account.getShortAddressBytes(), txType,
-                null, null, 0, 1000, true, false);
+                null, null, 0,
+                ServletUtils.isRemoteRequest(request) ? 100 : 1000,
+                true, false);
         if (unconfirmed) {
             if (txType == null || txType == 0)
                 result.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
@@ -451,7 +457,7 @@ public class APITXResource {
         List<Transaction> transs = new ArrayList<Transaction>();
 
         List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address),
-                null, null, null, 0, 1000, true, true);
+                null, null, null, 0, ServletUtils.isRemoteRequest(request) ? 100 : 1000, true, true);
         if (unconfirmed)
             trans.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
@@ -497,12 +503,14 @@ public class APITXResource {
         Integer type;
         try {
             type = Integer.valueOf(type1);
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(Account.makeShortBytes(address), type, 1000, 0);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(Account.makeShortBytes(address), type,
+                    ServletUtils.isRemoteRequest(request) ? 100 : 1000, 0);
 
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), null,
-                    null, null, 0, 1000, true, false);
+                    null, null, 0,
+                    ServletUtils.isRemoteRequest(request) ? 100 : 1000, true, false);
             // e.printStackTrace();
         }
 
@@ -700,7 +708,7 @@ public class APITXResource {
         boolean desc = API.checkBoolean(info, "desc");
         boolean noForge = API.checkBoolean(info, "noforge");
 
-        int limitMax = ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request)) ? 10000 : 100;
+        int limitMax = ServletUtils.isRemoteRequest(request) ? 100 : 1000;
         if (limit > limitMax || limit <= 0)
             limit = limitMax;
         if (offset > limitMax)
@@ -755,7 +763,7 @@ public class APITXResource {
                                         @DefaultValue("false") @QueryParam("count") boolean count
     ) {
 
-        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+        if (ServletUtils.isRemoteRequest(request)) {
             if (limit > 50 || limit == 0)
                 limit = 50;
         }
@@ -764,6 +772,26 @@ public class APITXResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(TransactionsResource.getTransactionsFind(info, address, sender, creator, recipient, fromSeqNo,
                         minHeight, maxHeight, type, offset, limit)).build();
+    }
+
+    @GET
+    @Path("dialog/{address1}/{address2}")
+    public Response getTransactionsDialog(@Context UriInfo info,
+                                          @PathParam("address1") String address1, @PathParam("address2") String address2,
+                                          @QueryParam("from") String fromSeqNo,
+                                          @QueryParam("offset") int offset,
+                                          @QueryParam("limit") int limit
+    ) {
+
+        if (ServletUtils.isRemoteRequest(request)) {
+            if (limit > 100 || limit == 0)
+                limit = 100;
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(TransactionsResource.getTransactionsDialog(info, address1, address2, fromSeqNo,
+                        offset, limit)).build();
     }
 
     @SuppressWarnings("unchecked")

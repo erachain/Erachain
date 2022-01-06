@@ -1,13 +1,10 @@
-package org.erachain.smartcontracts.epoch;
+package org.erachain.dapp.epoch;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Base58;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetUnique;
@@ -21,13 +18,12 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
-public class DogePlanet extends EpochSmartContract {
+public class DogePlanet extends EpochDAPP {
 
     static public final int ID = 1000;
-    static Controller contr = Controller.getInstance();
-    static Crypto crypto = Crypto.getInstance();
+    static public final String NAME = "Doge Planets";
 
-    static public final PublicKeyAccount MAKER = new PublicKeyAccount(Base58.encode(Longs.toByteArray(ID)));
+    static public final PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
     private int count;
     private long keyEnd;
 
@@ -42,6 +38,10 @@ public class DogePlanet extends EpochSmartContract {
         super(ID);
         this.count = count;
         this.keyEnd = keyEnd;
+    }
+
+    public String getName() {
+        return NAME;
     }
 
     public int getCount() {
@@ -132,7 +132,7 @@ public class DogePlanet extends EpochSmartContract {
 
             totalIssued++;
 
-            planet = new AssetUnique(null, maker, "Shiba Planet #" + totalIssued, null, null,
+            planet = new AssetUnique(null, stock, "Shiba Planet #" + totalIssued, null, null,
                     null, AssetCls.AS_NON_FUNGIBLE);
             planet.setReference(transaction.getSignature(), transaction.getDBRef());
 
@@ -156,9 +156,14 @@ public class DogePlanet extends EpochSmartContract {
         return false;
     }
 
+    @Override
+    public boolean processByTime(DCSet dcSet, Block block, Transaction transaction) {
+        return false;
+    }
+
 
     @Override
-    public boolean orphan(DCSet dcSet, Transaction transaction) {
+    public void orphan(DCSet dcSet, Transaction transaction) {
 
         SmartContractValues valuesMap = dcSet.getSmartContractValues();
         Integer totalIssued = (Integer) valuesMap.get(COUNT_KEY);
@@ -175,7 +180,10 @@ public class DogePlanet extends EpochSmartContract {
 
         valuesMap.put(COUNT_KEY, totalIssued - count);
 
-        return false;
+    }
+
+    @Override
+    public void orphanByTime(DCSet dcSet, Block block, Transaction transaction) {
     }
 
     private static String[][][] imgsStr;

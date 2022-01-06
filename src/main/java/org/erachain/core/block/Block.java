@@ -21,6 +21,7 @@ import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.core.transaction.TransactionFactory;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
@@ -248,8 +249,8 @@ public class Block implements Closeable, ExplorerJsonLine {
             pos += VERSION_LENGTH;
 
             //WRITE REFERENCE
-            byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-            System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+            byte[] flagsBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
+            System.arraycopy(flagsBytes, 0, data, pos, REFERENCE_LENGTH);
             pos += REFERENCE_LENGTH;
 
             //WRITE GENERATOR
@@ -899,6 +900,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     public synchronized List<Transaction> getTransactions() {
         if (this.transactions == null) {
+
             //LOAD TRANSACTIONS
             this.transactions = new ArrayList<Transaction>();
 
@@ -1095,8 +1097,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         pos += VERSION_LENGTH;
 
         //WRITE REFERENCE
-        byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-        System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+        byte[] flagsBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
+        System.arraycopy(flagsBytes, 0, data, pos, REFERENCE_LENGTH);
         pos += REFERENCE_LENGTH;
 
         //WRITE GENERATOR
@@ -1172,8 +1174,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         pos += VERSION_LENGTH;
 
         //WRITE REFERENCE
-        byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-        System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+        byte[] flagsBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
+        System.arraycopy(flagsBytes, 0, data, pos, REFERENCE_LENGTH);
         pos += REFERENCE_LENGTH;
 
         System.arraycopy(transactionsHash, 0, data, pos, TRANSACTIONS_HASH_LENGTH);
@@ -1495,6 +1497,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             }
 
             makeHoldRoyalty(dcSetPlace, false);
+            DAPP.processByBlock(dcSetPlace, this, false);
 
             this.getTransactions();
 
@@ -1525,7 +1528,7 @@ public class Block implements Closeable, ExplorerJsonLine {
                         // ALL GENESIS transaction
                         LOGGER.debug("*** Block[" + this.heightBlock
                                 + "].Tx[" + seqNo + " : " ///this.getTransactionSeq(transaction.getSignature()) + " : "
-                                + transaction.viewFullTypeName() + "]"
+                                + transaction + "]"
                                 + "creator is Null!"
                         );
                         return INVALID_BLOCK_VERSION;
@@ -1548,13 +1551,13 @@ public class Block implements Closeable, ExplorerJsonLine {
                     }
 
                     if (!isSignatureValid) {
+                        // for check SIGN need HEIGHT
+                        transaction.setHeightSeq(heightBlock, seqNo);
                         if (!transaction.isSignatureValid(dcSetPlace)
                                 && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                             //
-                            LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                    + ":" + transaction.viewFullTypeName()
-                                    + " signature  invalid!"
-                                    + " " + Base58.encode(transaction.getSignature()));
+                            LOGGER.debug("*** signature invalid!!! " + this.heightBlock + "-" + seqNo
+                                    + ": " + transaction);
                             return INVALID_BLOCK_VERSION;
                         }
                     }
@@ -1563,11 +1566,9 @@ public class Block implements Closeable, ExplorerJsonLine {
                     if ((BlockChain.TEST_MODE || BlockChain.CLONE_MODE || heightBlock > 278989) &&
                             transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                     ) {
-                        LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                + ":" + transaction.viewFullTypeName()
-                                + " timestamp Overhead"
+                        LOGGER.debug("*** timestamp Overhead!!! " + this.heightBlock + "-" + seqNo
+                                + ":" + transaction
                                 + " for diff: " + (transaction.getTimestamp() - timestampEnd)
-                                + " " + Base58.encode(transaction.getSignature())
                         );
                         return INVALID_BLOCK_VERSION;
                     }
@@ -1582,10 +1583,9 @@ public class Block implements Closeable, ExplorerJsonLine {
                             && BlockChain.ALL_VALID_BEFORE < heightBlock) {
                         int error = transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION);
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                + ":" + transaction.viewFullTypeName()
                                 + " invalid code: " + OnDealClick.resultMess(error) + "[" + error + "]"
                                 + (transaction.errorValue == null ? "" : " {" + transaction.errorValue + "}")
-                                + " " + Base58.encode(transaction.getSignature()));
+                                + ": " + transaction);
                         return INVALID_BLOCK_VERSION;
                     }
 
@@ -1596,8 +1596,8 @@ public class Block implements Closeable, ExplorerJsonLine {
                         if (cnt.isOnStopping())
                             return INVALID_BRANCH;
 
-                        LOGGER.error("*** " + this.heightBlock + "-" + seqNo
-                                + ": " + transaction.viewFullTypeName() + " - " + e.getMessage(), e);
+                        LOGGER.error("*** " + e.getMessage() + "!!! " + this.heightBlock + "-" + seqNo
+                                + ": " + transaction, e);
                         throw e;
                     }
 
@@ -1807,7 +1807,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             boolean hasValidatedForkDB = validatedForkDB != null;
             close();
             if (hasValidatedForkDB && BlockChain.CHECK_BUGS > 9) {
-                LOGGER.debug("validatedForkDB is FINALIZED: " + this.toString());
+                LOGGER.debug("validatedForkDB is FINALIZED: " + this);
             }
         }
 
@@ -1943,27 +1943,32 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
     public void assetsFeeProcess(DCSet dcSet, boolean asOrphan) {
 
-        if (BlockChain.TEST_MODE && heightBlock > 150000) {
-            // EMITTE
+        if (BlockChain.TEST_MODE) {
+            // EMIT
             if (earnedAllAssets == null)
                 earnedAllAssets = new HashMap<>();
 
-            BigDecimal emite = BigDecimal.ONE;
-            addAssetFee(BlockChain.ERA_ASSET, emite, null);
+            BigDecimal emitted = BigDecimal.ONE;
+            addAssetFee(BlockChain.ERA_ASSET, emitted, null);
+
             BlockChain.ERA_ASSET.getMaker().changeBalance(dcSet, !asOrphan, false,
-                    AssetCls.ERA_KEY, emite, false, false, false);
+                    AssetCls.ERA_KEY, emitted, false, false, false);
 
         }
 
         if (transactionCount > 0) {
             // подсчет наград с ПЕРЕВОДОВ
             for (Transaction transaction : getTransactions()) {
-                if (transaction.assetFee == null)
-                    continue;
+                if (transaction.assetFEE != null)
+                    addAssetFee(transaction.getAsset(), transaction.assetFEE.a, transaction.assetFEE.b);
 
-                AssetCls asset = transaction.getAsset();
-                addAssetFee(asset, transaction.assetFee, transaction.assetFeeBurn);
-
+                if (transaction.assetsPacketFEE != null && !transaction.assetsPacketFEE.isEmpty()) {
+                    Tuple2<BigDecimal, BigDecimal> rowTAX;
+                    for (AssetCls asset : transaction.assetsPacketFEE.keySet()) {
+                        rowTAX = transaction.assetsPacketFEE.get(asset);
+                        addAssetFee(asset, rowTAX.a, rowTAX.b);
+                    }
+                }
             }
         }
 
@@ -2206,6 +2211,33 @@ public class Block implements Closeable, ExplorerJsonLine {
 
     }
 
+    private void processTimed(DCSet dcSet) {
+
+        // time wait process
+        TimeTXWaitMap timeWaitMap = dcSet.getTimeTXWaitMap();
+        TimeTXDoneMap timewDoneMap = dcSet.getTimeTXDoneMap();
+        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
+        Transaction tx;
+        Tuple2<Integer, Long> key;
+        try (IteratorCloseable<Tuple2<Integer, Long>> iteraator = timeWaitMap.getTXIterator(false)) {
+            while (iteraator.hasNext()) {
+                key = iteraator.next();
+                // reversed pair - key = <Block, dbRef>
+                if (key.a > heightBlock)
+                    break;
+
+                timeWaitMap.remove(key.b);
+                timewDoneMap.put(key.b, key.a);
+
+                tx = txMap.get(key.b);
+                tx.processByTime(this);
+
+            }
+        } catch (IOException e) {
+            Controller.getInstance().stopAndExit(99999);
+        }
+    }
+
     /**
      * обработка всего что в конце блока прилипло
      *
@@ -2214,6 +2246,7 @@ public class Block implements Closeable, ExplorerJsonLine {
     private void processTail(DCSet dcSet) {
         // clear old orders
         OrderProcess.clearOldOrders(dcSet, this, false);
+
     }
 
     // TODO - make it trownable
@@ -2233,11 +2266,6 @@ public class Block implements Closeable, ExplorerJsonLine {
             compareCOMPUbals(dcSet, this.heightBlock - 1, "before PROCESS");
         }
 
-        // for DEBUG
-        if (this.heightBlock == 97815) {
-            boolean debug = true;
-        }
-
         //PROCESS TRANSACTIONS
         byte[] transactionSignature;
 
@@ -2253,6 +2281,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         }
 
         makeHoldRoyalty(dcSet, false);
+        DAPP.processByBlock(dcSet, this, false);
 
         this.getTransactions();
 
@@ -2341,6 +2370,8 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         }
 
+        processTimed(dcSet);
+
         timerStart = System.currentTimeMillis();
         this.process_after(cnt, dcSet);
         LOGGER.debug("BLOCK process_after: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
@@ -2359,13 +2390,51 @@ public class Block implements Closeable, ExplorerJsonLine {
     }
 
     /**
+     * Обязательно надо это вызвать после того как удалили все Вычисленные транзакции - так как иначе удалени активов тут вызовет крах в них
+     *
+     * @param dcSet
+     */
+    private void orphanTimed(DCSet dcSet) {
+
+        // time wait process
+        TimeTXWaitMap timeWaitMap = dcSet.getTimeTXWaitMap();
+        TimeTXDoneMap timeDoneMap = dcSet.getTimeTXDoneMap();
+        TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
+        Transaction tx;
+        Tuple2<Integer, Long> key;
+        try (IteratorCloseable<Tuple2<Integer, Long>> iteraator = timeDoneMap.getTXIterator(true)) {
+            while (iteraator.hasNext()) {
+                key = iteraator.next();
+                // reversed pair - key = <Block, dbRef>
+                if (key.a < heightBlock)
+                    break;
+
+                timeDoneMap.remove(key.b);
+                timeWaitMap.put(key.b, key.a);
+
+                tx = txMap.get(key.b);
+                tx.orphanByTime(this);
+
+            }
+        } catch (IOException e) {
+            Controller.getInstance().stopAndExit(99999);
+        }
+
+        // clear old orders
+        OrderProcess.clearOldOrders(dcSet, this, true);
+
+    }
+
+    /**
      * обработка всего что в конце блока прилипло
      *
      * @param dcSet
      */
     private void orphanHead(DCSet dcSet) {
+
         // clear old orders
         OrderProcess.clearOldOrders(dcSet, this, true);
+
     }
 
     public void orphan(DCSet dcSet, boolean notStoreTXs) throws Exception {
@@ -2402,6 +2471,7 @@ public class Block implements Closeable, ExplorerJsonLine {
         //PROCESS ASSETS FEE - after orphanTransactions!
         assetsFeeProcess(dcSet, true);
 
+        DAPP.processByBlock(dcSet, this, true);
         makeHoldRoyalty(dcSet, true);
 
         if (this.forgingInfoUpdate != null) {
@@ -2471,6 +2541,8 @@ public class Block implements Closeable, ExplorerJsonLine {
         // CLEAR ASSETS FEE
         earnedAllAssets = new HashMap<>();
 
+        boolean calculatedBefore = true;
+
         // DELETE ALL BY DB ITERATOR
         // It delete all CALCULATED FIRST correct and all txs too
         /// если форк их тут вообще нету - нужно выцепить из Родительской таблицы
@@ -2487,6 +2559,12 @@ public class Block implements Closeable, ExplorerJsonLine {
                 Transaction transaction = finalMap.get(dbRef);
 
                 if (!(transaction instanceof RCalculated)) {
+
+                    if (calculatedBefore) {
+                        calculatedBefore = false;
+                        // если перед этим были только вычисляемые и начались обычные, то сперва все запуски по времени откатим
+                        orphanTimed(dcSet);
+                    }
 
                     if (!transaction.isWiped()) {
                         transaction.orphan(this, Transaction.FOR_NETWORK);
@@ -2517,6 +2595,11 @@ public class Block implements Closeable, ExplorerJsonLine {
                 // полное удалени включая Посиковые Метки tags
                 finalMap.delete(dbRef);
             }
+        }
+
+        if (calculatedBefore) {
+            // если не было транзакций обычных вообще, только вычисляемые, то теперь откатим запуски по времени
+            orphanTimed(dcSet);
         }
 
     }

@@ -107,10 +107,9 @@ public class WalletTableRenderer extends DefaultTableCellRenderer {
                 // Get icon to use for the list item value
                 Iconable iconable = (Iconable) value;
 
-                byte[] iconBytes = iconable.getIcon();
-                if (iconBytes != null && iconBytes.length > 0) {
+                ImageIcon image = iconable.getImageIcon();
+                if (image != null) {
                     int rowSize = getFont().getSize() + 4;
-                    ImageIcon image = new ImageIcon(iconBytes);
                     setIcon(new ImageIcon(image.getImage().getScaledInstance(rowSize, rowSize, 1)));
                 }
 

@@ -10,9 +10,8 @@ import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
-import org.erachain.smartcontracts.SmartContract;
-import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -301,11 +300,6 @@ public class RSetStatusToItem extends Transaction {
     }
 
     @Override
-    public String viewAmount(String address) {
-        return DateTimeFormat.timestamptoString(end_date);
-    }
-
-    @Override
     public String viewRecipient() {
         ItemCls item = ItemCls.getItem(dcSet, this.itemType, this.itemKey);
         return item == null ? "null" : item.toString();
@@ -511,10 +505,10 @@ public class RSetStatusToItem extends Transaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -529,12 +523,12 @@ public class RSetStatusToItem extends Transaction {
             exLink = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -651,7 +645,7 @@ public class RSetStatusToItem extends Transaction {
         if (forDeal > Transaction.FOR_MYPACK) {
             return new RSetStatusToItem(typeBytes, creator, feePow, key, itemType, itemKey,
                     beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,
-                    timestamp, reference, signature, seqNo, feeLong);
+                    timestamp, flagsTX, signature, seqNo, feeLong);
         } else {
             return new RSetStatusToItem(typeBytes, creator, key, itemType, itemKey,
                     beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,
@@ -750,9 +744,9 @@ public class RSetStatusToItem extends Transaction {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+                base_len += dApp.length(forDeal);
             }
         }
 
@@ -771,13 +765,13 @@ public class RSetStatusToItem extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) {
             return result;
         }
@@ -919,7 +913,7 @@ public class RSetStatusToItem extends Transaction {
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        return new HashSet<>();
+        return new HashSet<>(1, 1);
     }
 
     @Override

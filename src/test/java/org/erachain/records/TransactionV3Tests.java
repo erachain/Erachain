@@ -12,9 +12,9 @@ import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.ArbitraryTransactionV3;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
-import org.erachain.smartcontracts.SmartContract;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class TransactionV3Tests {
     long timestamp = NTP.getTime();
 
     ExLink exLink = null;
-    SmartContract smartContract = null;
+    DAPP DAPP = null;
 
     byte[] itemAppData = null;
     long txFlags = 0L;
@@ -89,7 +89,7 @@ public class TransactionV3Tests {
 
 
         RSend messageTransactionV3 = new RSend(
-                maker, exLink, smartContract, FEE_POWER, //	ATFunding
+                maker, exLink, DAPP, FEE_POWER, //	ATFunding
                 recipient,
                 ERM_KEY,
                 amount,
@@ -99,10 +99,13 @@ public class TransactionV3Tests {
                 timestamp, maker.getLastTimestamp(db)[0]
         );
         messageTransactionV3.sign(maker, Transaction.FOR_NETWORK);
+        messageTransactionV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+
+        assertEquals(messageTransactionV3.isSignatureValid(db), true);
 
         assertEquals(messageTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
 
-        messageTransactionV3.process(gb,Transaction.FOR_NETWORK);
+        messageTransactionV3.process(gb, Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
         assertEquals(BigDecimal.valueOf(90).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERM_KEY, db));
@@ -127,7 +130,7 @@ public class TransactionV3Tests {
         assertEquals(messageTransactionV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
         assertEquals(messageTransactionV3.isText(), messageTransactionV3_2.isText());
 
-        assertEquals(messageTransactionV3.isSignatureValid(db), true);
+        messageTransactionV3_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(messageTransactionV3_2.isSignatureValid(db), true);
     }
 
@@ -178,6 +181,9 @@ public class TransactionV3Tests {
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 
+        arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
             assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.NOT_YET_RELEASED);
@@ -185,7 +191,7 @@ public class TransactionV3Tests {
             assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
         }
 
-        arbitraryTransactionV3.process(gb,Transaction.FOR_NETWORK);
+        arbitraryTransactionV3.process(gb, Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
         assertEquals(BigDecimal.valueOf(1000 - 110 - 120 - 201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(61l, db));
@@ -214,7 +220,7 @@ public class TransactionV3Tests {
         assertEquals(arbitraryTransactionV3.getService(), arbitraryTransactionV3_2.getService());
         assertEquals(arbitraryTransactionV3.getCreator(), arbitraryTransactionV3_2.getCreator());
 
-        assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+        arbitraryTransactionV3_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(arbitraryTransactionV3_2.isSignatureValid(db), true);
     }
 
@@ -248,6 +254,8 @@ public class TransactionV3Tests {
                 timestamp, maker.getLastTimestamp(db)[0]
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
+        arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
@@ -256,7 +264,7 @@ public class TransactionV3Tests {
             assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, txFlags), Transaction.VALIDATE_OK);
         }
 
-        arbitraryTransactionV3.process(gb,Transaction.FOR_NETWORK);
+        arbitraryTransactionV3.process(gb, Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(61l, db));
@@ -277,7 +285,7 @@ public class TransactionV3Tests {
         assertEquals(arbitraryTransactionV3.getService(), arbitraryTransactionV3_2.getService());
         assertEquals(arbitraryTransactionV3.getCreator(), arbitraryTransactionV3_2.getCreator());
 
-        assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+        arbitraryTransactionV3_2.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(arbitraryTransactionV3_2.isSignatureValid(db), true);
     }
 

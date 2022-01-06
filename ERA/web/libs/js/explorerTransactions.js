@@ -36,6 +36,9 @@ function tx(data) {
     if (tx.hasOwnProperty('foot')) {
         output += fformat(tx.foot) + '<br>';
     }
+    if (tx.hasOwnProperty('contract')) {
+        output += tx.contract + '<br>';
+    }
     if (tx.hasOwnProperty('signs')) {
         output += tx.signs + '<br>';
     }
@@ -43,7 +46,9 @@ function tx(data) {
         output += tx.links + '<br>';
     }
 
-    output += '<br><a href ="/api/tx/raw/' + tx.signature + '">{ RAW }</a>';
+    if (tx.hasOwnProperty('Label_RAW')) {
+        output += '<a href ="/api/tx/raw/' + tx.signature + '">{ ' + tx.Label_RAW + ' }</a>';
+    }
 
     return output;
 }

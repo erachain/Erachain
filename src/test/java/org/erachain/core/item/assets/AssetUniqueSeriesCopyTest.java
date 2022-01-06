@@ -41,7 +41,7 @@ public class AssetUniqueSeriesCopyTest {
         Long startDate = System.currentTimeMillis();
         Long stopDate = null;
         itemAppData = AssetCls.makeAppData(iconAsURL, iconType, imageAsURL, imageType,
-                startDate, stopDate, "tag", null, true);
+                startDate, stopDate, "tag", null, true, true);
         AssetUnique origAsset = new AssetUnique(itemAppData, null, "String name", null, null, "String description", 3);
 
         IssueAssetTransaction issueTX = new IssueAssetTransaction(maker, origAsset, feePow, System.currentTimeMillis(), 0L);

@@ -131,14 +131,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                 return u;
             }
 
-            u = this.getDefaultValue();
+            u = this.getDefaultValue(key);
             this.outUses();
             return u;
         } catch (Exception e) {
 
             logger.error(e.getMessage(), e);
 
-            U u = this.getDefaultValue();
+            U u = this.getDefaultValue(key);
             this.outUses();
             return u;
         }
@@ -284,7 +284,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         Iterator<T> parentIterator = parent.getIterator();
         IteratorCloseable<T> iterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratorParent(parentIterator, deleted), map.keySet().iterator()), Fun.COMPARATOR);
+                new IteratorParent(parentIterator, deleted), map.keySet().iterator()), Fun.COMPARATOR, false);
 
         this.outUses();
         return iterator;
@@ -320,7 +320,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
 
         IteratorCloseable iteratorMerged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratorParent(parentIterator, deleted), iterator), Fun.COMPARATOR);
+                new IteratorParent(parentIterator, deleted), iterator), Fun.COMPARATOR, descending);
 
         this.outUses();
         return iteratorMerged;

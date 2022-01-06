@@ -363,11 +363,11 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                 }
             }
 
-            u = this.getDefaultValue();
+            u = this.getDefaultValue(key);
             return u;
         } catch (Exception e) {
 
-            U u = this.getDefaultValue();
+            U u = this.getDefaultValue(key);
             return u;
         } finally {
             this.outUses();

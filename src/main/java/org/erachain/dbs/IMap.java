@@ -14,7 +14,7 @@ public interface IMap<T, U> {
 
     void openMap();
 
-    U getDefaultValue();
+    U getDefaultValue(T key);
 
     int size();
 
@@ -84,8 +84,6 @@ public interface IMap<T, U> {
     IteratorCloseable<T> getDescendingIterator();
 
     IteratorCloseable<T> getIterator(T fromKey, boolean descending);
-
-    int getDefaultIndex();
 
     void clear();
 

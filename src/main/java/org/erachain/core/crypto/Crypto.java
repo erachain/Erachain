@@ -2,6 +2,7 @@ package org.erachain.core.crypto;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ public class Crypto {
     public static final int SIGNATURE_LENGTH = 2 * HASH_LENGTH;
 
     public static final byte ADDRESS_VERSION = 15;
-    public static final byte AT_ADDRESS_VERSION = 23;
+    public static final byte DAPP_ADDRESS_VERSION = 23;
     static Logger LOGGER = LoggerFactory.getLogger(Crypto.class.getName());
     private static Crypto instance;
 
@@ -84,8 +85,14 @@ public class Crypto {
 
         //ADD VERSION BYTE
         addressBytes[0] = type;
+        if (type == DAPP_ADDRESS_VERSION) {
+            addressBytes[1] = 83;
+            addressBytes[2] = 118;
+            System.arraycopy(addressShort, 2, addressBytes, 3, addressShort.length - 2);
+        } else {
+            System.arraycopy(addressShort, 0, addressBytes, 1, addressShort.length);
+        }
 
-        System.arraycopy(addressShort, 0, addressBytes, 1, addressShort.length);
 
         //GENERATE CHECKSUM
         byte[] checkSum = this.doubleDigest(Arrays.copyOfRange(addressBytes, 0, 21));
@@ -103,44 +110,52 @@ public class Crypto {
         return Arrays.copyOfRange(bytes, 1, bytes.length - 4);
     }
 
-
     public String getAddressFromShort(byte[] addressShort) {
         return Base58.encode(getAddressFromShort(ADDRESS_VERSION, addressShort));
     }
 
-    public String getAddress(byte[] publicKey) {
-        //SHA256 PUBLICKEY FOR PROTECTION
-        byte[] publicKeyHash = this.digest(publicKey);
-
-        //RIPEMD160 TO CREATE A SHORTER ADDRESS
-        RIPEMD160 ripEmd160 = new RIPEMD160();
-        publicKeyHash = ripEmd160.digest(publicKeyHash);
-
-        return this.getAddressFromShort(publicKeyHash);
-
-    }
     public byte[] getAddressBytes(byte[] publicKey) {
-        //SHA256 PUBLICKEY FOR PROTECTION
-        byte[] publicKeyHash = this.digest(publicKey);
-
-        //RIPEMD160 TO CREATE A SHORTER ADDRESS
-        RIPEMD160 ripEmd160 = new RIPEMD160();
-        publicKeyHash = ripEmd160.digest(publicKeyHash);
-
-        return this.getAddressFromShortBytes(publicKeyHash);
+        return getAddressBytes(ADDRESS_VERSION, publicKey);
 
     }
 
-    public String getATAddress(byte[] signature) {
-        //SHA256 SIGNATURE TO CONVERT IT TO 32BYTE
-        byte[] publicKeyHash = this.digest(signature);
+    public byte[] getDAppAddress(byte[] signature) {
+        return getAddressBytes(DAPP_ADDRESS_VERSION, signature);
+
+    }
+
+    static final byte[] EMPTY_PUB_KEY = new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH];
+    public byte[] getAddressBytes(byte type, byte[] publicKeyOrSignarure) {
+
+        if (type == DAPP_ADDRESS_VERSION && publicKeyOrSignarure.length >= HASH_LENGTH) {
+            publicKeyOrSignarure[2] = (publicKeyOrSignarure[5] = (publicKeyOrSignarure[8] = (publicKeyOrSignarure[11] =
+                    (publicKeyOrSignarure[14] = (publicKeyOrSignarure[17] =
+                            (publicKeyOrSignarure[20] = (publicKeyOrSignarure[23] = (publicKeyOrSignarure[26] =
+                                    (publicKeyOrSignarure[29] = 0)))))))));
+        } else if (type == ADDRESS_VERSION && publicKeyOrSignarure.length >= HASH_LENGTH
+                && publicKeyOrSignarure[2] == 0 && publicKeyOrSignarure[5] == 0 && publicKeyOrSignarure[8] == 0
+                && publicKeyOrSignarure[11] == 0 && publicKeyOrSignarure[14] == 0 && publicKeyOrSignarure[17] == 0
+                && publicKeyOrSignarure[20] == 0 && publicKeyOrSignarure[23] == 0 && publicKeyOrSignarure[26] == 0
+                && publicKeyOrSignarure[29] == 0
+                // it si not the GENESIS PUB KEY
+                && !Arrays.equals(publicKeyOrSignarure, EMPTY_PUB_KEY)
+        ) {
+            type = DAPP_ADDRESS_VERSION;
+        }
+
+        //TO CONVERT IT TO 32BYTE
+        byte[] publicKeyHash = this.digest(publicKeyOrSignarure);
 
         //RIPEMD160 TO CREATE A SHORTER ADDRESS
         RIPEMD160 ripEmd160 = new RIPEMD160();
         publicKeyHash = ripEmd160.digest(publicKeyHash);
 
-        return Base58.encode(getAddressFromShort(AT_ADDRESS_VERSION, publicKeyHash));
 
+        return getAddressFromShort(type, publicKeyHash);
+    }
+
+    public String getDAppAddressB58(byte[] signature) {
+        return Base58.encode(getDAppAddress(signature));
     }
 
     public boolean isValidAddress(byte[] addressBytes) {
@@ -152,15 +167,11 @@ public class Crypto {
 
         //CHECK VERSION
         if (addressBytes[0] == ADDRESS_VERSION
-                || addressBytes[0] == AT_ADDRESS_VERSION) {
+                || addressBytes[0] == DAPP_ADDRESS_VERSION) {
 
             //REMOVE CHECKSUM
             byte[] checkSum = new byte[4];
             System.arraycopy(addressBytes, Account.ADDRESS_LENGTH - 4, checkSum, 0, 4);
-            //checkSum[3] = addressBytes[Account.ADDRESS_LENGTH - 1];
-            //checkSum[2] = addressBytes[Account.ADDRESS_LENGTH - 2];
-            //checkSum[1] = addressBytes[Account.ADDRESS_LENGTH - 3];
-            //checkSum[0] = addressBytes[Account.ADDRESS_LENGTH - 4];
 
             //GENERATE ADDRESS CHECKSUM
             byte[] shortBytes = new byte[Account.ADDRESS_LENGTH - 4];
@@ -168,10 +179,6 @@ public class Crypto {
             byte[] digest = this.doubleDigest(shortBytes); // Arrays.copyOfRange(addressBytes, 0, 21));
             byte[] checkSumTwo = new byte[4];
             System.arraycopy(digest, 0, checkSumTwo, 0, 4);
-            //checkSumTwo[0] = digest[0];
-            //checkSumTwo[1] = digest[1];
-            //checkSumTwo[2] = digest[2];
-            //checkSumTwo[3] = digest[3];
 
             //CHECK IF CHECKSUMS ARE THE SAME
             return Arrays.equals(checkSum, checkSumTwo);

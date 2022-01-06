@@ -42,7 +42,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 536; // vers 5.6.1 orderID
+    final static int CURRENT_VERSION = 540; // vers 5.7.1 dialog
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
@@ -103,6 +103,8 @@ public class DCSet extends DBASet implements Closeable {
 
     public static final int ORDERS_MAP = DBS_MAP_DB;
     public static final int COMPLETED_ORDERS_MAP = DBS_ROCK_DB;
+    public static final int TIME_DONE_MAP = DBS_ROCK_DB;
+    public static final int TIME_WAIT_MAP = DBS_ROCK_DB;
     public static final int TRADES_MAP = DBS_MAP_DB;
     public static final int PAIRS_MAP = DBS_MAP_DB;
 
@@ -159,9 +161,11 @@ public class DCSet extends DBASet implements Closeable {
     private HashtagPostMap hashtagPostMap;
     private VoteOnItemPollMap voteOnItemPollMap;
     private ItemAssetMap itemAssetMap;
+
     private OrderMapImpl orderMap;
     private CompletedOrderMapImpl completedOrderMap;
     private TradeMapImpl tradeMap;
+
     private ItemStatusMap itemStatusMap;
     private ItemImprintMap itemImprintMap;
     private ItemPollMap itemPollMap;
@@ -176,6 +180,9 @@ public class DCSet extends DBASet implements Closeable {
     private TransactionFinalCalculatedMap transactionFinalCalculatedMap;
     private TransactionFinalMapSigns transactionFinalMapSigns;
     private TransactionMapImpl transactionTab;
+
+    private TimeTXDoneMap timeTXDoneMap;
+    private TimeTXWaitMap timeTXWaitMap;
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
@@ -237,6 +244,13 @@ public class DCSet extends DBASet implements Closeable {
                     , this, database);
 
             this.addressPersonMap = new AddressPersonMapImpl(defaultDBS != DBS_FAST ? defaultDBS : DBS_MAP_DB, this, database);
+
+            this.timeTXDoneMap = new TimeTXDoneMap(defaultDBS != DBS_FAST ? defaultDBS :
+                    TIME_DONE_MAP
+                    , this, database);
+            this.timeTXWaitMap = new TimeTXWaitMap(defaultDBS != DBS_FAST ? defaultDBS :
+                    TIME_WAIT_MAP
+                    , this, database);
 
             this.actions = 0L;
 
@@ -388,6 +402,16 @@ public class DCSet extends DBASet implements Closeable {
 
         this.addressPersonMap = new AddressPersonMapImpl(DBS_MAP_DB, parent.addressPersonMap, this);
 
+        this.timeTXDoneMap = new TimeTXDoneMap(
+                DBS_MAP_DB
+                //DBS_ROCK_DB
+                //DBS_NATIVE_MAP
+                , parent.timeTXDoneMap, this);
+        this.timeTXWaitMap = new TimeTXWaitMap(
+                DBS_MAP_DB
+                //DBS_ROCK_DB
+                //DBS_NATIVE_MAP
+                , parent.timeTXWaitMap, this);
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.timeRoyaltyMap = new TimeRoyaltyMap(parent.timeRoyaltyMap, this);
@@ -801,6 +825,9 @@ public class DCSet extends DBASet implements Closeable {
         this.atStateMap.clear();
         this.atTransactionMap.clear();
 
+        this.timeTXDoneMap.clear();
+        this.timeTXWaitMap.clear();
+
         this.outUses();
     }
 
@@ -873,7 +900,7 @@ public class DCSet extends DBASet implements Closeable {
      *
      * <b>Значение:</b> сумма средств
      */
-    public CreditAddressesMap getCredit_AddressesMap() {
+    public CreditAddressesMap getCreditAddressesMap() {
         return this.credit_AddressesMap;
     }
 
@@ -1137,9 +1164,8 @@ public class DCSet extends DBASet implements Closeable {
 
     /**
      * TODO: Надо подумать может она лишняя??
-     * seek reference to tx_Parent by address+timestamp
+     * seek time reference to tx_Parent by address+timestamp
      * account.address -> <tx2.parentTimestamp>
-     *
      */
     public ReferenceMapImpl getReferenceMap() {
         return this.referenceMap;
@@ -1347,8 +1373,17 @@ public class DCSet extends DBASet implements Closeable {
         return this.itemUnionMap;
     }
 
+    public TimeTXDoneMap getTimeTXDoneMap() {
+        return this.timeTXDoneMap;
+    }
+
+    public TimeTXWaitMap getTimeTXWaitMap() {
+        return this.timeTXWaitMap;
+    }
+
     /**
      * Селектор таблицы по типу Сущности
+     *
      * @param type тип Сущности
      * @return
      */

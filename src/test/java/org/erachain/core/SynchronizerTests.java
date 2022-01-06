@@ -85,7 +85,7 @@ public class SynchronizerTests {
         //GENERATE 5 BLOCKS FROM ACCOUNT 1
         //GENERATE 5 NEXT BLOCKS
         Block lastBlock = genesisBlock;
-        BlockGenerator blockGenerator = new BlockGenerator(databaseSet,blockChain, false);
+        BlockGenerator blockGenerator = new BlockGenerator(databaseSet, blockChain, false);
         List<Block> firstBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
@@ -119,7 +119,7 @@ public class SynchronizerTests {
         DCSet fork = databaseSet.fork(this.toString());
         lastBlock = fork.getBlockMap().last();
 
-        BlockGenerator blockGeneratorFork = new BlockGenerator(fork,blockChain, false);
+        BlockGenerator blockGeneratorFork = new BlockGenerator(fork, blockChain, false);
         //GENERATE NEXT 5 BLOCKS
         List<Block> newBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
@@ -365,4 +365,25 @@ public class SynchronizerTests {
         }
     }
 
+    // Yandex test
+    private void gen(String res, int open, int closed, int n) {
+        if (res.length() == 2 * n) {
+            if (open == closed) {
+                System.out.println(res);
+            }
+            return;
+        }
+        gen(res + "(", open + 1, closed, n);
+
+        if (closed < open)
+            gen(res + ")", open, closed + 1, n);
+
+    }
+
+    @Test
+    public void testParens() {
+
+        gen("", 0, 0, 3);
+
+    }
 }

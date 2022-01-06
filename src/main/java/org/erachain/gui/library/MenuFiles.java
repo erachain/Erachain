@@ -86,20 +86,22 @@ public class MenuFiles extends JMenu {
         }
 
 
-        lockItem = new JMenuItem("lock");
+        lockItem = new JMenuItem();
         lockItem.getAccessibleContext().setAccessibleDescription(Lang.T("Lock/Unlock Wallet"));
         lockItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
 
         lockItem.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent e) {
                 PasswordPane.switchLockDialog(th);
             }
         });
-        add(lockItem);
+        if (false) {
+            // removed to Wallet Menu
+            add(lockItem);
 
-        //SEPARATOR
-        addSeparator();
+            //SEPARATOR
+            addSeparator();
+        }
 
         //CONSOLE
         JMenuItem consoleItem = new JMenuItem(Lang.T("Debug"));

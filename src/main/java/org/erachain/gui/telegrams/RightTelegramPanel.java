@@ -503,6 +503,16 @@ public class RightTelegramPanel extends javax.swing.JPanel {
         });
         menuSaveCopy.add(saveRAW64);
 
+        JMenuItem resendMenu = new JMenuItem(Lang.T("Resend"));
+        resendMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                Transaction transaction = walletTelegramsFilterTableModel.getItem(row);
+                Controller.getInstance().broadcastTelegram(transaction, false);
+
+            }
+        });
+        menu.add(resendMenu);
 
         menu.addSeparator();
 

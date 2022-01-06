@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.database.PagedIndexMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -17,6 +19,7 @@ import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import java.io.IOException;
@@ -32,10 +35,9 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * <b>Список балансов:</b> имущество, займы, хранение, производство, резерв<br>
  * Каждый баланс: Всего Пришло и Остаток<br><br>
  *
- * <b>Ключ:</b> account.address + asset key<br>
+ * <b>Ключ:</b> account.address.short[20] + asset key[8]<br>
  *
  * <b>Значение:</b> Балансы. in_OWN, in_RENT, on_HOLD = in_USE (TOTAL on HAND)
- *
  */
 // TODO SOFT HARD TRUE
 @Slf4j
@@ -66,8 +68,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     // TODO вставить настройки выбора СУБД
     @Override
-    public void openMap()
-    {
+    public void openMap() {
 
 
         if (parent == null) {
@@ -96,14 +97,30 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         }
     }
 
+
     @Override
     public Fun.Tuple5<
             Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> getDefaultValue() {
+            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> getDefaultValue(byte[] key) {
+
+        BigDecimal initialAmount = BigDecimal.ZERO;
+        if (BlockChain.ERA_COMPU_ALL_UP) {
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+            if (assetKey == AssetCls.ERA_KEY)
+                initialAmount = BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 1000 * (5000 + key[10]) / 5000);
+
+            else if (assetKey == AssetCls.FEE_KEY)
+                initialAmount = new BigDecimal("100.0");
+
+            else if (BlockChain.isNovaAsset(assetKey)) {
+                initialAmount = new BigDecimal("1000.0");
+            }
+        }
+
         return new Fun.Tuple5<
                 Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
                 Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
-                (new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                (new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, initialAmount),
                         new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
@@ -141,7 +158,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         return value;
     }
 
-    /**
+    /***
      * @param assetKey KEY for balance found + found balance
      * @return
      */
@@ -206,12 +223,65 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     }
 
+    /**
+     *
+     * @param assetKey
+     * @return
+     */
     public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
 
         if (assetKey < 0)
             assetKey = -assetKey;
 
         return ((ItemAssetBalanceSuit) map).getIteratorByAsset(assetKey);
+
+    }
+
+    public class PagedOwners extends PagedIndexMap<byte[],
+            Tuple3<Long, BigDecimal, byte[]>,
+            Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> {
+
+        public PagedOwners(DBTabImpl mapImpl) {
+            super(mapImpl);
+        }
+
+        @Override
+        public Tuple2<byte[],
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+        get(byte[] key) {
+
+            return new Tuple2(ItemAssetBalanceMap.getShortAccountFromKey(key), mapImpl.get(key));
+        }
+
+        @Override
+        public Tuple3<Long, BigDecimal, byte[]> makeSecondaryKey(byte[] key,
+                                                                 Tuple2<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> value) {
+
+            return new Tuple3<>(ItemAssetBalanceMap.getAssetKeyFromKey(key), value.b.a.b, ItemAssetBalanceMap.getShortAccountFromKey(key));
+        }
+
+        @Override
+        public IteratorCloseable<byte[]> getIterator(Tuple3<Long, BigDecimal, byte[]> fromSecondaryKey, boolean descending) {
+            return ((ItemAssetBalanceSuit) map).getIteratorByAsset(fromSecondaryKey.a, fromSecondaryKey.b, fromSecondaryKey.c, descending);
+        }
+
+    }
+
+    /**
+     * page of Short Address + Balances .. start & end ownAmount for keys
+     */
+    public List<Tuple2<byte[], Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+    getOwnersPage(Long assetKey, BigDecimal fromOwnAmount, byte[] fromAddres, int offset, int limit, boolean fillFullPage) {
+
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        PagedOwners pager = new PagedOwners(this);
+
+        return pager.getPageList(new Tuple3<>(assetKey, fromOwnAmount, fromAddres), offset, limit, fillFullPage);
 
     }
 

@@ -74,7 +74,7 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
     }
 
     @Override
-    public BigDecimal getDefaultValue() {
+    public BigDecimal getDefaultValue(Tuple3<String, Long, String> key) {
         return BigDecimal.ZERO;
     }
 
@@ -104,8 +104,13 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
     }
 
     public IteratorCloseable<Tuple3<String, Long, String>> getDebitorsIterator(String creditorAddress, long key) {
-        return IteratorCloseableImpl.make(((BTreeMap) map).subMap(new Tuple3(creditorAddress, key, null),
+        return IteratorCloseableImpl.make(((NavigableMap) map).subMap(new Tuple3(creditorAddress, key, null),
                 new Tuple3(creditorAddress, key, Fun.HI)).keySet().iterator());
+    }
+
+    public IteratorCloseable<Tuple3<String, Long, String>> getDebitorsIterator(String creditorAddress) {
+        return IteratorCloseableImpl.make(((NavigableMap) map).subMap(new Tuple3(creditorAddress, null, null),
+                new Tuple3(creditorAddress, Long.MAX_VALUE, Fun.HI)).keySet().iterator());
     }
 
     /**

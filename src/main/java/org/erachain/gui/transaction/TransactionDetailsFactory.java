@@ -60,7 +60,7 @@ public class TransactionDetailsFactory {
                 return new MultiPaymentDetailsFrame((MultiPaymentTransaction) transaction);
 
             case Transaction.SIGN_TRANSACTION:
-                new SigningDetailsFrame((RVouch) transaction);
+                return new SigningDetailsFrame((RVouch) transaction);
 
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
                 return new CertifyPubKeysDetailsFrame((RCertifyPubKeys) transaction);

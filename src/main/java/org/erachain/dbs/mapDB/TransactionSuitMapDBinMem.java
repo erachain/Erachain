@@ -3,7 +3,7 @@ package org.erachain.dbs.mapDB;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
-import org.erachain.database.serializer.TransactionSerializer;
+import org.erachain.database.serializer.TransactionUncSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
@@ -78,7 +78,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
         // OPEN MAP
         map = database.createHashMap("transactions")
                 .keySerializer(SerializerBase.LONG)
-                .valueSerializer(new TransactionSerializer())
+                .valueSerializer(new TransactionUncSerializer())
                 .counterEnable() // разрешаем счет размера - это будет немного тормозить работу
                 .makeOrGet();
 
@@ -95,7 +95,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     @Override
     public Transaction get(Long key) {
         if (database.getEngine().isClosed())
-            return getDefaultValue();
+            return getDefaultValue(key);
 
         return super.get(key);
     }
@@ -131,7 +131,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     @Override
     public Transaction remove(Long key) {
         if (database.getEngine().isClosed())
-            return getDefaultValue();
+            return getDefaultValue(key);
         return super.remove(key);
     }
 
@@ -149,7 +149,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     @Override
     public Transaction removeValue(Long key) {
         if (database.getEngine().isClosed())
-            return getDefaultValue();
+            return getDefaultValue(key);
         return super.removeValue(key);
     }
 

@@ -7,13 +7,13 @@ import org.mapdb.SerializerBase;
 import java.util.HashMap;
 
 /**
- * Use sates for save values that self-linked (change itself by previous state)
- * <b>Ключ:</b> smartContract.id + state.No<br>
+ * Use states for save values that self-linked (change itself by previous state)
+ * <b>Ключ:</b> DAPP.id + state.No (as SeqNo)<br>
  *
  * <b>Значение:</b> State values
  */
 
-public class SmartContractState extends DCUMap<Tuple2<Integer, Integer>, Object[]> {
+public class SmartContractState extends DCUMap<Tuple2<Integer, Long>, Object[]> {
 
     public SmartContractState(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -33,30 +33,7 @@ public class SmartContractState extends DCUMap<Tuple2<Integer, Integer>, Object[
 
     @Override
     protected void getMemoryMap() {
-        map = new HashMap<Tuple2<Integer, Integer>, Object[]>();
-    }
-
-    @Override
-    public void put(Tuple2<Integer, Integer> key, Object[] state) {
-        Tuple2<Integer, Integer> firstKey = new Tuple2<>(key.a, 0);
-        Object[] first = get(firstKey);
-        int stateID;
-        if (first == null) {
-            super.put(firstKey, new Object[]{1});
-            stateID = 1;
-        } else {
-            stateID = (int) first[0] + 1;
-        }
-        super.put(new Tuple2<>(key.a, stateID), state);
-    }
-
-    @Override
-    public void delete(Tuple2<Integer, Integer> key) {
-        Tuple2<Integer, Integer> firstKey = new Tuple2<>(key.a, 0);
-        Object[] first = get(firstKey);
-        int stateID = (int) first[0];
-        super.delete(new Tuple2<>(key.a, stateID));
-        super.put(firstKey, new Object[]{stateID - 1});
+        map = new HashMap<Tuple2<Integer, Long>, Object[]>();
     }
 
 }

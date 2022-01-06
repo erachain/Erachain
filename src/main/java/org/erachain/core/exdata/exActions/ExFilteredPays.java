@@ -36,7 +36,7 @@ import java.util.*;
  * Result: recipient + balance + accrual + Validate_Result {code, mess}
  */
 
-public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>>> {
+public class ExFilteredPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>>>> {
 
     public static final byte BASE_LENGTH = 4 + 3;
 
@@ -64,7 +64,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     private static final byte NOT_FILTER_PERSONS = -1; //
     private static final byte NOT_FILTER_GENDER = -2; //
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExPays.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExFilteredPays.class);
 
     public static final String FILTER_PERS_ALL = "All";
     public static final String FILTER_PERS_ONLY = "Only certified addresses";
@@ -128,11 +128,11 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
      * @param filterByGender
      * @param useSelfBalance
      */
-    public ExPays(int flags, Long assetKey, int balancePos, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
-                  Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
-                  BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
-                  int filterTXType, Long filterTimeStart, Long filterTimeEnd,
-                  int filterByGender, boolean useSelfBalance) {
+    public ExFilteredPays(int flags, Long assetKey, int balancePos, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
+                          Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
+                          BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
+                          int filterTXType, Long filterTimeStart, Long filterTimeEnd,
+                          int filterByGender, boolean useSelfBalance) {
 
         super(FILTERED_ACCRUALS_TYPE, balancePos, backward);
 
@@ -187,12 +187,12 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         this.useSelfBalance = useSelfBalance;
     }
 
-    public ExPays(int flags, Long assetKey, int balancePos, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
-                  Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
-                  BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
-                  int filterTXType, Long filterTimeStart, Long filterTimeEnd,
-                  int filterByGender, boolean useSelfBalance,
-                  int resultsCount, BigDecimal totalPay, long totalFeeBytes) {
+    public ExFilteredPays(int flags, Long assetKey, int balancePos, boolean backward, int payMethod, BigDecimal payMethodValue, BigDecimal amountMin, BigDecimal amountMax,
+                          Long filterAssetKey, int filterBalancePos, int filterBalanceSide,
+                          BigDecimal filterBalanceMIN, BigDecimal filterBalanceMAX,
+                          int filterTXType, Long filterTimeStart, Long filterTimeEnd,
+                          int filterByGender, boolean useSelfBalance,
+                          int resultsCount, BigDecimal totalPay, long totalFeeBytes) {
         this(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMIN, filterBalanceMAX,
@@ -221,6 +221,10 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         return "PAY_METHOD_" + mode;
     }
 
+    public static String viewPayMethod(int mode, JSONObject langObj) {
+        return Lang.T(viewPayMethod(mode), langObj);
+    }
+
     public static String viewFilterPersMode(int mode) {
         switch (mode) {
             case 0:
@@ -233,6 +237,10 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
                 return "Only for Women";
         }
         return "--";
+    }
+
+    public static String viewFilterPersMode(int mode, JSONObject langObj) {
+        return Lang.T(viewFilterPersMode(mode), langObj);
     }
 
     public void calcTotalFeeBytes() {
@@ -279,6 +287,11 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
 
     public boolean hasTXTypeFilterActiveEnd() {
         return (this.flags & ACTIVE_END_FLAG_MASK) != 0;
+    }
+
+    @Override
+    public BigDecimal getAmount(Account account) {
+        return BigDecimal.ZERO;
     }
 
     @Override
@@ -470,7 +483,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static ExPays parse(byte[] data, int position) throws Exception {
+    public static ExFilteredPays parse(byte[] data, int position) throws Exception {
 
         int scale;
         int len;
@@ -560,7 +573,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         int filterByPerson = data[position++];
         boolean selfPay = data[position++] > 0;
 
-        return new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
+        return new ExFilteredPays(flags, assetKey, balancePos, backward, payMethod, payMethodValue, amountMin, amountMax,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMoreThen, filterBalanceLessThen,
                 filterTXType, filterTXStart, filterTXEnd,
@@ -696,7 +709,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         }
 
         int flags = 0;
-        return new Fun.Tuple2<>(new ExPays(flags, assetKey, balancePos, backward, payMethod, payMethodValueBG, amountMinBG, amountMaxBG,
+        return new Fun.Tuple2<>(new ExFilteredPays(flags, assetKey, balancePos, backward, payMethod, payMethodValueBG, amountMinBG, amountMaxBG,
                 filterAssetKey, filterBalancePos, filterBalanceSide,
                 filterBalanceMoreThenBG, filterBalanceLessThenBG,
                 filterTXType, filterTimeStart, filterTimeEnd,
@@ -746,12 +759,12 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
             json.put("filterAsset", filterAsset.getName());
         }
 
-        json.put("payMethodName", Lang.T(ExPays.viewPayMethod(payMethod), langObj));
-        json.put("balancePosName", Lang.T(Account.balancePositionName(balancePos), langObj));
-        json.put("filterBalancePosName", Lang.T(Account.balancePositionName(filterBalancePos), langObj));
-        json.put("filterBalanceSideName", Lang.T(Account.balanceSideName(filterBalanceSide), langObj));
-        json.put("filterTXTypeName", Lang.T(Transaction.viewTypeName(filterTXType), langObj));
-        json.put("filterByGenderName", Lang.T(viewFilterPersMode(filterByGender), langObj));
+        json.put("payMethodName", ExFilteredPays.viewPayMethod(payMethod, langObj));
+        json.put("balancePosName", Account.balancePositionName(balancePos, langObj));
+        json.put("filterBalancePosName", Account.balancePositionName(filterBalancePos, langObj));
+        json.put("filterBalanceSideName", Account.balanceSideName(filterBalanceSide, langObj));
+        json.put("filterTXTypeName", Transaction.viewTypeName(filterTXType, langObj));
+        json.put("filterByGenderName", viewFilterPersMode(filterByGender, langObj));
 
         json.put("Label_Action_for_Asset", Lang.T("Action for Asset", langObj));
         json.put("Label_assetKey", Lang.T("Asset", langObj));
@@ -832,7 +845,7 @@ public class ExPays extends ExAction<List<Fun.Tuple4<Account, BigDecimal, BigDec
         if (onlyTotal || results == null)
             return out;
 
-        out += "<b>" + Lang.T("Recipients") + ":</b><br>";
+        out += "<b>" + Lang.T("Recipients", langObj) + ":</b><br>";
         for (Fun.Tuple4<Account, BigDecimal, BigDecimal, Fun.Tuple2<Integer, String>> item : results) {
             out += item.c.toPlainString() + " " + item.a.getAddress() + " x " + item.b.toPlainString() + "<br>";
         }

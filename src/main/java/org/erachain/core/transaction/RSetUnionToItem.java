@@ -149,10 +149,10 @@ public class RSetUnionToItem extends Transaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -212,7 +212,7 @@ public class RSetUnionToItem extends Transaction {
 
         if (forDeal > Transaction.FOR_MYPACK) {
             return new RSetUnionToItem(typeBytes, creator, feePow, key, itemType, itemKey,
-                    beg_date, end_date, timestamp, reference, signature, seqNo, feeLong);
+                    beg_date, end_date, timestamp, flagsTX, signature, seqNo, feeLong);
         } else {
             return new RSetStatusToItem(typeBytes, creator, key, itemType, itemKey,
                     beg_date, end_date, 0, 0, null, null, 0, null,
@@ -311,9 +311,9 @@ public class RSetUnionToItem extends Transaction {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+                base_len += dApp.length(forDeal);
             }
         }
 
@@ -327,13 +327,13 @@ public class RSetUnionToItem extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         //CHECK END_DAY
@@ -434,7 +434,7 @@ public class RSetUnionToItem extends Transaction {
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
-        return new HashSet<>();
+        return new HashSet<>(1, 1);
     }
 
     @Override

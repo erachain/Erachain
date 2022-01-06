@@ -76,7 +76,6 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
         searchString.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                transactionsTableModel.clear();
                 transactionsTableModel.find(searchString.getText(), null);
 
             }
@@ -87,7 +86,6 @@ public abstract class SearchTransactionsSplitPanelClass<T> extends SplitPanel {
         buttonGetLasts.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                transactionsTableModel.clear();
                 transactionsTableModel.find(null, null);
 
             }

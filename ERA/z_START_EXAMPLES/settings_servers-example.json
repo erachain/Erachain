@@ -1,0 +1,7 @@
+{
+  // Shiba servers
+  "shiba": {
+    // start Shiba FARM_01 server
+    "farm_01": true
+  }
+}

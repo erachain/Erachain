@@ -50,7 +50,7 @@ public class SourcesPanel extends JPanel {
                 }
 
                 if (sourcesModel.getRowCount() < 1) {
-                    sourcesModel.addRow(new Object[]{(int) 0, "", "", ""});
+                    sourcesModel.addEmpty();
                     interval = 0;
                 }
 
@@ -62,7 +62,7 @@ public class SourcesPanel extends JPanel {
         jButtonAddSources.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sourcesModel.addRow(new Object[]{(int) 0, "", "", ""});
+                sourcesModel.addEmpty();
             }
         });
 

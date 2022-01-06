@@ -8,6 +8,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -111,6 +112,10 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         return TransactionAmount.viewSubTypeName(this.key, this.amount, false, false);
     }
 
+    public String viewSubTypeName(JSONObject langObj) {
+        return Lang.T(TransactionAmount.viewSubTypeName(this.key, this.amount, false, false), langObj);
+    }
+
     @Override
     public BigDecimal getAmount() {
         return this.amount;
@@ -145,38 +150,19 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
             updateFromStateDB();
     }
 
-    @Override
-    public BigDecimal getAmount(String address) {
-        BigDecimal amount = BigDecimal.ZERO;
-
-        if (address.equals(this.recipient.getAddress())) {
-            //IF RECIPIENT
-            amount = amount.add(this.amount);
-        }
-
-        return amount;
-    }
 
     @Override
     public BigDecimal getAmount(Account account) {
-        String address = account.getAddress();
-        return getAmount(address);
+        if (recipient.equals(account)) {
+            return amount;
+        }
+
+        return BigDecimal.ZERO;
     }
 
     @Override
     public String viewAmount() {
         return NumberAsString.formatAsString(this.amount);
-    }
-
-    @Override
-    public String viewAmount(Account account) {
-        String address = account.getAddress();
-        return NumberAsString.formatAsString(getAmount(address));
-    }
-
-    @Override
-    public String viewAmount(String address) {
-        return NumberAsString.formatAsString(getAmount(address));
     }
 
     @Override
@@ -241,7 +227,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         //CHECK IF RECIPIENT IS VALID ADDRESS
         if (!"1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3".equals(this.recipient.getAddress())) {
@@ -279,7 +265,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         this.recipient.changeBalance(this.dcSet, false, false, key, this.amount,
                 false, false, false);
 
-        //UPDATE REFERENCE OF RECIPIENT
+        //UPDATE TIMESTAMP OF RECIPIENT
         this.recipient.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
 
         if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
@@ -293,7 +279,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
             // THIS is CREDIT
             this.sender.changeBalance(this.dcSet, true, false, key, this.amount,
                     false, false, false);
-            this.dcSet.getCredit_AddressesMap().add(
+            this.dcSet.getCreditAddressesMap().add(
                     new Tuple3<String, Long, String>(
                             this.sender.getAddress(), -key,
                             this.recipient.getAddress()),

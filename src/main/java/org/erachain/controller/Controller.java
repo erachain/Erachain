@@ -39,11 +39,11 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
+import org.erachain.dapp.DAPP;
 import org.erachain.database.DLSet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.TransactionMap;
-import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
@@ -57,7 +57,6 @@ import org.erachain.network.Peer;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
-import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.*;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
@@ -101,8 +100,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "5.6.1 dev 03";
-    public static String buildTime = "2021-10-05 12:00:00 UTC";
+    public static String version = "5.7 dev 6";
+    public static String buildTime = "2021-12-05 12:00:00 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -354,6 +353,20 @@ public class Controller extends Observable {
 
     public Wallet getWallet() {
         return this.wallet;
+    }
+
+    public String saveFavorites() {
+        if (doesWalletDatabaseExists())
+            return this.wallet.saveFavorites();
+
+        return null;
+    }
+
+    public String loadFavorites() {
+        if (doesWalletDatabaseExists())
+            return this.wallet.loadFavorites();
+
+        return null;
     }
 
     public boolean isAllThreadsGood() {
@@ -637,30 +650,32 @@ public class Controller extends Observable {
             ////LOGGER.error(e.getMessage(), e);
         }
 
-        // OPENING DATABASES
-        try {
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open DataChain"));
-            LOGGER.info("Try Open DataChain");
-            if (Settings.simpleTestNet) {
-                // -testnet
-                reCreateDC(inMemoryDC);
-            } else {
-                this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
-            }
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "DataChain OK"));
-            LOGGER.info("DataChain OK - " + Settings.getInstance().getDataChainPath());
-        } catch (Throwable e) {
-            // Error open DB
-            error = 1;
-            LOGGER.error("Error during startup detected trying to restore backup DataChain...");
-            LOGGER.error(e.getMessage(), e);
+        if (dcSet == null) {
+            // OPENING DATABASES
             try {
-                reCreateDC(inMemoryDC);
-            } catch (Throwable e1) {
-                LOGGER.error(e1.getMessage(), e1);
-                stopAndExit(5);
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Try Open DataChain"));
+                LOGGER.info("Try Open DataChain");
+                if (Settings.simpleTestNet) {
+                    // -testnet
+                    reCreateDC(inMemoryDC);
+                } else {
+                    this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
+                }
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "DataChain OK"));
+                LOGGER.info("DataChain OK - " + Settings.getInstance().getDataChainPath());
+            } catch (Throwable e) {
+                // Error open DB
+                error = 1;
+                LOGGER.error("Error during startup detected trying to restore backup DataChain...");
+                LOGGER.error(e.getMessage(), e);
+                try {
+                    reCreateDC(inMemoryDC);
+                } catch (Throwable e1) {
+                    LOGGER.error(e1.getMessage(), e1);
+                    stopAndExit(5);
+                }
             }
         }
 
@@ -702,30 +717,6 @@ public class Controller extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Datachain Ok")));
         // createDataCheckpoint();
-
-        // CHECK IF DB NEEDS UPDATE
-        /*
-         * try { if(this.dcSet.getBlocksHeadMap().getLastBlockSignature() != null) {
-         * //CHECK IF NAME STORAGE NEEDS UPDATE if
-         * (this.dcSet.getLocalDataMap().get("nsupdate") == null ) { //FIRST
-         * NAME STORAGE UPDATE UpdateUtil.repopulateNameStorage( 70000 );
-         * this.dcSet.getLocalDataMap().set("nsupdate", "1"); } //CREATE
-         * TRANSACTIONS FINAL MAP if
-         * (this.dcSet.getLocalDataMap().get("txfinalmap") == null ||
-         * !this.dcSet.getLocalDataMap().get("txfinalmap").equals("2")) {
-         * //FIRST NAME STORAGE UPDATE UpdateUtil.repopulateTransactionFinalMap(
-         * ); this.dcSet.getLocalDataMap().set("txfinalmap", "2"); }
-         *
-         * if (this.dcSet.getLocalDataMap().get("blogpostmap") == null ||
-         * !this.dcSet.getLocalDataMap().get("blogpostmap").equals("2")) {
-         * //recreate comment postmap UpdateUtil.repopulateCommentPostMap();
-         * this.dcSet.getLocalDataMap().set("blogpostmap", "2"); } } else {
-         * this.dcSet.getLocalDataMap().set("nsupdate", "1");
-         * this.dcSet.getLocalDataMap().set("txfinalmap", "2");
-         * this.dcSet.getLocalDataMap().set("blogpostmap", "2"); } } catch
-         * (Exception e12) { createDataCheckpoint(); //
-         * Setting_Json.put("DB_OPEN", "Open BAD - try reCreateDB"); }
-         */
 
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
@@ -1265,7 +1256,7 @@ public class Controller extends Observable {
             return false;
 
         try {
-            try (IteratorCloseable<Long> iterator = map.getIndexIterator(TransactionSuit.TIMESTAMP_INDEX, false)) {
+            try (IteratorCloseable<Long> iterator = map.getTimestampIterator(false)) {
                 long ping = 0;
                 int counter = 0;
                 ///////// big maxCounter freeze network and make bans on response
@@ -3111,7 +3102,8 @@ public class Controller extends Observable {
         }
 
         // CHECK IF RECORD VALID
-        if (!transaction.isSignatureValid(DCSet.getInstance()))
+        transaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        if (!transaction.isSignatureValid(DCSet.getInstance(), false))
             return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
 
         // CHECK FOR UPDATES
@@ -3126,7 +3118,8 @@ public class Controller extends Observable {
     public Tuple3<Transaction, Integer, String> checkTransaction(Transaction transaction) {
 
         // CHECK IF RECORD VALID
-        if (!transaction.isSignatureValid(DCSet.getInstance()))
+        transaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
+        if (!transaction.isSignatureValid(DCSet.getInstance(), false))
             return new Tuple3<Transaction, Integer, String>(transaction, Transaction.INVALID_SIGNATURE, null);
 
         // CHECK FOR UPDATES
@@ -3539,7 +3532,7 @@ public class Controller extends Observable {
         }
     }
 
-    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, SmartContract smartContract, String recipientStr,
+    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, ExLink linkTo, DAPP dApp, String recipientStr,
                                                   int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
                                                   String title, String message, int messagecode, boolean encrypt, long timestamp) {
 
@@ -3654,26 +3647,27 @@ public class Controller extends Observable {
         }
 
         // CREATE RSend
-        return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, linkTo, smartContract, feePow, recipient,
+        return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, linkTo, dApp, feePow, recipient,
                 assetKey, amount, title, messageBytes, isTextByte, encrypted, timestamp));
 
     }
 
-    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, SmartContract smartContract, int feePow,
+    public Transaction r_Send(PrivateKeyAccount sender, ExLink linkTo, DAPP dapp, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage, long timestamp) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(sender, linkTo, smartContract, recipient, key, amount, feePow, title, message, isText,
+            return this.transactionCreator.r_Send(sender, linkTo, dapp, recipient, key, amount, feePow, title, message, isText,
                     encryptMessage, timestamp);
         }
     }
 
     public Transaction r_Send(byte version, byte property1, byte property2,
-                              PrivateKeyAccount sender, ExLink linkTo, SmartContract smartContract, int feePow,
-                              Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
+                              PrivateKeyAccount sender, ExLink linkTo, DAPP dapp, int feePow,
+                              Account recipient, long key, BigDecimal amount, int actionPackage, Object[][] assetsPackage, String title, byte[] message, byte[] isText,
                               byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, linkTo, smartContract, feePow,
+            return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount,
+                    actionPackage, assetsPackage, linkTo, dapp, feePow,
                     title, message, isText, encryptMessage);
         }
     }

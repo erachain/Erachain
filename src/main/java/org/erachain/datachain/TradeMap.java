@@ -12,7 +12,7 @@ import java.util.List;
 public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
     void put(Trade trade);
 
-    IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByInitiator(Long orderID);
+    IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByInitiator(Long orderID, boolean descending);
 
     IteratorCloseable<Fun.Tuple2<Long, Long>> iteratorByAssetKey(long haveWant, boolean descending);
 

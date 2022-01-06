@@ -44,7 +44,7 @@ public class RecResource {
     /*@GET here defines, this method will process HTTP GET requests. */
 
     ///////////////////////////
-    public static String toBytes(int record_type, int version, int property1, int property2, int feePow, long timestamp, String creator, long reference,
+    public static String toBytes(int record_type, int version, int property1, int property2, int feePow, long timestamp, String creator, long flags,
                                  MultivaluedMap<String, String> queryParameters) // throws JSONException
     {
 
@@ -65,10 +65,6 @@ public class RecResource {
         creatorPK = new PublicKeyAccount(Base58.decode(creator));
 
         int step = 0;
-
-        if (reference == 0) {
-            reference = Controller.getInstance().getTransactionCreator().getReference(creatorPK);
-        }
 
 
         try {
@@ -197,7 +193,7 @@ public class RecResource {
                     record = new RSend((byte) version, (byte) property1, (byte) property2,
                             creatorPK,
                             exLink, null, (byte) feePow, recipient, key, amount, head,
-                            data, isText, encryptMessage, timestamp, reference);
+                            data, isText, encryptMessage, timestamp, flags);
 
                     break;
 
@@ -446,7 +442,7 @@ public class RecResource {
         int feePow;
         int version;
         long timestamp;
-        long reference;
+        long flags;
 
         int step = 0;
         try {
@@ -459,14 +455,14 @@ public class RecResource {
             timestamp = jsonObject.containsKey("timestamp") ? Long.parseLong(((List<String>) jsonObject.get("timestamp")).get(0)) : NTP.getTime();
 
             step++;
-            reference = jsonObject.containsKey("reference") ? Long.parseLong(((List<String>) jsonObject.get("reference")).get(0)) : 0l;
+            flags = jsonObject.containsKey("flags") ? Long.parseLong(((List<String>) jsonObject.get("flags")).get(0)) : 0l;
         } catch (Exception e1) {
             //logger.info(e1);
             return APIUtils.errorMess(-step, e1.toString() + " on step: " + step);
         }
 
 
-        return toBytes(record_type, version, 0, 0, feePow, timestamp, creator, reference, queryParameters);
+        return toBytes(record_type, version, 0, 0, feePow, timestamp, creator, flags, queryParameters);
 
     }
 
@@ -477,7 +473,7 @@ public class RecResource {
                          @PathParam("creator") String creator,
                          @PathParam("timestamp") long timestamp,
                          @PathParam("feePow") int feePow,
-                         @PathParam("reference") long reference
+                         @PathParam("flags") long flags
     ) // throws JSONException
     {
 
@@ -489,7 +485,7 @@ public class RecResource {
         // see http://ru.tmsoftstudio.com/file/page/web-services-java/javax_ws_rs_core.html
         MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
-        return toBytes(record_type, version, 0, 0, feePow, timestamp, creator, reference, queryParameters);
+        return toBytes(record_type, version, 0, 0, feePow, timestamp, creator, flags, queryParameters);
 
     }
 
@@ -502,7 +498,7 @@ public class RecResource {
                          @PathParam("creator") String creator,
                          @PathParam("timestamp") long timestamp,
                          @PathParam("feePow") int feePow,
-                         @PathParam("reference") long reference
+                         @PathParam("flags") long flags
     ) // throws JSONException
     {
 
@@ -514,7 +510,7 @@ public class RecResource {
         // see http://ru.tmsoftstudio.com/file/page/web-services-java/javax_ws_rs_core.html
         MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
-        return toBytes(record_type, version, property1, property2, feePow, timestamp, creator, reference, queryParameters);
+        return toBytes(record_type, version, property1, property2, feePow, timestamp, creator, flags, queryParameters);
 
     }
 

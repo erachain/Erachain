@@ -14,6 +14,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.dapp.DAPP;
 import org.erachain.gui.*;
 import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.items.accounts.AccountsComboBoxModel;
@@ -22,7 +23,6 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.library.RecipientAddress;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.erachain.smartcontracts.SmartContract;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
 import org.mapdb.Fun.Tuple2;
@@ -491,7 +491,7 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
         }
 
         this.txtRecDetails.setText(Lang.T(
-                Account.getDetailsForEncrypt(recipient, asset.getKey(),
+                Account.getDetailsForEncrypt(recipient, asset,
                         encrypted.isSelected(), true)));
 
         Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipient);
@@ -695,9 +695,9 @@ public class MailSendPanel extends IconPanel implements RecipientAddress.Recipie
             exLink = new ExLinkAppendix(linkRef);
         }
 
-        SmartContract smartContract = null;
+        DAPP dapp = null;
         // CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send(creator, exLink, smartContract, feePow, recipient, key,
+        Transaction transaction = Controller.getInstance().r_Send(creator, exLink, dapp, feePow, recipient, key,
                 amount, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);

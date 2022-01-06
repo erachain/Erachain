@@ -100,6 +100,11 @@ public class FPool extends MonitoredThread {
         }
 
         privateKeyAccount = controller.getWalletPrivateKeyAccountByAddress((String) settingsJSON.get("address"));
+        if (privateKeyAccount == null) {
+            LOGGER.error("FPool address is EMPTY or WRONG - see in 'settings_fpool.json'. FPool is shutdown...");
+            return;
+        }
+
         POOL_TAX = new BigDecimal(settingsJSON.get("tax").toString()).movePointLeft(2);
         PENDING_PERIOD = Integer.parseInt(settingsJSON.getOrDefault("pending_period", 30).toString());
 
@@ -228,7 +233,7 @@ public class FPool extends MonitoredThread {
         BigDecimal totalForginAmount = new BigDecimal(block.getForgingValue());
 
         // make table of credits
-        CreditAddressesMap creditMap = dcSet.getCredit_AddressesMap();
+        CreditAddressesMap creditMap = dcSet.getCreditAddressesMap();
         HashMap<String, BigDecimal> credits = new HashMap();
         try (IteratorCloseable<Tuple3<String, Long, String>> iterator = creditMap.getCreditorsIterator(
                 privateKeyAccount.getAddress(), AssetCls.ERA_KEY)) {
@@ -477,13 +482,12 @@ public class FPool extends MonitoredThread {
                 (byte) 0, null, (byte) 0, null,
                 (byte) 0, null, null, exDataJSON, null);
 
-        byte version = (byte) 3;
         byte property1 = (byte) 0;
         byte property2 = (byte) 0;
         byte feePow = 0;
         RSignNote issueDoc = null;
         try {
-            issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2,
+            issueDoc = (RSignNote) Controller.getInstance().r_SignNote(RSignNote.CURRENT_VERS, property1, property2,
                     privateKeyAccount, feePow, 0, exData.toByte());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

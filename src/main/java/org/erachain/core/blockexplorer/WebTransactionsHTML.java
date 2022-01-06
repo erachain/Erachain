@@ -2,6 +2,8 @@ package org.erachain.core.blockexplorer;
 
 import org.apache.commons.net.util.Base64;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.ExData;
@@ -16,6 +18,7 @@ import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.*;
+import org.erachain.dapp.DAPP;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
@@ -74,6 +77,12 @@ public class WebTransactionsHTML {
         outTX.put("timestampLabel", Lang.T("Date", langObj));
         outTX.put("timestamp", transaction.getTimestamp());
         outTX.put("signature", transaction.viewSignature());
+
+        if (transaction instanceof RCalculated) {
+
+        } else {
+            outTX.put("Label_RAW", Lang.T("RAW"));
+        }
 
         if (transaction.isWiped())
             return outTX;
@@ -201,7 +210,19 @@ public class WebTransactionsHTML {
                         + transaction.getCreator().getPersonAsString() + "</a>";
                 out += "<br><b>" + Lang.T("Public Key", langObj) + ": </b><a href=?address="
                         + tras_json.get("publickey") + get_Lang() + ">" + tras_json.get("publickey") + "</a>";
-                out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + tras_json.get("fee");
+                out += "<BR><b>" + Lang.T("Fee", langObj) + ": </b>" + transaction.getFee().toPlainString();
+
+                if (transaction.assetFEE != null && transaction.assetFEE.a.signum() != 0) {
+                    AssetCls asset = transaction.getAsset();
+                    if (asset == null) {
+                        asset = Controller.getInstance().getAsset(transaction.getAbsKey());
+                    }
+                    BigDecimal taxes = BlockChain.ASSET_TRANSFER_PERCENTAGE(transaction.getBlockHeight(), asset.getKey());
+                    BigDecimal taxesMin = BlockChain.ASSET_TRANSFER_PERCENTAGE_MIN(transaction.getBlockHeight(), asset.getKey());
+
+                    out += "<br>" + Lang.T("Additional Asset FEE", langObj) + ": ";
+                    out += Transaction.viewAssetFee(asset, taxes, taxesMin, transaction.assetFEE.a);
+                }
             }
             if (transaction.isWiped()) {
                 out += "<BR><b>" + Lang.T("WIPED", langObj) + ": </b>" + "true";
@@ -344,13 +365,20 @@ public class WebTransactionsHTML {
             out += cancelOrder.toJson();
         }
 
-        CreateOrderTransaction createOrder = (CreateOrderTransaction) dcSet.getTransactionFinalMap().get(key);
-
         out += "</br><h3>" + Lang.T("Order to Cancel", langObj) + "</h3>";
-        if (createOrder == null) {
+
+        Transaction txActor = dcSet.getTransactionFinalMap().get(key);
+        if (txActor == null) {
             out += "not found" + " : " + cancelOrder.viewSignature();
         } else {
-            out += create_Order_HTML(createOrder);
+            if (txActor instanceof ChangeOrderTransaction) {
+                out += update_Order_HTML(txActor);
+
+            } else if (txActor instanceof CreateOrderTransaction) {
+                out += create_Order_HTML(txActor);
+            } else {
+                out += "uncnow type tx: " + txActor.toString();
+            }
         }
 
         return out;
@@ -695,14 +723,54 @@ public class WebTransactionsHTML {
                 + rSend.getRecipient().getAddress() + get_Lang() + "><b>" + rSend.getRecipient().getPersonAsString()
                 + "</b></a>";
 
-        if (rSend.getAmount() != null) {
-            out += "<br>" + Lang.T(rSend.viewActionType(), langObj)
-                    + ": <b>" + rSend.getAmount().toPlainString() + " х "
-                    + itemNameHTML(Controller.getInstance().getAsset(rSend.getAbsKey())) + "</b>";
-        }
-
         if (!rSend.getTitle().equals(""))
             out += "<BR>" + Lang.T("Title", langObj) + ": <b>" + rSend.getTitle() + "</b>";
+
+        if (rSend.hasAmount()) {
+            if (rSend.hasPacket()) {
+                out += "<h3>" + Lang.T("Assets Package", langObj) + "</h3>";
+
+                out += Lang.T("Balance Position", langObj) + ": "
+                        + Lang.T(Account.balancePositionName(rSend.balancePosition()), langObj)
+                        + (rSend.isBackward() ? Lang.T("BACKWARD", langObj) : "")
+                        + "<br>" + Lang.T("Price Asset", langObj) + ": "
+                        + itemNameHTML(Controller.getInstance().getAsset(rSend.getAbsKey())) + "</b>";
+
+                out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>"
+                        + Lang.T("No.", this.langObj)
+                        + "<td>" + Lang.T("Asset", this.langObj)
+                        + "<td>" + Lang.T("Action", this.langObj)
+                        + "<td>" + Lang.T("Volume", this.langObj)
+                        + "<td>" + Lang.T("Price", this.langObj)
+                        + "<td>" + Lang.T("Discounted Price", this.langObj)
+                        + "<td>" + Lang.T("Tax # налог", this.langObj) + " %"
+                        + "<td>" + Lang.T("Fee", this.langObj)
+                        + "<td>" + Lang.T("Memo", this.langObj)
+                        + "</tr>";
+
+                Object[][] assetsPackage = rSend.getPacket();
+                AssetCls asset;
+                for (int count = 0; count < assetsPackage.length; count++) {
+                    asset = (AssetCls) assetsPackage[count][7];
+                    out += "<tr><td>" + (count + 1)
+                            + "<td>" + asset.toString()
+                            + "<td>" + Lang.T(asset.viewAssetTypeAction(rSend.isBackward(), rSend.balancePosition(), rSend.getCreator().equals(asset.getMaker())), langObj)
+                            + "<td>" + (assetsPackage[count][1] == null ? "" : assetsPackage[count][1].toString())
+                            + "<td>" + (assetsPackage[count][2] == null ? "" : assetsPackage[count][2].toString())
+                            + "<td>" + (assetsPackage[count][3] == null ? "" : assetsPackage[count][3].toString())
+                            + "<td>" + (assetsPackage[count][4] == null ? "" : assetsPackage[count][4].toString())
+                            + "<td>" + (assetsPackage[count][5] == null ? "" : assetsPackage[count][5].toString())
+                            + "<td>" + (assetsPackage[count][6] == null ? "" : assetsPackage[count][6].toString())
+                    ;
+                }
+                out += "</table>";
+
+            } else {
+                out += "<br>" + Lang.T(rSend.viewActionType(), langObj)
+                        + ": <b>" + rSend.getAmount().toPlainString() + " х "
+                        + itemNameHTML(Controller.getInstance().getAsset(rSend.getAbsKey())) + "</b>";
+            }
+        }
 
         return out;
 
@@ -799,7 +867,7 @@ public class WebTransactionsHTML {
 
         Fun.Tuple2<Integer, PersonCls> itemPerson = transaction.getCreator().getPerson();
         if (itemPerson == null) {
-            return htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature(), langObj);
+            return htmlSignifier(transaction.getTimestamp(), null, null, transaction.getCreator(), transaction.getSignature(), langObj);
         }
 
         return htmlSignifier(transaction.getTimestamp(), itemPerson.b.getKey(), itemPerson.b.viewName(),
@@ -849,7 +917,7 @@ public class WebTransactionsHTML {
             personSign = htmlSignifier(transaction.getTimestamp(), creatorPersonItem.b.getKey(),
                     creatorPersonItem.b.viewName(), transaction.getCreator(), transaction.getSignature(), langObj);
         } else {
-            personSign = htmlSignifier(0, null, null, transaction.getCreator(), transaction.getSignature(), langObj);
+            personSign = htmlSignifier(transaction.getTimestamp(), null, null, transaction.getCreator(), transaction.getSignature(), langObj);
         }
 
         Fun.Tuple2<BigDecimal, List<Long>> signsItem = dcSet.getVouchRecordMap().get(transaction.getDBRef());
@@ -888,6 +956,20 @@ public class WebTransactionsHTML {
 
     }
 
+    public static void getContract(HashMap output, Transaction transaction, JSONObject langObj) {
+
+        DAPP contract = transaction.getSmartContract();
+        if (contract == null) {
+            return;
+        }
+
+        String out = "<b><center>" + Lang.T("Smart Contract", langObj) + "</center></b> ";
+        out += contract.getHTML(langObj);
+
+        output.put("contract", out);
+
+    }
+
     public static void getSigns(HashMap output, Transaction transaction, JSONObject langObj) {
 
         DCSet dcSet = DCSet.getInstance();
@@ -922,7 +1004,7 @@ public class WebTransactionsHTML {
                     out += "<h2>" + Lang.T("Appendix", langObj)
                             + "</h2><h3>" + childTx.getTitle() + "</h3>";
                     out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
-                            + Lang.T(childTx.viewFullTypeName(), langObj) + " " + childTx.viewHeightSeq() + "</a> "
+                            + childTx.viewFullTypeName(langObj) + " " + childTx.viewHeightSeq() + "</a> "
                             + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
                     out += "<a href=?address="
                             + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
@@ -937,7 +1019,7 @@ public class WebTransactionsHTML {
                         out += "<h2>" + Lang.T("Appendix", langObj) + " " + ++count
                                 + "</h2><h3>" + childTx.getTitle() + "</h3>";
                         out += "<a href=?tx=" + childTx.viewHeightSeq() + BlockExplorer.get_Lang(langObj) + ">"
-                                + Lang.T(childTx.viewFullTypeName(), langObj) + " " + childTx.viewHeightSeq() + "</a> "
+                                + childTx.viewFullTypeName(langObj) + " " + childTx.viewHeightSeq() + "</a> "
                                 + " " + DateTimeFormat.timestamptoString(childTx.getTimestamp()) + " ";
                         out += "<a href=?address="
                                 + childTx.getCreator().getAddress() + BlockExplorer.get_Lang(langObj) + "><b>" + childTx.getCreator().getPersonAsString()
@@ -1072,6 +1154,7 @@ public class WebTransactionsHTML {
     }
 
     public static void getApps(HashMap output, Transaction transaction, JSONObject langObj) {
+        getContract(output, transaction, langObj);
         getSigns(output, transaction, langObj);
         getLinks(output, transaction, langObj);
     }

@@ -10,7 +10,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
-import org.erachain.smartcontracts.SmartContract;
+import org.erachain.dapp.DAPP;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
@@ -35,32 +35,32 @@ public class IssuePersonRecord extends IssueItemRecord {
     public static final int MAX_DESCRIPTION_LENGTH = 1 << 15;
 
 
-    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, Long reference) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, reference);
+    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, long flags) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, flags);
     }
 
-    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, reference, signature);
+    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp, long flags, byte[] signature) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, flags, signature);
     }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte feePow, long timestamp,
-                             Long reference, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, reference, signature);
+                             long flags, byte[] signature, long seqNo, long feeLong) {
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, feePow, timestamp, flags, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
     }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, PersonCls person, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, person, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, person, (byte) 0, 0L, 0L, signature);
     }
 
-    public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, person, feePow, timestamp, reference, signature);
+    public IssuePersonRecord(PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, long flags, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, null, person, feePow, timestamp, flags, signature);
     }
 
-    public IssuePersonRecord(PublicKeyAccount creator, ExLink linkTo, boolean andCertify, PersonCls person, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, andCertify ? (byte) AND_CERTIFY_MASK : (byte) 0}, creator, linkTo, person, feePow, timestamp, reference);
+    public IssuePersonRecord(PublicKeyAccount creator, ExLink linkTo, boolean andCertify, PersonCls person, byte feePow, long timestamp, long flags) {
+        this(new byte[]{TYPE_ID, 0, 0, andCertify ? (byte) AND_CERTIFY_MASK : (byte) 0}, creator, linkTo, person, feePow, timestamp, flags);
     }
 
     //GETTERS/SETTERS
@@ -106,10 +106,10 @@ public class IssuePersonRecord extends IssueItemRecord {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -124,12 +124,12 @@ public class IssuePersonRecord extends IssueItemRecord {
             linkTo = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -174,7 +174,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         }
 
         if (forDeal > Transaction.FOR_MYPACK) {
-            return new IssuePersonRecord(typeBytes, creator, linkTo, person, feePow, timestamp, reference, signatureBytes, seqNo, feeLong);
+            return new IssuePersonRecord(typeBytes, creator, linkTo, person, feePow, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
         } else {
             return new IssuePersonRecord(typeBytes, creator, linkTo, person, signatureBytes);
         }
@@ -219,7 +219,7 @@ public class IssuePersonRecord extends IssueItemRecord {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -319,12 +319,12 @@ public class IssuePersonRecord extends IssueItemRecord {
 
         // IF BALANCE 0 or more - not check FEE
         boolean checkFeeBalance = creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0;
-        int res = super.isValid(forDeal, flags |
+        int res = super.isValid(forDeal, checkFlags |
                 (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
         boolean creatorIsPerson = creator.isPerson(dcSet, height);
-        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
+        if ((checkFlags & NOT_VALIDATE_FLAG_PERSONAL) == 0L && !BlockChain.ANONIM_SERT_USE
                 && !creatorIsPerson) {
             // ALL Persons by ADMINS
             for (String admin : BlockChain.GENESIS_ADMINS) {
@@ -382,9 +382,13 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (person.isMustBeSigned()) {
             // for quick search public keys by address - use PUB_KEY from Person DATA owner
             // used in - controller.Controller.getPublicKeyByAddress
-            long[] makerLastTimestamp = maker.getLastTimestamp(this.dcSet);
-            if (makerLastTimestamp == null) {
-                maker.setLastTimestamp(new long[]{timestamp, dbRef}, this.dcSet);
+            if (!maker.equals(creator)) {
+                // если создатель персоны и выпускающий - один счет то игнорируем
+                long[] makerLastTimestamp = maker.getLastTimestamp(this.dcSet);
+                if (makerLastTimestamp == null) {
+                    // добавим первую точку счете персоны по времени
+                    maker.setLastTimestamp(new long[]{timestamp, dbRef}, this.dcSet);
+                }
             }
 
             // запомним подпись для поиска потом
@@ -413,12 +417,23 @@ public class IssuePersonRecord extends IssueItemRecord {
             RCertifyPubKeys.orphanBody(dcSet, this, person.getKey(), pubKeys);
         }
 
-        byte[] makerBytes = maker.getPublicKey();
-        this.dcSet.getTransactionFinalMapSigns().delete(makerBytes);
-
         if (person.isMustBeSigned()) {
+            // for quick search public keys by address - use PUB_KEY from Person DATA owner
+            // used in - controller.Controller.getPublicKeyByAddress
+            if (!maker.equals(creator)) {
+                // если создатель персоны и и выпускающий - один счет то игнорируем
+                long[] makerLastTimestamp = maker.getLastTimestamp(this.dcSet);
+                if (makerLastTimestamp == null) {
+                    maker.removeLastTimestamp(this.dcSet, timestamp);
+                }
+            }
+
+            // удалим подпись для поиска
             dcSet.getTransactionFinalMapSigns().delete(person.getMakerSignature());
         }
+
+        byte[] makerBytes = maker.getPublicKey();
+        this.dcSet.getTransactionFinalMapSigns().delete(makerBytes);
 
     }
 

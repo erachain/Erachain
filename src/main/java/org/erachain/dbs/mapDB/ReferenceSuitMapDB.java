@@ -9,7 +9,7 @@ import org.mapdb.SerializerBase;
 
 
 /**
- * seek reference to tx_Parent by address+timestamp
+ * seek time reference to tx_Parent by address+timestamp
  * account.address -> LAST[TX.timestamp + TX.dbRef]
  * account.address + TX.timestamp -> PARENT[TX.timestamp + TX.dbRef]
  */

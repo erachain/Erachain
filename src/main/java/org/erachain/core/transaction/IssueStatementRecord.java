@@ -8,7 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.exdata.exLink.ExLink;
-import org.erachain.smartcontracts.SmartContract;
+import org.erachain.dapp.DAPP;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -130,10 +130,10 @@ public class IssueStatementRecord extends Transaction {
             position += TIMESTAMP_LENGTH;
         }
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        Long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+        long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -148,12 +148,12 @@ public class IssueStatementRecord extends Transaction {
             linkTo = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -238,16 +238,16 @@ public class IssueStatementRecord extends Transaction {
         if (signersLen == 0) {
             if (forDeal > Transaction.FOR_MYPACK) {
                 return new IssueStatementRecord(typeBytes, creator, linkTo, feePow, key, arbitraryData, isTextByte, encryptedByte,
-                        timestamp, reference, signatureBytes, seqNo, feeLong);
+                        timestamp, flagsTX, signatureBytes, seqNo, feeLong);
             } else {
-                return new IssueStatementRecord(typeBytes, creator, linkTo, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
+                return new IssueStatementRecord(typeBytes, creator, linkTo, key, arbitraryData, isTextByte, encryptedByte, flagsTX, signatureBytes);
             }
         } else {
             if (forDeal > Transaction.FOR_MYPACK) {
                 return new IssueStatementRecord(typeBytes, creator, linkTo, feePow, key, arbitraryData, isTextByte, encryptedByte,
-                        signers, signatures, timestamp, reference, signatureBytes, seqNo, feeLong);
+                        signers, signatures, timestamp, flagsTX, signatureBytes, seqNo, feeLong);
             } else {
-                return new IssueStatementRecord(typeBytes, creator, linkTo, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
+                return new IssueStatementRecord(typeBytes, creator, linkTo, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, flagsTX, signatureBytes);
             }
 
         }
@@ -432,9 +432,9 @@ public class IssueStatementRecord extends Transaction {
         if (exLink != null)
             base_len += exLink.length();
 
-        if (smartContract != null) {
-            if (forDeal == FOR_DB_RECORD || !smartContract.isEpoch()) {
-                base_len += smartContract.length(forDeal);
+        if (dApp != null) {
+            if (forDeal == FOR_DB_RECORD || !dApp.isEpoch()) {
+                base_len += dApp.length(forDeal);
             }
         }
 
@@ -452,7 +452,7 @@ public class IssueStatementRecord extends Transaction {
 
     //@Override
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -464,7 +464,7 @@ public class IssueStatementRecord extends Transaction {
         }
 
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         // ITEM EXIST? - for assets transfer not need - amount expect instead

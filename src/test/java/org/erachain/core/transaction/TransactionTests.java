@@ -122,12 +122,14 @@ public class TransactionTests {
         Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
         payment.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF PAYMENT SIGNATURE IS VALID
+        payment.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, payment.isSignatureValid(db));
 
         //INVALID SIGNATURE
         payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp + 1, last_ref, new byte[64]);
 
         //CHECK IF PAYMENT SIGNATURE IS INVALID
+        payment.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, payment.isSignatureValid(db));
     }
 
@@ -293,6 +295,7 @@ public class TransactionTests {
         Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
         pollCreation.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF POLL CREATION IS VALID
+        pollCreation.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, pollCreation.isSignatureValid(db));
 
         //INVALID SIGNATURE
@@ -300,6 +303,7 @@ public class TransactionTests {
                 maker, poll, FEE_POWER, timestamp, last_ref, new byte[64]);
 
         //CHECK IF NAME REGISTRATION IS INVALID
+        pollCreation.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, pollCreation.isSignatureValid(db));
     }
 
@@ -472,6 +476,7 @@ public class TransactionTests {
         Transaction pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, last_ref);
         pollVote.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF POLL VOTE IS VALID
+        pollVote.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, pollVote.isSignatureValid(db));
 
         //INVALID SIGNATURE
@@ -479,6 +484,7 @@ public class TransactionTests {
                 maker, "test", 5, FEE_POWER, timestamp, last_ref, new byte[64]);
 
         //CHECK IF POLL VOTE IS INVALID
+        pollVote.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, pollVote.isSignatureValid(db));
     }
 
@@ -636,6 +642,7 @@ public class TransactionTests {
         arbitraryTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ARBITRARY TRANSACTION IS VALID
+        arbitraryTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, arbitraryTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
@@ -643,6 +650,7 @@ public class TransactionTests {
                 maker, null, 4889, "test".getBytes(), FEE_POWER, timestamp, last_ref, new byte[64]);
         //arbitraryTransaction.sign(maker);
         //CHECK IF ARBITRARY TRANSACTION IS INVALID
+        arbitraryTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, arbitraryTransaction.isSignatureValid(db));
     }
 
@@ -854,6 +862,7 @@ public class TransactionTests {
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE ASSET TRANSACTION IS VALID
+        issueAssetTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, issueAssetTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
@@ -861,6 +870,7 @@ public class TransactionTests {
                 maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE ASSET IS INVALID
+        issueAssetTransaction.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, issueAssetTransaction.isSignatureValid(db));
     }
 

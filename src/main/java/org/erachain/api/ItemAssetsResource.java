@@ -49,10 +49,10 @@ public class ItemAssetsResource {
         help.put("assets/images/{key}", "get item images by KEY");
         help.put("assets/listfrom/{start}", "get list from KEY");
         help.put("POST assets/issue {\"linkTo\": \"<SeqNo>\", \"feePow\": \"<feePow>\", \"creator\": \"<creator>\", \"name\": \"<name>\", \"description\": \"<description>\", \"icon\": \"<iconBase58>\", \"icon64\": \"<iconBase64>\", \"image\": \"<imageBase58>\", \"image64\": \"<imageBase64>\", \"scale\": \"<scale>\", \"assetType\": \"<assetType>\", \"quantity\": \"<quantity>\", \"password\": \"<password>\"}", "Issue Asset");
-        help.put("POST assets/issueraw/{creator} {\"linkTo\":<SeqNo>, \"feePow\":<int>, \"password\":<String>, \"linkTo\":<SeqNo>, \"raw\":RAW-Base58", "Issue Asset by Base58 RAW in POST body");
+        help.put("POST assets/issueraw/{creator} {\"linkTo\":<SeqNo>, \"feePow\":<int>, \"password\":<String>, \"linkTo\":<SeqNo>, \"raw\":RAW-Base58}", "Issue Asset by Base58 RAW in POST body");
 
         help.put("assets/types", "get types");
-        help.put("assets/balances/{key}", "get balances for key");
+        help.put("assets/balances/{key}?offset=0&position=1&limit=50", "get balances for key");
 
         return StrJSonFine.convert(help);
     }

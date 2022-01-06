@@ -108,6 +108,10 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
                     return;
                 }
                 jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
+                try {
+                    sleep(200);
+                } catch (InterruptedException e) {
+                }
                 jTableJScrollPanelLeftPanel.getSelectionModel().addSelectionInterval(0, 0);
             }
         }.start();
@@ -128,6 +132,10 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
                 }
                 if (search_Table_Model.getRowCount() > 0) {
                     jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
+                    try {
+                        sleep(200);
+                    } catch (InterruptedException e) {
+                    }
                     jTableJScrollPanelLeftPanel.getSelectionModel().addSelectionInterval(0, 0);
                     return;
                 }
@@ -147,6 +155,10 @@ public abstract class SearchItemSplitPanel extends ItemSplitPanel {
                 search_Table_Model.getLast();
                 if (search_Table_Model.getRowCount() > 0) {
                     jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
+                    try {
+                        sleep(200);
+                    } catch (InterruptedException e) {
+                    }
                     jTableJScrollPanelLeftPanel.getSelectionModel().addSelectionInterval(0, 0);
                     return;
                 }

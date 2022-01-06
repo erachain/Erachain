@@ -279,11 +279,10 @@ public class IssueDocumentPanel extends IconPanel {
         }
 
         // CREATE TX MESSAGE
-        byte version = (byte) 3;
         byte property1 = (byte) 0;
         byte property2 = (byte) 0;
 
-        RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(version, property1, property2,
+        RSignNote issueDoc = (RSignNote) Controller.getInstance().r_SignNote(RSignNote.CURRENT_VERS, property1, property2,
                 creator, feePow, key, exDataBytes
         );
 
@@ -317,7 +316,7 @@ public class IssueDocumentPanel extends IconPanel {
         // Lang.T("Issue Asset"),
         // JOptionPane.YES_NO_OPTION);
 
-        // for calculate ExPays
+        // for calculate ExFilteredPays
         ///issueDoc.setDC(DCSet.getInstance());
         RNoteInfo rNoteInfo = new RNoteInfo(issueDoc); // here load all values and calc FEE
         //rNoteInfo.jPanel2.setVisible(false);

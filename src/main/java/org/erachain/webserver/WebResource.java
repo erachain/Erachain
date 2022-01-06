@@ -1094,9 +1094,9 @@ public class WebResource {
 
         File file;
         if (slot.isEmpty()) {
-            file = new File("smartcontracts/epoch/" + id + "/" + filename);
+            file = new File("dapp/epoch/" + id + "/" + filename);
         } else {
-            file = new File("smartcontracts/epoch/" + id + "/" + slot + "/" + filename);
+            file = new File("dapp/epoch/" + id + "/" + slot + "/" + filename);
         }
 
         if (!file.exists())

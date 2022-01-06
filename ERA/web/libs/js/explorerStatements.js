@@ -290,6 +290,8 @@ function statement(data) {
         output += '<hr>' + data.links;
     }
 
+    output += '<hr><a href ="/api/tx/raw/' + data.tx.signature + '">{ ' + data.Label_RAW + ' }</a>';
+
     return output;
 
 }

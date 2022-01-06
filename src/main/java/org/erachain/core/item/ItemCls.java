@@ -32,8 +32,10 @@ import org.mapdb.Fun.Tuple6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -573,14 +575,6 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return flags;
     }
 
-    public byte[] getIcon() {
-        return this.icon;
-    }
-
-    public int getIconType() {
-        return iconType;
-    }
-
     public static String viewMediaType(int mediaType) {
         switch (mediaType) {
             case MEDIA_TYPE_IMG:
@@ -644,6 +638,33 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return getMediaType(imageType, hasImageURL() ? null : image);
     }
 
+    public byte[] getIcon() {
+        return this.icon;
+    }
+
+    @Override
+    public ImageIcon getImageIcon() {
+        byte[] icon = getIcon();
+        if (icon == null || icon.length == 0)
+            return null;
+
+        if (hasIconURL()) {
+            URL url = null;
+            try {
+                url = new URL(new String(icon, StandardCharsets.UTF_8));
+                return new ImageIcon(url);
+            } catch (Exception e) {
+                return null;
+            }
+        } else
+            return new ImageIcon(icon);
+    }
+
+
+    public int getIconType() {
+        return iconType;
+    }
+
     public MediaType getIconMediaType() {
         return getMediaType(iconType, hasIconURL() ? null : icon);
     }
@@ -653,7 +674,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public String getIconURL() {
-        if (iconAsURL) {
+        if (hasIconURL()) {
             // внешняя ссылка - обработаем ее
             return new String(getIcon(), StandardCharsets.UTF_8);
         } else if (getIcon() != null && getIcon().length > 0) {
@@ -699,8 +720,8 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         return DateTimeFormat.timestamptoString(this.stopDate, Settings.getInstance().getBirthTimeFormat(), "UTC");
     }
 
-    public boolean isActive(long timestamp) {
-        if (startDate != null && timestamp < startDate) {
+    public boolean isActive(long timestamp, boolean forInit) {
+        if (!forInit && startDate != null && timestamp < startDate) {
             errorValue = "< " + viewStartDate();
             return false;
         }
@@ -712,7 +733,7 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
     }
 
     public String getImageURL() {
-        if (imageAsURL) {
+        if (hasImageURL()) {
             // внешняя ссылка - обработаем ее
             return new String(getImage(), StandardCharsets.UTF_8);
         } else if (getImage() != null && getImage().length > 0) {
@@ -1101,7 +1122,15 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         json.put(keyName + "_name", viewName());
         json.put(keyName + "_icon", getImageURL());
         json.put(keyName + "_iconMediaType", getIconMediaType().toString());
+    }
 
+    public JSONObject toJsonInfo() {
+        JSONObject json = new JSONObject();
+        json.put("key", getKey());
+        json.put("name", viewName());
+        json.put("icon", getImageURL());
+        json.put("iconMediaType", getIconMediaType().toString());
+        return json;
     }
 
     public JSONObject toJsonLite() {
@@ -1149,22 +1178,25 @@ public abstract class ItemCls implements Iconable, ExplorerJsonLine, Jsonable {
         //itemJSON.put("makerPubkey", this.maker.getBase58());
         itemJSON.put("isConfirmed", this.isConfirmed());
         itemJSON.put("is_confirmed", this.isConfirmed());
-        itemJSON.put("reference", Base58.encode(this.reference));
-        itemJSON.put("tx_signature", Base58.encode(this.reference));
 
-        Long txSeqNo = DCSet.getInstance().getTransactionFinalMapSigns().get(getReference());
-        if (txSeqNo != null) {
-            // если транзакция еще не подтверждена - чтобы ошибок не было при отображении в блокэксплорере
-            itemJSON.put("tx_seqNo", Transaction.viewDBRef(txSeqNo));
-            if (referenceTx == null)
-                referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
+        if (reference != null) {
+            itemJSON.put("reference", Base58.encode(this.reference));
+            itemJSON.put("tx_signature", Base58.encode(this.reference));
 
-            if (referenceTx != null) {
-                PublicKeyAccount creatorTX = referenceTx.getCreator();
-                creatorTX.toJsonPersonInfo(itemJSON, "tx_creator");
-                itemJSON.put("tx_creator_pubkey", creatorTX.getBase58());
-                itemJSON.put("tx_timestamp", referenceTx.getTimestamp());
-                itemJSON.put("block_timestamp", Controller.getInstance().blockChain.getTimestamp(referenceTx.getBlockHeight()));
+            Long txSeqNo = DCSet.getInstance().getTransactionFinalMapSigns().get(this.reference);
+            if (txSeqNo != null) {
+                // если транзакция еще не подтверждена - чтобы ошибок не было при отображении в блокэксплорере
+                itemJSON.put("tx_seqNo", Transaction.viewDBRef(txSeqNo));
+                if (referenceTx == null)
+                    referenceTx = DCSet.getInstance().getTransactionFinalMap().get(txSeqNo);
+
+                if (referenceTx != null) {
+                    PublicKeyAccount creatorTX = referenceTx.getCreator();
+                    creatorTX.toJsonPersonInfo(itemJSON, "tx_creator");
+                    itemJSON.put("tx_creator_pubkey", creatorTX.getBase58());
+                    itemJSON.put("tx_timestamp", referenceTx.getTimestamp());
+                    itemJSON.put("block_timestamp", Controller.getInstance().blockChain.getTimestamp(referenceTx.getBlockHeight()));
+                }
             }
         }
 

@@ -99,7 +99,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
                     System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
                     return new Tuple2<Tuple2<Long, BigDecimal>, String>(
-                            new Tuple2<>(Longs.fromByteArray(assetKeyBytes), value.a.b.negate()),
+                            new Tuple2<>(Longs.fromByteArray(assetKeyBytes), value.a.b),
                             Crypto.getInstance().getAddressFromShort(shortAddress)
                     );
                 }
@@ -122,12 +122,17 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
         return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
                 new IteratorParent(parentIterator, deleted),
                 IteratorCloseableImpl.make(this.assetKeyMap.subMap(
-                        Fun.t2(Fun.t2(assetKey, null), null),
-                        Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI()))
+                                Fun.t2(Fun.t2(assetKey, null), null),
+                                Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI()))
                         .values().iterator())),
                 // for BYTES primary key
-                Fun.BYTE_ARRAY_COMPARATOR);
+                Fun.BYTE_ARRAY_COMPARATOR, false);
 
+    }
+
+    @Override
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey, BigDecimal fromOwnAmount, byte[] addressShort, boolean descending) {
+        return null;
     }
 
     @Override

@@ -91,7 +91,7 @@ public class BlockChain {
     /**
      * Защита от платежей с удостоверенного на анонима
      */
-    public static boolean PERSON_SEND_PROTECT = true;
+    public static boolean PERSON_SEND_PROTECT = false;
 
     /**
      * Подмена реального на чужой - для синхронизации из старой ветки
@@ -240,7 +240,7 @@ public class BlockChain {
 
     //public static final long LEFT_PRICE_HEIGHT_SEQ = Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
 
-    public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 2204193;
+    public static final int SKIP_INVALID_SIGN_BEFORE = TEST_DB > 0 || !MAIN_MODE ? 0 : 2204193;
 
     public static final int VERS_4_12 = VERS_4_11;
 
@@ -300,15 +300,18 @@ public class BlockChain {
      * };
      */
 
-    public static final byte[][] VALID_ADDRESSES = TEST_DB > 0? new byte[][]{} : new byte[][]{
+    public static final byte[][] VALID_ADDRESSES = TEST_DB > 0 ? new byte[][]{} : new byte[][]{
             Base58.decode("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3")
     };
 
-    public static final byte[][] DISCREDIR_ADDRESSES = TEST_DB > 0? new byte[][]{} : new byte[][]{
+    /**
+     * PUB KEY ONLY!
+     */
+    public static final byte[][] DISCREDIR_ADDRESSES = TEST_DB > 0 ? new byte[][]{} : new byte[][]{
             Base58.decode("HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7"),
-            Base58.decode("AoPMZ3Q8u5q2g9aK8JZSQRnb6iS53FjUjrtT8hCfHg9F") // 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
+            Base58.decode("AoPMZ3Q8u5q2g9aK8JZSQRnb6iS53FjUjrtT8hCfHg9F") // == 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
     };
-    public static final byte[][] VALID_SIGN = TEST_DB > 0? new byte[][]{} : new byte[][]{
+    public static final byte[][] VALID_SIGN = TEST_DB > 0 ? new byte[][]{} : new byte[][]{
             //Base58.decode("4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W")
     };
 
@@ -364,11 +367,15 @@ public class BlockChain {
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
 
-    public static final int FREE_FEE_LENGTH = 1 << 10;
-    public static final int FREE_FEE_TO_SEQNO = CLONE_MODE ? -1 : 1;
-    public static final int FREE_FEE_FROM_HEIGHT = CLONE_MODE ? Integer.MAX_VALUE : MAIN_MODE ? 1610000 : 1;
+    /**
+     * add to all TX for fee
+     */
 
     public static final int ADD_FEE_BYTES_FOR_COMMON_TX = 0;
+
+    public static final int FREE_FEE_LENGTH = ADD_FEE_BYTES_FOR_COMMON_TX + (1 << 10);
+    public static final int FREE_FEE_TO_SEQNO = CLONE_MODE ? -1 : 1;
+    public static final int FREE_FEE_FROM_HEIGHT = CLONE_MODE ? Integer.MAX_VALUE : MAIN_MODE ? 1610000 : 1;
 
 
     /**
@@ -383,14 +390,22 @@ public class BlockChain {
     public static final long ACTION_ROYALTY_ASSET_2 = 0L;
 
     /**
-     * какие проценты при переводе каких активов - Ключ : процент + минималка.
-     * Это Доход форжера за минусом Сгорания
+     * какие проценты при переводе каких активов - Ключ : коэффициент комиссии
+     * Это Доход форжера за минусом Сгорания. Обязательно задать ASSET_TRANSFER_PERCENTAGE_MIN_TAB - иначе игнор %%
      */
-    public static final HashMap<Long, Tuple2<BigDecimal, BigDecimal>> ASSET_TRANSFER_PERCENTAGE = new HashMap<>();
+    public static final HashMap<Long, BigDecimal> ASSET_TRANSFER_PERCENTAGE_TAB = new HashMap<>();
+    /// default = 0.1%
+    public static final BigDecimal ASSET_TRANSFER_PERCENTAGE_DEFAULT = new BigDecimal("0.001");
+
+    /**
+     * минимальная комиссия для актива - абсолютное значение. Если не задано, то и процент комиссии не берется!
+     */
+    public static final HashMap<Long, BigDecimal> ASSET_TRANSFER_PERCENTAGE_MIN_TAB = new HashMap<>();
     /**
      * какие проценты сжигаем при переводе активов - Ключ : процент
      */
-    public static final HashMap<Long, BigDecimal> ASSET_BURN_PERCENTAGE = new HashMap<>();
+    public static final HashMap<Long, BigDecimal> ASSET_BURN_PERCENTAGE_TAB = new HashMap<>();
+    public static final BigDecimal ASSET_BURN_PERCENTAGE_DEFAULT = new BigDecimal("0.5");
 
     public static final int HOLD_ROYALTY_PERIOD_DAYS = 0; // как часто начисляем? Если = 0 - не начислять
     public static final BigDecimal HOLD_ROYALTY_MIN = new BigDecimal("0.0001"); // если меньше то распределение не делаем
@@ -447,6 +462,12 @@ public class BlockChain {
     public static HashSet<String> TRUSTED_ANONYMOUS = new HashSet<String>();
     public static HashSet<String> ANONYMASERS = new HashSet<String>();
     public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
+
+    /**
+     * Used for freeze some amount on period list. [Height, freezed amount],...<br>
+     * example:<br>
+     * .put("7DMJcs8kw7EXUSeEFfNwznRKRLHLrcXJFm", new int[][]{{225655, 150000}, {333655, 100000}});
+     */
     public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
     public static HashSet<String> FREEZED_FORGING = new HashSet<String>();
 
@@ -491,9 +512,43 @@ public class BlockChain {
             FEE_ASSET_EMITTER = GenesisBlock.CREATOR;
         }
 
+        if (TEST_MODE) {
 
-        if (TEST_DB > 0 || TEST_MODE && !DEMO_MODE) {
-            ;
+            // из p130 счета для прорверки
+            NOVA_ASSETS.put("BTC",
+                    new Tuple3<Long, Long, byte[]>(12L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
+            NOVA_ASSETS.put("DOGE",
+                    new Tuple3<Long, Long, byte[]>(18L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
+            NOVA_ASSETS.put("USD",
+                    new Tuple3<Long, Long, byte[]>(95L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
+
+            // это как пример для отладки
+            ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(1L, new BigDecimal("0.05"));
+
+            ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(12L, new BigDecimal("0.00005"));
+
+            ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(18L, new BigDecimal("0.05"));
+
+            ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(95L, new BigDecimal("0.05"));
+
+            if (DEMO_MODE) {
+                // GENERAL TRUST
+                TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+                TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
+                //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+
+                // права для Кибальникова
+                ASSET_OWNERS.put(7L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
+                ASSET_OWNERS.put(8L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
+
+                LOCKED__ADDRESSES.put("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz", "7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1");
+                TRUSTED_ANONYMOUS.add("762eatKnsB3xbyy2t9fwjjqUG1GoxQ8Rhx");
+                ANONYMASERS.add("7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF");
+
+                ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
+            }
+
+        } else if (TEST_DB > 0) {
         } else if (CLONE_MODE) {
             File file = new File(Settings.CLONE_OR_SIDE.toLowerCase() + "PROTOCOL.json");
             if (file.exists()) {
@@ -572,40 +627,8 @@ public class BlockChain {
 
 
             }
-        } else if (DEMO_MODE) {
-
-            if (false) {
-                // это как пример для отладки
-                ASSET_TRANSFER_PERCENTAGE.put(1L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
-                ASSET_TRANSFER_PERCENTAGE.put(2L, new Tuple2<>(new BigDecimal("0.01"), new BigDecimal("0.005")));
-                ASSET_BURN_PERCENTAGE.put(1L, new BigDecimal("0.5"));
-                ASSET_BURN_PERCENTAGE.put(2L, new BigDecimal("0.5"));
-            }
-
-            // GENERAL TRUST
-            TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
-            TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
-            //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
-
-            // права для Кибальникова
-            ASSET_OWNERS.put(7L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
-            ASSET_OWNERS.put(8L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
-
-            // из p130 счета для прорверки
-            NOVA_ASSETS.put("BTC",
-                    new Tuple3<Long, Long, byte[]>(12L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
-            NOVA_ASSETS.put("DOGE",
-                    new Tuple3<Long, Long, byte[]>(18L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
-            NOVA_ASSETS.put("USD",
-                    new Tuple3<Long, Long, byte[]>(95L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
-
-            LOCKED__ADDRESSES.put("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz", "7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1");
-            TRUSTED_ANONYMOUS.add("762eatKnsB3xbyy2t9fwjjqUG1GoxQ8Rhx");
-            ANONYMASERS.add("7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF");
-
-
-            ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
+            // MAIN MODE
 
             ////////// WIPED
             // WRONG Issue Person #125
@@ -940,7 +963,30 @@ public class BlockChain {
     }
 
     public static BigDecimal feeBG(long feeLong) {
-        return BigDecimal.valueOf(feeLong * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+        return BigDecimal.valueOf(feeLong * FEE_PER_BYTE, FEE_SCALE);
+    }
+
+    public static BigDecimal ASSET_TRANSFER_PERCENTAGE_MIN(int height, Long assetKey) {
+        return ASSET_TRANSFER_PERCENTAGE_MIN_TAB.get(assetKey);
+    }
+
+    public static BigDecimal ASSET_TRANSFER_PERCENTAGE(int height, Long assetKey) {
+        BigDecimal percentAsset = ASSET_TRANSFER_PERCENTAGE_TAB.get(assetKey);
+        if (percentAsset == null) {
+            percentAsset = ASSET_TRANSFER_PERCENTAGE_DEFAULT;
+        }
+
+        return percentAsset;
+
+    }
+
+    public static BigDecimal ASSET_BURN_PERCENTAGE(int height, Long assetKey) {
+        if (ASSET_BURN_PERCENTAGE_TAB.isEmpty()
+                || !ASSET_BURN_PERCENTAGE_TAB.containsKey(assetKey))
+            return ASSET_BURN_PERCENTAGE_DEFAULT;
+
+        return ASSET_BURN_PERCENTAGE_TAB.get(assetKey);
+
     }
 
     public static BigDecimal BONUS_FOR_PERSON(int height) {
@@ -1330,10 +1376,18 @@ public class BlockChain {
             return false;
         }
 
-        if (this.waitWinBuffer != null && block.compareWin(waitWinBuffer) <= 0) {
-            block.close();
-            LOGGER.info("new winBlock is POOR!");
-            return false;
+        if (this.waitWinBuffer != null) {
+            if (block.equals(waitWinBuffer)) {
+                block.close();
+                LOGGER.info("new winBlock is SAME!");
+                return true;
+            }
+            if (block.compareWin(waitWinBuffer) <= 0) {
+                block.close();
+                LOGGER.info("new winBlock is POOR!");
+                return false;
+            }
+
         }
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет

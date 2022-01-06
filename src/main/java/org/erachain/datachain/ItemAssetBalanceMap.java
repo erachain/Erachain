@@ -60,6 +60,11 @@ public interface ItemAssetBalanceMap extends DBTab<byte[], Tuple5<
 
     IteratorCloseable<byte[]> getIteratorByAccount(Account account);
 
+    List<Tuple2<byte[], Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
+    getOwnersPage(Long assetKey, BigDecimal fromOwnAmount, byte[] fromAddres, int offset, int limit, boolean fillFullPage);
+
     void addObserver(Observer o);
 
-    }
+}

@@ -76,11 +76,21 @@ public abstract class ExAction<R> {
         return totalPay;
     }
 
+    public abstract BigDecimal getAmount(Account account);
+
     public abstract int getCount();
 
     public abstract String viewResults(Transaction transactionParent);
 
     public abstract String viewType();
+
+    public String viewActionType() {
+        return Account.balancePositionName(balancePos);
+    }
+
+    public String viewActionType(JSONObject langObj) {
+        return Lang.T(Account.balancePositionName(balancePos), langObj);
+    }
 
     public abstract long getTotalFeeBytes();
 
@@ -104,7 +114,7 @@ public abstract class ExAction<R> {
 
         switch (type) {
             case FILTERED_ACCRUALS_TYPE:
-                return ExPays.parse(data, pos);
+                return ExFilteredPays.parse(data, pos);
             case SIMPLE_PAYOUTS_TYPE:
                 return ExAirDrop.parse(data, pos);
             case LIST_PAYOUTS_TYPE:
@@ -121,7 +131,7 @@ public abstract class ExAction<R> {
             int type = (Integer) json.get("type");
             switch (type) {
                 case FILTERED_ACCRUALS_TYPE:
-                    return ExPays.parseJSON_local(json);
+                    return ExFilteredPays.parseJSON_local(json);
                 case SIMPLE_PAYOUTS_TYPE:
                     return ExAirDrop.parseJSON_local(json);
                 case LIST_PAYOUTS_TYPE:
@@ -158,6 +168,7 @@ public abstract class ExAction<R> {
         toJson.put("type", type);
         toJson.put("typeName", viewType());
         toJson.put("flags", flags);
+        toJson.put("flagsB", "0x" + Integer.toBinaryString(flags));
         toJson.put("assetKey", assetKey);
 
         toJson.put("balancePos", balancePos);
@@ -170,13 +181,13 @@ public abstract class ExAction<R> {
     }
 
     public String getInfoHTML(boolean onlyTotal, JSONObject langObj) {
-        String out = "<h4>" + Lang.T(viewType()) + "</h4>";
-        out += Lang.T("Count # кол-во") + ": <b>" + getCount()
-                + "</b> " + Lang.T("Additional Fee") + ": <b>" + BlockChain.feeBG(getTotalFeeBytes()) + "</b><br>";
+        String out = "<h4>" + Lang.T(viewType(), langObj) + "</h4>";
+        out += Lang.T("Count # кол-во", langObj) + ": <b>" + getCount()
+                + "</b> " + Lang.T("Additional Fee", langObj) + ": <b>" + BlockChain.feeBG(getTotalFeeBytes()) + "</b><br>";
 
-        out += Lang.T("Asset") + ": <b>" + asset.getName() + "</b><br>";
-        out += Lang.T("Total") + ": <b>" + getTotalPay()
-                + " (" + Lang.T(Account.balancePositionName(balancePos), langObj)
+        out += Lang.T("Asset", langObj) + ": <b>" + asset.getName() + "</b><br>";
+        out += Lang.T("Total", langObj) + ": <b>" + getTotalPay()
+                + " (" + viewActionType(langObj)
                 + (backward ? " " + Lang.T("backward", langObj) : "") + ")</b><br>";
 
         return out;

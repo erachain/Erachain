@@ -106,8 +106,6 @@ public class AgransTests {
 
         byte[] signerPublicKey = signerKeyPair.getB();
 
-        assertEquals(Crypto.getInstance().getAddress(signerPublicKey), "QQQQD8UkkJPnW3yRZqJAUH9Pi9BzVKJCv8");
-
         PrivateKeyAccount account = new PrivateKeyAccount(signerSeedByte);
 
         byte[] textByte = text.getBytes(StandardCharsets.UTF_8);
@@ -150,8 +148,6 @@ public class AgransTests {
         byte[] senderPrivateKey = senderKeyPair.getA();
         byte[] senderPublicKey = senderKeyPair.getB();
 
-        assertEquals(Crypto.getInstance().getAddress(senderPublicKey), "QQQQD8UkkJPnW3yRZqJAUH9Pi9BzVKJCv8");
-
         //address: QQQdEJ9xYHkBru1tCg2V7m2jPiHHcrJT4r
         //wallet seed: 7Zn2MtvqF8kYNwTwzgyWz9C7rSM5CUVm2MfcoTiT67ii
         //address seed: BExrh6dUDNSG1dLyVChTxBY4pfA3NPAqLkEMtbMdgX6V
@@ -163,8 +159,6 @@ public class AgransTests {
 
         byte[] recipientPrivateKey = recipientKeyPair.getA();
         byte[] recipientPublicKey = recipientKeyPair.getB();
-
-        assertEquals(Crypto.getInstance().getAddress(recipientPublicKey), "QQQdEJ9xYHkBru1tCg2V7m2jPiHHcrJT4r");
 
         String StartMessage = "Test message. Rus:�������� ���������.";
 

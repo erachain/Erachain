@@ -7,7 +7,7 @@ import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.imprints.Imprint;
 import org.erachain.core.item.imprints.ImprintCls;
-import org.erachain.smartcontracts.SmartContract;
+import org.erachain.dapp.DAPP;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -16,26 +16,26 @@ import java.util.Arrays;
 // TODO - reference NOT NEED - because it is unique record! - make it as new version protocol
 public class IssueImprintRecord extends IssueItemRecord {
 
-    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK - REFERENCE_LENGTH;
-    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK - REFERENCE_LENGTH;
-    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH - REFERENCE_LENGTH;
-    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD - REFERENCE_LENGTH;
+    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK - FLAGS_LENGTH;
+    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK - FLAGS_LENGTH;
+    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH - FLAGS_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD - FLAGS_LENGTH;
 
     public static final byte TYPE_ID = (byte) ISSUE_IMPRINT_TRANSACTION;
     public static final String TYPE_NAME = "Issue Imprint";
 
 
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp) {
-        super(typeBytes, TYPE_NAME, creator, null, imprint, feePow, timestamp, null);
+        super(typeBytes, TYPE_NAME, creator, null, imprint, feePow, timestamp, 0L);
     }
 
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, feePow, timestamp, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, feePow, timestamp, 0L, signature);
     }
 
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte feePow,
                               long timestamp, byte[] signature, long seqNo, long feeLong) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, feePow, timestamp, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, feePow, timestamp, 0L, signature);
         this.fee = BigDecimal.valueOf(feeLong, BlockChain.FEE_SCALE);
         if (seqNo > 0)
             this.setHeightSeq(seqNo);
@@ -43,7 +43,7 @@ public class IssueImprintRecord extends IssueItemRecord {
 
     // asPack
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ExLink linkTo, ImprintCls imprint, byte[] signature) {
-        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, (byte) 0, 0L, null, signature);
+        super(typeBytes, TYPE_NAME, creator, linkTo, imprint, (byte) 0, 0L, 0L, signature);
     }
 
     public IssueImprintRecord(PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {
@@ -112,12 +112,12 @@ public class IssueImprintRecord extends IssueItemRecord {
             linkTo = null;
         }
 
-        SmartContract smartContract;
+        DAPP dapp;
         if ((typeBytes[2] & HAS_SMART_CONTRACT_MASK) > 0) {
-            smartContract = SmartContract.Parses(data, position, forDeal);
-            position += smartContract.length(forDeal);
+            dapp = DAPP.Parses(data, position, forDeal);
+            position += dapp.length(forDeal);
         } else {
-            smartContract = null;
+            dapp = null;
         }
 
         byte feePow = 0;
@@ -181,7 +181,7 @@ public class IssueImprintRecord extends IssueItemRecord {
     //VALIDATE
     //
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
 
         if (height < BlockChain.ALL_VALID_BEFORE) {
             return VALIDATE_OK;
@@ -197,7 +197,7 @@ public class IssueImprintRecord extends IssueItemRecord {
             return INVALID_NAME_LENGTH_MAX;
         }
 
-        int result = super.isValid(forDeal, flags);
+        int result = super.isValid(forDeal, checkFlags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         // CHECK reference in DB

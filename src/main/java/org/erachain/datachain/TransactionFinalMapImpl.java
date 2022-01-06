@@ -110,6 +110,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         return ((DCSet) this.databaseSet).getTransactionFinalMapSigns().size();
     }
+
     /**
      * Это протокольный вызов - поэтому в форке он тоже бывает
      *
@@ -304,6 +305,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, typeTX, isCreator, fromID, toID, descending);
     }
 
+    public IteratorCloseable<Long> getIteratorOfDialog(Account account1, Account account2, Long fromSeqNo, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorOfDialog(TransactionFinalMap.makeDialogKey(account1, account2), fromSeqNo, descending);
+    }
+
+    public IteratorCloseable<Long> getIteratorByType(Integer type, Long fromID, boolean descending) {
+        return ((TransactionFinalSuit) map).getIteratorByType(type, fromID, descending);
+    }
+
     /**
      * Поиск активности данного счета по Созданным трнзакция за данный промежуток времени
      *
@@ -363,6 +372,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
         return txs;
     }
+
     public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit, int offset) {
         return getTransactionsByAddressAndType(Account.makeShortBytes(address), type, limit, offset);
     }
@@ -818,7 +828,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         @Override
-        public boolean filerRows() {
+        public boolean filterRows() {
             if (noForge && currentRow.getType() == Transaction.CALCULATED_TRANSACTION) {
                 RCalculated tx = (RCalculated) currentRow;
                 String mess = tx.getMessage();
@@ -837,6 +847,22 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     }
 
+    public class PagedAddressTXMap extends PagedTXMap {
+
+        byte[] addressShort;
+
+        public PagedAddressTXMap(DCSet dcSet, DBTabImpl mapImpl, byte[] addressShort, boolean noForge) {
+            super(dcSet, mapImpl, noForge);
+            this.addressShort = addressShort;
+        }
+
+        @Override
+        public IteratorCloseable<Long> getIterator(Long fromKey, boolean descending) {
+            return ((TransactionFinalSuit) map).getAddressesIterator(addressShort, fromKey, descending);
+        }
+
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsFromID(Long fromSeqNo, int offset, int limit,
@@ -845,141 +871,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        if (true) {
-            PagedMap<Long, Transaction> pager = new PagedTXMap(DCSet.getInstance(), this, noForge);
-            return pager.getPageList(fromSeqNo, offset, limit, fillFullPage);
-        } else {
+        PagedMap<Long, Transaction> pager = new PagedTXMap(DCSet.getInstance(), this, noForge);
+        return pager.getPageList(fromSeqNo, offset, limit, fillFullPage);
 
-            List<Transaction> txs = new ArrayList<>();
-            int forgedCount = 0;
-            long timeOut = System.currentTimeMillis();
-
-            if (offset < 0 || limit < 0) {
-                if (limit < 0)
-                    limit = -limit;
-
-                // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
-                // и по пути сосздаем список обратный что нашли по обратнму итератору
-                int offsetHere = -(offset + limit);
-                try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionIterator_old(fromSeqNo, false)) {
-                    Transaction item;
-                    Long key;
-                    int skipped = 0;
-                    int count = 0;
-                    while (iterator.hasNext() && (limit <= 0 || count < limit)) {
-                        key = iterator.next();
-                        item = get(key);
-                        if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
-                            RCalculated tx = (RCalculated) item;
-                            String mess = tx.getMessage();
-                            if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
-                                if (forgedCount < 100) {
-                                    // skip all but not 100
-                                    forgedCount++;
-                                    continue;
-                                } else {
-                                    if (System.currentTimeMillis() - timeOut > 5000) {
-                                        break;
-                                    }
-                                    forgedCount = 0;
-                                }
-                            }
-                        }
-
-                        if (offsetHere > 0 && skipped++ < offsetHere) {
-                            continue;
-                        }
-
-                        item.setDC((DCSet) databaseSet, true);
-
-                        count++;
-
-                        // обратный отсчет в списке
-                        txs.add(0, item);
-                    }
-
-                    if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
-                        // сюда пришло значит не полный список - дополним его
-                        for (Transaction transaction : getTransactionsFromID(fromSeqNo,
-                                0, limit - count, noForge, false)) {
-                            boolean exist = false;
-                            for (Transaction txHere : txs) {
-                                if (transaction.equals(txHere)) {
-                                    exist = true;
-                                    break;
-                                }
-                            }
-                            if (!exist) {
-                                txs.add(transaction);
-                            }
-                        }
-                    }
-
-                } catch (IOException e) {
-                }
-
-            } else {
-
-                try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionIterator_old(fromSeqNo, true)) {
-                    Transaction item;
-                    Long key;
-                    int skipped = 0;
-                    int count = 0;
-                    while (iterator.hasNext() && (limit <= 0 || count < limit)) {
-                        key = iterator.next();
-                        item = get(key);
-                        if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
-                            RCalculated tx = (RCalculated) item;
-                            String mess = tx.getMessage();
-                            if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
-                                if (forgedCount < 100) {
-                                    // skip all but not 100
-                                    forgedCount++;
-                                    continue;
-                                } else {
-                                    if (System.currentTimeMillis() - timeOut > 5000) {
-                                        break;
-                                    }
-                                    forgedCount = 0;
-                                }
-                            }
-                        }
-
-                        if (offset > 0 && skipped++ < offset) {
-                            continue;
-                        }
-
-                        item.setDC((DCSet) databaseSet, true);
-
-                        count++;
-
-                        txs.add(item);
-                    }
-
-                    if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
-                        // сюда пришло значит не полный список - дополним его
-                        int index = 0;
-                        int limitLeft = limit - count;
-                        for (Transaction transaction : getTransactionsFromID(fromSeqNo,
-                                -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, noForge, false)) {
-                            boolean exist = false;
-                            for (Transaction txHere : txs) {
-                                if (transaction.equals(txHere)) {
-                                    exist = true;
-                                    break;
-                                }
-                            }
-                            if (!exist) {
-                                txs.add(index++, transaction);
-                            }
-                        }
-                    }
-
-                } catch (IOException e) {
-                }
-            }
-            return txs;
-        }
     }
 
     @Override
@@ -990,7 +884,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        return ((TransactionFinalSuit) map).getBiDirectionAddressIterator(addressShort, fromID, descending);
+        return ((TransactionFinalSuit) map).getAddressesIterator(addressShort, fromID, descending);
     }
 
     /**
@@ -1236,7 +1130,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
                 // поэтому нужно удалить дубли
                 iterator = new MergedOR_IteratorsNoDuplicates(ImmutableList.of(creatorIterator, recipientIterator),
-                        descending ? Fun.REVERSE_COMPARATOR : Fun.COMPARATOR);
+                        Fun.COMPARATOR, descending);
             } else {
                 iterator = creatorIterator;
             }
@@ -1275,21 +1169,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit) {
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
-        }
-
-        IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map)
-                .getBiDirectionAddressIterator(address == null ? null : Crypto.getInstance().getShortBytesFromAddress(address), fromSeqNo, descending);
-        Iterators.advance(iterator, offset);
-
-        return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
-
-    }
-
-    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByAddressFromID(byte[] addressShort, Long fromSeqNo, int offset, int limit,
@@ -1298,148 +1177,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        List<Transaction> txs = new ArrayList<>();
-        long timeOut = System.currentTimeMillis();
+        PagedMap<Long, Transaction> pager = new PagedAddressTXMap(DCSet.getInstance(), this, addressShort, noForge);
+        return pager.getPageList(fromSeqNo, offset, limit, fillFullPage);
 
-        int forgedCount = 0;
-        if (offset < 0 || limit < 0) {
-            if (limit < 0)
-                limit = -limit;
-
-            // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
-            // и по пути сосздаем список обратный что нашли по обратнму итератору
-            int offsetHere = -(offset + limit);
-            try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(addressShort, fromSeqNo, false)) {
-                Transaction item;
-                Long key;
-                int skipped = 0;
-                int count = 0;
-                while (iterator.hasNext() && (limit <= 0 || count < limit)) {
-                    key = iterator.next();
-                    item = get(key);
-                    if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
-                        RCalculated tx = (RCalculated) item;
-                        String mess = tx.getMessage();
-                        if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
-                            if (forgedCount < 100) {
-                                // skip all but not 100
-                                forgedCount++;
-                                continue;
-                            } else {
-                                if (System.currentTimeMillis() - timeOut > 5000) {
-                                    break;
-                                }
-                                forgedCount = 0;
-                            }
-                        }
-                    }
-
-                    if (offsetHere > 0 && skipped++ < offsetHere) {
-                        continue;
-                    }
-
-                    item.setDC((DCSet) databaseSet, true);
-
-                    count++;
-
-                    // обратный отсчет в списке
-                    txs.add(0, item);
-                }
-
-                if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
-                    // сюда пришло значит не полный список - дополним его
-                    for (Transaction transaction : getTransactionsByAddressFromID(addressShort,
-                            fromSeqNo, 0, limit - count, noForge, false)) {
-                        boolean exist = false;
-                        for (Transaction txHere : txs) {
-                            if (transaction.equals(txHere)) {
-                                exist = true;
-                                break;
-                            }
-                        }
-                        if (!exist) {
-                            txs.add(transaction);
-                        }
-                    }
-                }
-
-            } catch (IOException e) {
-            }
-
-        } else {
-
-            try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(addressShort, fromSeqNo, true)) {
-                Transaction item;
-                Long key;
-                int skipped = 0;
-                int count = 0;
-                while (iterator.hasNext() && (limit <= 0 || count < limit)) {
-                    key = iterator.next();
-                    item = get(key);
-                    if (item == null) {
-                        String keyStr = Transaction.viewDBRef(key);
-                        boolean debug = true;
-                    }
-                    if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
-                        RCalculated tx = (RCalculated) item;
-                        String mess = tx.getMessage();
-                        if (mess != null && mess.equals(BlockChain.MESS_FORGING)) {
-                            if (forgedCount < 100) {
-                                // skip all but not 100
-                                forgedCount++;
-                                continue;
-                            } else {
-                                if (System.currentTimeMillis() - timeOut > 5000) {
-                                    break;
-                                }
-                                forgedCount = 0;
-                            }
-                        }
-                    }
-
-                    if (offset > 0 && skipped++ < offset) {
-                        continue;
-                    }
-
-                    item.setDC((DCSet) databaseSet, true);
-
-                    count++;
-
-                    boolean exist = false;
-                    for (Transaction txHere : txs) {
-                        if (item.equals(txHere)) {
-                            exist = true;
-                            break;
-                        }
-                    }
-                    if (!exist) {
-                        txs.add(item);
-                    }
-                }
-
-                if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
-                    // сюда пришло значит не полный список - дополним его
-                    int index = 0;
-                    int limitLeft = limit - count;
-                    for (Transaction transaction : getTransactionsByAddressFromID(addressShort,
-                            fromSeqNo, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, noForge, false)) {
-                        boolean exist = false;
-                        for (Transaction txHere : txs) {
-                            if (transaction.equals(txHere)) {
-                                exist = true;
-                                break;
-                            }
-                        }
-                        if (!exist) {
-                            txs.add(index++, transaction);
-                        }
-                    }
-                }
-
-            } catch (IOException e) {
-            }
-        }
-        return txs;
     }
 
     @Override
@@ -1483,11 +1223,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (transaction == null)
             return null;
 
+        Tuple2<Integer, Integer> seqNo = Transaction.parseDBRef(key);
         if (transaction instanceof GenesisRecord) {
-            Tuple2<Integer, Integer> seqNo = Transaction.parseDBRef(key);
-            transaction.setDC((DCSet) databaseSet, Transaction.FOR_PACK, seqNo.a, seqNo.b);
+            transaction.setDC((DCSet) databaseSet, Transaction.FOR_PACK, seqNo.a, seqNo.b, false);
         } else {
-            transaction.setDC((DCSet) databaseSet);
+            // need for calc FEE in orphan and block explorer
+            transaction.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, seqNo.a, seqNo.b, false);
         }
 
         // наращивание всех данных для скелета - так же необходимо для создания ключей tags
@@ -1500,12 +1241,22 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     public void put(Long key, Transaction transaction) {
-        super.put(key, transaction);
+        try {
+            super.put(key, transaction);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage() + " - " + transaction.toString(), e);
+            Controller.getInstance().stopAndExit(1351);
+        }
     }
 
     @Override
     public void put(Transaction transaction) {
-        put(transaction.getDBRef(), transaction);
+        try {
+            put(transaction.getDBRef(), transaction);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage() + " - " + transaction.toString(), e);
+            Controller.getInstance().stopAndExit(1351);
+        }
     }
 
 }

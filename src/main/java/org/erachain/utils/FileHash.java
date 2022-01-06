@@ -1,13 +1,13 @@
 package org.erachain.utils;
 
 import org.erachain.core.crypto.Base58;
+import org.erachain.lang.Lang;
 
+import javax.swing.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Быстрый ХЭШ больших файлов через буфер 1 МБ.
@@ -16,16 +16,16 @@ import java.security.NoSuchAlgorithmException;
  * а то что внутри ноды файлы хэшироуются - это другое.
  * См. https://lab.erachain.org/erachain/Erachain/-/issues/1433
  */
-public class FileHash  {
+public class FileHash {
     String partOfName;
     String partOfContent;
     String algorithm = "SHA-256";
-    String hash ="";
+    String hash = "";
     long offset = 0;
     private int buff;
 
 
-    public FileHash (File file){
+    public FileHash(File file) {
         try {
             init(file, "SHA-256", 1048576);
         } catch (IOException e) {
@@ -33,81 +33,68 @@ public class FileHash  {
             e.printStackTrace();
         }
     }
-    
-    public FileHash (File file, String algorithm){
+
+    public FileHash(File file, String algorithm) {
         try {
             init(file, algorithm, 1048576);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
     }
-    public FileHash (File file, String algorithm, int buff )  {
+
+    public FileHash(File file, String algorithm, int buff) {
         try {
             init(file, algorithm, buff);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-   
+
     }
-    public String getHash (){
-       return hash; 
+
+    public String getHash() {
+        return hash;
     }
-    private void init(File file1, String algorithm, int buff) throws IOException
-    {this.algorithm = algorithm;
-    String file_name = file1.getPath();
-    byte[] partialHash = null;
-    this.buff = buff;
-  
-       
+
+    private void init(File file1, String algorithm, int buff) throws IOException {
+        this.algorithm = algorithm;
+        String file_name = file1.getPath();
+        byte[] partialHash = null;
+        this.buff = buff;
+
+        if (!file1.exists() || file1.isDirectory()) {
+            JOptionPane.showMessageDialog(null, Lang.T("File not exist"),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         try {
             RandomAccessFile file2 = new RandomAccessFile(file_name, "r");
 
             long startTime = System.nanoTime();
             MessageDigest hashSum = null;
-            try {
-                hashSum = MessageDigest.getInstance(algorithm);
-            } catch (NoSuchAlgorithmException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            hashSum = MessageDigest.getInstance(algorithm);
 
             byte[] buffer = new byte[buff];
-           
 
             long read = 0;
 
             // calculate the hash of the hole file for the test
-            
-            try {
-                offset = file2.length();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+
+            offset = file2.length();
             int unitsize;
             while (read < offset) {
                 unitsize = (int) (((offset - read) >= buff) ? buff : (offset - read));
-                try {
-                    file2.read(buffer, 0, unitsize);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                file2.read(buffer, 0, unitsize);
 
                 hashSum.update(buffer, 0, unitsize);
 
                 read += unitsize;
             }
 
-            try {
-                file2.close();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            file2.close();
             partialHash = new byte[hashSum.getDigestLength()];
             partialHash = hashSum.digest();
 
@@ -115,14 +102,16 @@ public class FileHash  {
 
             System.out.println(endTime - startTime);
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(),
+                    Lang.T("Error"), JOptionPane.ERROR_MESSAGE);
         }
-    
- 
-    hash = Base58.encode(partialHash);
+
+
+        hash = Base58.encode(partialHash);
     }
-    public int getBufferSize(){
+
+    public int getBufferSize() {
         return buff;
     }
 }

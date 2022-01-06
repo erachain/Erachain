@@ -96,10 +96,10 @@ public class DeployATTransaction extends Transaction {
         long timestamp = Longs.fromByteArray(timestampBytes);
         position += TIMESTAMP_LENGTH;
 
-        //READ REFERENCE
-        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-        long reference = Longs.fromByteArray(referenceBytes);
-        position += REFERENCE_LENGTH;
+        //READ FLAGS
+        byte[] flagsBytes = Arrays.copyOfRange(data, position, position + FLAGS_LENGTH);
+         long flagsTX = Longs.fromByteArray(flagsBytes);
+        position += FLAGS_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -184,7 +184,7 @@ public class DeployATTransaction extends Transaction {
         //READ SIGNATURE
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-        return new DeployATTransaction(typeBytes, creator, name, description, type, tags, creationBytes, amount, feePow, timestamp, reference, signatureBytes);
+        return new DeployATTransaction(typeBytes, creator, name, description, type, tags, creationBytes, amount, feePow, timestamp, flagsTX, signatureBytes);
     }
 
     //PARSE/CONVERT
@@ -218,13 +218,11 @@ public class DeployATTransaction extends Transaction {
 
         //WRITE TIMESTAMP
         byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-        timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
         data = Bytes.concat(data, timestampBytes);
 
-        //WRITE REFERENCE
-        byte[] referenceBytes = Longs.toByteArray(this.reference);
-        referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        //WRITE FLAGS
+        byte[] flagsBytes = Longs.toByteArray(this.extFlags);
+        data = Bytes.concat(data, flagsBytes);
 
         //WRITE CREATOR
         data = Bytes.concat(data, this.creator.getPublicKey());
@@ -304,7 +302,7 @@ public class DeployATTransaction extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(int forDeal, long flags) {
+    public int isValid(int forDeal, long checkFlags) {
         return isValid(0);
     }
 
@@ -358,7 +356,7 @@ public class DeployATTransaction extends Transaction {
                 return returnCode + AT_ERROR;
             }
 
-            String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
+            String atId = Crypto.getInstance().getDAppAddressB58(getBytesForAddress(this.dcSet));
             if (this.dcSet.getATMap().getAT(atId) != null) {
                 return 12 + AT_ERROR;
             }
@@ -384,18 +382,13 @@ public class DeployATTransaction extends Transaction {
                 false, false, false);
 
         //CREATE AT ID = ADDRESS
-        String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
+        String atId = Crypto.getInstance().getDAppAddressB58(getBytesForAddress(this.dcSet));
 
         Account atAccount = new Account(atId);
 
         //atAccount.setBalance(Transaction.FEE_KEY, this.amount , db );
         atAccount.changeBalance(this.dcSet, false, false, Transaction.FEE_KEY, this.amount,
                 false, false, false);
-
-        //UPDATE REFERENCE OF RECIPIENT
-        if (true || atAccount.getLastTimestamp(this.dcSet) == null) {
-            atAccount.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
-        }
 
         //CREATE AT - public key or address? Is that the correct height?
         AT at = new AT(Base58.decode(atId), Base58.decode(this.creator.getAddress()), this.name, this.description, this.type, this.tags, this.creationBytes, this.dcSet.getBlockMap().last().getHeight() + 1);
@@ -433,7 +426,7 @@ public class DeployATTransaction extends Transaction {
 
         bf.putInt(getBlockHeightByParentOrLast(db));
 
-        String atId = Crypto.getInstance().getATAddress(bf.array().clone());
+        String atId = Crypto.getInstance().getDAppAddressB58(bf.array().clone());
 
         return new Account(atId);
     }
@@ -448,7 +441,7 @@ public class DeployATTransaction extends Transaction {
         this.creator.changeBalance(this.dcSet, false, false, Transaction.FEE_KEY, this.amount,
                 false, false, false);
 
-        String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
+        String atId = Crypto.getInstance().getDAppAddressB58(getBytesForAddress(this.dcSet));
 
         Account atAccount = new Account(atId);
 
@@ -457,8 +450,6 @@ public class DeployATTransaction extends Transaction {
         atAccount.changeBalance(this.dcSet, true, false, Transaction.FEE_KEY, this.amount,
                 false, false, false);
 
-        //UPDATE REFERENCE OF SENDER
-        this.creator.setLastTimestamp(new long[]{this.reference, dbRef}, this.dcSet);
 
     }
 

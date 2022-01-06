@@ -78,12 +78,14 @@ public class TestRecHash {
         hashesRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE PLATE TRANSACTION IS VALID
+        hashesRecord.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(true, hashesRecord.isSignatureValid(db));
 
         //INVALID SIGNATURE
         hashesRecord = new RHashes(maker, exLink, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE PLATE IS INVALID
+        hashesRecord.setHeightSeq(BlockChain.SKIP_INVALID_SIGN_BEFORE, 1);
         assertEquals(false, hashesRecord.isSignatureValid(db));
     }
 
