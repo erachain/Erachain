@@ -2538,9 +2538,6 @@ public class Block implements Closeable, ExplorerJsonLine {
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
         TransactionsPool pool = Controller.getInstance().transactionsPool;
 
-        // CLEAR ASSETS FEE
-        earnedAllAssets = new HashMap<>();
-
         boolean calculatedBefore = true;
 
         // DELETE ALL BY DB ITERATOR
