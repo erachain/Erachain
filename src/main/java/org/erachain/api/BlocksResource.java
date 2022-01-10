@@ -1,22 +1,28 @@
 package org.erachain.api;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.AddressForging;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
+import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -292,4 +298,31 @@ public class BlocksResource {
 
         return "OK";
     }
+
+    // get blocks/testforge/7KFgZFbJ6sKxoT2y45agHqJS7XLeXryqec
+    @GET
+    @Path("/testforge/{address}")
+    public String testForge(@PathParam("address") String address) {
+
+        Account account = new Account(address);
+
+        DCSet dcSet = DCSet.getInstance();
+        AddressForging map = dcSet.getAddressForging();
+        int count = 0;
+        Integer seqNo = 0;
+        do {
+            Fun.Tuple2<String, Integer> key = new Fun.Tuple2<String, Integer>(address, seqNo);
+            Fun.Tuple3<Integer, Integer, Integer> item = map.get(key);
+            if (item == null)
+                break;
+
+            count++;
+            seqNo = item.a;
+        } while (true);
+
+        BigDecimal defaultAmount = dcSet.getAssetBalanceMap().getDefaultValue(Bytes.concat(account.getShortAddressBytes(), Longs.toByteArray(AssetCls.ERA_KEY))).a.b;
+        return "count: " + count + ", forged: " + account.getBalance(dcSet, AssetCls.ERA_KEY, Account.BALANCE_POS_OWN).b.subtract(defaultAmount).toPlainString();
+
+    }
+
 }
