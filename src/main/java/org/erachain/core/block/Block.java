@@ -2468,7 +2468,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
         this.orphanTransactions(dcSet, heightBlock, notStoreTXs);
 
-        //PROCESS ASSETS FEE - after orphanTransactions!
+        //PROCESS ASSETS FEE - after orphanTransactions! - так как тут они будут вычислены
         assetsFeeProcess(dcSet, true);
 
         DAPP.processByBlock(dcSet, this, true);
@@ -2592,7 +2592,7 @@ public class Block implements Closeable, ExplorerJsonLine {
 
                 }
 
-                // полное удалени включая Посиковые Метки tags
+                // полное удаление включая Поисковые Метки tags и Вычисленные
                 finalMap.delete(dbRef);
             }
         }
