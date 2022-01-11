@@ -1545,6 +1545,8 @@
   "Smart Contract": "Умный Контракт",
   "Single": "Уникальный",
   "Start": "Начало",
+  "Start RPC Service on port": "Запуск RPC сервиса на порте",
+  "Start WEB & API Service on port": "Запуск WEB и API сервиса на порте",
   "Starting %app% / version: %version% / build date: %builddate% / ...": "Запуск %app% / версия: %version% / дата сборки: %builddate% / ...",
   "STARTUP ERROR": "ОШИБКА СТАРТА",
   "Statements": "Заявления",

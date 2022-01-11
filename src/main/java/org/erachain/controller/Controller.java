@@ -736,17 +736,17 @@ public class Controller extends Observable {
         // START API SERVICE
         if (Settings.getInstance().isRpcEnabled()) {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start API Service"));
-            LOGGER.info(Lang.T("Start API Service"));
             this.rpcService = new ApiService();
             this.rpcServiceRestart();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Start RPC Service on port") + " " + Settings.getInstance().getRpcPort()));
+            LOGGER.info("Start RPC Service on port " + Settings.getInstance().getRpcPort());
         }
 
         // START WEB SERVICE
         if (Settings.getInstance().isWebEnabled()) {
             this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, "Start WEB Service"));
-            LOGGER.info(Lang.T("Start WEB Service"));
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.T("Start WEB & API Service on port") + " " + Settings.getInstance().getWebPort()));
+            LOGGER.info("Start WEB & API Service on port " + Settings.getInstance().getWebPort());
             this.webService = WebService.getInstance();
             this.webService.start();
         }
