@@ -103,18 +103,27 @@ public class Block implements Closeable, ExplorerJsonLine {
     protected long totalFee;
     protected long emittedFee;
     public Block.BlockHead blockHead;
-    protected List<RCalculated> txCalculated;
 
     // BODY
-    protected List<Transaction> transactions;
     protected byte[] rawTransactions = null;
     protected int rawTransactionsLength;
     //protected Long atFees;
     protected byte[] atBytes;
 
     private boolean fromTrustedPeer = false;
+
+    // was validated
+    protected boolean wasValidated;
+
+    /**
+     * ******* CALCULATED below - need to clear on CLOSE ******
+     */
+
+    protected List<Transaction> transactions;
+    protected List<RCalculated> txCalculated;
+
     // FORGING INFO
-    // при обработке транзакций используем для запоминания что данные менялись
+    // при обработке транзакций используем для запоминания, что данные менялись
     protected List<Account> forgingInfoUpdate;
 
     /**
@@ -122,11 +131,11 @@ public class Block implements Closeable, ExplorerJsonLine {
      */
     protected HashMap<AssetCls, Tuple2<BigDecimal, BigDecimal>> earnedAllAssets;
 
-
-    // was validated
-    protected boolean wasValidated;
-
     protected DCSet validatedForkDB;
+
+    /**
+     * end CALCULATED
+     */
 
     /////////////////////////////////////// BLOCK HEAD //////////////////////////////
     public static class BlockHead implements ExplorerJsonLine {
@@ -822,7 +831,7 @@ public class Block implements Closeable, ExplorerJsonLine {
             return;
         }
 
-        // проверим может уже естьт ам такой счет
+        // проверим мочь уже есть там такой счет
         for (Account item : this.forgingInfoUpdate) {
             if (account.equals(item))
                 return;
@@ -1775,6 +1784,8 @@ public class Block implements Closeable, ExplorerJsonLine {
     public synchronized void close() {
 
         txCalculated = null;
+        forgingInfoUpdate = null;
+        earnedAllAssets = null;
 
         if (validatedForkDB != null) {
             try {
