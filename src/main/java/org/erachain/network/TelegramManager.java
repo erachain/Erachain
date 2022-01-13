@@ -145,12 +145,11 @@ public class TelegramManager extends Thread {
 
                         if (address != null) {
                             if (
-                                // исходящие
-                                    outcomes && !transaction.getCreator().equals(address)
-                                            ||
-                                            // входящие
-                                            transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                                                    && !((RSend) transaction).getRecipient().equals(address)
+                                // входящие
+                                    transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                                            && !((RSend) transaction).getRecipient().equals(address)
+                                            // исходящие
+                                            && (!outcomes || !transaction.getCreator().equals(address))
                             ) {
                                 continue;
                             }
