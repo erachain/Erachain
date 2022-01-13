@@ -119,7 +119,7 @@ public class APITelegramsResource {
 
     @GET
     @Path("incoming/{recipient}/{timestamp}")
-    public Response getIncoming(@QueryParam("recipient") String recipient, @QueryParam("timestamp") long timestamp,
+    public Response getIncoming(@PathParam("recipient") String recipient, @PathParam("timestamp") long timestamp,
                                 @QueryParam("limit") int limit) {
 
         // CHECK ADDRESS
