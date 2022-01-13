@@ -2,9 +2,12 @@ package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.web.ServletUtils;
+import org.erachain.lang.Lang;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
@@ -33,9 +36,9 @@ public class APITelegramsResource {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<String, String>();
         help.put("apitelegrams/getbysignature/{signature}", "Get Telegramm by signature");
-        help.put("apitelegrams/get?address={address}&timestamp={timestamp}&filter={filter}&outcomes=true",
-                "Get messages by filter. Filter is title. If outcomes=true get outcomes too");
-        help.put("apitelegrams/timestamp/{timestamp}?filter={filter}&outcomes=true",
+        help.put("apitelegrams/incoming/{recipient}/{timestamp}?limit=100",
+                Lang.T("Find telegrams for recipent from timestamp"));
+        help.put("apitelegrams/timestamp/{timestamp}?filter={filter}&outcomes=true&limit=100",
                 "Get messages from timestamp with filter. Filter is title. If outcomes=true get outcomes too");
         help.put("apitelegrams/check/{signature}",
                 "Check telegrams contain in node");
@@ -44,7 +47,6 @@ public class APITelegramsResource {
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
     }
 
-    
     /**
      * @param signature is signature message
      * @return telegram
@@ -84,27 +86,29 @@ public class APITelegramsResource {
      * @param address   account user
      * @param timestamp value time
      * @param filter    is title message.
-     * @param outcomes  is True get outcomes too
      * @return json string all find message by filter
      * @author Ruslan
      */
     @SuppressWarnings("unchecked")
+    @Deprecated
     @GET
     @Path("get")
-    public Response getTelegramsByTimestamp(@QueryParam("address") String address, @QueryParam("timestamp") int timestamp,
-                                            @QueryParam("filter") String filter, @QueryParam("outcomes") boolean outcomes) {
+    public Response get(@QueryParam("address") String address, @QueryParam("timestamp") long timestamp,
+                        @QueryParam("filter") String filter,
+                        @QueryParam("limit") int limit) {
 
         // CHECK ADDRESS
         if (!Crypto.getInstance().isValidAddress(address)) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
         }
 
-        int limit = 1024 << (Controller.HARD_WORK >> 1);
-        JSONArray array = new JSONArray();
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, address, filter, outcomes)) {
-            if (--limit < 0)
-                break;
+        if (ServletUtils.isRemoteRequest(request)) {
+            if (limit > 100 || limit == 0)
+                limit = 100;
+        }
 
+        JSONArray array = new JSONArray();
+        for (TelegramMessage telegram : Controller.getInstance().getTelegramsForAddress(new Account(address), timestamp, filter, limit)) {
             array.add(telegram.toJson());
         }
 
@@ -114,14 +118,44 @@ public class APITelegramsResource {
     }
 
     @GET
+    @Path("incoming/{recipient}/{timestamp}")
+    public Response getIncoming(@QueryParam("recipient") String address, @QueryParam("timestamp") long timestamp,
+                                @QueryParam("limit") int limit) {
+
+        // CHECK ADDRESS
+        if (!Crypto.getInstance().isValidAddress(address)) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
+        }
+
+        if (ServletUtils.isRemoteRequest(request)) {
+            if (limit > 100 || limit == 0)
+                limit = 100;
+        }
+
+        JSONArray array = new JSONArray();
+        for (TelegramMessage telegram : Controller.getInstance().getTelegramsForAddress(new Account(address), timestamp, null, limit)) {
+            array.add(telegram.toJson());
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(array.toJSONString()).build();
+    }
+
+
+    @GET
     @Path("timestamp/{timestamp}")
     public Response getTelegramsLimited(@PathParam("timestamp") long timestamp,
-                                        @QueryParam("filter") String filter, @QueryParam("outcomes") boolean outcomes
-    ) {
+                                        @QueryParam("filter") String filter, @QueryParam("outcomes") boolean outcomes,
+                                        @QueryParam("limit") int limit) {
 
-        int limit = 1024 << (Controller.HARD_WORK>>1);
+        if (ServletUtils.isRemoteRequest(request)) {
+            if (limit > 100 || limit == 0)
+                limit = 100;
+        }
+
         JSONArray array = new JSONArray();
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, null, filter, outcomes)) {
+        for (TelegramMessage telegram : Controller.getInstance().getTelegramsFromTimestamp(timestamp, null, filter, outcomes, limit)) {
             if (--limit < 0)
                 break;
 

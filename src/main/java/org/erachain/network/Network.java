@@ -440,8 +440,8 @@ public class Network extends Observable {
         return this.telegramer.add(telegram);
     }
 
-    public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter) {
-        return this.telegramer.getTelegramsForAddress(address, timestamp, filter);
+    public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter, int limit) {
+        return this.telegramer.getTelegramsForAddress(address, timestamp, filter, limit);
     }
 
     public List<String> deleteTelegram(List<String> telegramSignatures) {
@@ -451,12 +451,13 @@ public class Network extends Observable {
     public long deleteTelegramsToTimestamp(long timestamp, String recipient, String title) {
         return this.telegramer.deleteToTimestamp(timestamp, recipient, title);
     }
+
     public long deleteTelegramsForRecipient(String recipient, long timestamp, String title) {
         return this.telegramer.deleteForRecipient(recipient, timestamp, title);
     }
 
-    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes) {
-        return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes);
+    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes, int limit) {
+        return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes, limit);
     }
     //public TelegramMessage getTelegram64(String signature) {
     //	return this.telegramer.getTelegram64(signature);

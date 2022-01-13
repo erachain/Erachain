@@ -52,8 +52,9 @@ public class TelegramsResource {
             @QueryParam("filter") String filter,
             @QueryParam("outcomes") boolean outcomes,
             @QueryParam("decrypt") boolean decrypt,
+            @QueryParam("limit") int limit,
             @QueryParam("password") String password) {
-        return this.getTelegramsLimited(NTP.getTime() - 6000000, null, filter, decrypt, outcomes, password);
+        return this.getTelegramsLimited(NTP.getTime() - 6000000, null, filter, decrypt, outcomes, limit, password);
     }
 
     @GET
@@ -61,10 +62,11 @@ public class TelegramsResource {
     public String getTelegramsTwo(@PathParam("address") String address,
                                   @QueryParam("timestamp") long timestamp,
                                   @QueryParam("filter") String filter,
+                                  @QueryParam("limit") int limit,
                                   @QueryParam("outcomes") boolean outcomes,
                                   @QueryParam("decrypt") boolean decrypt,
                                   @QueryParam("password") String password) {
-        return this.getTelegramsTimestamp(address, timestamp, filter, decrypt, outcomes, password);
+        return this.getTelegramsTimestamp(address, timestamp, filter, decrypt, limit, outcomes, password);
     }
 
     private JSONObject decrypt(TelegramMessage telegram, JSONObject item) {
@@ -113,6 +115,7 @@ public class TelegramsResource {
                                       @QueryParam("filter") String filter,
                                       @QueryParam("outcomes") boolean outcomes,
                                       @QueryParam("decrypt") boolean decrypt,
+                                      @QueryParam("limit") int limit,
                                       @QueryParam("password") String password) {
 
         // CREATE JSON OBJECT
@@ -123,7 +126,7 @@ public class TelegramsResource {
         if (decrypt)
             APIUtils.askAPICallAllowed(password, "GET telegrams decrypt", request, true);
 
-        for (TelegramMessage telegram : controller.getLastTelegrams(timestamp, recipient, filter, outcomes)) {
+        for (TelegramMessage telegram : controller.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes, limit)) {
 
             item = telegram.toJson();
             if (decrypt) {
@@ -137,7 +140,7 @@ public class TelegramsResource {
     }
 
     /**
-     * @param address   its e recipient
+     * @param address   recipient
      * @param timestamp the value more than which will be searched
      * @param filter    is title in telegram
      * @param outcomes    if set True - use outcomes too
@@ -178,6 +181,7 @@ public class TelegramsResource {
     public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") long timestamp,
                                         @QueryParam("filter") String filter,
                                         @QueryParam("decrypt") boolean decrypt,
+                                        @QueryParam("limit") int limit,
                                         @QueryParam("outcomes") boolean outcomes,
                                         @QueryParam("password") String password) {
 
@@ -192,7 +196,7 @@ public class TelegramsResource {
         JSONArray array = new JSONArray();
         JSONObject item;
         Transaction transaction;
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, account.a.getAddress(), filter, outcomes)) {
+        for (TelegramMessage telegram : Controller.getInstance().getTelegramsFromTimestamp(timestamp, account.a.getAddress(), filter, outcomes, limit)) {
 
             item = telegram.toJson();
 

@@ -2516,12 +2516,12 @@ public class Controller extends Observable {
         return this.network.deleteTelegramsForRecipient(recipient, timestamp, title);
     }
 
-    public List<TelegramMessage> getLastIncomeTelegrams(Account account, long timestamp, String filter) {
-        return this.network.getTelegramsForAddress(account.getAddress(), timestamp, filter);
+    public List<TelegramMessage> getTelegramsForAddress(Account account, long timestamp, String filter, int limit) {
+        return this.network.getTelegramsForAddress(account.getAddress(), timestamp, filter, limit);
     }
 
-    public List<TelegramMessage> getLastTelegrams(long timestamp, String recipient, String filter, boolean outcomes) {
-        return this.network.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes);
+    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes, int limit) {
+        return this.network.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes, limit);
     }
 
     public TelegramMessage getTelegram(byte[] signature) {
