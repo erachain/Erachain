@@ -523,6 +523,12 @@ public class BlockChain {
                     new Tuple3<Long, Long, byte[]>(95L, 0L, genesisBlock.CREATOR.getShortAddressBytes()));
 
             // это как пример для отладки
+
+            // Процент за перевод и Минимальная комиссия
+            /**
+             * Если тут не задана минимальная величина комиссии для актива, и процент с него не берется
+             */
+
             ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(1L, new BigDecimal("0.05"));
 
             ASSET_TRANSFER_PERCENTAGE_MIN_TAB.put(12L, new BigDecimal("0.00005"));
