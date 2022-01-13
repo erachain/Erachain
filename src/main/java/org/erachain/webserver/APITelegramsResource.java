@@ -38,7 +38,7 @@ public class APITelegramsResource {
         help.put("apitelegrams/getbysignature/{signature}", "Get Telegramm by signature");
         help.put("apitelegrams/incoming/{recipient}/{timestamp}?limit=100",
                 Lang.T("Find telegrams for recipent from timestamp"));
-        help.put("apitelegrams/timestamp/{timestamp}?filter={filter}&outcomes=true&limit=100",
+        help.put("apitelegrams/timestamp/{timestamp}?address={address}&filter={filter}&outcomes=true&limit=100",
                 "Get messages from timestamp with filter. Filter is title. If outcomes=true get outcomes too");
         help.put("apitelegrams/check/{signature}",
                 "Check telegrams contain in node");
