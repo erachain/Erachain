@@ -103,12 +103,12 @@ public class APITelegramsResource {
         }
 
         if (ServletUtils.isRemoteRequest(request)) {
-            if (limit > 100 || limit == 0)
+            if (limit > 100 || limit <= 0)
                 limit = 100;
         }
 
         JSONArray array = new JSONArray();
-        for (TelegramMessage telegram : Controller.getInstance().getTelegramsForAddress(new Account(address), timestamp, filter, limit)) {
+        for (TelegramMessage telegram : Controller.getInstance().getTelegramsForRecipient(new Account(address), timestamp, filter, limit)) {
             array.add(telegram.toJson());
         }
 
@@ -119,21 +119,21 @@ public class APITelegramsResource {
 
     @GET
     @Path("incoming/{recipient}/{timestamp}")
-    public Response getIncoming(@QueryParam("recipient") String address, @QueryParam("timestamp") long timestamp,
+    public Response getIncoming(@QueryParam("recipient") String recipient, @QueryParam("timestamp") long timestamp,
                                 @QueryParam("limit") int limit) {
 
         // CHECK ADDRESS
-        if (!Crypto.getInstance().isValidAddress(address)) {
+        if (!Crypto.getInstance().isValidAddress(recipient)) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
         }
 
         if (ServletUtils.isRemoteRequest(request)) {
-            if (limit > 100 || limit == 0)
+            if (limit > 100 || limit <= 0)
                 limit = 100;
         }
 
         JSONArray array = new JSONArray();
-        for (TelegramMessage telegram : Controller.getInstance().getTelegramsForAddress(new Account(address), timestamp, null, limit)) {
+        for (TelegramMessage telegram : Controller.getInstance().getTelegramsForRecipient(new Account(recipient), timestamp, null, limit)) {
             array.add(telegram.toJson());
         }
 
@@ -146,19 +146,17 @@ public class APITelegramsResource {
     @GET
     @Path("timestamp/{timestamp}")
     public Response getTelegramsLimited(@PathParam("timestamp") long timestamp,
+                                        @QueryParam("address") String address,
                                         @QueryParam("filter") String filter, @QueryParam("outcomes") boolean outcomes,
                                         @QueryParam("limit") int limit) {
 
         if (ServletUtils.isRemoteRequest(request)) {
-            if (limit > 100 || limit == 0)
+            if (limit > 100 || limit <= 0)
                 limit = 100;
         }
 
         JSONArray array = new JSONArray();
-        for (TelegramMessage telegram : Controller.getInstance().getTelegramsFromTimestamp(timestamp, null, filter, outcomes, limit)) {
-            if (--limit < 0)
-                break;
-
+        for (TelegramMessage telegram : Controller.getInstance().getTelegramsFromTimestamp(timestamp, address, filter, outcomes, limit)) {
             array.add(telegram.toJson());
         }
 

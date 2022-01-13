@@ -123,7 +123,7 @@ public class TelegramManager extends Thread {
 
 
     // GET telegrams for RECIPIENT from TIME
-    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes, int limit) {
+    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String address, String filter, boolean outcomes, int limit) {
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         if (!controller.isOnStopping()) {
 
@@ -138,24 +138,32 @@ public class TelegramManager extends Thread {
                             continue;
 
                         if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                            String head = ((RSend) transaction).getTitle();
+                            String head = transaction.getTitle();
                             if (!filter.equals(head))
                                 continue;
                         }
 
-                        if (recipient != null) {
+                        if (address != null) {
                             if (
-                                // только входящие
-                                    transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                                            && !((RSend) transaction).getRecipient().equals(recipient)
-                                            // можно и исходящие
-                                            && outcomes && !transaction.getCreator().equals(recipient)
+                                // исходящие
+                                    outcomes && !transaction.getCreator().equals(address)
+                                            ||
+                                            // входящие
+                                            transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                                                    && !((RSend) transaction).getRecipient().equals(address)
                             ) {
                                 continue;
                             }
                         }
 
                         telegrams.add(telegram);
+
+                        if (limit > 0) {
+                            if (limit == 1)
+                                break;
+                            limit--;
+                        }
+
                     }
                 }
             }
@@ -166,7 +174,7 @@ public class TelegramManager extends Thread {
     }
 
     // GET telegrams for RECIPIENT from TIME
-    public List<TelegramMessage> getTelegramsForAddress(String recipient, long timestamp, String filter, int limit) {
+    public List<TelegramMessage> getTelegramsForRecipient(String recipient, long timestamp, String filter, int limit) {
         // TelegramMessage telegram;
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         // ASK DATABASE FOR A LIST OF PEERS
@@ -183,6 +191,16 @@ public class TelegramManager extends Thread {
                     String head = transaction.getTitle();
                     if (!filter.equals(head))
                         continue;
+                }
+
+                if (recipient != null) {
+                    if (
+                        // входящие
+                            transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                                    && !((RSend) transaction).getRecipient().equals(recipient)
+                    ) {
+                        continue;
+                    }
                 }
 
                 telegrams.add(telegram);

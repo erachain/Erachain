@@ -120,7 +120,7 @@ public class TelegramManagerTest {
         telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null, outcomes, 0);
         assertEquals(telegrams.size(), 100 - 1);
 
-        telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null, 0);
+        telegrams = telegramer.getTelegramsForRecipient(recipient1.getAddress(), 0, null, 0);
         assertEquals(telegrams.size(), 100 - 1);
 
         List<String> signsList = new ArrayList<String>();
@@ -139,7 +139,7 @@ public class TelegramManagerTest {
         telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null, outcomes, 0);
         assertEquals(telegrams.size(), 100 - 1 - signsList.size());
 
-        telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null, 0);
+        telegrams = telegramer.getTelegramsForRecipient(recipient1.getAddress(), 0, null, 0);
         assertEquals(telegrams.size(), 100 - 1 - signsList.size());
 
     }

@@ -2516,8 +2516,8 @@ public class Controller extends Observable {
         return this.network.deleteTelegramsForRecipient(recipient, timestamp, title);
     }
 
-    public List<TelegramMessage> getTelegramsForAddress(Account account, long timestamp, String filter, int limit) {
-        return this.network.getTelegramsForAddress(account.getAddress(), timestamp, filter, limit);
+    public List<TelegramMessage> getTelegramsForRecipient(Account account, long timestamp, String filter, int limit) {
+        return this.network.getTelegramsForRecipient(account.getAddress(), timestamp, filter, limit);
     }
 
     public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes, int limit) {
