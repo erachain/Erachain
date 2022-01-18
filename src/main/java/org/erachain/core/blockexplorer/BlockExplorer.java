@@ -1641,7 +1641,7 @@ public class BlockExplorer {
         output.put("type", "owners");
         output.put("search_placeholder", Lang.T("Type asset key", langObj));
 
-        int pageSize = 200; //this.pageSize << 1;
+        int pageSize = this.pageSize << 1;
         long assetKey = 1L;
         if (assetKeyStr != null)
             assetKey = Long.valueOf(assetKeyStr);
