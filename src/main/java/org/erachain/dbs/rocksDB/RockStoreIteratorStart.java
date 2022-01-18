@@ -57,9 +57,9 @@ public final class RockStoreIteratorStart extends RockStoreIterator {
             return hasNext;
         } else {
             if (descending) {
-                return (hasNext = hasNext && compareUnsignedAsMask(stopKey, dbIterator.key()) <= 0);
+                return hasNext && compareUnsignedAsMask(stopKey, dbIterator.key()) <= 0;
             } else {
-                return (hasNext = hasNext && compareUnsignedAsMask(stopKey, dbIterator.key()) >= 0);
+                return hasNext && compareUnsignedAsMask(stopKey, dbIterator.key()) >= 0;
             }
         }
     }

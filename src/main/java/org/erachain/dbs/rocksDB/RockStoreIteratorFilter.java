@@ -58,7 +58,7 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
       }
     }
 
-    return hasNext = hasNext && (filter == null || areEqualMask(dbIterator.key(), filter));
+    return hasNext && (filter == null || areEqualMask(dbIterator.key(), filter));
 
   }
 
