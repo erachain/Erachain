@@ -132,18 +132,22 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
         boolean addressIs = addressShort != null;
         byte[] fromKey = new byte[8 + ROCK_BIG_DECIMAL_LEN + (addressIs ? Long.BYTES : 0)];
+        byte[] toKey = new byte[8 + ROCK_BIG_DECIMAL_LEN];
+
         // ASSET KEY
         System.arraycopy(Longs.toByteArray(assetKey), 0, fromKey, 0, Long.BYTES);
+        System.arraycopy(Longs.toByteArray(assetKey), 0, toKey, 0, Long.BYTES);
 
         shiftForSortBuff = seralizerBigDecimal.toBytes(fromOwnAmount);
         System.arraycopy(shiftForSortBuff, 0, fromKey, Long.BYTES, ROCK_BIG_DECIMAL_LEN);
+        System.arraycopy(descending ? IndexByteableBigDecimal.MIN : IndexByteableBigDecimal.MAX, 0, toKey, Long.BYTES, ROCK_BIG_DECIMAL_LEN);
 
         if (addressIs)
             System.arraycopy(addressShort, 0, fromKey, Long.BYTES + ROCK_BIG_DECIMAL_LEN, Long.BYTES);
 
         // use START|STOP - not FILTER
         return map.getIndexIteratorFilter(balanceKeyAssetIndex.getColumnFamilyHandle(),
-                fromKey, null, descending, true);
+                fromKey, toKey, descending, true);
     }
 
     @Override
