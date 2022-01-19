@@ -60,7 +60,7 @@ public abstract class DAPPFactory {
                     && createOrder.getAmountWant().compareTo(new BigDecimal(100)) >= 0 // && createOrder.getHaveKey() == AssetCls.USD_KEY
             ) {
                 Order order = createOrder.getDCSet().getCompletedOrderMap().get(createOrder.getOrderId());
-                if (order != null)
+                if (false && order != null)
                     return new LeafFall();
             }
         }
