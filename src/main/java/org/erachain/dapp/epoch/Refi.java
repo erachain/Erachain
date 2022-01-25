@@ -23,7 +23,9 @@ public class Refi extends EpochDAPPjson {
 
 
     static public final int ID = 1012;
-    static public final String NAME = "Referal Asset";
+    static public final String NAME = "Referal dApp";
+    static public final String ASSET_NAME = "REFI";
+    static public final long ASSET_QUALITY = 25000000;
 
     // APPBjF5fbGj18aaXKSXemmHConG7JLBiJg
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
@@ -229,8 +231,8 @@ public class Refi extends EpochDAPPjson {
                 return false;
             }
 
-            AssetVenture asset = new AssetVenture(null, stock, "NAME", null, null,
-                    null, AssetCls.AS_INSIDE_ASSETS, ASSET_DECIMALS, 0);
+            AssetVenture asset = new AssetVenture(null, stock, ASSET_NAME, null, null,
+                    null, AssetCls.AS_INSIDE_ASSETS, ASSET_DECIMALS, ASSET_QUALITY);
             asset.setReference(commandTX.getSignature(), commandTX.getDBRef());
 
             //INSERT INTO DATABASE
