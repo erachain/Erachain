@@ -130,7 +130,7 @@ public class Refi extends EpochDAPPjson {
             valueSet(dcSet, recipientAddress, state[1]);
 
             BigDecimal stakeReward = (BigDecimal) state[2];
-            if (stakeReward.signum() > 0) {
+            if (stakeReward != null && stakeReward.signum() > 0) {
                 transfer(dcSet, block, rSend, stock, sender, stakeReward, rSend.getAssetKey(), true, null, null);
             }
 
