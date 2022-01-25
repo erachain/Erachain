@@ -213,12 +213,6 @@ public class DCSet extends DBASet implements Closeable {
                     ACCOUNT_BALANCES
                     , this, database);
 
-            this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
-                    FINAL_TX_MAP
-                    , this, database, SIZE_ENABLE_IN_FINAL);
-
-            this.transactionTab = new TransactionMapImpl(UNCONF_TX_MAP, this, database);
-
             this.referenceMap = new ReferenceMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ACCOUNTS_REFERENCES
                     , this, database);
@@ -226,10 +220,6 @@ public class DCSet extends DBASet implements Closeable {
             this.blockMap = new BlocksMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     BLOCKS_MAP
                     , this, database);
-
-            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS != DBS_FAST ? defaultDBS :
-                    FINAL_TX_SIGNS_MAP
-                    , this, database, !SIZE_ENABLE_IN_FINAL);
 
             this.orderMap = new OrderMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ORDERS_MAP
@@ -306,6 +296,17 @@ public class DCSet extends DBASet implements Closeable {
             this.atStateMap = new ATStateMap(this, database);
 
             this.atTransactionMap = new ATTransactionMap(this, database);
+
+            // IT OPEN AFTER ALL OTHER for make secondary keys and setDCSet
+            this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
+                    FINAL_TX_MAP
+                    , this, database, SIZE_ENABLE_IN_FINAL);
+
+            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS != DBS_FAST ? defaultDBS :
+                    FINAL_TX_SIGNS_MAP
+                    , this, database, !SIZE_ENABLE_IN_FINAL);
+
+            this.transactionTab = new TransactionMapImpl(UNCONF_TX_MAP, this, database);
 
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
