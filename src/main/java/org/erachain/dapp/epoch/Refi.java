@@ -144,6 +144,8 @@ public class Refi extends EpochDAPPjson {
 
         } else {
 
+            status = "";
+
             Long assetKey = rSend.getAssetKey();
             Long refDB = rSend.getDBRef();
             Integer height = rSend.getBlockHeight();
@@ -153,6 +155,7 @@ public class Refi extends EpochDAPPjson {
             Object[] recipientPoint;
             if (recipient.equals(adminAddress)) {
                 recipientPoint = null;
+                status += " Ignore recipient sender.";
 
             } else {
                 /////////// RECIPIENT REWARDS
@@ -160,6 +163,7 @@ public class Refi extends EpochDAPPjson {
                 recipientPoint = (Object[]) valueGet(dcSet, recipientAddress);
 
                 Object[] pointNew = makeNewPoin(assetKey, refDB, height, recipient, stake, recipientPoint);
+                status += " Reciever reward: " + ((BigDecimal) pointNew[1]).toPlainString() + ".";
 
                 // STORE NEW POINT
                 valuePut(dcSet, recipientAddress, pointNew);
@@ -170,6 +174,7 @@ public class Refi extends EpochDAPPjson {
             if (sender.equals(adminAddress)) {
                 senderPoint = null;
                 stakeReward = null;
+                status += " Ignore admin sender.";
 
             } else {
                 /////////// SENDER REWARDS
@@ -177,6 +182,7 @@ public class Refi extends EpochDAPPjson {
                 senderPoint = (Object[]) valueGet(dcSet, senderAddress);
 
                 Object[] pointNew = makeNewPoin(assetKey, refDB, height, sender, stake, senderPoint);
+                status += " Sender reward " + ((BigDecimal) pointNew[1]).toPlainString() + ".";
 
                 int lastHeightAction = (Integer) pointNew[0];
                 if (height - lastHeightAction >= SKIP) {
@@ -185,9 +191,11 @@ public class Refi extends EpochDAPPjson {
                     // reset pending reward
                     pointNew[0] = height;
                     pointNew[1] = BigDecimal.ZERO;
+                    status += " Withdraw.";
                 } else {
                     stakeReward = null;
                 }
+
 
                 // STORE NEW POINT
                 valuePut(dcSet, senderAddress, pointNew);
@@ -196,7 +204,6 @@ public class Refi extends EpochDAPPjson {
 
             // STORE STATE for ORPHAN
             putState(dcSet, rSend.getDBRef(), new Object[]{senderPoint, recipientPoint, stakeReward});
-            status = "done";
 
         }
 
