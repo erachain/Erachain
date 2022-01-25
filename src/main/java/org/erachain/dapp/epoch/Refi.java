@@ -26,11 +26,11 @@ public class Refi extends EpochDAPPjson {
     static public final String NAME = "Referal dApp";
     static public final String ASSET_NAME = "REFI";
     static public final long ASSET_QUALITY = 25000000;
+    public static final int ASSET_DECIMALS = 18;
 
     // APPBjF5fbGj18aaXKSXemmHConG7JLBiJg
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
-    public static final int ASSET_DECIMALS = 18;
     /**
      * admin account
      */
@@ -106,9 +106,11 @@ public class Refi extends EpochDAPPjson {
 
             BigDecimal pendingRewardNew = pendingReward.add(reward);
 
-            BigDecimal totalLeft = MAKER.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
-            if (totalLeft.compareTo(reward) < 0) {
-                pendingRewardNew = totalLeft;
+            if (ASSET_QUALITY > 0) {
+                BigDecimal totalLeft = MAKER.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
+                if (totalLeft.compareTo(pendingRewardNew) < 0) {
+                    pendingRewardNew = totalLeft;
+                }
             }
 
             pointNew = new Object[]{point[0], pendingRewardNew, height, stakeKoeff(account, stake)};
@@ -219,7 +221,13 @@ public class Refi extends EpochDAPPjson {
             // need to remove INIT_KEY - for reinit after orphans
             assetKey = (Long) dcSet.getSmartContractValues().remove(INIT_KEY);
 
-            // BACKWARDS from ADMIN
+            if (ASSET_QUALITY > 0) {
+                // ORPHAN QUANTITY
+                stock.changeBalance(dcSet, true, false, assetKey,
+                        new BigDecimal(ASSET_QUALITY), false, false, true);
+            }
+
+            // ORPHAN for ADMIN
             transfer(dcSet, block, commandTX, stock, adminAccount, amount, assetKey, true, null, null);
 
             // orphan GRAVITA ASSET
@@ -245,7 +253,13 @@ public class Refi extends EpochDAPPjson {
             assetKey = dcSet.getItemAssetMap().incrementPut(asset);
             dcSet.getSmartContractValues().put(INIT_KEY, assetKey);
 
-            // TRANSFER GRAVITA to ADMIN
+            if (ASSET_QUALITY > 0) {
+                // INIT QUANTITY
+                stock.changeBalance(dcSet, false, false, assetKey,
+                        new BigDecimal(ASSET_QUALITY), false, false, true);
+            }
+
+            // TRANSFER ASSET to ADMIN
             transfer(dcSet, block, commandTX, stock, adminAccount, amount, assetKey, false, null, "init");
 
             status = "done";
