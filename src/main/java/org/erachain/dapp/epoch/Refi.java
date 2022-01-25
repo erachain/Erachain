@@ -106,7 +106,7 @@ public class Refi extends EpochDAPPjson {
 
             BigDecimal pendingRewardNew = pendingReward.add(reward);
 
-            BigDecimal totalLeft = MAKER.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).a;
+            BigDecimal totalLeft = MAKER.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
             if (totalLeft.compareTo(reward) < 0) {
                 pendingRewardNew = totalLeft;
             }
