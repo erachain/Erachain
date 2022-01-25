@@ -14,6 +14,7 @@ import org.erachain.datachain.DCSet;
 import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ public class Refi extends EpochDAPPjson {
     // APPBjF5fbGj18aaXKSXemmHConG7JLBiJg
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
+    public static final int ASSET_DECIMALS = 18;
     /**
      * admin account
      */
@@ -38,12 +40,12 @@ public class Refi extends EpochDAPPjson {
     static final private Tuple2 INIT_KEY = new Tuple2(ID, "i");
     final static public String COMMAND_JOB = "job";
 
-    static final int SKIP = 5;
+    static final int SKIP = 10;
 
     /**
      * por calculate reward - amount of blocks in one year
      */
-    static final BigDecimal STAKE_PERIOD_KOEFF = new BigDecimal(1d / 30 * 24 * (60 / 30));
+    static final BigDecimal STAKE_PERIOD_KOEFF = new BigDecimal(1d / (30 * 24 * (60 / 30))).setScale(ASSET_DECIMALS + 3, RoundingMode.HALF_DOWN);
     static final BigDecimal STAKE_KOEFF_1 = new BigDecimal("0.1");
     static final BigDecimal STAKE_KOEFF_2 = new BigDecimal("0.15");
     static final BigDecimal STAKE_KOEFF_3 = new BigDecimal("0.20");
@@ -98,7 +100,7 @@ public class Refi extends EpochDAPPjson {
             Integer pendingRewardHeight = (Integer) point[2];
             BigDecimal rewardKoeff = (BigDecimal) point[3];
             BigDecimal reward = stake.multiply(new BigDecimal(height - pendingRewardHeight)).multiply(rewardKoeff)
-                    .multiply(STAKE_PERIOD_KOEFF);
+                    .multiply(STAKE_PERIOD_KOEFF).setScale(ASSET_DECIMALS, RoundingMode.HALF_DOWN);
             BigDecimal pendingRewardNew = pendingReward.add(reward);
 
             pointNew = new Object[]{point[0], pendingRewardNew, height, stakeKoeff(account, stake)};
@@ -132,11 +134,6 @@ public class Refi extends EpochDAPPjson {
 
         } else {
 
-            if (sender.equals(adminAddress)) {
-                fail("admin ignore");
-                return false;
-            }
-
             Long assetKey = rSend.getAssetKey();
             Long refDB = rSend.getDBRef();
             Integer height = rSend.getBlockHeight();
@@ -144,37 +141,47 @@ public class Refi extends EpochDAPPjson {
             BigDecimal stakeReward;
 
             Object[] recipientPoint;
-            {
+            if (recipient.equals(adminAddress)) {
+                recipientPoint = null;
+
+            } else {
                 /////////// RECIPIENT REWARDS
                 BigDecimal stake = recipient.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
-                recipientPoint = (Object[]) valueGet(dcSet, recipient);
+                recipientPoint = (Object[]) valueGet(dcSet, recipientAddress);
 
                 Object[] pointNew = makeNewPoin(refDB, height, recipient, stake, recipientPoint);
 
                 // STORE NEW POINT
-                valueSet(dcSet, recipient, pointNew);
+                valuePut(dcSet, recipientAddress, pointNew);
             }
 
             Object[] senderPoint;
-            {
+
+            if (sender.equals(adminAddress)) {
+                senderPoint = null;
+                stakeReward = null;
+
+            } else {
                 /////////// SENDER REWARDS
                 BigDecimal stake = sender.getBalanceForPosition(assetKey, Account.BALANCE_POS_OWN).b;
                 senderPoint = (Object[]) valueGet(dcSet, senderAddress);
 
                 Object[] pointNew = makeNewPoin(refDB, height, sender, stake, senderPoint);
 
-                int lastBlockAction = (Integer) pointNew[0];
-                if (height - lastBlockAction >= SKIP) {
-                    stakeReward = (BigDecimal) pointNew[1];
+                int lastHeightAction = (Integer) pointNew[0];
+                if (height - lastHeightAction >= SKIP) {
+                    stakeReward = (BigDecimal) pointNew[2];
                     transfer(dcSet, block, rSend, stock, sender, stakeReward, assetKey, false, null, "stake reward");
                     // reset pending reward
+                    pointNew[0] = height;
                     pointNew[1] = BigDecimal.ZERO;
                 } else {
                     stakeReward = null;
                 }
 
                 // STORE NEW POINT
-                valueSet(dcSet, sender, pointNew);
+                valuePut(dcSet, senderAddress, pointNew);
+
             }
 
             // STORE STATE for ORPHAN
@@ -223,7 +230,7 @@ public class Refi extends EpochDAPPjson {
             }
 
             AssetVenture asset = new AssetVenture(null, stock, "NAME", null, null,
-                    null, AssetCls.AS_INSIDE_ASSETS, 6, 0);
+                    null, AssetCls.AS_INSIDE_ASSETS, ASSET_DECIMALS, 0);
             asset.setReference(commandTX.getSignature(), commandTX.getDBRef());
 
             //INSERT INTO DATABASE

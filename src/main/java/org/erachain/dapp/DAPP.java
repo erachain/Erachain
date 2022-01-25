@@ -119,15 +119,15 @@ public abstract class DAPP {
         return dcSet.getSmartContractState().remove(new Fun.Tuple2<>(id, seqNo));
     }
 
-    public Object valueGet(DCSet dcSet, Object key) {
+    public Object valueGet(DCSet dcSet, String key) {
         return dcSet.getSmartContractValues().get(new Fun.Tuple2(id, key));
     }
 
-    public boolean valueSet(DCSet dcSet, Object key, Object value) {
+    public boolean valueSet(DCSet dcSet, String key, Object value) {
         return dcSet.getSmartContractValues().set(new Fun.Tuple2(id, key), value);
     }
 
-    public void valuePut(DCSet dcSet, Object key, Object value) {
+    public void valuePut(DCSet dcSet, String key, Object value) {
         dcSet.getSmartContractValues().put(new Fun.Tuple2(id, key), value);
     }
 
