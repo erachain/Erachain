@@ -45,7 +45,7 @@ public class Refi extends EpochDAPPjson {
     /**
      * por calculate reward - amount of blocks in one year
      */
-    static final BigDecimal STAKE_PERIOD_KOEFF = new BigDecimal(1d / (30 * 24 * (60 / 30))).setScale(ASSET_DECIMALS + 3, RoundingMode.HALF_DOWN);
+    static final BigDecimal STAKE_PERIOD_KOEFF = new BigDecimal(1.0d / (30.0d * 24.0d * 120.0d)).setScale(ASSET_DECIMALS + 3, RoundingMode.HALF_DOWN);
     static final BigDecimal STAKE_KOEFF_1 = new BigDecimal("0.1");
     static final BigDecimal STAKE_KOEFF_2 = new BigDecimal("0.15");
     static final BigDecimal STAKE_KOEFF_3 = new BigDecimal("0.20");
@@ -90,7 +90,7 @@ public class Refi extends EpochDAPPjson {
         Object[] pointNew;
 
         if (point == null) {
-            pointNew = new Object[]{refDB, BigDecimal.ZERO, height, stakeKoeff(account, stake)};
+            pointNew = new Object[]{height, BigDecimal.ZERO, height, stakeKoeff(account, stake)};
         } else if (height.equals(point[2])) {
             // не пересчитываем - только коэффициент
             pointNew = new Object[]{point[0], point[1], height, stakeKoeff(account, stake)};
@@ -170,7 +170,7 @@ public class Refi extends EpochDAPPjson {
 
                 int lastHeightAction = (Integer) pointNew[0];
                 if (height - lastHeightAction >= SKIP) {
-                    stakeReward = (BigDecimal) pointNew[2];
+                    stakeReward = (BigDecimal) pointNew[1];
                     transfer(dcSet, block, rSend, stock, sender, stakeReward, assetKey, false, null, "stake reward");
                     // reset pending reward
                     pointNew[0] = height;
