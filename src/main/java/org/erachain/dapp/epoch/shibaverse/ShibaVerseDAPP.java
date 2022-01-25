@@ -1074,9 +1074,9 @@ public class ShibaVerseDAPP extends EpochDAPPjson {
         return "<html>RARY: <b>" + format2.format(rary) + "</b><br>" + description + "</html>";
     }
 
-    public static void setDAPPFactory(HashMap<Account, Integer> skocks) {
+    public static void setDAPPFactory(HashMap<Account, Integer> stocks) {
         for (Account account : accounts) {
-            skocks.put(account, ID);
+            stocks.put(account, ID);
         }
     }
 

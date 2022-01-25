@@ -27,7 +27,7 @@ public abstract class DAPPFactory {
 
     static protected Controller contr = Controller.getInstance();
     static protected Crypto crypto = Crypto.getInstance();
-    static final HashMap<Account, Integer> skocks = new HashMap();
+    static final HashMap<Account, Integer> stocks = new HashMap();
     public static JSONObject settingsJSON;
 
     static {
@@ -37,8 +37,9 @@ public abstract class DAPPFactory {
             settingsJSON = new JSONObject();
         }
 
-        ShibaVerseDAPP.setDAPPFactory(skocks);
-        MemoCardsDAPP.setDAPPFactory(skocks);
+        ShibaVerseDAPP.setDAPPFactory(stocks);
+        MemoCardsDAPP.setDAPPFactory(stocks);
+        Refi.setDAPPFactory(stocks);
 
     }
 
@@ -96,12 +97,12 @@ public abstract class DAPPFactory {
 
         ///////////////////// MAKE DAPPS HERE
         // TRY BY RECIPIENT
-        Integer dappID = skocks.get(txSend.getRecipient());
+        Integer dappID = stocks.get(txSend.getRecipient());
         if (dappID == null) {
             // TODO сюда не дойдет из-за проверки isDAppOwned
             // TRY BY ASSET
             if (txSend.hasAmount()) {
-                dappID = skocks.get(txSend.getAsset().getMaker());
+                dappID = stocks.get(txSend.getAsset().getMaker());
             }
 
             if (dappID == null)
@@ -124,7 +125,7 @@ public abstract class DAPPFactory {
     }
 
     static public String getName(Account stock) {
-        Integer dappID = skocks.get(stock);
+        Integer dappID = stocks.get(stock);
         if (dappID == null)
             return null;
 

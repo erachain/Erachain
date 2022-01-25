@@ -16,6 +16,7 @@ import org.mapdb.Fun.Tuple2;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class Refi extends EpochDAPPjson {
 
@@ -23,7 +24,7 @@ public class Refi extends EpochDAPPjson {
     static public final int ID = 1012;
     static public final String NAME = "Referal Asset";
 
-    // APPBQyonEPbk2ZazbUuHZ2ffN1QJYaK1ow
+    // APPBjF5fbGj18aaXKSXemmHConG7JLBiJg
     final public static PublicKeyAccount MAKER = PublicKeyAccount.makeForDApp(crypto.digest(Longs.toByteArray(ID)));
 
     /**
@@ -326,6 +327,10 @@ public class Refi extends EpochDAPPjson {
         }
 
         return new Refi(data, status);
+    }
+
+    public static void setDAPPFactory(HashMap<Account, Integer> stocks) {
+        stocks.put(MAKER, ID);
     }
 
 }
