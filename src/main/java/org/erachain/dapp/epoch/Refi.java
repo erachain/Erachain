@@ -2,22 +2,28 @@ package org.erachain.dapp.epoch;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
+import org.erachain.core.item.persons.PersonCls;
+import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dapp.EpochDAPPjson;
 import org.erachain.datachain.DCSet;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class Refi extends EpochDAPPjson {
 
@@ -54,6 +60,12 @@ public class Refi extends EpochDAPPjson {
     static final BigDecimal STAKE_KOEFF_4 = new BigDecimal("0.25");
     static final BigDecimal STAKE_KOEFF_5 = new BigDecimal("0.30");
     static final BigDecimal STAKE_KOEFF_6 = new BigDecimal("0.35");
+    public static final int REFERAL_LEVEL_DEEP = 3;
+    public static final int REFERAL_SHARE2 = 3;
+    /**
+     * divide by power of 2
+     */
+    public static final int[] REFERAL_LEVEL_KOEFFS = new int[]{1, 1, 1};
 
 
     public Refi(String data, String status) {
@@ -119,6 +131,139 @@ public class Refi extends EpochDAPPjson {
         return pointNew;
     }
 
+    public static void processReferalLevel(DCSet dcSet, Long assetKey, int level, BigInteger referalGift, Account invitedAccount,
+                                           long invitedPersonKey, boolean asOrphan,
+                                           long royaltyAssetKey, int royaltyAssetScale,
+                                           List<RCalculated> txCalculated, String message, long dbRef, long timestamp) {
+
+        if (referalGift.signum() <= 0)
+            return;
+
+        String messageLevel;
+
+        // CREATOR is PERSON
+        // FIND person
+        Account issuerAccount = PersonCls.getIssuer(dcSet, invitedPersonKey);
+        Fun.Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(dcSet);
+        long issuerPersonKey;
+        if (issuerPersonDuration == null) {
+            // в тестовой сети возможно что каждый создает с неудостоверенного
+            issuerPersonKey = -1;
+        } else {
+            issuerPersonKey = issuerPersonDuration.a;
+        }
+
+        if (issuerPersonKey < 0 // это возможно только для первой персоны и то если не она сама себя зарегала и в ДЕВЕЛОПЕ так что пусть там и будет
+                || issuerPersonKey == invitedPersonKey // это возможно только в ДЕВЕЛОПЕ так что пусть там и будет
+                || issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
+        ) {
+            // break loop
+            BigDecimal giftBG = new BigDecimal(referalGift, royaltyAssetScale);
+            invitedAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey,
+                    giftBG, false, false, false);
+            // учтем что получили бонусы
+            if (royaltyAssetKey == assetKey) {
+                invitedAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
+            }
+
+            if (txCalculated != null && !asOrphan) {
+                messageLevel = message + " top level";
+                txCalculated.add(new RCalculated(invitedAccount, royaltyAssetKey, giftBG,
+                        messageLevel, 0L, dbRef));
+
+            }
+            return;
+        }
+
+        // IS INVITER ALIVE ???
+        PersonCls issuer = (PersonCls) dcSet.getItemPersonMap().get(issuerPersonKey);
+        if (!issuer.isAlive(timestamp)) {
+            // SKIP this LEVEL for DEAD persons
+            processReferalLevel(dcSet, assetKey, level, referalGift, issuerAccount, issuerPersonKey, asOrphan,
+                    royaltyAssetKey, royaltyAssetScale,
+                    txCalculated, message, dbRef, timestamp);
+            return;
+        }
+
+        int directLevel = REFERAL_LEVEL_DEEP - level;
+
+        if (level > 1) {
+
+            BigInteger fee_gift_next = referalGift.shiftRight(REFERAL_LEVEL_KOEFFS[directLevel]);
+            BigInteger fee_gift_get = referalGift.subtract(fee_gift_next);
+
+            BigDecimal giftBG = new BigDecimal(fee_gift_get, royaltyAssetScale);
+            issuerAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey, giftBG,
+                    false, false, false);
+
+            // учтем что получили бонусы
+            if (royaltyAssetKey == assetKey) {
+                issuerAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
+            }
+
+            if (txCalculated != null && !asOrphan) {
+                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + directLevel);
+                txCalculated.add(new RCalculated(issuerAccount, royaltyAssetKey, giftBG,
+                        messageLevel, 0L, dbRef));
+            }
+
+            if (fee_gift_next.signum() > 0) {
+                processReferalLevel(dcSet, assetKey, --level, fee_gift_next, issuerAccount, issuerPersonKey, asOrphan,
+                        royaltyAssetKey, royaltyAssetScale,
+                        txCalculated, message, dbRef, timestamp);
+            }
+
+        } else {
+            // this is END LEVEL
+            // GET REST of GIFT
+            BigDecimal giftBG = new BigDecimal(referalGift, royaltyAssetScale);
+            issuerAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey,
+                    new BigDecimal(referalGift, royaltyAssetScale), false, false, false);
+
+            // учтем что получили бонусы
+            if (royaltyAssetKey == assetKey) {
+                issuerAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
+            }
+
+            if (txCalculated != null && !asOrphan) {
+                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + directLevel);
+                txCalculated.add(new RCalculated(issuerAccount, royaltyAssetKey, giftBG,
+                        messageLevel, 0L, dbRef));
+            }
+        }
+    }
+
+    public static void processReferal(DCSet dcSet, int level, BigDecimal stakeReward, Account creator, boolean asOrphan,
+                                      AssetCls royaltyAsset,
+                                      Block block,
+                                      String message, long dbRef, long timestamp) {
+
+        if (stakeReward.signum() <= 0)
+            return;
+
+        BigInteger referalGift = stakeReward.setScale(royaltyAsset.getScale()).unscaledValue().shiftRight(REFERAL_SHARE2);
+
+        List<RCalculated> txCalculated = block == null ? null : block.getTXCalculated();
+        long royaltyAssetKey = royaltyAsset.getKey();
+        int royaltyAssetScale = royaltyAsset.getScale();
+
+        Fun.Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(dcSet);
+        if (personDuration == null
+                || personDuration.a <= BlockChain.BONUS_STOP_PERSON_KEY) {
+
+            // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
+            royaltyAsset.getMaker().changeBalance(dcSet, !asOrphan, false, royaltyAssetKey,
+                    new BigDecimal(referalGift, royaltyAssetScale), false, false, true);
+
+            return;
+        }
+
+        processReferalLevel(dcSet, royaltyAsset.getKey(), level, referalGift, creator, personDuration.a, asOrphan,
+                royaltyAssetKey, royaltyAssetScale,
+                txCalculated, message, dbRef, timestamp);
+
+    }
+
     ///////// COMMANDS
     private boolean job(DCSet dcSet, Block block, RSend rSend, boolean asOrphan) {
 
@@ -140,6 +285,12 @@ public class Refi extends EpochDAPPjson {
             BigDecimal stakeReward = (BigDecimal) state[2];
             if (stakeReward != null && stakeReward.signum() > 0) {
                 transfer(dcSet, block, rSend, stock, sender, stakeReward, rSend.getAssetKey(), true, null, null);
+
+                // ORPHAN REFERALS
+                AssetCls asset = rSend.getAsset();
+                processReferal(dcSet, REFERAL_LEVEL_DEEP, stakeReward, sender, asOrphan,
+                        asset, null, null, rSend.getDBRef(), rSend.getTimestamp());
+
             }
 
         } else {
@@ -188,6 +339,14 @@ public class Refi extends EpochDAPPjson {
                 if (height - lastHeightAction >= SKIP) {
                     stakeReward = (BigDecimal) pointNew[1];
                     transfer(dcSet, block, rSend, stock, sender, stakeReward, assetKey, false, null, "stake reward");
+
+                    // PROCESS REFERALS
+                    AssetCls asset = rSend.getAsset();
+                    processReferal(dcSet, REFERAL_LEVEL_DEEP, stakeReward, sender, asOrphan,
+                            asset, block,
+                            "NFT Royalty referral bonus " + "@" + rSend.viewHeightSeq(),
+                            rSend.getDBRef(), rSend.getTimestamp());
+
                     // reset pending reward
                     pointNew[0] = height;
                     pointNew[1] = BigDecimal.ZERO;
