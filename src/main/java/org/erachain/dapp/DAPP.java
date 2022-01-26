@@ -50,7 +50,7 @@ public abstract class DAPP {
     }
 
     public String getHTML(JSONObject langObj) {
-        return "ID: <b>" + id + "</b><br>" + Lang.T("Maker", langObj) + ": <b>" + stock.getAddress() + "</b>";
+        return "ID: <b>" + id + "</b><br>" + Lang.T("Address", langObj) + ": <b>" + stock.getAddress() + "</b>";
     }
 
     public Object[][] getItemsKeys() {
