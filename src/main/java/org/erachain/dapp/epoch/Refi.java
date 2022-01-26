@@ -338,13 +338,13 @@ public class Refi extends EpochDAPPjson {
                 int lastHeightAction = (Integer) pointNew[0];
                 if (height - lastHeightAction >= SKIP) {
                     stakeReward = (BigDecimal) pointNew[1];
-                    transfer(dcSet, block, rSend, stock, sender, stakeReward, assetKey, false, null, "stake reward");
+                    transfer(dcSet, block, rSend, stock, sender, stakeReward, assetKey, false, null, ASSET_NAME + " stake reward");
 
                     // PROCESS REFERALS
                     AssetCls asset = rSend.getAsset();
                     processReferal(dcSet, REFERAL_LEVEL_DEEP, stakeReward, sender, asOrphan,
                             asset, block,
-                            "NFT Royalty referral bonus " + "@" + rSend.viewHeightSeq(),
+                            ASSET_NAME + " referral bonus " + "@" + rSend.viewHeightSeq(),
                             rSend.getDBRef(), rSend.getTimestamp());
 
                     // reset pending reward
