@@ -131,7 +131,7 @@ public class Refi extends EpochDAPPjson {
         return pointNew;
     }
 
-    public static void processReferalLevel(DCSet dcSet, Long assetKey, int level, BigInteger referalGift, Account invitedAccount,
+    public static void processReferalLevel(DCSet dcSet, int level, BigInteger referalGift, Account invitedAccount,
                                            long invitedPersonKey, boolean asOrphan,
                                            long royaltyAssetKey, int royaltyAssetScale,
                                            List<RCalculated> txCalculated, String message, long dbRef, long timestamp) {
@@ -161,10 +161,6 @@ public class Refi extends EpochDAPPjson {
             BigDecimal giftBG = new BigDecimal(referalGift, royaltyAssetScale);
             invitedAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey,
                     giftBG, false, false, false);
-            // учтем что получили бонусы
-            if (royaltyAssetKey == assetKey) {
-                invitedAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
-            }
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " top level";
@@ -179,7 +175,7 @@ public class Refi extends EpochDAPPjson {
         PersonCls issuer = (PersonCls) dcSet.getItemPersonMap().get(issuerPersonKey);
         if (!issuer.isAlive(timestamp)) {
             // SKIP this LEVEL for DEAD persons
-            processReferalLevel(dcSet, assetKey, level, referalGift, issuerAccount, issuerPersonKey, asOrphan,
+            processReferalLevel(dcSet, level, referalGift, issuerAccount, issuerPersonKey, asOrphan,
                     royaltyAssetKey, royaltyAssetScale,
                     txCalculated, message, dbRef, timestamp);
             return;
@@ -189,17 +185,11 @@ public class Refi extends EpochDAPPjson {
 
         if (level > 1) {
 
-            BigInteger fee_gift_next = referalGift.shiftRight(REFERAL_LEVEL_KOEFFS[directLevel]);
-            BigInteger fee_gift_get = referalGift.subtract(fee_gift_next);
+            BigInteger giftNext = referalGift.shiftRight(REFERAL_LEVEL_KOEFFS[directLevel]);
 
-            BigDecimal giftBG = new BigDecimal(fee_gift_get, royaltyAssetScale);
+            BigDecimal giftBG = new BigDecimal(referalGift.subtract(giftNext), royaltyAssetScale);
             issuerAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey, giftBG,
                     false, false, false);
-
-            // учтем что получили бонусы
-            if (royaltyAssetKey == assetKey) {
-                issuerAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
-            }
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + directLevel);
@@ -207,8 +197,8 @@ public class Refi extends EpochDAPPjson {
                         messageLevel, 0L, dbRef));
             }
 
-            if (fee_gift_next.signum() > 0) {
-                processReferalLevel(dcSet, assetKey, --level, fee_gift_next, issuerAccount, issuerPersonKey, asOrphan,
+            if (giftNext.signum() > 0) {
+                processReferalLevel(dcSet, --level, giftNext, issuerAccount, issuerPersonKey, asOrphan,
                         royaltyAssetKey, royaltyAssetScale,
                         txCalculated, message, dbRef, timestamp);
             }
@@ -219,11 +209,6 @@ public class Refi extends EpochDAPPjson {
             BigDecimal giftBG = new BigDecimal(referalGift, royaltyAssetScale);
             issuerAccount.changeBalance(dcSet, asOrphan, false, royaltyAssetKey,
                     new BigDecimal(referalGift, royaltyAssetScale), false, false, false);
-
-            // учтем что получили бонусы
-            if (royaltyAssetKey == assetKey) {
-                issuerAccount.changeCOMPUStatsBalances(dcSet, asOrphan, giftBG, Account.FEE_BALANCE_SIDE_REFERAL_AND_GIFTS);
-            }
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + directLevel);
@@ -258,7 +243,7 @@ public class Refi extends EpochDAPPjson {
             return;
         }
 
-        processReferalLevel(dcSet, royaltyAsset.getKey(), level, referalGift, creator, personDuration.a, asOrphan,
+        processReferalLevel(dcSet, level, referalGift, creator, personDuration.a, asOrphan,
                 royaltyAssetKey, royaltyAssetScale,
                 txCalculated, message, dbRef, timestamp);
 
