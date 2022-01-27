@@ -108,6 +108,8 @@ public class DCSet extends DBASet implements Closeable {
     public static final int TRADES_MAP = DBS_MAP_DB;
     public static final int PAIRS_MAP = DBS_MAP_DB;
 
+    public static final int ITEMS_VALUES_MAP = DBS_MAP_DB;
+
     /**
      * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
      */
@@ -173,6 +175,9 @@ public class DCSet extends DBASet implements Closeable {
     private ItemStatementMap itemStatementMap;
     private ItemPersonMap itemPersonMap;
     private ItemUnionMap itemUnionMap;
+
+    private ItemsValuesMap itemsValuesMap;
+
     private ATMap atMap;
     private ATStateMap atStateMap;
     private ATTransactionMap atTransactionMap;
@@ -183,6 +188,7 @@ public class DCSet extends DBASet implements Closeable {
 
     private TimeTXDoneMap timeTXDoneMap;
     private TimeTXWaitMap timeTXWaitMap;
+
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
@@ -291,6 +297,8 @@ public class DCSet extends DBASet implements Closeable {
             this.itemStatementMap = new ItemStatementMap(this, database);
             this.itemStatusMap = new ItemStatusMap(this, database);
             this.itemUnionMap = new ItemUnionMap(this, database);
+
+            this.itemsValuesMap = new ItemsValuesMap(ITEMS_VALUES_MAP, this, database);
 
             this.atMap = new ATMap(this, database);
             this.atStateMap = new ATStateMap(this, database);
@@ -451,6 +459,8 @@ public class DCSet extends DBASet implements Closeable {
         this.itemPollMap = new ItemPollMap(parent.itemPollMap, this);
         this.itemStatusMap = new ItemStatusMap(parent.itemStatusMap, this);
         this.itemUnionMap = new ItemUnionMap(parent.itemUnionMap, this);
+
+        this.itemsValuesMap = new ItemsValuesMap(ITEMS_VALUES_MAP, parent.itemsValuesMap, this);
 
         this.atMap = new ATMap(parent.atMap, this);
         this.atStateMap = new ATStateMap(parent.atStateMap, this);
