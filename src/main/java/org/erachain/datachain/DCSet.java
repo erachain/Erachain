@@ -42,7 +42,7 @@ public class DCSet extends DBASet implements Closeable {
     /**
      * New version will auto-rebase DCSet from empty db file
      */
-    final static int CURRENT_VERSION = 540; // vers 5.7.1 dialog
+    final static int CURRENT_VERSION = 541; // ItemsValuesMap
 
     /**
      * Используется для отладки - где незакрытый набор таблиц остался.
@@ -832,6 +832,9 @@ public class DCSet extends DBASet implements Closeable {
         this.itemPollMap.clear();
         this.itemStatusMap.clear();
         this.itemUnionMap.clear();
+
+        this.itemsValuesMap.clear();
+
         this.atMap.clear();
         this.atStateMap.clear();
         this.atTransactionMap.clear();
@@ -1383,6 +1386,11 @@ public class DCSet extends DBASet implements Closeable {
     public ItemUnionMap getItemUnionMap() {
         return this.itemUnionMap;
     }
+
+    public ItemsValuesMap getItemsValuesMap() {
+        return this.itemsValuesMap;
+    }
+
 
     public TimeTXDoneMap getTimeTXDoneMap() {
         return this.timeTXDoneMap;

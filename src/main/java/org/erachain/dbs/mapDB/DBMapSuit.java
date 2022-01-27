@@ -153,7 +153,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     }
 
-    public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
+    public IteratorCloseable<T> getIterator(T fromKey, T toKey, boolean descending) {
         this.addUses();
 
         try {
@@ -165,7 +165,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
                                 ((NavigableMap) this.map).descendingMap()
                                         // задаем границы, так как он обратный границы меняем местами
                                         .subMap(fromKey == null || fromKey.equals(LO) ? HI : fromKey,
-                                                LO).keySet().iterator());
+                                                toKey == null ? LO : toKey).keySet().iterator());
             }
 
             return
@@ -174,13 +174,16 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
                             ((NavigableMap) this.map)
                                     // задаем границы, так как он обратный границы меняем местами
                                     .subMap(fromKey == null ? LO : fromKey,
-                                            HI).keySet().iterator());
+                                            toKey == null ? HI : toKey).keySet().iterator());
 
         } finally {
             this.outUses();
         }
 
+    }
 
+    public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
+        return getIterator(fromKey, null, descending);
     }
 
     public void addUses() {

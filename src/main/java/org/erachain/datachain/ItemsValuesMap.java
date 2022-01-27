@@ -1,6 +1,10 @@
 package org.erachain.datachain;
 
+import com.google.common.collect.ImmutableList;
+import org.erachain.core.item.ItemCls;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.erachain.dbs.mapDB.ItemsValuesMapDB;
 import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.ItemsValuesRocksDB;
@@ -40,12 +44,21 @@ public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new BlocksSuitMapDBFotk((TransactionMap) parent, databaseSet);
-                    //break;
                 default:
                     map = new NativeMapTreeMapFork(parent, databaseSet, Fun.TUPLE3_COMPARATOR, this);
             }
         }
     }
 
+    public IteratorCloseable<Tuple3<Long, Byte, byte[]>> getIssuedPersons(Long personKey, boolean descending) {
+
+        if (parent == null) {
+            return getIterator(new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, new byte[0]), descending);
+        } else {
+            IteratorCloseable<Tuple3<Long, Byte, byte[]>> iteratorParent = parent.getIterator(new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, new byte[0]), descending);
+            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(iteratorParent,
+                    getIterator(new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, new byte[0]), descending)),
+                    new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR), descending);
+        }
+    }
 }

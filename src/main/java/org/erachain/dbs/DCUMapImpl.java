@@ -240,7 +240,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     }
 
-    public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
+    public IteratorCloseable<T> getIterator(T fromKey, T toKey, boolean descending) {
         this.addUses();
 
         try {
@@ -252,7 +252,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                                 ((NavigableMap) this.map).descendingMap()
                                         // задаем границы, так как он обратный границы меняем местами
                                         .subMap(fromKey == null || fromKey.equals(LO) ? HI : fromKey,
-                                                LO).keySet().iterator());
+                                                toKey == null ? LO : toKey).keySet().iterator());
             }
 
             return
@@ -261,7 +261,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                             ((NavigableMap) this.map)
                                     // задаем границы, так как он обратный границы меняем местами
                                     .subMap(fromKey == null ? LO : fromKey,
-                                            HI).keySet().iterator());
+                                            toKey == null ? HI : toKey).keySet().iterator());
 
 
         } finally {
@@ -269,6 +269,11 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         }
 
     }
+
+    public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
+        return getIterator(fromKey, null, descending);
+    }
+
 
     // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало
 

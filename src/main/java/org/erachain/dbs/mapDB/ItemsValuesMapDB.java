@@ -17,6 +17,9 @@ public class ItemsValuesMapDB extends DBMapSuit<Fun.Tuple3<Long, Byte, byte[]>, 
     @Override
     public void openMap() {
 
+        LO = new Fun.Tuple3(0L, (byte) 0, new byte[0]);
+        HI = new Fun.Tuple3(Long.MAX_VALUE, Byte.MAX_VALUE, new byte[255]);
+
         //OPEN MAP
         map = database.createTreeMap("items_values")
                 .comparator(new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))

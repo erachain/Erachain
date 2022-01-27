@@ -1,5 +1,6 @@
 package org.erachain.core.blockexplorer;
 
+import com.google.common.primitives.Longs;
 import org.apache.commons.net.util.Base64;
 import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
@@ -1544,10 +1545,13 @@ public class BlockExplorer {
                 accountsJSON.put(i++, accountJSON);
 
                 Account account = new Account(address);
-                List<Transaction> issuedPersons = transactionsMap.getTransactionsByAddressAndType(account.getShortAddressBytes(),
-                        Transaction.ISSUE_PERSON_TRANSACTION, 200, 0);
-                if (issuedPersons != null) {
-                    myIssuePersons.addAll(issuedPersons);
+                if (false) {
+                    // OLD version -
+                    List<Transaction> issuedPersons = transactionsMap.getTransactionsByAddressAndType(account.getShortAddressBytes(),
+                            Transaction.ISSUE_PERSON_TRANSACTION, 200, 0);
+                    if (issuedPersons != null) {
+                        myIssuePersons.addAll(issuedPersons);
+                    }
                 }
 
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
@@ -1572,6 +1576,19 @@ public class BlockExplorer {
             output.put("compu_balance", NumberAsString.formatAsString(compuBalance));
             output.put("lia_balance_a", NumberAsString.formatAsString(liaBalanceA));
             output.put("lia_balance_b", NumberAsString.formatAsString(liaBalanceB));
+
+            ItemsValuesMap issuesMap = dcSet.getItemsValuesMap();
+            try (IteratorCloseable<Tuple3<Long, Byte, byte[]>> iterator = issuesMap.getIssuedPersons(person.getKey(), false)) {
+                Tuple3<Long, Byte, byte[]> key;
+                Long dbRef;
+                while (iterator.hasNext()) {
+                    key = iterator.next();
+                    dbRef = Longs.fromByteArray(issuesMap.get(key));
+                    myIssuePersons.add(transactionsMap.get(dbRef));
+                }
+            } catch (IOException e) {
+            }
+
         }
 
         output.put("accounts", accountsJSON);

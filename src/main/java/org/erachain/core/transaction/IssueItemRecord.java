@@ -10,6 +10,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.exdata.exLink.ExLink;
 import org.erachain.core.item.ItemCls;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -247,6 +248,10 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         //INSERT INTO DATABASE
         key = this.item.insertToMap(this.dcSet, this.item.getStartKey());
 
+        if (creatorPerson != null) {
+            dcSet.getItemsValuesMap().put(new Fun.Tuple3(creatorPerson.getKey(), (byte) ItemCls.PERSON_TYPE, Longs.toByteArray(key)),
+                    Longs.toByteArray(dbRef));
+        }
     }
 
     @Override
@@ -262,6 +267,10 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     protected void orphanItem() {
         //DELETE FROM DATABASE
         key = this.item.deleteFromMap(this.dcSet, item.getStartKey());
+
+        if (creatorPerson != null) {
+            dcSet.getItemsValuesMap().delete(new Fun.Tuple3(creatorPerson.getKey(), (byte) ItemCls.PERSON_TYPE, Longs.toByteArray(key)));
+        }
     }
 
     @Override
