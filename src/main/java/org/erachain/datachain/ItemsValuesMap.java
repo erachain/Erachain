@@ -60,11 +60,8 @@ public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]
      */
     public IteratorCloseable<Tuple3<Long, Byte, byte[]>> getIssuedPersons(Long personKey, int itemType, boolean descending) {
 
-        byte[] itemIssuedBytesMAX = Longs.toByteArray(Long.MAX_VALUE);
-        // first byte as type
-        itemIssuedBytesMAX[0] = (byte) itemType;
-
-        byte[] itemIssuedBytesMIN = new byte[]{(byte) itemType};
+        byte[] itemIssuedBytesMAX = new byte[]{(byte) itemType, 127, 127, 127, 127, 127, 127, 127};
+        byte[] itemIssuedBytesMIN = new byte[]{(byte) itemType, 0, 0, 0, 0, 0, 0, 0};
 
         Tuple3<Long, Byte, byte[]> fromKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? itemIssuedBytesMAX : itemIssuedBytesMIN);
         Tuple3<Long, Byte, byte[]> toKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? itemIssuedBytesMIN : itemIssuedBytesMAX);
@@ -88,12 +85,12 @@ public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]
     }
 
     public void putIssuedItem(ItemCls issuer, ItemCls item, Long dbRef) {
-        put(new Fun.Tuple3(issuer.getKey(), issuer.getItemType(), makeIssuedItemKey(item)), Longs.toByteArray(dbRef));
+        put(new Fun.Tuple3<Long, Byte, byte[]>(issuer.getKey(), (byte) issuer.getItemType(), makeIssuedItemKey(item)), Longs.toByteArray(dbRef));
 
     }
 
     public void deleteIssuedItem(ItemCls issuer, ItemCls item) {
-        delete(new Fun.Tuple3(issuer.getKey(), issuer.getItemType(), makeIssuedItemKey(item)));
+        delete(new Fun.Tuple3<Long, Byte, byte[]>(issuer.getKey(), (byte) issuer.getItemType(), makeIssuedItemKey(item)));
 
     }
 }
