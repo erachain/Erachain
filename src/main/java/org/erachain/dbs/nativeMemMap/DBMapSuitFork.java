@@ -280,11 +280,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.addUses();
         try {
 
-            IteratorCloseable<T> iterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                    new IteratorParent(parent.getIterator(), deleted),
-                    map.keySet().iterator()), COMPARATOR, false);
-
-            return iterator;
+            return ForkedIterator.make(parent.getIterator(),
+                    ((NavigableMap) map).keySet().iterator(), deleted, COMPARATOR, false);
 
         } finally {
             this.outUses();
@@ -297,9 +294,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.addUses();
         try {
 
-            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                    new IteratorParent(parent.getDescendingIterator(), deleted),
-                    ((NavigableMap) map).descendingMap().keySet().iterator()), COMPARATOR, true);
+            return ForkedIterator.make(parent.getDescendingIterator(),
+                    ((NavigableMap) map).descendingMap().keySet().iterator(), deleted, COMPARATOR, true);
 
         } finally {
             this.outUses();
@@ -333,11 +329,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                                                 toKey == null ? HI : toKey).keySet().iterator());
             }
 
-            if (false)
-                return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                        new IteratorParent(parent.getIterator(fromKey, toKey, descending), deleted), iterator), COMPARATOR, descending);
-            else
-                return ForkedIterator.make(parent.getIterator(fromKey, toKey, descending), iterator, COMPARATOR, descending);
+            return ForkedIterator.make(parent.getIterator(fromKey, toKey, descending), iterator, deleted, COMPARATOR, descending);
+
         } finally {
             this.outUses();
         }
