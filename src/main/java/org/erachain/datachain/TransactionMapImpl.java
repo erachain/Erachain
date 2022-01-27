@@ -9,7 +9,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dapp.DAPP;
 import org.erachain.dbs.*;
 import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
@@ -263,10 +262,6 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     }
 
     public void putDirect(Transaction transaction) {
-        DAPP dApp = transaction.getSmartContract();
-        if (dApp != null && dApp.isEpoch()) {
-            transaction.resetSmartContract();
-        }
         super.put(Longs.fromByteArray(transaction.getSignature()), transaction);
     }
 
