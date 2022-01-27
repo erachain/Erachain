@@ -58,10 +58,10 @@ public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]
      * @param descending
      * @return
      */
-    public IteratorCloseable<Tuple3<Long, Byte, byte[]>> getIssuedPersons(Long personKey, int itemType, boolean descending) {
+    public IteratorCloseable<Tuple3<Long, Byte, byte[]>> getIssuedPersonsIter(Long personKey, int itemType, boolean descending) {
 
         byte[] itemIssuedBytesMAX = new byte[]{(byte) itemType, 127, 127, 127, 127, 127, 127, 127};
-        byte[] itemIssuedBytesMIN = new byte[]{(byte) itemType, 0, 0, 0, 0, 0, 0, 0};
+        byte[] itemIssuedBytesMIN = new byte[]{(byte) itemType};
 
         Tuple3<Long, Byte, byte[]> fromKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? itemIssuedBytesMAX : itemIssuedBytesMIN);
         Tuple3<Long, Byte, byte[]> toKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? itemIssuedBytesMIN : itemIssuedBytesMAX);

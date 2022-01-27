@@ -174,7 +174,7 @@ public class Refi extends EpochDAPPjson {
 
         if (true) {
             ItemsValuesMap issuesMap = dcSet.getItemsValuesMap();
-            try (IteratorCloseable<Fun.Tuple3<Long, Byte, byte[]>> iterator = issuesMap.getIssuedPersons(person.getKey(), ItemCls.PERSON_TYPE, false)) {
+            try (IteratorCloseable<Fun.Tuple3<Long, Byte, byte[]>> iterator = issuesMap.getIssuedPersonsIter(person.getKey(), ItemCls.PERSON_TYPE, false)) {
                 while (iterator.hasNext()) {
                     count++;
                 }

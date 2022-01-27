@@ -1578,7 +1578,7 @@ public class BlockExplorer {
             output.put("lia_balance_b", NumberAsString.formatAsString(liaBalanceB));
 
             ItemsValuesMap issuesMap = dcSet.getItemsValuesMap();
-            try (IteratorCloseable<Tuple3<Long, Byte, byte[]>> iterator = issuesMap.getIssuedPersons(person.getKey(), ItemCls.PERSON_TYPE, false)) {
+            try (IteratorCloseable<Tuple3<Long, Byte, byte[]>> iterator = issuesMap.getIssuedPersonsIter(person.getKey(), ItemCls.PERSON_TYPE, false)) {
                 Tuple3<Long, Byte, byte[]> key;
                 Long dbRef;
                 while (iterator.hasNext()) {
