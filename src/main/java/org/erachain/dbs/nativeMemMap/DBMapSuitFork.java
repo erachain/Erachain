@@ -26,13 +26,13 @@ import java.util.*;
 public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements ForkedMap {
 
     protected DBTab<T, U> parent;
+    protected Comparator COMPARATOR;
 
     /**
      * пометка какие индексы не используются - отключим для ускорения
      */
     boolean OLD_USED_NOW = false;
 
-    protected Comparator COMPARATOR;
 
     //ConcurrentHashMap deleted;
     Map<T, Boolean> deleted;
@@ -281,13 +281,69 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     @Override
     public IteratorCloseable<T> getIterator() {
         this.addUses();
+        try {
 
-        Iterator<T> parentIterator = parent.getIterator();
-        IteratorCloseable<T> iterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratorParent(parentIterator, deleted), map.keySet().iterator()), Fun.COMPARATOR, false);
+            Iterator<T> parentIterator = parent.getIterator();
+            IteratorCloseable<T> iterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                    new IteratorParent(parentIterator, deleted), map.keySet().iterator()), COMPARATOR, false);
 
-        this.outUses();
-        return iterator;
+            return iterator;
+
+        } finally {
+            this.outUses();
+        }
+
+    }
+
+    @Override
+    public IteratorCloseable<T> getDescendingIterator() {
+        this.addUses();
+        try {
+
+            Iterator<T> parentIterator = parent.getDescendingIterator();
+            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                    new IteratorParent(parentIterator, deleted),
+                    ((NavigableMap) map).descendingMap().keySet().iterator()), COMPARATOR, true);
+
+        } finally {
+            this.outUses();
+        }
+
+    }
+
+    @Override
+    public IteratorCloseable<T> getIterator(T fromKey, T toKey, boolean descending) {
+        this.addUses();
+
+        IteratorCloseable<T> iterator;
+        try {
+            if (descending) {
+                iterator =
+                        // делаем закрываемый Итератор
+                        IteratorCloseableImpl.make(
+                                // берем индекс с обратным отсчетом
+                                ((NavigableMap) this.map).descendingMap()
+                                        // задаем границы, так как он обратный границы меняем местами
+                                        .subMap(fromKey == null || fromKey.equals(LO) ? HI : fromKey,
+                                                toKey == null ? LO : toKey).keySet().iterator());
+            } else {
+
+                iterator =
+                        // делаем закрываемый Итератор
+                        IteratorCloseableImpl.make(
+                                ((NavigableMap) this.map)
+                                        // задаем границы, так как он обратный границы меняем местами
+                                        .subMap(fromKey == null ? LO : fromKey,
+                                                toKey == null ? HI : toKey).keySet().iterator());
+            }
+
+            Iterator<T> parentIterator = parent.getIterator(fromKey, toKey, descending);
+            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                    new IteratorParent(parentIterator, deleted), iterator), COMPARATOR, descending);
+
+        } finally {
+            this.outUses();
+        }
 
     }
 
@@ -320,7 +376,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
 
         IteratorCloseable iteratorMerged = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                new IteratorParent(parentIterator, deleted), iterator), Fun.COMPARATOR, descending);
+                new IteratorParent(parentIterator, deleted), iterator), COMPARATOR, descending);
 
         this.outUses();
         return iteratorMerged;

@@ -218,21 +218,30 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                 }
             }
 
-            List<T> list = new ArrayList<>();
-            Iterator<T> parentIterator = parent.getDescendingIterator();
-            while (parentIterator.hasNext()) {
-                T key = parentIterator.next();
-                // пропустим если он есть в удаленных
-                if (deleted != null && deleted.containsKey(key)
-                        || map.containsKey(key))
-                    continue;
-                list.add(key);
-            }
+            if (false) {
+                List<T> list = new ArrayList<>();
+                Iterator<T> parentIterator = parent.getDescendingIterator();
+                while (parentIterator.hasNext()) {
+                    T key = parentIterator.next();
+                    // пропустим если он есть в удаленных
+                    if (deleted != null && deleted.containsKey(key)
+                            || map.containsKey(key))
+                        continue;
+                    list.add(key);
+                }
 
-            /// тут нет дублей они уже удалены и дубли не взяты
-            /// return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
-            return new IteratorCloseableImpl(Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(),
-                    ((NavigableMap) map).descendingMap().keySet().iterator()), Fun.COMPARATOR));
+                /// тут нет дублей они уже удалены и дубли не взяты
+                /// return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+                return new IteratorCloseableImpl(Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(),
+                        ((NavigableMap) map).descendingMap().keySet().iterator()), Fun.COMPARATOR));
+            } else {
+
+                // new STYLE
+                Iterator<T> parentIterator = parent.getDescendingIterator();
+                return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                        new IteratorParentSecondaryKey(parentIterator, deleted),
+                        ((NavigableMap) map).descendingMap().keySet().iterator()), Fun.COMPARATOR, true);
+            }
 
         } finally {
             this.outUses();

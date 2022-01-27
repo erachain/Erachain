@@ -66,7 +66,7 @@ public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]
         Tuple3<Long, Byte, byte[]> fromKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? itemIssuedBytesMAX : itemIssuedBytesMIN);
         Tuple3<Long, Byte, byte[]> toKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? itemIssuedBytesMIN : itemIssuedBytesMAX);
 
-        if (parent == null) {
+        if (true || parent == null) {
             return getIterator(fromKey, toKey, descending);
         } else {
             return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(

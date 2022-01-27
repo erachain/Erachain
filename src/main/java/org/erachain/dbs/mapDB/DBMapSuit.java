@@ -153,6 +153,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     }
 
+    @Override
     public IteratorCloseable<T> getIterator(T fromKey, T toKey, boolean descending) {
         this.addUses();
 
@@ -182,6 +183,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     }
 
+    @Override
     public IteratorCloseable<T> getIterator(T fromKey, boolean descending) {
         return getIterator(fromKey, null, descending);
     }

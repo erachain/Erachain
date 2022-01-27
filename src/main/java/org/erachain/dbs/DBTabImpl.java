@@ -153,6 +153,7 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     @Override
+    // TODO - for parent != null
     public int size() {
         return this.map.size();
     }
@@ -168,16 +169,19 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     @Override
+    // TODO - for parent != null
     public Set<T> keySet() {
         return this.map.keySet();
     }
 
     @Override
+    // TODO - for parent != null
     public Collection<U> values() {
         return this.map.values();
     }
 
     @Override
+    // TODO - for parent != null
     public U get(T key) {
         return this.map.get(key);
     }
@@ -189,6 +193,7 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
      * @return
      */
     @Override
+    // TODO - for parent != null
     public boolean set(T key, U value) {
 
         boolean result = this.map.set(key, value);
@@ -205,6 +210,7 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     @Override
+    // TODO - for parent != null
     public void put(T key, U value) {
 
         this.map.put(key, value);
