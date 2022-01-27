@@ -333,9 +333,11 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                                                 toKey == null ? HI : toKey).keySet().iterator());
             }
 
-            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                    new IteratorParent(parent.getIterator(fromKey, toKey, descending), deleted), iterator), COMPARATOR, descending);
-
+            if (false)
+                return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
+                        new IteratorParent(parent.getIterator(fromKey, toKey, descending), deleted), iterator), COMPARATOR, descending);
+            else
+                return ForkedIterator.make(parent.getIterator(fromKey, toKey, descending), iterator, COMPARATOR, descending);
         } finally {
             this.outUses();
         }
