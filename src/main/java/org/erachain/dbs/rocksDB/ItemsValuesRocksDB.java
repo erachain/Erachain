@@ -15,7 +15,7 @@ import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
 @Slf4j
-public class ItemsValuesRocksDB extends DBMapSuit<Fun.Tuple3<Long, Byte, Byte>, byte[]> {
+public class ItemsValuesRocksDB extends DBMapSuit<Fun.Tuple3<Long, Byte, byte[]>, byte[]> {
 
     private final String NAME_TABLE = "ITEMS_VALUES_TABLE";
 
@@ -26,13 +26,13 @@ public class ItemsValuesRocksDB extends DBMapSuit<Fun.Tuple3<Long, Byte, Byte>, 
     @Override
     public void openMap() {
 
-        ByteableTuple3<Long, Byte, Byte> byteableElement = new ByteableTuple3<Long, Byte, Byte>() {
+        ByteableTuple3<Long, Byte, byte[]> byteableElement = new ByteableTuple3<Long, Byte, byte[]>() {
             @Override
             public int[] sizeElements() {
-                return new int[]{Integer.BYTES, Byte.BYTES, Byte.BYTES};
+                return new int[]{Long.BYTES, Byte.BYTES};
             }
         };
-        byteableElement.setByteables(new Byteable[]{new ByteableInteger(), new ByteableByte(), new ByteableByte()})
+        byteableElement.setByteables(new Byteable[]{new ByteableInteger(), new ByteableByte(), new ByteableByte()});
 
         map = new DBRocksDBTableDBCommitedAsBath<>(byteableElement,
                 new ByteableTrivial(), NAME_TABLE, indexes,

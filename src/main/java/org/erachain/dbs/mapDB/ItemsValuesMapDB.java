@@ -8,7 +8,7 @@ import org.mapdb.Fun;
 
 
 @Slf4j
-public class ItemsValuesMapDB extends DBMapSuit<Fun.Tuple3<Long, Byte, Byte>, byte[]> {
+public class ItemsValuesMapDB extends DBMapSuit<Fun.Tuple3<Long, Byte, byte[]>, byte[]> {
 
     public ItemsValuesMapDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger, false);
@@ -19,8 +19,7 @@ public class ItemsValuesMapDB extends DBMapSuit<Fun.Tuple3<Long, Byte, Byte>, by
 
         //OPEN MAP
         map = database.createTreeMap("items_values")
-                //.valueSerializer(new OrderSerializer())
-                .comparator(Fun.TUPLE3_COMPARATOR)
+                .comparator(new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
                 .makeOrGet();
 
         if (Controller.getInstance().onlyProtocolIndexing)

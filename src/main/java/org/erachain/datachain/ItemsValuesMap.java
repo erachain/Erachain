@@ -16,7 +16,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * Ключ: номер актив + байт тип + байт тип связи<br>
  * Значение: что угодно - byte[]<br>
  */
-public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, Byte>, byte[]> {
+public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]> {
 
     public ItemsValuesMap(int dbs, DCSet databaseSet, DB database) {
         super(dbs, databaseSet, database);
