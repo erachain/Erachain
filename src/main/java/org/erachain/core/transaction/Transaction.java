@@ -950,9 +950,11 @@ public abstract class Transaction implements ExplorerJsonLine, Jsonable {
         return dApp;
     }
 
-    public void resetSmartContract() {
-        dApp = null;
-        typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
+    public void resetEpochDAPP() {
+        if (dApp != null && dApp.isEpoch()) {
+            typeBytes[2] &= ~HAS_SMART_CONTRACT_MASK();
+            dApp = null;
+        }
     }
 
     public void makeItemsKeys() {
