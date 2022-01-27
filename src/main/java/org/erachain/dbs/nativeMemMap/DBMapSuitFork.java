@@ -28,13 +28,10 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     protected DBTab<T, U> parent;
     protected Comparator COMPARATOR;
 
-    /**
-     * пометка какие индексы не используются - отключим для ускорения
-     */
-    boolean OLD_USED_NOW = false;
-
-
     //ConcurrentHashMap deleted;
+    ///////// - если ключи набор байт или других примитивов - то неверный поиск в этом виде таблиц HashMap deleted;
+    /// поэтому берем медленный но правильный TreeMap
+    /// НЕТ - это определяется на лету при созданий - по типу ключа
     Map<T, Boolean> deleted;
     Boolean EXIST = true;
     int shiftSize;
@@ -283,9 +280,9 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.addUses();
         try {
 
-            Iterator<T> parentIterator = parent.getIterator();
             IteratorCloseable<T> iterator = new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                    new IteratorParent(parentIterator, deleted), map.keySet().iterator()), COMPARATOR, false);
+                    new IteratorParent(parent.getIterator(), deleted),
+                    map.keySet().iterator()), COMPARATOR, false);
 
             return iterator;
 
@@ -300,9 +297,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.addUses();
         try {
 
-            Iterator<T> parentIterator = parent.getDescendingIterator();
             return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                    new IteratorParent(parentIterator, deleted),
+                    new IteratorParent(parent.getDescendingIterator(), deleted),
                     ((NavigableMap) map).descendingMap().keySet().iterator()), COMPARATOR, true);
 
         } finally {
@@ -337,9 +333,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                                                 toKey == null ? HI : toKey).keySet().iterator());
             }
 
-            Iterator<T> parentIterator = parent.getIterator(fromKey, toKey, descending);
             return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                    new IteratorParent(parentIterator, deleted), iterator), COMPARATOR, descending);
+                    new IteratorParent(parent.getIterator(fromKey, toKey, descending), deleted), iterator), COMPARATOR, descending);
 
         } finally {
             this.outUses();

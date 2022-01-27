@@ -1,11 +1,9 @@
 package org.erachain.datachain;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 import org.erachain.core.item.ItemCls;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.dbs.MergedOR_IteratorsNoDuplicates;
 import org.erachain.dbs.mapDB.ItemsValuesMapDB;
 import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.ItemsValuesRocksDB;
@@ -66,14 +64,8 @@ public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]
         Tuple3<Long, Byte, byte[]> fromKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? itemIssuedBytesMAX : itemIssuedBytesMIN);
         Tuple3<Long, Byte, byte[]> toKey = new Tuple3<>(personKey, (byte) ItemCls.PERSON_TYPE, descending ? itemIssuedBytesMIN : itemIssuedBytesMAX);
 
-        if (true || parent == null) {
-            return getIterator(fromKey, toKey, descending);
-        } else {
-            return new MergedOR_IteratorsNoDuplicates((Iterable) ImmutableList.of(
-                    parent.getIterator(fromKey, toKey, descending),
-                    getIterator(fromKey, toKey, descending)),
-                    new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR), descending);
-        }
+        return getIterator(fromKey, toKey, descending);
+
     }
 
     public byte[] makeIssuedItemKey(ItemCls item) {
