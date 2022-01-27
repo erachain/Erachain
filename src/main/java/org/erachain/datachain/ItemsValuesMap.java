@@ -44,7 +44,8 @@ public class ItemsValuesMap extends DBTabImpl<Tuple3<Long, Byte, byte[]>, byte[]
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
                 default:
-                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.TUPLE3_COMPARATOR, this);
+                    map = new NativeMapTreeMapFork(parent, databaseSet,
+                            new Fun.Tuple3Comparator<>(Fun.COMPARATOR, Fun.COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR), this);
             }
         }
     }
